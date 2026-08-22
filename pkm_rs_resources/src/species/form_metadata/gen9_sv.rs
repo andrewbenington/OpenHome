@@ -103,7 +103,7 @@ impl PersonalInfo for PersonalInfoScarletViolet {
 }
 
 pub type PersonalTableScarletViolet =
-    PersonalTable<PersonalInfoScarletViolet, SV_PERSONAL_FILE_SIZE, SV_ENTRY_SIZE>;
+    PersonalTable<PersonalInfoScarletViolet, SV_ENTRY_SIZE>;
 
 pub struct MetadataTableScarletViolet {
     personal_table: PersonalTableScarletViolet,
@@ -126,10 +126,6 @@ impl MetadataTable for MetadataTableScarletViolet {
 
     fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats> {
         self.personal_table.get_base_stats(national_dex, form_index)
-    }
-
-    fn get_source_name(&self) -> &'static str {
-        "Scarlet/Violet"
     }
 }
 

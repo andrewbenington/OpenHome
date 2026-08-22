@@ -153,7 +153,7 @@ impl PersonalInfo for PersonalInfoGen4 {
 }
 
 pub type PersonalTableDiamondPearl =
-    PersonalTable<PersonalInfoGen4, DIAMOND_PEARL_PERSONAL_FILE_SIZE, GEN4_ENTRY_SIZE>;
+    PersonalTable<PersonalInfoGen4, GEN4_ENTRY_SIZE>;
 
 #[derive(Debug)]
 pub struct MetadataTableDiamondPearl {
@@ -178,14 +178,10 @@ impl MetadataTable for MetadataTableDiamondPearl {
     fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats> {
         self.personal.get_base_stats(national_dex, form_index)
     }
-
-    fn get_source_name(&self) -> &'static str {
-        "Diamond/Pearl"
-    }
 }
 
 pub type PersonalTablePlatinumHgss =
-    PersonalTable<PersonalInfoGen4, PLATINUM_HGSS_PERSONAL_FILE_SIZE, GEN4_ENTRY_SIZE>;
+    PersonalTable<PersonalInfoGen4, GEN4_ENTRY_SIZE>;
 
 #[derive(Debug)]
 pub struct MetadataTablePlatinumHgss {
@@ -209,10 +205,6 @@ impl MetadataTable for MetadataTablePlatinumHgss {
 
     fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats> {
         self.personal.get_base_stats(national_dex, form_index)
-    }
-
-    fn get_source_name(&self) -> &'static str {
-        "Platinum/HeartGold/SoulSilver"
     }
 }
 

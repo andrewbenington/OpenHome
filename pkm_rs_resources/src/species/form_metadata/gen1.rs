@@ -82,7 +82,7 @@ impl PersonalInfo for PersonalInfoGen1 {
 }
 
 pub type PersonalTableGen1 =
-    PersonalTable<PersonalInfoGen1, GEN1_PERSONAL_FILE_SIZE, GEN1_ENTRY_SIZE>;
+    PersonalTable<PersonalInfoGen1, GEN1_ENTRY_SIZE>;
 
 #[derive(Debug)]
 pub struct MetadataTableGen1 {
@@ -106,10 +106,6 @@ impl MetadataTable for MetadataTableGen1 {
 
     fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats> {
         self.personal.get_base_stats(national_dex, form_index)
-    }
-
-    fn get_source_name(&self) -> &'static str {
-        "Red/Blue"
     }
 }
 

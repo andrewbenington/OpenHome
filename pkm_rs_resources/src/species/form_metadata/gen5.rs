@@ -108,7 +108,7 @@ impl PersonalInfo for PersonalInfoBw {
 }
 
 pub type PersonalTableBw =
-    PersonalTable<PersonalInfoBw, BLACK_WHITE_PERSONAL_FILE_SIZE, BW_ENTRY_SIZE>;
+    PersonalTable<PersonalInfoBw, BW_ENTRY_SIZE>;
 
 #[derive(Debug)]
 pub struct MetadataTableBw {
@@ -132,10 +132,6 @@ impl MetadataTable for MetadataTableBw {
 
     fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats> {
         self.personal.get_base_stats(national_dex, form_index)
-    }
-
-    fn get_source_name(&self) -> &'static str {
-        "Black/White"
     }
 }
 
@@ -215,7 +211,7 @@ impl PersonalInfo for PersonalInfoB2W2 {
 }
 
 pub type PersonalTableB2W2 =
-    PersonalTable<PersonalInfoB2W2, B2W2_PERSONAL_FILE_SIZE, B2W2_ENTRY_SIZE>;
+    PersonalTable<PersonalInfoB2W2, B2W2_ENTRY_SIZE>;
 
 #[derive(Debug)]
 pub struct MetadataTableB2W2 {
@@ -239,10 +235,6 @@ impl MetadataTable for MetadataTableB2W2 {
 
     fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats> {
         self.personal.get_base_stats(national_dex, form_index)
-    }
-
-    fn get_source_name(&self) -> &'static str {
-        "Black 2/White 2"
     }
 }
 

@@ -98,7 +98,7 @@ impl PersonalInfo for PersonalInfoGen7Alola {
 }
 
 pub type PersonalTableSunMoon =
-    PersonalTable<PersonalInfoGen7Alola, SUN_MOON_PERSONAL_FILE_SIZE, GEN7_ALOLA_ENTRY_SIZE>;
+    PersonalTable<PersonalInfoGen7Alola, GEN7_ALOLA_ENTRY_SIZE>;
 
 #[derive(Debug)]
 pub struct MetadataTableSunMoon {
@@ -123,14 +123,10 @@ impl MetadataTable for MetadataTableSunMoon {
     fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats> {
         self.personal.get_base_stats(national_dex, form_index)
     }
-
-    fn get_source_name(&self) -> &'static str {
-        "Sun/Moon"
-    }
 }
 
 pub type PersonalTableUsum =
-    PersonalTable<PersonalInfoGen7Alola, USUM_PERSONAL_FILE_SIZE, GEN7_ALOLA_ENTRY_SIZE>;
+    PersonalTable<PersonalInfoGen7Alola, GEN7_ALOLA_ENTRY_SIZE>;
 
 #[derive(Debug)]
 pub struct MetadataTableUsum {
@@ -154,10 +150,6 @@ impl MetadataTable for MetadataTableUsum {
 
     fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats> {
         self.personal.get_base_stats(national_dex, form_index)
-    }
-
-    fn get_source_name(&self) -> &'static str {
-        "Ultra Sun/Ultra Moon"
     }
 }
 

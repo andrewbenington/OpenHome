@@ -90,7 +90,7 @@ impl PersonalInfo for PersonalInfoLetsGo {
 }
 
 pub type PersonalTableLetsGo =
-    PersonalTable<PersonalInfoLetsGo, LGPE_PERSONAL_FILE_SIZE, LGPE_ENTRY_SIZE>;
+    PersonalTable<PersonalInfoLetsGo, LGPE_ENTRY_SIZE>;
 
 #[derive(Debug)]
 pub struct MetadataTableLetsGo {
@@ -114,9 +114,5 @@ impl MetadataTable for MetadataTableLetsGo {
 
     fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats> {
         self.personal.get_base_stats(national_dex, form_index)
-    }
-
-    fn get_source_name(&self) -> &'static str {
-        "Sun/Moon"
     }
 }
