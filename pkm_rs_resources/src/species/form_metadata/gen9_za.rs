@@ -11,7 +11,6 @@ const ZA_PERSONAL_BYTES: &[u8; ZA_PERSONAL_FILE_SIZE] =
     include_bytes!("pkhex_bin/personal/personal_za");
 
 const ZA_LEVELUP_BYTES: &[u8] = include_bytes!("pkhex_bin/levelup/lvlmove_za.pkl");
-
 const ZA_ENTRY_SIZE: usize = 0x50;
 
 pub static METADATA_TABLE_ZA: MetadataTableLegendsZa = MetadataTableLegendsZa {
@@ -89,8 +88,7 @@ impl PersonalInfo for PersonalInfoLegendsZa {
     }
 }
 
-pub type PersonalTableLegendsZa =
-    PersonalTable<PersonalInfoLegendsZa, ZA_PERSONAL_FILE_SIZE, ZA_ENTRY_SIZE>;
+pub type PersonalTableLegendsZa = PersonalTable<PersonalInfoLegendsZa, ZA_ENTRY_SIZE>;
 
 #[derive(Debug)]
 pub struct MetadataTableLegendsZa {
@@ -114,10 +112,6 @@ impl MetadataTable for MetadataTableLegendsZa {
 
     fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats> {
         self.personal.get_base_stats(national_dex, form_index)
-    }
-
-    fn get_source_name(&self) -> &'static str {
-        "Legends: Z-A"
     }
 }
 

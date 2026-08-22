@@ -27,7 +27,7 @@ use tsify::Tsify;
 
 use crate::{
     ExpectLog,
-    levelup::LearnsetReader,
+    levelup::{LearnsetCondition, LearnsetFileReader, LearnsetReader},
     metadata_source::MetadataSource,
     species::{
         form,
@@ -93,16 +93,13 @@ fn format_bad_type_error(
 }
 
 #[derive(Debug, Clone)]
-pub struct PersonalTable<
-    INFO: PersonalInfo,
-    const TABLE_BYTE_LEN: usize,
-    const ENTRY_BYTE_LEN: usize,
->(&'static [u8; TABLE_BYTE_LEN], PhantomData<INFO>);
+pub struct PersonalTable<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize>(
+    &'static [u8],
+    PhantomData<INFO>,
+);
 
-impl<INFO: PersonalInfo, const TABLE_BYTE_LEN: usize, const ENTRY_BYTE_LEN: usize>
-    PersonalTable<INFO, TABLE_BYTE_LEN, ENTRY_BYTE_LEN>
-{
-    pub const fn from_pkl_bytes(bytes: &'static [u8; TABLE_BYTE_LEN]) -> Self {
+impl<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize> PersonalTable<INFO, ENTRY_BYTE_LEN> {
+    pub const fn from_pkl_bytes(bytes: &'static [u8]) -> Self {
         Self(bytes, PhantomData)
     }
 
@@ -157,6 +154,51 @@ impl<INFO: PersonalInfo, const TABLE_BYTE_LEN: usize, const ENTRY_BYTE_LEN: usiz
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct GameMetadata<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize> {
+    personal: PersonalTable<INFO, ENTRY_BYTE_LEN>,
+    learnsets: LearnsetFileReader,
+}
+
+impl<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize> GameMetadata<INFO, ENTRY_BYTE_LEN> {
+    fn get_types(&self, national_dex: u16, form_index: u16) -> Option<(PkmType, Option<PkmType>)> {
+        self.personal.get_types(national_dex, form_index)
+    }
+
+    fn get_game_index(&self, national_dex: u16, form_index: u16) -> Option<u16> {
+        self.personal.get_game_index(national_dex, form_index)
+    }
+
+    fn get_levelup_learnset(&self, national_dex: u16, form_index: u16) -> Option<LearnsetReader> {
+        self.learnsets
+            .learnset_at_index(self.get_game_index(national_dex, form_index)?)
+    }
+
+    fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats> {
+        self.personal.get_base_stats(national_dex, form_index)
+    }
+}
+
+impl<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize> MetadataTable
+    for GameMetadata<INFO, ENTRY_BYTE_LEN>
+{
+    fn get_types(&self, national_dex: u16, form_index: u16) -> Option<(PkmType, Option<PkmType>)> {
+        self.get_types(national_dex, form_index)
+    }
+
+    fn get_game_index(&self, national_dex: u16, form_index: u16) -> Option<u16> {
+        self.get_game_index(national_dex, form_index)
+    }
+
+    fn get_levelup_learnset(&self, national_dex: u16, form_index: u16) -> Option<LearnsetReader> {
+        self.get_levelup_learnset(national_dex, form_index)
+    }
+
+    fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats> {
+        self.get_base_stats(national_dex, form_index)
+    }
+}
+
 pub trait MetadataTable {
     fn get_types(&self, national_dex: u16, form_index: u16) -> Option<(PkmType, Option<PkmType>)>;
 
@@ -169,8 +211,6 @@ pub trait MetadataTable {
     fn form_is_present(&self, national_dex: u16, form_index: u16) -> bool {
         self.get_game_index(national_dex, form_index).is_some()
     }
-
-    fn get_source_name(&self) -> &'static str;
 }
 
 impl<T, U> MetadataTable for T
@@ -196,10 +236,6 @@ where
 
     fn form_is_present(&self, national_dex: u16, form_index: u16) -> bool {
         (**self).form_is_present(national_dex, form_index)
-    }
-
-    fn get_source_name(&self) -> &'static str {
-        (**self).get_source_name()
     }
 }
 
@@ -272,11 +308,6 @@ impl MetadataTableReader {
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "baseStats"))]
     pub fn base_stats(&self) -> BaseStats {
         self.get_base_stats()
-    }
-
-    #[cfg_attr(feature = "wasm", wasm_bindgen(getter = "sourceName"))]
-    pub fn source_name(&self) -> String {
-        self.inner.get_source_name().to_owned()
     }
 }
 
@@ -428,6 +459,25 @@ pub fn levelup_learnset_lookup(
         }
         None => most_recent_metadata_table_for(national_dex, form_index)
             .get_levelup_learnset(national_dex, form_index),
+    }
+}
+
+pub fn move_mastery_la_lookup(national_dex: u16, form_index: u16) -> Option<LearnsetReader> {
+    gen8_la::get_levelup_mastery(national_dex, form_index)
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getMoveMasteredLevelLa"))]
+pub fn get_move_mastered_level_la(national_dex: u16, form_index: u16, move_id: u16) -> Option<u8> {
+    crate::log!("get_move_mastered_level_la: {national_dex}, {form_index}, {move_id}");
+    let reader = move_mastery_la_lookup(national_dex, form_index)?;
+    crate::log!("reader present; move_id = {move_id}");
+    let move_data = reader.move_data_by_id(move_id)?;
+    crate::log!("move data: {move_data:?}");
+
+    if let LearnsetCondition::LevelUp(level) = move_data.condition {
+        Some(level)
+    } else {
+        None
     }
 }
 
