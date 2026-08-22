@@ -46,6 +46,19 @@ export default function PokedexLearnset(props: PokedexLearnsetProps) {
           ))}
         </>
       )}
+      {metadataSource === MetadataSource.LegendsZa && (
+        <>
+          <h3>Plus Moves:</h3>
+          {selectedForm.plusMovesLza()?.map((learnsetMove) => (
+            <Flex key={`${learnsetMove.move_id}-${learnsetMove.level}`} align="center" gap="2">
+              <p className="learnset-move-requirement">
+                {learnsetMove.level ? `Level ${learnsetMove.level}: ` : 'On Evolution: '}
+              </p>
+              <MoveCard move={learnsetMove.move_id} compact />
+            </Flex>
+          ))}
+        </>
+      )}
     </div>
   )
 }
