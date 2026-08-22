@@ -4,6 +4,7 @@ use crate::result::{Error, Result};
 use crate::sectioned_data::DataSection;
 use crate::util;
 
+use pkm_rs_resources::moves::la_tutor;
 use pkm_rs_types::FlagSet;
 use pkm_rs_types::OriginGame;
 use pkm_rs_types::Stats8;
@@ -126,6 +127,12 @@ impl LegendsArceusData {
                 unknown_f3: old.unknown_f3,
                 unknown_a0: old.unknown_a0,
             })
+        }
+    }
+
+    pub fn set_mastered_move(&mut self, move_id: u16) {
+        if let Some(tutor_index) = la_tutor::tutor_index_by_move_id(move_id) {
+            self.master_flags.set_flag(tutor_index, true);
         }
     }
 }

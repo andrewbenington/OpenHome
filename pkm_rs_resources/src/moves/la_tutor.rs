@@ -26,6 +26,6 @@ pub fn move_id_by_tutor_index_wasm(index: usize) -> Option<u16> {
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "laTutorIndexByMoveId"))]
 #[allow(clippy::missing_const_for_fn)]
-pub fn tutor_index_by_move_id(move_id: u16) -> Option<u16> {
-    super::index_lookup::index_by_move_id(&TUTOR_INDEX_BY_MOVE_ID, move_id)
+pub fn tutor_index_by_move_id(move_id: u16) -> Option<usize> {
+    super::index_lookup::index_by_move_id(&TUTOR_INDEX_BY_MOVE_ID, move_id).map(|idx| idx as usize)
 }

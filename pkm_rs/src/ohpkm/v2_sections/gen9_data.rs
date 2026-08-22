@@ -5,6 +5,7 @@ use crate::ohpkm::v2_sections::bytes_are_empty;
 use crate::result::{Error, Result};
 use crate::sectioned_data::DataSection;
 
+use pkm_rs_resources::moves::lza_plus;
 use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_types::{FlagSet, TeraType};
 use serde::Serialize;
@@ -129,6 +130,16 @@ pub struct LegendsZaData {
     pub tm_flags_dlc: FlagSet<LZA_DLC_TM_BYTES>,
     pub plus_move_flags_c: FlagSet<LZA_PLUS_MOVES_BLOCK_C_BYTES>,
     pub plus_move_flags_d: FlagSet<LZA_PLUS_MOVES_BLOCK_D_BYTES>,
+}
+
+impl LegendsZaData {
+    pub fn set_plus_move(&mut self, move_id: u16) {
+        if let Some(block_c_index) = lza_plus::plus_move_index_by_move_id_block_c(move_id) {
+            self.plus_move_flags_c.set_flag(block_c_index, true);
+        } else if let Some(block_d_index) = lza_plus::plus_move_index_by_move_id_block_d(move_id) {
+            self.plus_move_flags_d.set_flag(block_d_index, true);
+        }
+    }
 }
 
 impl DataSection for LegendsZaData {

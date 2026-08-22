@@ -1790,6 +1790,8 @@ impl OhpkmV2 {
         let mut fixed_issues = Vec::<OhpkmIssue>::new();
 
         self.sync_learned_moves();
+        self.update_la_mastered_moves_by_current_level();
+        self.update_plus_moves_by_current_level();
 
         fixed_issues.append(&mut self.main_data.fix_errors());
 
@@ -1838,6 +1840,42 @@ impl OhpkmV2 {
 
     pub fn revert_ability_by_num(&mut self) {
         self.main_data.revert_ability_by_num()
+    }
+
+    fn update_la_mastered_moves_by_current_level(&mut self) {
+        let Some(move_mastery_data) = self.species_and_form().get_move_mastery_la() else {
+            return;
+        };
+
+        let current_level = self.calculate_level();
+
+        if let Some(la_data) = self.la_data.as_mut() {
+            for move_mastery in move_mastery_data.all_moves() {
+                if let LearnsetCondition::LevelUp(move_mastery_level) = move_mastery.get_condition()
+                    && current_level >= move_mastery_level
+                {
+                    la_data.set_mastered_move(move_mastery.move_id_raw());
+                }
+            }
+        };
+    }
+
+    fn update_plus_moves_by_current_level(&mut self) {
+        let Some(plus_move_data) = self.species_and_form().get_plus_moves_lza() else {
+            return;
+        };
+
+        let current_level = self.calculate_level();
+
+        if let Some(lza_data) = self.lza_data.as_mut() {
+            for plus_move in plus_move_data.all_moves() {
+                if let LearnsetCondition::LevelUp(plus_move_level) = plus_move.get_condition()
+                    && current_level >= plus_move_level
+                {
+                    lza_data.set_plus_move(plus_move.move_id_raw());
+                }
+            }
+        };
     }
 
     pub fn sync_learned_moves(&mut self) {
@@ -2640,6 +2678,8 @@ impl OhpkmV2 {
     #[wasm_bindgen(js_name = populateLearnedMoves)]
     pub fn populate_learned_moves_wasm(&mut self) {
         self.sync_learned_moves();
+        self.update_la_mastered_moves_by_current_level();
+        self.update_plus_moves_by_current_level();
     }
 
     #[wasm_bindgen(getter = homeTracker)]
@@ -3230,7 +3270,7 @@ impl OhpkmV2 {
     pub fn is_mastered_move_la(&self, move_id: u16) -> bool {
         if let Some(la_data) = self.la_data
             && let Some(flag) = la_tutor::tutor_index_by_move_id(move_id)
-            && la_data.master_flags.get_flag(flag as usize)
+            && la_data.master_flags.get_flag(flag)
         {
             true
         } else {
@@ -3510,10 +3550,10 @@ impl OhpkmV2 {
     pub fn is_plus_move(&self, move_id: u16) -> bool {
         if let Some(block_c_index) = lza_plus::plus_move_index_by_move_id_block_c(move_id) {
             self.plus_move_flags_lza_c()
-                .is_some_and(|flags| flags.get_flag(block_c_index as usize))
+                .is_some_and(|flags| flags.get_flag(block_c_index))
         } else if let Some(block_d_index) = lza_plus::plus_move_index_by_move_id_block_d(move_id) {
             self.plus_move_flags_lza_d()
-                .is_some_and(|flags| flags.get_flag(block_d_index as usize))
+                .is_some_and(|flags| flags.get_flag(block_d_index))
         } else {
             false
         }

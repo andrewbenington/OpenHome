@@ -43,8 +43,9 @@ pub fn move_id_by_plus_move_index_block_c_wasm(index: usize) -> Option<u16> {
     wasm_bindgen(js_name = "lzaPlusMoveIndexByMoveIdBlockC")
 )]
 #[allow(clippy::missing_const_for_fn)]
-pub fn plus_move_index_by_move_id_block_c(move_id: u16) -> Option<u16> {
+pub fn plus_move_index_by_move_id_block_c(move_id: u16) -> Option<usize> {
     super::index_lookup::index_by_move_id(&PLUS_MOVE_INDEX_BY_MOVE_ID_BLOCK_C, move_id)
+        .map(|idx| idx as usize)
 }
 
 const MOVE_ID_BY_PLUS_MOVE_INDEX_BLOCK_D: [u16; 93] = [
@@ -79,6 +80,7 @@ pub fn move_id_by_plus_move_index_block_d_wasm(index: usize) -> Option<u16> {
     wasm_bindgen(js_name = "lzaPlusMoveIndexByMoveIdBlockD")
 )]
 #[allow(clippy::missing_const_for_fn)]
-pub fn plus_move_index_by_move_id_block_d(move_id: u16) -> Option<u16> {
+pub fn plus_move_index_by_move_id_block_d(move_id: u16) -> Option<usize> {
     super::index_lookup::index_by_move_id(&PLUS_MOVE_INDEX_BY_MOVE_ID_BLOCK_D, move_id)
+        .map(|idx| idx as usize)
 }

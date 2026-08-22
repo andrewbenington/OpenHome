@@ -21,6 +21,10 @@ impl LearnsetMove {
     pub const fn get_condition(&self) -> LearnsetCondition {
         self.condition
     }
+
+    pub fn move_id_raw(&self) -> u16 {
+        self.move_id.to_raw().expect("learnset move has a valid id")
+    }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
@@ -104,7 +108,7 @@ impl LearnsetReader {
     pub fn move_data_by_id(&self, move_id: u16) -> Option<LearnsetMove> {
         (0..self.move_count())
             .filter_map(|index| self.get_move(index))
-            .find(|m| m.move_id.to_raw().is_some_and(|id| id == move_id))
+            .find(|m| m.move_id_raw() == move_id)
     }
 
     pub fn all_moves(&self) -> Vec<LearnsetMove> {
