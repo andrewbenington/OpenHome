@@ -91,7 +91,7 @@ impl PersonalInfo for PersonalInfoBdsp {
 }
 
 pub type PersonalTableBdsp =
-    PersonalTable<PersonalInfoBdsp, BDSP_PERSONAL_FILE_SIZE, BDSP_ENTRY_SIZE>;
+    PersonalTable<PersonalInfoBdsp, BDSP_ENTRY_SIZE>;
 
 #[derive(Debug)]
 pub struct MetadataTableBdsp {
@@ -115,9 +115,5 @@ impl MetadataTable for MetadataTableBdsp {
 
     fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats> {
         self.personal.get_base_stats(national_dex, form_index)
-    }
-
-    fn get_source_name(&self) -> &'static str {
-        "Brilliant Diamond/Shining Pearl"
     }
 }
