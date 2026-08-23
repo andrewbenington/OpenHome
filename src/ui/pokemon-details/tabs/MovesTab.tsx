@@ -23,10 +23,7 @@ const MovesTab = (props: { mon: PKMInterface }) => {
               move={move}
               movePP={mon.movePP[i]}
               maxPP={getMoveMaxPP(move, mon.format, mon.movePPUps[i])}
-              plusMove={
-                mon.plusMovesLzaBlockC?.some((m) => m.id === move) ||
-                mon.plusMovesLzaBlockD?.some((m) => m.id === move)
-              }
+              plusMove={mon.plusMoveFlags?.getMoveIds().some((id) => id === move)}
               masteredLa={
                 (mon instanceof PA8 || mon instanceof OHPKM) && mon.isMasteredMoveLa(move)
               }
@@ -35,7 +32,7 @@ const MovesTab = (props: { mon: PKMInterface }) => {
         </Flex>
       </div>
       <div className="pokemon-modal-card">
-        <h3 className="pokemon-modal-header">Relearn Moves</h3>
+        <h3 className="pokemon-modal-header">Egg/Event Moves</h3>
         <Inset side="x" p="0" mx="-2">
           <Separator />
         </Inset>

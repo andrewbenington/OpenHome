@@ -1,4 +1,8 @@
-use pkm_rs_resources::moves::{MoveIndex, lza_plus};
+use pkm_rs_resources::{
+    levelup::LearnsetCondition,
+    moves::{MoveIndex, lza_plus},
+    species::SpeciesForm,
+};
 use pkm_rs_types::FlagSet;
 
 pub const LZA_BASE_TM_BYTES: usize = 25;
@@ -45,6 +49,28 @@ impl PlusMoveFlags {
         for move_id in move_ids {
             self.add_move_id(move_id);
         }
+    }
+
+    pub fn add_all_for_species_at_level(&mut self, species_form: SpeciesForm, level: u8) {
+        let Some(plus_move_data) = species_form.get_plus_moves_lza() else {
+            return;
+        };
+
+        self.add_move_ids(
+            plus_move_data
+                .all_moves()
+                .iter()
+                .filter_map(|learnset_move| {
+                    if let LearnsetCondition::LevelUp(plus_move_level) =
+                        learnset_move.get_condition()
+                        && level >= plus_move_level
+                    {
+                        Some(learnset_move.move_id_raw())
+                    } else {
+                        None
+                    }
+                }),
+        );
     }
 
     pub fn add_all_from(&mut self, other: &PlusMoveFlags) {
@@ -142,6 +168,13 @@ impl PlusMoveFlags {
     #[wasm_bindgen(js_name = addAllFrom)]
     pub fn add_all_from_wasm(&mut self, other: &PlusMoveFlags) {
         self.add_all_from(other);
+    }
+
+    #[wasm_bindgen(js_name = withAllForSpeciesAtLevel)]
+    pub fn with_all_for_species_at_level(&self, species_form: SpeciesForm, level: u8) -> Self {
+        let mut copied = *self;
+        copied.add_all_for_species_at_level(species_form, level);
+        copied
     }
 
     #[wasm_bindgen(js_name = containsAllFrom)]

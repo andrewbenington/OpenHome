@@ -276,7 +276,10 @@ export default class PA9 {
       this.scale = other.scale ?? 0
       this.tmFlagsLzaBase = other.tmFlagsLzaBase ?? new Uint8Array(25)
       this.tmFlagsLzaDlc = other.tmFlagsLzaDlc ?? new Uint8Array(13)
-      this.plusMoveFlags = other.plusMoveFlags?.clone() ?? PlusMoveFlags.empty()
+      this.plusMoveFlags = (
+        other.plusMoveFlags?.clone() ?? PlusMoveFlags.empty()
+      ).withAllForSpeciesAtLevel(other.speciesAndForm, other.getLevel())
+
       this.nickname = converter.nickname(other)
 
       const moveFilter = MoveFilter.fromPkmClass(PA9)
