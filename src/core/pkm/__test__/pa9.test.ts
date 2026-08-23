@@ -1,4 +1,5 @@
 import { PA9 } from '@openhome-core/pkm'
+import { Moves } from '@openhome-core/resources'
 import { R } from '@openhome-core/util/functional'
 import { getDefaultConvertStrategy } from '@pkm-rs/pkg'
 import fs from 'fs'
@@ -9,6 +10,11 @@ import { initializeWasm } from './init'
 import { pkmTestFilePath } from './Ohpkm.test'
 ;(global as any).TextDecoder = TextDecoder
 
+function pa9FromTestFile(filename: string) {
+  const bytes = new Uint8Array(fs.readFileSync(pkmTestFilePath('pa9', filename)))
+  return PA9.fromBytes(bytes.buffer)
+}
+
 beforeAll(initializeWasm)
 
 describe('legends z-a conversion to bytes and back is lossless', async () => {
@@ -16,8 +22,7 @@ describe('legends z-a conversion to bytes and back is lossless', async () => {
   await initializeWasm()
 
   for (const file of files) {
-    const bytes = new Uint8Array(fs.readFileSync(pkmTestFilePath('pa9', file)))
-    const original = PA9.fromBytes(bytes.buffer)
+    const original = pa9FromTestFile(file)
     const roundTrip = PA9.fromBytes(PA9.fromBytes(original.toBytes()).toBytes())
 
     test(`round trip game of origin match - ${file}`, () => {
@@ -117,8 +122,9 @@ describe('legends z-a conversion to ohpkm and back is lossless', async () => {
     })
 
     test(`plus move flags match - ${file}`, () => {
-      expect(original.plusMoveFlagsLzaBlockC, 'Block C').toEqual(roundTrip.plusMoveFlagsLzaBlockC)
-      expect(original.plusMoveFlagsLzaBlockD, 'Block D').toEqual(roundTrip.plusMoveFlagsLzaBlockD)
+      expect(Array.from(original.plusMoveFlags.getMoveIds()).map((id) => Moves[id].name)).toEqual(
+        Array.from(roundTrip.plusMoveFlags.getMoveIds()).map((id) => Moves[id].name)
+      )
     })
   }
 })

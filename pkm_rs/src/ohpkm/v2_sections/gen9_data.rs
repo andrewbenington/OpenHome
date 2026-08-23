@@ -1,11 +1,14 @@
+use crate::gen9_lza::{
+    LZA_BASE_TM_BYTES, LZA_DLC_TM_BYTES, LZA_PLUS_MOVES_BLOCK_C_BYTES,
+    LZA_PLUS_MOVES_BLOCK_D_BYTES, PlusMoveFlags,
+};
 use crate::gen9_sv;
 use crate::ohpkm::issues::OhpkmIssue;
 use crate::ohpkm::v2::OhpkmSectionTag;
 use crate::ohpkm::v2_sections::bytes_are_empty;
 use crate::result::{Error, Result};
 use crate::sectioned_data::DataSection;
-
-use pkm_rs_resources::moves::lza_plus;
+use arrayref::{array_ref, mut_array_refs};
 use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_types::{FlagSet, TeraType};
 use serde::Serialize;
@@ -118,27 +121,17 @@ impl DataSection for ScarletVioletData {
     }
 }
 
-pub const LZA_BASE_TM_BYTES: usize = 25;
-pub const LZA_DLC_TM_BYTES: usize = 13;
-pub const LZA_PLUS_MOVES_BLOCK_C_BYTES: usize = 33;
-pub const LZA_PLUS_MOVES_BLOCK_D_BYTES: usize = 12;
-
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct LegendsZaData {
     pub tm_flags_base: FlagSet<LZA_BASE_TM_BYTES>,
     pub tm_flags_dlc: FlagSet<LZA_DLC_TM_BYTES>,
-    pub plus_move_flags_c: FlagSet<LZA_PLUS_MOVES_BLOCK_C_BYTES>,
-    pub plus_move_flags_d: FlagSet<LZA_PLUS_MOVES_BLOCK_D_BYTES>,
+    pub plus_moves: PlusMoveFlags,
 }
 
 impl LegendsZaData {
-    pub fn set_plus_move(&mut self, move_id: u16) {
-        if let Some(block_c_index) = lza_plus::plus_move_index_by_move_id_block_c(move_id) {
-            self.plus_move_flags_c.set_flag(block_c_index, true);
-        } else if let Some(block_d_index) = lza_plus::plus_move_index_by_move_id_block_d(move_id) {
-            self.plus_move_flags_d.set_flag(block_d_index, true);
-        }
+    pub fn add_plus_move_by_id(&mut self, move_id: u16) {
+        self.plus_moves.add_move_id(move_id);
     }
 }
 
@@ -151,31 +144,39 @@ impl DataSection for LegendsZaData {
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
         Self::ensure_buffer_size(bytes);
 
-        // try_into() will always succeed thanks to the buffer size check
-
         Ok(Self {
-            tm_flags_base: FlagSet::from_bytes(bytes[0..25].try_into().unwrap()),
-            tm_flags_dlc: FlagSet::from_bytes(bytes[25..38].try_into().unwrap()),
-            plus_move_flags_c: FlagSet::from_bytes(bytes[38..71].try_into().unwrap()),
-            plus_move_flags_d: FlagSet::from_bytes(bytes[71..83].try_into().unwrap()),
+            tm_flags_base: FlagSet::from_bytes(*array_ref![bytes, 0, LZA_BASE_TM_BYTES]),
+            tm_flags_dlc: FlagSet::from_bytes(*array_ref![bytes, 25, LZA_DLC_TM_BYTES]),
+            plus_moves: PlusMoveFlags::from_byte_blocks(
+                array_ref![bytes, 38, LZA_PLUS_MOVES_BLOCK_C_BYTES],
+                array_ref![bytes, 71, LZA_PLUS_MOVES_BLOCK_D_BYTES],
+            ),
         })
     }
 
     fn to_bytes(&self) -> Vec<u8> {
-        let mut bytes = [0u8; 83];
+        let mut bytes = [0u8; OhpkmSectionTag::LegendsZa.min_size()];
 
-        bytes[0..25].copy_from_slice(&self.tm_flags_base.to_bytes());
-        bytes[25..38].copy_from_slice(&self.tm_flags_dlc.to_bytes());
-        bytes[38..71].copy_from_slice(&self.plus_move_flags_c.to_bytes());
-        bytes[71..83].copy_from_slice(&self.plus_move_flags_d.to_bytes());
+        let (tm_base_bytes, tm_dlc_bytes, plus_block_c_bytes, plus_block_d_bytes) = mut_array_refs![
+            &mut bytes,
+            LZA_BASE_TM_BYTES,
+            LZA_DLC_TM_BYTES,
+            LZA_PLUS_MOVES_BLOCK_C_BYTES,
+            LZA_PLUS_MOVES_BLOCK_D_BYTES
+        ];
+
+        tm_base_bytes.copy_from_slice(&self.tm_flags_base.to_bytes());
+        tm_dlc_bytes.copy_from_slice(&self.tm_flags_dlc.to_bytes());
+
+        let (block_c, block_d) = self.plus_moves.to_bytes();
+
+        plus_block_c_bytes.copy_from_slice(&block_c);
+        plus_block_d_bytes.copy_from_slice(&block_d);
 
         bytes.to_vec()
     }
 
     fn is_empty(&self) -> bool {
-        self.tm_flags_base.is_empty()
-            && self.tm_flags_dlc.is_empty()
-            && self.plus_move_flags_c.is_empty()
-            && self.plus_move_flags_d.is_empty()
+        self.tm_flags_base.is_empty() && self.tm_flags_dlc.is_empty() && self.plus_moves.is_empty()
     }
 }

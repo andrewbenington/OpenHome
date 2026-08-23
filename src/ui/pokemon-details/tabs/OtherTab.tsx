@@ -54,12 +54,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
   const tmMovesSvBase = mon.tmMovesSV
   const tmMovesLzaBase = mon.tmMovesLzaBase
   const tmMovesLzaDlc = mon.tmMovesLzaDlc
-  const plusMovesLzaBlockC = mon.plusMovesLzaBlockC
-  const plusMovesLzaBlockD = mon.plusMovesLzaBlockD
-  const plusMovesLza =
-    plusMovesLzaBlockC || plusMovesLzaBlockD
-      ? [...(plusMovesLzaBlockC ?? []), ...(plusMovesLzaBlockD ?? [])]
-      : []
+  const plusMovesLza = Array.from(mon.plusMoveFlags?.getMoveIds() ?? []).map((id) => Moves[id])
 
   return (
     <div style={{ overflow: 'hidden', height: '100%' }}>

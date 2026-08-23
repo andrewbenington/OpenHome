@@ -2,12 +2,8 @@ import { bitwiseOrUint8Array, OHPKM } from '@openhome-core/pkm/OHPKM'
 import { ModernRibbons } from '@openhome-core/resources'
 import {
   LZA_DLC_TM_BYTES,
-  LZA_PLUS_MOVES_BLOCK_C_BYTES,
-  LZA_PLUS_MOVES_BLOCK_D_BYTES,
   movesFromLzaBaseTmFlags,
   movesFromLzaDlcTmFlags,
-  movesFromLzaPlusFlagsBlockC,
-  movesFromLzaPlusFlagsBlockD,
 } from '@openhome-core/resources/moves/flags'
 import * as byteLogic from '@openhome-core/util/byteLogic'
 import { Errorable, R } from '@openhome-core/util/functional'
@@ -25,6 +21,7 @@ import {
   MarkingsSixShapesColors,
   MetadataSummaryLookup,
   NatureIndex,
+  PlusMoveFlags,
   SpeciesLookup,
   TrainerMemory,
 } from '@pkm-rs/pkg'
@@ -109,8 +106,7 @@ export default class PA9 {
   homeTracker: bigint
   tmFlagsLzaBase: Uint8Array // 25 bytes
   tmFlagsLzaDlc: Uint8Array // 13 bytes
-  plusMoveFlagsLzaBlockC: Uint8Array // 33 bytes
-  plusMoveFlagsLzaBlockD: Uint8Array // 12 bytes
+  plusMoveFlags: PlusMoveFlags
   ribbons: string[]
   trainerGender: BinaryGender
   level: number
@@ -156,8 +152,11 @@ export default class PA9 {
       this.heightScalar = dataView.getUint8(0x48)
       this.weightScalar = dataView.getUint8(0x49)
       this.scale = dataView.getUint8(0x4a)
-      this.plusMoveFlagsLzaBlockC = new Uint8Array(buffer).slice(0xd6, 0xf7)
-      this.plusMoveFlagsLzaBlockD = new Uint8Array(buffer).slice(0x94, 0xa0)
+
+      const plusMovesBlockC = new Uint8Array(buffer).slice(0xd6, 0xf7)
+      const plusMovesBlockD = new Uint8Array(buffer).slice(0x60, 0x6c)
+      this.plusMoveFlags = PlusMoveFlags.fromByteBlocks(plusMovesBlockC, plusMovesBlockD)
+
       this.nickname = stringLogic.utf16BytesToString(buffer, 0x58, 12)
       this.moves = [
         dataView.getUint16(0x72, true),
@@ -277,8 +276,7 @@ export default class PA9 {
       this.scale = other.scale ?? 0
       this.tmFlagsLzaBase = other.tmFlagsLzaBase ?? new Uint8Array(25)
       this.tmFlagsLzaDlc = other.tmFlagsLzaDlc ?? new Uint8Array(13)
-      this.plusMoveFlagsLzaBlockC = other.plusMoveFlagsLzaBlockC ?? new Uint8Array(33)
-      this.plusMoveFlagsLzaBlockD = other.plusMoveFlagsLzaBlockD ?? new Uint8Array(12)
+      this.plusMoveFlags = other.plusMoveFlags?.clone() ?? PlusMoveFlags.empty()
       this.nickname = converter.nickname(other)
 
       const moveFilter = MoveFilter.fromPkmClass(PA9)
@@ -418,8 +416,9 @@ export default class PA9 {
     dataView.setBigUint64(0x127, this.homeTracker)
     new Uint8Array(buffer).set(new Uint8Array(this.tmFlagsLzaBase.slice(0, 25)), 0x12f)
     new Uint8Array(buffer).set(new Uint8Array(this.tmFlagsLzaDlc.slice(0, 13)), 0x4b)
-    new Uint8Array(buffer).set(new Uint8Array(this.plusMoveFlagsLzaBlockC.slice(0, 33)), 0xd6)
-    new Uint8Array(buffer).set(new Uint8Array(this.plusMoveFlagsLzaBlockD.slice(0, 12)), 0x94)
+
+    new Uint8Array(buffer).set(new Uint8Array(this.plusMoveFlags.toBlockCBytes()), 0xd6)
+    new Uint8Array(buffer).set(new Uint8Array(this.plusMoveFlags.toBlockDBytes()), 0x94)
     byteLogic.setFlagIndexes(
       dataView,
       0x34,
@@ -464,30 +463,14 @@ export default class PA9 {
     )
   }
 
-  get plusMovesLzaBlockC() {
-    return this.plusMoveFlagsLzaBlockC
-      ? movesFromLzaPlusFlagsBlockC(this.plusMoveFlagsLzaBlockC)
-      : []
+  get plusMovesLza() {
+    return this.plusMoveFlags?.getMoveIds() ?? []
   }
 
-  unionPlusFlagsLzaBlockC(otherPlusFlags: Uint8Array) {
-    this.plusMoveFlagsLzaBlockC = bitwiseOrUint8Array(
-      this.plusMoveFlagsLzaBlockC || new Uint8Array(LZA_PLUS_MOVES_BLOCK_C_BYTES),
-      otherPlusFlags
-    )
-  }
-
-  get plusMovesLzaBlockD() {
-    return this.plusMoveFlagsLzaBlockD
-      ? movesFromLzaPlusFlagsBlockD(this.plusMoveFlagsLzaBlockD)
-      : []
-  }
-
-  unionPlusFlagsLzaBlockD(otherPlusFlags: Uint8Array) {
-    this.plusMoveFlagsLzaBlockD = bitwiseOrUint8Array(
-      this.plusMoveFlagsLzaBlockD || new Uint8Array(LZA_PLUS_MOVES_BLOCK_D_BYTES),
-      otherPlusFlags
-    )
+  unionPlusFlagsLza(otherPlusFlags: PlusMoveFlags) {
+    const updated = this.plusMoveFlags ?? PlusMoveFlags.empty()
+    updated.addAllFrom(otherPlusFlags)
+    this.plusMoveFlags = updated
   }
 
   public getStats() {

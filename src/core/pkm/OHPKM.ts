@@ -4,13 +4,9 @@ import { Gen34ContestRibbons, Gen34TowerRibbons } from '@openhome-core/resources
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import {
   LZA_DLC_TM_BYTES,
-  LZA_PLUS_MOVES_BLOCK_C_BYTES,
-  LZA_PLUS_MOVES_BLOCK_D_BYTES,
   movesFromLaTutorFlags,
   movesFromLzaBaseTmFlags,
   movesFromLzaDlcTmFlags,
-  movesFromLzaPlusFlagsBlockC,
-  movesFromLzaPlusFlagsBlockD,
   movesFromSvTmFlags,
   movesFromSwshTrFlags,
   SWSH_TR_BYTE_COUNT,
@@ -46,6 +42,7 @@ import {
   NatureIndex,
   OriginGames,
   PkmFormat,
+  PlusMoveFlags,
   PokeDate,
   Pokerus,
   ShinyLeaves,
@@ -335,8 +332,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
       this.tmFlagsLzaBase = other.tmFlagsLzaBase
       this.tmFlagsLzaDlc = other.tmFlagsLzaDlc
-      this.plusMoveFlagsLzaBlockC = other.plusMoveFlagsLzaBlockC
-      this.plusMoveFlagsLzaBlockD = other.plusMoveFlagsLzaBlockD
+      this.plusMoveFlags = other.plusMoveFlags?.clone()
 
       if (other.heightScalar !== undefined && other.weightScalar !== undefined) {
         this.heightScalar = other.heightScalar
@@ -567,30 +563,14 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     )
   }
 
-  get plusMovesLzaBlockC() {
-    return this.plusMoveFlagsLzaBlockC
-      ? movesFromLzaPlusFlagsBlockC(this.plusMoveFlagsLzaBlockC)
-      : []
+  get plusMovesLza() {
+    return this.plusMoveFlags?.getMoveIds() ?? []
   }
 
-  unionPlusFlagsLzaBlockC(otherPlusFlags: Uint8Array) {
-    this.plusMoveFlagsLzaBlockC = bitwiseOrUint8Array(
-      this.plusMoveFlagsLzaBlockC || new Uint8Array(LZA_PLUS_MOVES_BLOCK_C_BYTES),
-      otherPlusFlags
-    )
-  }
-
-  get plusMovesLzaBlockD() {
-    return this.plusMoveFlagsLzaBlockD
-      ? movesFromLzaPlusFlagsBlockD(this.plusMoveFlagsLzaBlockD)
-      : []
-  }
-
-  unionPlusFlagsLzaBlockD(otherPlusFlags: Uint8Array) {
-    this.plusMoveFlagsLzaBlockD = bitwiseOrUint8Array(
-      this.plusMoveFlagsLzaBlockD || new Uint8Array(LZA_PLUS_MOVES_BLOCK_D_BYTES),
-      otherPlusFlags
-    )
+  unionPlusFlagsLza(otherPlusFlags: PlusMoveFlags) {
+    const updated = this.plusMoveFlags ?? PlusMoveFlags.empty()
+    updated.addAllFrom(otherPlusFlags)
+    this.plusMoveFlags = updated
   }
 
   get tutorMovesLa() {
@@ -1062,24 +1042,13 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.unionTmFlagsLzaDlc(other.tmFlagsLzaDlc)
     }
 
-    if (
-      other.plusMoveFlagsLzaBlockC &&
-      !arraysEqual(this.plusMoveFlagsLzaBlockC, other.plusMoveFlagsLzaBlockC)
-    ) {
-      const thisFlags = this.plusMoveFlagsLzaBlockC
-      const otherFlags = other.plusMoveFlagsLzaBlockC
-      updates.push(syncUpdate('Plus moves (Block C)', thisFlags, otherFlags))
-      this.unionPlusFlagsLzaBlockC(other.plusMoveFlagsLzaBlockC)
-    }
-
-    if (
-      other.plusMoveFlagsLzaBlockD &&
-      !arraysEqual(this.plusMoveFlagsLzaBlockD, other.plusMoveFlagsLzaBlockD)
-    ) {
-      const thisFlags = this.plusMoveFlagsLzaBlockD
-      const otherFlags = other.plusMoveFlagsLzaBlockD
-      updates.push(syncUpdate('Plus moves (Block D)', thisFlags, otherFlags))
-      this.unionPlusFlagsLzaBlockD(other.plusMoveFlagsLzaBlockD)
+    if (other.plusMoveFlags) {
+      if (!this.plusMoveFlags) {
+        this.plusMoveFlags = other.plusMoveFlags.clone()
+      } else if (!this.plusMoveFlags.containsAllFrom(other.plusMoveFlags)) {
+        this.unionPlusFlagsLza(other.plusMoveFlags)
+      }
+      updates.push(syncUpdate('Plus moves', this.plusMoveFlags, other.plusMoveFlags))
     }
 
     if (other.obedienceLevel !== undefined && this.obedienceLevel !== other.obedienceLevel) {

@@ -1,11 +1,11 @@
 use std::num::NonZeroU64;
 
 use super::v2_sections::{
-    GameboyData, Gen45Data, Gen67Data, LZA_PLUS_MOVES_BLOCK_C_BYTES, LZA_PLUS_MOVES_BLOCK_D_BYTES,
-    LearnedMoves, LegendsArceusData, LegendsZaData, MainDataV2, MonTags, MostRecentSave, Notes,
-    PastHandlerDataV2, PluginData, SV_BASE_TM_BYTES_EXCLUDE_UNUSED, ScarletVioletData,
-    SwordShieldData,
+    GameboyData, Gen45Data, Gen67Data, LearnedMoves, LegendsArceusData, LegendsZaData, MainDataV2,
+    MonTags, MostRecentSave, Notes, PastHandlerDataV2, PluginData, SV_BASE_TM_BYTES_EXCLUDE_UNUSED,
+    ScarletVioletData, SwordShieldData,
 };
+use crate::gen9_lza::PlusMoveFlags;
 use crate::ohpkm::OhpkmConvert;
 #[allow(deprecated)]
 use crate::ohpkm::deprecated::PastHandlerDataV1;
@@ -19,7 +19,8 @@ use crate::traits::{HasSpeciesAndForm, IsShiny, PkmBytes};
 
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::moves::{MoveIndex, MoveSlots, la_tutor, lza_plus, lza_tm, sv_tm, swsh_tr};
+use pkm_rs_resources::levelup::LearnsetCondition;
+use pkm_rs_resources::moves::{MoveIndex, MoveSlots, la_tutor, lza_tm, sv_tm, swsh_tr};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesForm;
@@ -39,15 +40,13 @@ use pkm_rs_types::randomize::Randomize;
 #[cfg(feature = "wasm")]
 use super::JsResult;
 #[cfg(feature = "wasm")]
-use crate::gen9_sv;
+use crate::gen9_lza::{LZA_BASE_TM_BYTES, LZA_DLC_TM_BYTES};
 #[cfg(feature = "wasm")]
-use crate::ohpkm::v2_sections::{LZA_BASE_TM_BYTES, LZA_DLC_TM_BYTES};
+use crate::gen9_sv;
 #[cfg(feature = "wasm")]
 use crate::ohpkm::v2_sections::{MonTag, pkm_bytes};
 #[cfg(feature = "wasm")]
 use pkm_rs_resources::abilities::AbilityIndexWasm;
-#[cfg(feature = "wasm")]
-use pkm_rs_resources::levelup::LearnsetCondition;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -1426,12 +1425,8 @@ impl OhpkmV2 {
 
     // Legends Z-A
 
-    pub fn plus_move_flags_lza_c(&self) -> Option<FlagSet<{ LZA_PLUS_MOVES_BLOCK_C_BYTES }>> {
-        Some(self.lza_data?.plus_move_flags_c)
-    }
-
-    pub fn plus_move_flags_lza_d(&self) -> Option<FlagSet<{ LZA_PLUS_MOVES_BLOCK_D_BYTES }>> {
-        Some(self.lza_data?.plus_move_flags_d)
+    pub fn plus_moves_lza(&self) -> Option<PlusMoveFlags> {
+        Some(self.lza_data?.plus_moves)
     }
 
     // Past Handlers
@@ -1872,7 +1867,7 @@ impl OhpkmV2 {
                 if let LearnsetCondition::LevelUp(plus_move_level) = plus_move.get_condition()
                     && current_level >= plus_move_level
                 {
-                    lza_data.set_plus_move(plus_move.move_id_raw());
+                    lza_data.add_plus_move_by_id(plus_move.move_id_raw());
                 }
             }
         };
@@ -1928,19 +1923,7 @@ impl OhpkmV2 {
                 .filter_map(lza_tm::move_id_by_dlc_tm_index);
             learned_moves.add_moves(dlc_tm_move_ids);
 
-            let block_c_plus_move_ids = lza_data
-                .plus_move_flags_c
-                .get_flags()
-                .into_iter()
-                .filter_map(lza_plus::move_id_by_lza_plus_move_index_block_c);
-            learned_moves.add_moves(block_c_plus_move_ids);
-
-            let block_d_plus_move_ids = lza_data
-                .plus_move_flags_d
-                .get_flags()
-                .into_iter()
-                .filter_map(lza_plus::move_id_by_plus_move_index_block_d);
-            learned_moves.add_moves(block_d_plus_move_ids);
+            learned_moves.add_moves(lza_data.plus_moves.get_move_ids());
         };
 
         learned_moves.add_moves(self.main_data.relearn_moves);
@@ -3500,47 +3483,18 @@ impl OhpkmV2 {
         }
     }
 
-    #[wasm_bindgen(getter = plusMoveFlagsLzaBlockC)]
-    pub fn plus_move_flags_lza_c_wasm(&self) -> Option<Vec<u8>> {
-        Some(self.lza_data?.plus_move_flags_c.to_bytes().to_vec())
+    #[wasm_bindgen(getter = plusMoveFlags)]
+    pub fn plus_move_flags_lza_wasm(&self) -> Option<PlusMoveFlags> {
+        Some(self.lza_data?.plus_moves)
     }
 
-    #[wasm_bindgen(setter = plusMoveFlagsLzaBlockC)]
-    pub fn set_plus_move_flags_lza_c(&mut self, value: Option<Vec<u8>>) {
+    #[wasm_bindgen(setter = plusMoveFlags)]
+    pub fn set_plus_move_flags_lza_wasm(&mut self, value: Option<PlusMoveFlags>) {
         match value {
-            Some(flags) => {
-                let mut new_bytes = [0u8; LZA_PLUS_MOVES_BLOCK_C_BYTES];
-                dbg!(new_bytes, LZA_PLUS_MOVES_BLOCK_C_BYTES);
-                new_bytes.copy_from_slice(&flags);
-                self.lza_data.get_or_insert_default().plus_move_flags_c =
-                    FlagSet::<LZA_PLUS_MOVES_BLOCK_C_BYTES>::from_bytes(new_bytes);
-            }
+            Some(plus_moves) => self.lza_data.get_or_insert_default().plus_moves = plus_moves,
             None => {
                 if let Some(lza_data) = &mut self.lza_data {
-                    lza_data.plus_move_flags_c = FlagSet::default();
-                }
-            }
-        }
-    }
-
-    #[wasm_bindgen(getter = plusMoveFlagsLzaBlockD)]
-    pub fn plus_move_flags_lza_d_wasm(&self) -> Option<Vec<u8>> {
-        Some(self.lza_data?.plus_move_flags_d.to_bytes().to_vec())
-    }
-
-    #[wasm_bindgen(setter = plusMoveFlagsLzaBlockD)]
-    pub fn set_plus_move_flags_lza_d(&mut self, value: Option<Vec<u8>>) {
-        match value {
-            Some(flags) => {
-                let mut new_bytes = [0u8; LZA_PLUS_MOVES_BLOCK_D_BYTES];
-                dbg!(new_bytes, LZA_PLUS_MOVES_BLOCK_D_BYTES);
-                new_bytes.copy_from_slice(&flags);
-                self.lza_data.get_or_insert_default().plus_move_flags_d =
-                    FlagSet::<LZA_PLUS_MOVES_BLOCK_D_BYTES>::from_bytes(new_bytes);
-            }
-            None => {
-                if let Some(lza_data) = &mut self.lza_data {
-                    lza_data.plus_move_flags_d = FlagSet::default();
+                    lza_data.plus_moves = PlusMoveFlags::default();
                 }
             }
         }
@@ -3548,25 +3502,13 @@ impl OhpkmV2 {
 
     #[wasm_bindgen(js_name = isPlusMove)]
     pub fn is_plus_move(&self, move_id: u16) -> bool {
-        if let Some(block_c_index) = lza_plus::plus_move_index_by_move_id_block_c(move_id) {
-            self.plus_move_flags_lza_c()
-                .is_some_and(|flags| flags.get_flag(block_c_index))
-        } else if let Some(block_d_index) = lza_plus::plus_move_index_by_move_id_block_d(move_id) {
-            self.plus_move_flags_lza_d()
-                .is_some_and(|flags| flags.get_flag(block_d_index))
-        } else {
-            false
-        }
+        self.lza_data
+            .is_some_and(|lza_data| lza_data.plus_moves.is_plus_move(move_id))
     }
 
     #[wasm_bindgen(js_name = toByteArray)]
-    pub fn to_bytes_js_js(&self) -> Vec<u8> {
+    pub fn to_bytes_wasm(&self) -> Vec<u8> {
         self.to_bytes()
-    }
-
-    #[wasm_bindgen(js_name = fromV1Bytes)]
-    pub fn from_v1_bytes_js(bytes: Vec<u8>) -> JsResult<Self> {
-        Ok(OhpkmV1::from_bytes(&bytes).map(OhpkmV2::from_v1)?)
     }
 
     #[wasm_bindgen(js_name = getSectionBytes)]
