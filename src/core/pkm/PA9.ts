@@ -154,8 +154,8 @@ export default class PA9 {
       this.scale = dataView.getUint8(0x4a)
 
       const plusMovesBlockC = new Uint8Array(buffer).slice(0xd6, 0xf7)
-      const plusMovesBlockD = new Uint8Array(buffer).slice(0x60, 0x6c)
-      this.plusMoveFlags = PlusMoveFlags.fromByteBlocks(plusMovesBlockC, plusMovesBlockD)
+      const plusMovesBlockB = new Uint8Array(buffer).slice(0x60, 0x6c)
+      this.plusMoveFlags = PlusMoveFlags.fromByteBlocks(plusMovesBlockC, plusMovesBlockB)
 
       this.nickname = stringLogic.utf16BytesToString(buffer, 0x58, 12)
       this.moves = [
@@ -421,7 +421,7 @@ export default class PA9 {
     new Uint8Array(buffer).set(new Uint8Array(this.tmFlagsLzaDlc.slice(0, 13)), 0x4b)
 
     new Uint8Array(buffer).set(new Uint8Array(this.plusMoveFlags.toBlockCBytes()), 0xd6)
-    new Uint8Array(buffer).set(new Uint8Array(this.plusMoveFlags.toBlockDBytes()), 0x94)
+    new Uint8Array(buffer).set(new Uint8Array(this.plusMoveFlags.toBlockBBytes()), 0x94)
     byteLogic.setFlagIndexes(
       dataView,
       0x34,

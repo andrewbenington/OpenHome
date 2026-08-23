@@ -48,7 +48,7 @@ pub fn plus_move_index_by_move_id_block_c(move_id: u16) -> Option<usize> {
         .map(|idx| idx as usize)
 }
 
-const MOVE_ID_BY_PLUS_MOVE_INDEX_BLOCK_D: [u16; 93] = [
+const MOVE_ID_BY_PLUS_MOVE_INDEX_BLOCK_B: [u16; 93] = [
     4, 6, 13, 47, 80, 90, 102, 130, 138, 143, 147, 155, 160, 161, 176, 206, 207, 246, 252, 259,
     263, 295, 296, 299, 305, 307, 308, 318, 325, 329, 330, 333, 338, 402, 409, 410, 443, 451, 458,
     463, 464, 466, 480, 488, 490, 491, 503, 509, 524, 530, 533, 546, 547, 548, 618, 619, 620, 659,
@@ -56,31 +56,31 @@ const MOVE_ID_BY_PLUS_MOVE_INDEX_BLOCK_D: [u16; 93] = [
     830, 839, 854, 856, 858, 862, 864, 866, 874, 880, 885, 886, 889, 890, 891, 893,
 ];
 
-const MAX_VAL_BLOCK_D: usize =
-    super::index_lookup::max_value(&MOVE_ID_BY_PLUS_MOVE_INDEX_BLOCK_D) as usize;
+const MAX_VAL_BLOCK_B: usize =
+    super::index_lookup::max_value(&MOVE_ID_BY_PLUS_MOVE_INDEX_BLOCK_B) as usize;
 
-const PLUS_MOVE_INDEX_BY_MOVE_ID_BLOCK_D: [u16; MAX_VAL_BLOCK_D + 1] =
-    super::index_lookup::build_reverse(MOVE_ID_BY_PLUS_MOVE_INDEX_BLOCK_D);
+const PLUS_MOVE_INDEX_BY_MOVE_ID_BLOCK_B: [u16; MAX_VAL_BLOCK_B + 1] =
+    super::index_lookup::build_reverse(MOVE_ID_BY_PLUS_MOVE_INDEX_BLOCK_B);
 
-pub const fn move_id_by_plus_move_index_block_d(index: usize) -> Option<MoveIndex> {
-    super::index_lookup::move_id_by_index(&MOVE_ID_BY_PLUS_MOVE_INDEX_BLOCK_D, index)
+pub const fn move_id_by_plus_move_index_block_b(index: usize) -> Option<MoveIndex> {
+    super::index_lookup::move_id_by_index(&MOVE_ID_BY_PLUS_MOVE_INDEX_BLOCK_B, index)
 }
 
 #[cfg_attr(
     feature = "wasm",
-    wasm_bindgen(js_name = "moveIdByLzaPlusMoveIndexBlockD")
+    wasm_bindgen(js_name = "moveIdByLzaPlusMoveIndexBlockB")
 )]
 #[allow(clippy::missing_const_for_fn)]
-pub fn move_id_by_plus_move_index_block_d_wasm(index: usize) -> Option<u16> {
-    super::index_lookup::move_id_by_index_wasm(&MOVE_ID_BY_PLUS_MOVE_INDEX_BLOCK_D, index)
+pub fn move_id_by_plus_move_index_block_b_wasm(index: usize) -> Option<u16> {
+    super::index_lookup::move_id_by_index_wasm(&MOVE_ID_BY_PLUS_MOVE_INDEX_BLOCK_B, index)
 }
 
 #[cfg_attr(
     feature = "wasm",
-    wasm_bindgen(js_name = "lzaPlusMoveIndexByMoveIdBlockD")
+    wasm_bindgen(js_name = "lzaPlusMoveIndexByMoveIdBlockB")
 )]
 #[allow(clippy::missing_const_for_fn)]
-pub fn plus_move_index_by_move_id_block_d(move_id: u16) -> Option<usize> {
-    super::index_lookup::index_by_move_id(&PLUS_MOVE_INDEX_BY_MOVE_ID_BLOCK_D, move_id)
+pub fn plus_move_index_by_move_id_block_b(move_id: u16) -> Option<usize> {
+    super::index_lookup::index_by_move_id(&PLUS_MOVE_INDEX_BY_MOVE_ID_BLOCK_B, move_id)
         .map(|idx| idx as usize)
 }

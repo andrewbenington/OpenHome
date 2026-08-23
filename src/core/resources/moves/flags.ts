@@ -5,8 +5,8 @@ import {
   moveIdByLaTutorIndex,
   moveIdByLzaBaseTmIndex,
   moveIdByLzaDlcTmIndex,
+  moveIdByLzaPlusMoveIndexBlockB,
   moveIdByLzaPlusMoveIndexBlockC,
-  moveIdByLzaPlusMoveIndexBlockD,
   moveIdBySvTmIndex,
   moveIdBySwshTrIndex,
 } from '@pkm-rs/pkg'
@@ -51,7 +51,7 @@ export function movesFromSvTmFlags(flags: Uint8Array): Move[] {
 export const LZA_BASE_TM_BYTES = 25
 export const LZA_DLC_TM_BYTES = 13
 export const LZA_PLUS_MOVES_BLOCK_C_BYTES = 33
-export const LZA_PLUS_MOVES_BLOCK_D_BYTES = 12
+export const LZA_PLUS_MOVES_BLOCK_B_BYTES = 12
 
 export function movesFromLzaBaseTmFlags(flags: Uint8Array): Move[] {
   return getFlagsInArrayRange(flags, 0, LZA_BASE_TM_BYTES)
@@ -74,9 +74,9 @@ export function movesFromLzaPlusFlagsBlockC(flags: Uint8Array): Move[] {
     .map((index) => Moves[index])
 }
 
-export function movesFromLzaPlusFlagsBlockD(flags: Uint8Array): Move[] {
-  return getFlagsInArrayRange(flags, 0, LZA_PLUS_MOVES_BLOCK_D_BYTES)
-    .map(moveIdByLzaPlusMoveIndexBlockD)
+export function movesFromLzaPlusFlagsBlockB(flags: Uint8Array): Move[] {
+  return getFlagsInArrayRange(flags, 0, LZA_PLUS_MOVES_BLOCK_B_BYTES)
+    .map(moveIdByLzaPlusMoveIndexBlockB)
     .filter(filterUndefined)
     .map((index) => Moves[index])
 }
