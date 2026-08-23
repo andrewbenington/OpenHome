@@ -122,6 +122,146 @@ const GBStringDict: { [key: number]: string } = {
   0xff: '9',
 }
 
+export type GBEncoding = 'Int' | 'Jpn'
+
+/**
+ * The Japanese Gen 1/2 character table. Katakana run from 0x80 but omit ヘ
+ * and リ (the games share the hiragana glyphs for them); hiragana follow
+ * from 0xB1. Dakuten/handakuten kana are precomposed glyphs stored at low
+ * code points offset from their plain counterparts:
+ *   katakana + dakuten:    plain byte - 0x80 (ガ 0x05 ... ド 0x13, バ行 0x19-0x1C)
+ *   hiragana + dakuten:    plain byte - 0x90 (が 0x26 ... ど 0x34, ば行 0x3A-0x3E)
+ *   katakana + handakuten: plain byte - 0x59 (パ 0x40 ... ポ 0x43)
+ *   hiragana + handakuten: plain byte - 0x86 (ぱ 0x44 ... ぽ 0x48)
+ * ベ/ペ share the hiragana べ/ぺ glyphs (as ヘ shares へ).
+ */
+const GBStringDictJpn: { [key: number]: string } = (() => {
+  const dict: { [key: number]: string } = {
+    0x7f: ' ',
+    0xe3: 'ー',
+    0xe9: 'ァ',
+    0xea: 'ゥ',
+    0xeb: 'ェ',
+    0xef: '♂',
+    0xf4: 'ォ',
+    0xf5: '♀',
+  }
+  const katakana =
+    'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフホマミムメモヤユヨラルレロワヲンッャュョィ'
+  const hiragana =
+    'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんっゃゅょ'
+
+  ;[...katakana].forEach((char, i) => {
+    dict[0x80 + i] = char
+  })
+  ;[...hiragana].forEach((char, i) => {
+    dict[0xb1 + i] = char
+  })
+  for (let i = 0; i < 10; i++) {
+    dict[0xf6 + i] = i.toString()
+  }
+  const dakuten: { [key: string]: string } = {
+    カ: 'ガ',
+    キ: 'ギ',
+    ク: 'グ',
+    ケ: 'ゲ',
+    コ: 'ゴ',
+    サ: 'ザ',
+    シ: 'ジ',
+    ス: 'ズ',
+    セ: 'ゼ',
+    ソ: 'ゾ',
+    タ: 'ダ',
+    チ: 'ヂ',
+    ツ: 'ヅ',
+    テ: 'デ',
+    ト: 'ド',
+    ハ: 'バ',
+    ヒ: 'ビ',
+    フ: 'ブ',
+    ホ: 'ボ',
+    か: 'が',
+    き: 'ぎ',
+    く: 'ぐ',
+    け: 'げ',
+    こ: 'ご',
+    さ: 'ざ',
+    し: 'じ',
+    す: 'ず',
+    せ: 'ぜ',
+    そ: 'ぞ',
+    た: 'だ',
+    ち: 'ぢ',
+    つ: 'づ',
+    て: 'で',
+    と: 'ど',
+    は: 'ば',
+    ひ: 'び',
+    ふ: 'ぶ',
+    へ: 'べ',
+    ほ: 'ぼ',
+  }
+  const handakuten: { [key: string]: string } = {
+    ハ: 'パ',
+    ヒ: 'ピ',
+    フ: 'プ',
+    ホ: 'ポ',
+    は: 'ぱ',
+    ひ: 'ぴ',
+    ふ: 'ぷ',
+    へ: 'ぺ',
+    ほ: 'ぽ',
+  }
+
+  Object.entries({ ...dict }).forEach(([byteStr, char]) => {
+    const byte = parseInt(byteStr)
+
+    if (dakuten[char]) {
+      dict[byte - (byte < 0xb1 ? 0x80 : 0x90)] = dakuten[char]
+    }
+    if (handakuten[char]) {
+      dict[byte - (byte < 0xb1 ? 0x59 : 0x86)] = handakuten[char]
+    }
+  })
+  return dict
+})()
+
+const getGBStringDict = (encoding: GBEncoding) =>
+  encoding === 'Jpn' ? GBStringDictJpn : GBStringDict
+
+const buildEncodeMap = (dict: { [key: number]: string }) => {
+  const map = new Map<string, number>()
+
+  Object.entries(dict).forEach(([byteStr, char]) => {
+    if (!map.has(char)) {
+      map.set(char, parseInt(byteStr))
+    }
+  })
+  return map
+}
+
+// katakana that share their hiragana counterpart's code point, since the
+// games have no distinct glyph for them
+const KANA_SHARED_CODE_POINTS: [katakana: string, hiragana: string][] = [
+  ['ヘ', 'へ'],
+  ['リ', 'り'],
+  ['ベ', 'べ'],
+  ['ペ', 'ぺ'],
+]
+
+const gbEncodeMaps: Record<GBEncoding, Map<string, number>> = (() => {
+  const jpnMap = buildEncodeMap(GBStringDictJpn)
+
+  KANA_SHARED_CODE_POINTS.forEach(([katakana, hiragana]) => {
+    const byte = jpnMap.get(hiragana)
+
+    if (byte !== undefined) {
+      jpnMap.set(katakana, byte)
+    }
+  })
+  return { Int: buildEncodeMap(GBStringDict), Jpn: jpnMap }
+})()
+
 /**
  * Convert string to Gen 1/Gen 2 encoded bytes. Uses a proprietary encoding,
  * terminated with 0xff character. Characters not in Gen 3 character
@@ -129,20 +269,27 @@ const GBStringDict: { [key: number]: string } = {
  * @param str the string to encode
  * @param length character length of string
  * @param terminate include 0x50 at the end
+ * @param encoding 'Int' (default) or 'Jpn'
  * @returns UInt8Array of Gen 1/2 bytes
  */
-export const utf16StringToGen12 = (str: string, length: number, terminate: boolean) => {
+export const utf16StringToGen12 = (
+  str: string,
+  length: number,
+  terminate: boolean,
+  encoding: GBEncoding = 'Int'
+) => {
   const bufView = new Uint8Array(length)
+  const encodeMap = gbEncodeMaps[encoding]
 
   for (let i = 0; i < Math.min(str.length, length); i++) {
-    const gen12DictEntry = Object.entries(GBStringDict).find(([, val]) => val === str.charAt(i))
+    const gen12Byte = encodeMap.get(str.charAt(i))
 
     if (str.charCodeAt(i) === 0) {
       break
-    } else if (!gen12DictEntry) {
+    } else if (gen12Byte === undefined) {
       bufView[i] = 0xe6
     } else {
-      bufView[i] = parseInt(gen12DictEntry[0])
+      bufView[i] = gen12Byte
     }
   }
   if (terminate) {
@@ -161,8 +308,14 @@ export const utf16StringToGen12 = (str: string, length: number, terminate: boole
  * @param length character length of string
  * @returns string of decoded Gen 1/2 bytes
  */
-export const readGameBoyStringFromBytes = (dataView: DataView, offset: number, length: number) => {
+export const readGameBoyStringFromBytes = (
+  dataView: DataView,
+  offset: number,
+  length: number,
+  encoding: GBEncoding = 'Int'
+) => {
   let str = ''
+  const dict = getGBStringDict(encoding)
 
   for (let i = offset; i < offset + length; i += 1) {
     const character = dataView.getUint8(i)
@@ -170,8 +323,12 @@ export const readGameBoyStringFromBytes = (dataView: DataView, offset: number, l
     if (character === G1_TERMINATOR) {
       break
     }
+    if (encoding === 'Jpn' && character === 0) {
+      // some Japanese event mons (e.g. the ゲーフリ Mew) pad names with 0x00
+      break
+    }
 
-    str += GBStringDict[character] ?? '?'
+    str += dict[character] ?? '?'
   }
 
   return str
@@ -191,18 +348,20 @@ export const writeGameBoyStringToBytes = (
   str: string,
   offset: number,
   length: number,
-  terminate: boolean
+  terminate: boolean,
+  encoding: GBEncoding = 'Int'
 ) => {
+  const encodeMap = gbEncodeMaps[encoding]
+
   for (let i = 0; i < Math.min(str.length, length); i++) {
-    const character = str.charAt(i)
-    const dictEntry = Object.entries(GBStringDict).find(([, val]) => val === character)
+    const gen12Byte = encodeMap.get(str.charAt(i))
 
     if (str.charCodeAt(i) === 0) {
       break
-    } else if (!dictEntry) {
+    } else if (gen12Byte === undefined) {
       dataView.setUint8(offset + i, 0xe6)
     } else {
-      dataView.setUint8(offset + i, parseInt(dictEntry[0]))
+      dataView.setUint8(offset + i, gen12Byte)
     }
   }
 

@@ -3,7 +3,9 @@ import { BWSAV } from '@openhome-core/save/BWSAV'
 import { CompassSave } from '@openhome-core/save/compass/CompassSave'
 import { DPSAV } from '@openhome-core/save/DPSAV'
 import { G1SAV } from '@openhome-core/save/G1SAV'
+import { G1SAVJP } from '@openhome-core/save/G1SAVJP'
 import { G2SAV } from '@openhome-core/save/G2SAV'
+import { G2SAVJP } from '@openhome-core/save/G2SAVJP'
 import { G3SAV } from '@openhome-core/save/G3SAV'
 import { Gen7AlolaSave } from '@openhome-core/save/Gen7AlolaSave'
 import { BdspSave } from '@openhome-core/save/Gen89/BdspSave'
@@ -28,7 +30,9 @@ import { Dispatch, Reducer, createContext } from 'react'
 
 export const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
   G1SAV,
+  G1SAVJP,
   G2SAV,
+  G2SAVJP,
   G3SAV,
   DPSAV,
   PtSAV,
