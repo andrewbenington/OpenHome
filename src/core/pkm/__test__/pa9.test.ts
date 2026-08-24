@@ -128,7 +128,7 @@ describe('legends z-a conversion to ohpkm and back is lossless', async () => {
   }
 })
 
-describe("ohpkm sync doesn't crash", async () => {
+describe("pa9 - ohpkm sync doesn't crash", async () => {
   const files = fs.readdirSync(pkmTestFilePath('pa9')).filter((f) => f.endsWith('.pa9'))
   await initializeWasm()
 
