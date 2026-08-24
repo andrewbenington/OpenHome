@@ -1,0 +1,30 @@
+.pokemon-moves-card {
+  gap: 0;
+  padding: 0;
+}
+
+.pokemon-moves-card-content {
+  gap: 0.5rem;
+  padding: var(--padding-radius-sm-lg);
+}
+
+.pokemon-moves-card-header {
+  padding: var(--padding-radius-sm-lg);
+  margin: calc(-1 * var(--padding-radius-sm-lg)) calc(-1 / 2 * var(--padding-radius-sm-lg))
+    calc(-1 * var(--padding-radius-sm-lg)) calc(-1 * var(--padding-radius-sm-lg));
+}
+
+.pokemon-moves-card-title {
+  --diagonal-length: 1rem;
+
+  background-color: var(--gray-a6);
+  clip-path: polygon(
+    0% 0%,
+    0% 100%,
+    calc(100% - 0px) 100%,
+    calc(100% - var(--diagonal-length)) 0%,
+    100% 0%
+  );
+  padding: var(--padding-radius-xs-sm) 2rem var(--padding-radius-xs-sm) var(--padding-radius-sm-lg);
+  margin-right: auto;
+}

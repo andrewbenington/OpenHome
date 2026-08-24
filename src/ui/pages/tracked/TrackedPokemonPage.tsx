@@ -1,13 +1,15 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { SAV } from '@openhome-core/save/interfaces'
+import { R } from '@openhome-core/util/functional'
 import { numericSorter } from '@openhome-core/util/sort'
 import Badge from '@openhome-ui/components/badge/Badge'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import MessageRibbon from '@openhome-ui/components/MessageRibbon'
 import SideTabNavigation from '@openhome-ui/components/side-tabs/SideTabNavigation'
-import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
-import { useSaves } from '@openhome-ui/state/saves'
+import useDisplayError from '@openhome-ui/hooks/displayError'
+import PokemonDetailsModal from '@openhome-ui/pokemon-details/PokemonDetailsModal'
+import { SaveError, saveErrorMessage, saveErrorTitle, useSaves } from '@openhome-ui/state/saves'
 import { Button, DropdownMenu, Flex } from '@radix-ui/themes'
 import { PropsWithChildren, ReactNode, useState } from 'react'
 import { useNavigate } from 'react-router'
@@ -194,10 +196,15 @@ function ForOneStateBody(props: ForOneStateBodyProps) {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const { getCurrentBank } = useBanksAndBoxes()
+  const displayError = useDisplayError()
 
   function openSaveAndNavToHome(save: SAV) {
-    saves.addSave(save)
-    navigate('/home')
+    saves.addSave(save).then(
+      R.match(
+        () => navigate('/home'),
+        (error: SaveError) => displayError(saveErrorTitle(error.type), saveErrorMessage(error))
+      )
+    )
   }
 
   function recoverToBox(boxIndex: number) {

@@ -4,6 +4,7 @@ use crate::result::{Error, Result};
 use crate::sectioned_data::DataSection;
 use crate::util;
 
+use pkm_rs_resources::moves::la_tutor;
 use pkm_rs_types::FlagSet;
 use pkm_rs_types::OriginGame;
 use pkm_rs_types::Stats8;
@@ -86,54 +87,6 @@ impl DataSection for SwordShieldData {
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
-pub struct BdspData {
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub tm_flags: FlagSet<14>,
-}
-
-impl BdspData {
-    pub fn from_v1(old: crate::ohpkm::v1::OhpkmV1) -> Option<Self> {
-        if !old.game_of_origin.is_bdsp() && bytes_are_empty(&old.tm_flags_bdsp) {
-            None
-        } else {
-            Some(Self {
-                tm_flags: FlagSet::from_bytes(old.tm_flags_bdsp),
-            })
-        }
-    }
-}
-
-impl DataSection for BdspData {
-    type TagType = OhpkmSectionTag;
-    const TAG: Self::TagType = OhpkmSectionTag::BdspTmFlags;
-
-    type ErrorType = Error;
-
-    fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::ensure_buffer_size(bytes);
-
-        // try_into() will always succeed thanks to the buffer size check
-        Ok(Self {
-            tm_flags: FlagSet::from_bytes(bytes[0..14].try_into().unwrap()),
-        })
-    }
-
-    fn to_bytes(&self) -> Vec<u8> {
-        let mut bytes = [0u8; 14];
-
-        bytes.copy_from_slice(&self.tm_flags.to_bytes());
-
-        bytes.to_vec()
-    }
-
-    fn is_empty(&self) -> bool {
-        self.tm_flags.is_empty()
-    }
-}
-
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[cfg_attr(feature = "randomize", derive(Randomize))]
-#[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct LegendsArceusData {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub gvs: Stats8,
@@ -174,6 +127,12 @@ impl LegendsArceusData {
                 unknown_f3: old.unknown_f3,
                 unknown_a0: old.unknown_a0,
             })
+        }
+    }
+
+    pub fn set_mastered_move(&mut self, move_id: u16) {
+        if let Some(tutor_index) = la_tutor::tutor_index_by_move_id(move_id) {
+            self.master_flags.set_flag(tutor_index, true);
         }
     }
 }

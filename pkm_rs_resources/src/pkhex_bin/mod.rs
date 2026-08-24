@@ -70,3 +70,4 @@ pub(crate) const SV_LEVELUP_PKL: PklFileData = include_pkl!("levelup/lvlmove_sv.
 
 pub(crate) const LZA_PERSONAL_FILE: &[u8] = include_bytes!("personal/personal_za");
 pub(crate) const LZA_LEVELUP_PKL: PklFileData = include_pkl!("levelup/lvlmove_za.pkl");
+pub(crate) const LZA_PLUS_MOVES_PKL: PklFileData = include_pkl!("levelup/plus_za.pkl");
