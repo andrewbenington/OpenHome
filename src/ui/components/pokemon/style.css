@@ -172,6 +172,14 @@
   box-sizing: border-box;
 }
 
+.pp-up-indicator.missing:not(:last-child) {
+  margin-right: 1px;
+}
+
 .pp-up-indicator.present {
-  background-color: white;
+  background-color: var(--accent-a9);
+}
+
+.pp-up-indicator.present:not(:last-child) {
+  border-right: 1px solid #333a;
 }

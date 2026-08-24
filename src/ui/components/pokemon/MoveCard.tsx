@@ -97,7 +97,7 @@ const MoveCard = (props: MoveCardProps) => {
           )}
         </div>
       </OhoFlex.RowStart>
-      <OhoFlex.Row width="100%" gap="3px">
+      <OhoFlex.Row width="100%" gap="0">
         {ppUps !== undefined &&
           [1, 2, 3].map((ppUpNumber) => (
             <div
