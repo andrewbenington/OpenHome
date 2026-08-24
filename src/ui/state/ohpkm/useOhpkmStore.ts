@@ -1,4 +1,5 @@
 import useBackend from '@openhome-core/backend/useBackend'
+import { getMoveMaxPP } from '@openhome-core/pkm'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import {
   getMonFileIdentifier,
@@ -217,8 +218,17 @@ export function useOhpkmStore() {
 
       const mon = result.data
       const newMoves: FourMoves = [...mon.moves]
+
       newMoves[slot] = moveId ?? 0
-      mon.moves = newMoves
+
+      mon.moves = fixMoveSlots(newMoves, newMoves)
+
+      mon.movePP = [
+        getMoveMaxPP(mon.moves[0], 'OHPKM', mon.movePPUps[0]) ?? 0,
+        getMoveMaxPP(mon.moves[1], 'OHPKM', mon.movePPUps[1]) ?? 0,
+        getMoveMaxPP(mon.moves[2], 'OHPKM', mon.movePPUps[2]) ?? 0,
+        getMoveMaxPP(mon.moves[3], 'OHPKM', mon.movePPUps[3]) ?? 0,
+      ]
 
       insertOrUpdate(mon)
       return R.Ok(mon)
@@ -388,6 +398,21 @@ export function useOhpkmStore() {
 
     replaceHeldItem,
   }
+}
+
+function fixMoveSlots(slots: FourMoves, moves: FourMoves): FourMoves {
+  const dedupedMoves = Array.from(new Set(moves))
+
+  const presentSlots = [0, 1, 2, 3]
+    .filter((index) => Boolean(dedupedMoves.at(index)))
+    .map((index) => slots[index])
+
+  return [
+    presentSlots.at(0) ?? 0,
+    presentSlots.at(1) ?? 0,
+    presentSlots.at(2) ?? 0,
+    presentSlots.at(3) ?? 0,
+  ]
 }
 
 export type OhpkmStore = ReturnType<typeof useOhpkmStore>

@@ -50,10 +50,6 @@ export default function MovesTab(props: { mon: PKMInterface }) {
                 masteredLa={
                   (mon instanceof PA8 || mon instanceof OHPKM) && mon.isMasteredMoveLa(move)
                 }
-                onClick={() =>
-                  mon instanceof OHPKM &&
-                  ohpkmStore.setMonMove(mon.openhomeId, 13, i as MoveSlotIndex)
-                }
               />
             )
           )}

@@ -195,7 +195,7 @@ function MetadataSourceByFormat(format: MonFormat): MetadataSource {
   }
 }
 
-export const getMoveMaxPP = (moveIndex: number, format: string, ppUps = 0) => {
+export const getMoveMaxPP = (moveIndex: number, format: PkmOrOhpkmFormat, ppUps = 0) => {
   const move = Moves[moveIndex]
 
   if (!move) return undefined
@@ -259,13 +259,13 @@ export const adjustMovePPBetweenFormats = (
     moves: FourMoves
     movePP: FourMoves
     movePPUps: FourMoves
-    format: string
+    format: PkmOrOhpkmFormat
   },
   sourceFormatMon: {
     moves: FourMoves
     movePP: FourMoves
     movePPUps: FourMoves
-    format: string
+    format: PkmOrOhpkmFormat
   }
 ) => {
   return sourceFormatMon.moves.map((move, i) => {
