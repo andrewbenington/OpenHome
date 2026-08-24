@@ -65,7 +65,7 @@ export default function useOhpkmColumns(
       width: '3.5rem',
       sortFunction: stringSorter((mon) => mon.metadata?.type1),
       renderValue: (mon) =>
-        mon.metadata?.type1Index ? (
+        mon.metadata?.type1Index !== undefined ? (
           <TypeIcon size="1.5rem" typeIndex={mon.metadata?.type1Index} />
         ) : null,
       getFilterValue: (mon) => mon.metadata?.type1 || 'Unknown',
