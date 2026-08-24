@@ -29,4 +29,25 @@ export function addMissingFunctions() {
       return bytes
     }
   }
+
+  // for forEach on Map.values(), etc
+  const IteratorPrototype = getIteratorPrototype()
+
+  if (!IteratorPrototype.forEach) {
+    IteratorPrototype.forEach = function forEach(
+      callbackFn: (value: unknown, index: number) => void
+    ) {
+      if (typeof callbackFn !== 'function') {
+        throw new TypeError('callbackFn must be a function')
+      }
+      let index = 0
+      for (const value of this) {
+        callbackFn(value, index++)
+      }
+    }
+  }
+}
+
+function getIteratorPrototype() {
+  return Object.getPrototypeOf(Object.getPrototypeOf((function* () {})()))
 }
