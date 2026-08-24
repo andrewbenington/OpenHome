@@ -45,9 +45,9 @@ const BOX_NICKNAME_OFFSET = BOX_OT_OFFSET + BOX_CAPACITY * NAME_SIZE
 const BOX_SIZE = BOX_NICKNAME_OFFSET + BOX_CAPACITY * NAME_SIZE // 0x566
 
 // Japanese releases are titled ポケットモンスター 赤/緑/青/ピカチュウ
-const YELLOW_TITLES = ['yellow', 'ピカチュウ']
-const BLUE_TITLES = ['blue', '青']
-const GREEN_TITLES = ['green', '緑']
+const YELLOW_TITLES = ['yellow', 'ピカチュウ', 'pikachu']
+const BLUE_TITLES = ['blue', '青', 'ao']
+const GREEN_TITLES = ['green', '緑', 'midori']
 
 const TRAINER_NAME_OFFSET = 0x2598
 const TID_OFFSET = 0x25fb
