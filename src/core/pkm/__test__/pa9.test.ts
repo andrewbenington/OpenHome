@@ -71,8 +71,7 @@ describe('legends z-a conversion to ohpkm and back is lossless', async () => {
   await initializeWasm()
 
   for (const file of files) {
-    const bytes = new Uint8Array(fs.readFileSync(pkmTestFilePath('pa9', file)))
-    const original = PA9.fromBytes(bytes.buffer)
+    const original = pa9FromTestFile(file)
     const roundTrip = R.assert(
       PA9.fromOhpkm(OHPKM.fromMonUnknownSave(original), getDefaultConvertStrategy())
     )
@@ -125,6 +124,20 @@ describe('legends z-a conversion to ohpkm and back is lossless', async () => {
       expect(Array.from(original.plusMoveFlags.getMoveIds()).map((id) => Moves[id].name)).toEqual(
         Array.from(roundTrip.plusMoveFlags.getMoveIds()).map((id) => Moves[id].name)
       )
+    })
+  }
+})
+
+describe("ohpkm sync doesn't crash", async () => {
+  const files = fs.readdirSync(pkmTestFilePath('pa9')).filter((f) => f.endsWith('.pa9'))
+  await initializeWasm()
+
+  for (const file of files) {
+    const mon = pa9FromTestFile(file)
+
+    test(`sync doesn't crash - ${file}`, () => {
+      const ohpkm = OHPKM.defaultWithSpecies(mon.nationalDex, mon.formIndex)
+      ohpkm.syncWithGameData(mon)
     })
   }
 })
