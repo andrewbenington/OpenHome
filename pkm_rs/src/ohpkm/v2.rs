@@ -17,6 +17,8 @@ use crate::result::{Error, Result};
 use crate::sectioned_data::{DataSection, SectionTag, SectionedData};
 use crate::traits::{HasSpeciesAndForm, IsShiny, PkmBytes};
 
+#[cfg(feature = "wasm")]
+use arrayref::array_ref;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::{MoveIndex, MoveSlots, la_tutor, lza_tm, sv_tm, swsh_tr};
@@ -2569,7 +2571,7 @@ impl OhpkmV2 {
 
     #[wasm_bindgen(getter = nickname)]
     pub fn nickname_js(&self) -> String {
-        self.main_data.nickname.to_string()
+        self.nickname().to_string()
     }
 
     #[wasm_bindgen(setter = nickname)]
@@ -3446,11 +3448,9 @@ impl OhpkmV2 {
     pub fn set_tm_flags_lza_base_wasm(&mut self, value: Option<Vec<u8>>) {
         match value {
             Some(flags) => {
-                let mut new_bytes = [0u8; LZA_BASE_TM_BYTES];
-                dbg!(new_bytes, LZA_BASE_TM_BYTES);
-                new_bytes.copy_from_slice(&flags);
+                let sized_array = array_ref![flags, 0, LZA_BASE_TM_BYTES];
                 self.lza_data.get_or_insert_default().tm_flags_base =
-                    FlagSet::<LZA_BASE_TM_BYTES>::from_bytes(new_bytes);
+                    FlagSet::<LZA_BASE_TM_BYTES>::from_bytes(*sized_array);
             }
             None => {
                 if let Some(lza_data) = &mut self.lza_data {

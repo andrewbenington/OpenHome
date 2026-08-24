@@ -34,7 +34,7 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'home
 
   importMonsToLocation(mons: PKMInterface[], startingAt: MonLocation): void
 
-  addSave(save: SAV): void
+  addSave(save: SAV): Promise<Result<SAV, SaveError>>
   buildAndOpenSave: (filePath?: PathData | undefined) => Promise<Result<Option<SAV>, SaveError>>
   removeSave(save: SAV): void
   saveBoxNavigateLeft(save: SAV): void
@@ -364,62 +364,68 @@ export function useSaves(): SavesAndBanksManager {
   )
 
   const addSave = useCallback(
-    async (save: SAV) => {
-      await backend.addRecentSave(getSaveRef(save))
-      const result = await backend.registerInPokedex(pokedexSeenFromSave(save))
-      if (R.isErr(result)) {
-        console.error('Error registering pokedex entries from save:', result.error)
-      }
+    async (save: SAV): Promise<Result<SAV, SaveError>> => {
+      try {
+        await backend.addRecentSave(getSaveRef(save))
+        const result = await backend.registerInPokedex(pokedexSeenFromSave(save))
+        if (R.isErr(result)) {
+          console.error('Error registering pokedex entries from save:', result.error)
+        }
 
-      const allOhpkms = ohpkmStore.getAllStored()
-      for (const mon of allOhpkms) {
-        if (!monSupportedBySave(save, mon)) continue
+        const allOhpkms = ohpkmStore.getAllStored()
+        for (const mon of allOhpkms) {
+          if (!monSupportedBySave(save, mon)) continue
 
-        const matchingHandler = mon.matchingUnknownHandler(save.name, save.trainerGender)
-        if (!matchingHandler) continue
+          const matchingHandler = mon.matchingUnknownHandler(save.name, save.trainerGender)
+          if (!matchingHandler) continue
 
-        mon.updateTrainerData(
-          save,
-          matchingHandler.friendship,
-          matchingHandler.affection,
-          matchingHandler.memory
-        )
+          mon.updateTrainerData(
+            save,
+            matchingHandler.friendship,
+            matchingHandler.affection,
+            matchingHandler.memory
+          )
 
-        ohpkmStore.insertOrUpdate(mon)
-      }
+          ohpkmStore.insertOrUpdate(mon)
+        }
 
-      const toUpdate: OhpkmStoreData = {}
-      for (const mon of save.getAllMons()) {
-        const trackedData = ohpkmStore.loadIfTracked(mon)
-        if (trackedData) {
-          const updates = trackedData.syncWithGameData(mon, save)
+        const toUpdate: OhpkmStoreData = {}
+        for (const mon of save.getAllMons()) {
+          const trackedData = ohpkmStore.loadIfTracked(mon)
+          if (trackedData) {
+            const updates = trackedData.syncWithGameData(mon, save)
 
-          if (updates.length > 0) {
-            backend.log('DEBUG', `synced ${mon.nickname} with game data`, {
-              ohpkm_id: trackedData.openhomeId,
-              event: 'game_data_sync',
-              updates,
-            })
-          }
-
-          for (const update of updates) {
-            backend.log(
-              'INFO',
-              `${mon.nickname}: ${update.message ?? `Updated ${update.field} from ${JSON.stringify(update.prevValue)} to ${JSON.stringify(update.newValue)}`}`,
-              {
+            if (updates.length > 0) {
+              backend.log('DEBUG', `synced ${mon.nickname} with game data`, {
                 ohpkm_id: trackedData.openhomeId,
                 event: 'game_data_sync',
                 updates,
-              }
-            )
+              })
+            }
+
+            for (const update of updates) {
+              backend.log(
+                'INFO',
+                `${mon.nickname}: ${update.message ?? `Updated ${update.field} from ${JSON.stringify(update.prevValue)} to ${JSON.stringify(update.newValue)}`}`,
+                {
+                  ohpkm_id: trackedData.openhomeId,
+                  event: 'game_data_sync',
+                  updates,
+                }
+              )
+            }
+
+            toUpdate[trackedData.openhomeId] = trackedData
           }
-
-          toUpdate[trackedData.openhomeId] = trackedData
         }
-      }
 
-      ohpkmStore.insertOrUpdateAll(toUpdate)
-      openSavesDispatch({ type: 'add_save', payload: save })
+        ohpkmStore.insertOrUpdateAll(toUpdate)
+        openSavesDispatch({ type: 'add_save', payload: save })
+        return R.Ok(save)
+      } catch (e) {
+        console.error(e)
+        return R.Err({ type: 'OTHER', cause: String(e) })
+      }
     },
     [backend, openSavesDispatch, ohpkmStore]
   )
@@ -479,8 +485,7 @@ export function useSaves(): SavesAndBanksManager {
       if (!saveFile) {
         return R.Err({ type: 'UNRECOGNIZED' })
       } else {
-        addSave(saveFile)
-        return R.Ok(saveFile)
+        return addSave(saveFile)
       }
     },
     [addSave, allOpenSaves, backend, getEnabledSaveTypes, promptDisambiguation]
@@ -861,6 +866,10 @@ export type SaveError =
     }
   | {
       type: 'BUILD_SAVE'
+      cause: string
+    }
+  | {
+      type: 'OTHER'
       cause: string
     }
 

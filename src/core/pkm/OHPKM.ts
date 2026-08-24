@@ -3,6 +3,7 @@ import { isWasmFormat, WasmPkmFormat } from '@openhome-core/pkm/PKM'
 import { Gen34ContestRibbons, Gen34TowerRibbons } from '@openhome-core/resources'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import {
+  LZA_BASE_TM_BYTES,
   LZA_DLC_TM_BYTES,
   movesFromLaTutorFlags,
   movesFromLzaBaseTmFlags,
@@ -547,7 +548,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
   unionTmFlagsLzaBase(otherTmFlags: Uint8Array) {
     this.tmFlagsLzaBase = bitwiseOrUint8Array(
-      this.tmFlagsLzaBase || new Uint8Array(LZA_DLC_TM_BYTES),
+      this.tmFlagsLzaBase || new Uint8Array(LZA_BASE_TM_BYTES),
       otherTmFlags
     )
   }
@@ -1032,13 +1033,15 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
     if (other.tmFlagsLzaBase && !arraysEqual(this.tmFlagsLzaBase, other.tmFlagsLzaBase)) {
       updates.push(
-        syncUpdate('TM moves (Legends Z-A base game)', this.tmFlagsSVDLC, other.tmFlagsSVDLC)
+        syncUpdate('TM moves (Legends Z-A base game)', this.tmFlagsLzaBase, other.tmFlagsLzaBase)
       )
       this.unionTmFlagsLzaBase(other.tmFlagsLzaBase)
     }
 
     if (other.tmFlagsLzaDlc && !arraysEqual(this.tmFlagsLzaDlc, other.tmFlagsLzaDlc)) {
-      updates.push(syncUpdate('TM moves (Legends Z-A DLC)', this.tmFlagsSVDLC, other.tmFlagsSVDLC))
+      updates.push(
+        syncUpdate('TM moves (Legends Z-A DLC)', this.tmFlagsLzaDlc, other.tmFlagsLzaDlc)
+      )
       this.unionTmFlagsLzaDlc(other.tmFlagsLzaDlc)
     }
 

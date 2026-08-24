@@ -1,6 +1,7 @@
 import { bitwiseOrUint8Array, OHPKM } from '@openhome-core/pkm/OHPKM'
 import { ModernRibbons } from '@openhome-core/resources'
 import {
+  LZA_BASE_TM_BYTES,
   LZA_DLC_TM_BYTES,
   movesFromLzaBaseTmFlags,
   movesFromLzaDlcTmFlags,
@@ -417,8 +418,11 @@ export default class PA9 {
     dataView.setUint8(0x125, this.metLevel)
     types.writeHyperTrainStatsToBytes(dataView, 0x126, this.hyperTraining)
     dataView.setBigUint64(0x127, this.homeTracker)
-    new Uint8Array(buffer).set(new Uint8Array(this.tmFlagsLzaBase.slice(0, 25)), 0x12f)
-    new Uint8Array(buffer).set(new Uint8Array(this.tmFlagsLzaDlc.slice(0, 13)), 0x4b)
+    new Uint8Array(buffer).set(
+      new Uint8Array(this.tmFlagsLzaBase.slice(0, LZA_BASE_TM_BYTES)),
+      0x12f
+    )
+    new Uint8Array(buffer).set(new Uint8Array(this.tmFlagsLzaDlc.slice(0, LZA_DLC_TM_BYTES)), 0x4b)
 
     new Uint8Array(buffer).set(new Uint8Array(this.plusMoveFlags.toBlockCBytes()), 0xd6)
     new Uint8Array(buffer).set(new Uint8Array(this.plusMoveFlags.toBlockBBytes()), 0x94)
