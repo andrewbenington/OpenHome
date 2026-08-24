@@ -67,6 +67,10 @@ function mapErr<T, E, U>(transform: Mapper<E, U>): (result: Result<T, E>) => Res
   return (result) => (isErr(result) ? buildErr(transform(result.error)) : result)
 }
 
+function orElse<T, E>(fallback: T): (result: Result<T, E>) => T {
+  return (result) => (isOk(result) ? result.data : fallback)
+}
+
 function flatMap<T, E, U>(
   transform: (val: T) => Result<U, E>
 ): (result: Result<T, E>) => Result<U, E> {
@@ -151,5 +155,6 @@ export function $R<T, E>(r: Result<T, E>) {
     map: <U>(onOk: OnOk<T, U>) => map<T, E, U>(onOk)(r),
     flatMap: <U>(onOk: OnOk<T, Result<U, E>>) => flatMap<T, E, U>(onOk)(r),
     mapErr: <U>(onErr: OnErr<E, U>) => mapErr<T, E, U>(onErr)(r),
+    orElse: (ifErr: T) => orElse<T, E>(ifErr)(r),
   }
 }
