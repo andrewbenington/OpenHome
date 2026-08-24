@@ -1,4 +1,5 @@
 import useBackend from '@openhome-core/backend/useBackend'
+import { PkmOrOhpkmFormat } from '@openhome-core/pkm'
 import { fileTypeFromStringNonOhpkm } from '@openhome-core/pkm/FileImport'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM, originalDataTagToMonFormat } from '@openhome-core/pkm/OHPKM'
@@ -14,7 +15,6 @@ import { ArrowLeftIcon, ArrowRightIcon } from '@openhome-ui/components/Icons'
 import SideTabs from '@openhome-ui/components/side-tabs/SideTabs'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import MiniBoxIndicator, { MiniBoxIndicatorProps } from '@openhome-ui/saves/boxes/MiniBoxIndicator'
-import { PkmFormat } from '@pkm-rs/pkg/pkm_rs'
 import { Flex, Switch, VisuallyHidden } from '@radix-ui/themes'
 import { useCallback, useEffect, useState } from 'react'
 import { MdDownload } from 'react-icons/md'
@@ -96,7 +96,7 @@ export default function PokemonDetailsModal(props: PokemonDetailsModalProps) {
             <Dialog.Description>Detailed information about the selected Pokémon</Dialog.Description>
           </VisuallyHidden>
           <Fallback>
-            <ModalContents key={mon.calculateChecksum?.()} mon={mon} />
+            <ModalContents mon={mon} />
           </Fallback>
           <div className="modal-footer">
             <Flex gap="1" align="center" minWidth="7rem">
@@ -156,67 +156,55 @@ const TAB_QUERY_KEY = 'pokemon-modal-tab'
 
 function ModalContents(props: ModalContentsProps) {
   const { mon } = props
-  const [displayMon, setDisplayMon] = useState(mon)
+  const [currentFormat, setCurrentFormat] = useState<PkmOrOhpkmFormat>(mon?.format ?? 'OHPKM')
   const [isOriginal, setIsOriginal] = useState(false)
   const { defaultConvertStrategy } = useConvertStrategies()
   const backend = useBackend()
   const displayError = useDisplayError()
 
-  function updateIsOriginal(isOriginal: boolean) {
-    setIsOriginal(isOriginal)
-    if (isOriginal && mon instanceof OHPKM && mon.originalData) {
-      if (isOriginal && mon.originalData) {
-        const O = fileTypeFromStringNonOhpkm(originalDataTagToMonFormat(mon.originalData.tag))
-        if (O) {
-          setDisplayMon(O.fromBytes(mon.originalData.data.buffer as ArrayBuffer))
-          return
+  let displayMon = mon
+  if (isOriginal && mon instanceof OHPKM && mon.originalData) {
+    if (isOriginal && mon.originalData) {
+      const O = fileTypeFromStringNonOhpkm(originalDataTagToMonFormat(mon.originalData.tag))
+      if (O) {
+        displayMon = O.fromBytes(mon.originalData.data.buffer as ArrayBuffer)
+        return
+      }
+    }
+  } else if (mon.format !== currentFormat) {
+    if (currentFormat === 'OHPKM') {
+      displayMon = OHPKM.fromMonUnknownSave(mon)
+    } else {
+      const PkmClass = fileTypeFromStringNonOhpkm(currentFormat)
+
+      if (!PkmClass) {
+        throw `Invalid filetype: ${PkmClass}`
+      }
+
+      try {
+        if (
+          mon instanceof OHPKM &&
+          isOriginal &&
+          mon.originalData &&
+          originalDataTagToMonFormat(mon.originalData.tag) === currentFormat
+        ) {
+          const originalFormat = originalDataTagToMonFormat(mon.originalData.tag)
+          const OriginalPkmClass = fileTypeFromStringNonOhpkm(originalFormat) ?? PkmClass
+          displayMon = OriginalPkmClass.fromBytes(mon.originalData.data.buffer as ArrayBuffer)
+        } else {
+          const ohpkm = mon instanceof OHPKM ? mon : OHPKM.fromMonUnknownSave(mon)
+
+          $R(PkmClass.fromOhpkm(ohpkm, defaultConvertStrategy)).match(
+            (converted) => {
+              displayMon = converted
+            },
+            (error) => displayError(`Failed to convert OHPKM to ${PkmClass.getFormat()}`, error)
+          )
         }
+      } catch (e) {
+        console.error(e)
+        displayError(`Error converting to ${PkmClass.getFormat()}`, `${e}`)
       }
-      switchFormat(originalDataTagToMonFormat(mon.originalData.tag))
-    } else if (mon) {
-      switchFormat(mon.format)
-    }
-  }
-
-  function switchFormat(newFormat: PkmFormat | 'OHPKM') {
-    if (!mon) return
-    if (mon.format === newFormat) {
-      setDisplayMon(mon)
-      return
-    }
-
-    if (newFormat === 'OHPKM') {
-      setDisplayMon(mon instanceof OHPKM ? mon : OHPKM.fromMonUnknownSave(mon))
-      return
-    }
-
-    const PkmClass = fileTypeFromStringNonOhpkm(newFormat)
-
-    if (!PkmClass) {
-      throw `Invalid filetype: ${PkmClass}`
-    }
-
-    try {
-      if (
-        mon instanceof OHPKM &&
-        isOriginal &&
-        mon.originalData &&
-        originalDataTagToMonFormat(mon.originalData.tag) === newFormat
-      ) {
-        const originalFormat = originalDataTagToMonFormat(mon.originalData.tag)
-        const OriginalPkmClass = fileTypeFromStringNonOhpkm(originalFormat) ?? PkmClass
-        setDisplayMon(OriginalPkmClass.fromBytes(mon.originalData.data.buffer as ArrayBuffer))
-      } else {
-        const ohpkm = mon instanceof OHPKM ? mon : OHPKM.fromMonUnknownSave(mon)
-
-        $R(PkmClass.fromOhpkm(ohpkm, defaultConvertStrategy)).match(
-          (converted) => setDisplayMon(converted),
-          (error) => displayError(`Failed to convert OHPKM to ${PkmClass.getFormat()}`, error)
-        )
-      }
-    } catch (e) {
-      console.error(e)
-      displayError(`Error converting to ${PkmClass.getFormat()}`, `${e}`)
     }
   }
 
@@ -230,7 +218,7 @@ function ModalContents(props: ModalContentsProps) {
             color={displayMon.selectColor}
             formData={mon}
             disabled={isOriginal}
-            onChange={switchFormat}
+            onChange={setCurrentFormat}
           />
           <button
             className="mini-button"
@@ -264,12 +252,7 @@ function ModalContents(props: ModalContentsProps) {
         <div style={{ flex: 1 }} />
         {(isOriginal || (mon instanceof OHPKM && mon.originalData)) && (
           <Flex className="original-data-switch" align="center" gap="2">
-            <Switch
-              radius="full"
-              size="1"
-              checked={isOriginal}
-              onCheckedChange={updateIsOriginal}
-            />
+            <Switch radius="full" size="1" checked={isOriginal} onCheckedChange={setIsOriginal} />
             Show Original
           </Flex>
         )}

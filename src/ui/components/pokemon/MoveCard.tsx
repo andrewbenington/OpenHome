@@ -6,7 +6,7 @@ import { cssClass } from '@openhome-ui/util/style'
 import { PkmType, PkmTypes } from '@pkm-rs/pkg'
 import './style.css'
 
-interface MoveCardProps {
+type MoveCardProps = {
   move?: number
   movePP?: number
   maxPP?: number
@@ -15,24 +15,30 @@ interface MoveCardProps {
   masteredLa?: boolean
   plusMove?: boolean
   typeOverride?: PkmType
-}
+} & React.HTMLProps<HTMLDivElement>
 
 const MoveCard = (props: MoveCardProps) => {
   const { move } = props
   const moveData = move ? Moves[move] : undefined
-  if (!moveData) {
+  if (move && !moveData) {
     console.warn(`An unknown move has been detected. The move index is ${move}.`)
+  }
+
+  if (!moveData) {
     return (
       <div
+        {...props}
         className={cssClass('move-card')
           .with('move-card-small')
           .if(props.compact)
           .else('move-card-full')
+          .with(props.className)
           .build()}
         style={{
           backgroundColor: 'gray',
           color: 'white',
           opacity: 0.5,
+          ...props.style,
         }}
       >
         <div className="type-icon-container" />
@@ -60,7 +66,7 @@ const MoveCard = (props: MoveCardProps) => {
   const shouldShowPp = !props.compact && !props.noPP
 
   const content = (
-    <>
+    <div className="move-card">
       <div className="type-icon-container">
         <TypeIcon
           type={type}
@@ -87,7 +93,7 @@ const MoveCard = (props: MoveCardProps) => {
           <img className="move-icon" src={getPublicImageURL('icons/plus-move.png')} />
         )}
       </div>
-    </>
+    </div>
   )
 
   return (
@@ -101,6 +107,7 @@ const MoveCard = (props: MoveCardProps) => {
         backgroundColor: colorForType(type),
         color: contrastColorForType(type),
       }}
+      {...props}
     >
       {content}
     </div>

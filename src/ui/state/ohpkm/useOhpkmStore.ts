@@ -11,6 +11,7 @@ import { SAV } from '@openhome-core/save/interfaces'
 import { SAVClass } from '@openhome-core/save/util'
 import { expectExhaustive } from '@openhome-core/util'
 import { $R, Errorable, Option, R, Result } from '@openhome-core/util/functional'
+import { FourMoves } from '@openhome-core/util/types'
 import { Lookup, MarkingsSixShapesColors, ModernRibbon, OriginGames } from '@pkm-rs/pkg/pkm_rs'
 import dayjs from 'dayjs'
 import { createContext, useCallback, useContext } from 'react'
@@ -19,6 +20,8 @@ import { useConvertStrategies } from '../convert-strategies'
 import { useLookups } from '../lookups'
 
 export const FORCE_MISSED_LOOKUP = false
+
+export type MoveSlotIndex = 0 | 1 | 2 | 3
 
 export function useOhpkmStore() {
   const [ohpkmStore, updateStore] = useContext(OhpkmStoreContext)
@@ -207,6 +210,22 @@ export function useOhpkmStore() {
     [insertOrUpdate, tryLoadFromId]
   )
 
+  const setMonMove = useCallback(
+    (monId: string, moveId: Option<number>, slot: MoveSlotIndex) => {
+      const result = tryLoadFromId(monId)
+      if (R.isErr(result)) return result
+
+      const mon = result.data
+      const newMoves: FourMoves = [...mon.moves]
+      newMoves[slot] = moveId ?? 0
+      mon.moves = newMoves
+
+      insertOrUpdate(mon)
+      return R.Ok(mon)
+    },
+    [insertOrUpdate, tryLoadFromId]
+  )
+
   const setMonNickname = useCallback(
     (monId: string, nickname: Option<string>) => {
       const result = tryLoadFromId(monId)
@@ -357,6 +376,7 @@ export function useOhpkmStore() {
     updateMonAffixedRibbon,
     updateMonDisplayColor,
     setMonNickname,
+    setMonMove,
 
     getAllStored,
     updateAndConvertForSave,

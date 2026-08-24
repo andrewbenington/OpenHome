@@ -446,6 +446,7 @@ function SingleBoxMonDisplay() {
       </OpenHomeCtxMenu>
       <PokemonDetailsModal
         mon={selectedMon}
+        key={selectedMon?.openhomeId}
         onClose={() => setSelectedIndex(undefined)}
         navigateRight={navigateRight}
         navigateLeft={navigateLeft}
