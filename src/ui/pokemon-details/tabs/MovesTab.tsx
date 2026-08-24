@@ -46,6 +46,7 @@ export default function MovesTab(props: { mon: PKMInterface }) {
                 move={move}
                 movePP={mon.movePP[i]}
                 maxPP={getMoveMaxPP(move, mon.format, mon.movePPUps[i])}
+                ppUps={mon.movePPUps[i]}
                 plusMove={mon.plusMoveFlags?.getMoveIds().some((id) => id === move)}
                 masteredLa={
                   (mon instanceof PA8 || mon instanceof OHPKM) && mon.isMasteredMoveLa(move)

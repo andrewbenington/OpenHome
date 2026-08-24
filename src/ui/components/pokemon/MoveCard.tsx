@@ -4,12 +4,14 @@ import { getPublicImageURL } from '@openhome-ui/images/images'
 import { colorForType, contrastColorForType } from '@openhome-ui/util/color'
 import { cssClass } from '@openhome-ui/util/style'
 import { PkmType, PkmTypes } from '@pkm-rs/pkg'
+import OhoFlex from '../OhoFlex'
 import './style.css'
 
 type MoveCardProps = {
   move?: number
   movePP?: number
   maxPP?: number
+  ppUps?: number
   compact?: boolean
   noPP?: boolean
   masteredLa?: boolean
@@ -18,7 +20,7 @@ type MoveCardProps = {
 } & React.HTMLProps<HTMLDivElement>
 
 const MoveCard = (props: MoveCardProps) => {
-  const { move } = props
+  const { move, ppUps } = props
   const moveData = move ? Moves[move] : undefined
   if (move && !moveData) {
     console.warn(`An unknown move has been detected. The move index is ${move}.`)
@@ -67,32 +69,47 @@ const MoveCard = (props: MoveCardProps) => {
 
   const content = (
     <div className="move-card">
-      <div className="type-icon-container">
-        <TypeIcon
-          type={type}
-          key={`${type}_type_icon`}
-          size={props.compact ? '1.5rem' : '2rem'}
-          border
-        />
-      </div>
-      <div className="move-card-vert">
-        <div className="move-name" style={{ color: contrastColorForType(type) }}>
-          {moveData.name}
+      <OhoFlex.RowStart width="100%" height="100%">
+        <div className="type-icon-container">
+          <TypeIcon
+            type={type}
+            key={`${type}_type_icon`}
+            size={props.compact ? '1.5rem' : '2.5rem'}
+            border
+          />
         </div>
-        {shouldShowPp && (
-          <div className="move-pp-display">
-            {props.movePP ?? '--'}/{props.maxPP ?? '--'} PP
+        <div className="move-card-vert">
+          <div className="move-name" style={{ color: contrastColorForType(type) }}>
+            {moveData.name}
           </div>
-        )}
-      </div>
-      <div className="move-icons">
-        {props.masteredLa && (
-          <img className="move-icon" src={getPublicImageURL('icons/move-mastery.png')} />
-        )}
-        {props.plusMove && (
-          <img className="move-icon" src={getPublicImageURL('icons/plus-move.png')} />
-        )}
-      </div>
+          {shouldShowPp && (
+            <div className="move-pp-display">
+              {props.movePP ?? '--'}/{props.maxPP ?? '--'} PP
+            </div>
+          )}
+        </div>
+        <div className="move-icons">
+          {props.masteredLa && (
+            <img className="move-icon" src={getPublicImageURL('icons/move-mastery.png')} />
+          )}
+          {props.plusMove && (
+            <img className="move-icon" src={getPublicImageURL('icons/plus-move.png')} />
+          )}
+        </div>
+      </OhoFlex.RowStart>
+      <OhoFlex.Row width="100%" gap="3px">
+        {ppUps !== undefined &&
+          [1, 2, 3].map((ppUpNumber) => (
+            <div
+              className={cssClass('pp-up-indicator')
+                .with('missing')
+                .if(ppUps < ppUpNumber)
+                .else('present')
+                .build()}
+              key={`pp-up-${ppUpNumber}`}
+            />
+          ))}
+      </OhoFlex.Row>
     </div>
   )
 

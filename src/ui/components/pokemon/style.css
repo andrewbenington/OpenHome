@@ -100,17 +100,17 @@
 }
 
 .move-card {
-  flex: 1;
-  display: flex;
+  width: 100%;
+  height: 100%;
   border-radius: var(--border-radius-sm);
   flex-direction: column;
   align-items: center;
   display: flex;
-  flex-direction: row;
+  contain: paint;
 }
 
 .move-card-full {
-  height: 3rem;
+  height: 3.5rem;
 }
 
 .move-card-small {
@@ -160,4 +160,18 @@
   width: 1.5rem;
   aspect-ratio: 1;
   margin: -0.08rem 0;
+}
+
+.pp-up-indicator {
+  height: 0.4rem;
+  flex: 1;
+}
+
+.pp-up-indicator.missing {
+  background-color: #ffffff66;
+  box-sizing: border-box;
+}
+
+.pp-up-indicator.present {
+  background-color: white;
 }
