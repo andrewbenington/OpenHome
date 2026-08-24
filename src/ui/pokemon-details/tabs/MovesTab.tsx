@@ -2,8 +2,10 @@ import { PA8 } from '@openhome-core/pkm'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { getMoveMaxPP } from '@openhome-core/pkm/util'
+import { EditIcon } from '@openhome-ui/components/Icons'
+import OhoFlex from '@openhome-ui/components/OhoFlex'
 import MoveCard from '@openhome-ui/components/pokemon/MoveCard'
-import { Flex, Grid, Inset, Separator } from '@radix-ui/themes'
+import { Button, Flex, Grid, Inset, Separator } from '@radix-ui/themes'
 import './MovesTab.css'
 
 const MovesTab = (props: { mon: PKMInterface }) => {
@@ -11,12 +13,17 @@ const MovesTab = (props: { mon: PKMInterface }) => {
 
   return (
     <Flex className="pokemon-modal-content" direction="column" height="100%">
-      <div className="pokemon-modal-card">
-        <h3 className="pokemon-modal-header">Current Moves</h3>
+      <div className="pokemon-modal-card pokemon-moves-card">
+        <OhoFlex.RowStart className="pokemon-moves-card-header">
+          <h3 className="pokemon-moves-card-title">Current Moves</h3>
+          <Button className="mini-button" variant="outline" color="gray">
+            <EditIcon />
+          </Button>
+        </OhoFlex.RowStart>
         <Inset side="x" p="0" mx="-2">
           <Separator />
         </Inset>
-        <Flex direction="row" justify="center" gap="0.5rem">
+        <Flex className="pokemon-moves-card-content" direction="row" justify="center" gap="0.5rem">
           {mon.moves?.map((move, i) => (
             <MoveCard
               key={`relearn-${i}-${move}`}
@@ -32,7 +39,7 @@ const MovesTab = (props: { mon: PKMInterface }) => {
         </Flex>
       </div>
       <div className="pokemon-modal-card">
-        <h3 className="pokemon-modal-header">Egg/Event Moves</h3>
+        <h3 className="pokemon-moves-card-title">Egg/Event Moves</h3>
         <Inset side="x" p="0" mx="-2">
           <Separator />
         </Inset>
@@ -44,7 +51,7 @@ const MovesTab = (props: { mon: PKMInterface }) => {
       </div>
       {mon instanceof OHPKM && (
         <div className="pokemon-modal-card">
-          <h3 className="pokemon-modal-header">All Known Moves</h3>
+          <h3 className="pokemon-moves-card-title">All Known Moves</h3>
           <Inset side="x" p="0" mx="-2">
             <Separator />
           </Inset>
