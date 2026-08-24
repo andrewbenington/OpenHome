@@ -13,12 +13,7 @@ import {
   getHiddenPowerType,
 } from '@openhome-core/pkm/util'
 import { AllPKMFields } from '@openhome-core/pkm/util/pkmInterface'
-import {
-  BDSPTMMoveIndexes,
-  LATutorMoveIndexes,
-  Moves,
-  SVTMMoveIndexes,
-} from '@openhome-core/resources'
+import { Moves } from '@openhome-core/resources'
 import { Countries } from '@openhome-core/resources/consts/Countries'
 import { EncounterTypes } from '@openhome-core/resources/consts/EncounterTypes'
 import { SWEETS } from '@openhome-core/resources/consts/Forms'
@@ -26,19 +21,13 @@ import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import {
   GEN2_TRANSFER_RESTRICTIONS,
   HGSS_TRANSFER_RESTRICTIONS,
-  LA_TRANSFER_RESTRICTIONS,
   ORAS_TRANSFER_RESTRICTIONS,
   SV_TRANSFER_RESTRICTIONS_ID,
   SWSH_TRANSFER_RESTRICTIONS_CT,
   USUM_TRANSFER_RESTRICTIONS,
 } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import {
-  getDisplayID,
-  getFlagsInArrayRange,
-  getHeightCalculated,
-  getWeightCalculated,
-} from '@openhome-core/util'
+import { getDisplayID, getHeightCalculated, getWeightCalculated } from '@openhome-core/util'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import AttributeRowExpand from '@openhome-ui/components/AttributeRowExpand'
 import DebugOnly from '@openhome-ui/components/DebugOnly'
@@ -59,7 +48,13 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
   const weightCalculated = getWeightCalculated(mon)
 
   const pokerus = Pokerus.fromByteOrDefault(mon.pokerusByte)
+
   const trMovesSwSh = mon.trMovesSwSh
+  const tutorMovesLa = mon.tutorMovesLa
+  const tmMovesSvBase = mon.tmMovesSV
+  const tmMovesLzaBase = mon.tmMovesLzaBase
+  const tmMovesLzaDlc = mon.tmMovesLzaDlc
+  const plusMovesLza = Array.from(mon.plusMoveFlags?.getMoveIds() ?? []).map((id) => Moves[id])
 
   return (
     <div style={{ overflow: 'hidden', height: '100%' }}>
@@ -251,42 +246,45 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               )}
             </AttributeRowExpand>
           )}
-        {!isRestricted(
-          SWSH_TRANSFER_RESTRICTIONS_CT,
-          mon.nationalDex,
-          mon.formIndex,
-          mon.extraFormIndex
-        ) &&
-          trMovesSwSh &&
-          trMovesSwSh.length > 0 && (
-            <AttributeRowExpand summary="SwSh TRs" value={trMovesSwSh.length}>
-              {trMovesSwSh.map((move) => (
-                <AttributeRow key={`swsh_tr_${move.name}`} label={move.name} indent={10}>
+        {mon instanceof OHPKM && (
+          <AttributeRowExpand summary="Learned Moves" value={mon.learnedMovesWasm.length}>
+            {Array.from(mon.learnedMovesWasm)
+              .map((id) => Moves[id])
+              .map((move) => (
+                <AttributeRow key={`learned_move_${move.id}`} label={move.name} indent={10}>
                   {move.name}
                 </AttributeRow>
               ))}
-            </AttributeRowExpand>
-          )}
-        {!isRestricted(
-          HGSS_TRANSFER_RESTRICTIONS,
-          mon.nationalDex,
-          mon.formIndex,
-          mon.extraFormIndex
-        ) &&
-          mon.tmFlagsBDSP &&
-          getFlagsInArrayRange(mon.tmFlagsBDSP, 0, 14).length > 0 && (
-            <AttributeRowExpand
-              summary="BDSP TMs"
-              value={`${getFlagsInArrayRange(mon.tmFlagsBDSP, 0, 14).length} TMs`}
-            >
-              {getFlagsInArrayRange(mon.tmFlagsBDSP, 0, 14).map((i) => (
-                <AttributeRow key={`bdsp_tm_${i + 1}`} label={`TM ${i + 1}`} indent={10}>
-                  {Moves[BDSPTMMoveIndexes[i]].name}
-                </AttributeRow>
-              ))}
-            </AttributeRowExpand>
-          )}
-        {!isRestricted(
+          </AttributeRowExpand>
+        )}
+        {trMovesSwSh && trMovesSwSh.length > 0 && (
+          <AttributeRowExpand summary="SwSh TRs" value={trMovesSwSh.length}>
+            {trMovesSwSh.map((move) => (
+              <AttributeRow key={`swsh_tr_${move.name}`} label={move.name} indent={10}>
+                {move.name}
+              </AttributeRow>
+            ))}
+          </AttributeRowExpand>
+        )}
+        {tutorMovesLa && tutorMovesLa.length > 0 && (
+          <AttributeRowExpand summary="LA Tutors" value={tutorMovesLa.length}>
+            {tutorMovesLa.map((move) => (
+              <AttributeRow key={`la_tutor_${move.name}`} label={move.name} indent={10}>
+                {move.name}
+              </AttributeRow>
+            ))}
+          </AttributeRowExpand>
+        )}
+        {tmMovesSvBase && tmMovesSvBase.length > 0 && (
+          <AttributeRowExpand summary="S/V Base TMs" value={tmMovesSvBase.length}>
+            {tmMovesSvBase.map((move) => (
+              <AttributeRow key={`sv_base_tm_${move.name}`} label={move.name} indent={10}>
+                {move.name}
+              </AttributeRow>
+            ))}
+          </AttributeRowExpand>
+        )}
+        {/* {!isRestricted(
           LA_TRANSFER_RESTRICTIONS,
           mon.nationalDex,
           mon.formIndex,
@@ -304,9 +302,8 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
                 </AttributeRow>
               ))}
             </AttributeRowExpand>
-          )}
-
-        {!isRestricted(
+          )} */}
+        {/* {!isRestricted(
           SV_TRANSFER_RESTRICTIONS_ID,
           mon.nationalDex,
           mon.formIndex,
@@ -324,8 +321,34 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
                 </AttributeRow>
               ))}
             </AttributeRowExpand>
-          )}
-
+          )} */}
+        {tmMovesLzaBase && (
+          <AttributeRowExpand summary="Legends Z-A Base TMs" value={tmMovesLzaBase.length}>
+            {tmMovesLzaBase.map((move) => (
+              <AttributeRow key={`lza_base_tm_${move.name}`} label={move.name} indent={10}>
+                {move.name}
+              </AttributeRow>
+            ))}
+          </AttributeRowExpand>
+        )}
+        {tmMovesLzaDlc && (
+          <AttributeRowExpand summary="Legends Z-A DLC TMs" value={tmMovesLzaDlc.length}>
+            {tmMovesLzaDlc.map((move) => (
+              <AttributeRow key={`lza_dlc_tm_${move.name}`} label={move.name} indent={10}>
+                {move.name}
+              </AttributeRow>
+            ))}
+          </AttributeRowExpand>
+        )}
+        {plusMovesLza && (
+          <AttributeRowExpand summary="Legends Z-A Plus Moves" value={plusMovesLza.length}>
+            {plusMovesLza.map((move) => (
+              <AttributeRow key={`lza_plus_move_${move.name}`} label={move.name} indent={10}>
+                {move.name}
+              </AttributeRow>
+            ))}
+          </AttributeRowExpand>
+        )}
         {(!isRestricted(
           SWSH_TRANSFER_RESTRICTIONS_CT,
           mon.nationalDex,

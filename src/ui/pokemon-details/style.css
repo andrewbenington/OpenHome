@@ -113,6 +113,10 @@
   background-color: var(--color-panel);
   padding: var(--padding-radius-sm-lg);
   font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  contain: paint;
 }
 
 .limit-text-width {

@@ -15,20 +15,18 @@ mod gen45_data;
 mod gen67_data;
 mod gen8_data;
 mod gen9_data;
+mod learned_moves;
 mod main_data;
 mod past_handlers;
 
 pub mod pkm_bytes;
 
 pub(crate) use gameboy_data::GameboyData;
-pub(crate) use gen8_data::{BdspData, LegendsArceusData, SwordShieldData};
-pub(crate) use gen9_data::{
-    LZA_BASE_TM_BYTES, LZA_DLC_TM_BYTES, LZA_PLUS_MOVES_BLOCK_C_BYTES,
-    LZA_PLUS_MOVES_BLOCK_D_BYTES, LegendsZaData, SV_BASE_TM_BYTES_EXCLUDE_UNUSED,
-    ScarletVioletData,
-};
+pub(crate) use gen8_data::{LegendsArceusData, SwordShieldData};
+pub(crate) use gen9_data::{LegendsZaData, SV_BASE_TM_BYTES_EXCLUDE_UNUSED, ScarletVioletData};
 pub(crate) use gen45_data::Gen45Data;
 pub(crate) use gen67_data::Gen67Data;
+pub(crate) use learned_moves::LearnedMoves;
 pub(crate) use main_data::MainDataV2;
 pub(crate) use past_handlers::PastHandlerDataV2;
 

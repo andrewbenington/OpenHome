@@ -1,5 +1,11 @@
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { bitwiseOrUint8Array, OHPKM } from '@openhome-core/pkm/OHPKM'
 import { ModernRibbons } from '@openhome-core/resources'
+import {
+  LZA_BASE_TM_BYTES,
+  LZA_DLC_TM_BYTES,
+  movesFromLzaBaseTmFlags,
+  movesFromLzaDlcTmFlags,
+} from '@openhome-core/resources/moves/flags'
 import * as byteLogic from '@openhome-core/util/byteLogic'
 import { Errorable, R } from '@openhome-core/util/functional'
 import { FourMoves } from '@openhome-core/util/types'
@@ -16,6 +22,7 @@ import {
   MarkingsSixShapesColors,
   MetadataSummaryLookup,
   NatureIndex,
+  PlusMoveFlags,
   SpeciesLookup,
   TrainerMemory,
 } from '@pkm-rs/pkg'
@@ -100,8 +107,7 @@ export default class PA9 {
   homeTracker: bigint
   tmFlagsLzaBase: Uint8Array // 25 bytes
   tmFlagsLzaDlc: Uint8Array // 13 bytes
-  plusMoveFlagsLzaBlockC: Uint8Array // 33 bytes
-  plusMoveFlagsLzaBlockD: Uint8Array // 12 bytes
+  plusMoveFlags: PlusMoveFlags
   ribbons: string[]
   trainerGender: BinaryGender
   level: number
@@ -147,8 +153,11 @@ export default class PA9 {
       this.heightScalar = dataView.getUint8(0x48)
       this.weightScalar = dataView.getUint8(0x49)
       this.scale = dataView.getUint8(0x4a)
-      this.plusMoveFlagsLzaBlockC = new Uint8Array(buffer).slice(0xd6, 0xf7)
-      this.plusMoveFlagsLzaBlockD = new Uint8Array(buffer).slice(0x94, 0xa0)
+
+      const plusMovesBlockC = new Uint8Array(buffer).slice(0xd6, 0xf7)
+      const plusMovesBlockB = new Uint8Array(buffer).slice(0x60, 0x6c)
+      this.plusMoveFlags = PlusMoveFlags.fromByteBlocks(plusMovesBlockC, plusMovesBlockB)
+
       this.nickname = stringLogic.utf16BytesToString(buffer, 0x58, 12)
       this.moves = [
         dataView.getUint16(0x72, true),
@@ -268,8 +277,10 @@ export default class PA9 {
       this.scale = other.scale ?? 0
       this.tmFlagsLzaBase = other.tmFlagsLzaBase ?? new Uint8Array(25)
       this.tmFlagsLzaDlc = other.tmFlagsLzaDlc ?? new Uint8Array(13)
-      this.plusMoveFlagsLzaBlockC = other.plusMoveFlagsLzaBlockC ?? new Uint8Array(33)
-      this.plusMoveFlagsLzaBlockD = other.plusMoveFlagsLzaBlockD ?? new Uint8Array(12)
+      this.plusMoveFlags = (
+        other.plusMoveFlags?.clone() ?? PlusMoveFlags.empty()
+      ).withAllForSpeciesAtLevel(other.speciesAndForm, other.getLevel())
+
       this.nickname = converter.nickname(other)
 
       const moveFilter = MoveFilter.fromPkmClass(PA9)
@@ -407,10 +418,14 @@ export default class PA9 {
     dataView.setUint8(0x125, this.metLevel)
     types.writeHyperTrainStatsToBytes(dataView, 0x126, this.hyperTraining)
     dataView.setBigUint64(0x127, this.homeTracker)
-    new Uint8Array(buffer).set(new Uint8Array(this.tmFlagsLzaBase.slice(0, 25)), 0x12f)
-    new Uint8Array(buffer).set(new Uint8Array(this.tmFlagsLzaDlc.slice(0, 13)), 0x4b)
-    new Uint8Array(buffer).set(new Uint8Array(this.plusMoveFlagsLzaBlockC.slice(0, 33)), 0xd6)
-    new Uint8Array(buffer).set(new Uint8Array(this.plusMoveFlagsLzaBlockD.slice(0, 12)), 0x94)
+    new Uint8Array(buffer).set(
+      new Uint8Array(this.tmFlagsLzaBase.slice(0, LZA_BASE_TM_BYTES)),
+      0x12f
+    )
+    new Uint8Array(buffer).set(new Uint8Array(this.tmFlagsLzaDlc.slice(0, LZA_DLC_TM_BYTES)), 0x4b)
+
+    new Uint8Array(buffer).set(new Uint8Array(this.plusMoveFlags.toBlockCBytes()), 0xd6)
+    new Uint8Array(buffer).set(new Uint8Array(this.plusMoveFlags.toBlockBBytes()), 0x94)
     byteLogic.setFlagIndexes(
       dataView,
       0x34,
@@ -431,6 +446,38 @@ export default class PA9 {
     dataView.setUint8(0x148, this.level)
     types.writeStatsToBytesU16(dataView, 0x14a, this.stats)
     return buffer
+  }
+
+  get tmMovesLzaBase() {
+    return this.tmFlagsLzaBase ? movesFromLzaBaseTmFlags(this.tmFlagsLzaBase) : []
+  }
+
+  unionTmFlagsLzaBase(otherTmFlags: Uint8Array) {
+    this.tmFlagsLzaBase = bitwiseOrUint8Array(
+      this.tmFlagsLzaBase || new Uint8Array(LZA_DLC_TM_BYTES),
+      otherTmFlags
+    )
+  }
+
+  get tmMovesLzaDlc() {
+    return this.tmFlagsLzaDlc ? movesFromLzaDlcTmFlags(this.tmFlagsLzaDlc) : []
+  }
+
+  unionTmFlagsLzaDlc(otherTmFlags: Uint8Array) {
+    this.tmFlagsLzaDlc = bitwiseOrUint8Array(
+      this.tmFlagsLzaDlc || new Uint8Array(LZA_DLC_TM_BYTES),
+      otherTmFlags
+    )
+  }
+
+  get plusMovesLza() {
+    return this.plusMoveFlags?.getMoveIds() ?? []
+  }
+
+  unionPlusFlagsLza(otherPlusFlags: PlusMoveFlags) {
+    const updated = this.plusMoveFlags ?? PlusMoveFlags.empty()
+    updated.addAllFrom(otherPlusFlags)
+    this.plusMoveFlags = updated
   }
 
   public getStats() {
