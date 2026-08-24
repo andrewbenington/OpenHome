@@ -875,6 +875,37 @@ export type SaveError =
 
 export type SaveErrorType = SaveError['type']
 
+export function saveErrorTitle(errorType: SaveErrorType): string {
+  switch (errorType) {
+    case 'SELECT_FILE':
+      return 'Error Selecting File'
+    case 'READ_FILE':
+      return 'Error Reading File'
+    case 'UNRECOGNIZED':
+      return 'Error Detecting Save'
+    case 'BUILD_SAVE':
+      return 'Save File Invalid'
+    case 'ALREADY_OPEN':
+      return 'Already Open'
+    case 'OTHER':
+      return 'Error Opening Save'
+  }
+}
+
+export function saveErrorMessage(error: SaveError): string {
+  switch (error.type) {
+    case 'SELECT_FILE':
+    case 'READ_FILE':
+    case 'BUILD_SAVE':
+    case 'OTHER':
+      return error.cause
+    case 'UNRECOGNIZED':
+      return 'The selected file was not recognized as a supported save file.'
+    case 'ALREADY_OPEN':
+      return 'The selected save file is already open'
+  }
+}
+
 function pokedexSeenFromSave(saveFile: SAV) {
   const pokedexUpdates: PokedexUpdate[] = []
 

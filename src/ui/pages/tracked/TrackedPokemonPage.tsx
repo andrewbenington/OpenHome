@@ -9,7 +9,7 @@ import MessageRibbon from '@openhome-ui/components/MessageRibbon'
 import SideTabNavigation from '@openhome-ui/components/side-tabs/SideTabNavigation'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/PokemonDetailsModal'
-import { SaveError, useSaves } from '@openhome-ui/state/saves'
+import { SaveError, saveErrorMessage, saveErrorTitle, useSaves } from '@openhome-ui/state/saves'
 import { Button, DropdownMenu, Flex } from '@radix-ui/themes'
 import { PropsWithChildren, ReactNode, useState } from 'react'
 import { useNavigate } from 'react-router'
@@ -202,8 +202,7 @@ function ForOneStateBody(props: ForOneStateBodyProps) {
     saves.addSave(save).then(
       R.match(
         () => navigate('/home'),
-        (error: SaveError) =>
-          displayError('Error Opening Save', 'cause' in error ? error.cause : error.type)
+        (error: SaveError) => displayError(saveErrorTitle(error.type), saveErrorMessage(error))
       )
     )
   }
