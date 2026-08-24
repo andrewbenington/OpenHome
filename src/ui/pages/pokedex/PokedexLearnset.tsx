@@ -37,11 +37,11 @@ export default function PokedexLearnset(props: PokedexLearnsetProps) {
         <>
           <h3>Mastered:</h3>
           {selectedForm.moveMasteryLa()?.map((learnsetMove) => (
-            <Flex key={`${learnsetMove.move_id}-${learnsetMove.level}`} align="center" gap="2">
+            <Flex key={`${learnsetMove.moveId}-${learnsetMove.level}`} align="center" gap="2">
               <p className="learnset-move-requirement">
                 {learnsetMove.level ? `Level ${learnsetMove.level}: ` : 'On Evolution: '}
               </p>
-              <MoveCard move={learnsetMove.move_id} compact />
+              <MoveCard move={learnsetMove.moveId} compact />
             </Flex>
           ))}
         </>
@@ -50,11 +50,11 @@ export default function PokedexLearnset(props: PokedexLearnsetProps) {
         <>
           <h3>Plus Moves:</h3>
           {selectedForm.plusMovesLza()?.map((learnsetMove) => (
-            <Flex key={`${learnsetMove.move_id}-${learnsetMove.level}`} align="center" gap="2">
+            <Flex key={`${learnsetMove.moveId}-${learnsetMove.level}`} align="center" gap="2">
               <p className="learnset-move-requirement">
                 {learnsetMove.level ? `Level ${learnsetMove.level}: ` : 'On Evolution: '}
               </p>
-              <MoveCard move={learnsetMove.move_id} compact />
+              <MoveCard move={learnsetMove.moveId} compact />
             </Flex>
           ))}
         </>

@@ -1,4 +1,4 @@
-use crate::levelup::{LearnsetFileReader, LearnsetReader};
+use crate::levelup::{LevelupLearnsetFileReader, LevelupLearnsetReader};
 use crate::pkhex_bin::{LZA_LEVELUP_PKL, LZA_PERSONAL_FILE, LZA_PLUS_MOVES_PKL};
 use crate::species::form_metadata::{BaseStats, GameMetadata, PersonalInfo};
 use pkm_rs_types::{NationalDex, PkmType, Stats8};
@@ -10,9 +10,13 @@ type GameMetadataLza = GameMetadata<PersonalInfoLza, LZA_ENTRY_SIZE>;
 pub static METADATA_TABLE_LZA: GameMetadataLza =
     GameMetadataLza::from_binary(LZA_PERSONAL_FILE, LZA_LEVELUP_PKL);
 
-const LZA_PLUS_MOVE_MASTERY: LearnsetFileReader = LearnsetFileReader::from_pkl(LZA_PLUS_MOVES_PKL);
+const LZA_PLUS_MOVE_MASTERY: LevelupLearnsetFileReader =
+    LevelupLearnsetFileReader::from_pkl(LZA_PLUS_MOVES_PKL);
 
-pub fn get_levelup_plus_move_mastery(national_dex: u16, form_index: u16) -> Option<LearnsetReader> {
+pub fn get_levelup_plus_move_mastery(
+    national_dex: u16,
+    form_index: u16,
+) -> Option<LevelupLearnsetReader> {
     LZA_PLUS_MOVE_MASTERY.learnset_at_index(
         METADATA_TABLE_LZA
             .personal

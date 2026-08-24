@@ -19,7 +19,6 @@ use crate::traits::{HasSpeciesAndForm, IsShiny, PkmBytes};
 
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::levelup::LearnsetCondition;
 use pkm_rs_resources::moves::{MoveIndex, MoveSlots, la_tutor, lza_tm, sv_tm, swsh_tr};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
@@ -1844,15 +1843,17 @@ impl OhpkmV2 {
 
         let current_level = self.calculate_level();
 
-        if let Some(la_data) = self.la_data.as_mut() {
-            for move_mastery in move_mastery_data.all_moves() {
-                if let LearnsetCondition::LevelUp(move_mastery_level) = move_mastery.get_condition()
-                    && current_level >= move_mastery_level
-                {
-                    la_data.set_mastered_move(move_mastery.move_id_raw());
-                }
-            }
+        let Some(la_data) = self.la_data.as_mut() else {
+            return;
         };
+
+        for move_mastery in move_mastery_data
+            .all_moves()
+            .iter()
+            .filter(|move_mastery| current_level >= move_mastery.get_level())
+        {
+            la_data.set_mastered_move(move_mastery.move_id_raw());
+        }
     }
 
     fn update_plus_moves_by_current_level(&mut self) {
@@ -1862,15 +1863,17 @@ impl OhpkmV2 {
 
         let current_level = self.calculate_level();
 
-        if let Some(lza_data) = self.lza_data.as_mut() {
-            for plus_move in plus_move_data.all_moves() {
-                if let LearnsetCondition::LevelUp(plus_move_level) = plus_move.get_condition()
-                    && current_level >= plus_move_level
-                {
-                    lza_data.add_plus_move_by_id(plus_move.move_id_raw());
-                }
-            }
+        let Some(lza_data) = self.lza_data.as_mut() else {
+            return;
         };
+
+        for plus_move in plus_move_data
+            .all_moves()
+            .iter()
+            .filter(|plus_move| current_level >= plus_move.get_level())
+        {
+            lza_data.add_plus_move_by_id(plus_move.move_id_raw());
+        }
     }
 
     pub fn sync_learned_moves(&mut self) {
@@ -3260,10 +3263,7 @@ impl OhpkmV2 {
             self.species_and_form()
                 .get_move_mastery_la()
                 .and_then(|lookup| lookup.move_data_by_id(move_id))
-                .is_some_and(|data| match data.get_condition() {
-                    LearnsetCondition::LevelUp(level) => self.calculate_level() >= level,
-                    LearnsetCondition::Evolution => false,
-                })
+                .is_some_and(|data| self.calculate_level() >= data.get_level())
         }
     }
 

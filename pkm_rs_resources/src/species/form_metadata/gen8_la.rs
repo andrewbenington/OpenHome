@@ -1,4 +1,4 @@
-use crate::levelup::{LearnsetFileReader, LearnsetReader};
+use crate::levelup::{LevelupLearnsetFileReader, LevelupLearnsetReader};
 use crate::pkhex_bin::{LA_LEVELUP_PKL, LA_MASTERY_PKL, LA_PERSONAL_FILE};
 use crate::species::form_metadata::{BaseStats, GameMetadata, PersonalInfo};
 use pkm_rs_types::{NationalDex, PkmType, Stats8};
@@ -10,9 +10,10 @@ type GameMetadataLa = GameMetadata<PersonalInfoLa, LA_ENTRY_SIZE>;
 pub static METADATA_TABLE_LA: GameMetadataLa =
     GameMetadataLa::from_binary(LA_PERSONAL_FILE, LA_LEVELUP_PKL);
 
-const LA_MOVE_MASTERY: LearnsetFileReader = LearnsetFileReader::from_pkl(LA_MASTERY_PKL);
+const LA_MOVE_MASTERY: LevelupLearnsetFileReader =
+    LevelupLearnsetFileReader::from_pkl(LA_MASTERY_PKL);
 
-pub fn get_levelup_mastery(national_dex: u16, form_index: u16) -> Option<LearnsetReader> {
+pub fn get_levelup_mastery(national_dex: u16, form_index: u16) -> Option<LevelupLearnsetReader> {
     LA_MOVE_MASTERY.learnset_at_index(
         METADATA_TABLE_LA
             .personal

@@ -1,5 +1,7 @@
 use crate::ExpectLog;
-use crate::levelup::LearnsetReader;
+#[cfg(feature = "wasm")]
+use crate::levelup::LevelupLearnsetMove;
+use crate::levelup::{LearnsetReader, LevelupLearnsetReader};
 use crate::species::GetSpeciesMetadata;
 use crate::species::form_metadata::{
     BaseStats, base_stats_lookup, move_mastery_la_lookup, plus_moves_lza_lookup,
@@ -552,27 +554,13 @@ impl FormMetadata {
     }
 
     #[wasm_bindgen(js_name = moveMasteryLa)]
-    pub fn move_mastery_la(&self) -> Option<Vec<LearnsetMoveJs>> {
-        Some(
-            self.forme_ref()
-                .get_move_mastery_la()?
-                .all_moves()
-                .into_iter()
-                .map(LearnsetMoveJs::from)
-                .collect(),
-        )
+    pub fn move_mastery_la(&self) -> Option<Vec<LevelupLearnsetMove>> {
+        Some(self.forme_ref().get_move_mastery_la()?.all_moves())
     }
 
     #[wasm_bindgen(js_name = plusMovesLza)]
-    pub fn plus_moves_lza(&self) -> Option<Vec<LearnsetMoveJs>> {
-        Some(
-            self.forme_ref()
-                .get_plus_moves_lza()?
-                .all_moves()
-                .into_iter()
-                .map(LearnsetMoveJs::from)
-                .collect(),
-        )
+    pub fn plus_moves_lza(&self) -> Option<Vec<LevelupLearnsetMove>> {
+        Some(self.forme_ref().get_plus_moves_lza()?.all_moves())
     }
 }
 
@@ -725,11 +713,11 @@ impl SpeciesForm {
         levelup_learnset_lookup(self.national_dex as u16, self.form_index, source)
     }
 
-    pub fn get_move_mastery_la(&self) -> Option<LearnsetReader> {
+    pub fn get_move_mastery_la(&self) -> Option<LevelupLearnsetReader> {
         move_mastery_la_lookup(self.national_dex as u16, self.form_index)
     }
 
-    pub fn get_plus_moves_lza(&self) -> Option<LearnsetReader> {
+    pub fn get_plus_moves_lza(&self) -> Option<LevelupLearnsetReader> {
         plus_moves_lza_lookup(self.national_dex as u16, self.form_index)
     }
 }

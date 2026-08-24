@@ -27,7 +27,7 @@ use tsify::Tsify;
 
 use crate::{
     ExpectLog,
-    levelup::{LearnsetCondition, LearnsetFileReader, LearnsetReader},
+    levelup::{LearnsetFileReader, LearnsetReader, LevelupLearnsetReader},
     metadata_source::MetadataSource,
     species::{
         form,
@@ -457,36 +457,30 @@ pub fn levelup_learnset_lookup(
     }
 }
 
-pub fn move_mastery_la_lookup(national_dex: u16, form_index: u16) -> Option<LearnsetReader> {
+pub fn move_mastery_la_lookup(national_dex: u16, form_index: u16) -> Option<LevelupLearnsetReader> {
     gen8_la::get_levelup_mastery(national_dex, form_index)
 }
 
-pub fn plus_moves_lza_lookup(national_dex: u16, form_index: u16) -> Option<LearnsetReader> {
+pub fn plus_moves_lza_lookup(national_dex: u16, form_index: u16) -> Option<LevelupLearnsetReader> {
     gen9_za::get_levelup_plus_move_mastery(national_dex, form_index)
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getMoveMasteredLevelLa"))]
 pub fn get_move_mastered_level_la(national_dex: u16, form_index: u16, move_id: u16) -> Option<u8> {
-    let reader = move_mastery_la_lookup(national_dex, form_index)?;
-    let move_data = reader.move_data_by_id(move_id)?;
-
-    if let LearnsetCondition::LevelUp(level) = move_data.condition {
-        Some(level)
-    } else {
-        None
-    }
+    Some(
+        move_mastery_la_lookup(national_dex, form_index)?
+            .move_data_by_id(move_id)?
+            .level,
+    )
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getPlusMoveLevelLza"))]
 pub fn get_plus_move_level_lza(national_dex: u16, form_index: u16, move_id: u16) -> Option<u8> {
-    let reader = plus_moves_lza_lookup(national_dex, form_index)?;
-    let move_data = reader.move_data_by_id(move_id)?;
-
-    if let LearnsetCondition::LevelUp(level) = move_data.condition {
-        Some(level)
-    } else {
-        None
-    }
+    Some(
+        plus_moves_lza_lookup(national_dex, form_index)?
+            .move_data_by_id(move_id)?
+            .level,
+    )
 }
 #[cfg(test)]
 mod tests {

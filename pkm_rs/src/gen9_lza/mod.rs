@@ -1,5 +1,4 @@
 use pkm_rs_resources::{
-    levelup::LearnsetCondition,
     moves::{MoveIndex, lza_plus},
     species::SpeciesForm,
 };
@@ -61,10 +60,7 @@ impl PlusMoveFlags {
                 .all_moves()
                 .iter()
                 .filter_map(|learnset_move| {
-                    if let LearnsetCondition::LevelUp(plus_move_level) =
-                        learnset_move.get_condition()
-                        && level >= plus_move_level
-                    {
+                    if level >= learnset_move.get_level() {
                         Some(learnset_move.move_id_raw())
                     } else {
                         None
