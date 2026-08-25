@@ -1,20 +1,21 @@
 import useBackend from '@openhome-core/backend/useBackend'
+import { PkmOrOhpkmFormat } from '@openhome-core/pkm'
 import { fileTypeFromStringNonOhpkm } from '@openhome-core/pkm/FileImport'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM, originalDataTagToMonFormat } from '@openhome-core/pkm/OHPKM'
 import { isRomHackFormat } from '@openhome-core/pkm/PKM'
 import { FileSchemas } from '@openhome-core/pkm/schema'
-import { $R } from '@openhome-core/util/functional'
+import { $R, Option, R, Result } from '@openhome-core/util/functional'
 import Badge from '@openhome-ui/components/badge/Badge'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import Fallback from '@openhome-ui/components/Fallback'
 import FileTypeSelect from '@openhome-ui/components/FileTypeSelect'
 import HexDisplay from '@openhome-ui/components/HexDisplay'
 import { ArrowLeftIcon, ArrowRightIcon } from '@openhome-ui/components/Icons'
+import MessageRibbon from '@openhome-ui/components/MessageRibbon'
 import SideTabs from '@openhome-ui/components/side-tabs/SideTabs'
-import useDisplayError from '@openhome-ui/hooks/displayError'
 import MiniBoxIndicator, { MiniBoxIndicatorProps } from '@openhome-ui/saves/boxes/MiniBoxIndicator'
-import { PkmFormat } from '@pkm-rs/pkg/pkm_rs'
+import { ConvertStrategy, OriginalDataJs, PkmFormat } from '@pkm-rs/pkg'
 import { Flex, Switch, VisuallyHidden } from '@radix-ui/themes'
 import { useCallback, useEffect, useState } from 'react'
 import { MdDownload } from 'react-icons/md'
@@ -23,7 +24,8 @@ import LogsPage from '../pages/logs/LogsPage'
 import { useConvertStrategies } from '../state/convert-strategies'
 import './style.css'
 import DisplayTab from './tabs/DisplayTab'
-import MetDataMovesTab from './tabs/MetDataMovesTab'
+import MetDataTab from './tabs/MetDataTab'
+import MovesTab from './tabs/MovesTab'
 import NotesDisplay from './tabs/NotesTab'
 import OtherDisplay from './tabs/OtherTab'
 import RecentSaveTab from './tabs/RecentSaveTab'
@@ -95,7 +97,7 @@ export default function PokemonDetailsModal(props: PokemonDetailsModalProps) {
             <Dialog.Description>Detailed information about the selected Pokémon</Dialog.Description>
           </VisuallyHidden>
           <Fallback>
-            <ModalContents key={mon.calculateChecksum?.()} mon={mon} />
+            <ModalContents mon={mon} />
           </Fallback>
           <div className="modal-footer">
             <Flex gap="1" align="center" minWidth="7rem">
@@ -155,69 +157,13 @@ const TAB_QUERY_KEY = 'pokemon-modal-tab'
 
 function ModalContents(props: ModalContentsProps) {
   const { mon } = props
-  const [displayMon, setDisplayMon] = useState(mon)
-  const [isOriginal, setIsOriginal] = useState(false)
-  const { defaultConvertStrategy } = useConvertStrategies()
   const backend = useBackend()
-  const displayError = useDisplayError()
 
-  function updateIsOriginal(isOriginal: boolean) {
-    setIsOriginal(isOriginal)
-    if (isOriginal && mon instanceof OHPKM && mon.originalData) {
-      if (isOriginal && mon.originalData) {
-        const O = fileTypeFromStringNonOhpkm(originalDataTagToMonFormat(mon.originalData.tag))
-        if (O) {
-          setDisplayMon(O.fromBytes(mon.originalData.data.buffer as ArrayBuffer))
-          return
-        }
-      }
-      switchFormat(originalDataTagToMonFormat(mon.originalData.tag))
-    } else if (mon) {
-      switchFormat(mon.format)
-    }
-  }
+  const displayMonController = useDisplayMon(mon)
+  const { displayFormat, setDisplayFormat, showOriginal, setShowOriginal } = displayMonController
 
-  function switchFormat(newFormat: PkmFormat | 'OHPKM') {
-    if (!mon) return
-    if (mon.format === newFormat) {
-      setDisplayMon(mon)
-      return
-    }
-
-    if (newFormat === 'OHPKM') {
-      setDisplayMon(mon instanceof OHPKM ? mon : OHPKM.fromMonUnknownSave(mon))
-      return
-    }
-
-    const PkmClass = fileTypeFromStringNonOhpkm(newFormat)
-
-    if (!PkmClass) {
-      throw `Invalid filetype: ${PkmClass}`
-    }
-
-    try {
-      if (
-        mon instanceof OHPKM &&
-        isOriginal &&
-        mon.originalData &&
-        originalDataTagToMonFormat(mon.originalData.tag) === newFormat
-      ) {
-        const originalFormat = originalDataTagToMonFormat(mon.originalData.tag)
-        const OriginalPkmClass = fileTypeFromStringNonOhpkm(originalFormat) ?? PkmClass
-        setDisplayMon(OriginalPkmClass.fromBytes(mon.originalData.data.buffer as ArrayBuffer))
-      } else {
-        const ohpkm = mon instanceof OHPKM ? mon : OHPKM.fromMonUnknownSave(mon)
-
-        $R(PkmClass.fromOhpkm(ohpkm, defaultConvertStrategy)).match(
-          (converted) => setDisplayMon(converted),
-          (error) => displayError(`Failed to convert OHPKM to ${PkmClass.getFormat()}`, error)
-        )
-      }
-    } catch (e) {
-      console.error(e)
-      displayError(`Error converting to ${PkmClass.getFormat()}`, `${e}`)
-    }
-  }
+  const displayMon = $R(displayMonController.displayMon)
+  const displayMonOrFallback = displayMon.orElse(mon)
 
   return (
     <SideTabs.Root className="pokemon-modal-tabs" defaultValue="summary" queryKey={TAB_QUERY_KEY}>
@@ -225,19 +171,19 @@ function ModalContents(props: ModalContentsProps) {
         <Flex direction="row" gap="var(--padding-radius-sm-lg">
           <FileTypeSelect
             baseFormat={mon.format}
-            currentFormat={displayMon.format}
-            color={displayMon.selectColor}
+            currentFormat={displayFormat ?? mon.format}
+            color={displayMonOrFallback.selectColor}
             formData={mon}
-            disabled={isOriginal}
-            onChange={switchFormat}
+            disabled={showOriginal}
+            onChange={setDisplayFormat}
           />
           <button
             className="mini-button"
             onClick={() => {
-              displayMon.refreshChecksum?.()
+              displayMonOrFallback.refreshChecksum?.()
               backend.saveLocalFile(
-                new Uint8Array(displayMon.toBytes()),
-                `${displayMon.nickname}.${displayMon.format.toLocaleLowerCase()}`
+                new Uint8Array(displayMonOrFallback.toBytes()),
+                `${displayMonOrFallback.nickname}.${displayMonOrFallback.format.toLocaleLowerCase()}`
               )
             }}
           >
@@ -245,11 +191,12 @@ function ModalContents(props: ModalContentsProps) {
           </button>
         </Flex>
         <SideTabs.Tab value="summary">Summary</SideTabs.Tab>
-        <SideTabs.Tab value="moves_met_data">Moves/Met Data</SideTabs.Tab>
+        <SideTabs.Tab value="moves">Moves</SideTabs.Tab>
+        <SideTabs.Tab value="met_data">Met Data</SideTabs.Tab>
         <SideTabs.Tab value="stats">Stats</SideTabs.Tab>
         <SideTabs.Tab value="ribbons">Ribbons</SideTabs.Tab>
         <SideTabs.Tab value="other">Other</SideTabs.Tab>
-        {mon instanceof OHPKM && (
+        {displayMonOrFallback instanceof OHPKM && (
           <>
             <SideTabs.Tab value="trainers">Trainers</SideTabs.Tab>
             <SideTabs.Tab value="notes">Notes</SideTabs.Tab>
@@ -260,66 +207,173 @@ function ModalContents(props: ModalContentsProps) {
         )}
         <SideTabs.Tab value="raw">Raw</SideTabs.Tab>
         <div style={{ flex: 1 }} />
-        {(isOriginal || (mon instanceof OHPKM && mon.originalData)) && (
+        {(showOriginal || (mon instanceof OHPKM && mon.originalData)) && (
           <Flex className="original-data-switch" align="center" gap="2">
             <Switch
               radius="full"
               size="1"
-              checked={isOriginal}
-              onCheckedChange={updateIsOriginal}
+              checked={showOriginal}
+              onCheckedChange={setShowOriginal}
             />
             Show Original
           </Flex>
         )}
       </SideTabs.TabList>
-      <Fallback>
-        <SideTabs.Panel value="summary">
-          <SummaryDisplay mon={displayMon} />
-        </SideTabs.Panel>
-        <SideTabs.Panel value="moves_met_data">
-          <MetDataMovesTab mon={displayMon} />
-        </SideTabs.Panel>
-        <SideTabs.Panel value="stats">
-          <StatsDisplay mon={displayMon} />
-        </SideTabs.Panel>
-        <SideTabs.Panel value="ribbons">
-          <RibbonsDisplay mon={displayMon} />
-        </SideTabs.Panel>
-        <SideTabs.Panel value="other">
-          <OtherDisplay mon={displayMon} />
-        </SideTabs.Panel>
-        {mon instanceof OHPKM && (
-          <>
-            <SideTabs.Panel value="trainers">
-              <TrainersDisplay mon={mon} />
-            </SideTabs.Panel>
-            <SideTabs.Panel value="notes">
-              <NotesDisplay mon={mon} />
-            </SideTabs.Panel>
-            <SideTabs.Panel value="display">
-              <DisplayTab mon={mon} key={mon.openhomeId} />
-            </SideTabs.Panel>
-            <SideTabs.Panel value="recent-save">
-              <RecentSaveTab mon={mon} />
-            </SideTabs.Panel>
-            <SideTabs.Panel value="logs">
-              <LogsPage openhomeIdFilter={mon.openhomeId} />
-            </SideTabs.Panel>
-          </>
-        )}
-        <SideTabs.Panel value="raw">
+      {displayMon.match(
+        (mon) => (
           <Fallback>
-            <HexDisplay
-              data={new Uint8Array(displayMon.toBytes({ includeExtraFields: true }))}
-              format={
-                isRomHackFormat(displayMon.format)
-                  ? undefined
-                  : (displayMon.format as keyof typeof FileSchemas | 'OHPKM')
-              }
-            />
+            <SideTabs.Panel value="summary">
+              <SummaryDisplay mon={mon} />
+            </SideTabs.Panel>
+            <SideTabs.Panel value="moves">
+              <MovesTab mon={mon} />
+            </SideTabs.Panel>
+            <SideTabs.Panel value="met_data">
+              <MetDataTab mon={mon} />
+            </SideTabs.Panel>
+            <SideTabs.Panel value="stats">
+              <StatsDisplay mon={mon} />
+            </SideTabs.Panel>
+            <SideTabs.Panel value="ribbons">
+              <RibbonsDisplay mon={mon} />
+            </SideTabs.Panel>
+            <SideTabs.Panel value="other">
+              <OtherDisplay mon={mon} />
+            </SideTabs.Panel>
+            {mon instanceof OHPKM && (
+              <>
+                <SideTabs.Panel value="trainers">
+                  <TrainersDisplay mon={mon} />
+                </SideTabs.Panel>
+                <SideTabs.Panel value="notes">
+                  <NotesDisplay mon={mon} />
+                </SideTabs.Panel>
+                <SideTabs.Panel value="display">
+                  <DisplayTab mon={mon} />
+                </SideTabs.Panel>
+                <SideTabs.Panel value="recent-save">
+                  <RecentSaveTab mon={mon} />
+                </SideTabs.Panel>
+                <SideTabs.Panel value="logs">
+                  <LogsPage openhomeIdFilter={mon.openhomeId} />
+                </SideTabs.Panel>
+              </>
+            )}
+            <SideTabs.Panel value="raw">
+              <Fallback>
+                <HexDisplay
+                  data={new Uint8Array(mon.toBytes({ includeExtraFields: true }))}
+                  format={
+                    isRomHackFormat(mon.format)
+                      ? undefined
+                      : (mon.format as keyof typeof FileSchemas | 'OHPKM')
+                  }
+                />
+              </Fallback>
+            </SideTabs.Panel>
           </Fallback>
-        </SideTabs.Panel>
-      </Fallback>
+        ),
+        (error) => (
+          <MessageRibbon type="error">{error}</MessageRibbon>
+        )
+      )}
     </SideTabs.Root>
   )
+}
+
+type DisplayMonController = {
+  displayMon: Result<PKMInterface>
+  displayFormat: Option<PkmOrOhpkmFormat>
+  showOriginal: boolean
+  setShowOriginal: (value: boolean) => void
+  setDisplayFormat: (newFormat: PkmOrOhpkmFormat) => void
+}
+
+function useDisplayMon(mon: PKMInterface): DisplayMonController {
+  // currentFormat should always be undefined if displaying the current data
+  const [displayFormat, setDisplayFormat] = useState<Option<PkmOrOhpkmFormat>>()
+  const [showOriginal, setShowOriginal] = useState(false)
+  const { defaultConvertStrategy } = useConvertStrategies()
+
+  function setDisplayFormatIfDifferent(newFormat: PkmOrOhpkmFormat) {
+    setDisplayFormat(newFormat === mon.format ? undefined : newFormat)
+  }
+
+  const originalMon = mon instanceof OHPKM ? mon.originalData : undefined
+
+  return {
+    displayFormat:
+      showOriginal && originalMon ? originalDataTagToMonFormat(originalMon.tag) : displayFormat,
+    setDisplayFormat: setDisplayFormatIfDifferent,
+    showOriginal,
+    setShowOriginal,
+    displayMon: getDisplayMon(mon, displayFormat, showOriginal, defaultConvertStrategy),
+  }
+}
+
+function isOhkmFormat(format: PkmOrOhpkmFormat): format is 'OHPKM' {
+  return format === 'OHPKM'
+}
+
+function getDisplayMon(
+  mon: PKMInterface,
+  displayFormat: Option<PkmOrOhpkmFormat>,
+  showOriginal: boolean,
+  convertStrategy: ConvertStrategy
+): Result<PKMInterface> {
+  if (showOriginal && mon instanceof OHPKM && mon.originalData) {
+    return getDisplayOriginalPkm(mon.originalData)
+  }
+  if (!displayFormat || mon.format === displayFormat) {
+    return R.Ok(mon)
+  }
+
+  if (isOhkmFormat(displayFormat)) {
+    return R.Ok(OHPKM.fromMonUnknownSave(mon))
+  } else if (!(mon instanceof OHPKM)) {
+    return R.Err(
+      'If mon is not an OHPKM, the display format must either be its current format or OHPKM'
+    )
+  }
+
+  return getDisplayOhpkm(mon, displayFormat, showOriginal, convertStrategy)
+}
+
+function getDisplayOhpkm(
+  mon: OHPKM,
+  displayFormat: PkmFormat,
+  showOriginal: boolean,
+  convertStrategy: ConvertStrategy
+): Result<PKMInterface> {
+  if (showOriginal && mon.originalData) {
+    return getDisplayOriginalPkm(mon.originalData)
+  }
+
+  const PkmClass = fileTypeFromStringNonOhpkm(displayFormat)
+
+  if (!PkmClass) {
+    return R.Err(`Invalid filetype: ${PkmClass}`)
+  }
+
+  const ohpkm = mon instanceof OHPKM ? mon : OHPKM.fromMonUnknownSave(mon)
+
+  return $R(PkmClass.fromOhpkm(ohpkm, convertStrategy)).mapErr(
+    (error) => `Failed to convert OHPKM to ${PkmClass.getFormat()}: ${error}`
+  )
+}
+
+function getDisplayOriginalPkm(originalData: OriginalDataJs): Result<PKMInterface> {
+  const OriginalPkmClass = fileTypeFromStringNonOhpkm(originalDataTagToMonFormat(originalData.tag))
+  if (!OriginalPkmClass) {
+    return R.Err(`originalData.tag is an invalid filetype: ${originalData.tag}`)
+  }
+
+  const originalDataBytes = originalData.data.buffer as ArrayBuffer
+
+  try {
+    return R.Ok(OriginalPkmClass.fromBytes(originalDataBytes))
+  } catch (e) {
+    console.error(e)
+    return R.Err(String(e))
+  }
 }

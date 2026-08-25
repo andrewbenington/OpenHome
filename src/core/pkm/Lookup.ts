@@ -7,7 +7,7 @@ import {
   utf16StringToGen12,
 } from '@openhome-core/util/stringConversion'
 import { PKMFormeRef } from '@openhome-core/util/types'
-import { MetadataSummaryLookup, OriginGame, OriginGames } from '@pkm-rs/pkg'
+import { Language, MetadataSummaryLookup, OriginGame, OriginGames } from '@pkm-rs/pkg'
 
 export type OhpkmIdentifier = string
 
@@ -63,9 +63,13 @@ export const getMonGen12Identifier = (mon: PKMInterface): Option<Gen12Identifier
     dvs = dvsFromIVs(ivs, mon.isShiny())
   }
 
-  const gen12Bytes = utf16StringToGen12(mon.trainerName, 8, true)
+  // round-trip the OT name through the game's own encoding so the identifier
+  // matches what a Gen 1/2 save can actually store
+  const encoding = mon.language === Language.Japanese ? 'Jpn' : 'Int'
+  const nameLength = encoding === 'Jpn' ? 6 : 8
+  const gen12Bytes = utf16StringToGen12(mon.trainerName, nameLength, true, encoding)
   const dataView = new DataView(gen12Bytes.buffer)
-  const convertedTrainerName = readGameBoyStringFromBytes(dataView, 0, 8)
+  const convertedTrainerName = readGameBoyStringFromBytes(dataView, 0, nameLength, encoding)
   const baseEvolution = getBaseEvolution(mon.nationalDex, mon.formIndex)
   let tid = mon.trainerID
 

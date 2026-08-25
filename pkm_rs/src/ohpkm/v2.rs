@@ -1,9 +1,11 @@
 use std::num::NonZeroU64;
 
 use super::v2_sections::{
-    BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, MostRecentSave,
-    Notes, PluginData, ScarletVioletData, SwordShieldData,
+    GameboyData, Gen45Data, Gen67Data, LearnedMoves, LegendsArceusData, LegendsZaData, MainDataV2,
+    MonTags, MostRecentSave, Notes, PastHandlerDataV2, PluginData, SV_BASE_TM_BYTES_EXCLUDE_UNUSED,
+    ScarletVioletData, SwordShieldData,
 };
+use crate::gen9_lza::PlusMoveFlags;
 use crate::ohpkm::OhpkmConvert;
 #[allow(deprecated)]
 use crate::ohpkm::deprecated::PastHandlerDataV1;
@@ -11,15 +13,15 @@ use crate::ohpkm::extra_form::ExtraFormIndex;
 use crate::ohpkm::issues::OhpkmIssue;
 use crate::ohpkm::v1::OhpkmV1;
 use crate::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, StoredPkmBytes, UnconvertedPkm};
-use crate::ohpkm::v2_sections::{MonTags, PastHandlerDataV2, SV_BASE_TM_BYTES_EXCLUDE_UNUSED};
 use crate::result::{Error, Result};
 use crate::sectioned_data::{DataSection, SectionTag, SectionedData};
 use crate::traits::{HasSpeciesAndForm, IsShiny, PkmBytes};
 
+#[cfg(feature = "wasm")]
+use arrayref::array_ref;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::moves::MoveIndex;
-use pkm_rs_resources::moves::MoveSlots;
+use pkm_rs_resources::moves::{MoveIndex, MoveSlots, la_tutor, lza_tm, sv_tm, swsh_tr};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesForm;
@@ -38,6 +40,8 @@ use pkm_rs_types::randomize::Randomize;
 
 #[cfg(feature = "wasm")]
 use super::JsResult;
+#[cfg(feature = "wasm")]
+use crate::gen9_lza::{LZA_BASE_TM_BYTES, LZA_DLC_TM_BYTES};
 #[cfg(feature = "wasm")]
 use crate::gen9_sv;
 #[cfg(feature = "wasm")]
@@ -119,6 +123,7 @@ pub enum OhpkmSectionTag {
     BdspTmFlags = 0x05,
     LegendsArceus = 0x06,
     ScarletViolet = 0x07,
+    LegendsZa = 0x11,
     PluginData = 0x09,
     Notes = 0x0A,
     MostRecentSave = 0x0B,
@@ -126,6 +131,7 @@ pub enum OhpkmSectionTag {
     OriginalBackup = 0x0D,
     UnconvertedPkm = 0x0E,
     PastHandlerV2 = 0x0F,
+    LearnedMoves = 0x10,
 
     // deprecated, but can't mark it as such without warnings
     PastHandlerV1 = 0x08,
@@ -142,6 +148,7 @@ impl OhpkmSectionTag {
             0x05 => Some(Self::BdspTmFlags),
             0x06 => Some(Self::LegendsArceus),
             0x07 => Some(Self::ScarletViolet),
+            0x11 => Some(Self::LegendsZa),
             #[allow(deprecated)]
             0x08 => Some(Self::PastHandlerV1),
             0x09 => Some(Self::PluginData),
@@ -151,6 +158,7 @@ impl OhpkmSectionTag {
             0x0D => Some(Self::OriginalBackup),
             0x0E => Some(Self::UnconvertedPkm),
             0x0F => Some(Self::PastHandlerV2),
+            0x10 => Some(Self::LearnedMoves),
             _ => None,
         }
     }
@@ -171,6 +179,7 @@ impl OhpkmSectionTag {
             Self::BdspTmFlags => 14,
             Self::LegendsArceus => 44,
             Self::ScarletViolet => 37,
+            Self::LegendsZa => 83,
             Self::PastHandlerV2 => 40,
             Self::PluginData => 0,
             Self::Notes => 0,
@@ -178,6 +187,7 @@ impl OhpkmSectionTag {
             Self::Tag => 0,
             Self::OriginalBackup => 2, // Size of the tag
             Self::UnconvertedPkm => 2, // Size of the tag
+            Self::LearnedMoves => 2,   // Size of length field
 
             #[allow(deprecated)]
             Self::PastHandlerV1 => 39,
@@ -208,10 +218,11 @@ pub struct OhpkmV2 {
     gen45_data: Option<Gen45Data>,
     gen67_data: Option<Gen67Data>,
     swsh_data: Option<SwordShieldData>,
-    bdsp_data: Option<BdspData>,
     la_data: Option<LegendsArceusData>,
     sv_data: Option<ScarletVioletData>,
+    lza_data: Option<LegendsZaData>,
     handler_data: Vec<PastHandlerDataV2>,
+    learned_moves: Option<LearnedMoves>,
     plugin_data: Option<PluginData>,
     notes: Option<Notes>,
     most_recent_save: Option<MostRecentSave>,
@@ -762,6 +773,13 @@ impl OhpkmV2 {
         self.main_data.relearn_moves = value;
     }
 
+    pub fn get_learned_moves(&self) -> Vec<MoveIndex> {
+        self.learned_moves
+            .as_ref()
+            .map(|moves| moves.all_ordered())
+            .unwrap_or_default()
+    }
+
     pub const fn home_tracker(&self) -> Option<u64> {
         self.main_data.home_tracker
     }
@@ -1180,28 +1198,6 @@ impl OhpkmV2 {
         }
     }
 
-    // Brilliant Diamond/Shining Pearl
-
-    pub fn tutor_flags_bdsp(&self) -> Option<Vec<u8>> {
-        Some(self.bdsp_data?.tm_flags.to_bytes().to_vec())
-    }
-
-    pub fn set_tm_flags_bdsp(&mut self, value: Option<Vec<u8>>) {
-        match value {
-            Some(tm_flags) => {
-                let mut new_bytes = [0u8; 14];
-                new_bytes.copy_from_slice(&tm_flags);
-                self.bdsp_data.get_or_insert_default().tm_flags =
-                    FlagSet::<14>::from_bytes(new_bytes);
-            }
-            None => {
-                if let Some(bdsp_data) = &mut self.bdsp_data {
-                    bdsp_data.tm_flags = FlagSet::default();
-                }
-            }
-        }
-    }
-
     // Legends Arceus
 
     pub fn gvs(&self) -> Option<Stats8> {
@@ -1274,18 +1270,13 @@ impl OhpkmV2 {
         }
     }
 
-    pub fn master_flags_la(&self) -> Option<Vec<u8>> {
-        Some(self.la_data?.master_flags.to_bytes().to_vec())
+    pub fn master_flags_la(&self) -> Option<FlagSet<8>> {
+        Some(self.la_data?.master_flags)
     }
 
-    pub fn set_master_flags_la(&mut self, value: Option<Vec<u8>>) {
+    pub fn set_master_flags_la(&mut self, value: Option<FlagSet<8>>) {
         match value {
-            Some(master_flags) => {
-                let mut new_bytes = [0u8; 8];
-                new_bytes.copy_from_slice(&master_flags);
-                self.la_data.get_or_insert_default().master_flags =
-                    FlagSet::<8>::from_bytes(new_bytes);
-            }
+            Some(master_flags) => self.la_data.get_or_insert_default().master_flags = master_flags,
             None => {
                 if let Some(la_data) = &mut self.la_data {
                     la_data.master_flags = FlagSet::default();
@@ -1431,6 +1422,12 @@ impl OhpkmV2 {
                 }
             }
         }
+    }
+
+    // Legends Z-A
+
+    pub fn plus_moves_lza(&self) -> Option<PlusMoveFlags> {
+        Some(self.lza_data?.plus_moves)
     }
 
     // Past Handlers
@@ -1588,11 +1585,12 @@ impl OhpkmV2 {
             gen45_data: None,
             gen67_data: None,
             swsh_data: None,
-            bdsp_data: None,
             la_data: None,
             sv_data: None,
+            lza_data: None,
             handler_data: Vec::new(),
             plugin_data: None,
+            learned_moves: None,
             notes: None,
             most_recent_save: None,
             tags: None,
@@ -1628,10 +1626,11 @@ impl OhpkmV2 {
             gen45_data: Gen45Data::extract_from(&sectioned_data)?,
             gen67_data: Gen67Data::extract_from(&sectioned_data)?,
             swsh_data: SwordShieldData::extract_from(&sectioned_data)?,
-            bdsp_data: BdspData::extract_from(&sectioned_data)?,
             la_data: LegendsArceusData::extract_from(&sectioned_data)?,
             sv_data: ScarletVioletData::extract_from(&sectioned_data)?,
+            lza_data: LegendsZaData::extract_from(&sectioned_data)?,
             handler_data: past_handler_data_v2,
+            learned_moves: LearnedMoves::extract_from(&sectioned_data)?,
             plugin_data: PluginData::extract_from(&sectioned_data)?,
             notes: Notes::extract_from(&sectioned_data)?,
             most_recent_save: MostRecentSave::extract_from(&sectioned_data)?,
@@ -1672,14 +1671,15 @@ impl OhpkmV2 {
             swsh_data: SwordShieldData::extract_from(&sectioned_data)
                 .ok()
                 .flatten(),
-            bdsp_data: BdspData::extract_from(&sectioned_data).ok().flatten(),
             la_data: LegendsArceusData::extract_from(&sectioned_data)
                 .ok()
                 .flatten(),
             sv_data: ScarletVioletData::extract_from(&sectioned_data)
                 .ok()
                 .flatten(),
+            lza_data: LegendsZaData::extract_from(&sectioned_data).ok().flatten(),
             handler_data: past_handler_data_v2,
+            learned_moves: LearnedMoves::extract_from(&sectioned_data).ok().flatten(),
             plugin_data: PluginData::extract_from(&sectioned_data).ok().flatten(),
             notes: Notes::extract_from(&sectioned_data).ok().flatten(),
             most_recent_save: MostRecentSave::extract_from(&sectioned_data).ok().flatten(),
@@ -1705,10 +1705,11 @@ impl OhpkmV2 {
             gen45_data: Gen45Data::from_v1(old),
             gen67_data: Gen67Data::from_v1(old),
             swsh_data: SwordShieldData::from_v1(old),
-            bdsp_data: BdspData::from_v1(old),
             la_data: LegendsArceusData::from_v1(old),
             sv_data: ScarletVioletData::from_v1(old),
+            lza_data: None, // z-a move flags weren't tracked in v1
             handler_data: PastHandlerDataV2::from_ohpkm_v1(old).map_or(Vec::new(), |hd| vec![hd]),
+            learned_moves: LearnedMoves::from_v1(old),
             plugin_data: PluginData::from_v1(old),
             notes: None,
             most_recent_save: None,
@@ -1720,22 +1721,48 @@ impl OhpkmV2 {
 
     pub fn to_sectioned_data(&self) -> SectionedData<OhpkmSectionTag> {
         let mut sectioned_data = SectionedData::new(MAGIC_NUMBER, CURRENT_VERSION);
+
+        let mut to_be_sectioned = self.clone();
+        to_be_sectioned.fix_errors();
+
+        // destructure here to give an error when adding a new section (force handling)
+        let Self {
+            main_data,
+            gameboy_data,
+            gen45_data,
+            gen67_data,
+            swsh_data,
+            la_data,
+            sv_data,
+            lza_data,
+            handler_data,
+            learned_moves,
+            plugin_data,
+            notes,
+            most_recent_save,
+            tags,
+            original_data,
+            unconverted_pkm,
+        } = to_be_sectioned;
+
         sectioned_data
-            .add(self.main_data)
-            .add_if_some(self.gameboy_data)
-            .add_if_some(self.gen45_data)
-            .add_if_some(self.gen67_data)
-            .add_if_some(self.swsh_data)
-            .add_if_some(self.bdsp_data)
-            .add_if_some(self.la_data)
-            .add_if_some(self.sv_data)
-            .add_all(self.handler_data.clone())
-            .add_if_some(self.plugin_data.clone())
-            .add_if_some(self.notes.clone())
-            .add_if_some(self.most_recent_save.clone())
-            .add_if_some(self.tags.clone())
-            .add_if_some(self.original_data)
-            .add_if_some(self.unconverted_pkm);
+            .add(main_data)
+            .add_if_some(gameboy_data)
+            .add_if_some(gen45_data)
+            .add_if_some(gen67_data)
+            .add_if_some(swsh_data)
+            .add_if_some(la_data)
+            .add_if_some(sv_data)
+            .add_if_some(lza_data)
+            .add_all(handler_data)
+            .add_if_some(plugin_data)
+            .add_if_some(notes)
+            .add_if_some(learned_moves)
+            .add_if_some(most_recent_save)
+            .add_if_some(tags)
+            .add_if_some(original_data)
+            .add_if_some(unconverted_pkm);
+
         sectioned_data
     }
 
@@ -1757,6 +1784,10 @@ impl OhpkmV2 {
 
     pub fn fix_errors(&mut self) -> Vec<OhpkmIssue> {
         let mut fixed_issues = Vec::<OhpkmIssue>::new();
+
+        self.sync_learned_moves();
+        self.update_la_mastered_moves_by_current_level();
+        self.update_plus_moves_by_current_level();
 
         fixed_issues.append(&mut self.main_data.fix_errors());
 
@@ -1806,6 +1837,106 @@ impl OhpkmV2 {
     pub fn revert_ability_by_num(&mut self) {
         self.main_data.revert_ability_by_num()
     }
+
+    fn update_la_mastered_moves_by_current_level(&mut self) {
+        let Some(move_mastery_data) = self.species_and_form().get_move_mastery_la() else {
+            return;
+        };
+
+        let current_level = self.calculate_level();
+
+        let Some(la_data) = self.la_data.as_mut() else {
+            return;
+        };
+
+        for move_mastery in move_mastery_data
+            .all_moves()
+            .iter()
+            .filter(|move_mastery| current_level >= move_mastery.get_level())
+        {
+            la_data.set_mastered_move(move_mastery.move_id_raw());
+        }
+    }
+
+    fn update_plus_moves_by_current_level(&mut self) {
+        let Some(plus_move_data) = self.species_and_form().get_plus_moves_lza() else {
+            return;
+        };
+
+        let current_level = self.calculate_level();
+
+        let Some(lza_data) = self.lza_data.as_mut() else {
+            return;
+        };
+
+        for plus_move in plus_move_data
+            .all_moves()
+            .iter()
+            .filter(|plus_move| current_level >= plus_move.get_level())
+        {
+            lza_data.add_plus_move_by_id(plus_move.move_id_raw());
+        }
+    }
+
+    pub fn sync_learned_moves(&mut self) {
+        let mut learned_moves = self.learned_moves.take().unwrap_or_default();
+
+        learned_moves.add_moves(
+            self.moves()
+                .into_iter()
+                .map(|move_data| move_data.move_index),
+        );
+
+        if let Some(swsh_data) = self.swsh_data {
+            let swsh_tr_move_ids = FlagSet::from_bytes(swsh_data.tr_flags)
+                .get_flags()
+                .into_iter()
+                .filter_map(swsh_tr::move_id_by_tr_index);
+            learned_moves.add_moves(swsh_tr_move_ids);
+        };
+
+        if let Some(la_data) = self.la_data {
+            let la_tutor_move_ids = la_data
+                .tutor_flags
+                .get_flags()
+                .into_iter()
+                .filter_map(la_tutor::move_id_by_tutor_index);
+            learned_moves.add_moves(la_tutor_move_ids);
+        };
+
+        if let Some(sv_data) = self.sv_data {
+            let sv_tm_move_ids = sv_data
+                .tm_flags
+                .get_flags()
+                .into_iter()
+                .filter_map(sv_tm::move_id_by_tm_index);
+            learned_moves.add_moves(sv_tm_move_ids);
+        };
+
+        if let Some(lza_data) = self.lza_data {
+            let base_game_tm_move_ids = lza_data
+                .tm_flags_base
+                .get_flags()
+                .into_iter()
+                .filter_map(lza_tm::move_id_by_base_game_tm_index);
+            learned_moves.add_moves(base_game_tm_move_ids);
+
+            let dlc_tm_move_ids = lza_data
+                .tm_flags_dlc
+                .get_flags()
+                .into_iter()
+                .filter_map(lza_tm::move_id_by_dlc_tm_index);
+            learned_moves.add_moves(dlc_tm_move_ids);
+
+            learned_moves.add_moves(lza_data.plus_moves.get_move_ids());
+        };
+
+        learned_moves.add_moves(self.main_data.relearn_moves);
+
+        if learned_moves.count() > 0 {
+            self.learned_moves = Some(learned_moves);
+        }
+    }
 }
 
 #[cfg(test)]
@@ -1853,19 +1984,51 @@ impl OhpkmV2 {
     pub fn get_section_bytes(&self) -> JsResult<js_sys::Object> {
         let obj = js_sys::Object::new();
 
+        // destructure here to give an error when adding a new section (force handling)
+        let Self {
+            main_data,
+            gameboy_data,
+            gen45_data,
+            gen67_data,
+            swsh_data,
+            la_data,
+            sv_data,
+            lza_data,
+            handler_data,
+            learned_moves,
+            plugin_data,
+            notes,
+            most_recent_save,
+            tags,
+            original_data,
+            unconverted_pkm,
+        } = self;
+
         js_sys::Reflect::set(
             &obj,
             &JsValue::from("MainData"),
-            &JsValue::from(self.main_data.to_bytes()),
+            &JsValue::from(main_data.to_bytes()),
         )?;
-        add_section_bytes_to_js_object(&obj, &self.gameboy_data)?;
-        add_section_bytes_to_js_object(&obj, &self.gen45_data)?;
-        add_section_bytes_to_js_object(&obj, &self.gen67_data)?;
-        add_section_bytes_to_js_object(&obj, &self.swsh_data)?;
-        add_section_bytes_to_js_object(&obj, &self.bdsp_data)?;
-        add_section_bytes_to_js_object(&obj, &self.la_data)?;
-        add_section_bytes_to_js_object(&obj, &self.sv_data)?;
-        add_section_bytes_to_js_object(&obj, &self.plugin_data)?;
+
+        add_section_bytes_to_js_object(&obj, gameboy_data)?;
+        add_section_bytes_to_js_object(&obj, gen45_data)?;
+        add_section_bytes_to_js_object(&obj, gen67_data)?;
+        add_section_bytes_to_js_object(&obj, swsh_data)?;
+        add_section_bytes_to_js_object(&obj, la_data)?;
+        add_section_bytes_to_js_object(&obj, sv_data)?;
+        add_section_bytes_to_js_object(&obj, lza_data)?;
+
+        for handler in handler_data {
+            add_section_bytes_to_js_object(&obj, &Some(handler.clone()))?;
+        }
+
+        add_section_bytes_to_js_object(&obj, learned_moves)?;
+        add_section_bytes_to_js_object(&obj, plugin_data)?;
+        add_section_bytes_to_js_object(&obj, notes)?;
+        add_section_bytes_to_js_object(&obj, most_recent_save)?;
+        add_section_bytes_to_js_object(&obj, tags)?;
+        add_section_bytes_to_js_object(&obj, original_data)?;
+        add_section_bytes_to_js_object(&obj, unconverted_pkm)?;
 
         Ok(obj)
     }
@@ -2408,7 +2571,7 @@ impl OhpkmV2 {
 
     #[wasm_bindgen(getter = nickname)]
     pub fn nickname_js(&self) -> String {
-        self.main_data.nickname.to_string()
+        self.nickname().to_string()
     }
 
     #[wasm_bindgen(setter = nickname)]
@@ -2483,6 +2646,28 @@ impl OhpkmV2 {
             MoveIndex::from(value[2]),
             MoveIndex::from(value[3]),
         ]
+    }
+
+    #[wasm_bindgen(getter = learnedMovesWasm)]
+    pub fn get_learned_moves_wasm(&self) -> Vec<usize> {
+        self.learned_moves
+            .as_ref()
+            .map(|moves| {
+                moves
+                    .all_ordered()
+                    .iter()
+                    .filter_map(MoveIndex::to_raw)
+                    .map(|id| id as usize)
+                    .collect()
+            })
+            .unwrap_or_default()
+    }
+
+    #[wasm_bindgen(js_name = populateLearnedMoves)]
+    pub fn populate_learned_moves_wasm(&mut self) {
+        self.sync_learned_moves();
+        self.update_la_mastered_moves_by_current_level();
+        self.update_plus_moves_by_current_level();
     }
 
     #[wasm_bindgen(getter = homeTracker)]
@@ -2972,30 +3157,6 @@ impl OhpkmV2 {
         }
     }
 
-    // Brilliant Diamond/Shining Pearl
-
-    #[wasm_bindgen(getter = tmFlagsBDSP)]
-    pub fn tutor_flags_bdsp_js(&self) -> Option<Vec<u8>> {
-        Some(self.bdsp_data?.tm_flags.to_bytes().to_vec())
-    }
-
-    #[wasm_bindgen(setter = tmFlagsBDSP)]
-    pub fn set_tm_flags_bdsp_js(&mut self, value: Option<Vec<u8>>) {
-        match value {
-            Some(tm_flags) => {
-                let mut new_bytes = [0u8; 14];
-                new_bytes.copy_from_slice(&tm_flags);
-                self.bdsp_data.get_or_insert_default().tm_flags =
-                    FlagSet::<14>::from_bytes(new_bytes);
-            }
-            None => {
-                if let Some(bdsp_data) = &mut self.bdsp_data {
-                    bdsp_data.tm_flags = FlagSet::default();
-                }
-            }
-        }
-    }
-
     // Legends Arceus
 
     #[wasm_bindgen(getter = gvs)]
@@ -3086,18 +3247,25 @@ impl OhpkmV2 {
 
     #[wasm_bindgen(setter = masterFlagsLA)]
     pub fn set_master_flags_la_js(&mut self, value: Option<Vec<u8>>) {
-        match value {
-            Some(master_flags) => {
-                let mut new_bytes = [0u8; 8];
-                new_bytes.copy_from_slice(&master_flags);
-                self.la_data.get_or_insert_default().master_flags =
-                    FlagSet::<8>::from_bytes(new_bytes);
-            }
-            None => {
-                if let Some(la_data) = &mut self.la_data {
-                    la_data.master_flags = FlagSet::default();
-                }
-            }
+        self.set_master_flags_la(value.map(|v| {
+            let mut new_bytes = [0u8; 8];
+            new_bytes.copy_from_slice(&v);
+            FlagSet::<8>::from_bytes(new_bytes)
+        }));
+    }
+
+    #[wasm_bindgen(js_name = isMasteredMoveLa)]
+    pub fn is_mastered_move_la(&self, move_id: u16) -> bool {
+        if let Some(la_data) = self.la_data
+            && let Some(flag) = la_tutor::tutor_index_by_move_id(move_id)
+            && la_data.master_flags.get_flag(flag)
+        {
+            true
+        } else {
+            self.species_and_form()
+                .get_move_mastery_la()
+                .and_then(|lookup| lookup.move_data_by_id(move_id))
+                .is_some_and(|data| self.calculate_level() >= data.get_level())
         }
     }
 
@@ -3269,14 +3437,78 @@ impl OhpkmV2 {
         }
     }
 
-    #[wasm_bindgen(js_name = toByteArray)]
-    pub fn to_bytes_js_js(&self) -> Vec<u8> {
-        self.to_bytes()
+    // Legends Z-A
+
+    #[wasm_bindgen(getter = tmFlagsLzaBase)]
+    pub fn tm_flags_lza_base_wasm(&self) -> Option<Vec<u8>> {
+        Some(self.lza_data?.tm_flags_base.to_bytes().to_vec())
     }
 
-    #[wasm_bindgen(js_name = fromV1Bytes)]
-    pub fn from_v1_bytes_js(bytes: Vec<u8>) -> JsResult<Self> {
-        Ok(OhpkmV1::from_bytes(&bytes).map(OhpkmV2::from_v1)?)
+    #[wasm_bindgen(setter = tmFlagsLzaBase)]
+    pub fn set_tm_flags_lza_base_wasm(&mut self, value: Option<Vec<u8>>) {
+        match value {
+            Some(flags) => {
+                let sized_array = array_ref![flags, 0, LZA_BASE_TM_BYTES];
+                self.lza_data.get_or_insert_default().tm_flags_base =
+                    FlagSet::<LZA_BASE_TM_BYTES>::from_bytes(*sized_array);
+            }
+            None => {
+                if let Some(lza_data) = &mut self.lza_data {
+                    lza_data.tm_flags_base = FlagSet::default();
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter = tmFlagsLzaDlc)]
+    pub fn tm_flags_lza_dlc_wasm(&self) -> Option<Vec<u8>> {
+        Some(self.lza_data?.tm_flags_dlc.to_bytes().to_vec())
+    }
+
+    #[wasm_bindgen(setter = tmFlagsLzaDlc)]
+    pub fn set_tm_flags_lza_dlc_wasm(&mut self, value: Option<Vec<u8>>) {
+        match value {
+            Some(flags) => {
+                let mut new_bytes = [0u8; LZA_DLC_TM_BYTES];
+                dbg!(new_bytes, LZA_DLC_TM_BYTES);
+                new_bytes.copy_from_slice(&flags);
+                self.lza_data.get_or_insert_default().tm_flags_dlc =
+                    FlagSet::<LZA_DLC_TM_BYTES>::from_bytes(new_bytes);
+            }
+            None => {
+                if let Some(lza_data) = &mut self.lza_data {
+                    lza_data.tm_flags_dlc = FlagSet::default();
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter = plusMoveFlags)]
+    pub fn plus_move_flags_lza_wasm(&self) -> Option<PlusMoveFlags> {
+        Some(self.lza_data?.plus_moves)
+    }
+
+    #[wasm_bindgen(setter = plusMoveFlags)]
+    pub fn set_plus_move_flags_lza_wasm(&mut self, value: Option<PlusMoveFlags>) {
+        match value {
+            Some(plus_moves) => self.lza_data.get_or_insert_default().plus_moves = plus_moves,
+            None => {
+                if let Some(lza_data) = &mut self.lza_data {
+                    lza_data.plus_moves = PlusMoveFlags::default();
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(js_name = isPlusMove)]
+    pub fn is_plus_move(&self, move_id: u16) -> bool {
+        self.lza_data
+            .is_some_and(|lza_data| lza_data.plus_moves.is_plus_move(move_id))
+    }
+
+    #[wasm_bindgen(js_name = toByteArray)]
+    pub fn to_bytes_wasm(&self) -> Vec<u8> {
+        self.to_bytes()
     }
 
     #[wasm_bindgen(js_name = getSectionBytes)]
@@ -3292,7 +3524,6 @@ impl OhpkmV2 {
         add_section_bytes_to_js_object(&obj, &self.gen45_data)?;
         add_section_bytes_to_js_object(&obj, &self.gen67_data)?;
         add_section_bytes_to_js_object(&obj, &self.swsh_data)?;
-        add_section_bytes_to_js_object(&obj, &self.bdsp_data)?;
         add_section_bytes_to_js_object(&obj, &self.la_data)?;
         add_section_bytes_to_js_object(&obj, &self.sv_data)?;
         add_section_bytes_to_js_object(&obj, &self.plugin_data)?;

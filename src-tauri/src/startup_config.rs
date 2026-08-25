@@ -1,5 +1,11 @@
 use crate::commands::CommandResult;
+#[cfg(not(mobile))]
+use crate::data_controller::TauriDataController;
+#[cfg(not(mobile))]
+use openhome_core::Error;
 use openhome_core::Result;
+#[cfg(not(mobile))]
+use openhome_core::data_controller::DataController;
 use openhome_core::startup_config::StartupConfig;
 use serde::Serialize;
 #[cfg(not(mobile))]

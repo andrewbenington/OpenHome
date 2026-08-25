@@ -1,4 +1,5 @@
 import useBackend from '@openhome-core/backend/useBackend'
+import { getMoveMaxPP } from '@openhome-core/pkm'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import {
   getMonFileIdentifier,
@@ -11,6 +12,7 @@ import { SAV } from '@openhome-core/save/interfaces'
 import { SAVClass } from '@openhome-core/save/util'
 import { expectExhaustive } from '@openhome-core/util'
 import { $R, Errorable, Option, R, Result } from '@openhome-core/util/functional'
+import { FourMoves } from '@openhome-core/util/types'
 import { Lookup, MarkingsSixShapesColors, ModernRibbon, OriginGames } from '@pkm-rs/pkg/pkm_rs'
 import dayjs from 'dayjs'
 import { createContext, useCallback, useContext } from 'react'
@@ -19,6 +21,8 @@ import { useConvertStrategies } from '../convert-strategies'
 import { useLookups } from '../lookups'
 
 export const FORCE_MISSED_LOOKUP = false
+
+export type MoveSlotIndex = 0 | 1 | 2 | 3
 
 export function useOhpkmStore() {
   const [ohpkmStore, updateStore] = useContext(OhpkmStoreContext)
@@ -207,6 +211,31 @@ export function useOhpkmStore() {
     [insertOrUpdate, tryLoadFromId]
   )
 
+  const setMonMove = useCallback(
+    (monId: string, moveId: Option<number>, slot: MoveSlotIndex) => {
+      const result = tryLoadFromId(monId)
+      if (R.isErr(result)) return result
+
+      const mon = result.data
+      const newMoves: FourMoves = [...mon.moves]
+
+      newMoves[slot] = moveId ?? 0
+
+      mon.moves = fixMoveSlots(newMoves, newMoves)
+
+      mon.movePP = [
+        getMoveMaxPP(mon.moves[0], 'OHPKM', mon.movePPUps[0]) ?? 0,
+        getMoveMaxPP(mon.moves[1], 'OHPKM', mon.movePPUps[1]) ?? 0,
+        getMoveMaxPP(mon.moves[2], 'OHPKM', mon.movePPUps[2]) ?? 0,
+        getMoveMaxPP(mon.moves[3], 'OHPKM', mon.movePPUps[3]) ?? 0,
+      ]
+
+      insertOrUpdate(mon)
+      return R.Ok(mon)
+    },
+    [insertOrUpdate, tryLoadFromId]
+  )
+
   const setMonNickname = useCallback(
     (monId: string, nickname: Option<string>) => {
       const result = tryLoadFromId(monId)
@@ -357,6 +386,7 @@ export function useOhpkmStore() {
     updateMonAffixedRibbon,
     updateMonDisplayColor,
     setMonNickname,
+    setMonMove,
 
     getAllStored,
     updateAndConvertForSave,
@@ -368,6 +398,21 @@ export function useOhpkmStore() {
 
     replaceHeldItem,
   }
+}
+
+function fixMoveSlots(slots: FourMoves, moves: FourMoves): FourMoves {
+  const dedupedMoves = Array.from(new Set(moves))
+
+  const presentSlots = [0, 1, 2, 3]
+    .filter((index) => Boolean(dedupedMoves.at(index)))
+    .map((index) => slots[index])
+
+  return [
+    presentSlots.at(0) ?? 0,
+    presentSlots.at(1) ?? 0,
+    presentSlots.at(2) ?? 0,
+    presentSlots.at(3) ?? 0,
+  ]
 }
 
 export type OhpkmStore = ReturnType<typeof useOhpkmStore>

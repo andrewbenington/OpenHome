@@ -64,11 +64,11 @@ As of Version 1.10.1, newly tracked Pokémon include a backup of their original 
 
 All official PKM formats are supported, except for:
 
-- Japanese versions of Gen 1/Gen 2 Pokémon
+- Korean versions of Gen 1/Gen 2 Pokémon
 - Pokémon from Colosseum and XD: Gale of Darkness
 - Pokémon HOME files
 
-Japanese Gen 1/Gen 2 and Colosseum/XD save files are also unsupported as of now.
+Colosseum/XD and Korean Gen 1/Gen 2 save files are also unsupported as of now.
 
 Support for more formats will be added if there is demand for them, and when I have time to work on them.
 

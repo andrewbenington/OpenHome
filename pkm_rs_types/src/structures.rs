@@ -150,7 +150,7 @@ impl From<BinaryGender> for Gender {
 }
 
 #[cfg_attr(feature = "randomize", derive(Randomize))]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct FlagSet<const N: usize, FLAG: Copy + Into<usize> = usize> {
     _marker: core::marker::PhantomData<FLAG>,
     raw: [u8; N],
@@ -185,6 +185,10 @@ impl<const N: usize, FLAG: Copy + Into<usize> + From<usize>> FlagSet<N, FLAG> {
 
     pub const fn to_bytes(self) -> [u8; N] {
         self.raw
+    }
+
+    pub fn bytes(&self) -> impl Iterator<Item = &u8> {
+        self.raw.iter()
     }
 
     pub fn set_flag(&mut self, flag: FLAG, value: bool) {
@@ -235,6 +239,20 @@ impl<const N: usize, FLAG: Copy + Into<usize> + From<usize>> FlagSet<N, FLAG> {
             _marker: self._marker,
             raw: resized_raw,
         }
+    }
+
+    pub fn add_all_from(&mut self, other: &Self) {
+        self.raw
+            .iter_mut()
+            .zip(other.bytes())
+            .for_each(|(this_byte, other_byte)| *this_byte |= *other_byte);
+    }
+
+    pub fn is_superset_of(&mut self, other: &Self) -> bool {
+        self.raw
+            .iter()
+            .zip(other.bytes())
+            .all(|(this_byte, other_byte)| this_byte & other_byte == *this_byte)
     }
 }
 

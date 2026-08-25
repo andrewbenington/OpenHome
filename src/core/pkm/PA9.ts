@@ -1,5 +1,11 @@
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { bitwiseOrUint8Array, OHPKM } from '@openhome-core/pkm/OHPKM'
 import { ModernRibbons } from '@openhome-core/resources'
+import {
+  LZA_BASE_TM_BYTES,
+  LZA_DLC_TM_BYTES,
+  movesFromLzaBaseTmFlags,
+  movesFromLzaDlcTmFlags,
+} from '@openhome-core/resources/moves/flags'
 import * as byteLogic from '@openhome-core/util/byteLogic'
 import { Errorable, R } from '@openhome-core/util/functional'
 import { FourMoves } from '@openhome-core/util/types'
@@ -16,6 +22,7 @@ import {
   MarkingsSixShapesColors,
   MetadataSummaryLookup,
   NatureIndex,
+  PlusMoveFlags,
   SpeciesLookup,
   TrainerMemory,
 } from '@pkm-rs/pkg'
@@ -64,7 +71,6 @@ export default class PA9 {
   heightScalar: number
   weightScalar: number
   scale: number
-  tmFlagsLzaDlc: Uint8Array
   nickname: string
   moves: FourMoves
   movePP: FourMoves
@@ -99,7 +105,9 @@ export default class PA9 {
   metLevel: number
   hyperTraining: HyperTraining
   homeTracker: bigint
-  tmFlagsLza: Uint8Array
+  tmFlagsLzaBase: Uint8Array // 25 bytes
+  tmFlagsLzaDlc: Uint8Array // 13 bytes
+  plusMoveFlags: PlusMoveFlags
   ribbons: string[]
   trainerGender: BinaryGender
   level: number
@@ -145,7 +153,11 @@ export default class PA9 {
       this.heightScalar = dataView.getUint8(0x48)
       this.weightScalar = dataView.getUint8(0x49)
       this.scale = dataView.getUint8(0x4a)
-      this.tmFlagsLzaDlc = new Uint8Array(buffer).slice(0x4b, 0x58)
+
+      const plusMovesBlockC = new Uint8Array(buffer).slice(0xd6, 0xf7)
+      const plusMovesBlockB = new Uint8Array(buffer).slice(0x60, 0x6c)
+      this.plusMoveFlags = PlusMoveFlags.fromByteBlocks(plusMovesBlockC, plusMovesBlockB)
+
       this.nickname = stringLogic.utf16BytesToString(buffer, 0x58, 12)
       this.moves = [
         dataView.getUint16(0x72, true),
@@ -200,7 +212,8 @@ export default class PA9 {
       this.metLevel = dataView.getUint8(0x125)
       this.hyperTraining = types.readHyperTrainStatsFromBytes(dataView, 0x126)
       this.homeTracker = dataView.getBigUint64(0x127)
-      this.tmFlagsLza = new Uint8Array(buffer).slice(0x12f, 0x145)
+      this.tmFlagsLzaBase = new Uint8Array(buffer).slice(0x12f, 0x148)
+      this.tmFlagsLzaDlc = new Uint8Array(buffer).slice(0x4b, 0x58)
       this.ribbons = byteLogic
         .getFlagsInBitRange(dataView, 0x34, 0, 64)
         .map((index) => ModernRibbons[index])
@@ -262,7 +275,12 @@ export default class PA9 {
       this.heightScalar = other.heightScalar ?? 0
       this.weightScalar = other.weightScalar ?? 0
       this.scale = other.scale ?? 0
-      this.tmFlagsLzaDlc = other.tmFlagsSVDLC ?? new Uint8Array(13)
+      this.tmFlagsLzaBase = other.tmFlagsLzaBase ?? new Uint8Array(25)
+      this.tmFlagsLzaDlc = other.tmFlagsLzaDlc ?? new Uint8Array(13)
+      this.plusMoveFlags = (
+        other.plusMoveFlags?.clone() ?? PlusMoveFlags.empty()
+      ).withAllForSpeciesAtLevel(other.speciesAndForm, other.getLevel())
+
       this.nickname = converter.nickname(other)
 
       const moveFilter = MoveFilter.fromPkmClass(PA9)
@@ -304,7 +322,6 @@ export default class PA9 {
       this.metLevel = other.metLevel
       this.hyperTraining = other.hyperTraining
       this.homeTracker = other.homeTracker ?? 0n
-      this.tmFlagsLza = other.tmFlagsSV ?? new Uint8Array(22)
       this.ribbons = filterRibbons(other.ribbons, [ModernRibbons], '')
       this.trainerGender = other.trainerGender
     }
@@ -401,7 +418,14 @@ export default class PA9 {
     dataView.setUint8(0x125, this.metLevel)
     types.writeHyperTrainStatsToBytes(dataView, 0x126, this.hyperTraining)
     dataView.setBigUint64(0x127, this.homeTracker)
-    new Uint8Array(buffer).set(new Uint8Array(this.tmFlagsLza.slice(0, 22)), 0x12f)
+    new Uint8Array(buffer).set(
+      new Uint8Array(this.tmFlagsLzaBase.slice(0, LZA_BASE_TM_BYTES)),
+      0x12f
+    )
+    new Uint8Array(buffer).set(new Uint8Array(this.tmFlagsLzaDlc.slice(0, LZA_DLC_TM_BYTES)), 0x4b)
+
+    new Uint8Array(buffer).set(new Uint8Array(this.plusMoveFlags.toBlockCBytes()), 0xd6)
+    new Uint8Array(buffer).set(new Uint8Array(this.plusMoveFlags.toBlockBBytes()), 0x94)
     byteLogic.setFlagIndexes(
       dataView,
       0x34,
@@ -422,6 +446,38 @@ export default class PA9 {
     dataView.setUint8(0x148, this.level)
     types.writeStatsToBytesU16(dataView, 0x14a, this.stats)
     return buffer
+  }
+
+  get tmMovesLzaBase() {
+    return this.tmFlagsLzaBase ? movesFromLzaBaseTmFlags(this.tmFlagsLzaBase) : []
+  }
+
+  unionTmFlagsLzaBase(otherTmFlags: Uint8Array) {
+    this.tmFlagsLzaBase = bitwiseOrUint8Array(
+      this.tmFlagsLzaBase || new Uint8Array(LZA_DLC_TM_BYTES),
+      otherTmFlags
+    )
+  }
+
+  get tmMovesLzaDlc() {
+    return this.tmFlagsLzaDlc ? movesFromLzaDlcTmFlags(this.tmFlagsLzaDlc) : []
+  }
+
+  unionTmFlagsLzaDlc(otherTmFlags: Uint8Array) {
+    this.tmFlagsLzaDlc = bitwiseOrUint8Array(
+      this.tmFlagsLzaDlc || new Uint8Array(LZA_DLC_TM_BYTES),
+      otherTmFlags
+    )
+  }
+
+  get plusMovesLza() {
+    return this.plusMoveFlags?.getMoveIds() ?? []
+  }
+
+  unionPlusFlagsLza(otherPlusFlags: PlusMoveFlags) {
+    const updated = this.plusMoveFlags ?? PlusMoveFlags.empty()
+    updated.addAllFrom(otherPlusFlags)
+    this.plusMoveFlags = updated
   }
 
   public getStats() {

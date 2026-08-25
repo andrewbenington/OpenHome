@@ -13,6 +13,7 @@ import {
   HyperTraining,
   Language,
   NatureIndex,
+  PlusMoveFlags,
   ShinyLeaves,
   StatsPreSplit,
   TeraType,
@@ -126,11 +127,15 @@ export interface AllPKMFields {
   tags?: MonTag[]
   teraTypeOriginal?: TeraType
   teraTypeOverride?: TeraType
-  tmFlagsBDSP?: Uint8Array
-  tmFlagsLza?: Uint8Array
+  tmFlagsLzaBase?: Uint8Array
+  tmMovesLzaBase?: Move[]
   tmFlagsLzaDlc?: Uint8Array
+  tmMovesLzaDlc?: Move[]
+  plusMoveFlags?: PlusMoveFlags
   tmFlagsSV?: Uint8Array
+  tmMovesSV?: Move[]
   tmFlagsSVDLC?: Uint8Array
+  tmMovesSVDLC?: Move[]
   trFlagsSwSh?: Uint8Array
   trMovesSwSh?: Move[]
   trainerAffection?: number
@@ -142,6 +147,7 @@ export interface AllPKMFields {
   trainingBag?: number
   trainingBagHits?: number
   tutorFlagsLA?: Uint8Array
+  tutorMovesLa?: Move[]
   type1?: number
   type2?: number
   unknownA0?: number

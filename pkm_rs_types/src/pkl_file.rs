@@ -28,3 +28,10 @@ impl<'a> PklFileData<'a> {
         self.0
     }
 }
+
+#[macro_export]
+macro_rules! include_pkl {
+    ($path:expr) => {
+        PklFileData::from_bytes(include_bytes!($path))
+    };
+}

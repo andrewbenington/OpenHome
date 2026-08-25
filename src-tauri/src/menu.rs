@@ -17,8 +17,6 @@ use tauri::{AppHandle, Emitter};
 use tauri::menu::*;
 
 #[cfg(not(mobile))]
-use crate::data_controller::DataController;
-#[cfg(not(mobile))]
 const APP_ICON: Image<'_> = include_image!("icons/128x128.png");
 
 #[cfg(not(mobile))]

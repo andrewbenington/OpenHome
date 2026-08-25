@@ -2,19 +2,24 @@ import { PK9 } from '@openhome-core/pkm'
 import fs from 'fs'
 import { TextDecoder } from 'node:util' // (ESM style imports)
 import { assert, beforeAll, describe, expect, test } from 'vitest'
+import { OHPKM } from '../OHPKM'
 import { initializeWasm } from './init'
 import { pkmTestFilePath } from './Ohpkm.test'
 ;(global as any).TextDecoder = TextDecoder
 
+function pk9FromTestFile(filename: string) {
+  const bytes = new Uint8Array(fs.readFileSync(pkmTestFilePath('pk9', filename)))
+  return PK9.fromBytes(bytes.buffer)
+}
+
 beforeAll(initializeWasm)
 
-describe('gen 9 conversion to bytes and back is lossless', async () => {
+describe('scarlet/violet conversion to bytes and back is lossless', async () => {
   const files = fs.readdirSync(pkmTestFilePath('pk9')).filter((f) => f.endsWith('.pk9'))
   await initializeWasm()
 
   for (const file of files) {
-    const bytes = new Uint8Array(fs.readFileSync(pkmTestFilePath('pk9', file)))
-    const original = PK9.fromBytes(bytes.buffer)
+    const original = pk9FromTestFile(file)
     const roundTrip = PK9.fromBytes(PK9.fromBytes(original.toBytes()).toBytes())
 
     test(`round trip game of origin match - ${file}`, () => {
@@ -53,6 +58,20 @@ describe('gen 9 conversion to bytes and back is lossless', async () => {
       expect(original.moves, 'move indices').toEqual(roundTrip.moves)
       expect(original.movePP, 'move PP').toEqual(roundTrip.movePP)
       expect(original.movePPUps, 'move PP Ups').toEqual(roundTrip.movePPUps)
+    })
+  }
+})
+
+describe("pk9 - ohpkm sync doesn't crash", async () => {
+  const files = fs.readdirSync(pkmTestFilePath('pk9')).filter((f) => f.endsWith('.pk9'))
+  await initializeWasm()
+
+  for (const file of files) {
+    const mon = pk9FromTestFile(file)
+
+    test(`sync doesn't crash - ${file}`, () => {
+      const ohpkm = OHPKM.defaultWithSpecies(mon.nationalDex, mon.formIndex)
+      ohpkm.syncWithGameData(mon)
     })
   }
 })

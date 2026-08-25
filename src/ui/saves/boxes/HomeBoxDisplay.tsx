@@ -23,7 +23,7 @@ import SearchFields from '@openhome-ui/components/search/SearchFields'
 import PokemonSearchModal from '@openhome-ui/components/search/SearchModal'
 import ToggleButton from '@openhome-ui/components/ToggleButton'
 import useDisplayError from '@openhome-ui/hooks/displayError'
-import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
+import PokemonDetailsModal from '@openhome-ui/pokemon-details/PokemonDetailsModal'
 import { ErrorContext } from '@openhome-ui/state/error'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import useTrackedDataRecovery from '@openhome-ui/state/ohpkm/useTrackedDataRecovery'
@@ -446,6 +446,7 @@ function SingleBoxMonDisplay() {
       </OpenHomeCtxMenu>
       <PokemonDetailsModal
         mon={selectedMon}
+        key={selectedMon?.openhomeId}
         onClose={() => setSelectedIndex(undefined)}
         navigateRight={navigateRight}
         navigateLeft={navigateLeft}

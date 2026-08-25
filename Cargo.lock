@@ -10,7 +10,7 @@ checksum = "fe438c63458706e03479442743baae6c88256498e6431708f6dfc520a26515d3"
 
 [[package]]
 name = "OpenHome"
-version = "1.15.2"
+version = "1.16.0"
 dependencies = [
  "base64 0.22.1",
  "bytes",
@@ -108,6 +108,12 @@ name = "arbitrary-int"
 version = "2.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "993a810118f8f37e9c4411c86f1c4c940a09a7ab34b7bf2d88d06f50c553fab7"
+
+[[package]]
+name = "arrayref"
+version = "0.3.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "76a2e8124351fda1ef8aaaa3bbd7ebbcb486bbcd4225aca0aa0d84bb2db8fecb"
 
 [[package]]
 name = "ascii"
@@ -2727,7 +2733,7 @@ dependencies = [
 
 [[package]]
 name = "openhome_core"
-version = "1.15.2"
+version = "1.16.0"
 dependencies = [
  "base64 0.22.1",
  "dirs",
@@ -2924,10 +2930,11 @@ checksum = "19f132c84eca552bf34cab8ec81f1c1dcc229b811638f9d283dceabe58c5569e"
 
 [[package]]
 name = "pkm_rs"
-version = "1.15.2"
+version = "1.16.0"
 dependencies = [
  "aes",
  "arbitrary-int",
+ "arrayref",
  "assert-json-diff",
  "console_error_panic_hook",
  "getrandom 0.4.3",
@@ -2957,7 +2964,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_derive"
-version = "1.15.2"
+version = "1.16.0"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2966,7 +2973,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_resources"
-version = "1.15.2"
+version = "1.16.0"
 dependencies = [
  "arbitrary-int",
  "getrandom 0.4.3",
@@ -2986,7 +2993,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_types"
-version = "1.15.2"
+version = "1.16.0"
 dependencies = [
  "arbitrary-int",
  "chrono",

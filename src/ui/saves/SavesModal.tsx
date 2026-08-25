@@ -4,7 +4,7 @@ import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import { CardsIcon, GridIcon } from '@openhome-ui/components/Icons'
 import SideTabs from '@openhome-ui/components/side-tabs/SideTabs'
 import { AppInfoAction, AppInfoContext } from '@openhome-ui/state/appInfo'
-import { SaveError, SaveErrorType, useSaves } from '@openhome-ui/state/saves'
+import { saveErrorMessage, saveErrorTitle, useSaves } from '@openhome-ui/state/saves'
 import { Button, Flex, Slider } from '@radix-ui/themes'
 import { useCallback, useContext, useState } from 'react'
 import 'react-data-grid/lib/styles.css'
@@ -15,37 +15,9 @@ import SaveFolders from './SaveFolders'
 import SuggestedSaves from './SuggestedSaves'
 import { SaveViewMode } from './util'
 
-interface SavesModalProps {
+export interface SavesModalProps {
   open?: boolean
   onClose: () => void
-}
-
-function saveErrorTitle(errorType: SaveErrorType): string {
-  switch (errorType) {
-    case 'SELECT_FILE':
-      return 'Error Selecting File'
-    case 'READ_FILE':
-      return 'Error Reading File'
-    case 'UNRECOGNIZED':
-      return 'Error Detecting Save'
-    case 'BUILD_SAVE':
-      return 'Save File Invalid'
-    case 'ALREADY_OPEN':
-      return 'Already Open'
-  }
-}
-
-function saveErrorMessage(error: SaveError): string {
-  switch (error.type) {
-    case 'SELECT_FILE':
-    case 'READ_FILE':
-    case 'BUILD_SAVE':
-      return error.cause
-    case 'UNRECOGNIZED':
-      return 'The selected file was not recognized as a supported save file.'
-    case 'ALREADY_OPEN':
-      return 'The selected save file is already open'
-  }
 }
 
 const SavesModal = (props: SavesModalProps) => {

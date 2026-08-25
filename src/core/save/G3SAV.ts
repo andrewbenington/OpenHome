@@ -193,6 +193,14 @@ export class G3SaveBackup {
     this.trainerGender = this.sectors[0].data[0x08] ? BinaryGender.Female : BinaryGender.Male
   }
 
+  static buildIfInitialized(bytes: Uint8Array): Option<G3SaveBackup> {
+    if (new DataView(bytes.buffer).getUint32(0) === 0xffffffff) {
+      return undefined
+    }
+
+    return new G3SaveBackup(bytes)
+  }
+
   // Per PKHeX:
   // "OT name is the first 8 bytes of Small. The game fills any unused characters with 0xFF.
   // Japanese games are limited to 5 character OT names; INT 7 characters. +1 0xFF terminator.
@@ -216,7 +224,7 @@ export class G3SAV extends OfficialSAV<PK3> {
 
   primarySave: G3SaveBackup
 
-  backupSave: G3SaveBackup
+  backupSave?: G3SaveBackup
 
   primarySaveOffset: number
 
@@ -250,18 +258,21 @@ export class G3SAV extends OfficialSAV<PK3> {
     super()
     this.bytes = bytes
     this.filePath = path
-    const saveOne = new G3SaveBackup(bytes.slice(0, 0xe000))
-    const saveTwo = new G3SaveBackup(bytes.slice(0xe000, 0x1c000))
+    const saveOne = G3SaveBackup.buildIfInitialized(bytes.slice(0, 0xe000))
+    const saveTwo = G3SaveBackup.buildIfInitialized(bytes.slice(0xe000, 0x1c000))
 
-    if (saveOne.saveIndex > saveTwo.saveIndex) {
+    if (saveOne && (!saveTwo || saveOne.saveIndex > saveTwo.saveIndex)) {
       this.primarySave = saveOne
       this.backupSave = saveTwo
       this.primarySaveOffset = 0
-    } else {
+    } else if (saveTwo) {
       this.primarySave = saveTwo
       this.backupSave = saveOne
       this.primarySaveOffset = 0xe000
+    } else {
+      throw Error('Save file has no data')
     }
+
     this.currentPCBox = this.primarySave.currentPCBox
     this.money = this.primarySave.money
     this.name = this.primarySave.name

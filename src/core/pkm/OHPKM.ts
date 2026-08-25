@@ -1,13 +1,17 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { isWasmFormat, WasmPkmFormat } from '@openhome-core/pkm/PKM'
+import { Gen34ContestRibbons, Gen34TowerRibbons } from '@openhome-core/resources'
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import {
-  Gen34ContestRibbons,
-  Gen34TowerRibbons,
+  LZA_BASE_TM_BYTES,
+  LZA_DLC_TM_BYTES,
+  movesFromLaTutorFlags,
+  movesFromLzaBaseTmFlags,
+  movesFromLzaDlcTmFlags,
+  movesFromSvTmFlags,
   movesFromSwshTrFlags,
   SWSH_TR_BYTE_COUNT,
-  trIndexForMove,
-} from '@openhome-core/resources'
-import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
+} from '@openhome-core/resources/moves/flags'
 import {
   expectExhaustive,
   getFlag,
@@ -39,11 +43,13 @@ import {
   NatureIndex,
   OriginGames,
   PkmFormat,
+  PlusMoveFlags,
   PokeDate,
   Pokerus,
   ShinyLeaves,
   SpeciesForm,
   SpeciesLookup,
+  swshTrIndexByMoveId,
   Tag,
   TeraType,
   TrainerData,
@@ -310,8 +316,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
       this.sociability = other.sociability ?? 0
 
-      this.tmFlagsBDSP = other.tmFlagsBDSP
-
       this.isAlpha = other.isAlpha || this.ribbons.includes('Alpha Mark')
       if (other.isAlpha && !this.ribbons.includes('Alpha Mark')) {
         this.ribbons = [...this.ribbons, 'Alpha Mark']
@@ -326,6 +330,10 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.flag2LA = other.flag2LA
       this.unknownA0 = other.unknownA0
       this.unknownF3 = other.unknownF3
+
+      this.tmFlagsLzaBase = other.tmFlagsLzaBase
+      this.tmFlagsLzaDlc = other.tmFlagsLzaDlc
+      this.plusMoveFlags = other.plusMoveFlags?.clone()
 
       if (other.heightScalar !== undefined && other.weightScalar !== undefined) {
         this.heightScalar = other.heightScalar
@@ -348,6 +356,8 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
           )
         }
       }
+
+      this.populateLearnedMoves()
     }
   }
 
@@ -509,7 +519,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     const trFlags = this.trFlagsSwSh
     if (!trFlags) return false
 
-    const trIndex = trIndexForMove(moveId)
+    const trIndex = swshTrIndexByMoveId(moveId)
     return trIndex !== undefined && getFlag(new DataView(trFlags.buffer), 0, trIndex)
   }
 
@@ -517,7 +527,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     const trFlags = this.trFlagsSwSh
     if (!trFlags) return undefined
 
-    const trIndex = trIndexForMove(moveId)
+    const trIndex = swshTrIndexByMoveId(moveId)
     if (trIndex !== undefined) {
       setFlag(new DataView(trFlags.buffer), 0, trIndex, true)
     }
@@ -526,12 +536,50 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   unionTrFlagsSwSh(otherTrFlags: Uint8Array) {
-    const trFlags = this.trFlagsSwSh || new Uint8Array(SWSH_TR_BYTE_COUNT)
+    this.trFlagsSwSh = bitwiseOrUint8Array(
+      this.trFlagsSwSh || new Uint8Array(SWSH_TR_BYTE_COUNT),
+      otherTrFlags
+    )
+  }
 
-    for (let i = 0; i < otherTrFlags.length; i++) {
-      trFlags[i] |= otherTrFlags[i]
-    }
-    this.trFlagsSwSh = trFlags
+  get tmMovesLzaBase() {
+    return this.tmFlagsLzaBase ? movesFromLzaBaseTmFlags(this.tmFlagsLzaBase) : []
+  }
+
+  unionTmFlagsLzaBase(otherTmFlags: Uint8Array) {
+    this.tmFlagsLzaBase = bitwiseOrUint8Array(
+      this.tmFlagsLzaBase || new Uint8Array(LZA_BASE_TM_BYTES),
+      otherTmFlags
+    )
+  }
+
+  get tmMovesLzaDlc() {
+    return this.tmFlagsLzaDlc ? movesFromLzaDlcTmFlags(this.tmFlagsLzaDlc) : []
+  }
+
+  unionTmFlagsLzaDlc(otherTmFlags: Uint8Array) {
+    this.tmFlagsLzaDlc = bitwiseOrUint8Array(
+      this.tmFlagsLzaDlc || new Uint8Array(LZA_DLC_TM_BYTES),
+      otherTmFlags
+    )
+  }
+
+  get plusMovesLza() {
+    return this.plusMoveFlags?.getMoveIds() ?? []
+  }
+
+  unionPlusFlagsLza(otherPlusFlags: PlusMoveFlags) {
+    const updated = this.plusMoveFlags ?? PlusMoveFlags.empty()
+    updated.addAllFrom(otherPlusFlags)
+    this.plusMoveFlags = updated
+  }
+
+  get tutorMovesLa() {
+    return this.tutorFlagsLA ? movesFromLaTutorFlags(this.tutorFlagsLA) : []
+  }
+
+  get tmMovesSvBaseGame() {
+    return this.tmFlagsSV ? movesFromSvTmFlags(this.tmFlagsSV) : []
   }
 
   public getLevel(): number {
@@ -651,6 +699,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   public get speciesMetadata() {
     return SpeciesLookup(this.nationalDex)
   }
+
   public syncWithGameData(other: PKMInterface, save?: SAV) {
     const updates: SyncUpdate[] = []
 
@@ -972,11 +1021,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.unionTrFlagsSwSh(other.trFlagsSwSh)
     }
 
-    if (other.tmFlagsBDSP !== undefined && !arraysEqual(this.tmFlagsBDSP, other.tmFlagsBDSP)) {
-      updates.push(syncUpdate('tmFlagsBDSP', this.tmFlagsBDSP, other.tmFlagsBDSP))
-      this.tmFlagsBDSP = other.tmFlagsBDSP
-    }
-
     if (other.tmFlagsSV !== undefined && !arraysEqual(this.tmFlagsSV, other.tmFlagsSV)) {
       updates.push(syncUpdate('tmFlagsSV', this.tmFlagsSV, other.tmFlagsSV))
       this.tmFlagsSV = other.tmFlagsSV
@@ -985,6 +1029,29 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     if (other.tmFlagsSVDLC !== undefined && !arraysEqual(this.tmFlagsSVDLC, other.tmFlagsSVDLC)) {
       updates.push(syncUpdate('tmFlagsSVDLC', this.tmFlagsSVDLC, other.tmFlagsSVDLC))
       this.tmFlagsSVDLC = other.tmFlagsSVDLC
+    }
+
+    if (other.tmFlagsLzaBase && !arraysEqual(this.tmFlagsLzaBase, other.tmFlagsLzaBase)) {
+      updates.push(
+        syncUpdate('TM moves (Legends Z-A base game)', this.tmFlagsLzaBase, other.tmFlagsLzaBase)
+      )
+      this.unionTmFlagsLzaBase(other.tmFlagsLzaBase)
+    }
+
+    if (other.tmFlagsLzaDlc && !arraysEqual(this.tmFlagsLzaDlc, other.tmFlagsLzaDlc)) {
+      updates.push(
+        syncUpdate('TM moves (Legends Z-A DLC)', this.tmFlagsLzaDlc, other.tmFlagsLzaDlc)
+      )
+      this.unionTmFlagsLzaDlc(other.tmFlagsLzaDlc)
+    }
+
+    if (other.plusMoveFlags) {
+      if (!this.plusMoveFlags) {
+        this.plusMoveFlags = other.plusMoveFlags.clone()
+      } else if (!this.plusMoveFlags.containsAllFrom(other.plusMoveFlags)) {
+        this.unionPlusFlagsLza(other.plusMoveFlags)
+      }
+      updates.push(syncUpdate('Plus moves', this.plusMoveFlags, other.plusMoveFlags))
     }
 
     if (other.obedienceLevel !== undefined && this.obedienceLevel !== other.obedienceLevel) {
@@ -1233,4 +1300,11 @@ function teraTypesEqual(tt1: Option<TeraType>, tt2: Option<TeraType>) {
     default:
       return isObject(tt2) && tt1.Standard === tt2.Standard
   }
+}
+
+export function bitwiseOrUint8Array(array1: Uint8Array, array2: Uint8Array): Uint8Array {
+  for (let i = 0; i < array1.length; i++) {
+    array1[i] |= array2[i]
+  }
+  return array1
 }
