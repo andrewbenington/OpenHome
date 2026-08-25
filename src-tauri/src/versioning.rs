@@ -173,6 +173,7 @@ pub enum SignificantUpdate {
     V1_15_0,
     V1_15_1,
     V1_15_2,
+    V1_16_0,
 }
 
 impl SignificantUpdate {
@@ -208,6 +209,7 @@ impl SignificantUpdate {
             Self::V1_15_0 => Version::parse("1.15.0"),
             Self::V1_15_1 => Version::parse("1.15.1"),
             Self::V1_15_2 => Version::parse("1.15.2"),
+            Self::V1_16_0 => Version::parse("1.16.0"),
         }
         .expect("all versions are valid semver")
     }
@@ -353,6 +355,12 @@ impl SignificantUpdate {
             Self::V1_15_2 => Some(vec![
                 "A bug preventing saving an open Scarlet/Violet save has been fixed",
                 "Binaries more compatible with Arch-based Linux distributions are now now build built with each release.",
+            ]),
+            Self::V1_16_0 => Some(vec![
+                "Support for Japanese Gen 1 and Gen 2 games has been added.",
+                "Via the new Moves tab in the Pokémon details modal, moves can now be changed to any moves the Pokémon remembers. This includes TR/TM/Tutor moves from some recent games.",
+                "Plus Moves and Legends Arceus mastered moves now have a visual indicator, and should be set correctly based on the Pokémon's level",
+                "Legends Z-A Plus Moves and TMs are now tracked properly.",
             ]),
             _ => None,
         }
