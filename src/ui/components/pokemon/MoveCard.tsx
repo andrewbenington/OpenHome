@@ -20,7 +20,18 @@ type MoveCardProps = {
 } & React.HTMLProps<HTMLDivElement>
 
 const MoveCard = (props: MoveCardProps) => {
-  const { move, ppUps } = props
+  const {
+    move,
+    movePP,
+    maxPP,
+    ppUps,
+    noPP,
+    compact,
+    masteredLa,
+    plusMove,
+    typeOverride,
+    ...htmlProps
+  } = props
   const moveData = move ? Moves[move] : undefined
   if (move && !moveData) {
     console.warn(`An unknown move has been detected. The move index is ${move}.`)
@@ -29,18 +40,18 @@ const MoveCard = (props: MoveCardProps) => {
   if (!moveData) {
     return (
       <div
-        {...props}
+        {...htmlProps}
         className={cssClass('move-card')
           .with('move-card-small')
-          .if(props.compact)
+          .if(compact)
           .else('move-card-full')
-          .with(props.className)
+          .with(htmlProps.className)
           .build()}
         style={{
           backgroundColor: 'gray',
           color: 'white',
           opacity: 0.5,
-          ...props.style,
+          ...htmlProps.style,
         }}
       >
         <div className="type-icon-container" />
@@ -49,7 +60,7 @@ const MoveCard = (props: MoveCardProps) => {
     )
   }
 
-  const type = props.typeOverride ?? PkmTypes.tryFromString(moveData.type)
+  const type = typeOverride ?? PkmTypes.tryFromString(moveData.type)
 
   if (!type) {
     console.warn(
@@ -65,7 +76,7 @@ const MoveCard = (props: MoveCardProps) => {
     )
   }
 
-  const shouldShowPp = !props.compact && !props.noPP
+  const shouldShowPp = !compact && !noPP
 
   const content = (
     <div className="move-card">
@@ -74,7 +85,7 @@ const MoveCard = (props: MoveCardProps) => {
           <TypeIcon
             type={type}
             key={`${type}_type_icon`}
-            size={props.compact ? '1.5rem' : '2.5rem'}
+            size={compact ? '1.5rem' : '2.5rem'}
             border
           />
         </div>
@@ -84,17 +95,15 @@ const MoveCard = (props: MoveCardProps) => {
           </div>
           {shouldShowPp && (
             <div className="move-pp-display">
-              {props.movePP ?? '--'}/{props.maxPP ?? '--'} PP
+              {movePP ?? '--'}/{maxPP ?? '--'} PP
             </div>
           )}
         </div>
         <div className="move-icons">
-          {props.masteredLa && (
+          {masteredLa && (
             <img className="move-icon" src={getPublicImageURL('icons/move-mastery.png')} />
           )}
-          {props.plusMove && (
-            <img className="move-icon" src={getPublicImageURL('icons/plus-move.png')} />
-          )}
+          {plusMove && <img className="move-icon" src={getPublicImageURL('icons/plus-move.png')} />}
         </div>
       </OhoFlex.RowStart>
       <OhoFlex.Row width="100%" gap="0">
@@ -117,14 +126,14 @@ const MoveCard = (props: MoveCardProps) => {
     <div
       className={cssClass('move-card')
         .with('move-card-small')
-        .if(props.compact)
+        .if(compact)
         .else('move-card-full')
         .build()}
       style={{
         backgroundColor: colorForType(type),
         color: contrastColorForType(type),
       }}
-      {...props}
+      {...htmlProps}
     >
       {content}
     </div>
