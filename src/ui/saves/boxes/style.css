@@ -349,7 +349,6 @@
   font-size: 1.2rem;
 }
 
-/* compact layout: box cells scale down to fit the viewport instead of forcing overflow */
 @media (max-width: 1250px) {
   .home-box-grid {
     min-width: 0;
@@ -365,5 +364,16 @@
 
   .save-box-card {
     max-width: 100%;
+  }
+}
+
+@media (max-width: 1250px) and (max-height: 430px) {
+  .home-box-column {
+    container-type: size;
+  }
+
+  .home-box-grid {
+    width: min(100%, calc((100cqh - 6rem) * 6 / 5));
+    margin-inline: auto;
   }
 }

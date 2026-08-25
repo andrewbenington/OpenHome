@@ -30,11 +30,11 @@ export default function AppTabs() {
     <Fallback fatal>
       <Tabs.Root
         value={tab}
-        style={{ height: '100vh' }}
+        style={{ height: '100dvh' }}
         orientation="vertical"
         onValueChange={(tab) => navigate(tab)}
       >
-        <Flex style={{ height: '100vh' }}>
+        <Flex style={{ height: '100dvh' }}>
           <Tabs.IconList className="tab-sidebar" direction="column">
             <Tabs.Tab value="home">
               <AppTabIconsActive.Home />

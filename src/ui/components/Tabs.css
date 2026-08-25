@@ -43,6 +43,23 @@
   }
 }
 
+@media (max-height: 430px) {
+  .IconList {
+    overflow-y: auto;
+
+    .Tab {
+      min-height: 2.2rem;
+      font-size: 0.58rem;
+      line-height: 0.7rem;
+      padding-top: 0.05rem;
+    }
+
+    svg {
+      height: 1.15rem;
+    }
+  }
+}
+
 .Tab {
   display: flex;
   align-items: center;
