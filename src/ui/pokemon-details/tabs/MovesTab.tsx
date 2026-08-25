@@ -33,7 +33,8 @@ export default function MovesTab(props: { mon: PKMInterface }) {
             editing && mon instanceof OHPKM ? (
               <MoveSelect
                 key={`move_slot_${i}`}
-                moveIds={Array.from(mon.learnedMovesWasm)}
+                currentMoveIds={mon.moves}
+                learnedMoveIds={Array.from(mon.learnedMovesWasm)}
                 uniqueFieldId={`move_slot_${i}`}
                 value={move}
                 onChange={(moveId) =>
@@ -91,7 +92,8 @@ export default function MovesTab(props: { mon: PKMInterface }) {
 }
 
 type MoveSelectProps = {
-  moveIds: number[]
+  learnedMoveIds: number[]
+  currentMoveIds: number[]
   value?: number | undefined
   onChange: (newValue: number | undefined) => void
   uniqueFieldId: string
@@ -101,7 +103,9 @@ function MoveSelect(props: MoveSelectProps) {
   return (
     <Typeahead
       uniqueFieldId={props.uniqueFieldId}
-      options={props.moveIds.map((moveId) => Moves[moveId])}
+      options={props.learnedMoveIds
+        .filter((moveId) => !props.currentMoveIds.includes(moveId))
+        .map((moveId) => Moves[moveId])}
       getOptionString={(move) => move.name}
       getOptionUniqueID={(move) => move.id.toString()}
       value={props.value ? Moves[props.value] : undefined}
