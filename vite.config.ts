@@ -1,4 +1,5 @@
 import react from '@vitejs/plugin-react'
+import postcssNesting from 'postcss-nesting'
 import { fileURLToPath, URL } from 'url'
 import { defineConfig } from 'vite'
 
@@ -7,6 +8,12 @@ const host = process.env.TAURI_DEV_HOST
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
   plugins: [react()],
+  css: {
+    postcss: {
+      // flatten native CSS nesting for older Android WebViews (< Chrome 112)
+      plugins: [postcssNesting()],
+    },
+  },
   optimizeDeps: {
     include: ['@tauri-apps/plugin-dialog'],
   },

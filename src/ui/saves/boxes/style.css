@@ -348,3 +348,22 @@
   font-weight: bold;
   font-size: 1.2rem;
 }
+
+/* compact layout: box cells scale down to fit the viewport instead of forcing overflow */
+@media (max-width: 1250px) {
+  .home-box-grid {
+    min-width: 0;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .box-cell {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    min-width: 0;
+  }
+
+  .save-box-card {
+    max-width: 100%;
+  }
+}

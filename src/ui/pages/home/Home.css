@@ -101,3 +101,24 @@
   height: 1.75rem;
   border-top-left-radius: var(--border-radius-lg);
 }
+
+/* compact layout for small screens */
+@media (max-width: 1250px) {
+  .save-file-column {
+    min-width: 14rem;
+    width: 14rem;
+    flex-shrink: 0;
+  }
+
+  .home-box-column {
+    min-width: 0;
+    max-width: none;
+    flex: 1;
+    overflow-x: hidden;
+  }
+
+  .right-column {
+    width: 13rem;
+    flex-shrink: 0;
+  }
+}
