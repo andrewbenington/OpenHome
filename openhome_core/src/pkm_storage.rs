@@ -2,6 +2,7 @@ use crate::{
     Result,
     data_controller::{DataController, DataDir},
 };
+use pkm_rs::ohpkm::OpenHomeId;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use uuid::Uuid;
@@ -109,7 +110,7 @@ impl Box {
     }
 }
 
-pub type BoxIdentifiers = HashMap<u8, String>;
+pub type BoxIdentifiers = HashMap<u8, OpenHomeId>;
 
 pub fn load_banks(controller: &impl DataController) -> Result<StoredBankData> {
     let mut storage: StoredBankData =
