@@ -564,6 +564,10 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     )
   }
 
+  get tmMovesLza() {
+    return [...this.tmMovesLzaBase, ...this.tmMovesLzaDlc]
+  }
+
   get plusMovesLza() {
     return this.plusMoveFlags?.getMoveIds() ?? []
   }
@@ -578,7 +582,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     return this.tutorFlagsLA ? movesFromLaTutorFlags(this.tutorFlagsLA) : []
   }
 
-  get tmMovesSvBaseGame() {
+  get tmMovesSv() {
     return this.tmFlagsSV ? movesFromSvTmFlags(this.tmFlagsSV) : []
   }
 

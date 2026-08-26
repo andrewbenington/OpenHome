@@ -30,7 +30,7 @@ function colorByPercent(percent: number) {
   return 'hsl(204, 99%, 65%)'
 }
 
-function NumericalBadge({ value, percent, max: maxProp }: TopRightNumericalBadgeProps) {
+function NumericBadge({ value, percent, max: maxProp }: TopRightNumericalBadgeProps) {
   if (value === undefined) return null
 
   const color = colorByPercent(percent ? value : Math.min((value / maxProp) * 100, 100))
@@ -170,7 +170,7 @@ const Badge = {
   Gigantamax: GigantamaxBadge,
   HyperTrain: HyperTrainBadge,
   Image: ImageBadge,
-  Numerical: NumericalBadge,
+  Numeric: NumericBadge,
   Pokerus: PokerusBadge,
 }
 
