@@ -134,6 +134,7 @@ impl FromStr for OpenHomeId {
 
         let national_dex = parts[0]
             .parse::<u16>()
+            .map(national_dex_base_evo)
             .map_err(|_| ParseOpenHomeIdError::InvalidFormat)?;
 
         // middle segment is trainer_id (4 hex chars) + secret_id (4 hex chars)
@@ -154,6 +155,16 @@ impl FromStr for OpenHomeId {
             secret_id,
             personality_value,
         })
+    }
+}
+
+fn national_dex_base_evo(raw: u16) -> u16 {
+    if let Ok(national_dex) = NationalDex::try_from(raw) {
+        SpeciesForm::base_form(national_dex)
+            .get_base_evolution()
+            .get_ndex() as u16
+    } else {
+        raw
     }
 }
 
