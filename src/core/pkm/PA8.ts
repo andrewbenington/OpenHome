@@ -1,5 +1,6 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { ModernRibbons } from '@openhome-core/resources'
+import { movesFromLaTutorFlags } from '@openhome-core/resources/moves/flags'
 import * as byteLogic from '@openhome-core/util/byteLogic'
 import { Errorable, Option, R } from '@openhome-core/util/functional'
 import { FourMoves } from '@openhome-core/util/types'
@@ -474,6 +475,10 @@ export default class PA8 {
 
     const masteredAtLevel = getMoveMasteredLevelLa(this.nationalDex, this.formIndex, moveId)
     return masteredAtLevel !== undefined && this.level >= masteredAtLevel
+  }
+
+  get tutorMovesLa() {
+    return this.tutorFlagsLA ? movesFromLaTutorFlags(this.tutorFlagsLA) : []
   }
 
   public getStats() {
