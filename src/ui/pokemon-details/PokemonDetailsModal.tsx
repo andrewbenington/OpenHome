@@ -122,7 +122,10 @@ export default function PokemonDetailsModal(props: PokemonDetailsModalProps) {
             <div>Level {mon.getLevel()}</div>
             <div style={{ flex: 1 }} />
             {mon instanceof OHPKM && (
-              <div>Tracked since {mon.startedTrackingTimestamp?.format('MMMM D, YYYY')}</div>
+              <>
+                <div>OpenHome ID: {mon.openhomeId}</div>
+                <div>Tracked since {mon.startedTrackingTimestamp?.format('MMMM D, YYYY')}</div>
+              </>
             )}
           </div>
         </Dialog.Popup>

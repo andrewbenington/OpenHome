@@ -106,8 +106,10 @@ export const TauriBackend: BackendInterface = {
     )
   },
 
-  /* prompt user to select new data directory location */
-  promptChangeDataDir: Commands.changeDataDir,
+  /* prompt user to select new data directory location, then restart using that location */
+  promptChangeDataDir: () => Commands.changeDataDir(false),
+  /* prompt user to select new data directory location, copy all data there, and restart using that location */
+  promptMoveDataDir: () => Commands.changeDataDir(true),
   /* get the current data directory path */
   getDataDirPath: Commands.getDataDirPath,
 
