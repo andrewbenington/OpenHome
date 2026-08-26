@@ -7,7 +7,7 @@ import {
   utf16StringToGen12,
 } from '@openhome-core/util/stringConversion'
 import { PKMFormeRef } from '@openhome-core/util/types'
-import { Language, MetadataSummaryLookup, OriginGame, OriginGames } from '@pkm-rs/pkg'
+import { Language, MetadataSummaryLookup, OpenHomeId, OriginGame, OriginGames } from '@pkm-rs/pkg'
 
 export type OhpkmIdentifier = string
 
@@ -47,12 +47,12 @@ function getHomeIdentifier(mon: HomeIdentifierDerivableMon): OhpkmIdentifier {
     throw Error(`Invalid dex/form: ${mon.nationalDex} / ${mon.formIndex}`)
   }
 
-  return `${baseEvolution.nationalDex.toString().padStart(4, '0')}-${bytesToString(
+  return new OpenHomeId(
+    baseEvolution.nationalDex,
     mon.trainerID,
-    2
-  ).concat(
-    bytesToString(mon.secretID ?? 0, 2)
-  )}-${bytesToString(mon.personalityValue ?? 0, 4)}-${bytesToString(mon.gameOfOrigin ?? -1, 1)}`
+    mon.secretID,
+    mon.personalityValue
+  ).toString()
 }
 
 export type Gen12Identifier = string

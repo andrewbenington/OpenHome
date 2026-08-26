@@ -10,6 +10,7 @@ use crate::ohpkm::OhpkmConvert;
 #[allow(deprecated)]
 use crate::ohpkm::deprecated::PastHandlerDataV1;
 use crate::ohpkm::extra_form::ExtraFormIndex;
+use crate::ohpkm::id::OpenHomeId;
 use crate::ohpkm::issues::OhpkmIssue;
 use crate::ohpkm::v1::OhpkmV1;
 use crate::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, StoredPkmBytes, UnconvertedPkm};
@@ -260,8 +261,8 @@ impl OhpkmV2 {
         Ok(ohpkm)
     }
 
-    pub fn openhome_id(&self) -> String {
-        self.main_data.openhome_id()
+    pub const fn openhome_id(&self) -> OpenHomeId {
+        self.main_data.openhome_id
     }
 
     pub fn gen_345_id(&self) -> String {
@@ -2035,7 +2036,7 @@ impl OhpkmV2 {
 
     #[wasm_bindgen(getter = openhomeId)]
     pub fn openhome_id_js(&self) -> String {
-        self.openhome_id()
+        self.openhome_id().to_string()
     }
 
     #[wasm_bindgen(getter = gen345Identifier)]

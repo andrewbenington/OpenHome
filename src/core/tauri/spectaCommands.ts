@@ -222,7 +222,7 @@ export const commands = {
       else return { status: 'error', error: e as any }
     }
   },
-  async getLookups(): Promise<Result<LookupState, CommandError>> {
+  async getLookups(): Promise<Result<LookupStateStringIds, CommandError>> {
     try {
       return { status: 'ok', data: await TAURI_INVOKE('get_lookups') }
     } catch (e) {
@@ -230,7 +230,7 @@ export const commands = {
       else return { status: 'error', error: e as any }
     }
   },
-  async addToLookups(newEntries: LookupState): Promise<Result<null, CommandError>> {
+  async addToLookups(newEntries: LookupStateStringIds): Promise<Result<null, CommandError>> {
     try {
       return { status: 'ok', data: await TAURI_INVOKE('add_to_lookups', { newEntries }) }
     } catch (e) {
@@ -351,7 +351,7 @@ export type LogFilterJs = {
 }
 export type LogLevel = 'TRACE' | 'DEBUG' | 'INFO' | 'WARN' | 'ERROR'
 export type LogsResponse = { current: LogFilter; next: LogFilter; remaining_file_lines: LogEntry[] }
-export type LookupState = {
+export type LookupStateStringIds = {
   gen12: Partial<{ [key in string]: string }>
   gen345: Partial<{ [key in string]: string }>
 }

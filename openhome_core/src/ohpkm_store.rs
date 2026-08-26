@@ -3,6 +3,7 @@ use crate::error::{Error, Result};
 use crate::util;
 use base64::prelude::*;
 use pkm_rs::ohpkm::OhpkmV2;
+use pkm_rs::ohpkm::OpenHomeId;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::num::NonZeroU64;
@@ -11,9 +12,9 @@ use std::time::{Duration, UNIX_EPOCH};
 use std::{collections::HashMap, fs};
 use tracing::warn;
 
-#[cfg_attr(feature = "desktop", derive(specta::Type))]
+// #[cfg_attr(feature = "desktop", derive(specta::Type))]
 #[derive(Default, Serialize, Deserialize, Clone)]
-pub struct OhpkmBytesStore(HashMap<String, Vec<u8>>);
+pub struct OhpkmBytesStore(HashMap<OpenHomeId, Vec<u8>>);
 
 impl OhpkmBytesStore {
     fn load_from_directory(path: &Path) -> Result<Self> {
@@ -61,7 +62,7 @@ impl OhpkmBytesStore {
                     let errors_fixed_msgs: Vec<String> =
                         errors.into_iter().map(|e| e.to_string()).collect();
                     let errors_fixed_serialized = json!({"errors_fixed": errors_fixed_msgs});
-                    warn!(event = "ohpkm_errors_fixed", context = %errors_fixed_serialized, ohpkm_id = mon.openhome_id(), "Fixed Ohpkm {identifier} with nickname {}", mon.get_nickname());
+                    warn!(event = "ohpkm_errors_fixed", context = %errors_fixed_serialized, ohpkm_id = mon.openhome_id().to_string(), "Fixed Ohpkm {identifier} with nickname {}", mon.get_nickname());
                     *bytes = mon.to_bytes();
                 }
             }
@@ -98,7 +99,7 @@ impl OhpkmBytesStore {
     pub fn to_b64_map(&self) -> HashMap<String, String> {
         let mut output: HashMap<String, String> = HashMap::new();
         for (k, v) in self.0.clone() {
-            output.insert(k, BASE64_STANDARD.encode(v));
+            output.insert(k.to_string(), BASE64_STANDARD.encode(v));
         }
 
         output
@@ -108,23 +109,23 @@ impl OhpkmBytesStore {
         self.0
             .clone()
             .into_iter()
-            .map(|(k, v)| (k, BASE64_STANDARD.encode(v)))
+            .map(|(k, v)| (k.to_string(), BASE64_STANDARD.encode(v)))
             .collect()
     }
 
-    pub fn includes(&self, identifier: &str) -> bool {
+    pub fn includes(&self, identifier: &OpenHomeId) -> bool {
         self.0.contains_key(identifier)
     }
 
-    pub fn insert(&mut self, identifier: &str, bytes: &[u8]) {
+    pub fn insert(&mut self, identifier: &OpenHomeId, bytes: &[u8]) {
         self.0.insert(identifier.to_owned(), bytes.to_vec());
     }
 
-    pub fn remove(&mut self, identifier: &str) -> bool {
+    pub fn remove(&mut self, identifier: &OpenHomeId) -> bool {
         self.0.remove(identifier).is_some()
     }
 
-    pub fn all_entries(&self) -> impl Iterator<Item = (&String, &Vec<u8>)> {
+    pub fn all_entries(&self) -> impl Iterator<Item = (&OpenHomeId, &Vec<u8>)> {
         self.0.iter()
     }
 }
