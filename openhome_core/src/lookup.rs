@@ -1,18 +1,17 @@
 use std::collections::HashMap;
 
-use pkm_rs::ohpkm::OhpkmV2;
+use pkm_rs::ohpkm::{OhpkmV2, OpenHomeId};
 use serde::{Deserialize, Serialize};
 
 use crate::data_controller::{DataController, DataDir};
 use crate::error::Result;
 use crate::ohpkm_store::OhpkmBytesStore;
 
-type IdentifierLookup = HashMap<String, String>;
+type IdentifierLookup = HashMap<String, OpenHomeId>;
 
 pub const GEN12_FILENAME: &str = "gen12_lookup.json";
 pub const GEN345_FILENAME: &str = "gen345_lookup.json";
 
-#[cfg_attr(feature = "desktop", derive(specta::Type))]
 #[derive(Default, Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct LookupState {
@@ -28,6 +27,10 @@ impl LookupState {
             gen_345: data_controller
                 .read_or_create_default_json_file(DataDir::Storage, GEN345_FILENAME)?,
         })
+    }
+
+    pub fn from_lookups(gen_12: IdentifierLookup, gen_345: IdentifierLookup) -> Self {
+        Self { gen_12, gen_345 }
     }
 
     pub fn write_to_files(&self, data_controller: &impl DataController) -> Result<()> {
@@ -63,5 +66,13 @@ impl LookupState {
         for ohpkm in ohpkms {
             self.gen_345.insert(ohpkm.gen_345_id(), ohpkm.openhome_id());
         }
+    }
+
+    pub fn gen_12_entries(&self) -> impl Iterator<Item = (String, OpenHomeId)> {
+        self.gen_12.clone().into_iter()
+    }
+
+    pub fn gen_345_entries(&self) -> impl Iterator<Item = (String, OpenHomeId)> {
+        self.gen_345.clone().into_iter()
     }
 }
