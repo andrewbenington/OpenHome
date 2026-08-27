@@ -9,7 +9,7 @@ mod startup_config;
 mod state;
 mod synced_state;
 mod util;
-mod versioning;
+mod version;
 
 use crate::data_controller::ToDataController;
 use crate::synced_state::AllSyncedState;

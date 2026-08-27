@@ -1,5 +1,5 @@
 use crate::data_controller::ToDataController;
-use crate::versioning;
+use crate::version;
 use crate::{logging, util};
 use openhome_core::data_controller::{DataController, DataDir, MONS_V2_DIR};
 use openhome_core::lookup::{GEN12_FILENAME, GEN345_FILENAME};
@@ -14,7 +14,7 @@ const LOGS_DIR: &str = "logs";
 #[cfg(not(target_os = "linux"))]
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 
-pub fn run_app_startup(app: &App) -> Result<Vec<versioning::UpdateFeatures>> {
+pub fn run_app_startup(app: &App) -> Result<Vec<version::UpdateFeatures>> {
     let handle = app.handle().clone();
     logging::init_logging(
         &Path::join(
@@ -33,8 +33,8 @@ pub fn run_app_startup(app: &App) -> Result<Vec<versioning::UpdateFeatures>> {
 
     let current_version = &app.handle().package_info().version;
     let controller = app.handle().controller();
-    let update_features: Vec<versioning::UpdateFeatures> =
-        match versioning::handle_updates_get_features(&controller, current_version, false) {
+    let update_features: Vec<version::UpdateFeatures> =
+        match version::handle_updates_get_features(&controller, current_version, false) {
             Err(error) => match error {
                 Error::OutdatedVersion { .. } => {
                     let should_launch = show_version_error_prompt(app, &error);
@@ -43,14 +43,14 @@ pub fn run_app_startup(app: &App) -> Result<Vec<versioning::UpdateFeatures>> {
                         return Err(error);
                     }
 
-                    versioning::handle_updates_get_features(&controller, current_version, true)?
+                    version::handle_updates_get_features(&controller, current_version, true)?
                 }
                 other => return Err(other),
             },
             Ok(feature_messages) => feature_messages,
         };
 
-    versioning::update_version_last_used(&controller, current_version)?;
+    version::update_version_last_used(&controller, current_version)?;
 
     // IMPORTANT: should occur after any migrations (above)
     initialize_storage(&controller)?;
