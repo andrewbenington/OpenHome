@@ -319,8 +319,14 @@ type OhpkmLogButtonProps = {
 }
 
 function OhpkmLogButton(props: OhpkmLogButtonProps) {
-  const { identifier, onClick, onError } = props
+  const { identifier, onClick } = props
   const { loading, ohpkmResult } = useOhpkm(identifier)
+
+  const onError = () =>
+    props.onError(
+      'OHPKM Data Not found',
+      `This log is associated with the OHPKM with id ${identifier}, but that data could not be found.`
+    )
 
   return !loading && ohpkmResult ? (
     $R(ohpkmResult).match(
@@ -335,17 +341,7 @@ function OhpkmLogButton(props: OhpkmLogButtonProps) {
       ),
       () => (
         <Tooltip content={identifier}>
-          <Button
-            className="box-slot-missing-id"
-            radius="full"
-            size="1"
-            onClick={() =>
-              onError(
-                'OHPKM Data Not found',
-                `This log is associated with the OHPKM with id ${identifier}, but that data could not be found.`
-              )
-            }
-          >
+          <Button className="box-slot-missing-id" radius="full" size="1" onClick={onError}>
             !
           </Button>
         </Tooltip>

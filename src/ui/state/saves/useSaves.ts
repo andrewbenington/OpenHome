@@ -143,11 +143,7 @@ export function useSaves(): SavesAndBanksManager {
       const destSave = openSavesState.openSaves[dest.saveIdentifier].save
 
       let ohpkm: Option<OHPKM> = await $O(mon)
-        .map(
-          async (mon) =>
-            (await ohpkmStore.loadIfTracked(mon)) ??
-            (await ohpkmStore.startTrackingNewMon(mon, sourceSave, destSave))
-        )
+        .map(async (mon) => ohpkmStore.loadOrStartTracking(mon, sourceSave, destSave))
         .getPromise()
 
       return (
@@ -225,9 +221,7 @@ export function useSaves(): SavesAndBanksManager {
 
       let ohpkm: Option<OHPKM>
       if (mon) {
-        ohpkm =
-          (await ohpkmStore.loadIfTracked(mon)) ??
-          (await ohpkmStore.startTrackingNewMon(mon, sourceSave, undefined))
+        ohpkm = await ohpkmStore.loadOrStartTracking(mon, sourceSave, undefined)
       }
 
       if (!mon) {
@@ -537,9 +531,7 @@ export function useSaves(): SavesAndBanksManager {
         if (!mon) return R.Ok(null)
 
         const save = saveFromIdentifier(location.saveIdentifier)
-        ohpkm =
-          (await ohpkmStore.loadIfTracked(mon)) ??
-          (await ohpkmStore.startTrackingNewMon(mon, save, save))
+        ohpkm = await ohpkmStore.loadOrStartTracking(mon, save, save)
 
         const converted = save.convertOhpkm(ohpkm, defaultConvertStrategy)
         if (R.isErr(converted)) {
@@ -714,9 +706,7 @@ export function useSaves(): SavesAndBanksManager {
           banksAndBoxes.addBoxCurrentBank('end')
         }
 
-        const ohpkm =
-          (await ohpkmStore.loadIfTracked(mon)) ??
-          (await ohpkmStore.startTrackingNewMon(mon, save, undefined))
+        const ohpkm = await ohpkmStore.loadOrStartTracking(mon, save, undefined)
 
         banksAndBoxes.setAtHomeLocation(
           {
@@ -778,9 +768,7 @@ export function useSaves(): SavesAndBanksManager {
             banksAndBoxes.addBoxCurrentBank('end')
           }
 
-          const ohpkm =
-            (await ohpkmStore.loadIfTracked(mon)) ??
-            (await ohpkmStore.startTrackingNewMon(mon, save, undefined))
+          const ohpkm = await ohpkmStore.loadOrStartTracking(mon, save, undefined)
 
           banksAndBoxes.setAtHomeLocation(
             {
