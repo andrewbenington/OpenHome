@@ -13,7 +13,6 @@ import dayjs from 'dayjs'
 import { useState } from 'react'
 import { getOriginIconPath } from '../images/game'
 import { OPENHOME_BOX_SLOTS, useBanksAndBoxes } from '../state-zustand/banks-and-boxes/store'
-import { useOhpkmStore } from '../state/ohpkm'
 
 export type SaveViewMode = 'card' | 'grid'
 
@@ -107,7 +106,6 @@ function moduloUnderflowWrap(a: number, b: number): number {
 
 export function useOpenHomeBoxNavigator() {
   const { getCurrentBox } = useBanksAndBoxes()
-  const ohpkmStore = useOhpkmStore()
   const [currentIndex, setCurrentIndex] = useState<number>()
 
   function navigateNext() {
@@ -119,7 +117,7 @@ export function useOpenHomeBoxNavigator() {
       i = (i + 1) % OPENHOME_BOX_SLOTS
     ) {
       const identifier = currentBox.identifiers.get(i)
-      if (identifier && ohpkmStore.monIsStored(identifier)) {
+      if (identifier) {
         setCurrentIndex(i)
         break
       }
@@ -135,7 +133,7 @@ export function useOpenHomeBoxNavigator() {
       i = moduloUnderflowWrap(i - 1, OPENHOME_BOX_SLOTS)
     ) {
       const identifier = currentBox.identifiers.get(i)
-      if (identifier && ohpkmStore.monIsStored(identifier)) {
+      if (identifier) {
         setCurrentIndex(i)
         break
       }

@@ -25,7 +25,7 @@ import useDisplayError from '@openhome-ui/hooks/displayError'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/PokemonDetailsModal'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import useTrackedDataRecovery from '@openhome-ui/state/ohpkm/useTrackedDataRecovery'
-import { HomeMonLocation, MonLocation, MonWithLocation, useSaves } from '@openhome-ui/state/saves'
+import { HomeMonLocation, MonWithLocation, useSaves } from '@openhome-ui/state/saves'
 import { cssClass } from '@openhome-ui/util/style'
 import { Language, Lookup } from '@pkm-rs/pkg'
 import { Button, Card, DropdownMenu, Flex, Heading, TextField, Tooltip } from '@radix-ui/themes'
@@ -274,12 +274,7 @@ function SingleBoxMonDisplay() {
     },
   }
 
-  const attemptImportMons = useCallback(
-    (mons: PKMInterface[], location: MonLocation) => {
-      importMonsToLocation(mons, location)
-    },
-    [importMonsToLocation]
-  )
+  const attemptImportMons = importMonsToLocation
 
   const dragData: MonWithLocation | undefined = useMemo(() => {
     const payload = dragState.payload

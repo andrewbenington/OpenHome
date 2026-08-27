@@ -55,7 +55,7 @@ export function useManageTracked() {
         setFindingSaveState({ type: 'finding_one', state })
       }
 
-      const mon = ohpkmStore.getById(identifier)
+      const mon = await ohpkmStore.getById(identifier)
       if (!mon) {
         console.error('mon not tracked!')
 

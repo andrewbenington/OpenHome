@@ -12,20 +12,23 @@ export default function useDragAndDrop() {
     [dragState.selectedLocations]
   )
 
-  const startDragging = (payload: DragPayload) => {
+  const startDragging = async (payload: DragPayload) => {
     if (
       dragState.payload?.kind === 'mon' &&
       dragState.multiSelectEnabled &&
       dragState.selectedLocations.length > 0
     ) {
       // If we start dragging a mon and multi-select is enabled, we want to switch to dragging multiple mons
-      const monsWithLocation: MonWithLocation[] = dragState.selectedLocations
-        .map((location) => {
-          const mon = savesAndBanks.getMonAtLocation(location)
-          const monWithLocation: Option<MonWithLocation> = mon ? { ...location, mon } : undefined
-          return monWithLocation
-        })
-        .filter(filterUndefined)
+      const monsWithLocation: MonWithLocation[] = (
+        await Promise.all(
+          dragState.selectedLocations.map(async (location) => {
+            const mon = await savesAndBanks.getMonAtLocation(location)
+            const monWithLocation: Option<MonWithLocation> = mon ? { ...location, mon } : undefined
+            return monWithLocation
+          })
+        )
+      ).filter(filterUndefined)
+
       setDragState((prev) => {
         return {
           ...prev,

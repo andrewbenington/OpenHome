@@ -8,7 +8,7 @@ import { Flex, Spinner } from '@radix-ui/themes'
 import { useEffect, useState } from 'react'
 import { useOhpkmStore } from '../../state/ohpkm'
 
-type MonsToReleaseState =
+export type MonsToReleaseState =
   | {
       loading: boolean
       loadedMons: undefined
