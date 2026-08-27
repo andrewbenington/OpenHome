@@ -43,15 +43,15 @@ export type Nullable<T> = T | null
 export type NullableOption<T> = T | null | undefined
 export type Errorable<T> = Result<T, string>
 
-function buildOk<T = never, E = never>(value: T): Result<T, E> {
+export function buildOk<T = never, E = never>(value: T): Result<T, E> {
   return { status: 'ok', data: value }
 }
 
-function buildErr<T = never, E = never>(err: E): Result<T, E> {
+export function buildErr<T = never, E = never>(err: E): Result<T, E> {
   return { status: 'error', error: err }
 }
 
-function isOk<T>(result: Result<T, unknown>): result is Ok<T> {
+export function isOk<T>(result: Result<T, unknown>): result is Ok<T> {
   return result.status === 'ok'
 }
 
@@ -69,6 +69,10 @@ function mapErr<T, E, U>(transform: Mapper<E, U>): (result: Result<T, E>) => Res
 
 function orElse<T, E>(fallback: T): (result: Result<T, E>) => T {
   return (result) => (isOk(result) ? result.data : fallback)
+}
+
+function ok<T, E>(): (result: Result<T, E>) => Option<T> {
+  return (result) => (isOk(result) ? result.data : undefined)
 }
 
 function flatMap<T, E, U>(
@@ -133,6 +137,8 @@ export const R = {
   flatMap,
   asyncFlatMap,
   assert,
+  orElse,
+  ok,
   fromNullable,
   Ok: buildOk,
   Err: buildErr,
@@ -142,11 +148,11 @@ export const R = {
   tryPromise,
 }
 
-type Mapper<T, R> = (val: T) => R
+export type Mapper<T, R> = (val: T) => R
 
-type OnOk<T, R> = Mapper<T, R>
+export type OnOk<T, R> = Mapper<T, R>
 
-type OnErr<E, R> = Mapper<E, R>
+export type OnErr<E, R> = Mapper<E, R>
 
 // Wrapper function exposing Result utility functions as "methods"
 export function $R<T, E>(r: Result<T, E>) {
