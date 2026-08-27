@@ -292,8 +292,6 @@ function SingleBoxMonDisplay() {
     },
   }
 
-  const attemptImportMons = importMonsToLocation
-
   const dragData: MonWithLocation | undefined = useMemo(() => {
     const payload = dragState.payload
 
@@ -465,7 +463,7 @@ function SingleBoxMonDisplay() {
                 mon={mon}
                 onDrop={(importedMons) => {
                   if (importedMons) {
-                    attemptImportMons(importedMons, location)
+                    importMonsToLocation(importedMons, location)
                   }
                 }}
                 disabled={
