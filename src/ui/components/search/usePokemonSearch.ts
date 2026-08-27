@@ -93,7 +93,9 @@ function prefixMatches(prefix: NullableOption<string>, value: NullableOption<str
   )
 }
 
-export function usePokemonSearch(prefilter?: (mon: OHPKM) => boolean): PokemonSearchController {
+export function usePokemonSearch(
+  prefilter?: (mon: OHPKM) => Promise<boolean>
+): PokemonSearchController {
   const [nickname, setNickname] = useState<Nullable<string>>(null)
   const [knownMove, setKnownMove] = useState<Nullable<string>>(null)
   const [originGame, setOriginGame] = useState<Nullable<OriginGame>>(null)
@@ -108,7 +110,7 @@ export function usePokemonSearch(prefilter?: (mon: OHPKM) => boolean): PokemonSe
     const mons = await ohpkmStore.getAllStored()
 
     const results = mons
-      .filter((mon) => prefilter?.(mon) !== false)
+      .filter(async (mon) => (await prefilter?.(mon)) !== false)
       .filter((mon) => prefixMatches(nickname, mon.nickname))
       .filter((mon) =>
         mon.moves.some((moveIndex) => prefixMatches(knownMove, Moves[moveIndex]?.name))

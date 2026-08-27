@@ -496,11 +496,11 @@ export function useBanksAndBoxes() {
     switchBoxCurrentBank((getCurrentBank().current_box + 1) % currentBankBoxCount)
   }
 
-  function sortHomeBox(
+  async function sortHomeBox(
     boxIndex: number,
     sortType: string
-  ): Result<null, IdentifierNotPresentError[]> {
-    const loadResults = ohpkmStore.tryLoadFromIds(allMonsInHomeBoxCurrentBank(boxIndex))
+  ): Promise<Result<null, IdentifierNotPresentError[]>> {
+    const loadResults = await ohpkmStore.tryLoadFromIds(allMonsInHomeBoxCurrentBank(boxIndex))
     const { successes: mons, failures } = partitionResults(loadResults)
     if (failures.length) {
       return R.Err(failures)
@@ -525,9 +525,11 @@ export function useBanksAndBoxes() {
     return R.Ok(null)
   }
 
-  function sortAllHomeBoxes(sortType: string): Result<null, IdentifierNotPresentError[]> {
+  async function sortAllHomeBoxes(
+    sortType: string
+  ): Promise<Result<null, IdentifierNotPresentError[]>> {
     const currentBankMons = allMonsInCurrentBankWithLocations()
-    const loadResults = ohpkmStore.tryLoadFromIds(Object.keys(currentBankMons))
+    const loadResults = await ohpkmStore.tryLoadFromIds(Object.keys(currentBankMons))
     const { successes: allMons, failures } = partitionResults(loadResults)
     if (failures.length) {
       failures.forEach((failure) => {
