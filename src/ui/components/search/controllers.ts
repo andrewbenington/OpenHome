@@ -5,12 +5,13 @@ export type SearchController<T> = {
   clearFields: () => void
   fieldsEmpty: boolean
 
-  results: T[]
+  loading: boolean
+  getResults: () => Promise<T[]>
 
   getRowId: (item: T) => string
   selectedId: Option<string>
   setSelectedId: (id: Option<string>) => void
-  selectedItem: Option<T>
+  getSelectedItem: () => Promise<Option<T>>
 
   reset: () => void
 }

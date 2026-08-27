@@ -62,7 +62,7 @@ export function usePokemonEdit() {
       return R.Err('No Pokémon is being edited.')
     }
 
-    return $R(ohpkmStore.setMonNickname(editingId, formController.name)).mapErr(
+    return $R(await ohpkmStore.setMonNickname(editingId, formController.name)).mapErr(
       (err): string => `Pokémon tracking data not found (id ${err.identifier}`
     )
   }
@@ -98,15 +98,26 @@ export function usePokemonSearch(prefilter?: (mon: OHPKM) => boolean): PokemonSe
   const [knownMove, setKnownMove] = useState<Nullable<string>>(null)
   const [originGame, setOriginGame] = useState<Nullable<OriginGame>>(null)
   const [selectedId, setSelectedId] = useState<Option<string>>()
-  const mons = useOhpkmStore().getAllStored()
+  const ohpkmStore = useOhpkmStore()
+  const [loading, setLoading] = useState(false)
 
-  const filtered = mons
-    .filter((mon) => prefilter?.(mon) !== false)
-    .filter((mon) => prefixMatches(nickname, mon.nickname))
-    .filter((mon) =>
-      mon.moves.some((moveIndex) => prefixMatches(knownMove, Moves[moveIndex]?.name))
-    )
-    .filter((mon) => originGame === null || mon.gameOfOrigin === originGame)
+  // TODO: do not get all of these at once
+  async function getResults(): Promise<OHPKM[]> {
+    setLoading(true)
+    const mons = await ohpkmStore.getAllStored()
+
+    const results = mons
+      .filter((mon) => prefilter?.(mon) !== false)
+      .filter((mon) => prefixMatches(nickname, mon.nickname))
+      .filter((mon) =>
+        mon.moves.some((moveIndex) => prefixMatches(knownMove, Moves[moveIndex]?.name))
+      )
+      .filter((mon) => originGame === null || mon.gameOfOrigin === originGame)
+
+    setLoading(false)
+
+    return results
+  }
 
   function clearFields() {
     setNickname(null)
@@ -119,7 +130,9 @@ export function usePokemonSearch(prefilter?: (mon: OHPKM) => boolean): PokemonSe
     setSelectedId(undefined)
   }
 
-  const selectedItem = mons.find((mon) => mon.openhomeId === selectedId)
+  async function getSelectedMon() {
+    return selectedId ? ohpkmStore.getById(selectedId) : undefined
+  }
 
   return {
     nickname,
@@ -132,12 +145,13 @@ export function usePokemonSearch(prefilter?: (mon: OHPKM) => boolean): PokemonSe
     fieldsEmpty: !nickname,
     clearFields,
 
-    results: filtered,
+    loading,
+    getResults,
 
     getRowId: (mon) => mon.openhomeId,
     selectedId,
     setSelectedId,
-    selectedItem,
+    getSelectedItem: getSelectedMon,
 
     reset,
   }
