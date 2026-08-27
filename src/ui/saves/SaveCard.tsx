@@ -3,7 +3,7 @@ import { SaveRef } from '@openhome-core/util/types'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import useDisplayError from '@openhome-ui/hooks/displayError'
-import { OriginGames } from '@pkm-rs/pkg'
+import { OriginGame, OriginGames } from '@pkm-rs/pkg'
 import { Badge, Flex } from '@radix-ui/themes'
 import { useMemo, useState } from 'react'
 import { classNames, grayscaleIf } from '../util/style'
@@ -26,7 +26,7 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
   const displayError = useDisplayError()
   const backend = useBackend()
 
-  const isGameBoy = save.game && OriginGames.isGameboy(save.game)
+  const isBoxartGame = save.game === OriginGame.BlueGreen || save.game === OriginGame.BlueJpn
 
   const backgroundColor = useMemo(() => {
     return save.pluginIdentifier
@@ -46,7 +46,7 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
             width: size,
             height: size,
             backgroundImage,
-            backgroundSize: isGameBoy ? size : size * 0.9,
+            backgroundSize: isBoxartGame ? size : size * 0.9,
             backgroundColor,
           }}
           onClick={onOpen}
