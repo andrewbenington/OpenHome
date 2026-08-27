@@ -15,9 +15,7 @@ use std::ffi::OsStr;
 use std::fs::DirEntry;
 use std::{fs, path::PathBuf};
 use strum::{self, EnumIter, IntoEnumIterator};
-use tracing::error;
-use tracing::warn;
-use tracing::{debug, info};
+use tracing::{debug, error, info, warn};
 
 const VERSION_FILE: &str = "version.txt";
 
