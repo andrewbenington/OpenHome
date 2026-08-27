@@ -1601,11 +1601,9 @@ impl OhpkmV2 {
     }
 
     pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        let sectioned_data = SectionedData::<OhpkmSectionTag>::from_bytes(bytes)?;
+        let sectioned_data = SectionedData::<OhpkmSectionTag>::from_bytes(bytes, MAGIC_NUMBER)?;
 
-        if sectioned_data.magic_number != MAGIC_NUMBER {
-            return Err(Error::other("Bad magic number"));
-        } else if sectioned_data.version != 2 {
+        if sectioned_data.version != 2 {
             return Err(Error::other("Bad version number"));
         }
 
@@ -1644,11 +1642,9 @@ impl OhpkmV2 {
     }
 
     pub fn from_bytes_fixing_errors(bytes: &[u8]) -> Result<Self> {
-        let sectioned_data = SectionedData::<OhpkmSectionTag>::from_bytes(bytes)?;
+        let sectioned_data = SectionedData::<OhpkmSectionTag>::from_bytes(bytes, MAGIC_NUMBER)?;
 
-        if sectioned_data.magic_number != MAGIC_NUMBER {
-            return Err(Error::other("Bad magic number"));
-        } else if sectioned_data.version != 2 {
+        if sectioned_data.version != 2 {
             return Err(Error::other("Bad version number"));
         }
 
