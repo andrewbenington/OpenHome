@@ -289,6 +289,14 @@ export function useOhpkmStore() {
     }
   }
 
+  async function loadOrStartTracking(
+    mon: PKMInterface,
+    sourceSave: Option<SAV>,
+    destSave: Option<SAV>
+  ) {
+    return (await loadIfTracked(mon)) ?? (await startTrackingNewMon(mon, sourceSave, destSave))
+  }
+
   async function monOrOhpkmIfTracked<P extends PKMInterface>(mon: P): Promise<OHPKM | P> {
     return (await loadIfTracked(mon)) ?? mon
   }
@@ -335,6 +343,7 @@ export function useOhpkmStore() {
     startTrackingNewMon,
     getIdIfTracked,
     loadIfTracked,
+    loadOrStartTracking,
     monOrOhpkmIfTracked,
     syncOhpkmIfTracked,
 
