@@ -6,8 +6,10 @@ use openhome_core::{Error, Result};
 use pkm_rs::ohpkm::{OhpkmV2, v1::OhpkmV1};
 use semver::Version;
 use serde::Serialize;
+use std::fs::DirEntry;
 use std::{fs, path::PathBuf};
 use strum::{self, EnumIter, IntoEnumIterator};
+use tracing::error;
 use tracing::{debug, info};
 
 const VERSION_FILE: &str = "version.txt";
@@ -221,6 +223,7 @@ impl SignificantUpdate {
             Self::V1_8_0AlphaFeatureMessages => Ok(()),
             Self::V1_8_1 => handle_old_mons_directories_for_ohpkm_v2(data_controller),
             Self::V1_14_1 => update_convert_strat_json_dot_keys(data_controller),
+            Self::V1_16_0 => update_ohpkm_filenames_standard_format(data_controller),
             _ => Ok(()),
         }
     }
@@ -487,6 +490,45 @@ pub fn update_convert_strat_json_dot_keys(data_controller: &impl DataController)
     let fixed_json = convert_strats_json.replace(".", "__");
 
     data_controller.write_file_text(DATA_DIR, JSON_FILENAME, &fixed_json)
+}
+
+fn update_ohpkm_filenames_standard_format(data_controller: &impl DataController) -> Result<()> {
+    for dir_entry in data_controller.list_directory(DataDir::Storage, MONS_V2_DIR)? {
+        if let Err(err) = standardize_ohpkm_filename(&dir_entry) {
+            error!(
+                "error renaming {}: {}",
+                dir_entry
+                    .file_name()
+                    .into_string()
+                    .unwrap_or("(cannot decode filename)".to_owned()),
+                err
+            )
+        }
+    }
+
+    Ok(())
+}
+
+fn standardize_ohpkm_filename(dir_entry: &DirEntry) -> Result<()> {
+    let path = dir_entry.path();
+    let mon = OhpkmV2::from_bytes(&util::read_file_bytes(&path)?)
+        .map_err(|e| Error::file_malformed(&path, e))?;
+
+    let openhome_id_str = mon.openhome_id().to_string();
+    let filename = PathBuf::from(dir_entry.file_name());
+
+    if let Some(stem) = filename.file_stem()
+        && let Some(stem) = stem.to_str()
+        && stem == openhome_id_str
+    {
+        return Ok(());
+    }
+
+    fs::rename(
+        &path,
+        path.with_file_name(format!("{openhome_id_str}.ohpkm")),
+    )
+    .map_err(|e| Error::file_access(&path, e))
 }
 
 #[cfg(test)]
