@@ -99,6 +99,7 @@ export function usePokemonSearch(prefilter?: (mon: OHPKM) => boolean): PokemonSe
   const [originGame, setOriginGame] = useState<Nullable<OriginGame>>(null)
   const [selectedId, setSelectedId] = useState<Option<string>>()
   const ohpkmStore = useOhpkmStore()
+  const [results, setResults] = useState<Option<OHPKM[]>>()
   const [loading, setLoading] = useState(false)
 
   // TODO: do not get all of these at once
@@ -115,6 +116,7 @@ export function usePokemonSearch(prefilter?: (mon: OHPKM) => boolean): PokemonSe
       .filter((mon) => originGame === null || mon.gameOfOrigin === originGame)
 
     setLoading(false)
+    setResults(results)
 
     return results
   }
@@ -146,6 +148,7 @@ export function usePokemonSearch(prefilter?: (mon: OHPKM) => boolean): PokemonSe
     clearFields,
 
     loading,
+    results,
     getResults,
 
     getRowId: (mon) => mon.openhomeId,

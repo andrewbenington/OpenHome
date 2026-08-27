@@ -40,15 +40,20 @@ function SearchModal<T extends SortableValue, SC extends SearchController<T>>(
     SearchComponent,
   } = props
   const { modalOpen, setModalOpen } = props.modalController
-  const { selectedItem, reset } = searchController
+  const { selectedId, getSelectedItem, reset, loading } = searchController
 
   function closeAndClear() {
     reset()
     setModalOpen(false)
   }
 
-  function confirmSelected() {
-    if (selectedItem) onSelect(selectedItem)
+  async function confirmSelected() {
+    if (!selectedId) return
+
+    const selectedItem = await getSelectedItem()
+    if (selectedItem) {
+      onSelect(selectedItem)
+    }
   }
 
   return (
@@ -75,7 +80,7 @@ function SearchModal<T extends SortableValue, SC extends SearchController<T>>(
             <OhoButton type="reset" onClick={closeAndClear}>
               Cancel
             </OhoButton>
-            <OhoButton disabled={!selectedItem} type="submit" onClick={confirmSelected}>
+            <OhoButton disabled={loading || !selectedId} type="submit" onClick={confirmSelected}>
               Select
             </OhoButton>
           </Flex>

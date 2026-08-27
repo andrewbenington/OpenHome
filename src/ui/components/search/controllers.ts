@@ -6,6 +6,7 @@ export type SearchController<T> = {
   fieldsEmpty: boolean
 
   loading: boolean
+  results: Option<T[]>
   getResults: () => Promise<T[]>
 
   getRowId: (item: T) => string
