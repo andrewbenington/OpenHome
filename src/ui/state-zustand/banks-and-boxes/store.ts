@@ -500,8 +500,10 @@ export function useBanksAndBoxes() {
     boxIndex: number,
     sortType: string
   ): Promise<Result<null, IdentifierNotPresentError[]>> {
-    const loadResults = await ohpkmStore.tryLoadFromIds(allMonsInHomeBoxCurrentBank(boxIndex))
-    const { successes: mons, failures } = partitionResults(loadResults)
+    const loadResults = await ohpkmStore.tryLoadBatch(allMonsInHomeBoxCurrentBank(boxIndex))
+
+    const { successes: mons, failures } = partitionResults(Array.from(loadResults.values()))
+
     if (failures.length) {
       return R.Err(failures)
     }
@@ -529,8 +531,9 @@ export function useBanksAndBoxes() {
     sortType: string
   ): Promise<Result<null, IdentifierNotPresentError[]>> {
     const currentBankMons = allMonsInCurrentBankWithLocations()
-    const loadResults = await ohpkmStore.tryLoadFromIds(Object.keys(currentBankMons))
-    const { successes: allMons, failures } = partitionResults(loadResults)
+    const loadResults = await ohpkmStore.tryLoadBatch(Object.keys(currentBankMons))
+    const { successes: allMons, failures } = partitionResults(Array.from(loadResults.values()))
+
     if (failures.length) {
       failures.forEach((failure) => {
         const location = currentBankMons[failure.identifier]
