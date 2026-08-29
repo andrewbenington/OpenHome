@@ -16,7 +16,8 @@ import { useLookups } from '@openhome-ui/state/lookups/useLookups'
 import useOhpkmIdBatchLookup from '@openhome-ui/state/ohpkm/useOhpkmIdBatchLookup'
 import { Language, Lookup, OriginGames } from '@pkm-rs/pkg'
 import { Spinner } from '@radix-ui/themes'
-export type G345LookupRow = {
+
+type G345LookupRow = {
   gen345ID: string
   homeID: string
   homeMon?: OHPKM
