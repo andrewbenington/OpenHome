@@ -15,7 +15,7 @@ import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
 import { useBanksAndBoxes } from '@openhome-ui/state-zustand/banks-and-boxes/store'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import './style.css'
 
@@ -43,6 +43,13 @@ export default function AllTrackedPokemon({
   const columns = useOhpkmColumns(trackedMonsToRelease, onSelectMon)
   const navigate = useNavigate()
   const { switchBoxCurrentBank } = useBanksAndBoxes()
+  const [mons, setMons] = useState<OHPKM[]>()
+
+  useEffect(() => {
+    if (!mons) {
+      ohpkmStore.getAllStored().then((mons) => setMons(mons))
+    }
+  }, [mons, ohpkmStore])
 
   const buildContextElements = useCallback(
     (mon: OHPKM) => {
@@ -106,7 +113,7 @@ export default function AllTrackedPokemon({
       {/* this div is necessary to give the context menu a target */}
       <div style={{ height: '100%', width: '100%' }}>
         <SortableDataGrid
-          rows={ohpkmStore.getAllStored().toSorted(stringSorter((mon) => mon.openhomeId))}
+          rows={mons?.toSorted(stringSorter((mon) => mon.openhomeId)) ?? []}
           columns={columns}
           style={{ borderLeft: 'none' }}
           rowKeyGetter={keyGetter}
