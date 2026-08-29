@@ -48,6 +48,8 @@ function getBackgroundPosition(formeMetadata?: FormMetadata, isEgg?: boolean) {
 
 type IconType = 'spritesheet' | 'image'
 
+const FORCE_ICON_FROM_IMAGE = false
+
 function iconType(
   nationalDex: number,
   formIndex: number,
@@ -59,6 +61,7 @@ function iconType(
   const extraFormWithSprite = Boolean(extraFormIndex && extraFormSpriteName(extraFormIndex))
 
   const shouldUseImage =
+    FORCE_ICON_FROM_IMAGE ||
     inChampions ||
     isGen9Mega ||
     extraFormWithSprite ||

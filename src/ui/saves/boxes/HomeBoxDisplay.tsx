@@ -239,15 +239,17 @@ export default function HomeBoxDisplay() {
       {viewMode === 'one' ? (
         <SingleBoxMonDisplay />
       ) : (
-        <AllHomeBoxes
-          onBoxSelect={(boxIndex) => {
-            switchBoxCurrentBank(boxIndex)
-            setViewMode('one')
-          }}
-          moving={moving}
-          deleting={deleting}
-          debugMode={debugMode}
-        />
+        viewMode === 'all' && (
+          <AllHomeBoxes
+            onBoxSelect={(boxIndex) => {
+              switchBoxCurrentBank(boxIndex)
+              setViewMode('one')
+            }}
+            moving={moving}
+            deleting={deleting}
+            debugMode={debugMode}
+          />
+        )
       )}
     </Card>
   )
@@ -257,6 +259,8 @@ type MissingIdData = {
   id: OhpkmIdentifier
   location: BankBoxCoordinates
 }
+
+const FORCE_LOADING = false
 
 function SingleBoxMonDisplay() {
   const ohpkmStore = useOhpkmStore()
@@ -335,7 +339,7 @@ function SingleBoxMonDisplay() {
     () => [
       Submenu.label('Sort this box...').with(
         ...SortTypes.map((sortType) =>
-          Item.label(`By ${sortType}`).action(() => sortHomeBox(getCurrentBox().index, sortType))
+          Item.label(`By ${sortType}`).action(() => sortHomeBox(currentBox.index, sortType))
         )
       ),
       Submenu.label('Sort all boxes...').with(
@@ -344,10 +348,16 @@ function SingleBoxMonDisplay() {
         )
       ),
     ],
-    [getCurrentBox, sortAllHomeBoxes, sortHomeBox]
+    [currentBox, sortAllHomeBoxes, sortHomeBox]
   )
 
-  if (boxOhpkmsLoading) return <Spinner />
+  if (boxOhpkmsLoading || FORCE_LOADING) {
+    return (
+      <div className="home-box-grid">
+        <Spinner style={{ margin: 'auto', gridColumn: '1 / 13' }} />
+      </div>
+    )
+  }
 
   const removeDupesItem = Item.label('Remove duplicates from this box').action(removeAllHomeDupes)
 
