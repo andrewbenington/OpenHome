@@ -1,5 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SortTypes } from '@openhome-core/pkm/sort'
 import { monSupportedBySave } from '@openhome-core/save/util'
 import { mapToObject } from '@openhome-core/util'
@@ -23,22 +24,13 @@ import PokemonSearchModal from '@openhome-ui/components/search/SearchModal'
 import ToggleButton from '@openhome-ui/components/ToggleButton'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/PokemonDetailsModal'
-import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
+import { OhpkmLookupResult } from '@openhome-ui/state/ohpkm'
 import useOhpkmBatchIdLookup from '@openhome-ui/state/ohpkm/useOhpkmIdBatchLookup'
 import useTrackedDataRecovery from '@openhome-ui/state/ohpkm/useTrackedDataRecovery'
 import { HomeMonLocation, MonWithLocation, useSaves } from '@openhome-ui/state/saves'
 import { cssClass } from '@openhome-ui/util/style'
 import { Language, Lookup } from '@pkm-rs/pkg'
-import {
-  Button,
-  Card,
-  DropdownMenu,
-  Flex,
-  Heading,
-  Spinner,
-  TextField,
-  Tooltip,
-} from '@radix-ui/themes'
+import { Button, Card, DropdownMenu, Flex, Heading, TextField, Tooltip } from '@radix-ui/themes'
 import { ToggleGroup } from 'radix-ui'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { BsFillGrid3X3GapFill } from 'react-icons/bs'
@@ -262,8 +254,14 @@ type MissingIdData = {
 
 const FORCE_LOADING = false
 
+type SlotData = {
+  monResult?: OhpkmLookupResult
+  location: HomeMonLocation
+  identifier: Option<OhpkmIdentifier>
+  loading: boolean
+}
+
 function SingleBoxMonDisplay() {
-  const ohpkmStore = useOhpkmStore()
   const displayError = useDisplayError()
   const { importMonsToLocation, saveFromIdentifier } = useSaves()
   const { getCurrentBox, getCurrentBank, clearAtHomeLocation, removeAllHomeDupes } =
@@ -351,13 +349,13 @@ function SingleBoxMonDisplay() {
     [currentBox, sortAllHomeBoxes, sortHomeBox]
   )
 
-  if (boxOhpkmsLoading || FORCE_LOADING) {
-    return (
-      <div className="home-box-grid">
-        <Spinner style={{ margin: 'auto', gridColumn: '1 / 13' }} />
-      </div>
-    )
-  }
+  // if (boxOhpkmsLoading || FORCE_LOADING) {
+  //   return (
+  //     <div className="home-box-grid">
+  //       <Spinner style={{ margin: 'auto', gridColumn: '1 / 13' }} />
+  //     </div>
+  //   )
+  // }
 
   const removeDupesItem = Item.label('Remove duplicates from this box').action(removeAllHomeDupes)
 
@@ -377,7 +375,7 @@ function SingleBoxMonDisplay() {
   const currentBankIndex = getCurrentBank().index
   const currentBoxIndex = getCurrentBox().index
 
-  const slots = range(OPENHOME_BOX_SLOTS)
+  const slots: SlotData[] = range(OPENHOME_BOX_SLOTS)
     .map((index: number) => currentBox.identifiers.get(index))
     .map((identifier, index) => {
       const location: HomeMonLocation = {
@@ -386,9 +384,15 @@ function SingleBoxMonDisplay() {
         boxSlot: index,
         isHome: true,
       }
+
       const monResult = identifier ? boxOhpkms?.get(identifier) : undefined
 
-      return { monResult, location, identifier }
+      return {
+        monResult,
+        location,
+        identifier,
+        loading: (identifier !== undefined && boxOhpkmsLoading) || FORCE_LOADING,
+      }
     })
 
   const DetailsModal = $R(selectedMon)
@@ -419,9 +423,21 @@ function SingleBoxMonDisplay() {
     <>
       <OpenHomeCtxMenu sections={[contextElements, [removeDupesItem]]}>
         <div className="home-box-grid">
-          {slots.map(({ monResult, location, identifier }, index) => {
+          {slots.map(({ monResult, location, identifier, loading }, index) => {
             // if underlying data changes but this key doesn't, the box cell will be stale and may not display the correct species
             let uniqueKey = `${currentBoxIndex}-${index}-${identifier}`
+
+            if (loading)
+              return (
+                <img
+                  key={uniqueKey}
+                  src="/items/index/0000.png"
+                  alt=""
+                  aria-hidden
+                  draggable={false}
+                  style={{ width: '2.75rem', padding: '0.5rem' }}
+                />
+              )
 
             if (monResult && R.isErr(monResult)) {
               return (
