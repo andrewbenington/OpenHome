@@ -75,6 +75,10 @@ function ok<T, E>(result: Result<T, E>): Option<T> {
   return isOk(result) ? result.data : undefined
 }
 
+function err<T, E>(result: Result<T, E>): Option<E> {
+  return isErr(result) ? result.error : undefined
+}
+
 function flatMap<T, E, U>(
   transform: (val: T) => Result<U, E>
 ): (result: Result<T, E>) => Result<U, E> {
@@ -130,6 +134,14 @@ export type Ok<T> = {
 
 export type Result<T, E = string> = Ok<T> | Err<E>
 
+export function isResult(v: object): v is Result<unknown, unknown> {
+  return (
+    v !== null &&
+    'status' in v &&
+    ((v.status === 'ok' && 'data' in v) || (v.status === 'error' && 'error' in v))
+  )
+}
+
 export const R = {
   match,
   map,
@@ -139,6 +151,7 @@ export const R = {
   assert,
   orElse,
   ok,
+  err,
   fromNullable,
   Ok: buildOk,
   Err: buildErr,
@@ -159,6 +172,8 @@ export function $R<T, E>(r: Result<T, E>) {
   return {
     match: <U>(onOk: OnOk<T, U>, onErr: OnErr<E, U>) => match(onOk, onErr)(r),
     map: <U>(onOk: OnOk<T, U>) => map<T, E, U>(onOk)(r),
+    ok: () => ok(r),
+    err: () => err(r),
     flatMap: <U>(onOk: OnOk<T, Result<U, E>>) => flatMap<T, E, U>(onOk)(r),
     mapErr: <U>(onErr: OnErr<E, U>) => mapErr<T, E, U>(onErr)(r),
     orElse: (ifErr: T) => orElse<T, E>(ifErr)(r),
