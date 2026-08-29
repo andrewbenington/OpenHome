@@ -1,6 +1,6 @@
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { Option } from '@openhome-core/util/functional'
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { OhpkmBatchLookupResults, useOhpkmStore } from './useOhpkmStore'
 
 export type OhpkmBatchLookupState = {
@@ -15,7 +15,7 @@ export default function useOhpkmIdBatchLookup(
   const ohpkmStore = useOhpkmStore()
   const [batchResults, setBatchResults] = useState<Option<OhpkmBatchLookupResults>>()
 
-  async function loadMons() {
+  const loadMons = useCallback(async () => {
     if (!loading && !batchResults) {
       setLoading(true)
 
@@ -24,11 +24,13 @@ export default function useOhpkmIdBatchLookup(
 
       setLoading(false)
     }
-  }
+  }, [batchResults, loading, ohpkmStore, openhomeIds])
 
-  if (!loading && !batchResults) {
-    loadMons()
-  }
+  useEffect(() => {
+    if (!loading && !batchResults) {
+      loadMons()
+    }
+  }, [batchResults, loadMons, loading])
 
   return { loading, batchResults }
 }
