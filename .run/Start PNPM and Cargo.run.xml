@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Start PNPM and Cargo" type="CompoundRunConfigurationType">
+    <toRun name="Debug App" targetId="RsBuildProfile:dev" type="CargoCommandRunConfiguration" />
+    <toRun name="pnpm run dev" type="js.build_tools.npm" />
+    <method v="2" />
+  </configuration>
+</component>

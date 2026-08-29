@@ -11,6 +11,8 @@ mod synced_state;
 mod util;
 mod version;
 
+use std::collections::hash_map::Entry;
+use std::collections::HashMap;
 use crate::data_controller::ToDataController;
 use crate::synced_state::AllSyncedState;
 use openhome_core::convert_strategies::ConvertStrategies;
@@ -19,6 +21,7 @@ use openhome_core::ohpkm_store::OhpkmBytesStore;
 use openhome_core::{Error, Result};
 use pkm_rs::ohpkm::OhpkmV2;
 use std::env;
+use specta::datatype::List;
 use tauri::Manager;
 
 const RAW_HANDLER: fn(tauri::ipc::Invoke<tauri::Wry>) -> bool = tauri::generate_handler![
@@ -125,6 +128,11 @@ pub fn run() {
                     std::process::exit(1);
                 }
             };
+
+            let all_mons = ohpkm_store
+                .all_entries();
+
+            let all_mons_as_list : Vec<Entry<String, Vec<u8>>> = all_mons.collect();
 
             lookup_state.with_recalculated(
                 ohpkm_store

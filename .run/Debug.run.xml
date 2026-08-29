@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Debug" type="ChromiumRemoteDebugType" factoryName="Chromium Remote" port="12345">
+    <method v="2">
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="Run" run_configuration_type="CargoCommandRunConfiguration" run_configuration_target="RsBuildProfile:dev" />
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="Run Dev" run_configuration_type="js.build_tools.npm" />
+    </method>
+  </configuration>
+</component>
