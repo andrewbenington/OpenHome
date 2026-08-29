@@ -1,6 +1,6 @@
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { Option } from '@openhome-core/util/functional'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useEffectEvent, useState } from 'react'
 import { OhpkmBatchLookupResults, useOhpkmStore } from './useOhpkmStore'
 
 export type OhpkmBatchLookupState = {
@@ -11,26 +11,30 @@ export type OhpkmBatchLookupState = {
 export default function useOhpkmIdBatchLookup(
   openhomeIds: OhpkmIdentifier[]
 ): OhpkmBatchLookupState {
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const ohpkmStore = useOhpkmStore()
   const [batchResults, setBatchResults] = useState<Option<OhpkmBatchLookupResults>>()
 
-  const loadMons = useCallback(async () => {
-    if (!loading && !batchResults) {
-      setLoading(true)
-
-      const result = await ohpkmStore.tryLoadBatch(openhomeIds)
-      setBatchResults(result)
-
-      setLoading(false)
-    }
-  }, [batchResults, loading, ohpkmStore, openhomeIds])
+  const loadBatch = useEffectEvent(() => ohpkmStore.tryLoadBatch(openhomeIds))
+  const openhomeIdsKey = openhomeIds.toSorted().join('~')
 
   useEffect(() => {
-    if (!loading && !batchResults) {
-      loadMons()
+    // if this effect is cleaned up before the results return, the ignore flag tells the callback that it is outdated and should set the results
+    let ignore = false
+    setLoading(true)
+    setBatchResults(undefined)
+
+    loadBatch().then((result) => {
+      if (!ignore) {
+        setBatchResults(result)
+        setLoading(false)
+      }
+    })
+
+    return () => {
+      ignore = true
     }
-  }, [batchResults, loadMons, loading])
+  }, [openhomeIdsKey])
 
   return { loading, batchResults }
 }

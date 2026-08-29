@@ -31,6 +31,7 @@ export type OhpkmBatchLookupResults = Map<OhpkmIdentifier, OhpkmLookupResult>
 function removeOriginIfPresent(id: string) {
   return id.slice(0, 22)
 }
+const waitFor = (delay: number) => new Promise((resolve) => setTimeout(resolve, delay))
 
 export function useOhpkmStore() {
   const [ohpkmStore, updateStore] = useContext(OhpkmStoreContext)
@@ -40,6 +41,7 @@ export function useOhpkmStore() {
   const backend = useBackend()
 
   async function getById(id: string): Promise<Option<OHPKM>> {
+    await waitFor(0) // forces load to be async, temporary
     return ohpkmStore[removeOriginIfPresent(id)]
   }
 
@@ -63,14 +65,17 @@ export function useOhpkmStore() {
   }
 
   async function monIsStored(id: string): Promise<boolean> {
+    await waitFor(0) // forces load to be async, temporary
     return id in ohpkmStore
   }
 
   async function insertOrUpdate(mon: OHPKM) {
+    await waitFor(0) // forces load to be async, temporary
     updateStore({ [mon.openhomeId]: mon.clone() })
   }
 
   async function insertOrUpdateAll(mons: OhpkmStoreData) {
+    await waitFor(0) // forces load to be async, temporary
     return updateStore(mons)
   }
 
@@ -82,10 +87,12 @@ export function useOhpkmStore() {
   }
 
   async function getAllStored() {
+    await waitFor(0) // forces load to be async, temporary
     return Object.values(ohpkmStore)
   }
 
   async function getAllStoredIds() {
+    await waitFor(0) // forces load to be async, temporary
     return Object.keys(ohpkmStore)
   }
 

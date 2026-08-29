@@ -2,7 +2,7 @@ import { baseEvolutionsMatch } from '@openhome-core/pkm'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { expectExhaustive } from '@openhome-core/util'
-import { $R, Option, R, Result } from '@openhome-core/util/functional'
+import { Option, R, Result } from '@openhome-core/util/functional'
 import { usePokemonSearch } from '@openhome-ui/components/search/usePokemonSearch'
 import { useState } from 'react'
 import { MonLocation, useSaves } from '../saves'
@@ -83,7 +83,7 @@ export default function useTrackedDataRecovery() {
       ? undefined
       : savesManager.saveFromIdentifier(state.monToRecoverLocation.saveIdentifier)
 
-    return $R(await ohpkmStore.syncOhpkmIfTracked(state.recoveredDataOhpkmId, mon, save)).match(
+    return (await ohpkmStore.syncOhpkmIfTracked(state.recoveredDataOhpkmId, mon, save)).match(
       (updated) => {
         savesManager.overwriteMonAtLocation(state.monToRecoverLocation, updated?.openhomeId)
         if (state.sourceMonOhpkmId) {
