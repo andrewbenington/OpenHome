@@ -85,6 +85,10 @@ export function useOhpkmStore() {
     return Object.values(ohpkmStore)
   }
 
+  async function getAllStoredIds() {
+    return Object.keys(ohpkmStore)
+  }
+
   async function handleLookupsUpdate(ohpkm: OHPKM, save: SAV) {
     const lookupType = (save.constructor as SAVClass).lookupType
     const ohpkmIdentifier = ohpkm.openhomeId
@@ -351,6 +355,7 @@ export function useOhpkmStore() {
     setMonMove,
 
     getAllStored,
+    getAllStoredIds,
     updateAndConvertForSave,
     startTrackingNewMon,
     getIdIfTracked,
