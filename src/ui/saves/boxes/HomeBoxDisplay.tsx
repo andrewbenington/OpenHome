@@ -381,6 +381,30 @@ function SingleBoxMonDisplay() {
       return { monResult, location, identifier }
     })
 
+  const DetailsModal = $R(selectedMon)
+    .map((selectedMon) => (
+      <PokemonDetailsModal
+        mon={selectedMon}
+        key={selectedMon?.openhomeId}
+        onClose={() => setSelectedIndex(undefined)}
+        navigateRight={navigateRight}
+        navigateLeft={navigateLeft}
+        boxIndicatorProps={
+          selectedIndex !== undefined
+            ? {
+                currentIndex: selectedIndex,
+                columns: OPENHOME_BOX_COLUMNS,
+                rows: OPENHOME_BOX_ROWS,
+                emptyIndexes: range(OPENHOME_BOX_SLOTS).filter(
+                  (boxSlot) => !currentBox.identifiers.has(boxSlot)
+                ),
+              }
+            : undefined
+        }
+      />
+    ))
+    .ok()
+
   return (
     <>
       <OpenHomeCtxMenu sections={[contextElements, [removeDupesItem]]}>
@@ -439,27 +463,7 @@ function SingleBoxMonDisplay() {
           })}
         </div>
       </OpenHomeCtxMenu>
-      {$R(selectedMon).map((selectedMon) => (
-        <PokemonDetailsModal
-          mon={selectedMon}
-          key={selectedMon?.openhomeId}
-          onClose={() => setSelectedIndex(undefined)}
-          navigateRight={navigateRight}
-          navigateLeft={navigateLeft}
-          boxIndicatorProps={
-            selectedIndex !== undefined
-              ? {
-                  currentIndex: selectedIndex,
-                  columns: OPENHOME_BOX_COLUMNS,
-                  rows: OPENHOME_BOX_ROWS,
-                  emptyIndexes: range(OPENHOME_BOX_SLOTS).filter(
-                    (boxSlot) => !currentBox.identifiers.has(boxSlot)
-                  ),
-                }
-              : undefined
-          }
-        />
-      ))}
+      {DetailsModal}
       <PromptDialog
         title="Tracking Data Missing"
         open={missingIdData !== undefined}
