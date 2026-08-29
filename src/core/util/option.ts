@@ -8,11 +8,16 @@ function map<T, U>(transform: Mapper<T, U>): (option: NullableOption<T>) => Opti
   return (option) => (isSome(option) ? transform(option) : undefined)
 }
 
+function flatMap<T, U>(transform: Mapper<T, Option<U>>): (option: NullableOption<T>) => Option<U> {
+  return (option) => (isSome(option) ? transform(option) : undefined)
+}
+
 // Wrapper function for an Option utility
 export function $O<T>(v: T | undefined | null) {
   return {
     orElse: <E>(error: E): Result<T, E> => (isSome(v) ? buildOk(v) : buildErr(error)),
     map: <R>(onOk: OnOk<T, R>) => $O(map(onOk)(v)),
+    flatMap: <R>(onOk: OnOk<T, Option<R>>) => $O(flatMap(onOk)(v)),
     get: () => (isSome(v) ? v : undefined),
     getPromise: () => Promise.resolve(isSome(v) ? v : undefined),
   }
@@ -20,4 +25,5 @@ export function $O<T>(v: T | undefined | null) {
 
 export const O = {
   map,
+  flatMap,
 }

@@ -1,6 +1,8 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PluginIdentifier } from '@openhome-core/save/interfaces'
+import { isOk } from '@openhome-core/util/functional'
 import {
+  filterUndefined,
   gameOrPluginSorter,
   multiSorter,
   numericSorter,
@@ -11,8 +13,9 @@ import Badge from '@openhome-ui/components/badge/Badge'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
 import { useLookups } from '@openhome-ui/state/lookups/useLookups'
-import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
+import useOhpkmIdBatchLookup from '@openhome-ui/state/ohpkm/useOhpkmIdBatchLookup'
 import { Language, Lookup, OriginGames } from '@pkm-rs/pkg'
+import { Spinner } from '@radix-ui/themes'
 type G345LookupRow = {
   gen345ID: string
   homeID: string
@@ -24,8 +27,8 @@ type Gen345LookupProps = {
 }
 
 export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
-  const ohpkmStore = useOhpkmStore()
   const { lookups } = useLookups()
+  const { loading, batchResults } = useOhpkmIdBatchLookup(Object.values(lookups.gen12))
 
   const columns: SortableColumn<G345LookupRow>[] = [
     {
@@ -88,15 +91,26 @@ export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
     },
   ]
 
-  return (
+  const rowsWithLoadedOhpkms: G345LookupRow[] = Object.entries(lookups.gen12)
+    .map(([gen345ID, homeID]) => ({
+      gen345ID,
+      homeID,
+      ohpkmResult: batchResults?.get(homeID),
+    }))
+    .map(({ gen345ID, homeID, ohpkmResult }) =>
+      ohpkmResult !== undefined && isOk(ohpkmResult)
+        ? { gen345ID, homeID, homeMon: ohpkmResult.data }
+        : undefined
+    )
+    .filter(filterUndefined)
+
+  return loading ? (
+    <Spinner />
+  ) : (
     <SortableDataGrid
-      rows={Object.entries(lookups.gen345).map(([gen345ID, homeID]) => ({
-        gen345ID,
-        homeID,
-        homeMon: ohpkmStore.getById(homeID),
-      }))}
+      rows={rowsWithLoadedOhpkms}
       columns={columns}
-      enableVirtualization={Object.entries(lookups.gen345).length > 2000} // maybe this should be user-togglable
+      enableVirtualization={rowsWithLoadedOhpkms.length > 2000} // maybe this should be user-togglable
       defaultSort="Pokémon"
     />
   )

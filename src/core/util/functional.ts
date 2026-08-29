@@ -71,8 +71,8 @@ function orElse<T, E>(fallback: T): (result: Result<T, E>) => T {
   return (result) => (isOk(result) ? result.data : fallback)
 }
 
-function ok<T, E>(): (result: Result<T, E>) => Option<T> {
-  return (result) => (isOk(result) ? result.data : undefined)
+function ok<T, E>(result: Result<T, E>): Option<T> {
+  return isOk(result) ? result.data : undefined
 }
 
 function flatMap<T, E, U>(

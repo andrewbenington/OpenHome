@@ -26,6 +26,7 @@ export const FORCE_MISSED_LOOKUP = false
 export type MoveSlotIndex = 0 | 1 | 2 | 3
 
 export type OhpkmLookupResult = Result<OHPKM, IdentifierNotPresentError>
+export type OhpkmBatchLookupResults = Map<OhpkmIdentifier, OhpkmLookupResult>
 
 function removeOriginIfPresent(id: string) {
   return id.slice(0, 22)
@@ -46,8 +47,19 @@ export function useOhpkmStore() {
     return $O(await getById(id)).orElse(IdentifierNotPresent(id))
   }
 
-  async function tryLoadFromIds(ids: OhpkmIdentifier[]): Promise<OhpkmLookupResult[]> {
-    return Promise.all(ids.map(tryLoadFromId))
+  async function tryLoadBatch(ids: OhpkmIdentifier[]): Promise<OhpkmBatchLookupResults> {
+    const batchResults: OhpkmBatchLookupResults = new Map()
+    const lookupResults = await Promise.all(ids.map(tryLoadFromId))
+
+    for (const result of lookupResults) {
+      const identifier = $R(result).match(
+        (ohpkm) => ohpkm.openhomeId,
+        (error) => error.identifier
+      )
+      batchResults.set(identifier, result)
+    }
+
+    return batchResults
   }
 
   async function monIsStored(id: string): Promise<boolean> {
@@ -228,12 +240,14 @@ export function useOhpkmStore() {
     return ohpkm
   }
 
-  async function loadIfTracked(mon: PKMInterface): Promise<Option<OHPKM>> {
+  // if PK6+, calculates openhome ID based on pokemon's attributes. otherwise uses lookup map to find openhome ID.
+  // PK6+ mons will always return an ID, but that doesn't mean they are tracked
+  function calculateOrLookupOhpkmId(mon: PKMInterface): Option<OhpkmIdentifier> {
     if (FORCE_MISSED_LOOKUP) return undefined
     switch (mon.format) {
       case 'OHPKM':
         if (!(mon instanceof OHPKM)) throw Error('Non-OHPKM has OHPKM format')
-        return mon
+        return mon.openhomeId
       case 'PK1':
       case 'PK2': {
         const gen12Identifier = getMonGen12Identifier(mon)
@@ -241,10 +255,7 @@ export function useOhpkmStore() {
           throw Error(`unable to calculate gen 1/2 identifier for ${mon.nickname} (${mon.format})`)
         }
 
-        const homeIdentifier = gen12Lookup[gen12Identifier]
-        if (!homeIdentifier) return undefined
-
-        return ohpkmStore[homeIdentifier]
+        return gen12Lookup[gen12Identifier]
       }
       case 'PK3':
       case 'COLOPKM':
@@ -260,10 +271,7 @@ export function useOhpkmStore() {
           )
         }
 
-        const homeIdentifier = gen345Lookup[gen345Identifier]
-        if (!homeIdentifier) return undefined
-
-        return ohpkmStore[homeIdentifier]
+        return gen345Lookup[gen345Identifier]
       }
       case 'PK6':
       case 'PK7':
@@ -275,18 +283,16 @@ export function useOhpkmStore() {
       case 'PK9':
       case 'PK9Compass':
       case 'PA9': {
-        const homeIdentifier = getMonFileIdentifier(mon)
-        if (!homeIdentifier) {
-          throw Error(`unable to calculate OpenHome identifier for ${mon.nickname} (${mon.format})`)
-        }
-
-        // because the game of origin may have been changed for legality reasons, we need to ignore the origin when looking up in the store
-
-        return ohpkmStore[removeOriginIfPresent(homeIdentifier)]
+        return getMonFileIdentifier(mon)
       }
       default:
         expectExhaustive(mon.format, `unrecognized format: ${mon.format}`)
     }
+  }
+
+  async function loadIfTracked(mon: PKMInterface): Promise<Option<OHPKM>> {
+    const openhomeId = calculateOrLookupOhpkmId(mon)
+    return openhomeId ? ohpkmStore[openhomeId] : undefined
   }
 
   async function loadOrStartTracking(
@@ -299,6 +305,12 @@ export function useOhpkmStore() {
 
   async function monOrOhpkmIfTracked<P extends PKMInterface>(mon: P): Promise<OHPKM | P> {
     return (await loadIfTracked(mon)) ?? mon
+  }
+
+  async function monOrOhpkmIfTrackedAll<P extends PKMInterface>(
+    mons: readonly P[]
+  ): Promise<(OHPKM | P)[]> {
+    return Promise.all(mons.map(async (mon) => (await loadIfTracked(mon)) ?? mon))
   }
 
   async function getIdIfTracked(mon: PKMInterface): Promise<Option<OhpkmIdentifier>> {
@@ -324,7 +336,7 @@ export function useOhpkmStore() {
   return {
     getById,
     tryLoadFromId,
-    tryLoadFromIds,
+    tryLoadBatch,
     byId: ohpkmStore,
     monIsStored,
     insertOrUpdate,
@@ -344,7 +356,9 @@ export function useOhpkmStore() {
     getIdIfTracked,
     loadIfTracked,
     loadOrStartTracking,
+    getPotentialOhpkmId: calculateOrLookupOhpkmId,
     monOrOhpkmIfTracked,
+    monOrOhpkmIfTrackedAll,
     syncOhpkmIfTracked,
 
     replaceHeldItem,

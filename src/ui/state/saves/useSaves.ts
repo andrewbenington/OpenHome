@@ -127,7 +127,7 @@ export function useSaves(): SavesAndBanksManager {
         if (!identifier) return Promise.resolve(undefined)
 
         // TODO: should this function return an error if the lookup fails? for now the error is replaced with undefined (via R.ok())
-        return ohpkmStore.tryLoadFromId(identifier).then(R.ok())
+        return ohpkmStore.tryLoadFromId(identifier).then(R.ok)
       }
     },
     [getMonAtHomeLocation, getMonAtSaveLocation, ohpkmStore]
