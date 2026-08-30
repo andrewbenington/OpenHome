@@ -4,7 +4,7 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SortTypes } from '@openhome-core/pkm/sort'
 import { monSupportedBySave } from '@openhome-core/save/util'
 import { mapToObject } from '@openhome-core/util'
-import { $R, Option, R, range, Result } from '@openhome-core/util/functional'
+import { $R, Option, R, range } from '@openhome-core/util/functional'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import { Item, Separator, Submenu } from '@openhome-ui/components/context-menu/types'
 import { DebugDataDisplay } from '@openhome-ui/components/DebugDataDisplay'
@@ -23,9 +23,7 @@ import SearchFields from '@openhome-ui/components/search/SearchFields'
 import PokemonSearchModal from '@openhome-ui/components/search/SearchModal'
 import ToggleButton from '@openhome-ui/components/ToggleButton'
 import useDisplayError from '@openhome-ui/hooks/displayError'
-import PokemonDetailsModal from '@openhome-ui/pokemon-details/PokemonDetailsModal'
-import { OhpkmLookupResult } from '@openhome-ui/state/ohpkm'
-import useOhpkmBatchIdLookup from '@openhome-ui/state/ohpkm/useOhpkmIdBatchLookup'
+import { OhpkmLookupResult, useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import useTrackedDataRecovery from '@openhome-ui/state/ohpkm/useTrackedDataRecovery'
 import { HomeMonLocation, MonWithLocation, useSaves } from '@openhome-ui/state/saves'
 import { cssClass } from '@openhome-ui/util/style'
@@ -37,8 +35,6 @@ import { BsFillGrid3X3GapFill } from 'react-icons/bs'
 import { FaSquare } from 'react-icons/fa'
 import {
   BankBoxCoordinates,
-  OPENHOME_BOX_COLUMNS,
-  OPENHOME_BOX_ROWS,
   OPENHOME_BOX_SLOTS,
   useBanksAndBoxes,
 } from '../../state-zustand/banks-and-boxes/store'
@@ -46,7 +42,7 @@ import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
 import { useOpenHomeBoxNavigator } from '../util'
 import AllHomeBoxes from './AllHomeBoxes'
 import ArrowButton from './ArrowButton'
-import BoxCell from './BoxCell'
+import BoxCellAsync from './BoxCellAsync'
 import DroppableSpace from './DroppableSpace'
 import './style.css'
 
@@ -256,12 +252,14 @@ const FORCE_LOADING = false
 
 type SlotData = {
   monResult?: OhpkmLookupResult
+  monPromise: Option<Promise<Option<OHPKM>>>
   location: HomeMonLocation
   identifier: Option<OhpkmIdentifier>
-  loading: boolean
+  // loading: boolean
 }
 
 function SingleBoxMonDisplay() {
+  const ohpkmStore = useOhpkmStore()
   const displayError = useDisplayError()
   const { importMonsToLocation, saveFromIdentifier } = useSaves()
   const { getCurrentBox, getCurrentBank, clearAtHomeLocation, removeAllHomeDupes } =
@@ -278,9 +276,9 @@ function SingleBoxMonDisplay() {
 
   const currentBox = getCurrentBox()
 
-  const { loading: boxOhpkmsLoading, batchResults: boxOhpkms } = useOhpkmBatchIdLookup(
-    Array.from(currentBox.identifiers.values())
-  )
+  // const { loading: boxOhpkmsLoading, batchResults: boxOhpkms } = useOhpkmBatchIdLookup(
+  //   Array.from(currentBox.identifiers.values())
+  // )
 
   const TrackedDataRecovery = useTrackedDataRecovery()
   const dataRecoverySearchModal = {
@@ -309,27 +307,27 @@ function SingleBoxMonDisplay() {
     [dragData, saveFromIdentifier]
   )
 
-  const selectedMon: Result<Option<OHPKM>> = useMemo(() => {
-    if (
-      !currentBox ||
-      selectedIndex === undefined ||
-      selectedIndex >= OPENHOME_BOX_SLOTS ||
-      !boxOhpkms
-    ) {
-      return R.Ok(undefined)
-    }
-    const selectedMonIdentifier = currentBox.identifiers.get(selectedIndex)
-    if (!selectedMonIdentifier) return R.Ok(undefined)
+  // const selectedMon: Result<Option<OHPKM>> = useMemo(() => {
+  //   if (
+  //     !currentBox ||
+  //     selectedIndex === undefined ||
+  //     selectedIndex >= OPENHOME_BOX_SLOTS ||
+  //     !boxOhpkms
+  //   ) {
+  //     return R.Ok(undefined)
+  //   }
+  //   const selectedMonIdentifier = currentBox.identifiers.get(selectedIndex)
+  //   if (!selectedMonIdentifier) return R.Ok(undefined)
 
-    const lookupResult = boxOhpkms.get(selectedMonIdentifier)
-    if (!lookupResult) {
-      return R.Err(`Could not find OHPKM data associated with ID ${selectedMonIdentifier}`)
-    }
+  //   const lookupResult = boxOhpkms.get(selectedMonIdentifier)
+  //   if (!lookupResult) {
+  //     return R.Err(`Could not find OHPKM data associated with ID ${selectedMonIdentifier}`)
+  //   }
 
-    return $R(lookupResult).mapErr(
-      ({ identifier }) => `Could not find OHPKM data associated with ID ${identifier}`
-    )
-  }, [boxOhpkms, currentBox, selectedIndex])
+  //   return $R(lookupResult).mapErr(
+  //     ({ identifier }) => `Could not find OHPKM data associated with ID ${identifier}`
+  //   )
+  // }, [boxOhpkms, currentBox, selectedIndex])
 
   const contextElements = useMemo(
     () => [
@@ -383,59 +381,61 @@ function SingleBoxMonDisplay() {
         isHome: true,
       }
 
-      const monResult = identifier ? boxOhpkms?.get(identifier) : undefined
+      // const monResult = identifier ? boxOhpkms?.get(identifier) : undefined
 
       return {
-        monResult,
+        // monResult,
+        monPromise: identifier ? ohpkmStore.getById(identifier) : undefined,
         location,
         identifier,
-        loading: (identifier !== undefined && boxOhpkmsLoading) || FORCE_LOADING,
+        // loading: (identifier !== undefined && boxOhpkmsLoading) || FORCE_LOADING,
       }
     })
 
-  const DetailsModal = $R(selectedMon)
-    .map((selectedMon) => (
-      <PokemonDetailsModal
-        mon={selectedMon}
-        key={selectedMon?.openhomeId}
-        onClose={() => setSelectedIndex(undefined)}
-        navigateRight={navigateRight}
-        navigateLeft={navigateLeft}
-        boxIndicatorProps={
-          selectedIndex !== undefined
-            ? {
-                currentIndex: selectedIndex,
-                columns: OPENHOME_BOX_COLUMNS,
-                rows: OPENHOME_BOX_ROWS,
-                emptyIndexes: range(OPENHOME_BOX_SLOTS).filter(
-                  (boxSlot) => !currentBox.identifiers.has(boxSlot)
-                ),
-              }
-            : undefined
-        }
-      />
-    ))
-    .ok()
+  const DetailsModal = null
+  // $R(selectedMon)
+  //   .map((selectedMon) => (
+  //     <PokemonDetailsModal
+  //       mon={selectedMon}
+  //       key={selectedMon?.openhomeId}
+  //       onClose={() => setSelectedIndex(undefined)}
+  //       navigateRight={navigateRight}
+  //       navigateLeft={navigateLeft}
+  //       boxIndicatorProps={
+  //         selectedIndex !== undefined
+  //           ? {
+  //               currentIndex: selectedIndex,
+  //               columns: OPENHOME_BOX_COLUMNS,
+  //               rows: OPENHOME_BOX_ROWS,
+  //               emptyIndexes: range(OPENHOME_BOX_SLOTS).filter(
+  //                 (boxSlot) => !currentBox.identifiers.has(boxSlot)
+  //               ),
+  //             }
+  //           : undefined
+  //       }
+  //     />
+  //   ))
+  //   .ok()
 
   return (
     <>
       <OpenHomeCtxMenu sections={[contextElements, [removeDupesItem]]}>
         <div className="home-box-grid">
-          {slots.map(({ monResult, location, identifier, loading }, index) => {
+          {slots.map(({ monResult, monPromise, location, identifier }, index) => {
             // if underlying data changes but this key doesn't, the box cell will be stale and may not display the correct species
             let uniqueKey = `${currentBoxIndex}-${index}-${identifier}`
 
-            if (loading)
-              return (
-                <img
-                  key={uniqueKey}
-                  src="/items/index/0000.png"
-                  alt=""
-                  aria-hidden
-                  draggable={false}
-                  style={{ width: '2.75rem', padding: '0.5rem' }}
-                />
-              )
+            // if (loading && identifier)
+            //   return (
+            //     <img
+            //       key={uniqueKey}
+            //       src="/items/index/0000.png"
+            //       alt=""
+            //       aria-hidden
+            //       draggable={false}
+            //       style={{ width: '2.75rem', padding: '0.5rem' }}
+            //     />
+            //   )
 
             if (monResult && R.isErr(monResult)) {
               return (
@@ -455,12 +455,12 @@ function SingleBoxMonDisplay() {
             const mon = monResult?.data
 
             return (
-              <BoxCell
+              <BoxCellAsync
                 key={uniqueKey}
                 onClick={() => setSelectedIndex(index)}
                 dragID={`home_${currentBoxIndex}_${index}`}
                 location={location}
-                mon={mon}
+                openhomeId={identifier}
                 onDrop={(importedMons) => {
                   if (importedMons) {
                     importMonsToLocation(importedMons, location)
