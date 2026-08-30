@@ -16,7 +16,7 @@ export default function useOhpkmIdBatchLookup(
   const [batchResults, setBatchResults] = useState<Option<OhpkmBatchLookupResults>>()
 
   const loadBatch = useEffectEvent(() => ohpkmStore.tryLoadBatch(openhomeIds))
-  const openhomeIdsKey = openhomeIds.toSorted().join('~')
+  const openhomeIdsKey = hashStrings(openhomeIds)
 
   useEffect(() => {
     // if this effect is cleaned up before the results return, the ignore flag tells the callback that it is outdated and should set the results
@@ -37,4 +37,14 @@ export default function useOhpkmIdBatchLookup(
   }, [openhomeIdsKey])
 
   return { loading, batchResults }
+}
+
+function hashStrings(strings: string[]) {
+  let hash = 5381
+  for (const str of strings) {
+    for (let i = 0; i < str.length; i++) {
+      hash = (hash * 33) ^ str.charCodeAt(i)
+    }
+  }
+  return hash >>> 0 // convert to unsigned 32-bit integer
 }

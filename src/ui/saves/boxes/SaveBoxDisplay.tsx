@@ -84,9 +84,9 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
     if (!potentialOhpkmId) return selectedSlot
 
     const lookupResult = saveOhpkms?.get(potentialOhpkmId)
-    if (!lookupResult) return undefined
+    if (!lookupResult) return selectedSlot
 
-    return R.ok(lookupResult)
+    return R.ok(lookupResult) ?? selectedSlot
   }, [selectedIndex, save, ohpkmStore, saveOhpkms])
 
   const attemptImportMons = async (mons: PKMInterface[], location: MonLocation) => {

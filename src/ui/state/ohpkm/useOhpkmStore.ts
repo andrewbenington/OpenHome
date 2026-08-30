@@ -51,14 +51,12 @@ export function useOhpkmStore() {
 
   async function tryLoadBatch(ids: OhpkmIdentifier[]): Promise<OhpkmBatchLookupResults> {
     const batchResults: OhpkmBatchLookupResults = new Map()
-    const lookupResults = await Promise.all(ids.map(tryLoadFromId))
 
-    for (const result of lookupResults) {
-      const identifier = $R(result).match(
-        (ohpkm) => ohpkm.openhomeId,
-        (error) => error.identifier
+    for (const identifier of ids) {
+      batchResults.set(
+        identifier,
+        $O(ohpkmStore[removeOriginIfPresent(identifier)]).orElse(IdentifierNotPresent(identifier))
       )
-      batchResults.set(identifier, result)
     }
 
     return batchResults
