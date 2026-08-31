@@ -1,4 +1,4 @@
-use std::fs;
+use std::fs::{self, DirEntry};
 use std::path::{Path, PathBuf};
 
 use crate::error::{Error, Result};
@@ -159,6 +159,17 @@ pub trait DataController {
         } else {
             self.read_file_json(dir, &relative_path)
         }
+    }
+
+    fn list_directory<P>(&self, dir: DataDir, relative_path: P) -> Result<Vec<DirEntry>>
+    where
+        P: AsRef<Path>,
+    {
+        let absolute_path = self.absolute_path(dir, relative_path)?;
+        Ok(fs::read_dir(&absolute_path)
+            .map_err(|e| Error::file_access(&absolute_path, e))?
+            .filter_map(|r| r.ok())
+            .collect())
     }
 }
 

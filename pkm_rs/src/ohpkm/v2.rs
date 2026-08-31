@@ -10,6 +10,7 @@ use crate::ohpkm::OhpkmConvert;
 #[allow(deprecated)]
 use crate::ohpkm::deprecated::PastHandlerDataV1;
 use crate::ohpkm::extra_form::ExtraFormIndex;
+use crate::ohpkm::id::OpenHomeId;
 use crate::ohpkm::issues::OhpkmIssue;
 use crate::ohpkm::v1::OhpkmV1;
 use crate::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, StoredPkmBytes, UnconvertedPkm};
@@ -240,13 +241,18 @@ type DataUpdated = bool;
 
 impl OhpkmV2 {
     pub fn convert_without_backup<PKM: OhpkmConvert>(other: &PKM) -> Self {
-        Self {
+        let mut ohpkm = Self {
             main_data: other.to_main_data(),
             gen67_data: other.to_gen_67_data(),
             swsh_data: other.to_swsh_data(),
             sv_data: other.to_sv_data(),
             ..Default::default()
-        }
+        };
+
+        ohpkm.regenerate_openhome_id();
+        ohpkm.sync_learned_moves();
+
+        ohpkm
     }
 
     pub fn convert_with_backup<PKM: OhpkmConvert>(
@@ -260,8 +266,17 @@ impl OhpkmV2 {
         Ok(ohpkm)
     }
 
-    pub fn openhome_id(&self) -> String {
-        self.main_data.openhome_id()
+    pub const fn openhome_id(&self) -> OpenHomeId {
+        self.main_data.openhome_id
+    }
+
+    pub fn regenerate_openhome_id(&mut self) {
+        self.main_data.openhome_id = OpenHomeId::new(
+            self.species_and_form().get_ndex(),
+            self.trainer_id(),
+            self.secret_id(),
+            self.personality_value(),
+        );
     }
 
     pub fn gen_345_id(&self) -> String {
@@ -1600,11 +1615,9 @@ impl OhpkmV2 {
     }
 
     pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        let sectioned_data = SectionedData::<OhpkmSectionTag>::from_bytes(bytes)?;
+        let sectioned_data = SectionedData::<OhpkmSectionTag>::from_bytes(bytes, MAGIC_NUMBER)?;
 
-        if sectioned_data.magic_number != MAGIC_NUMBER {
-            return Err(Error::other("Bad magic number"));
-        } else if sectioned_data.version != 2 {
+        if sectioned_data.version != 2 {
             return Err(Error::other("Bad version number"));
         }
 
@@ -1643,11 +1656,9 @@ impl OhpkmV2 {
     }
 
     pub fn from_bytes_fixing_errors(bytes: &[u8]) -> Result<Self> {
-        let sectioned_data = SectionedData::<OhpkmSectionTag>::from_bytes(bytes)?;
+        let sectioned_data = SectionedData::<OhpkmSectionTag>::from_bytes(bytes, MAGIC_NUMBER)?;
 
-        if sectioned_data.magic_number != MAGIC_NUMBER {
-            return Err(Error::other("Bad magic number"));
-        } else if sectioned_data.version != 2 {
+        if sectioned_data.version != 2 {
             return Err(Error::other("Bad version number"));
         }
 
@@ -2035,7 +2046,12 @@ impl OhpkmV2 {
 
     #[wasm_bindgen(getter = openhomeId)]
     pub fn openhome_id_js(&self) -> String {
-        self.openhome_id()
+        self.openhome_id().to_string()
+    }
+
+    #[wasm_bindgen(js_name = regenerateOpenhomeId)]
+    pub fn regenerate_openhome_id_js(&mut self) {
+        self.regenerate_openhome_id();
     }
 
     #[wasm_bindgen(getter = gen345Identifier)]

@@ -106,17 +106,35 @@ function GeneralSettings() {
               <b>Current Data Directory:</b>
               <div>{dataDirPath}</div>
               <PromptDialog
+                title="Switch Data Directory"
+                description="Switch data directory? The app will restart using the specified directory as its datastore. No data will be copied or moved. THis is useful when you'd like to treat different directories as multiple 'profiles'. Note that Pokémon tracking data is independent per-directory."
+                triggerButton="Switch Profile"
+                actions={[
+                  { uniqueLabel: 'Cancel', action: () => {}, type: 'cancel' },
+                  {
+                    uniqueLabel: 'Select Directory...',
+                    action: () => {
+                      backend
+                        .promptChangeDataDir()
+                        .then(
+                          R.mapErr((err) => displayError('Error switching data directory', err))
+                        )
+                    },
+                  },
+                ]}
+              />
+              <PromptDialog
                 title="Move Data Directory?"
                 description="Are you sure you want to move the data directory? All files will be copied to the new location, and the app will restart. After they are copied to the new directory successfully, your storage and plugins will be removed from the old directory."
-                triggerButton="Change"
+                triggerButton="Move Data"
                 actions={[
                   { uniqueLabel: 'Cancel', action: () => {}, type: 'cancel' },
                   {
                     uniqueLabel: 'Select New Directory...',
                     action: () => {
                       backend
-                        .promptChangeDataDir()
-                        .then(R.mapErr((err) => displayError('Error changing data directory', err)))
+                        .promptMoveDataDir()
+                        .then(R.mapErr((err) => displayError('Error moving data', err)))
                     },
                     type: 'destructive',
                   },

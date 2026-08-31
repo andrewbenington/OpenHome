@@ -24,6 +24,10 @@ export const FORCE_MISSED_LOOKUP = false
 
 export type MoveSlotIndex = 0 | 1 | 2 | 3
 
+function removeOriginIfPresent(id: string) {
+  return id.slice(0, 22)
+}
+
 export function useOhpkmStore() {
   const [ohpkmStore, updateStore] = useContext(OhpkmStoreContext)
   const { defaultConvertStrategy } = useConvertStrategies()
@@ -33,7 +37,7 @@ export function useOhpkmStore() {
 
   const getById = useCallback(
     (id: string): OHPKM | undefined => {
-      return ohpkmStore[id]
+      return ohpkmStore[removeOriginIfPresent(id)]
     },
     [ohpkmStore]
   )
@@ -325,11 +329,8 @@ export function useOhpkmStore() {
           }
 
           // because the game of origin may have been changed for legality reasons, we need to ignore the origin when looking up in the store
-          const homeIdentifierNoOrigin = homeIdentifier.split('-').slice(0, -1).join('-')
 
-          return Object.entries(ohpkmStore).find(([id, _]) =>
-            id.startsWith(homeIdentifierNoOrigin)
-          )?.[1]
+          return ohpkmStore[removeOriginIfPresent(homeIdentifier)]
         }
         default:
           expectExhaustive(mon.format, `unrecognized format: ${mon.format}`)
