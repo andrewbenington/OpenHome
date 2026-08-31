@@ -470,6 +470,10 @@ export default class PA9 {
     )
   }
 
+  get tmMovesLza() {
+    return [...this.tmMovesLzaBase, ...this.tmMovesLzaDlc]
+  }
+
   get plusMovesLza() {
     return this.plusMoveFlags?.getMoveIds() ?? []
   }

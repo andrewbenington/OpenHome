@@ -5,6 +5,7 @@ import { Option } from '@openhome-core/util/functional'
 import {
   SortableColumn,
   booleanSorter,
+  dayjsSorter,
   gameOrPluginSorter,
   gameSorter,
   multiSorter,
@@ -22,6 +23,7 @@ import {
 } from '@openhome-ui/state-zustand/banks-and-boxes/store'
 import { Language, Lookup, OriginGames } from '@pkm-rs/pkg'
 import { useRef } from 'react'
+import { SelectColumn } from 'react-data-grid'
 
 export default function useOhpkmColumns(
   trackedMonsToRelease: OhpkmIdentifier[],
@@ -34,6 +36,7 @@ export default function useOhpkmColumns(
   trackedMonsRef.current = trackedMonsToRelease
 
   return [
+    { ...SelectColumn, minWidth: 36, width: undefined },
     {
       key: 'Pokémon',
       name: 'Mon',
@@ -62,13 +65,25 @@ export default function useOhpkmColumns(
     {
       key: 'type1',
       name: 'Type 1',
-      width: '3.5rem',
+      width: '4rem',
       sortFunction: stringSorter((mon) => mon.metadata?.type1),
       renderValue: (mon) =>
         mon.metadata?.type1Index !== undefined ? (
           <TypeIcon size="1.5rem" typeIndex={mon.metadata?.type1Index} />
         ) : null,
       getFilterValue: (mon) => mon.metadata?.type1 || 'Unknown',
+      cellClass: 'centered-cell',
+    },
+    {
+      key: 'type2',
+      name: 'Type 2',
+      width: '4rem',
+      sortFunction: stringSorter((mon) => mon.metadata?.type2),
+      renderValue: (mon) =>
+        mon.metadata?.type2Index !== undefined ? (
+          <TypeIcon size="1.5rem" typeIndex={mon.metadata?.type2Index} />
+        ) : null,
+      getFilterValue: (mon) => mon.metadata?.type2 || 'Unknown',
       cellClass: 'centered-cell',
     },
     {
@@ -158,6 +173,14 @@ export default function useOhpkmColumns(
       cellClass: 'centered-cell',
     },
     {
+      key: 'started_tracking',
+      name: 'First Tracked',
+      width: '8rem',
+      renderValue: (value) => value.startedTrackingTimestamp?.format('MMM DD, YYYY'),
+      sortFunction: dayjsSorter((mon) => mon.startedTrackingTimestamp, true),
+      noFilter: true,
+    },
+    {
       key: 'trainerName',
       name: 'OT',
       width: '6rem',
@@ -198,7 +221,7 @@ export default function useOhpkmColumns(
     {
       key: 'level',
       name: 'Level',
-      width: '3rem',
+      width: '5rem',
       renderValue: (value) => value.getLevel(),
       getFilterValue: (mon) => getLevelRange(mon.getLevel()),
       getFilterValueDropdownPos: (filterValue) =>
@@ -209,7 +232,7 @@ export default function useOhpkmColumns(
     {
       key: 'hp',
       name: 'HP',
-      width: '2.5rem',
+      width: '3.5rem',
       renderValue: (mon) => mon.stats.hp.toString(),
       getFilterValue: (mon) => mon.stats.hp.toString(),
       sortFunction: numericSorter((mon) => mon.stats.hp),
@@ -219,7 +242,7 @@ export default function useOhpkmColumns(
     {
       key: 'atk',
       name: 'ATK',
-      width: '2.5rem',
+      width: '3.5rem',
       renderValue: (mon) => mon.stats.atk.toString(),
       getFilterValue: (mon) => mon.stats.atk.toString(),
       sortFunction: numericSorter((mon) => mon.stats.atk),
@@ -229,7 +252,7 @@ export default function useOhpkmColumns(
     {
       key: 'def',
       name: 'DEF',
-      width: '2.5rem',
+      width: '3.5rem',
       renderValue: (mon) => mon.stats.def.toString(),
       getFilterValue: (mon) => mon.stats.def.toString(),
       sortFunction: numericSorter((mon) => mon.stats.def),
@@ -239,7 +262,7 @@ export default function useOhpkmColumns(
     {
       key: 'spa',
       name: 'SPA',
-      width: '2.5rem',
+      width: '3.5rem',
       renderValue: (mon) => mon.stats.spa.toString(),
       getFilterValue: (mon) => mon.stats.spa.toString(),
       sortFunction: numericSorter((mon) => mon.stats.spa),
@@ -249,7 +272,7 @@ export default function useOhpkmColumns(
     {
       key: 'spd',
       name: 'SPD',
-      width: '2.5rem',
+      width: '3.5rem',
       renderValue: (mon) => mon.stats.spd.toString(),
       getFilterValue: (mon) => mon.stats.spd.toString(),
       sortFunction: numericSorter((mon) => mon.stats.spd),
@@ -259,7 +282,7 @@ export default function useOhpkmColumns(
     {
       key: 'spe',
       name: 'SPE',
-      width: '2.5rem',
+      width: '3.5rem',
       renderValue: (mon) => mon.stats.spe.toString(),
       getFilterValue: (mon) => mon.stats.spe.toString(),
       sortFunction: numericSorter((mon) => mon.stats.spe),
