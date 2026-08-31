@@ -122,25 +122,33 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             <AttributeRow label="Affection" value={mon.trainerAffection.toString()} indent={10} />
           )}
         </AttributeRowExpand>
-        <AttributeRowExpand
-          summary="Last Handler"
-          value={
-            <Flex gap="1">
-              {mon.handlerName ?? '(empty)'}
-              <GenderIcon gender={mon.handlerGender} />
-            </Flex>
-          }
-        >
-          <AttributeRow label="Handler ID" indent={10}>
-            <code>{`${u16Display(mon.handlerID ?? 0)}`}</code>
-          </AttributeRow>
-          {!!mon.handlerFriendship && (
-            <AttributeRow label="Friendship" value={mon.handlerFriendship.toString()} indent={10} />
-          )}
-          {!!mon.handlerAffection && (
-            <AttributeRow label="Affection" value={mon.handlerAffection.toString()} indent={10} />
-          )}
-        </AttributeRowExpand>
+        {(!!mon.handlerFriendship || !!mon.handlerAffection || !!mon.handlerID) && (
+          <AttributeRowExpand
+            summary="Last Handler"
+            value={
+              <Flex gap="1">
+                {mon.handlerName ?? '(empty)'}
+                <GenderIcon gender={mon.handlerGender} />
+              </Flex>
+            }
+          >
+            {!!mon.handlerID && (
+              <AttributeRow label="Handler ID" indent={10}>
+                <code>{`${u16Display(mon.handlerID ?? 0)}`}</code>
+              </AttributeRow>
+            )}
+            {!!mon.handlerFriendship && (
+              <AttributeRow
+                label="Friendship"
+                value={mon.handlerFriendship.toString()}
+                indent={10}
+              />
+            )}
+            {!!mon.handlerAffection && (
+              <AttributeRow label="Affection" value={mon.handlerAffection.toString()} indent={10} />
+            )}
+          </AttributeRowExpand>
+        )}
         {pokerus.status() === 'Uninfected' ? (
           <AttributeRow label="Pokérus" value={pokerus.status()} />
         ) : (
