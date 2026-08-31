@@ -12,9 +12,6 @@ use openhome_core::lookup::LookupState;
 use openhome_core::ohpkm_store::OhpkmBytesStore;
 use openhome_core::{Error, Result};
 
-pub mod convert_strategies;
-pub mod lookup;
-pub mod ohpkm_store;
 
 pub trait SyncedState: Clone + Serialize + tauri::ipc::IpcResponse {
     type Action: Clone + Serialize + tauri::ipc::IpcResponse + serde::de::DeserializeOwned;

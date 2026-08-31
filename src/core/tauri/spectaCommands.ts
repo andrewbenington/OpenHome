@@ -182,28 +182,8 @@ export const commands = {
       else return { status: 'error', error: e as any }
     }
   },
-  async saveSyncedState(): Promise<Result<null, CommandError>> {
-    try {
-      return { status: 'ok', data: await TAURI_INVOKE('save_synced_state') }
-    } catch (e) {
-      if (e instanceof Error) throw e
-      else return { status: 'error', error: e as any }
-    }
-  },
-  async updateSyncedState(
-    stateIdentifier: string,
-    action: JsonValue
-  ): Promise<Result<null, CommandError>> {
-    try {
-      return {
-        status: 'ok',
-        data: await TAURI_INVOKE('update_synced_state', { stateIdentifier, action }),
-      }
-    } catch (e) {
-      if (e instanceof Error) throw e
-      else return { status: 'error', error: e as any }
-    }
-  },
+
+
   async getConvertStrategies(): Promise<Result<ConvertStrategyEntries, CommandError>> {
     try {
       return { status: 'ok', data: await TAURI_INVOKE('get_convert_strategies') }
@@ -383,9 +363,13 @@ export type SaveRef = {
   valid: boolean
   pluginIdentifier: PluginIdentifier | null
 }
+
+export const LAST_VIEWED_BOXES_CACHE_SIZE = 25;
+
 export type StoredBankData = { banks: Bank[]; current_bank?: number }
 export type TransactionState = { open_transaction: boolean; temp_files: string[] }
 export type UpdateFeatures = { version: string; feature_messages: string[] }
+export type LastViewedBoxesCache = { last_viewed_box_ids: string[] }
 
 /** tauri-specta globals **/
 

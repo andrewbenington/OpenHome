@@ -1,37 +1,11 @@
 import { StoredLookups } from '@openhome-core/backend/backendInterface'
 import useBackend from '@openhome-core/backend/useBackend'
-import { Option } from '@openhome-core/util/functional'
-import {
-  RustStateProvider,
-  SyncedStateController,
-  useSyncedState,
-} from '@openhome-ui/state/synced-state'
+import { Errorable, Option } from '@openhome-core/util/functional'
+
 import { PropsWithChildren, useCallback } from 'react'
 import { LookupsContext } from './useLookups'
 
 function useLookupsTauri() {
-  return useSyncedState(useSyncedLookupsState())
-}
-
-export default function LookupsProvider({ children }: PropsWithChildren) {
-  return (
-    <RustStateProvider
-      useStateManager={useLookupsTauri}
-      StateContext={LookupsContext}
-      stateDescription="lookups"
-      children={children}
-    />
-  )
-}
-
-function stateReducer(prev: Option<StoredLookups>, updated: StoredLookups): StoredLookups {
-  return {
-    gen12: { ...prev?.gen12, ...updated.gen12 },
-    gen345: { ...prev?.gen345, ...updated.gen345 },
-  }
-}
-
-function useSyncedLookupsState(): SyncedStateController<StoredLookups> {
   const backend = useBackend()
 
   const stateUpdater = useCallback(
@@ -46,5 +20,34 @@ function useSyncedLookupsState(): SyncedStateController<StoredLookups> {
     stateGetter: backend.loadLookups,
     stateReducer,
     stateUpdater,
+  }
+}
+
+function OhpkmWrapper(_props: {
+  useStateManager: { identifier: string }
+  stateContext: React.Context<[StoredLookups, (updated: StoredLookups) => Promise<Errorable<null>>]>
+  description: string
+  children: React.ReactNode | undefined
+}) {
+  return null
+}
+
+export default function LookupsProvider({ children }: PropsWithChildren) {
+  return (
+    <OhpkmWrapper
+      useStateManager={{
+        identifier: 'lookups',
+      }}
+      stateContext={LookupsContext}
+      description="lookups"
+      children={children}
+    />
+  )
+}
+
+function stateReducer(prev: Option<StoredLookups>, updated: StoredLookups): StoredLookups {
+  return {
+    gen12: { ...prev?.gen12, ...updated.gen12 },
+    gen345: { ...prev?.gen345, ...updated.gen345 },
   }
 }
