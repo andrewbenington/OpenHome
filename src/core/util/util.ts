@@ -98,11 +98,12 @@ function adjustPpForFormat(
   moves: FourMoves,
   currentPp: FourMoves,
   ppUps: FourMoves,
-  destFormat: string
+  destFormat: string,
+  destFormatNoPpUps: boolean = false
 ) {
   return moves.map((move, i) => {
     const otherMaxPP = getMoveMaxPP(move, sourceFormat, ppUps[i]) ?? 0
-    const thisMaxPP = getMoveMaxPP(move, destFormat, ppUps[i]) ?? 0
+    const thisMaxPP = getMoveMaxPP(move, destFormat, destFormatNoPpUps ? 0 : ppUps[i]) ?? 0
     const adjustedMovePP = currentPp[i] - (otherMaxPP - thisMaxPP)
 
     return adjustedMovePP > 0 ? adjustedMovePP : 0
@@ -144,7 +145,7 @@ export class MoveFilter<P extends PKMInterface> {
     return [filtered[0] ?? 0, filtered[1] ?? 0, filtered[2] ?? 0, filtered[3] ?? 0]
   }
 
-  private hasAtLeastOneAllowedMove(mon: AllPKMFields) {
+  private hasAtLeastOneAllowedMove(mon: { moves: FourMoves }) {
     return mon.moves.some((move) => this.moveIsAllowed(move))
   }
 
@@ -177,15 +178,20 @@ export class MoveFilter<P extends PKMInterface> {
     return this.filteredMovesOrLevelupIfEmpty(mon)
   }
 
-  movePp(mon: AllPKMFields, adjustForFormat: string): FourMoves {
+  movePp(
+    mon: AllPKMFields,
+    adjustForFormat: string,
+    destFormatNoPpUps: boolean = false
+  ): FourMoves {
     if (this.hasAtLeastOneAllowedMove(mon)) {
       const filteredMovePp = this.filterByMoves(mon, mon.movePP)
       return adjustPpForFormat(
         mon.format,
-        mon.moves,
+        this.filterByMoves(mon, mon.moves),
         filteredMovePp,
         mon.movePPUps,
-        adjustForFormat
+        adjustForFormat,
+        destFormatNoPpUps
       )
     }
     return this.filteredMovesOrLevelupIfEmpty(mon).map((moveIndex) =>
