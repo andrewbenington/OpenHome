@@ -12,11 +12,8 @@ use openhome_core::lookup::LookupState;
 use openhome_core::ohpkm_store::OhpkmBytesStore;
 use openhome_core::{Error, Result};
 
-pub mod convert_strategies;
-pub mod lookup;
-pub mod ohpkm_store;
 
-pub trait SyncedState: Clone + Serialize + tauri::ipc::IpcResponse {
+pub trait AsyncedState: Clone + Serialize + tauri::ipc::IpcResponse {
     type Action: Clone + Serialize + tauri::ipc::IpcResponse + serde::de::DeserializeOwned;
     const ID: &'static str;
     fn update(&mut self, action: Self::Action);
@@ -25,9 +22,9 @@ pub trait SyncedState: Clone + Serialize + tauri::ipc::IpcResponse {
 
 /// SyncedStateWrapper wraps state synced with the React frontend. All mutations
 /// result in an emitted event to ensure the React side is up to date.
-pub struct SyncedStateWrapper<State: SyncedState>(State);
+pub struct LazyStateWrapper<State: AsyncedState>(State);
 
-impl<State: SyncedState> SyncedStateWrapper<State> {
+impl<State: AsyncedState> LazyStateWrapper<State> {
     fn emit_update(&self, app_handle: &tauri::AppHandle) -> Result<()> {
         let event = format!("synced_state_update::{}", State::ID);
 
@@ -59,24 +56,24 @@ impl<State: SyncedState> SyncedStateWrapper<State> {
     }
 }
 
-pub struct AllSyncedStateInner {
-    pub lookups: SyncedStateWrapper<LookupState>,
-    pub ohpkm_store: SyncedStateWrapper<OhpkmBytesStore>,
-    pub convert_strategies: SyncedStateWrapper<ConvertStrategies>,
+pub struct LazyStateInner {
+    pub lookups: LazyStateWrapper<LookupState>,
+    pub ohpkm_store: LazyStateWrapper<OhpkmBytesStore>,
+    pub convert_strategies: LazyStateWrapper<ConvertStrategies>,
 }
 
-pub struct AllSyncedState(pub Mutex<AllSyncedStateInner>);
+pub struct LazyStateWrapper(pub Mutex<LazyStateInner>);
 
-impl AllSyncedState {
+impl LazyStateWrapper {
     pub fn from_states(
         lookups: LookupState,
         ohpkm_store: OhpkmBytesStore,
         convert_strategies: ConvertStrategies,
     ) -> Self {
-        Self(Mutex::new(AllSyncedStateInner {
-            lookups: SyncedStateWrapper(lookups),
-            ohpkm_store: SyncedStateWrapper(ohpkm_store),
-            convert_strategies: SyncedStateWrapper(convert_strategies),
+        Self(Mutex::new(LazyStateInner {
+            lookups: LazyStateWrapper(lookups),
+            ohpkm_store: LazyStateWrapper(ohpkm_store),
+            convert_strategies: LazyStateWrapper(convert_strategies),
         }))
     }
 
@@ -109,7 +106,7 @@ impl AllSyncedState {
     ) -> Result<()> {
         match state_identifier {
             ConvertStrategies::ID => {
-                let action: <ConvertStrategies as SyncedState>::Action =
+                let action: <ConvertStrategies as AsyncedState>::Action =
                     serde_json::from_value(action).map_err(|e| {
                         Error::unexpeted_condition_with_source(
                             "update_from_frontend: invalid ConvertStrategies action received"
@@ -120,7 +117,7 @@ impl AllSyncedState {
                 self.lock()?.convert_strategies.0.update(action);
             }
             LookupState::ID => {
-                let action: <LookupState as SyncedState>::Action = serde_json::from_value(action)
+                let action: <LookupState as AsyncedState>::Action = serde_json::from_value(action)
                     .map_err(|e| {
                     Error::unexpeted_condition_with_source(
                         "update_from_frontend: invalid LookupState action received".to_owned(),
@@ -130,7 +127,7 @@ impl AllSyncedState {
                 self.lock()?.lookups.0.update(action);
             }
             OhpkmBytesStore::ID => {
-                let action: <OhpkmBytesStore as SyncedState>::Action =
+                let action: <OhpkmBytesStore as AsyncedState>::Action =
                     serde_json::from_value(action).map_err(|e| {
                         Error::unexpeted_condition_with_source(
                             "update_from_frontend: invalid OhpkmBytesStore action received"
@@ -151,8 +148,8 @@ impl AllSyncedState {
     }
 }
 
-impl Deref for AllSyncedState {
-    type Target = Mutex<AllSyncedStateInner>;
+impl Deref for LazyStateWrapper {
+    type Target = Mutex<LazyStateInner>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -163,7 +160,7 @@ impl Deref for AllSyncedState {
 #[specta::specta]
 pub fn save_synced_state(
     app_handle: tauri::AppHandle,
-    synced_state: tauri::State<'_, AllSyncedState>,
+    synced_state: tauri::State<'_, LazyStateWrapper>,
 ) -> CommandResult<()> {
     synced_state
         .save_to_files(&app_handle.controller())
@@ -173,7 +170,7 @@ pub fn save_synced_state(
 #[tauri::command]
 #[specta::specta]
 pub fn update_synced_state(
-    synced_state: tauri::State<'_, AllSyncedState>,
+    synced_state: tauri::State<'_, LazyStateWrapper>,
     state_identifier: &str,
     action: serde_json::Value,
 ) -> CommandResult<()> {

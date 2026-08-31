@@ -3,9 +3,8 @@ use openhome_core::convert_strategies::{ConvertStrategies, NamedStrategy};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::synced_state;
 
-impl synced_state::SyncedState for ConvertStrategies {
+impl ConvertStrategies {
     type Action = ConvertStrategyEntries;
     const ID: &'static str = "convert_strategies";
 

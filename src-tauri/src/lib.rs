@@ -12,7 +12,7 @@ mod util;
 mod version;
 
 use crate::data_controller::ToDataController;
-use crate::synced_state::AllSyncedState;
+use crate::synced_state::LazyStateWrapper;
 use openhome_core::convert_strategies::ConvertStrategies;
 use openhome_core::lookup::LookupState;
 use openhome_core::ohpkm_store::OhpkmBytesStore;
@@ -142,8 +142,9 @@ pub fn run() {
                 }
             };
 
+            // Only get the info we need.
             let synced_state =
-                AllSyncedState::from_states(lookup_state, ohpkm_store, conversion_settings);
+                LazyStateWrapper::from_states(lookup_state, ohpkm_store, conversion_settings);
             app.manage(synced_state);
 
             let pokedex_state = match state::PokedexState::load_from_storage(&controller) {

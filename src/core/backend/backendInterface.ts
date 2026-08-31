@@ -73,8 +73,6 @@ export default interface BackendInterface {
   /* get the current data directory path */
   getDataDirPath: () => Promise<Errorable<string>>
 
-  /* write synced state to disk during save */
-  saveSyncedState: () => Promise<Errorable<null>>
 
   /* past gen identifier lookups */
   loadPokedex: () => Promise<Errorable<Pokedex>>
