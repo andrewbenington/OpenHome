@@ -126,7 +126,7 @@ export const commands = {
       else return { status: 'error', error: e as any }
     }
   },
-  async loadBanks(): Promise<Result<StoredBankData, CommandError>> {
+  async loadBanks(): Promise<Result<StoredBankDataWasm, CommandError>> {
     try {
       return { status: 'ok', data: await TAURI_INVOKE('load_banks') }
     } catch (e) {
@@ -134,7 +134,7 @@ export const commands = {
       else return { status: 'error', error: e as any }
     }
   },
-  async writeBanks(bankData: StoredBankData): Promise<Result<null, CommandError>> {
+  async writeBanks(bankData: StoredBankDataWasm): Promise<Result<null, CommandError>> {
     try {
       return { status: 'ok', data: await TAURI_INVOKE('write_banks', { bankData }) }
     } catch (e) {
@@ -302,14 +302,14 @@ export type AppStateInner = {
   new_features_since_update: UpdateFeatures[]
   transaction: TransactionState
 }
-export type Bank = {
+export type BankWasm = {
   id?: string
   name: string | null
   index: number
-  boxes: Box[]
+  boxes: BoxWasm[]
   current_box?: number
 }
-export type Box = {
+export type BoxWasm = {
   id?: string
   name: string | null
   index: number
@@ -383,7 +383,7 @@ export type SaveRef = {
   valid: boolean
   pluginIdentifier: PluginIdentifier | null
 }
-export type StoredBankData = { banks: Bank[]; current_bank?: number }
+export type StoredBankDataWasm = { banks: BankWasm[]; current_bank?: number }
 export type TransactionState = { open_transaction: boolean; temp_files: string[] }
 export type UpdateFeatures = { version: string; feature_messages: string[] }
 

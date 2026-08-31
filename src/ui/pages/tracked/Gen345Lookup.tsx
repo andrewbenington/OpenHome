@@ -51,9 +51,7 @@ export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
         numericSorter((value) => value.homeMon?.formIndex)
       ),
       getFilterValue: (value) =>
-        value.homeMon?.nationalDex
-          ? Lookup.speciesName(value.homeMon?.nationalDex, Language.English)
-          : undefined,
+        value.homeMon ? Lookup.speciesName(value.homeMon.nationalDex, Language.English) : undefined,
     },
     {
       key: 'game',
@@ -99,7 +97,7 @@ export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
       }))}
       columns={columns}
       enableVirtualization={Object.entries(lookups.gen345).length > 2000} // maybe this should be user-togglable
-      style={{ width: '100%', flexGrow: 1 }}
+      defaultSort="Pokémon"
     />
   )
 }

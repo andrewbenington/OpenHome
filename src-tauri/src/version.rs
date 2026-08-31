@@ -1,15 +1,22 @@
 use crate::deprecated;
 use crate::util;
 use openhome_core::data_controller::{DataController, DataDir, MONS_V2_DIR};
+use openhome_core::lookup::GEN12_FILENAME;
+use openhome_core::lookup::GEN345_FILENAME;
+use openhome_core::lookup::LookupState;
 use openhome_core::pkm_storage::{Bank, StoredBankData};
 use openhome_core::{Error, Result};
+use pkm_rs::ohpkm::OpenHomeId;
 use pkm_rs::ohpkm::{OhpkmV2, v1::OhpkmV1};
 use semver::Version;
 use serde::Serialize;
+use std::collections::HashMap;
+use std::ffi::OsStr;
 use std::fs::DirEntry;
 use std::{fs, path::PathBuf};
 use strum::{self, EnumIter, IntoEnumIterator};
 use tracing::error;
+use tracing::warn;
 use tracing::{debug, info};
 
 const VERSION_FILE: &str = "version.txt";
@@ -176,6 +183,7 @@ pub enum SignificantUpdate {
     V1_15_1,
     V1_15_2,
     V1_16_0,
+    V1_17_0,
 }
 
 impl SignificantUpdate {
@@ -212,6 +220,7 @@ impl SignificantUpdate {
             Self::V1_15_1 => Version::parse("1.15.1"),
             Self::V1_15_2 => Version::parse("1.15.2"),
             Self::V1_16_0 => Version::parse("1.16.0"),
+            Self::V1_17_0 => Version::parse("1.17.0-x-alpha.0"),
         }
         .expect("all versions are valid semver")
     }
@@ -223,7 +232,7 @@ impl SignificantUpdate {
             Self::V1_8_0AlphaFeatureMessages => Ok(()),
             Self::V1_8_1 => handle_old_mons_directories_for_ohpkm_v2(data_controller),
             Self::V1_14_1 => update_convert_strat_json_dot_keys(data_controller),
-            Self::V1_16_0 => update_ohpkm_filenames_standard_format(data_controller),
+            Self::V1_17_0 => update_ohpkm_filenames_standard_format(data_controller),
             _ => Ok(()),
         }
     }
@@ -493,7 +502,54 @@ pub fn update_convert_strat_json_dot_keys(data_controller: &impl DataController)
 }
 
 fn update_ohpkm_filenames_standard_format(data_controller: &impl DataController) -> Result<()> {
+    let gen12_lookup_old: HashMap<String, String> = data_controller
+        .read_file_json_if_exists(DataDir::Storage, GEN12_FILENAME)
+        .transpose()?
+        .unwrap_or_default();
+
+    let gen345_lookup_old: HashMap<String, String> = data_controller
+        .read_file_json_if_exists(DataDir::Storage, GEN345_FILENAME)
+        .transpose()?
+        .unwrap_or_default();
+
+    let gen12_id_by_old_openhome_id: HashMap<String, String> = gen12_lookup_old
+        .into_iter()
+        .map(|(key, value)| (value, key))
+        .collect();
+
+    let gen345_id_by_old_openhome_id: HashMap<String, String> = gen345_lookup_old
+        .into_iter()
+        .map(|(key, value)| (value, key))
+        .collect();
+
+    let mut new_gen12_lookup: HashMap<String, OpenHomeId> = HashMap::new();
+    let mut new_gen345_lookup: HashMap<String, OpenHomeId> = HashMap::new();
+
     for dir_entry in data_controller.list_directory(DataDir::Storage, MONS_V2_DIR)? {
+        let path = dir_entry.path();
+        if path.extension().is_none_or(|ext| !ext.eq("ohpkm")) {
+            warn!(
+                "skipping file {}: no .ohpkm extension",
+                path.as_os_str().to_string_lossy()
+            );
+            continue;
+        }
+
+        let mon = OhpkmV2::from_bytes(&util::read_file_bytes(&path)?)
+            .map_err(|e| Error::file_malformed(&path, e))?;
+
+        if let Some(existing_openhome_id) = PathBuf::from(dir_entry.file_name())
+            .file_stem()
+            .and_then(OsStr::to_str)
+        {
+            if let Some(gen12_id) = gen12_id_by_old_openhome_id.get(existing_openhome_id) {
+                new_gen12_lookup.insert(gen12_id.clone(), mon.openhome_id());
+            }
+            if let Some(gen345_id) = gen345_id_by_old_openhome_id.get(existing_openhome_id) {
+                new_gen345_lookup.insert(gen345_id.clone(), mon.openhome_id());
+            }
+        }
+
         if let Err(err) = standardize_ohpkm_filename(&dir_entry) {
             error!(
                 "error renaming {}: {}",
@@ -505,6 +561,9 @@ fn update_ohpkm_filenames_standard_format(data_controller: &impl DataController)
             )
         }
     }
+
+    LookupState::from_lookups(new_gen12_lookup, new_gen345_lookup)
+        .write_to_files(data_controller)?;
 
     Ok(())
 }
