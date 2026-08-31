@@ -241,13 +241,18 @@ type DataUpdated = bool;
 
 impl OhpkmV2 {
     pub fn convert_without_backup<PKM: OhpkmConvert>(other: &PKM) -> Self {
-        Self {
+        let mut ohpkm = Self {
             main_data: other.to_main_data(),
             gen67_data: other.to_gen_67_data(),
             swsh_data: other.to_swsh_data(),
             sv_data: other.to_sv_data(),
             ..Default::default()
-        }
+        };
+
+        ohpkm.regenerate_openhome_id();
+        ohpkm.sync_learned_moves();
+
+        ohpkm
     }
 
     pub fn convert_with_backup<PKM: OhpkmConvert>(
@@ -263,6 +268,15 @@ impl OhpkmV2 {
 
     pub const fn openhome_id(&self) -> OpenHomeId {
         self.main_data.openhome_id
+    }
+
+    pub fn regenerate_openhome_id(&mut self) {
+        self.main_data.openhome_id = OpenHomeId::new(
+            self.species_and_form().get_ndex(),
+            self.trainer_id(),
+            self.secret_id(),
+            self.personality_value(),
+        );
     }
 
     pub fn gen_345_id(&self) -> String {
@@ -2037,12 +2051,7 @@ impl OhpkmV2 {
 
     #[wasm_bindgen(js_name = regenerateOpenhomeId)]
     pub fn regenerate_openhome_id_js(&mut self) {
-        self.main_data.openhome_id = OpenHomeId::new(
-            self.species_and_form().get_ndex(),
-            self.trainer_id(),
-            self.secret_id(),
-            self.personality_value(),
-        );
+        self.regenerate_openhome_id();
     }
 
     #[wasm_bindgen(getter = gen345Identifier)]

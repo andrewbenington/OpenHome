@@ -12,7 +12,6 @@ use std::time::{Duration, UNIX_EPOCH};
 use std::{collections::HashMap, fs};
 use tracing::warn;
 
-// #[cfg_attr(feature = "desktop", derive(specta::Type))]
 #[derive(Default, Serialize, Deserialize, Clone)]
 pub struct OhpkmBytesStore(HashMap<OpenHomeId, Vec<u8>>);
 

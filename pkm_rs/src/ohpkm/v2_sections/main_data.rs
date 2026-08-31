@@ -129,12 +129,21 @@ impl MainDataV2 {
     pub fn new(national_dex: u16, form_index: u16) -> Result<Self> {
         let species_and_form = SpeciesForm::new(national_dex, form_index)?;
         let national_dex = species_and_form.get_ndex();
-        Ok(Self {
+        let mut main_data = Self {
             species_and_form,
             language: Language::English,
             nickname: lookup::species_name(national_dex, Language::English).into(),
             ..Default::default()
-        })
+        };
+
+        main_data.openhome_id = OpenHomeId::new(
+            national_dex,
+            main_data.trainer_id,
+            main_data.secret_id,
+            main_data.personality_value,
+        );
+
+        Ok(main_data)
     }
 
     pub fn from_v1(old: crate::ohpkm::v1::OhpkmV1) -> Self {
@@ -680,7 +689,10 @@ impl DataSection for MainDataV2 {
 
         bytes[244..248].copy_from_slice(&self.form_argument.to_le_bytes());
         bytes[248] = ModernRibbon::to_affixed_byte(self.affixed_ribbon);
-        // gap: 249-263
+        // gap: 249
+        bytes[250..260].copy_from_slice(&self.openhome_id.to_bytes());
+        // gap: 260-263
+
         bytes[264..272].copy_from_slice(&self.extra_form.map_or(0, |f| f as u64).to_le_bytes());
         bytes[272..298].copy_from_slice(&self.trainer_name);
         bytes[298] = self.trainer_friendship;
