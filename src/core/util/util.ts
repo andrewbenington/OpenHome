@@ -102,7 +102,7 @@ function adjustPpForFormat(
   destFormatNoPpUps: boolean = false
 ) {
   return moves.map((move, i) => {
-    const otherMaxPP = getMoveMaxPP(move, sourceFormat, ppUps[i]) ?? 0
+    const otherMaxPP = getMoveMaxPP(move, sourceFormat, destFormatNoPpUps ? 0 : ppUps[i]) ?? 0
     const thisMaxPP = getMoveMaxPP(move, destFormat, destFormatNoPpUps ? 0 : ppUps[i]) ?? 0
     const adjustedMovePP = currentPp[i] - (otherMaxPP - thisMaxPP)
 

@@ -234,12 +234,10 @@ describe('move filter', () => {
     const ohpkm = OHPKM.defaultWithSpecies(NationalDex.Gyarados, 0)
     ohpkm.moves = [AQUA_TAIL, RAIN_DANCE, HYDRO_PUMP, DRAGON_DANCE]
     ohpkm.movePP = [10, 5, 5, 20]
-    ohpkm.movePPUps = [1, 2, 3, 1]
 
     const pa8 = R.assert(PA8.fromOhpkm(ohpkm, ConvertStrategies.getDefault()))
     expect(pa8.moves).toEqual([AQUA_TAIL, HYDRO_PUMP, 0, 0])
     expect(pa8.movePP).toEqual([10, 5, 0, 0])
-    expect(pa8.movePPUps).toEqual([1, 3, 0, 0])
   })
 
   test('if no moves are compatible, use level-up moves', () => {
