@@ -349,6 +349,14 @@ impl<S: AsRef<[u8]>> ColopkmBuffer<S> {
         )))
     }
 
+    pub fn current_region(&self) -> u8 {
+        self.get_u8(Offset::CurrentRegion)
+    }
+
+    pub fn original_region(&self) -> u8 {
+        self.get_u8(Offset::OriginalRegion)
+    }
+
     pub fn language(&self) -> Result<Language> {
         Ok(Language::try_from_gcn(self.get_u8(Offset::LanguageGcn))?)
     }

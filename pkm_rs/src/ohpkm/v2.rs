@@ -5,7 +5,6 @@ use super::v2_sections::{
     MonTags, MostRecentSave, Notes, PastHandlerDataV2, PluginData, SV_BASE_TM_BYTES_EXCLUDE_UNUSED,
     ScarletVioletData, SwordShieldData,
 };
-use crate::gen3::shadow::Purification;
 use crate::gen9_lza::PlusMoveFlags;
 use crate::ohpkm::OhpkmConvert;
 #[allow(deprecated)]
@@ -257,7 +256,7 @@ impl OhpkmV2 {
             swsh_data: other.to_swsh_data(),
             la_data: None,
             sv_data: other.to_sv_data(),
-            lza_data: other.lza_data(),
+            lza_data: other.to_lza_data(),
             handler_data: vec![],
             learned_moves: other.to_learned_moves(),
             plugin_data: None,
