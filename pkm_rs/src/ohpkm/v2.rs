@@ -13,8 +13,8 @@ use crate::ohpkm::extra_form::ExtraFormIndex;
 use crate::ohpkm::id::OpenHomeId;
 use crate::ohpkm::issues::OhpkmIssue;
 use crate::ohpkm::v1::OhpkmV1;
-use crate::ohpkm::v2_sections::OrreData;
 use crate::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, StoredPkmBytes, UnconvertedPkm};
+use crate::ohpkm::v2_sections::{COLO_UNUSED_DATA_SIZE, ColoUnusedData, OrreData};
 use crate::result::{Error, Result};
 use crate::sectioned_data::{DataSection, SectionTag, SectionedData};
 use crate::traits::{HasSpeciesAndForm, IsShiny, PkmBytes};
@@ -49,8 +49,6 @@ use crate::ohpkm::v2_sections::{MonTag, pkm_bytes};
 use arrayref::array_ref;
 #[cfg(feature = "wasm")]
 use pkm_rs_resources::abilities::AbilityIndexWasm;
-#[cfg(feature = "wasm")]
-use pkm_rs_types::shadow::ShadowData;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -135,7 +133,8 @@ pub enum OhpkmSectionTag {
     UnconvertedPkm = 0x0E,
     PastHandlerV2 = 0x0F,
     LearnedMoves = 0x10,
-    GcnData = 0x12,
+    OrreData = 0x12,
+    ColosseumUnusedData = 0x13,
 
     // deprecated, but can't mark it as such without warnings
     PastHandlerV1 = 0x08,
@@ -146,7 +145,8 @@ impl OhpkmSectionTag {
         match tag {
             0x00 => Some(Self::MainData),
             0x01 => Some(Self::GameboyData),
-            0x12 => Some(Self::GcnData),
+            0x12 => Some(Self::OrreData),
+            0x13 => Some(Self::ColosseumUnusedData),
             0x02 => Some(Self::Gen45Data),
             0x03 => Some(Self::Gen67Data),
             0x04 => Some(Self::SwordShield),
@@ -193,7 +193,8 @@ impl OhpkmSectionTag {
             Self::OriginalBackup => 2, // Size of the tag
             Self::UnconvertedPkm => 2, // Size of the tag
             Self::LearnedMoves => 2,   // Size of length field
-            Self::GcnData => 10,       // id (2), purification (4), exp (4)
+            Self::OrreData => 10,      // id (2), purification (4), exp (4)
+            Self::ColosseumUnusedData => COLO_UNUSED_DATA_SIZE,
 
             #[allow(deprecated)]
             Self::PastHandlerV1 => 39,
@@ -220,21 +221,29 @@ impl SectionTag for OhpkmSectionTag {
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct OhpkmV2 {
     main_data: MainDataV2,
+
     gameboy_data: Option<GameboyData>,
+
     orre_data: Option<OrreData>,
+    #[serde(skip)]
+    colo_unused_data: Option<ColoUnusedData>,
+
     gen45_data: Option<Gen45Data>,
     gen67_data: Option<Gen67Data>,
     swsh_data: Option<SwordShieldData>,
     la_data: Option<LegendsArceusData>,
     sv_data: Option<ScarletVioletData>,
     lza_data: Option<LegendsZaData>,
+
     handler_data: Vec<PastHandlerDataV2>,
     learned_moves: Option<LearnedMoves>,
     plugin_data: Option<PluginData>,
     notes: Option<Notes>,
     most_recent_save: Option<MostRecentSave>,
+
     #[cfg_attr(feature = "randomize", randomize(skip))]
     tags: Option<MonTags>,
+
     #[cfg_attr(feature = "randomize", randomize(skip))]
     #[serde(skip)]
     original_data: Option<OriginalBackup>,
@@ -252,6 +261,7 @@ impl OhpkmV2 {
             gameboy_data: None,
             gen45_data: None,
             orre_data: other.to_orre_data(),
+            colo_unused_data: other.to_colo_unused_data(),
             gen67_data: other.to_gen_67_data(),
             swsh_data: other.to_swsh_data(),
             la_data: None,
@@ -893,13 +903,23 @@ impl OhpkmV2 {
     // Gamecube
 
     #[cfg(feature = "wasm")]
-    pub fn shadow_data(&self) -> Option<ShadowData> {
-        self.orre_data.map(|data| data.0)
+    pub const fn orre_data(&self) -> Option<OrreData> {
+        self.orre_data
     }
 
     #[cfg(feature = "wasm")]
-    pub fn set_shadow_data(&mut self, v: Option<ShadowData>) {
-        self.orre_data = v.map(OrreData);
+    pub const fn set_orre_data(&mut self, v: Option<OrreData>) {
+        self.orre_data = v
+    }
+
+    #[cfg(feature = "wasm")]
+    pub const fn colo_unused_data(&self) -> Option<ColoUnusedData> {
+        self.colo_unused_data
+    }
+
+    #[cfg(feature = "wasm")]
+    pub const fn set_colo_unused_data(&mut self, v: Option<ColoUnusedData>) {
+        self.colo_unused_data = v
     }
 
     // Gen 4/5
@@ -1628,6 +1648,7 @@ impl OhpkmV2 {
             main_data: MainDataV2::new(national_dex, form_index)?,
             gameboy_data: None,
             orre_data: None,
+            colo_unused_data: None,
             gen45_data: None,
             gen67_data: None,
             swsh_data: None,
@@ -1668,6 +1689,7 @@ impl OhpkmV2 {
                 .ok_or(Error::other("Main data not present in OHPKM V2 file"))?,
             gameboy_data: GameboyData::extract_from(&sectioned_data)?,
             orre_data: OrreData::extract_from(&sectioned_data)?,
+            colo_unused_data: ColoUnusedData::extract_from(&sectioned_data)?,
             gen45_data: Gen45Data::extract_from(&sectioned_data)?,
             gen67_data: Gen67Data::extract_from(&sectioned_data)?,
             swsh_data: SwordShieldData::extract_from(&sectioned_data)?,
@@ -1710,6 +1732,7 @@ impl OhpkmV2 {
                 .ok_or(Error::other("Main data not present in OHPKM V2 file"))?,
             gameboy_data: GameboyData::extract_from(&sectioned_data).ok().flatten(),
             orre_data: OrreData::extract_from(&sectioned_data).ok().flatten(),
+            colo_unused_data: ColoUnusedData::extract_from(&sectioned_data).ok().flatten(),
             gen45_data: Gen45Data::extract_from(&sectioned_data).ok().flatten(),
             gen67_data: Gen67Data::extract_from(&sectioned_data).ok().flatten(),
             swsh_data: SwordShieldData::extract_from(&sectioned_data)
@@ -1747,6 +1770,7 @@ impl OhpkmV2 {
             main_data: MainDataV2::from_v1(old),
             gameboy_data: GameboyData::from_v1(old),
             orre_data: OrreData::from_v1(old),
+            colo_unused_data: None,
             gen45_data: Gen45Data::from_v1(old),
             gen67_data: Gen67Data::from_v1(old),
             swsh_data: SwordShieldData::from_v1(old),
@@ -1775,6 +1799,7 @@ impl OhpkmV2 {
             main_data,
             gameboy_data,
             orre_data,
+            colo_unused_data,
             gen45_data,
             gen67_data,
             swsh_data,
@@ -1795,6 +1820,7 @@ impl OhpkmV2 {
             .add(main_data)
             .add_if_some(gameboy_data)
             .add_if_some(orre_data)
+            .add_if_some(colo_unused_data)
             .add_if_some(gen45_data)
             .add_if_some(gen67_data)
             .add_if_some(swsh_data)
@@ -2036,6 +2062,7 @@ impl OhpkmV2 {
             main_data,
             gameboy_data,
             orre_data,
+            colo_unused_data,
             gen45_data,
             gen67_data,
             swsh_data,
@@ -2060,6 +2087,7 @@ impl OhpkmV2 {
 
         add_section_bytes_to_js_object(&obj, gameboy_data)?;
         add_section_bytes_to_js_object(&obj, orre_data)?;
+        add_section_bytes_to_js_object(&obj, colo_unused_data)?;
         add_section_bytes_to_js_object(&obj, gen45_data)?;
         add_section_bytes_to_js_object(&obj, gen67_data)?;
         add_section_bytes_to_js_object(&obj, swsh_data)?;

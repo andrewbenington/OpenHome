@@ -36,6 +36,8 @@ public static class ColopkmObject
             trainer_name_trash = System.Convert.ToHexString(pk.OriginalTrainerTrash),
             trainer_friendship = pk.OriginalTrainerFriendship,
             shadow_data = Util.ShadowData(pk),
+            current_region = Util.GcnRegion(pk.CurrentRegion),
+            original_region = Util.GcnRegion(pk.OriginalRegion),
             met_location_index = pk.MetLocation,
             ball = Util.FormatBall(pk, strings),
             met_level = pk.MetLevel,

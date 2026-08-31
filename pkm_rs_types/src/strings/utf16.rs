@@ -106,7 +106,7 @@ impl<const N: usize, E: Endianness> SizedUtf16String<N, E> {
         self.raw[0] == 0 && self.raw[1] == 0
     }
 
-    pub fn resize<const M: usize>(&mut self) -> SizedUtf16String<M, E> {
+    pub fn resized<const M: usize>(&self) -> SizedUtf16String<M, E> {
         let mut raw = [0u8; M];
         if M >= 2 {
             let end = N.min(M - 2);

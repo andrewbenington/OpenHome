@@ -10,8 +10,9 @@ use pkm_rs_resources::ribbons::{
 };
 use pkm_rs_types::strings::{BigEndian, SizedUtf16String};
 use pkm_rs_types::{
-    BinaryGender, ContestStats, FlagSet, Ivs, MarkingsFourShapes, OriginGame, Pokerus,
-    SimpleAbilityNumber, read_i32_be, read_u16_be, read_u32_be,
+    BinaryGender, ColoInGamePtrs, ColoUnknownBlocks, ContestStats, FlagSet, GcnRegion, Ivs,
+    MarkingsFourShapes, OriginGame, Pokerus, SimpleAbilityNumber, read_i32_be, read_u16_be,
+    read_u32_be,
 };
 use pkm_rs_types::{Language, Stats16};
 
@@ -31,6 +32,7 @@ pub(super) enum Offset {
     TrainerId = 0x16,
     TrainerName = 0x18,
     Nickname = 0x2e,
+    NicknameDisplay = 0x44,
     Exp = 0x5c,
     StatLevel = 0x60,
     Moves = 0x78,
@@ -49,10 +51,21 @@ pub(super) enum Offset {
     AbilityNumber = 0xcc,
     Markings = 0xcf,
     PokerusDays = 0xd0,
+    PartyIndex = 0xd7,
     ShadowId = 0xd8,
     Purification = 0xdc,
     RibbonsContest = 0xb7,
     RibbonsStandard = 0xbd,
+
+    UnknownData0x02 = 0x02,
+    UnknownData0x11 = 0x11,
+    UnknownData0x61 = 0x61,
+    UnknownData0xce = 0xce,
+    UnknownData0xd1 = 0xd1,
+    UnknownData0xda = 0xda,
+    UnknownData0xe4 = 0xe4,
+
+    InGamePtrs = 0xFC,
 }
 
 impl From<Offset> for usize {
@@ -236,7 +249,7 @@ impl<S: AsRef<[u8]>> ColopkmBuffer<S> {
     }
 
     fn pokerus_strain(&self) -> u8 {
-        self.get_u8(Offset::PokerusStrain)
+        self.get_u8(Offset::PokerusStrain) & 0xf
     }
 
     fn pokerus_days(&self) -> u8 {
@@ -378,6 +391,62 @@ impl<S: AsRef<[u8]>> ColopkmBuffer<S> {
     }
 
     // ------------------------------------------------------------------
+    // Unknown fields (PKHeX says unused, but game sets these bytes)
+    // ------------------------------------------------------------------
+
+    pub fn unknown_blocks(&self) -> ColoUnknownBlocks {
+        ColoUnknownBlocks {
+            unknown_data_0x02: self.unknown_data_0x02(),
+            unknown_data_0x11: self.unknown_data_0x11(),
+            unknown_data_0x61: self.unknown_data_0x61(),
+            unknown_data_0xce: self.unknown_data_0xce(),
+            unknown_data_0xd1: self.unknown_data_0xd1(),
+            unknown_data_0xda: self.unknown_data_0xda(),
+            unknown_data_0xe4: self.unknown_data_0xe4(),
+        }
+    }
+
+    fn unknown_data_0x02(&self) -> [u8; 2] {
+        self.get_array(Offset::UnknownData0x02)
+    }
+
+    fn unknown_data_0x11(&self) -> [u8; 3] {
+        self.get_array(Offset::UnknownData0x11)
+    }
+
+    fn unknown_data_0x61(&self) -> [u8; 4] {
+        self.get_array(Offset::UnknownData0x61)
+    }
+
+    fn unknown_data_0xce(&self) -> [u8; 1] {
+        self.get_array(Offset::UnknownData0xce)
+    }
+
+    fn unknown_data_0xd1(&self) -> [u8; 4] {
+        self.get_array(Offset::UnknownData0xd1)
+    }
+
+    fn unknown_data_0xda(&self) -> [u8; 2] {
+        self.get_array(Offset::UnknownData0xda)
+    }
+
+    fn unknown_data_0xe4(&self) -> [u8; 4] {
+        self.get_array(Offset::UnknownData0xe4)
+    }
+
+    // ------------------------------------------------------------------
+    // Documented but not touched by PKHeX
+    // ------------------------------------------------------------------
+
+    pub fn party_index(&self) -> u8 {
+        self.get_u8(Offset::PartyIndex)
+    }
+
+    pub fn in_game_ptrs(&self) -> ColoInGamePtrs {
+        ColoInGamePtrs(self.get_array(Offset::InGamePtrs))
+    }
+
+    // ------------------------------------------------------------------
     // Encryption
     // ------------------------------------------------------------------
 
@@ -464,7 +533,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> ColopkmBuffer<S> {
     }
 
     fn set_pokerus_strain(&mut self, v: u8) {
-        self.set_u8(Offset::PokerusStrain, v);
+        self.set_u8(Offset::PokerusStrain, v & 0xf);
     }
 
     fn set_pokerus_days(&mut self, v: u8) {
@@ -474,7 +543,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> ColopkmBuffer<S> {
     pub fn set_pokerus(&mut self, v: Pokerus) {
         self.set_pokerus_strain(v.strain().value().min(MAX_POKERUS_STRAIN));
         let days_byte = match v.days_remaining().value() {
-            NO_POKERUS_DAYS => NO_POKERUS_DAYS,
+            0 => NO_POKERUS_DAYS,
             other => other.min(MAX_POKERUS_DAYS),
         };
         self.set_pokerus_days(days_byte);
@@ -521,8 +590,27 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> ColopkmBuffer<S> {
         self.set_array(Offset::Nickname, v);
     }
 
-    pub fn set_nickname(&mut self, v: &SizedUtf16String<22, BigEndian>) {
+    fn set_nickname_display_raw(&mut self, v: &[u8; 22]) {
+        self.set_array(Offset::NicknameDisplay, v);
+    }
+
+    pub fn set_nickname_and_current_region(
+        &mut self,
+        v: &SizedUtf16String<22, BigEndian>,
+        current_region: GcnRegion,
+    ) {
         self.set_nickname_raw(&v.bytes());
+        self.set_current_region(current_region as u8);
+
+        // Japanese games only show up to five characters from the nickname
+        let nickname_display = if current_region == GcnRegion::NtscJapan {
+            let truncated_nickname: SizedUtf16String<12, BigEndian> = v.resized();
+            &truncated_nickname.resized()
+        } else {
+            v
+        };
+
+        self.set_nickname_display_raw(&nickname_display.bytes());
     }
 
     pub fn set_move_slots(&mut self, v: &MoveSlots) {
@@ -584,6 +672,14 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> ColopkmBuffer<S> {
         );
     }
 
+    fn set_current_region(&mut self, v: u8) {
+        self.set_u8(Offset::CurrentRegion, v)
+    }
+
+    pub fn set_original_region(&mut self, v: u8) {
+        self.set_u8(Offset::OriginalRegion, v)
+    }
+
     fn set_language_raw(&mut self, v: u8) {
         self.set_u8(Offset::LanguageGcn, v);
     }
@@ -606,6 +702,59 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> ColopkmBuffer<S> {
 
     pub fn set_stats(&mut self, v: Stats16) {
         self.set_stats_raw(v.to_bytes_be_gcn());
+    }
+
+    // ------------------------------------------------------------------
+    // Unknown fields (PKHeX says unused, but game sets these bytes)
+    // ------------------------------------------------------------------
+
+    pub fn set_unknown_blocks(&mut self, v: &ColoUnknownBlocks) {
+        self.set_unknown_data_0x02(&v.unknown_data_0x02);
+        self.set_unknown_data_0x11(&v.unknown_data_0x11);
+        self.set_unknown_data_0x61(&v.unknown_data_0x61);
+        self.set_unknown_data_0xce(&v.unknown_data_0xce);
+        self.set_unknown_data_0xd1(&v.unknown_data_0xd1);
+        self.set_unknown_data_0xda(&v.unknown_data_0xda);
+        self.set_unknown_data_0xe4(&v.unknown_data_0xe4);
+    }
+
+    fn set_unknown_data_0x02(&mut self, v: &[u8; 2]) {
+        self.set_array(Offset::UnknownData0x02, v)
+    }
+
+    fn set_unknown_data_0x11(&mut self, v: &[u8; 3]) {
+        self.set_array(Offset::UnknownData0x11, v)
+    }
+
+    fn set_unknown_data_0x61(&mut self, v: &[u8; 4]) {
+        self.set_array(Offset::UnknownData0x61, v)
+    }
+
+    fn set_unknown_data_0xce(&mut self, v: &[u8; 1]) {
+        self.set_array(Offset::UnknownData0xce, v)
+    }
+
+    fn set_unknown_data_0xd1(&mut self, v: &[u8; 4]) {
+        self.set_array(Offset::UnknownData0xd1, v)
+    }
+
+    fn set_unknown_data_0xda(&mut self, v: &[u8; 2]) {
+        self.set_array(Offset::UnknownData0xda, v)
+    }
+
+    fn set_unknown_data_0xe4(&mut self, v: &[u8; 4]) {
+        self.set_array(Offset::UnknownData0xe4, v)
+    }
+
+    // ------------------------------------------------------------------
+    // Documented but not touched by PKHeX
+    // ------------------------------------------------------------------
+    pub fn set_party_index(&mut self, v: u8) {
+        self.set_u8(Offset::PartyIndex, v);
+    }
+
+    pub fn set_in_game_ptrs(&mut self, v: &ColoInGamePtrs) {
+        self.set_array(Offset::InGamePtrs, &v.0);
     }
 
     // ------------------------------------------------------------------

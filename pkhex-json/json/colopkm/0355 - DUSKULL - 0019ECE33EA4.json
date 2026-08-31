@@ -1,9 +1,9 @@
 {
-  "pokemon_index": 196,
+  "pokemon_index": 361,
   "held_item_index": null,
-  "trainer_id": 57413,
-  "secret_id": 24795,
-  "exp": 15625,
+  "trainer_id": 34978,
+  "secret_id": 48423,
+  "exp": 15746,
   "ability_num": "First",
   "markings": {
     "circle": false,
@@ -11,16 +11,16 @@
     "triangle": false,
     "heart": false
   },
-  "personality_value": 4236353979,
+  "personality_value": 3974315684,
   "is_fateful_encounter": false,
   "gender": "Male",
   "evs": {
-    "hp": 2,
+    "hp": 0,
     "atk": 0,
     "def": 0,
     "spa": 0,
     "spd": 0,
-    "spe": 2
+    "spe": 0
   },
   "contest": {
     "cool": 0,
@@ -32,60 +32,60 @@
   },
   "pokerus": "strain 0, 0 days remaining",
   "ribbons": [],
-  "nickname": "ESPEON",
-  "nickname_trash": "0045005300500045004F004E00000000000000000000",
+  "nickname": "DUSKULL",
+  "nickname_trash": "004400550053004B0055004C004C0000000000000000",
   "moves": [
     {
-      "move_index": "Confusion",
-      "pp": 25,
+      "move_index": "Foresight",
+      "pp": 40,
       "pp_ups": 0
     },
     {
-      "move_index": "Return",
-      "pp": 20,
+      "move_index": "Astonish",
+      "pp": 15,
       "pp_ups": 0
     },
     {
-      "move_index": "Reflect",
-      "pp": 20,
+      "move_index": "Confuse Ray",
+      "pp": 10,
       "pp_ups": 0
     },
     {
-      "move_index": "Helping Hand",
+      "move_index": "Pursuit",
       "pp": 20,
       "pp_ups": 0
     }
   ],
   "ivs": {
-    "hp": 24,
-    "atk": 27,
-    "def": 9,
-    "spa": 0,
-    "spd": 9,
-    "spe": 20
+    "hp": 31,
+    "atk": 23,
+    "def": 14,
+    "spa": 31,
+    "spd": 8,
+    "spe": 19
   },
   "is_egg": false,
   "trainer_name": "RoC",
   "trainer_name_trash": "0052006F004300000000000000000000000000000000",
-  "trainer_friendship": 220,
+  "trainer_friendship": 35,
   "shadow_data": null,
   "current_region": "Pal",
   "original_region": "NtscUsa",
-  "met_location_index": 254,
+  "met_location_index": 65,
   "ball": "Pok\u00E9",
-  "met_level": 25,
+  "met_level": 27,
   "trainer_gender": "Male",
-  "game_of_origin": "Colosseum/XD",
+  "game_of_origin": "Emerald",
   "language": "English",
-  "stat_level": 25,
-  "current_hp": 73,
+  "stat_level": 27,
+  "current_hp": 56,
   "stats": {
-    "hp": 73,
-    "atk": 48,
-    "def": 37,
-    "spa": 70,
-    "spd": 48,
-    "spe": 65
+    "hp": 56,
+    "atk": 32,
+    "def": 62,
+    "spa": 29,
+    "spd": 49,
+    "spe": 23
   },
-  "level": 25
+  "level": 27
 }

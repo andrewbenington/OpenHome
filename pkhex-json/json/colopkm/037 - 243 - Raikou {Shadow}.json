@@ -77,6 +77,8 @@
       "shadow_gauge": 13000
     }
   },
+  "current_region": "Pal",
+  "original_region": "NtscUsa",
   "met_location_index": 69,
   "ball": "Ultra",
   "met_level": 40,

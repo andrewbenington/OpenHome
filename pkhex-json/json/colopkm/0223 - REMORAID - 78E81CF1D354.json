@@ -1,9 +1,9 @@
 {
-  "pokemon_index": 196,
+  "pokemon_index": 223,
   "held_item_index": null,
   "trainer_id": 57413,
   "secret_id": 24795,
-  "exp": 15625,
+  "exp": 8000,
   "ability_num": "First",
   "markings": {
     "circle": false,
@@ -11,16 +11,16 @@
     "triangle": false,
     "heart": false
   },
-  "personality_value": 4236353979,
+  "personality_value": 485610324,
   "is_fateful_encounter": false,
-  "gender": "Male",
+  "gender": "Female",
   "evs": {
-    "hp": 2,
+    "hp": 0,
     "atk": 0,
     "def": 0,
     "spa": 0,
     "spd": 0,
-    "spe": 2
+    "spe": 0
   },
   "contest": {
     "cool": 0,
@@ -31,61 +31,67 @@
     "sheen": 0
   },
   "pokerus": "strain 0, 0 days remaining",
-  "ribbons": [],
-  "nickname": "ESPEON",
-  "nickname_trash": "0045005300500045004F004E00000000000000000000",
+  "ribbons": ["National"],
+  "nickname": "REMORAID",
+  "nickname_trash": "00520045004D004F0052004100490044000000000000",
   "moves": [
     {
-      "move_index": "Confusion",
-      "pp": 25,
-      "pp_ups": 0
-    },
-    {
-      "move_index": "Return",
+      "move_index": "Bubble Beam",
       "pp": 20,
       "pp_ups": 0
     },
     {
-      "move_index": "Reflect",
+      "move_index": "Lock-On",
+      "pp": 5,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Psybeam",
       "pp": 20,
       "pp_ups": 0
     },
     {
-      "move_index": "Helping Hand",
+      "move_index": "Aurora Beam",
       "pp": 20,
       "pp_ups": 0
     }
   ],
   "ivs": {
-    "hp": 24,
-    "atk": 27,
-    "def": 9,
-    "spa": 0,
-    "spd": 9,
-    "spe": 20
+    "hp": 7,
+    "atk": 1,
+    "def": 19,
+    "spa": 20,
+    "spd": 23,
+    "spe": 30
   },
   "is_egg": false,
   "trainer_name": "RoC",
   "trainer_name_trash": "0052006F004300000000000000000000000000000000",
-  "trainer_friendship": 220,
-  "shadow_data": null,
+  "trainer_friendship": 70,
+  "shadow_data": {
+    "id": {
+      "colo": 13
+    },
+    "exp": 0,
+    "purification": "purified"
+  },
   "current_region": "Pal",
   "original_region": "NtscUsa",
-  "met_location_index": 254,
-  "ball": "Pok\u00E9",
-  "met_level": 25,
+  "met_location_index": 28,
+  "ball": "Great",
+  "met_level": 20,
   "trainer_gender": "Male",
   "game_of_origin": "Colosseum/XD",
   "language": "English",
-  "stat_level": 25,
-  "current_hp": 73,
+  "stat_level": 20,
+  "current_hp": 45,
   "stats": {
-    "hp": 73,
-    "atk": 48,
-    "def": 37,
-    "spa": 70,
-    "spd": 48,
-    "spe": 65
+    "hp": 45,
+    "atk": 31,
+    "def": 22,
+    "spa": 35,
+    "spd": 23,
+    "spe": 37
   },
-  "level": 25
+  "level": 20
 }

@@ -29,7 +29,7 @@ pub(crate) use gen45_data::Gen45Data;
 pub(crate) use gen67_data::Gen67Data;
 pub(crate) use learned_moves::LearnedMoves;
 pub(crate) use main_data::MainDataV2;
-pub(crate) use orre_data::OrreData;
+pub(crate) use orre_data::{COLO_UNUSED_DATA_SIZE, ColoUnusedData, OrreData};
 pub(crate) use past_handlers::PastHandlerDataV2;
 
 #[cfg(feature = "wasm")]

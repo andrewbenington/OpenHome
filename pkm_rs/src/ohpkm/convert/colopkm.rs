@@ -11,6 +11,7 @@ use crate::ohpkm::OhpkmV2;
 use crate::ohpkm::v2_sections::OrreData;
 use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
 use crate::result::{Error, Result};
+use crate::sectioned_data::DataSection;
 use crate::{format::PkmFormat, traits::HasSpeciesAndForm};
 use crate::{gen3, ohpkm, util::personality_value};
 
@@ -98,7 +99,25 @@ impl OhpkmConvert for Colopkm {
     }
 
     fn to_orre_data(&self) -> Option<OrreData> {
-        self.shadow_data.map(OrreData)
+        Some(OrreData {
+            shadow_data: self.shadow_data,
+            current_region: self.current_region,
+            original_region: self.original_region,
+        })
+    }
+
+    fn to_colo_unused_data(&self) -> Option<ohpkm::v2_sections::ColoUnusedData> {
+        let unused_data = ohpkm::v2_sections::ColoUnusedData {
+            party_index: self.party_index,
+            unknown_blocks: self.unknown_blocks,
+            in_game_ptrs: self.in_game_ptrs,
+        };
+
+        if unused_data.is_empty() {
+            None
+        } else {
+            Some(unused_data)
+        }
     }
 
     fn from_ohpkm(ohpkm: &OhpkmV2, strategy: ConvertStrategy) -> Result<Self> {
@@ -125,6 +144,9 @@ impl OhpkmConvert for Colopkm {
         {
             nickname = original_colopkm.nickname;
         };
+
+        let ohpkm_orre_data = ohpkm.orre_data().unwrap_or_default();
+        let unused_data = ohpkm.colo_unused_data().unwrap_or_default();
 
         let mut mon = Self {
             pokemon_index: Gen3PokemonIndex::from_national_dex(
@@ -153,15 +175,20 @@ impl OhpkmConvert for Colopkm {
                 .to_pp_adjusted(ohpkm::MOVE_METADATA_SOURCE, MetadataSource::Emerald),
             ivs: converter.ivs(ohpkm),
             is_egg: ohpkm.is_egg(),
-            trainer_name: ohpkm.trainer_name().reverse_endian().resize(),
+            trainer_name: ohpkm.trainer_name().reverse_endian().resized(),
             trainer_friendship: ohpkm.trainer_friendship(),
             met_location_index: met_data.location_index,
             ball: ohpkm.ball(),
             met_level: ohpkm.met_level(),
             trainer_gender: ohpkm.trainer_gender(),
             game_of_origin: met_data.origin,
+            current_region: ohpkm_orre_data.current_region,
+            original_region: ohpkm_orre_data.original_region,
             language: ohpkm.language(),
-            shadow_data: ohpkm.shadow_data(),
+            party_index: unused_data.party_index,
+            shadow_data: ohpkm_orre_data.shadow_data,
+            unknown_blocks: unused_data.unknown_blocks,
+            in_game_ptrs: unused_data.in_game_ptrs,
             stat_level: 0,
             current_hp: 0,
             stats: Stats16::default(),

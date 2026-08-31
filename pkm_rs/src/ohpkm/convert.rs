@@ -10,7 +10,9 @@ mod pk8;
 mod pk9;
 
 use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
-use crate::ohpkm::v2_sections::{LearnedMoves, LegendsZaData, OrreData, SwordShieldData};
+use crate::ohpkm::v2_sections::{
+    ColoUnusedData, LearnedMoves, LegendsZaData, OrreData, SwordShieldData,
+};
 use crate::result::Result;
 use crate::traits::Pkm;
 use crate::{convert_strategy::ConvertStrategy, ohpkm::v2_sections::ScarletVioletData};
@@ -21,6 +23,10 @@ pub trait OhpkmConvert: Pkm {
     fn to_main_data(&self) -> MainDataV2;
 
     fn to_orre_data(&self) -> Option<OrreData> {
+        None
+    }
+
+    fn to_colo_unused_data(&self) -> Option<ColoUnusedData> {
         None
     }
 

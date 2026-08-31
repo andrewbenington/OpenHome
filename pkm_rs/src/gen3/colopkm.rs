@@ -1,18 +1,16 @@
 use super::colopkm_buffer::ColopkmBuffer;
 use super::colopkm_buffer::ColopkmBufferMut;
 use crate::bytes::AsBytesMut;
+#[cfg(feature = "wasm")]
 use crate::convert_strategy::ConvertStrategy;
-#[cfg(feature = "wasm")]
 use crate::gen3::Gen3PokemonIndex;
+#[cfg(feature = "wasm")]
 use crate::ohpkm::OhpkmConvert;
+#[cfg(feature = "wasm")]
 use crate::ohpkm::OhpkmV2;
-#[cfg(feature = "wasm")]
-use crate::result::{Error, Result};
-#[cfg(test)]
-use crate::tests::PkhexJson;
-use crate::traits::ModernEvs;
-#[cfg(feature = "wasm")]
-use crate::traits::{HasSpeciesAndForm, PkmBytes};
+use crate::result::Error;
+use crate::result::Result;
+use crate::traits::{HasSpeciesAndForm, ModernEvs, PkmBytes};
 
 use pkm_rs_derive::IsShiny8192;
 use pkm_rs_resources::ball::Ball;
@@ -26,6 +24,9 @@ use pkm_rs_resources::species::{FormMetadata, SpeciesMetadata};
 use pkm_rs_resources::{helpers, lookup};
 #[cfg(feature = "wasm")]
 use pkm_rs_types::AbilityNumber;
+use pkm_rs_types::ColoInGamePtrs;
+use pkm_rs_types::ColoUnknownBlocks;
+use pkm_rs_types::GcnRegion;
 use pkm_rs_types::Pokerus;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
@@ -79,6 +80,8 @@ pub struct Colopkm {
     pub met_level: u8,
     pub trainer_gender: BinaryGender,
     pub game_of_origin: OriginGame,
+    pub current_region: GcnRegion,
+    pub original_region: GcnRegion,
     pub language: Language,
     #[cfg_attr(feature = "randomize", randomize(skip))]
     pub stat_level: u8,
@@ -86,6 +89,15 @@ pub struct Colopkm {
     pub current_hp: u16,
     #[cfg_attr(feature = "randomize", randomize(skip))]
     pub stats: Stats16,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    #[serde(skip)]
+    pub party_index: u8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    #[serde(skip)]
+    pub unknown_blocks: ColoUnknownBlocks,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    #[serde(skip)]
+    pub in_game_ptrs: ColoInGamePtrs,
 }
 
 pub type ColosseumPkmString = SizedUtf16String<22, BigEndian>;
@@ -144,10 +156,16 @@ impl Colopkm {
             met_level: buf.met_level(),
             trainer_gender: buf.trainer_gender(),
             game_of_origin: buf.game_of_origin()?,
+            current_region: GcnRegion::from_byte(buf.current_region()),
+            original_region: GcnRegion::from_byte(buf.original_region()),
             language,
             stat_level: Default::default(),
             stats: Default::default(),
             current_hp: Default::default(),
+
+            party_index: buf.party_index(),
+            unknown_blocks: buf.unknown_blocks(),
+            in_game_ptrs: buf.in_game_ptrs(),
         };
 
         mon.stat_level = mon.calculate_level();
@@ -187,7 +205,7 @@ impl Colopkm {
         buf.set_pokerus(self.pokerus);
         buf.set_is_egg(self.is_egg);
         buf.set_ribbons(self.ribbons);
-        buf.set_nickname(&self.nickname);
+        buf.set_nickname_and_current_region(&self.nickname, self.current_region);
         buf.set_move_slots(&self.moves);
         buf.set_ivs(&self.ivs);
         buf.set_trainer_name(&self.trainer_name);
@@ -204,10 +222,15 @@ impl Colopkm {
         buf.set_met_level(self.met_level);
         buf.set_trainer_gender(self.trainer_gender);
         buf.set_game_of_origin(self.game_of_origin);
+        buf.set_original_region(self.original_region as u8);
         buf.set_language(self.language);
         buf.set_stat_level(self.stat_level);
         buf.set_current_hp(self.current_hp);
         buf.set_stats(self.stats);
+
+        buf.set_party_index(self.party_index);
+        buf.set_unknown_blocks(&self.unknown_blocks);
+        buf.set_in_game_ptrs(&self.in_game_ptrs);
     }
 
     pub fn write_to_party_buffer(&self, buf: &mut ColopkmBufferMut) {
@@ -542,7 +565,7 @@ impl ModernEvs for Colopkm {
 }
 
 #[cfg(test)]
-impl PkhexJson for Colopkm {
+impl crate::tests::PkhexJson for Colopkm {
     fn to_pkhex_json_value(&self) -> std::result::Result<serde_json::Value, serde_json::Error> {
         let mut value = serde_json::to_value(self)?;
         value["nickname_trash"] = serde_json::json!(
@@ -567,15 +590,15 @@ impl PkhexJson for Colopkm {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::convert_strategy::ConvertStrategy;
+    use crate::tests;
     use std::path::PathBuf;
 
     // use crate::convert_strategy::ConvertStrategy;
     use crate::gen3::Colopkm;
     use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 
-    #[cfg(feature = "randomize")]
-    use crate::tests::{self, TestResult};
+    use crate::tests::TestResult;
 
     // use pkm_rs_resources::ribbons::Gen3Ribbon;
     // use pkm_rs_types::Gender;

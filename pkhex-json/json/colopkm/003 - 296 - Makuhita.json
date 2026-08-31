@@ -75,6 +75,8 @@
     "exp": 0,
     "purification": "purified"
   },
+  "current_region": "Pal",
+  "original_region": "NtscUsa",
   "met_location_index": 5,
   "ball": "Pok\u00E9",
   "met_level": 30,

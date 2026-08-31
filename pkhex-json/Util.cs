@@ -340,6 +340,17 @@ public static partial class Util
       return new { shadow_gauge = purification };
     }
   }
+  public static string GcnRegion(GCRegion region)
+  {
+    switch (region)
+    {
+      case GCRegion.NoRegion: return "None";
+      case GCRegion.NTSC_J: return "NtscJapan";
+      case GCRegion.NTSC_U: return "NtscUsa";
+      case GCRegion.PAL: return "Pal";
+      default: return region.ToString();
+    }
+  }
 
   [GeneratedRegex(@"(?=[A-Z])")]
   private static partial Regex RibbonRegex();

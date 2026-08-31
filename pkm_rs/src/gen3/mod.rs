@@ -1,25 +1,39 @@
+#[cfg(feature = "wasm")]
 mod colopkm_buffer;
+
+#[cfg(feature = "wasm")]
 mod pk3;
+#[cfg(feature = "wasm")]
 mod pk3_buffer;
 mod pokemon_index;
 
+#[cfg(feature = "wasm")]
 pub mod colopkm;
 
+#[cfg(feature = "wasm")]
 pub use colopkm::Colopkm;
+#[cfg(feature = "wasm")]
 pub use pk3::*;
 pub use pokemon_index::Gen3PokemonIndex;
 
+#[cfg(feature = "wasm")]
 use pk3_buffer::Offset;
+#[cfg(feature = "wasm")]
 use pk3_buffer::Pk3Buffer;
 use pkm_rs_resources;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
+#[cfg(feature = "wasm")]
 use pkm_rs_resources::moves::MoveDataOffsets;
 use pkm_rs_types::NationalDex;
 
+#[cfg(feature = "wasm")]
 pub(crate) const BOX_SIZE_GBA: usize = 80;
+#[cfg(feature = "wasm")]
 pub(crate) const PARTY_SIZE_GBA: usize = 100;
+#[cfg(feature = "wasm")]
 pub(crate) const PKM_SIZE_COLOSSEUM: usize = 312;
 
+#[cfg(feature = "wasm")]
 const MOVE_DATA_OFFSETS_GBA: MoveDataOffsets<Offset> = MoveDataOffsets {
     moves: Offset::Moves,
     pp: Offset::MovePp,

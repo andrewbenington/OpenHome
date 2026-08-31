@@ -3000,6 +3000,7 @@ dependencies = [
  "chrono",
  "getrandom 0.4.3",
  "js-sys",
+ "num",
  "num_enum",
  "pastey",
  "pkm_rs_derive",
