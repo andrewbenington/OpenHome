@@ -62,6 +62,21 @@ impl LookupState {
         }
     }
 
+    pub fn with_dangling_removed_in_boxes(self, this_box: &OhpkmBox) -> Self {
+        Self {
+            gen_12: self
+                .gen_12
+                .into_iter()
+                .filter(|(_, openhome_id)| this_box.includes(openhome_id))
+                .collect(),
+            gen_345: self
+                .gen_345
+                .into_iter()
+                .filter(|(_, openhome_id)| this_box.includes(openhome_id))
+                .collect(),
+        }
+    }
+
     pub fn with_recalculated(&mut self, ohpkms: impl IntoIterator<Item = OhpkmV2>) {
         for ohpkm in ohpkms {
             self.gen_345.insert(ohpkm.gen_345_id(), ohpkm.openhome_id());
@@ -74,5 +89,17 @@ impl LookupState {
 
     pub fn gen_345_entries(&self) -> impl Iterator<Item = (String, OpenHomeId)> {
         self.gen_345.clone().into_iter()
+    }
+}
+
+pub struct OhpkmBox {
+
+}
+
+impl OhpkmBox {
+
+    // TODO: Implement this
+    pub(crate) fn includes(&self, _openhome_id: &String) -> bool {
+        todo!()
     }
 }
