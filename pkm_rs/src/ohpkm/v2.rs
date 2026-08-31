@@ -2035,6 +2035,16 @@ impl OhpkmV2 {
         self.openhome_id().to_string()
     }
 
+    #[wasm_bindgen(js_name = regenerateOpenhomeId)]
+    pub fn regenerate_openhome_id_js(&mut self) {
+        self.main_data.openhome_id = OpenHomeId::new(
+            self.species_and_form().get_ndex(),
+            self.trainer_id(),
+            self.secret_id(),
+            self.personality_value(),
+        );
+    }
+
     #[wasm_bindgen(getter = gen345Identifier)]
     pub fn gen_345_id_js(&self) -> String {
         self.gen_345_id()

@@ -30,7 +30,7 @@ import {
   LogFilterJs,
   LogFilter as LogFilterRust,
   LogsResponse as LogsResponseRust,
-  StoredBankData as StoredBankDataRust,
+  StoredBankDataWasm as StoredBankDataRust,
 } from './spectaCommands'
 
 async function pathDataFromRaw(raw: string): Promise<PathData> {
