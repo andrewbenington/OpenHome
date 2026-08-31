@@ -30,7 +30,7 @@ pub struct ConvertStrategyEntries {
 #[tauri::command]
 #[specta::specta]
 pub fn get_convert_strategies(
-    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
+    synced_state: tauri::State<'_, synced_state::LazyState>,
 ) -> CommandResult<ConvertStrategyEntries> {
     synced_state
         .get_convert_strategies()
@@ -45,7 +45,7 @@ pub fn get_convert_strategies(
 #[specta::specta]
 pub fn update_convert_strategies(
     app_handle: tauri::AppHandle,
-    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
+    synced_state: tauri::State<'_, synced_state::LazyState>,
     updates: ConvertStrategyEntries,
 ) -> CommandResult<()> {
     synced_state

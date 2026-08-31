@@ -7,5 +7,6 @@ pub mod pkm_storage;
 pub mod saves;
 pub mod startup_config;
 mod util;
+pub mod ohpkm_store_partial;
 
 pub use error::*;
