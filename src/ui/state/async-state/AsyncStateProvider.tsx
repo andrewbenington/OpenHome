@@ -3,17 +3,15 @@ import { Callout } from '@radix-ui/themes'
 import { Context, ReactNode, useMemo } from 'react'
 import { ErrorIcon } from '../../components/Icons'
 import LoadingIndicator from '../../components/LoadingIndicator'
-import { RustStateManager } from './useSyncedState'
 
-export type SyncedStateProviderProps<State, Action> = {
-  useStateManager: () => RustStateManager<State, Action>
+export type AsyncStateProviderProps<State, Action> = {
   StateContext: Context<[State, (updated: Action) => Promise<Errorable<null>>]>
   stateDescription: string
   children: ReactNode
 }
 
-export default function SyncedStateProvider<State, Action = State>(
-  props: SyncedStateProviderProps<State, Action>
+export default function AsyncStateProvider<State, Action = State>(
+  props: AsyncStateProviderProps<State, Action>
 ) {
   const { useStateManager, StateContext, stateDescription, children } = props
   const stateManager = useStateManager()

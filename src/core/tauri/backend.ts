@@ -111,8 +111,6 @@ export const TauriBackend: BackendInterface = {
   /* get the current data directory path */
   getDataDirPath: Commands.getDataDirPath,
 
-  /* write synced state to disk during save */
-  saveSyncedState: Commands.saveSyncedState,
 
   /* pokedex */
   loadPokedex: () =>
@@ -356,13 +354,6 @@ export const TauriBackend: BackendInterface = {
       }),
     ]
 
-    if (listeners.onStateUpdate) {
-      for (const [stateType, listener] of Object.entries(listeners.onStateUpdate)) {
-        unlistenPromises.push(
-          listen(`synced_state_update::${stateType}`, (event) => listener(event.payload), {})
-        )
-      }
-    }
     if (listeners.onLookupsUpdate) {
       const listener = listeners.onLookupsUpdate
 
