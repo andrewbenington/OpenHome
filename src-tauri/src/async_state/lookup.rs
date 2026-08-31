@@ -1,10 +1,12 @@
+use std::sync::MutexGuard;
 use openhome_core::lookup::LookupState;
 use serde::Serialize;
 
 use crate::commands::{CommandError, CommandResult};
-use crate::synced_state;
+use crate::async_state;
+use crate::async_state::LazyStateInner;
 
-impl synced_state::SyncedState for LookupState {
+impl async_state::SyncedState for LookupState {
     type Action = Self;
     const ID: &'static str = "lookups";
 
@@ -20,7 +22,7 @@ impl synced_state::SyncedState for LookupState {
 #[tauri::command]
 #[specta::specta]
 pub fn get_lookups(
-    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
+    synced_state: tauri::State<'_, async_state::LazyState>,
 ) -> CommandResult<LookupState> {
     Ok(synced_state.clone_lookups()?)
 }
@@ -29,7 +31,7 @@ pub fn get_lookups(
 #[specta::specta]
 pub fn add_to_lookups(
     app_handle: tauri::AppHandle,
-    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
+    synced_state: tauri::State<'_, async_state::LazyState>,
     new_entries: LookupState,
 ) -> CommandResult<()> {
     synced_state
@@ -43,13 +45,17 @@ pub fn add_to_lookups(
 #[specta::specta]
 pub fn remove_dangling(
     app_handle: tauri::AppHandle,
-    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
+    this_async_state: tauri::State<'_, async_state::LazyState>,
 ) -> CommandResult<()> {
-    // definitely unnecessary clones here
-    let mut synced_state = synced_state.lock()?;
-    let ohpkm_store = synced_state.ohpkm_store.read().clone();
 
-    synced_state
+    // TODO: Add dangling checks to other boxes when loading them as well, since we are
+    // no longer loading everything at once.
+
+    // definitely unnecessary clones here
+    let mut async_state: MutexGuard<LazyStateInner> = this_async_state.lock()?;
+    let ohpkm_store = async_state.get_current_box().read().clone();
+
+    async_state
         .lookups
         .replace(&app_handle, |l| {
             l.clone().with_dangling_removed(&ohpkm_store)

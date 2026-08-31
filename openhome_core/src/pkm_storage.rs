@@ -1,10 +1,11 @@
 use crate::{
-    Result,
     data_controller::{DataController, DataDir},
+    Result,
 };
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use uuid::Uuid;
+
 
 pub const BANKS_FILENAME: &str = "banks.json";
 
@@ -14,9 +15,29 @@ pub struct StoredBankData {
     banks: Vec<Bank>,
     #[serde(default)]
     current_bank: usize,
+
+
+}
+
+// TODO: Ensure box_index gets used
+pub struct BoxPointer {
+    box_index: usize,
+    bank_index: usize
 }
 
 impl StoredBankData {
+
+    pub fn get_current_box_pointer(&self) -> BoxPointer {
+        BoxPointer {
+            box_index: self.current_bank,
+            bank_index : self.banks[self.current_bank].current_box
+        }
+    }
+
+    pub fn get_current_bank(self) -> usize { self.current_bank }
+
+    pub fn get_current_box(self) -> usize { self.banks[self.current_bank].current_box }
+
     pub fn from_banks(banks: Vec<Bank>) -> Self {
         let mut bank_data = StoredBankData {
             banks,

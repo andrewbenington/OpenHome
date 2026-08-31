@@ -425,10 +425,10 @@ fn is_prevo_species_name(species_and_form: &SpeciesForm, name: &str, language: L
 }
 
 impl DataSection for MainDataV2 {
-    type TagType = OhpkmSectionTag;
-    const TAG: Self::TagType = OhpkmSectionTag::MainData;
-
     type ErrorType = Error;
+    type TagType = OhpkmSectionTag;
+
+    const TAG: Self::TagType = OhpkmSectionTag::MainData;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
         Self::ensure_buffer_size(bytes);
