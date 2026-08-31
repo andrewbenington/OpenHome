@@ -3552,7 +3552,6 @@ impl OhpkmV2 {
         match value {
             Some(flags) => {
                 let mut new_bytes = [0u8; LZA_DLC_TM_BYTES];
-                dbg!(new_bytes, LZA_DLC_TM_BYTES);
                 new_bytes.copy_from_slice(&flags);
                 self.lza_data.get_or_insert_default().tm_flags_dlc =
                     FlagSet::<LZA_DLC_TM_BYTES>::from_bytes(new_bytes);

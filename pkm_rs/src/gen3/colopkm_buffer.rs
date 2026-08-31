@@ -396,42 +396,14 @@ impl<S: AsRef<[u8]>> ColopkmBuffer<S> {
 
     pub fn unknown_blocks(&self) -> ColoUnknownBlocks {
         ColoUnknownBlocks {
-            unknown_data_0x02: self.unknown_data_0x02(),
-            unknown_data_0x11: self.unknown_data_0x11(),
-            unknown_data_0x61: self.unknown_data_0x61(),
-            unknown_data_0xce: self.unknown_data_0xce(),
-            unknown_data_0xd1: self.unknown_data_0xd1(),
-            unknown_data_0xda: self.unknown_data_0xda(),
-            unknown_data_0xe4: self.unknown_data_0xe4(),
+            unknown_data_0x02: self.get_array(Offset::UnknownData0x02),
+            unknown_data_0x11: self.get_array(Offset::UnknownData0x11),
+            unknown_data_0x61: self.get_array(Offset::UnknownData0x61),
+            unknown_data_0xce: self.get_array(Offset::UnknownData0xce),
+            unknown_data_0xd1: self.get_array(Offset::UnknownData0xd1),
+            unknown_data_0xda: self.get_array(Offset::UnknownData0xda),
+            unknown_data_0xe4: self.get_array(Offset::UnknownData0xe4),
         }
-    }
-
-    fn unknown_data_0x02(&self) -> [u8; 2] {
-        self.get_array(Offset::UnknownData0x02)
-    }
-
-    fn unknown_data_0x11(&self) -> [u8; 3] {
-        self.get_array(Offset::UnknownData0x11)
-    }
-
-    fn unknown_data_0x61(&self) -> [u8; 4] {
-        self.get_array(Offset::UnknownData0x61)
-    }
-
-    fn unknown_data_0xce(&self) -> [u8; 1] {
-        self.get_array(Offset::UnknownData0xce)
-    }
-
-    fn unknown_data_0xd1(&self) -> [u8; 4] {
-        self.get_array(Offset::UnknownData0xd1)
-    }
-
-    fn unknown_data_0xda(&self) -> [u8; 2] {
-        self.get_array(Offset::UnknownData0xda)
-    }
-
-    fn unknown_data_0xe4(&self) -> [u8; 4] {
-        self.get_array(Offset::UnknownData0xe4)
     }
 
     // ------------------------------------------------------------------
@@ -709,41 +681,13 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> ColopkmBuffer<S> {
     // ------------------------------------------------------------------
 
     pub fn set_unknown_blocks(&mut self, v: &ColoUnknownBlocks) {
-        self.set_unknown_data_0x02(&v.unknown_data_0x02);
-        self.set_unknown_data_0x11(&v.unknown_data_0x11);
-        self.set_unknown_data_0x61(&v.unknown_data_0x61);
-        self.set_unknown_data_0xce(&v.unknown_data_0xce);
-        self.set_unknown_data_0xd1(&v.unknown_data_0xd1);
-        self.set_unknown_data_0xda(&v.unknown_data_0xda);
-        self.set_unknown_data_0xe4(&v.unknown_data_0xe4);
-    }
-
-    fn set_unknown_data_0x02(&mut self, v: &[u8; 2]) {
-        self.set_array(Offset::UnknownData0x02, v)
-    }
-
-    fn set_unknown_data_0x11(&mut self, v: &[u8; 3]) {
-        self.set_array(Offset::UnknownData0x11, v)
-    }
-
-    fn set_unknown_data_0x61(&mut self, v: &[u8; 4]) {
-        self.set_array(Offset::UnknownData0x61, v)
-    }
-
-    fn set_unknown_data_0xce(&mut self, v: &[u8; 1]) {
-        self.set_array(Offset::UnknownData0xce, v)
-    }
-
-    fn set_unknown_data_0xd1(&mut self, v: &[u8; 4]) {
-        self.set_array(Offset::UnknownData0xd1, v)
-    }
-
-    fn set_unknown_data_0xda(&mut self, v: &[u8; 2]) {
-        self.set_array(Offset::UnknownData0xda, v)
-    }
-
-    fn set_unknown_data_0xe4(&mut self, v: &[u8; 4]) {
-        self.set_array(Offset::UnknownData0xe4, v)
+        self.set_array(Offset::UnknownData0x02, &v.unknown_data_0x02);
+        self.set_array(Offset::UnknownData0x11, &v.unknown_data_0x11);
+        self.set_array(Offset::UnknownData0x61, &v.unknown_data_0x61);
+        self.set_array(Offset::UnknownData0xce, &v.unknown_data_0xce);
+        self.set_array(Offset::UnknownData0xd1, &v.unknown_data_0xd1);
+        self.set_array(Offset::UnknownData0xda, &v.unknown_data_0xda);
+        self.set_array(Offset::UnknownData0xe4, &v.unknown_data_0xe4);
     }
 
     // ------------------------------------------------------------------
