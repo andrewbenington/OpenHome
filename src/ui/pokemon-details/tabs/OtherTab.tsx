@@ -1,10 +1,6 @@
 import { PK3, PK4, PK5 } from '@openhome-core/pkm'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import {
-  getMonFileIdentifier,
-  getMonGen12Identifier,
-  getMonGen345Identifier,
-} from '@openhome-core/pkm/Lookup'
+import { getMonGen12Identifier, getMonGen345Identifier } from '@openhome-core/pkm/Lookup'
 import { getLocationStringOrOrigin } from '@openhome-core/pkm/MetLocation'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
@@ -450,9 +446,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             )}
           </>
         )}
-        {mon instanceof OHPKM && (
-          <AttributeRow label="OpenHome ID" value={getMonFileIdentifier(mon)} />
-        )}
+        {mon instanceof OHPKM && <AttributeRow label="OpenHome ID" value={mon.openhomeId} />}
         {mon.relearnMoves && (
           <>
             {mon.relearnMoves[0] > 0 && (

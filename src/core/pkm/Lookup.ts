@@ -19,7 +19,7 @@ function hasPersonalityValue(
 
 export const getMonFileIdentifier = (mon: PKMInterface): OhpkmIdentifier | undefined => {
   if (mon instanceof OHPKM) {
-    return getHomeIdentifier(mon)
+    return mon.openhomeId
   }
   if (!hasPersonalityValue(mon)) {
     return undefined
