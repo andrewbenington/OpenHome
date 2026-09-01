@@ -23,6 +23,7 @@ import SearchFields from '@openhome-ui/components/search/SearchFields'
 import PokemonSearchModal from '@openhome-ui/components/search/SearchModal'
 import ToggleButton from '@openhome-ui/components/ToggleButton'
 import useDisplayError from '@openhome-ui/hooks/displayError'
+import PokemonDetailsModal from '@openhome-ui/pokemon-details/PokemonDetailsModal'
 import { OhpkmLookupResult, useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import useTrackedDataRecovery from '@openhome-ui/state/ohpkm/useTrackedDataRecovery'
 import { HomeMonLocation, MonWithLocation, useSaves } from '@openhome-ui/state/saves'
@@ -35,6 +36,8 @@ import { BsFillGrid3X3GapFill } from 'react-icons/bs'
 import { FaSquare } from 'react-icons/fa'
 import {
   BankBoxCoordinates,
+  OPENHOME_BOX_COLUMNS,
+  OPENHOME_BOX_ROWS,
   OPENHOME_BOX_SLOTS,
   useBanksAndBoxes,
 } from '../../state-zustand/banks-and-boxes/store'
@@ -248,8 +251,6 @@ type MissingIdData = {
   location: BankBoxCoordinates
 }
 
-const FORCE_LOADING = false
-
 type SlotData = {
   monResult?: OhpkmLookupResult
   monPromise: Option<Promise<Option<OHPKM>>>
@@ -272,6 +273,7 @@ function SingleBoxMonDisplay() {
     setCurrentIndex: setSelectedIndex,
     navigateNext: navigateRight,
     navigatePrev: navigateLeft,
+    selectedMon,
   } = useOpenHomeBoxNavigator()
 
   const currentBox = getCurrentBox()
@@ -307,28 +309,6 @@ function SingleBoxMonDisplay() {
     [dragData, saveFromIdentifier]
   )
 
-  // const selectedMon: Result<Option<OHPKM>> = useMemo(() => {
-  //   if (
-  //     !currentBox ||
-  //     selectedIndex === undefined ||
-  //     selectedIndex >= OPENHOME_BOX_SLOTS ||
-  //     !boxOhpkms
-  //   ) {
-  //     return R.Ok(undefined)
-  //   }
-  //   const selectedMonIdentifier = currentBox.identifiers.get(selectedIndex)
-  //   if (!selectedMonIdentifier) return R.Ok(undefined)
-
-  //   const lookupResult = boxOhpkms.get(selectedMonIdentifier)
-  //   if (!lookupResult) {
-  //     return R.Err(`Could not find OHPKM data associated with ID ${selectedMonIdentifier}`)
-  //   }
-
-  //   return $R(lookupResult).mapErr(
-  //     ({ identifier }) => `Could not find OHPKM data associated with ID ${identifier}`
-  //   )
-  // }, [boxOhpkms, currentBox, selectedIndex])
-
   const contextElements = useMemo(
     () => [
       Submenu.label('Sort this box...').with(
@@ -344,14 +324,6 @@ function SingleBoxMonDisplay() {
     ],
     [currentBox, sortAllHomeBoxes, sortHomeBox]
   )
-
-  // if (boxOhpkmsLoading || FORCE_LOADING) {
-  //   return (
-  //     <div className="home-box-grid">
-  //       <Spinner style={{ margin: 'auto', gridColumn: '1 / 13' }} />
-  //     </div>
-  //   )
-  // }
 
   const removeDupesItem = Item.label('Remove duplicates from this box').action(removeAllHomeDupes)
 
@@ -392,30 +364,27 @@ function SingleBoxMonDisplay() {
       }
     })
 
-  const DetailsModal = null
-  // $R(selectedMon)
-  //   .map((selectedMon) => (
-  //     <PokemonDetailsModal
-  //       mon={selectedMon}
-  //       key={selectedMon?.openhomeId}
-  //       onClose={() => setSelectedIndex(undefined)}
-  //       navigateRight={navigateRight}
-  //       navigateLeft={navigateLeft}
-  //       boxIndicatorProps={
-  //         selectedIndex !== undefined
-  //           ? {
-  //               currentIndex: selectedIndex,
-  //               columns: OPENHOME_BOX_COLUMNS,
-  //               rows: OPENHOME_BOX_ROWS,
-  //               emptyIndexes: range(OPENHOME_BOX_SLOTS).filter(
-  //                 (boxSlot) => !currentBox.identifiers.has(boxSlot)
-  //               ),
-  //             }
-  //           : undefined
-  //       }
-  //     />
-  //   ))
-  //   .ok()
+  const DetailsModal = (
+    <PokemonDetailsModal
+      mon={selectedMon}
+      key={selectedMon?.openhomeId}
+      onClose={() => setSelectedIndex(undefined)}
+      navigateRight={navigateRight}
+      navigateLeft={navigateLeft}
+      boxIndicatorProps={
+        selectedIndex !== undefined
+          ? {
+              currentIndex: selectedIndex,
+              columns: OPENHOME_BOX_COLUMNS,
+              rows: OPENHOME_BOX_ROWS,
+              emptyIndexes: range(OPENHOME_BOX_SLOTS).filter(
+                (boxSlot) => !currentBox.identifiers.has(boxSlot)
+              ),
+            }
+          : undefined
+      }
+    />
+  )
 
   return (
     <>
@@ -457,6 +426,7 @@ function SingleBoxMonDisplay() {
             return (
               <BoxCellAsync
                 key={uniqueKey}
+                monPromise={monPromise}
                 onClick={() => setSelectedIndex(index)}
                 dragID={`home_${currentBoxIndex}_${index}`}
                 location={location}

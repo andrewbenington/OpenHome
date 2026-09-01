@@ -1,4 +1,6 @@
 import BackendInterface from '@openhome-core/backend/backendInterface'
+import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
   pluginGameName,
   PluginIdentifier,
@@ -8,6 +10,7 @@ import {
 import { Option } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
 import { CtxMenuElementBuilder, Item } from '@openhome-ui/components/context-menu/types'
+import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { OriginGames } from '@pkm-rs/pkg'
 import dayjs from 'dayjs'
 import { useState } from 'react'
@@ -107,6 +110,13 @@ function moduloUnderflowWrap(a: number, b: number): number {
 export function useOpenHomeBoxNavigator() {
   const { getCurrentBox } = useBanksAndBoxes()
   const [currentIndex, setCurrentIndex] = useState<number>()
+  const [selectedMon, setSelectedMon] = useState<Option<OHPKM>>()
+  const ohpkmStore = useOhpkmStore()
+
+  function selectMon(index: number, identifier: OhpkmIdentifier) {
+    setCurrentIndex(index)
+    ohpkmStore.getById(identifier).then(setSelectedMon)
+  }
 
   function navigateNext() {
     if (currentIndex === undefined) return
@@ -118,7 +128,7 @@ export function useOpenHomeBoxNavigator() {
     ) {
       const identifier = currentBox.identifiers.get(i)
       if (identifier) {
-        setCurrentIndex(i)
+        selectMon(i, identifier)
         break
       }
     }
@@ -134,7 +144,7 @@ export function useOpenHomeBoxNavigator() {
     ) {
       const identifier = currentBox.identifiers.get(i)
       if (identifier) {
-        setCurrentIndex(i)
+        selectMon(i, identifier)
         break
       }
     }
@@ -143,6 +153,7 @@ export function useOpenHomeBoxNavigator() {
   return {
     currentIndex,
     setCurrentIndex,
+    selectedMon,
     navigatePrev,
     navigateNext,
   }

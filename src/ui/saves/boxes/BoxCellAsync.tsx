@@ -3,17 +3,15 @@ import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Option } from '@openhome-core/util/functional'
 import { CtxMenuElementBuilder } from '@openhome-ui/components/context-menu'
-import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { MonLocation } from '@openhome-ui/state/saves'
-import { Suspense, use, useEffect, useEffectEvent, useState } from 'react'
+import { Suspense, use } from 'react'
 import '../style.css'
 import BoxCell from './BoxCell'
-
-type MonWithOpenHomeId = PKMInterface & { openhomeId: string }
 
 interface BoxCellAsyncProps {
   title?: string
   onClick: () => void
+  monPromise?: Promise<Option<OHPKM>>
   onDrop: (_: PKMInterface[]) => void
   disabled?: boolean
   disabledReason?: string
@@ -28,18 +26,7 @@ interface BoxCellAsyncProps {
 }
 
 function BoxCellAsync(props: BoxCellAsyncProps) {
-  const ohpkmStore = useOhpkmStore()
-  const [monPromise, setMonPromise] = useState<Promise<Option<OHPKM>>>()
-
-  const getOhpkmById = useEffectEvent((openhomeId: OhpkmIdentifier) =>
-    ohpkmStore.getById(openhomeId)
-  )
-
-  useEffect(() => {
-    setMonPromise(props.openhomeId ? getOhpkmById(props.openhomeId) : undefined)
-  }, [props.openhomeId])
-
-  return (
+  return props.monPromise ? (
     <Suspense
       fallback={
         <img
@@ -47,18 +34,20 @@ function BoxCellAsync(props: BoxCellAsyncProps) {
           alt=""
           aria-hidden
           draggable={false}
-          style={{ width: '2.75rem', padding: '0.5rem' }}
+          style={{ width: '2.75rem', padding: '0.5rem', backgroundColor: '#6662' }}
         />
       }
     >
-      <BoxCellAsyncInner {...props} monPromise={monPromise} />
+      <BoxCellAsyncInner {...props} monPromise={props.monPromise} />{' '}
     </Suspense>
+  ) : (
+    <BoxCell {...props} mon={undefined} />
   )
 }
 
-function BoxCellAsyncInner(props: BoxCellAsyncProps & { monPromise?: Promise<Option<OHPKM>> }) {
+function BoxCellAsyncInner(props: BoxCellAsyncProps & { monPromise: Promise<Option<OHPKM>> }) {
   const { monPromise, ...boxCellProps } = props
-  const mon = monPromise ? use(monPromise) : undefined
+  const mon = use(monPromise)
 
   return <BoxCell {...boxCellProps} mon={mon} />
 }
