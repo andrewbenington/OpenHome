@@ -99,7 +99,7 @@ pub struct OhpkmBox {
 impl OhpkmBox {
 
     // TODO: Implement this
-    pub(crate) fn includes(&self, _openhome_id: &String) -> bool {
+    pub(crate) fn includes(&self, _openhome_id: &OpenHomeId) -> bool {
         todo!()
     }
 }
