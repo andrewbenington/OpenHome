@@ -42,11 +42,15 @@ export function useOhpkmStore() {
 
   async function getById(id: string): Promise<Option<OHPKM>> {
     await waitFor(0) // forces load to be async, temporary
-    return ohpkmStore[removeOriginIfPresent(id)]
+    // return ohpkmStore[removeOriginIfPresent(id)]
+    return backend.lookupOhpkmById(id).then(R.ok)
   }
 
   async function tryLoadFromId(id: string): Promise<OhpkmLookupResult> {
-    return $O(await getById(id)).orElse(IdentifierNotPresent(id))
+    return backend
+      .lookupOhpkmById(id)
+      .then(R.mapErr(() => IdentifierNotPresent(id)))
+      .then(R.flatMap((ohpkm) => (ohpkm ? R.Ok(ohpkm) : R.Err(IdentifierNotPresent(id)))))
   }
 
   async function tryLoadBatch(ids: OhpkmIdentifier[]): Promise<OhpkmBatchLookupResults> {
