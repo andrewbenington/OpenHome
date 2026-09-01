@@ -10,6 +10,7 @@ mod state;
 mod synced_state;
 mod util;
 mod version;
+mod box_pointer;
 
 use crate::data_controller::ToDataController;
 use crate::synced_state::LazyState;
@@ -18,8 +19,8 @@ use openhome_core::lookup::LookupState;
 use openhome_core::{Error, Result};
 use std::env;
 use tauri::Manager;
-use box_pointer::BoxPointer;
 use openhome_core::pkm_storage::{load_banks, StoredBankData};
+use crate::box_pointer::BoxPointer;
 
 const RAW_HANDLER: fn(tauri::ipc::Invoke<tauri::Wry>) -> bool = tauri::generate_handler![
     commands::get_file_bytes,
@@ -61,7 +62,9 @@ pub fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
         synced_state::lookup::get_lookups,
         synced_state::lookup::add_to_lookups,
         synced_state::lookup::remove_dangling,
-        synced_state::ohpkm_store::get_ohpkm_store,
+
+        // TODO: replace implementations of this method with appropriate counterparts
+        // synced_state::ohpkm_store::get_ohpkm_store,
         synced_state::ohpkm_store::permanently_delete_ohpkms,
         logging::get_logs_today,
         logging::clear_logs_for_range,
@@ -184,9 +187,7 @@ pub fn run() {
 }
 
 fn get_bank_pointer(bank_data: StoredBankData) -> BoxPointer {
-
-    return bank_data.get_current_box_pointer();
-
+    bank_data.get_current_box_pointer()
 }
 
 fn launch_error_msg(error_category: &str) -> String {

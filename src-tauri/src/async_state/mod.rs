@@ -2,7 +2,6 @@ use std::ops::Deref;
 use std::sync::Mutex;
 
 use serde::Serialize;
-use specta::datatype::List;
 use tauri::Emitter;
 
 use crate::commands::{CommandError, CommandResult};
@@ -12,6 +11,7 @@ use openhome_core::data_controller;
 use openhome_core::lookup::LookupState;
 use openhome_core::ohpkm_store::OhpkmBytesStore;
 use openhome_core::{Error, Result};
+use openhome_core::ohpkm_store_changes::OhpkmStoreChanges;
 use openhome_core::pkm_storage::BoxPointer;
 
 pub mod convert_strategies;
@@ -65,9 +65,8 @@ pub struct LazyStateInner {
     pub lookups: SyncedStateWrapper<LookupState>,
     pub current_box: BoxPointer,
     pub convert_strategies: SyncedStateWrapper<ConvertStrategies>,
-    ohpkm_store_changes: OhpkmStoreChanges
+    pub ohpkm_store_changes: OhpkmStoreChanges
 }
-
 
 
 pub struct LazyState(pub Mutex<LazyStateInner>);
@@ -78,7 +77,7 @@ impl LazyState {
             lookups: SyncedStateWrapper(lookups),
             current_box: bank_pointer,
             convert_strategies: SyncedStateWrapper(convert_strategies),
-            ohpkm_store_changes: OhpkmBytesStore
+            ohpkm_store_changes: OhpkmStoreChanges
         }))
     }
 }
@@ -95,6 +94,9 @@ impl LazyState {
                 // TODO Initialize this
                 current_box,
                 convert_strategies: SyncedStateWrapper(convert_strategies),
+
+                // TODO initialize this
+                ohpkm_store_changes: (),
             }))
         }
 

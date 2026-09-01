@@ -32,7 +32,9 @@ pub fn add_to_ohpkm_store(
 ) -> CommandResult<()> {
     Ok(synced_state
         .lock()?
-        .ohpkm_store
+
+        // TODO change the logic of ohpkm_store so it properly reflects new behaviour
+        .ohpkm_store_changes
         .update(&app_handle, updates)?)
 }
 
@@ -48,7 +50,7 @@ pub fn permanently_delete_ohpkms(
     // first remove from the ohpkm store
     synced_state
         .lock()?
-        .ohpkm_store
+        .ohpkm_store_changes
         .replace(&app_handle, |store| {
             let mut new_store = store.clone();
             for identifier in openhome_ids.iter().filter_map(|id_str| id_str.parse().ok()) {

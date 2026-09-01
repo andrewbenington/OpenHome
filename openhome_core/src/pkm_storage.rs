@@ -6,7 +6,7 @@ use pkm_rs::ohpkm::OpenHomeId;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use uuid::Uuid;
-
+pub use crate::box_pointer::BoxPointer;
 
 pub const BANKS_FILENAME: &str = "banks.json";
 
@@ -17,12 +17,6 @@ pub struct StoredBankData {
     current_bank: usize,
 
 
-}
-
-// TODO: Ensure box_index gets used
-pub struct BoxPointer {
-    box_index: usize,
-    bank_index: usize
 }
 
 impl StoredBankData {
