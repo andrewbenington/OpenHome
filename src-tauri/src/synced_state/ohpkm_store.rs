@@ -1,6 +1,6 @@
 use crate::commands::CommandResult;
 use crate::data_controller::TauriDataController;
-use crate::async_state;
+use crate::synced_state;
 use openhome_core::Error;
 use openhome_core::data_controller::{DataController, DataDir, MONS_V2_DIR};
 use openhome_core::ohpkm_store::OhpkmBytesStore;
@@ -8,7 +8,7 @@ use serde::Serialize;
 use std::path::Path;
 use std::{collections::HashMap, fs};
 
-impl async_state::SyncedState for OhpkmBytesStore {
+impl synced_state::SyncedState for OhpkmBytesStore {
     type Action = Self;
     const ID: &'static str = "ohpkm_store";
 
@@ -27,7 +27,7 @@ impl async_state::SyncedState for OhpkmBytesStore {
 #[specta::specta]
 pub fn add_to_ohpkm_store(
     app_handle: tauri::AppHandle,
-    synced_state: tauri::State<'_, async_state::LazyState>,
+    synced_state: tauri::State<'_, synced_state::LazyState>,
     updates: OhpkmBytesStore,
 ) -> CommandResult<()> {
     Ok(synced_state
@@ -42,7 +42,7 @@ type DeleteResultsById = HashMap<String, Option<String>>;
 #[specta::specta]
 pub fn permanently_delete_ohpkms(
     app_handle: tauri::AppHandle,
-    synced_state: tauri::State<'_, async_state::LazyState>,
+    synced_state: tauri::State<'_, synced_state::LazyState>,
     openhome_ids: Vec<String>,
 ) -> CommandResult<DeleteResultsById> {
     // first remove from the ohpkm store
@@ -51,8 +51,8 @@ pub fn permanently_delete_ohpkms(
         .ohpkm_store
         .replace(&app_handle, |store| {
             let mut new_store = store.clone();
-            for identifier in &openhome_ids {
-                new_store.remove(identifier);
+            for identifier in openhome_ids.iter().filter_map(|id_str| id_str.parse().ok()) {
+                new_store.remove(&identifier);
             }
             new_store
         })?;

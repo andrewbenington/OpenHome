@@ -118,15 +118,15 @@ export const commands = {
       else return { status: 'error', error: e as any }
     }
   },
-  async changeDataDir(): Promise<Result<null, CommandError>> {
+  async changeDataDir(shouldMove: boolean): Promise<Result<null, CommandError>> {
     try {
-      return { status: 'ok', data: await TAURI_INVOKE('change_data_dir') }
+      return { status: 'ok', data: await TAURI_INVOKE('change_data_dir', { shouldMove }) }
     } catch (e) {
       if (e instanceof Error) throw e
       else return { status: 'error', error: e as any }
     }
   },
-  async loadBanks(): Promise<Result<StoredBankData, CommandError>> {
+  async loadBanks(): Promise<Result<StoredBankDataWasm, CommandError>> {
     try {
       return { status: 'ok', data: await TAURI_INVOKE('load_banks') }
     } catch (e) {
@@ -134,7 +134,7 @@ export const commands = {
       else return { status: 'error', error: e as any }
     }
   },
-  async writeBanks(bankData: StoredBankData): Promise<Result<null, CommandError>> {
+  async writeBanks(bankData: StoredBankDataWasm): Promise<Result<null, CommandError>> {
     try {
       return { status: 'ok', data: await TAURI_INVOKE('write_banks', { bankData }) }
     } catch (e) {
@@ -222,7 +222,7 @@ export const commands = {
       else return { status: 'error', error: e as any }
     }
   },
-  async getLookups(): Promise<Result<LookupState, CommandError>> {
+  async getLookups(): Promise<Result<LookupStateStringIds, CommandError>> {
     try {
       return { status: 'ok', data: await TAURI_INVOKE('get_lookups') }
     } catch (e) {
@@ -230,7 +230,7 @@ export const commands = {
       else return { status: 'error', error: e as any }
     }
   },
-  async addToLookups(newEntries: LookupState): Promise<Result<null, CommandError>> {
+  async addToLookups(newEntries: LookupStateStringIds): Promise<Result<null, CommandError>> {
     try {
       return { status: 'ok', data: await TAURI_INVOKE('add_to_lookups', { newEntries }) }
     } catch (e) {
@@ -302,14 +302,14 @@ export type AppStateInner = {
   new_features_since_update: UpdateFeatures[]
   transaction: TransactionState
 }
-export type Bank = {
+export type BankWasm = {
   id?: string
   name: string | null
   index: number
-  boxes: Box[]
+  boxes: BoxWasm[]
   current_box?: number
 }
-export type Box = {
+export type BoxWasm = {
   id?: string
   name: string | null
   index: number
@@ -351,7 +351,7 @@ export type LogFilterJs = {
 }
 export type LogLevel = 'TRACE' | 'DEBUG' | 'INFO' | 'WARN' | 'ERROR'
 export type LogsResponse = { current: LogFilter; next: LogFilter; remaining_file_lines: LogEntry[] }
-export type LookupState = {
+export type LookupStateStringIds = {
   gen12: Partial<{ [key in string]: string }>
   gen345: Partial<{ [key in string]: string }>
 }
@@ -383,7 +383,7 @@ export type SaveRef = {
   valid: boolean
   pluginIdentifier: PluginIdentifier | null
 }
-export type StoredBankData = { banks: Bank[]; current_bank?: number }
+export type StoredBankDataWasm = { banks: BankWasm[]; current_bank?: number }
 export type TransactionState = { open_transaction: boolean; temp_files: string[] }
 export type UpdateFeatures = { version: string; feature_messages: string[] }
 
