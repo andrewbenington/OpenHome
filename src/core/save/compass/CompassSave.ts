@@ -25,6 +25,7 @@ import {
   Block,
   BlockType,
   ConvertStrategy,
+  emptyBoxSlotBytesScarletViolet,
   ExtraFormIndex,
   Languages,
   OriginGame,
@@ -233,11 +234,8 @@ export class CompassSave extends PluginSAV<PK9Compass> {
         : 'Base Game'
   }
 
-  emptyBoxSlotBytes(): Uint8Array {
-    const mon = this.monConstructor(new Uint8Array(this.getMonBoxSizeBytes()).buffer)
-
-    mon.refreshChecksum()
-    return new Uint8Array(mon.toPCBytes())
+  emptyBoxSlotBytes() {
+    return emptyBoxSlotBytesScarletViolet()
   }
 
   isEmptySlot(bytes: ArrayBuffer): boolean {
