@@ -10,8 +10,7 @@ mod state;
 mod synced_state;
 mod util;
 mod version;
-
-
+mod box_pointer;
 
 use crate::data_controller::ToDataController;
 use crate::synced_state::LazyState;
@@ -21,8 +20,7 @@ use openhome_core::{Error, Result};
 use std::env;
 use tauri::Manager;
 use openhome_core::pkm_storage::{load_banks, StoredBankData};
-use openhome_core::box_pointer::BoxPointer;
-use openhome_core::ohpkm_store_partial::OhpkmStorePartial;
+use crate::box_pointer::BoxPointer;
 
 const RAW_HANDLER: fn(tauri::ipc::Invoke<tauri::Wry>) -> bool = tauri::generate_handler![
     commands::get_file_bytes,
@@ -143,8 +141,7 @@ pub fn run() {
             };
 
             let synced_state =
-                LazyState::from_partial_states(lookup_state, get_bank_pointer(bank_info),
-                                               conversion_settings);
+                LazyState::from_partial_states(lookup_state, get_bank_pointer(bank_info), conversion_settings);
             app.manage(synced_state);
 
             let pokedex_state = match state::PokedexState::load_from_storage(&controller) {
