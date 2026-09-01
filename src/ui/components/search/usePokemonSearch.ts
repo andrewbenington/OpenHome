@@ -110,7 +110,7 @@ export function usePokemonSearch(
     const mons = await ohpkmStore.getAllStored()
 
     const results = mons
-      .filter(async (mon) => (await prefilter?.(mon)) !== false)
+      ?.filter(async (mon) => (await prefilter?.(mon)) !== false)
       .filter((mon) => prefixMatches(nickname, mon.nickname))
       .filter((mon) =>
         mon.moves.some((moveIndex) => prefixMatches(knownMove, Moves[moveIndex]?.name))
