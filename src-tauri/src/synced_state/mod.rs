@@ -1,6 +1,7 @@
 use std::ops::Deref;
 use std::sync::Mutex;
 
+use pkm_rs::ohpkm::{OhpkmV2, OpenHomeId};
 use serde::Serialize;
 use tauri::Emitter;
 
@@ -86,6 +87,10 @@ impl AllSyncedState {
 
     pub fn ohpkm_store_b64(&self) -> Result<Vec<(String, String)>> {
         Ok(self.lock()?.ohpkm_store.0.to_b64_entries())
+    }
+
+    pub fn ohpkm_lookup(&self, id: OpenHomeId) -> Result<Option<OhpkmV2>> {
+        self.lock()?.ohpkm_store.0.lookup(&id)
     }
 
     pub fn get_convert_strategies(&self) -> Result<ConvertStrategies> {

@@ -33,6 +33,17 @@ pub fn get_ohpkm_store(
 
 #[tauri::command]
 #[specta::specta]
+pub fn get_ohpkm_bytes_by_id(
+    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
+    openhome_id: String,
+) -> CommandResult<Option<Vec<u8>>> {
+    Ok(synced_state
+        .ohpkm_lookup(openhome_id.parse()?)?
+        .map(|ohpkm| ohpkm.to_bytes().to_vec()))
+}
+
+#[tauri::command]
+#[specta::specta]
 pub fn add_to_ohpkm_store(
     app_handle: tauri::AppHandle,
     synced_state: tauri::State<'_, synced_state::AllSyncedState>,

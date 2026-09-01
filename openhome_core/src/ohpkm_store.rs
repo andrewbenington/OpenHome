@@ -112,6 +112,14 @@ impl OhpkmBytesStore {
             .collect()
     }
 
+    pub fn lookup(&self, identifier: &OpenHomeId) -> Result<Option<OhpkmV2>> {
+        Ok(self
+            .0
+            .get(identifier)
+            .map(|bytes| OhpkmV2::from_bytes(bytes))
+            .transpose()?)
+    }
+
     pub fn includes(&self, identifier: &OpenHomeId) -> bool {
         self.0.contains_key(identifier)
     }

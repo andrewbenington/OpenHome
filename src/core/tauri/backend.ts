@@ -7,11 +7,12 @@ import BackendInterface, {
   OhpkmStore,
   StoredLookups,
 } from '@openhome-core/backend/backendInterface'
+import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SaveWriter } from '@openhome-core/save/interfaces'
 import { PathData, PossibleSaves } from '@openhome-core/save/util/path'
 import { SaveFolder, SimpleOpenHomeBox, StoredBankData } from '@openhome-core/save/util/storage'
-import { Errorable, R } from '@openhome-core/util/functional'
+import { Errorable, Option, R } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
 import { JSONObject, LoadSaveResponse, SaveRef } from '@openhome-core/util/types'
 import { LogFilter } from '@openhome-ui/pages/logs'
@@ -83,6 +84,11 @@ export const TauriBackend: BackendInterface = {
           ])
         )
       )
+    )
+  },
+  lookupOhpkmById: async function (id: OhpkmIdentifier): Promise<Errorable<Option<OHPKM>>> {
+    return Commands.getOhpkmBytesById(id).then(
+      R.map((bytes) => (bytes ? OHPKM.fromBytes(new Uint8Array(bytes).buffer) : undefined))
     )
   },
   removeDangling: Commands.removeDangling,
