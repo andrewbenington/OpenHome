@@ -45,16 +45,16 @@ pub fn add_to_lookups(
 #[specta::specta]
 pub fn remove_dangling(
     app_handle: tauri::AppHandle,
-    this_async_state: tauri::State<'_, synced_state::LazyState>,
+    this_synced_state: tauri::State<'_, synced_state::LazyState>,
 ) -> CommandResult<()> {
     // TODO: Add dangling checks to other boxes when loading them as well, since we are
     // no longer loading everything at once.
 
     // definitely unnecessary clones here
-    let mut async_state: MutexGuard<LazyStateInner> = this_async_state.lock()?;
-    let ohpkm_store = async_state.get_current_box().read().clone();
+    let mut synced_state: MutexGuard<LazyStateInner> = this_synced_state.lock()?;
+    let ohpkm_store = synced_state.get_current_box().read().clone();
 
-    async_state
+    synced_state
         .lookups
         .replace(&app_handle, |l| {
             l.clone().with_dangling_removed(&ohpkm_store)
