@@ -1,5 +1,4 @@
 import BackendInterface from '@openhome-core/backend/backendInterface'
-import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
   pluginGameName,
@@ -113,22 +112,30 @@ export function useOpenHomeBoxNavigator() {
   const [selectedMon, setSelectedMon] = useState<Option<OHPKM>>()
   const ohpkmStore = useOhpkmStore()
 
-  function selectMon(index: number, identifier: OhpkmIdentifier) {
+  function selectMon(index: Option<number>) {
     setCurrentIndex(index)
-    ohpkmStore.getById(identifier).then(setSelectedMon)
+    if (index === undefined) {
+      setSelectedMon(undefined)
+      return
+    }
+
+    const identifier = getCurrentBox().identifiers.get(index)
+    if (identifier) {
+      ohpkmStore.getById(identifier).then(setSelectedMon)
+      return true
+    } else {
+      return false
+    }
   }
 
   function navigateNext() {
     if (currentIndex === undefined) return
-    const currentBox = getCurrentBox()
     for (
       let i = (currentIndex + 1) % OPENHOME_BOX_SLOTS;
       i !== currentIndex;
       i = (i + 1) % OPENHOME_BOX_SLOTS
     ) {
-      const identifier = currentBox.identifiers.get(i)
-      if (identifier) {
-        selectMon(i, identifier)
+      if (selectMon(i)) {
         break
       }
     }
@@ -136,15 +143,12 @@ export function useOpenHomeBoxNavigator() {
 
   function navigatePrev() {
     if (currentIndex === undefined) return
-    const currentBox = getCurrentBox()
     for (
       let i = moduloUnderflowWrap(currentIndex - 1, OPENHOME_BOX_SLOTS);
       i !== currentIndex;
       i = moduloUnderflowWrap(i - 1, OPENHOME_BOX_SLOTS)
     ) {
-      const identifier = currentBox.identifiers.get(i)
-      if (identifier) {
-        selectMon(i, identifier)
+      if (selectMon(i)) {
         break
       }
     }
@@ -152,7 +156,7 @@ export function useOpenHomeBoxNavigator() {
 
   return {
     currentIndex,
-    setCurrentIndex,
+    setCurrentIndex: selectMon,
     selectedMon,
     navigatePrev,
     navigateNext,

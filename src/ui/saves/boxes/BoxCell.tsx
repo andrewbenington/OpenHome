@@ -36,6 +36,7 @@ interface BoxCellProps {
   onClick: () => void
   onDrop: (_: PKMInterface[]) => void
   disabled?: boolean
+  loading?: boolean
   disabledReason?: string
   mon: PKMInterface | undefined
   borderColor?: string
@@ -232,6 +233,7 @@ function BoxCell(props: BoxCellProps) {
                 style={{
                   width: '100%',
                   height: '100%',
+                  opacity: props.loading ? 0.6 : 1,
                   ...getBackgroundDetails(),
                 }}
                 dragData={dragData}

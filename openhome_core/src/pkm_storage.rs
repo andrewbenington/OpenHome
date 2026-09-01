@@ -4,7 +4,8 @@ use crate::{
 };
 use pkm_rs::ohpkm::OpenHomeId;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
+use tracing::{info, warn};
 use uuid::Uuid;
 
 pub const BANKS_FILENAME: &str = "banks.json";
@@ -23,6 +24,7 @@ impl StoredBankData {
             current_bank: 0,
         };
         bank_data.reset_box_indices();
+        bank_data.remove_duplicates();
 
         bank_data
     }
@@ -40,6 +42,16 @@ impl StoredBankData {
 
     fn order_boxes_by_indices(&mut self) {
         self.banks.iter_mut().for_each(Bank::order_boxes_by_indices);
+    }
+
+    pub fn remove_duplicates(&mut self) {
+        self.remove_duplicates_internal(&mut HashSet::new());
+    }
+
+    fn remove_duplicates_internal(&mut self, existing_ids: &mut HashSet<OpenHomeId>) {
+        for bank in self.banks.iter_mut() {
+            bank.remove_duplicatesl(existing_ids);
+        }
     }
 }
 
@@ -74,6 +86,12 @@ impl Bank {
     fn order_boxes_by_indices(&mut self) {
         self.boxes.sort_by_key(|b| b.index);
     }
+
+    fn remove_duplicatesl(&mut self, existing_ids: &mut HashSet<OpenHomeId>) {
+        for box_ in self.boxes.iter_mut() {
+            box_.remove_duplicates(existing_ids);
+        }
+    }
 }
 
 impl Default for Bank {
@@ -105,6 +123,27 @@ impl Box {
             ..Default::default()
         }
     }
+
+    fn remove_duplicates(&mut self, existing_ids: &mut HashSet<OpenHomeId>) {
+        info!(
+            "removing duplicates in box {} ({:?})",
+            self.index, self.name
+        );
+        let mut slots_to_clear = Vec::<u8>::new();
+        for (key, identifier) in self.identifiers.iter() {
+            if !existing_ids.insert(*identifier) {
+                warn!(
+                    "removing duplicate with id {identifier} in box {} ({:?})",
+                    self.index, self.name
+                );
+                slots_to_clear.push(*key);
+            }
+        }
+
+        for slot in slots_to_clear {
+            self.identifiers.remove(&slot);
+        }
+    }
 }
 
 pub type BoxIdentifiers = HashMap<u8, OpenHomeId>;
@@ -117,6 +156,7 @@ pub fn load_banks(controller: &impl DataController) -> Result<StoredBankData> {
     }
 
     storage.reset_box_indices();
+    storage.remove_duplicates();
 
     Ok(storage)
 }

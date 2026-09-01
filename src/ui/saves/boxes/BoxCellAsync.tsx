@@ -4,7 +4,7 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Option } from '@openhome-core/util/functional'
 import { CtxMenuElementBuilder } from '@openhome-ui/components/context-menu'
 import { MonLocation } from '@openhome-ui/state/saves'
-import { Suspense, use } from 'react'
+import { Suspense, use, useDeferredValue } from 'react'
 import '../style.css'
 import BoxCell from './BoxCell'
 
@@ -47,9 +47,11 @@ function BoxCellAsync(props: BoxCellAsyncProps) {
 
 function BoxCellAsyncInner(props: BoxCellAsyncProps & { monPromise: Promise<Option<OHPKM>> }) {
   const { monPromise, ...boxCellProps } = props
-  const mon = use(monPromise)
+  const deferredMonPromise = useDeferredValue(monPromise) // this prevents the icon from returning to the loading icon when two are swapped
+  const mon = use(deferredMonPromise)
+  const isStale = deferredMonPromise !== monPromise
 
-  return <BoxCell {...boxCellProps} mon={mon} />
+  return <BoxCell {...boxCellProps} mon={mon} loading={isStale} />
 }
 
 export default BoxCellAsync

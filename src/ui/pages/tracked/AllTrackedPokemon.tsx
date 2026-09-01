@@ -15,7 +15,7 @@ import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
 import { useBanksAndBoxes } from '@openhome-ui/state-zustand/banks-and-boxes/store'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useEffectEvent, useState } from 'react'
 import { useNavigate } from 'react-router'
 import './style.css'
 
@@ -45,11 +45,11 @@ export default function AllTrackedPokemon({
   const { switchBoxCurrentBank } = useBanksAndBoxes()
   const [mons, setMons] = useState<OHPKM[]>()
 
+  const getAllStoredMons = useEffectEvent(ohpkmStore.getAllStored)
+
   useEffect(() => {
-    if (!mons) {
-      ohpkmStore.getAllStored().then((mons) => setMons(mons))
-    }
-  }, [mons, ohpkmStore])
+    getAllStoredMons().then((mons) => setMons(mons ? Object.values(mons) : []))
+  }, [])
 
   const buildContextElements = useCallback(
     (mon: OHPKM) => {
