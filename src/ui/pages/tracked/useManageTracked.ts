@@ -157,7 +157,7 @@ export function useManageTracked() {
       return
     }
 
-    const allStoredById = ohpkmStore.byId
+    const allStoredById = ohpkmStore.getAllStored()
     const allStoredIdsNotInBoxes = new Set(
       Object.keys(allStoredById).filter((id) => findHomeLocation(id) === undefined)
     )
