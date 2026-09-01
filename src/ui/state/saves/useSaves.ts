@@ -386,20 +386,22 @@ export function useSaves(): SavesAndBanksManager {
         // task so the app doesn't freeze every time a save is opened.
         if (SCAN_FULL_STORE_AND_FIX_HANDLERS) {
           const allOhpkms = await ohpkmStore.getAllStored()
-          for (const mon of allOhpkms) {
-            if (!monSupportedBySave(save, mon)) continue
+          if (allOhpkms) {
+            for (const mon of Object.values(allOhpkms)) {
+              if (!monSupportedBySave(save, mon)) continue
 
-            const matchingHandler = mon.matchingUnknownHandler(save.name, save.trainerGender)
-            if (!matchingHandler) continue
+              const matchingHandler = mon.matchingUnknownHandler(save.name, save.trainerGender)
+              if (!matchingHandler) continue
 
-            mon.updateTrainerData(
-              save,
-              matchingHandler.friendship,
-              matchingHandler.affection,
-              matchingHandler.memory
-            )
+              mon.updateTrainerData(
+                save,
+                matchingHandler.friendship,
+                matchingHandler.affection,
+                matchingHandler.memory
+              )
 
-            ohpkmStore.insertOrUpdate(mon)
+              ohpkmStore.insertOrUpdate(mon)
+            }
           }
         }
 

@@ -12,11 +12,10 @@ import { SAV } from '@openhome-core/save/interfaces'
 import { SAVClass } from '@openhome-core/save/util'
 import { expectExhaustive } from '@openhome-core/util'
 import { $R, Errorable, Option, R, Result } from '@openhome-core/util/functional'
-import { $O } from '@openhome-core/util/option'
 import { FourMoves } from '@openhome-core/util/types'
 import { Lookup, MarkingsSixShapesColors, ModernRibbon, OriginGames } from '@pkm-rs/pkg/pkm_rs'
 import dayjs from 'dayjs'
-import { createContext, useContext } from 'react'
+import { createContext, useCallback } from 'react'
 import { OhpkmStoreData } from '.'
 import { useConvertStrategies } from '../convert-strategies'
 import { useLookups } from '../lookups'
@@ -28,23 +27,21 @@ export type MoveSlotIndex = 0 | 1 | 2 | 3
 export type OhpkmLookupResult = Result<OHPKM, IdentifierNotPresentError>
 export type OhpkmBatchLookupResults = Map<OhpkmIdentifier, OhpkmLookupResult>
 
-function removeOriginIfPresent(id: string) {
-  return id.slice(0, 22)
-}
-const waitFor = (delay: number) => new Promise((resolve) => setTimeout(resolve, delay))
-
 export function useOhpkmStore() {
-  const [ohpkmStore, updateStore] = useContext(OhpkmStoreContext)
   const { defaultConvertStrategy } = useConvertStrategies()
   const { lookups, updateLookups } = useLookups()
   const { gen12: gen12Lookup, gen345: gen345Lookup } = lookups
   const backend = useBackend()
+  const { addToOhpkmStore } = useBackend()
 
-  async function getById(id: string): Promise<Option<OHPKM>> {
-    await waitFor(0) // forces load to be async, temporary
-    // return ohpkmStore[removeOriginIfPresent(id)]
-    return backend.lookupOhpkmById(id).then(R.ok)
-  }
+  const updateStore = addToOhpkmStore
+
+  const getById = useCallback(
+    (id: string): Promise<Option<OHPKM>> => {
+      return backend.lookupOhpkmById(id).then(R.ok)
+    },
+    [backend]
+  )
 
   async function tryLoadFromId(id: string): Promise<OhpkmLookupResult> {
     return backend
@@ -57,27 +54,21 @@ export function useOhpkmStore() {
     const batchResults: OhpkmBatchLookupResults = new Map()
 
     for (const identifier of ids) {
-      batchResults.set(
-        identifier,
-        $O(ohpkmStore[removeOriginIfPresent(identifier)]).orElse(IdentifierNotPresent(identifier))
-      )
+      batchResults.set(identifier, await tryLoadFromId(identifier))
     }
 
     return batchResults
   }
 
   async function monIsStored(id: string): Promise<boolean> {
-    await waitFor(0) // forces load to be async, temporary
-    return id in ohpkmStore
+    return getById(id) !== undefined
   }
 
   async function insertOrUpdate(mon: OHPKM) {
-    await waitFor(0) // forces load to be async, temporary
     updateStore({ [mon.openhomeId]: mon.clone() })
   }
 
   async function insertOrUpdateAll(mons: OhpkmStoreData) {
-    await waitFor(0) // forces load to be async, temporary
     return updateStore(mons)
   }
 
@@ -89,13 +80,13 @@ export function useOhpkmStore() {
   }
 
   async function getAllStored() {
-    await waitFor(0) // forces load to be async, temporary
-    return Object.values(ohpkmStore)
+    return backend.loadOhpkmStore().then(R.ok)
   }
 
   async function getAllStoredIds() {
-    await waitFor(0) // forces load to be async, temporary
-    return Object.keys(ohpkmStore)
+    const allStored = await getAllStored()
+
+    return allStored ? Object.keys(allStored) : undefined
   }
 
   async function handleLookupsUpdate(ohpkm: OHPKM, save: SAV) {
@@ -305,7 +296,7 @@ export function useOhpkmStore() {
 
   async function loadIfTracked(mon: PKMInterface): Promise<Option<OHPKM>> {
     const openhomeId = calculateOrLookupOhpkmId(mon)
-    return openhomeId ? ohpkmStore[openhomeId] : undefined
+    return openhomeId ? getById(openhomeId) : undefined
   }
 
   async function loadOrStartTracking(
@@ -350,7 +341,6 @@ export function useOhpkmStore() {
     getById,
     tryLoadFromId,
     tryLoadBatch,
-    byId: ohpkmStore,
     monIsStored,
     insertOrUpdate,
     insertOrUpdateAll,

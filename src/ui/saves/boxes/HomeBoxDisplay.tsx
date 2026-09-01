@@ -277,10 +277,11 @@ function SingleBoxMonDisplay() {
   } = useOpenHomeBoxNavigator()
 
   const currentBox = getCurrentBox()
-
-  // const { loading: boxOhpkmsLoading, batchResults: boxOhpkms } = useOhpkmBatchIdLookup(
-  //   Array.from(currentBox.identifiers.values())
-  // )
+  const getById = ohpkmStore.getById
+  const lookupOhpkmById = useCallback(
+    (identifier: OhpkmIdentifier) => getById(identifier),
+    [getById]
+  )
 
   const TrackedDataRecovery = useTrackedDataRecovery()
   const dataRecoverySearchModal = {
@@ -343,47 +344,25 @@ function SingleBoxMonDisplay() {
   const currentBankIndex = getCurrentBank().index
   const currentBoxIndex = getCurrentBox().index
 
-  const slots: SlotData[] = range(OPENHOME_BOX_SLOTS)
-    .map((index: number) => currentBox.identifiers.get(index))
-    .map((identifier, index) => {
-      const location: HomeMonLocation = {
-        bank: currentBankIndex,
-        box: currentBoxIndex,
-        boxSlot: index,
-        isHome: true,
-      }
+  const slots: SlotData[] = useMemo(
+    () =>
+      range(OPENHOME_BOX_SLOTS)
+        .map((index: number) => currentBox.identifiers.get(index))
+        .map((identifier, index) => {
+          const location: HomeMonLocation = {
+            bank: currentBankIndex,
+            box: currentBoxIndex,
+            boxSlot: index,
+            isHome: true,
+          }
 
-      // const monResult = identifier ? boxOhpkms?.get(identifier) : undefined
-
-      return {
-        // monResult,
-        monPromise: identifier ? ohpkmStore.getById(identifier) : undefined,
-        location,
-        identifier,
-        // loading: (identifier !== undefined && boxOhpkmsLoading) || FORCE_LOADING,
-      }
-    })
-
-  const DetailsModal = (
-    <PokemonDetailsModal
-      mon={selectedMon}
-      key={selectedMon?.openhomeId}
-      onClose={() => setSelectedIndex(undefined)}
-      navigateRight={navigateRight}
-      navigateLeft={navigateLeft}
-      boxIndicatorProps={
-        selectedIndex !== undefined
-          ? {
-              currentIndex: selectedIndex,
-              columns: OPENHOME_BOX_COLUMNS,
-              rows: OPENHOME_BOX_ROWS,
-              emptyIndexes: range(OPENHOME_BOX_SLOTS).filter(
-                (boxSlot) => !currentBox.identifiers.has(boxSlot)
-              ),
-            }
-          : undefined
-      }
-    />
+          return {
+            monPromise: identifier ? lookupOhpkmById(identifier) : undefined,
+            location,
+            identifier,
+          }
+        }),
+    [currentBankIndex, currentBox.identifiers, currentBoxIndex, lookupOhpkmById]
   )
 
   return (
@@ -392,19 +371,7 @@ function SingleBoxMonDisplay() {
         <div className="home-box-grid">
           {slots.map(({ monResult, monPromise, location, identifier }, index) => {
             // if underlying data changes but this key doesn't, the box cell will be stale and may not display the correct species
-            let uniqueKey = `${currentBoxIndex}-${index}-${identifier}`
-
-            // if (loading && identifier)
-            //   return (
-            //     <img
-            //       key={uniqueKey}
-            //       src="/items/index/0000.png"
-            //       alt=""
-            //       aria-hidden
-            //       draggable={false}
-            //       style={{ width: '2.75rem', padding: '0.5rem' }}
-            //     />
-            //   )
+            let uniqueKey = identifier ?? `${currentBoxIndex}-${index}`
 
             if (monResult && R.isErr(monResult)) {
               return (
@@ -457,7 +424,25 @@ function SingleBoxMonDisplay() {
           })}
         </div>
       </OpenHomeCtxMenu>
-      {DetailsModal}
+      <PokemonDetailsModal
+        mon={selectedMon}
+        key={selectedMon?.openhomeId}
+        onClose={() => setSelectedIndex(undefined)}
+        navigateRight={navigateRight}
+        navigateLeft={navigateLeft}
+        boxIndicatorProps={
+          selectedIndex !== undefined
+            ? {
+                currentIndex: selectedIndex,
+                columns: OPENHOME_BOX_COLUMNS,
+                rows: OPENHOME_BOX_ROWS,
+                emptyIndexes: range(OPENHOME_BOX_SLOTS).filter(
+                  (boxSlot) => !currentBox.identifiers.has(boxSlot)
+                ),
+              }
+            : undefined
+        }
+      />
       <PromptDialog
         title="Tracking Data Missing"
         open={missingIdData !== undefined}
