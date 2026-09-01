@@ -48,7 +48,7 @@ function getBackgroundPosition(formeMetadata?: FormMetadata, isEgg?: boolean) {
 
 type IconType = 'spritesheet' | 'image'
 
-const FORCE_ICON_FROM_IMAGE = true
+const FORCE_ICON_FROM_IMAGE = false
 
 function iconType(
   nationalDex: number,
