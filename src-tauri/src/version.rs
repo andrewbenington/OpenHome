@@ -372,6 +372,14 @@ impl SignificantUpdate {
                 "Plus Moves and Legends Arceus mastered moves now have a visual indicator, and should be set correctly based on the Pokémon's level",
                 "Legends Z-A Plus Moves and TMs are now tracked properly.",
             ]),
+            Self::V1_17_0 => Some(vec![
+                "GameBoy games (except INT Blue/JPN Green) now all show logos instead of box art on the saves screen.",
+                "The top-right indicator can now display a count of different types of in-game move flags (SwSh TRs, LA Tutor Moves, and S/V + LZA TMs.",
+                "Users can now switch data directories without needing to move the data inside. This can be done via the settings page. Note that Pokémon tracking data will only be retrieved from the currently used directory.",
+                "A significant performance issues affecting users with many tracked Pokémon has been fixed. More performance fixes are being worked on.",
+                "Some conversion/legality issues when sending Pokémon to Legends Arceus have been fixed.",
+                "Various other bugs have been fixed.",
+            ]),
             _ => None,
         }
     }
