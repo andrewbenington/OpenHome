@@ -1,6 +1,5 @@
 import useBackend from '@openhome-core/backend/useBackend'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
 import { monSupportedBySave } from '@openhome-core/save/util'
@@ -31,8 +30,6 @@ import BoxCell from './BoxCell'
 interface OpenSaveDisplayProps {
   saveIndex: number
 }
-
-const ALLOW_DUPE_IMPORT = true
 
 const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const savesManager = useSaves()
@@ -90,31 +87,6 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
       return
     }
 
-    for (const mon of mons) {
-      try {
-        const identifier = getMonFileIdentifier(OHPKM.fromMonUnknownSave(mon))
-
-        if (!identifier) continue
-
-        if (!ALLOW_DUPE_IMPORT && ohpkmStore.monIsStored(identifier)) {
-          const message =
-            mons.length === 1
-              ? 'This Pokémon has been moved into OpenHome before.'
-              : 'One or more of these Pokémon has been moved into OpenHome before.'
-
-          dispatchError({
-            type: 'set_message',
-            payload: { title: 'Import Failed', messages: [message] },
-          })
-          return
-        }
-      } catch (e) {
-        dispatchError({
-          type: 'set_message',
-          payload: { title: 'Import Failed', messages: [`${e}`] },
-        })
-      }
-    }
     importMonsToLocation(mons, location)
   }
 

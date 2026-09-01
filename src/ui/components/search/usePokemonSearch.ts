@@ -1,4 +1,3 @@
-import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Moves } from '@openhome-core/resources'
 import { $R, Nullable, NullableOption, Option, R, Result } from '@openhome-core/util/functional'
@@ -69,7 +68,7 @@ export function usePokemonEdit() {
   }
 
   function startEditing(pokemon: OHPKM) {
-    setEditingId(getMonFileIdentifier(pokemon))
+    setEditingId(pokemon.openhomeId)
     formController.populateForm(pokemon)
   }
 
@@ -120,7 +119,7 @@ export function usePokemonSearch(prefilter?: (mon: OHPKM) => boolean): PokemonSe
     setSelectedId(undefined)
   }
 
-  const selectedItem = mons.find((mon) => getMonFileIdentifier(mon) === selectedId)
+  const selectedItem = mons.find((mon) => mon.openhomeId === selectedId)
 
   return {
     nickname,
@@ -135,7 +134,7 @@ export function usePokemonSearch(prefilter?: (mon: OHPKM) => boolean): PokemonSe
 
     results: filtered,
 
-    getRowId: (mon) => String(getMonFileIdentifier(mon)),
+    getRowId: (mon) => mon.openhomeId,
     selectedId,
     setSelectedId,
     selectedItem,

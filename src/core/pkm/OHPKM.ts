@@ -169,9 +169,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
           Gender.Genderless
         this.nature = other.nature ?? NatureIndex.newFromModulo(other.exp)
 
-        if (other.personalityValue === undefined) {
-          this.personalityValue = this.generatePk3CompatiblePid()
-        }
+        this.personalityValue = this.generatePk3CompatiblePid()
       } else {
         this.abilityNum = other.abilityNum ?? 0
         this.gender =
@@ -358,6 +356,8 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       }
 
       this.populateLearnedMoves()
+      // because the ohpkm wasm struct is initialized with an empty byte array, this needs to be called to set the stored openhome ID (or it will remain the default 0001-00000000-00000000)
+      this.regenerateOpenhomeId()
     }
   }
 

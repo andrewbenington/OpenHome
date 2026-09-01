@@ -2,6 +2,7 @@ use crate::{
     data_controller::{DataController, DataDir},
     Result,
 };
+use pkm_rs::ohpkm::OpenHomeId;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use uuid::Uuid;
@@ -9,7 +10,6 @@ use uuid::Uuid;
 
 pub const BANKS_FILENAME: &str = "banks.json";
 
-#[cfg_attr(feature = "desktop", derive(specta::Type))]
 #[derive(Default, Serialize, Deserialize, Clone)]
 pub struct StoredBankData {
     banks: Vec<Bank>,
@@ -68,7 +68,6 @@ fn default_id() -> Uuid {
     Uuid::new_v4()
 }
 
-#[cfg_attr(feature = "desktop", derive(specta::Type))]
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Bank {
     #[serde(default = "default_id")]
@@ -110,7 +109,6 @@ impl Default for Bank {
     }
 }
 
-#[cfg_attr(feature = "desktop", derive(specta::Type))]
 #[derive(Default, Serialize, Deserialize, Clone)]
 pub struct Box {
     #[serde(default = "default_id")]
@@ -130,7 +128,7 @@ impl Box {
     }
 }
 
-pub type BoxIdentifiers = HashMap<u8, String>;
+pub type BoxIdentifiers = HashMap<u8, OpenHomeId>;
 
 pub fn load_banks(controller: &impl DataController) -> Result<StoredBankData> {
     let mut storage: StoredBankData =
@@ -149,4 +147,106 @@ pub fn write_banks(controller: &impl DataController, mut bank_data: StoredBankDa
     bank_data.reset_box_indices();
 
     controller.write_file_json(DataDir::Storage, BANKS_FILENAME, &bank_data)
+}
+
+#[cfg_attr(feature = "desktop", derive(specta::Type))]
+#[derive(Default, Serialize, Deserialize, Clone)]
+pub struct StoredBankDataWasm {
+    banks: Vec<BankWasm>,
+    #[serde(default)]
+    current_bank: usize,
+}
+
+impl From<StoredBankDataWasm> for StoredBankData {
+    fn from(value: StoredBankDataWasm) -> Self {
+        Self {
+            banks: value.banks.into_iter().map(Bank::from).collect(),
+            current_bank: value.current_bank,
+        }
+    }
+}
+
+impl From<StoredBankData> for StoredBankDataWasm {
+    fn from(value: StoredBankData) -> Self {
+        Self {
+            banks: value.banks.into_iter().map(BankWasm::from).collect(),
+            current_bank: value.current_bank,
+        }
+    }
+}
+
+#[cfg_attr(feature = "desktop", derive(specta::Type))]
+#[derive(Serialize, Deserialize, Clone)]
+pub struct BankWasm {
+    #[serde(default = "default_id")]
+    id: Uuid,
+    name: Option<String>,
+    index: usize,
+    boxes: Vec<BoxWasm>,
+    #[serde(default)]
+    current_box: usize,
+}
+
+impl From<BankWasm> for Bank {
+    fn from(value: BankWasm) -> Self {
+        Self {
+            id: value.id,
+            name: value.name,
+            index: value.index,
+            boxes: value.boxes.into_iter().map(Box::from).collect(),
+            current_box: value.current_box,
+        }
+    }
+}
+
+impl From<Bank> for BankWasm {
+    fn from(value: Bank) -> Self {
+        Self {
+            id: value.id,
+            name: value.name,
+            index: value.index,
+            boxes: value.boxes.into_iter().map(BoxWasm::from).collect(),
+            current_box: value.current_box,
+        }
+    }
+}
+
+#[cfg_attr(feature = "desktop", derive(specta::Type))]
+#[derive(Default, Serialize, Deserialize, Clone)]
+pub struct BoxWasm {
+    #[serde(default = "default_id")]
+    pub id: Uuid,
+    pub name: Option<String>,
+    pub index: usize,
+    pub identifiers: HashMap<u8, String>,
+}
+
+impl From<BoxWasm> for Box {
+    fn from(value: BoxWasm) -> Self {
+        Self {
+            id: value.id,
+            name: value.name,
+            index: value.index,
+            identifiers: value
+                .identifiers
+                .into_iter()
+                .filter_map(|(key, value)| value.parse().map(|id| (key, id)).ok())
+                .collect(),
+        }
+    }
+}
+
+impl From<Box> for BoxWasm {
+    fn from(value: Box) -> Self {
+        Self {
+            id: value.id,
+            name: value.name,
+            index: value.index,
+            identifiers: value
+                .identifiers
+                .into_iter()
+                .map(|(key, value)| (key, value.to_string()))
+                .collect(),
+        }
+    }
 }

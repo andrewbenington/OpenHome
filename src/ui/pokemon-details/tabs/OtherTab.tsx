@@ -1,10 +1,6 @@
 import { PK3, PK4, PK5 } from '@openhome-core/pkm'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import {
-  getMonFileIdentifier,
-  getMonGen12Identifier,
-  getMonGen345Identifier,
-} from '@openhome-core/pkm/Lookup'
+import { getMonGen12Identifier, getMonGen345Identifier } from '@openhome-core/pkm/Lookup'
 import { getLocationStringOrOrigin } from '@openhome-core/pkm/MetLocation'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
@@ -122,25 +118,33 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             <AttributeRow label="Affection" value={mon.trainerAffection.toString()} indent={10} />
           )}
         </AttributeRowExpand>
-        <AttributeRowExpand
-          summary="Last Handler"
-          value={
-            <Flex gap="1">
-              {mon.handlerName ?? '(empty)'}
-              <GenderIcon gender={mon.handlerGender} />
-            </Flex>
-          }
-        >
-          <AttributeRow label="Handler ID" indent={10}>
-            <code>{`${u16Display(mon.handlerID ?? 0)}`}</code>
-          </AttributeRow>
-          {!!mon.handlerFriendship && (
-            <AttributeRow label="Friendship" value={mon.handlerFriendship.toString()} indent={10} />
-          )}
-          {!!mon.handlerAffection && (
-            <AttributeRow label="Affection" value={mon.handlerAffection.toString()} indent={10} />
-          )}
-        </AttributeRowExpand>
+        {(!!mon.handlerFriendship || !!mon.handlerAffection || !!mon.handlerID) && (
+          <AttributeRowExpand
+            summary="Last Handler"
+            value={
+              <Flex gap="1">
+                {mon.handlerName ?? '(empty)'}
+                <GenderIcon gender={mon.handlerGender} />
+              </Flex>
+            }
+          >
+            {!!mon.handlerID && (
+              <AttributeRow label="Handler ID" indent={10}>
+                <code>{`${u16Display(mon.handlerID ?? 0)}`}</code>
+              </AttributeRow>
+            )}
+            {!!mon.handlerFriendship && (
+              <AttributeRow
+                label="Friendship"
+                value={mon.handlerFriendship.toString()}
+                indent={10}
+              />
+            )}
+            {!!mon.handlerAffection && (
+              <AttributeRow label="Affection" value={mon.handlerAffection.toString()} indent={10} />
+            )}
+          </AttributeRowExpand>
+        )}
         {pokerus.status() === 'Uninfected' ? (
           <AttributeRow label="Pokérus" value={pokerus.status()} />
         ) : (
@@ -450,9 +454,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             )}
           </>
         )}
-        {mon instanceof OHPKM && (
-          <AttributeRow label="OpenHome ID" value={getMonFileIdentifier(mon)} />
-        )}
+        {mon instanceof OHPKM && <AttributeRow label="OpenHome ID" value={mon.openhomeId} />}
         {mon.relearnMoves && (
           <>
             {mon.relearnMoves[0] > 0 && (

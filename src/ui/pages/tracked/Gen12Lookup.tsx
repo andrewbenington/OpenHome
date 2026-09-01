@@ -1,12 +1,18 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PluginIdentifier } from '@openhome-core/save/interfaces'
-import { gameOrPluginSorter, SortableColumn, stringSorter } from '@openhome-core/util/sort'
+import {
+  gameOrPluginSorter,
+  multiSorter,
+  numericSorter,
+  SortableColumn,
+  stringSorter,
+} from '@openhome-core/util/sort'
 import Badge from '@openhome-ui/components/badge/Badge'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
 import { useLookups } from '@openhome-ui/state/lookups/useLookups'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
-import { OriginGames } from '@pkm-rs/pkg'
+import { Language, Lookup, OriginGames } from '@pkm-rs/pkg'
 
 type G12LookupRow = {
   gen12ID: string
@@ -40,6 +46,12 @@ export default function Gen12Lookup({ onSelectMon }: Gen12LookupProps) {
             />
           </button>
         ),
+      sortFunction: multiSorter(
+        numericSorter((row) => row.homeMon?.nationalDex),
+        numericSorter((row) => row.homeMon?.formIndex)
+      ),
+      getFilterValue: (value) =>
+        value.homeMon ? Lookup.speciesName(value.homeMon.nationalDex, Language.English) : undefined,
       cellClass: 'centered-cell',
     },
     {
@@ -86,6 +98,7 @@ export default function Gen12Lookup({ onSelectMon }: Gen12LookupProps) {
       }))}
       columns={columns}
       enableVirtualization={Object.entries(lookups.gen12).length > 2000} // maybe this should be user-togglable
+      defaultSort="Pokémon"
     />
   )
 }

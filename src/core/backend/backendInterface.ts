@@ -68,8 +68,10 @@ export default interface BackendInterface {
   addToOhpkmStore: (updates: OhpkmStore) => Promise<Errorable<null>>
   deleteHomeMons: (identifiers: string[]) => Promise<Errorable<null>>
 
-  /* prompt user to select new data directory location */
+  /* prompt user to select new data directory location, then restart using that location */
   promptChangeDataDir: () => Promise<Errorable<null>>
+  /* prompt user to select new data directory location, copy all data there, and restart using that location */
+  promptMoveDataDir: () => Promise<Errorable<null>>
   /* get the current data directory path */
   getDataDirPath: () => Promise<Errorable<string>>
 

@@ -51,8 +51,8 @@ pub fn permanently_delete_ohpkms(
         .ohpkm_store
         .replace(&app_handle, |store| {
             let mut new_store = store.clone();
-            for identifier in &openhome_ids {
-                new_store.remove(identifier);
+            for identifier in openhome_ids.iter().filter_map(|id_str| id_str.parse().ok()) {
+                new_store.remove(&identifier);
             }
             new_store
         })?;

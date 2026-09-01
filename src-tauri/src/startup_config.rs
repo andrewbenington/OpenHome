@@ -47,6 +47,7 @@ pub fn get_data_dir_path(
 pub async fn change_data_dir(
     app_handle: tauri::AppHandle,
     startup_config_state: tauri::State<'_, StartupConfigState>,
+    should_move: bool, // if true, files in current dir are moved to the new one and deleted from the current one
 ) -> CommandResult<()> {
     let Some(selected_dir) = app_handle
         .dialog()
@@ -62,7 +63,7 @@ pub async fn change_data_dir(
         return Ok(());
     };
 
-    if !is_dir_empty_ignore_ds_store(selected_dir)? {
+    if should_move && !is_dir_empty_ignore_ds_store(selected_dir)? {
         return Err(Error::other(
             "Selected directory is not empty. Please select an empty directory.",
         )
@@ -71,7 +72,9 @@ pub async fn change_data_dir(
 
     let current_data_dir = controller.get_data_folder()?;
 
-    copy_all_directory_items(&current_data_dir, selected_dir)?;
+    if should_move {
+        copy_all_directory_items(&current_data_dir, selected_dir)?;
+    }
 
     let mut state = startup_config_state.lock()?;
 
@@ -79,22 +82,24 @@ pub async fn change_data_dir(
     state.update_data_dir(selected_dir);
     state.write_to_storage()?;
 
-    // if we fail to delete old files, log the error but don't abort the dir change process
-    let old_storage_dir = current_data_dir.join("storage");
-    if let Err(err) = fs::remove_dir_all(&old_storage_dir) {
-        eprintln!("Failed to delete old storage directory at {old_storage_dir:?}: {err}");
-    }
-    let old_plugins_dir = current_data_dir.join("plugins");
-    if old_plugins_dir.exists()
-        && let Err(err) = fs::remove_dir_all(&old_plugins_dir)
-    {
-        eprintln!("Failed to delete old plugins directory at {old_plugins_dir:?}: {err}");
-    }
-    let old_version_file = current_data_dir.join("version.txt");
-    if old_version_file.exists()
-        && let Err(err) = fs::remove_file(&old_version_file)
-    {
-        eprintln!("Failed to delete old version file at {old_version_file:?}: {err}");
+    if should_move {
+        // if we fail to delete old files, log the error but don't abort the dir change process
+        let old_storage_dir = current_data_dir.join("storage");
+        if let Err(err) = fs::remove_dir_all(&old_storage_dir) {
+            eprintln!("Failed to delete old storage directory at {old_storage_dir:?}: {err}");
+        }
+        let old_plugins_dir = current_data_dir.join("plugins");
+        if old_plugins_dir.exists()
+            && let Err(err) = fs::remove_dir_all(&old_plugins_dir)
+        {
+            eprintln!("Failed to delete old plugins directory at {old_plugins_dir:?}: {err}");
+        }
+        let old_version_file = current_data_dir.join("version.txt");
+        if old_version_file.exists()
+            && let Err(err) = fs::remove_file(&old_version_file)
+        {
+            eprintln!("Failed to delete old version file at {old_version_file:?}: {err}");
+        }
     }
 
     // restart the app for a fresh launch using the new data directory

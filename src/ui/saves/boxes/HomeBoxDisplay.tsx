@@ -1,6 +1,5 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { getMonFileIdentifier, OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { SortTypes } from '@openhome-core/pkm/sort'
 import { monSupportedBySave } from '@openhome-core/save/util'
 import { mapToObject } from '@openhome-core/util'
@@ -24,7 +23,6 @@ import PokemonSearchModal from '@openhome-ui/components/search/SearchModal'
 import ToggleButton from '@openhome-ui/components/ToggleButton'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/PokemonDetailsModal'
-import { ErrorContext } from '@openhome-ui/state/error'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import useTrackedDataRecovery from '@openhome-ui/state/ohpkm/useTrackedDataRecovery'
 import { HomeMonLocation, MonLocation, MonWithLocation, useSaves } from '@openhome-ui/state/saves'
@@ -32,7 +30,7 @@ import { cssClass } from '@openhome-ui/util/style'
 import { Language, Lookup } from '@pkm-rs/pkg'
 import { Button, Card, DropdownMenu, Flex, Heading, TextField, Tooltip } from '@radix-ui/themes'
 import { ToggleGroup } from 'radix-ui'
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { BsFillGrid3X3GapFill } from 'react-icons/bs'
 import { FaSquare } from 'react-icons/fa'
 import {
@@ -51,8 +49,6 @@ import DroppableSpace from './DroppableSpace'
 import './style.css'
 
 export type BoxViewMode = 'one' | 'all'
-
-const ALLOW_DUPE_IMPORT = true
 
 export default function HomeBoxDisplay() {
   const [editing, setEditing] = useState(false)
@@ -259,7 +255,6 @@ function SingleBoxMonDisplay() {
   const { getCurrentBox, getCurrentBank, clearAtHomeLocation, removeAllHomeDupes } =
     useBanksAndBoxes()
   const [missingIdData, setMissingIdData] = useState<MissingIdData>()
-  const [, dispatchError] = useContext(ErrorContext)
   const { dragState, isSelected, toggleSelection } = useDragAndDrop()
   const { sortHomeBox, sortAllHomeBoxes } = useBanksAndBoxes()
   const {
@@ -281,34 +276,9 @@ function SingleBoxMonDisplay() {
 
   const attemptImportMons = useCallback(
     (mons: PKMInterface[], location: MonLocation) => {
-      for (const mon of mons) {
-        try {
-          const identifier = getMonFileIdentifier(OHPKM.fromMonUnknownSave(mon))
-
-          if (!identifier) continue
-
-          if (!ALLOW_DUPE_IMPORT && ohpkmStore.monIsStored(identifier)) {
-            const message =
-              mons.length === 1
-                ? 'This Pokémon has been moved into OpenHome before.'
-                : 'One or more of these Pokémon has been moved into OpenHome before.'
-
-            dispatchError({
-              type: 'set_message',
-              payload: { title: 'Import Failed', messages: [message] },
-            })
-            return
-          }
-        } catch (e) {
-          dispatchError({
-            type: 'set_message',
-            payload: { title: 'Import Failed', messages: [`${e}`] },
-          })
-        }
-      }
       importMonsToLocation(mons, location)
     },
-    [dispatchError, importMonsToLocation, ohpkmStore]
+    [importMonsToLocation]
   )
 
   const dragData: MonWithLocation | undefined = useMemo(() => {
