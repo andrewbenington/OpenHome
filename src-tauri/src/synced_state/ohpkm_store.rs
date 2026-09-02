@@ -7,19 +7,20 @@ use openhome_core::ohpkm_store::OhpkmBytesStore;
 use serde::Serialize;
 use std::path::Path;
 use std::{collections::HashMap, fs};
+use crate::box_pointer::BoxPointer;
 
 impl synced_state::SyncedState for OhpkmBytesStore {
     type Action = Self;
     const ID: &'static str = "ohpkm_store";
 
-    fn to_command_response(&self) -> impl Clone + Serialize + tauri::ipc::IpcResponse {
-        self.to_b64_map()
-    }
-
     fn update(&mut self, other: Self) {
         other.all_entries().for_each(|(k, v)| {
             self.insert(k, v);
         });
+    }
+
+    fn to_command_response(&self) -> impl Clone + Serialize + tauri::ipc::IpcResponse {
+        self.to_b64_map()
     }
 }
 

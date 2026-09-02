@@ -67,7 +67,7 @@ impl LookupStateStringIds {
 #[tauri::command]
 #[specta::specta]
 pub fn get_lookups(
-    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
+    synced_state: tauri::State<'_, synced_state::LazyState>,
 ) -> CommandResult<LookupStateStringIds> {
     Ok(LookupStateStringIds::from_lookup_state(
         &synced_state.clone_lookups()?,
@@ -78,7 +78,7 @@ pub fn get_lookups(
 #[specta::specta]
 pub fn add_to_lookups(
     app_handle: tauri::AppHandle,
-    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
+    synced_state: tauri::State<'_, synced_state::LazyState>,
     new_entries: LookupStateStringIds,
 ) -> CommandResult<()> {
     synced_state
@@ -92,11 +92,11 @@ pub fn add_to_lookups(
 #[specta::specta]
 pub fn remove_dangling(
     app_handle: tauri::AppHandle,
-    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
+    synced_state: tauri::State<'_, synced_state::LazyState>,
 ) -> CommandResult<()> {
     // definitely unnecessary clones here
     let mut synced_state = synced_state.lock()?;
-    let ohpkm_store = synced_state.ohpkm_store.read().clone();
+    let ohpkm_store = synced_state.ohpkm_store_changes.read().clone();
 
     synced_state
         .lookups
