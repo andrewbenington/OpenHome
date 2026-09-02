@@ -3,7 +3,7 @@ import { R } from '@openhome-core/util/functional'
 import { stringSorter } from '@openhome-core/util/sort'
 import ContentCard from '@openhome-ui/components/ContentCard'
 import SideTabNavigation from '@openhome-ui/components/side-tabs/SideTabNavigation'
-import { AppInfoContext, AppTheme } from '@openhome-ui/state/appInfo'
+import { AppInfoContext, AppTheme, TableType } from '@openhome-ui/state/appInfo'
 import {
   BoolOption,
   ConvertStrategies,
@@ -93,6 +93,20 @@ function GeneralSettings() {
             <RadioGroup.Item value="system">System</RadioGroup.Item>
             <RadioGroup.Item value="light">Light</RadioGroup.Item>
             <RadioGroup.Item value="dark">Dark</RadioGroup.Item>
+          </RadioGroup.Root>
+        </div>
+        <div>
+          <GroupHeader name="Table Type" />
+          <RadioGroup.Root
+            onValueChange={(newValue: TableType) => {
+              if (!newValue) return
+              dispatchAppInfoState({ type: 'set_table_type', payload: newValue })
+            }}
+            value={appInfoState.settings.tableType}
+            style={{ margin: 8 }}
+          >
+            <RadioGroup.Item value="rdg">React Data Grid</RadioGroup.Item>
+            <RadioGroup.Item value="tanstack">Tanstack (Alpha)</RadioGroup.Item>
           </RadioGroup.Root>
         </div>
         <div>

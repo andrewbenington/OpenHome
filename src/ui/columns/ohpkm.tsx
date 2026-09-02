@@ -43,9 +43,15 @@ export default function useOhpkmColumns(
       width: '3rem',
       frozen: true,
       renderValue: (value) => (
-        <button onClick={() => onSelectMon?.(value)} className="mon-icon-button">
-          <PokemonIcon nationalDex={value.nationalDex} formIndex={value.formIndex} />
-        </button>
+        <div className="flex-row-centered">
+          <button onClick={() => onSelectMon?.(value)} className="mon-icon-button">
+            <PokemonIcon
+              nationalDex={value.nationalDex}
+              formIndex={value.formIndex}
+              style={{ height: '1.75rem', width: '1.75rem' }}
+            />
+          </button>
+        </div>
       ),
       cellClass: 'centered-cell',
       sortFunction: multiSorter(
@@ -69,7 +75,9 @@ export default function useOhpkmColumns(
       sortFunction: stringSorter((mon) => mon.metadata?.type1),
       renderValue: (mon) =>
         mon.metadata?.type1Index !== undefined ? (
-          <TypeIcon size="1.5rem" typeIndex={mon.metadata?.type1Index} />
+          <div className="flex-row-centered">
+            <TypeIcon size="1.5rem" typeIndex={mon.metadata?.type1Index} />
+          </div>
         ) : null,
       getFilterValue: (mon) => mon.metadata?.type1 || 'Unknown',
       cellClass: 'centered-cell',
@@ -81,7 +89,9 @@ export default function useOhpkmColumns(
       sortFunction: stringSorter((mon) => mon.metadata?.type2),
       renderValue: (mon) =>
         mon.metadata?.type2Index !== undefined ? (
-          <TypeIcon size="1.5rem" typeIndex={mon.metadata?.type2Index} />
+          <div className="flex-row-centered">
+            <TypeIcon size="1.5rem" typeIndex={mon.metadata?.type2Index} />
+          </div>
         ) : null,
       getFilterValue: (mon) => mon.metadata?.type2 || 'Unknown',
       cellClass: 'centered-cell',
@@ -163,14 +173,16 @@ export default function useOhpkmColumns(
       name: 'Original Game',
       width: '10rem',
       renderValue: (value) => (
-        <Badge.Game originGame={value.gameOfOrigin} plugin={value.pluginOrigin} withName />
+        <div className="flex-row-centered">
+          <Badge.Game originGame={value.gameOfOrigin} plugin={value.pluginOrigin} withName />
+        </div>
       ),
       getFilterValue: (mon) => OriginGames.gameNameFull(mon.gameOfOrigin),
       sortFunction: gameOrPluginSorter(
         (mon) => mon.gameOfOrigin,
         (mon) => mon.pluginOrigin
       ),
-      cellClass: 'centered-cell',
+      cellClass: 'flex-row-centered',
     },
     {
       key: 'started_tracking',

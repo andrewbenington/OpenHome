@@ -80,7 +80,10 @@ export function useOhpkmStore() {
   }
 
   async function getAllStored() {
-    return backend.loadOhpkmStore().then(R.ok)
+    return backend
+      .loadOhpkmStore()
+      .then(R.map((mons) => Object.fromEntries(Object.entries(mons).slice(0, 100))))
+      .then(R.ok)
   }
 
   async function getAllStoredIds() {

@@ -8,23 +8,17 @@ import {
   SortType,
   stringSorter,
 } from '@openhome-core/util/sort'
-import { useSettings } from '@openhome-ui/state/appInfo'
+import { cssClass } from '@openhome-ui/util/style'
 import { Flex } from '@radix-ui/themes'
+import type { ColumnDef } from '@tanstack/react-table'
+import { columnSizingFeature, tableFeatures, useTable } from '@tanstack/react-table'
 import { isDayjs } from 'dayjs'
-import { ReactNode, useMemo, useRef, useState, type RefAttributes } from 'react'
-import {
-  DataGrid,
-  RenderCellProps,
-  SELECT_COLUMN_KEY,
-  type DataGridHandle,
-  type DataGridProps,
-  type RenderHeaderCellProps,
-  type SortColumn,
-} from 'react-data-grid'
+import { ReactNode, useMemo, useState } from 'react'
+import { type SortColumn } from 'react-data-grid'
 import 'react-data-grid/lib/styles.css'
 import { Checkbox, Item, Label, OpenHomeCtxMenu, Separator, Submenu } from './context-menu'
 import { DropdownArrowIcon, FilterIcon } from './Icons'
-import SortableTable from './SortableTable'
+import { SortableDataGridProps } from './SortableDataGrid'
 import './style.css'
 
 const dataGridProps = {
@@ -140,14 +134,41 @@ type Filters<T extends Record<string, any>> = Partial<{
   [K in keyof T]: string[]
 }>
 
-export type SortableDataGridProps<R extends SortableValue> = {
-  columns: SortableColumn<R>[]
-  defaultSort?: string
-  defaultSortOrder?: 'ASC' | 'DESC'
-} & DataGridProps<R> &
-  RefAttributes<DataGridHandle>
+const TABLE_FEATURES = tableFeatures({ columnSizingFeature })
 
-export default function SortableDataGrid<R extends SortableValue>(props: SortableDataGridProps<R>) {
+function toTanstackColumn<T extends SortableValue>(
+  rdgColumn: SortableColumn<T>
+): ColumnDef<typeof TABLE_FEATURES, T> {
+  console.log(rdgColumn.name, rdgColumn.width)
+  return {
+    id: rdgColumn.key,
+    header: typeof rdgColumn.name === 'string' ? rdgColumn.name : rdgColumn.key,
+    accessorFn: (row) => {
+      try {
+        return rdgColumn.key in row ? row[rdgColumn.key] : rdgColumn.getFilterValue?.(row)
+      } catch (e) {
+        console.error(e)
+        console.dir({ row, rdgColumn })
+        return String(e)
+      }
+    },
+    cell: (info) => {
+      try {
+        return rdgColumn.renderValue?.(info.row.original)
+      } catch (e) {
+        console.error(e)
+        console.dir({ info, value: info.getValue() })
+        return String(e)
+      }
+    },
+    size: rdgColumn.width ? parseInt(rdgColumn.width.slice(0, -3)) : undefined,
+    minSize: rdgColumn.minWidth ?? undefined,
+    maxSize: rdgColumn.maxWidth ?? undefined,
+    // size: 10,
+  }
+}
+
+export default function SortableTable<R extends SortableValue>(props: SortableDataGridProps<R>) {
   const {
     rows,
     columns,
@@ -166,9 +187,6 @@ export default function SortableDataGrid<R extends SortableValue>(props: Sortabl
   )
   const [filters, setFilters] = useState<Filters<R>>({})
 
-  const [reorderedColumns, setReorderedColumns] = useState(columns)
-  const gridRef = useRef<DataGridHandle | null>(null)
-
   const sortedRows = useMemo(
     () => sortRows(rows, columns, sortColumns),
     [rows, columns, sortColumns]
@@ -178,6 +196,8 @@ export default function SortableDataGrid<R extends SortableValue>(props: Sortabl
     () => filterRows(sortedRows, columns, filters),
     [sortedRows, filters, columns]
   )
+
+  console.log(sortedRows, filteredRows, rows)
 
   // The data grid library only accepts a row height in pixels, so we need to manually calculate it
   // based on the site ui scaling
@@ -189,74 +209,105 @@ export default function SortableDataGrid<R extends SortableValue>(props: Sortabl
       ? scaling * baseRowHeight
       : (row: NoInfer<R>) => scaling * baseRowHeight(row)
 
-  const modifiedColumns = useMemo(
-    () =>
-      reorderedColumns
-        .filter((col) => !hiddenColumns.includes(col.key))
-        .map((col) =>
-          col.key === SELECT_COLUMN_KEY
-            ? col
-            : {
-                ...col,
-                resizable: true,
-                sortable: !!(col.sortType ?? col.sortFunction),
-                draggable: true,
-                renderCell: hasRenderValueMethod(col)
-                  ? (value: RenderCellProps<R>) => col.renderValue(value.row)
-                  : col.renderCell,
-                renderHeaderCell: (props: RenderHeaderCellProps<R>) => (
-                  <HeaderWithContextMenu
-                    column={props.column}
-                    columns={columns}
-                    sortColumns={sortColumns}
-                    rows={sortedRows}
-                    filters={filters}
-                    setFilters={setFilters}
-                    hiddenColumns={hiddenColumns}
-                    setHiddenColumns={setHiddenColumns}
-                  />
-                ),
-              }
-        ),
-    [columns, filters, hiddenColumns, reorderedColumns, sortColumns, sortedRows]
-  )
+  // 5. Create the table instance
+  const table = useTable({
+    key: 'person-table', // needed for devtools, omit if you don't want to use the devtools
+    features: TABLE_FEATURES,
+    columns: columns.filter((col) => col.key !== 'rdg-select-column').map(toTanstackColumn),
+    data: filteredRows,
+  })
 
-  const { settings } = useSettings()
-
-  if (settings.tableType === 'tanstack') {
-    return <SortableTable {...props} />
-  }
-
+  // 6. Render markup from the table instance APIs
   return (
-    <div className={className} style={{ height: '100%', overflow: 'hidden ', flex: 1 }}>
-      <DataGrid
-        ref={gridRef}
-        className="datagrid"
-        {...dataGridProps}
-        {...otherProps}
-        rowHeight={scaledRowHeight}
-        rows={filteredRows}
-        columns={modifiedColumns}
-        sortColumns={sortColumns}
-        onSortColumnsChange={(params) => setSortColumns(params)}
-        onColumnsReorder={(col1, col2) => {
-          const movedColumnIdx = reorderedColumns.findIndex((col) => col.key === col1)
-          const targetColumnIdx = reorderedColumns.findIndex((col) => col.key === col2)
-          const newColumns = [...reorderedColumns]
-          const movedColumn = newColumns.splice(movedColumnIdx, 1)[0]
-
-          setReorderedColumns([
-            ...newColumns.slice(0, targetColumnIdx),
-            movedColumn,
-            ...newColumns.slice(targetColumnIdx),
-          ])
-        }}
-        defaultColumnOptions={{ ...defaultColumnOptions, minWidth: 30 }}
-        style={{ fontSize: 12, height: 'inherit', ...otherProps.style }}
-      />
+    <div className={className} style={{ height: '100%', overflow: 'auto', flex: 1 }}>
+      <table className="datagrid">
+        <thead>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <tr key={headerGroup.id} style={{ height: '1.75rem' }}>
+              {headerGroup.headers.map((header) => {
+                return (
+                  <th
+                    className="rdg-header-row"
+                    key={header.id}
+                    colSpan={header.colSpan}
+                    style={{
+                      width: `${header.column.columnDef.size}rem`,
+                    }}
+                  >
+                    {header.isPlaceholder ? null : <table.FlexRender header={header} />}
+                  </th>
+                )
+              })}
+            </tr>
+          ))}
+        </thead>
+        <tbody>
+          {table.getRowModel().rows.map((row, index) => (
+            <tr
+              className={cssClass('rdg-row')
+                .with('rdg-row-even')
+                .if(index % 2 === 0)
+                .else('rdg-row-odd')
+                .build()}
+              key={row.id}
+            >
+              {row.getAllCells().map((cell, i) => {
+                const column = columns[i + 1]
+                return (
+                  <td
+                    // className='rdg-cell'
+                    className={cssClass('rdg-cell')
+                      .with(typeof column?.cellClass === 'string' ? column?.cellClass : undefined)
+                      .build()}
+                    key={cell.id}
+                    style={{
+                      minWidth: cell.column.columnDef.minSize ?? `${cell.column.columnDef.size}rem`,
+                      width: `${cell.column.columnDef.size}rem`,
+                      // display: 'table-cell',
+                    }}
+                  >
+                    <table.FlexRender cell={cell} />
+                  </td>
+                )
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   )
 }
+
+// return (
+//   <div className={className} style={{ height: '100%', overflow: 'hidden ', flex: 1 }}>
+//     <DataGrid
+//       ref={gridRef}
+//       className="datagrid"
+//       {...dataGridProps}
+//       {...otherProps}
+//       rowHeight={scaledRowHeight}
+//       rows={filteredRows}
+//       columns={modifiedColumns}
+//       sortColumns={sortColumns}
+//       onSortColumnsChange={(params) => setSortColumns(params)}
+//       onColumnsReorder={(col1, col2) => {
+//         const movedColumnIdx = reorderedColumns.findIndex((col) => col.key === col1)
+//         const targetColumnIdx = reorderedColumns.findIndex((col) => col.key === col2)
+//         const newColumns = [...reorderedColumns]
+//         const movedColumn = newColumns.splice(movedColumnIdx, 1)[0]
+
+//         setReorderedColumns([
+//           ...newColumns.slice(0, targetColumnIdx),
+//           movedColumn,
+//           ...newColumns.slice(targetColumnIdx),
+//         ])
+//       }}
+//       defaultColumnOptions={{ ...defaultColumnOptions, minWidth: 30 }}
+//       style={{ fontSize: 12, height: 'inherit', ...otherProps.style }}
+//     />
+//   </div>
+// )
+// }
 
 function hasRenderValueMethod<T extends SortableValue>(
   col: SortableColumn<T>
