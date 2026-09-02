@@ -7,7 +7,7 @@ pub mod pkm_storage;
 pub mod saves;
 pub mod startup_config;
 mod util;
-mod box_pointer;
-pub mod ohpkm_store_changes;
+pub mod box_pointer;
+pub mod ohpkm_store_partial;
 
 pub use error::*;

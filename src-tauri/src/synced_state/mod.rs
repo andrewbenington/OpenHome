@@ -1,23 +1,24 @@
 use std::ops::Deref;
 use std::sync::Mutex;
 
-use serde::Serialize;
-use tauri::Emitter;
-use lazy_state_inner::LazyStateInner;
 use crate::commands::{CommandError, CommandResult};
 use crate::data_controller::ToDataController;
+use lazy_state_inner::LazyStateInner;
 use openhome_core::convert_strategies::ConvertStrategies;
 use openhome_core::data_controller;
 use openhome_core::lookup::LookupState;
 use openhome_core::ohpkm_store::OhpkmBytesStore;
-use openhome_core::{Error, Result};
+use openhome_core::ohpkm_store_partial::OhpkmStorePartial;
 use openhome_core::pkm_storage::BoxPointer;
+use openhome_core::{Error, Result};
+use serde::Serialize;
+use tauri::Emitter;
 
 pub mod convert_strategies;
 pub mod lookup;
 pub mod ohpkm_store;
 
-pub mod ohpkm_store_changes;
+pub mod lazy_state_change;
 mod lazy_state_inner;
 
 pub trait SyncedState: Clone + Serialize + tauri::ipc::IpcResponse {
@@ -63,130 +64,137 @@ impl<State: SyncedState> SyncedStateWrapper<State> {
     }
 }
 
-
 pub struct LazyState(pub Mutex<LazyStateInner>);
 
 impl LazyState {
-    pub(crate) fn from_partial_states(lookups: LookupState, bank_pointer: BoxPointer, convert_strategies: ConvertStrategies) -> Self {
+    pub(crate) fn from_partial_states(
+        lookups: LookupState,
+        bank_pointer: BoxPointer,
+        convert_strategies: ConvertStrategies,
+    ) -> Self {
         Self(Mutex::new(LazyStateInner {
             lookups: SyncedStateWrapper(lookups),
             current_box: bank_pointer,
-            convert_strategies: SyncedStateWrapper(convert_strategies),
+            convert_strategies: SyncedStateWrapper(convert_strategies)
         }))
     }
 }
 
 impl LazyState {
-        pub fn from_states(
-            lookups: LookupState,
-            current_box: BoxPointer,
-            convert_strategies: ConvertStrategies,
-        ) -> Self {
-            Self(Mutex::new(LazyStateInner {
-                lookups: SyncedStateWrapper(lookups),
+    pub fn from_states(
+        lookups: LookupState,
+        current_box: BoxPointer,
+        convert_strategies: ConvertStrategies,
+        ohpkm_store_changes: OhpkmStorePartial,
+    ) -> Self {
+        Self(Mutex::new(LazyStateInner {
+            lookups: SyncedStateWrapper(lookups),
 
-                // TODO Initialize this
-                current_box,
-                convert_strategies: SyncedStateWrapper(convert_strategies),
+            // TODO Initialize this
+            current_box,
+            convert_strategies: SyncedStateWrapper(convert_strategies),
 
-            }))
-        }
-
-        pub fn clone_lookups(&self) -> Result<LookupState> {
-            Ok(self.lock()?.lookups.0.clone())
-        }
-
-        pub fn get_convert_strategies(&self) -> Result<ConvertStrategies> {
-            Ok(self.lock()?.convert_strategies.0.clone())
-        }
-
-        pub fn save_to_files(
-            &self,
-            data_controller: &impl data_controller::DataController,
-        ) -> Result<()> {
-            let locked = self.lock()?;
-            locked.ohpkm_store_changes.0.write_to_mons_v2(data_controller)?;
-            locked.lookups.0.write_to_files(data_controller)?;
-            locked.convert_strategies.0.write_to_files(data_controller)
-        }
-
-        fn update_from_frontend(
-            &self,
-            state_identifier: &str,
-            action: serde_json::Value,
-        ) -> Result<()> {
-            match state_identifier {
-                ConvertStrategies::ID => {
-                    let action: <ConvertStrategies as SyncedState>::Action =
-                        serde_json::from_value(action).map_err(|e| {
-                            Error::unexpeted_condition_with_source(
-                                "update_from_frontend: invalid ConvertStrategies action received"
-                                    .to_owned(),
-                                e,
-                            )
-                        })?;
-                    self.lock()?.convert_strategies.0.update(action);
-                }
-                LookupState::ID => {
-                    let action: <LookupState as SyncedState>::Action = serde_json::from_value(action)
-                        .map_err(|e| {
-                            Error::unexpeted_condition_with_source(
-                                "update_from_frontend: invalid LookupState action received".to_owned(),
-                                e,
-                            )
-                        })?;
-                    self.lock()?.lookups.0.update(action);
-                }
-                OhpkmBytesStore::ID => {
-                    let action: <OhpkmBytesStore as SyncedState>::Action =
-                        serde_json::from_value(action).map_err(|e| {
-                            Error::unexpeted_condition_with_source(
-                                "update_from_frontend: invalid OhpkmBytesStore action received"
-                                    .to_owned(),
-                                e,
-                            )
-                        })?;
-                    self.lock()?.ohpkm_store_changes.0.update(action);
-                }
-                _ => {
-                    return Err(Error::unexpeted_condition(format!(
-                        "update_from_frontend: invalid state identifier received - '{state_identifier}'"
-                    )));
-                }
-            }
-
-            Ok(())
-        }
+            ohpkm_store_partial: ohpkm_store_changes,
+        }))
     }
 
-    impl Deref for LazyState {
-        type Target = Mutex<LazyStateInner>;
-
-        fn deref(&self) -> &Self::Target {
-            &self.0
-        }
+    pub fn clone_lookups(&self) -> Result<LookupState> {
+        Ok(self.lock()?.lookups.0.clone())
     }
 
-    #[tauri::command]
-    #[specta::specta]
-    pub fn save_synced_state(
-        app_handle: tauri::AppHandle,
-        synced_state: tauri::State<'_, LazyState>,
-    ) -> CommandResult<()> {
-        synced_state
-            .save_to_files(&app_handle.controller())
-            .map_err(CommandError::from)
+    pub fn get_convert_strategies(&self) -> Result<ConvertStrategies> {
+        Ok(self.lock()?.convert_strategies.0.clone())
     }
 
-    #[tauri::command]
-    #[specta::specta]
-    pub fn update_synced_state(
-        synced_state: tauri::State<'_, LazyState>,
+    pub fn save_to_files(
+        &self,
+        data_controller: &impl data_controller::DataController,
+    ) -> Result<()> {
+        let locked = self.lock()?;
+        locked
+            .ohpkm_store_partial
+            .0
+            .write_to_mons_v2(data_controller)?;
+        locked.lookups.0.write_to_files(data_controller)?;
+        locked.convert_strategies.0.write_to_files(data_controller)
+    }
+
+    fn update_from_frontend(
+        &self,
         state_identifier: &str,
         action: serde_json::Value,
-    ) -> CommandResult<()> {
-        synced_state
-            .update_from_frontend(state_identifier, action)
-            .map_err(CommandError::from)
-    }
+    ) -> Result<()> {
+        match state_identifier {
+            ConvertStrategies::ID => {
+                let action: <ConvertStrategies as SyncedState>::Action =
+                    serde_json::from_value(action).map_err(|e| {
+                        Error::unexpeted_condition_with_source(
+                            "update_from_frontend: invalid ConvertStrategies action received"
+                                .to_owned(),
+                            e,
+                        )
+                    })?;
+                self.lock()?.convert_strategies.0.update(action);
+            }
+            LookupState::ID => {
+                let action: <LookupState as SyncedState>::Action = serde_json::from_value(action)
+                    .map_err(|e| {
+                    Error::unexpeted_condition_with_source(
+                        "update_from_frontend: invalid LookupState action received".to_owned(),
+                        e,
+                    )
+                })?;
+                self.lock()?.lookups.0.update(action);
+            }
+            OhpkmBytesStore::ID => {
+                let action: <OhpkmBytesStore as SyncedState>::Action =
+                    serde_json::from_value(action).map_err(|e| {
+                        Error::unexpeted_condition_with_source(
+                            "update_from_frontend: invalid OhpkmBytesStore action received"
+                                .to_owned(),
+                            e,
+                        )
+                    })?;
+                self.lock()?.ohpkm_store_partial.0.update(action);
+            }
+            _ => {
+                return Err(Error::unexpeted_condition(format!(
+                    "update_from_frontend: invalid state identifier received - '{state_identifier}'"
+                )));
+            }
+        }
 
+        Ok(())
+    }
+}
+
+impl Deref for LazyState {
+    type Target = Mutex<LazyStateInner>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn save_synced_state(
+    app_handle: tauri::AppHandle,
+    synced_state: tauri::State<'_, LazyState>,
+) -> CommandResult<()> {
+    synced_state
+        .save_to_files(&app_handle.controller())
+        .map_err(CommandError::from)
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn update_synced_state(
+    synced_state: tauri::State<'_, LazyState>,
+    state_identifier: &str,
+    action: serde_json::Value,
+) -> CommandResult<()> {
+    synced_state
+        .update_from_frontend(state_identifier, action)
+        .map_err(CommandError::from)
+}

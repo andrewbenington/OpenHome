@@ -1,13 +1,12 @@
 use crate::commands::CommandResult;
 use crate::data_controller::TauriDataController;
 use crate::synced_state;
-use openhome_core::Error;
 use openhome_core::data_controller::{DataController, DataDir, MONS_V2_DIR};
 use openhome_core::ohpkm_store::OhpkmBytesStore;
+use openhome_core::Error;
 use serde::Serialize;
 use std::path::Path;
 use std::{collections::HashMap, fs};
-use crate::box_pointer::BoxPointer;
 
 impl synced_state::SyncedState for OhpkmBytesStore {
     type Action = Self;
@@ -35,7 +34,7 @@ pub fn add_to_ohpkm_store(
         .lock()?
 
         // TODO change the logic of ohpkm_store so it properly reflects new behaviour
-        .ohpkm_store_changes
+        .ohpkm_store_partial
         .update(&app_handle, updates)?)
 }
 
@@ -51,7 +50,7 @@ pub fn permanently_delete_ohpkms(
     // first remove from the ohpkm store
     synced_state
         .lock()?
-        .ohpkm_store_changes
+        .ohpkm_store_partial
         .replace(&app_handle, |store| {
             let mut new_store = store.clone();
             for identifier in openhome_ids.iter().filter_map(|id_str| id_str.parse().ok()) {
