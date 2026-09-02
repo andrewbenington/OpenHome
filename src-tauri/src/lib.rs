@@ -20,7 +20,6 @@ use openhome_core::{Error, Result};
 use std::env;
 use tauri::Manager;
 use openhome_core::pkm_storage::{load_banks, StoredBankData};
-use crate::box_pointer::BoxPointer;
 
 const RAW_HANDLER: fn(tauri::ipc::Invoke<tauri::Wry>) -> bool = tauri::generate_handler![
     commands::get_file_bytes,

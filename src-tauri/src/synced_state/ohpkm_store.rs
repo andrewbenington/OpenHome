@@ -7,6 +7,7 @@ use openhome_core::Error;
 use serde::Serialize;
 use std::path::Path;
 use std::{collections::HashMap, fs};
+use crate::box_pointer::BoxPointer;
 
 impl synced_state::SyncedState for OhpkmBytesStore {
     type Action = Self;
