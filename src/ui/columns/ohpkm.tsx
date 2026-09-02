@@ -67,6 +67,7 @@ export default function useOhpkmColumns(
       frozen: true,
       sortFunction: stringSorter((mon) => mon.nickname),
       noFilter: true,
+      renderValue: (mon) => mon.nickname,
     },
     {
       key: 'type1',
@@ -182,7 +183,7 @@ export default function useOhpkmColumns(
         (mon) => mon.gameOfOrigin,
         (mon) => mon.pluginOrigin
       ),
-      cellClass: 'flex-row-centered',
+      cellClass: 'centered-cell',
     },
     {
       key: 'started_tracking',
@@ -196,6 +197,7 @@ export default function useOhpkmColumns(
       key: 'trainerName',
       name: 'OT',
       width: '6rem',
+      renderValue: (mon) => mon.trainerName,
     },
     {
       key: 'nature',
