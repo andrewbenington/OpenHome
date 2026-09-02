@@ -1,5 +1,7 @@
 .mon-icon-button {
   padding: 0;
+  border: none;
+  margin: auto;
   background-color: transparent;
 
   --pokemon-icon-size: 2rem;

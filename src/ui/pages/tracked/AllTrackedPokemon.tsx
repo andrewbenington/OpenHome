@@ -51,6 +51,8 @@ export default function AllTrackedPokemon({
     getAllStoredMons().then((mons) => setMons(mons ? Object.values(mons) : []))
   }, [])
 
+  console.log(mons?.length)
+
   const buildContextElements = useCallback(
     (mon: OHPKM) => {
       const homeLocation = findHomeLocation(mon.openhomeId)
@@ -111,7 +113,7 @@ export default function AllTrackedPokemon({
       style={{ overflow: 'hidden' }}
     >
       {/* this div is necessary to give the context menu a target */}
-      <div style={{ height: '100%', width: '100%' }}>
+      <div style={{ height: '100%', width: '100%', backgroundColor: 'var(--gray-3)' }}>
         <SortableDataGrid
           rows={mons?.toSorted(stringSorter((mon) => mon.openhomeId)) ?? []}
           columns={columns}
