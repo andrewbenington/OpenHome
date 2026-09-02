@@ -224,18 +224,32 @@ export default function SortableTable<R extends SortableValue>(props: SortableDa
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id} style={{ height: '1.75rem' }}>
-              {headerGroup.headers.map((header) => {
+              {headerGroup.headers.map((header, i) => {
+                const column = columns[i + 1]
                 return (
-                  <th
-                    className="rdg-header-row"
+                  <OpenHomeCtxMenu
                     key={header.id}
-                    colSpan={header.colSpan}
-                    style={{
-                      width: `${header.column.columnDef.size}rem`,
-                    }}
+                    elements={buildHeaderContextMenu({
+                      column,
+                      columns,
+                      sortColumns,
+                      rows,
+                      filters,
+                      setFilters,
+                      hiddenColumns,
+                      setHiddenColumns,
+                    })}
                   >
-                    {header.isPlaceholder ? null : <table.FlexRender header={header} />}
-                  </th>
+                    <th
+                      className="rdg-header-row"
+                      colSpan={header.colSpan}
+                      style={{
+                        width: `${header.column.columnDef.size}rem`,
+                      }}
+                    >
+                      {header.isPlaceholder ? null : <table.FlexRender header={header} />}
+                    </th>
+                  </OpenHomeCtxMenu>
                 )
               })}
             </tr>
@@ -319,7 +333,7 @@ type HeaderWithContextMenuProps<R extends Record<string, unknown>> = {
   column: SortableColumnAnyWidth<R>
   columns: SortableColumnAnyWidth<R>[]
   sortColumns: SortColumn[]
-  rows: R[]
+  rows: readonly R[]
   filters: Partial<Filters<R>>
   setFilters: (filters: Partial<Filters<R>>) => void
   hiddenColumns: string[]
@@ -490,4 +504,103 @@ function HeaderWithContextMenu<R extends Record<string, unknown>>({
       </Flex>
     </OpenHomeCtxMenu>
   )
+}
+
+function buildHeaderContextMenu<R extends Record<string, unknown>>({
+  column,
+  columns,
+  sortColumns,
+  rows,
+  filters,
+  setFilters,
+  hiddenColumns,
+  setHiddenColumns,
+}: HeaderWithContextMenuProps<R>) {
+  const columnKey: keyof R = column.key
+
+  const columnFilter = filters[columnKey]
+
+  const getFilterValue = buildFilterValueGetter(rows, column)
+
+  const filterValues = getFilterValue
+    ? Array.from(new Set(rows.map(getFilterValue))).filter(
+        (val) => val !== null && val !== undefined
+      )
+    : []
+
+  const sortDirection = sortColumns.find((s) => s.columnKey === column.key)?.direction
+
+  const visibleColumnKeys = new Set(columns.map((c) => c.key)).difference(new Set(hiddenColumns))
+
+  const getFilterValueDropdownPos = column.getFilterValueDropdownPos
+
+  const filterDropdownSorter = getFilterValueDropdownPos
+    ? numericSorter((val: string) => getFilterValueDropdownPos(val))
+    : stringSorter((val: string) => val)
+
+  const activeFilter = columnFilter !== undefined && columnFilter.length !== filterValues.length
+
+  const headerCtxMenuBuilders = [
+    Label.component(column.name),
+    Separator,
+    getFilterValue
+      ? Submenu.label('Filter...')
+          .with(
+            Item.label(activeFilter ? 'Select All' : 'Deselect All').action(() =>
+              setFilters({
+                ...filters,
+                [columnKey]: activeFilter ? undefined : [],
+              })
+            )
+          )
+          .with(
+            ...filterValues.toSorted(filterDropdownSorter).map((filterValue) =>
+              Checkbox.label(filterValue)
+                .handleValueChanged(() => {
+                  if (columnFilter === undefined) {
+                    setFilters({
+                      ...filters,
+                      [columnKey]: filterValues.filter((otherValue) => filterValue !== otherValue),
+                    })
+                  } else if (columnFilter.includes(filterValue)) {
+                    setFilters({
+                      ...filters,
+                      [columnKey]: columnFilter.filter((otherValue) => filterValue !== otherValue),
+                    })
+                  } else {
+                    setFilters({
+                      ...filters,
+                      [columnKey]: [...columnFilter, filterValue],
+                    })
+                  }
+                })
+                .handleIsChecked(() => !columnFilter || columnFilter.includes(filterValue))
+            )
+          )
+      : undefined,
+    getFilterValue ? Item.label('Clear Filters').action(() => setFilters({})) : undefined,
+    getFilterValue ? Separator : undefined,
+    Submenu.label('Show/Hide Columns').with(
+      ...columns
+        .filter((col) => !!col.name)
+        .map((col) =>
+          Checkbox.component(col.name)
+            .handleValueChanged(() => {
+              if (visibleColumnKeys.has(col.key)) {
+                if (visibleColumnKeys.size > 1) {
+                  setHiddenColumns([...hiddenColumns, col.key])
+                }
+              } else {
+                setHiddenColumns([...hiddenColumns.filter((k) => k !== col.key)])
+              }
+            })
+            .handleIsChecked(() => visibleColumnKeys.has(col.key))
+        )
+    ),
+    Item.label('Reset to Default').action(() =>
+      setHiddenColumns(columns.filter((c) => c.hideByDefault).map((c) => c.key))
+    ),
+  ]
+
+  return headerCtxMenuBuilders
 }
