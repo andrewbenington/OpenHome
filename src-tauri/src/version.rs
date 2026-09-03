@@ -182,6 +182,7 @@ pub enum SignificantUpdate {
     V1_15_2,
     V1_16_0,
     V1_17_0,
+    V1_17_1,
 }
 
 impl SignificantUpdate {
@@ -219,6 +220,7 @@ impl SignificantUpdate {
             Self::V1_15_2 => Version::parse("1.15.2"),
             Self::V1_16_0 => Version::parse("1.16.0"),
             Self::V1_17_0 => Version::parse("1.17.0"),
+            Self::V1_17_1 => Version::parse("1.17.1"),
         }
         .expect("all versions are valid semver")
     }
@@ -379,6 +381,11 @@ impl SignificantUpdate {
                 "A significant performance issues affecting users with many tracked Pokémon has been fixed. More performance fixes are being worked on.",
                 "Some conversion/legality issues when sending Pokémon to Legends Arceus have been fixed.",
                 "Various other bugs have been fixed.",
+            ]),
+            Self::V1_17_1 => Some(vec![
+                "A bug preventing new users from launching the app has been fixed.",
+                "A bug where Arceus' Legend form caused a crash has been fixed.",
+                "A affecting Dark- and Steel- type Pokémon in the Gen 2 format has bene fixed.",
             ]),
             _ => None,
         }
