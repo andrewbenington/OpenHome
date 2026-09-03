@@ -5,10 +5,14 @@ import { PaginationCursor } from '@openhome-core/tauri/spectaCommands'
 import { $R, Option, R } from '@openhome-core/util/functional'
 import { $O } from '@openhome-core/util/option'
 import { filterUndefined } from '@openhome-core/util/sort'
-import useOhpkmColumns from '@openhome-ui/columns/ohpkm'
+import {
+  OhpkmRowData,
+  toRowData,
+  useTanstackOhpkmColumnsPrecomputed,
+} from '@openhome-ui/columns/tanstackOhpkmRowData'
 import { CtxMenuElementBuilder, Item, Label, Separator } from '@openhome-ui/components/context-menu'
 import SortableTable, { TableController } from '@openhome-ui/components/SortableTable'
-import { TABLE_FEATURES, toTanstackColumn } from '@openhome-ui/components/TanstackTableUtil'
+import { TABLE_FEATURES } from '@openhome-ui/components/TanstackTableUtil'
 import { useBanksAndBoxes } from '@openhome-ui/state-zustand/banks-and-boxes/store'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
@@ -16,7 +20,7 @@ import { Spinner } from '@radix-ui/themes'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { useCreateAtom } from '@tanstack/react-store'
 import { useTable } from '@tanstack/react-table'
-import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import './style.css'
 
@@ -45,17 +49,9 @@ export default function AllTrackedPokemon({
   )
   const [ctxMenuMonId, setCtxMenuMonId] = useState<Option<OhpkmIdentifier>>()
   const { releaseMonsById, trackedMonsToRelease } = saves
-  const columns = useOhpkmColumns(trackedMonsToRelease, onSelectMon)
   const navigate = useNavigate()
   const { switchBoxCurrentBank } = useBanksAndBoxes()
-  const [mons, setMons] = useState<OHPKM[]>()
   const tableContainerRef = useRef<HTMLDivElement>(null) // for listening to scroll
-
-  const getAllStoredMons = useEffectEvent(ohpkmStore.getAllStored)
-
-  useEffect(() => {
-    getAllStoredMons().then((mons) => setMons(mons ? Object.values(mons) : []))
-  }, [])
 
   const buildContextElements = useCallback(
     (mon: OHPKM) => {
@@ -104,10 +100,6 @@ export default function AllTrackedPokemon({
     ]
   )
 
-  const keyGetter = (row: NoInfer<OHPKM>): string => {
-    return row.openhomeId
-  }
-
   const { data, fetchNextPage, isFetching, isLoading } = useInfiniteQuery({
     queryKey: [
       'all-tracked',
@@ -119,9 +111,14 @@ export default function AllTrackedPokemon({
     ],
     queryFn: async (d) => {
       const pageParam = paginationAtom.get() ?? d.pageParam
-      return await ohpkmStore.searchStore(pageParam)
+      return await ohpkmStore.searchStore(pageParam).then(
+        R.map((page) => ({
+          ...page,
+          results: page.results.map((mon) => toRowData(mon, findHomeLocation, [])),
+        }))
+      )
     },
-    initialPageParam: { pageIndex: 0, pageSize: 100 },
+    initialPageParam: { pageIndex: 0, pageSize: 300 },
     getNextPageParam: (lastPage) => {
       return $R(lastPage).match(
         (page) => page.nextCursor,
@@ -133,22 +130,8 @@ export default function AllTrackedPokemon({
     },
   })
 
-  const atom = paginationAtom?.get()
-  const currentPageIndex = atom?.pageIndex
-  const currentPage = currentPageIndex !== undefined ? data?.pages[0] : undefined
-  const currentPageRows = currentPage
-    ? $R(currentPage).match(
-        (result) => result.results,
-        (e) => {
-          console.error(e)
-          return []
-        }
-      )
-    : []
-
   // flatten the array of arrays from the useInfiniteQuery hook
   const flatData = useMemo(() => {
-    console.log('flattening')
     return (
       data?.pages
         .flatMap(R.ok)
@@ -163,22 +146,20 @@ export default function AllTrackedPokemon({
     .orElse(0)
   const totalFetched = flatData.length
 
-  const NO_FETCH = false
   // called on scroll and possibly on mount to fetch more data as the user scrolls and reaches bottom of table
   const fetchMoreOnBottomReached = async () => {
-    console.log(tableContainerRef.current, isFetching, totalFetched >= totalDBRowCount)
-    if (!tableContainerRef.current || isFetching || totalFetched >= totalDBRowCount || NO_FETCH) {
+    if (!tableContainerRef.current || isFetching || totalFetched >= totalDBRowCount) {
       return
     }
-    console.log('fetching next page')
     await fetchNextPage()
   }
 
+  const columns = useTanstackOhpkmColumnsPrecomputed(onSelectMon)
   // 5. Create the table instance
-  const table: TableController<OHPKM> = useTable({
+  const table: TableController<OhpkmRowData> = useTable({
     key: 'person-table', // needed for devtools, omit if you don't want to use the devtools
     features: TABLE_FEATURES,
-    columns: columns.filter((col) => col.key !== 'rdg-select-column').map(toTanstackColumn),
+    columns: columns,
     // atoms: { pagination: paginationAtom },
     data: flatData,
     // onPaginationChange: (e) => console.dir(e),
@@ -203,7 +184,6 @@ export default function AllTrackedPokemon({
           table={table}
           columns={columns}
           style={{ borderLeft: 'none' }}
-          rowKeyGetter={keyGetter}
           // onCellContextMenu={(props, e) => {
           //   setCtxMenuMonId(props.row.openhomeId)
           //   setContextMenuBuilders(buildContextElements(props.row))
@@ -229,6 +209,7 @@ export default function AllTrackedPokemon({
           paginationAtom={paginationAtom}
           onScrolledToBottom={fetchMoreOnBottomReached}
           fetching={isFetching ? 'next' : undefined}
+          shouldLoadMore={flatData.length < totalDBRowCount}
         />
       </div>
     </div>

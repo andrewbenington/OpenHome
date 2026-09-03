@@ -1,4 +1,3 @@
-import { $R } from '@openhome-core/util/functional'
 import {
   booleanSorter,
   dayjsSorter,
@@ -13,7 +12,7 @@ import { cssClass } from '@openhome-ui/util/style'
 import { Flex, Spinner } from '@radix-ui/themes'
 import type { ColumnDef, ReactTable } from '@tanstack/react-table'
 import { isDayjs } from 'dayjs'
-import { ReactNode, RefObject, useMemo, useState } from 'react'
+import { ReactNode, RefObject, useCallback, useMemo } from 'react'
 import { type SortColumn } from 'react-data-grid'
 import 'react-data-grid/lib/styles.css'
 import { Checkbox, Item, Label, OpenHomeCtxMenu, Separator, Submenu } from './context-menu'
@@ -61,41 +60,41 @@ function sorterBySortType<T>(
   }
 }
 
-function sortRows<T extends SortableValue>(
-  rows: readonly T[],
-  columns: SortableColumn<T>[],
-  sortColumns: SortColumn[]
-) {
-  return rows.toSorted((a, b) => {
-    for (const sortParamColumn of sortColumns) {
-      const column = columns.find((col) => col.key === sortParamColumn.columnKey)
+// function sortRows<T extends SortableValue>(
+//   rows: readonly T[],
+//   columns: SortableTableColumn<T>[],
+//   sortColumns: SortColumn[]
+// ) {
+//   return rows.toSorted((a, b) => {
+//     for (const sortParamColumn of sortColumns) {
+//       const column = columns.find((col) => col.key === sortParamColumn.columnKey)
 
-      if (!column) continue
+//       if (!column) continue
 
-      let colComparer = column?.sortFunction
+//       let colComparer = column?.sortFunction
 
-      if (column?.sortType) {
-        const columnKey = column.key
+//       if (column?.sortType) {
+//         const columnKey = column.key
 
-        colComparer = sorterBySortType(column.sortType, columnKey)
-      }
+//         colComparer = sorterBySortType(column.sortType, columnKey)
+//       }
 
-      if (colComparer) {
-        const orderedComparer =
-          sortParamColumn.direction === 'ASC'
-            ? colComparer
-            : (a: T, b: T) => (colComparer?.(a, b) ?? 0) * -1
-        const comparison = orderedComparer(a, b)
+//       if (colComparer) {
+//         const orderedComparer =
+//           sortParamColumn.direction === 'ASC'
+//             ? colComparer
+//             : (a: T, b: T) => (colComparer?.(a, b) ?? 0) * -1
+//         const comparison = orderedComparer(a, b)
 
-        if (comparison !== 0) {
-          return comparison
-        }
-      }
-    }
+//         if (comparison !== 0) {
+//           return comparison
+//         }
+//       }
+//     }
 
-    return 0
-  })
-}
+//     return 0
+//   })
+// }
 
 function filterRows<T extends SortableValue>(
   rows: readonly T[],
@@ -144,30 +143,20 @@ export type SortableTableProps<R extends SortableValue> = {
   tableRef?: RefObject<HTMLDivElement | null>
   fetching?: 'prev' | 'next'
   onScrolledToBottom?: () => Promise<void>
+  shouldLoadMore?: boolean
 } & Omit<SortableDataGridProps<R>, 'columns' | 'rows'>
 
 export default function SortableTable<R extends SortableValue>(props: SortableTableProps<R>) {
-  const {
-    // rows,
-    columns,
-    defaultSort,
-    defaultSortOrder,
-    rowHeight,
-    defaultColumnOptions,
-    className,
-    dataQuery,
-    table,
-    tableRef,
-    ...otherProps
-  } = props
+  const { columns, className, table, tableRef, onScrolledToBottom } = props
 
-  const [sortColumns, setSortColumns] = useState<SortColumn[]>(
-    defaultSort ? [{ columnKey: defaultSort, direction: defaultSortOrder ?? 'ASC' }] : []
-  )
-  const [hiddenColumns, setHiddenColumns] = useState<string[]>(
-    columns.filter((col) => col.hideByDefault).map((col) => col.key) ?? []
-  )
-  const [filters, setFilters] = useState<Filters<R>>({})
+  console.warn('rendering SortableTable')
+  // const [sortColumns, setSortColumns] = useState<SortColumn[]>(
+  //   defaultSort ? [{ columnKey: defaultSort, direction: defaultSortOrder ?? 'ASC' }] : []
+  // )
+  // const [hiddenColumns, setHiddenColumns] = useState<string[]>(
+  //   columns.filter((col) => col.hideByDefault).map((col) => col.key) ?? []
+  // )
+  // const [filters, setFilters] = useState<Filters<R>>({})
 
   // const sortedRows = useMemo(
   //   () => sortRows(rows, columns, sortColumns),
@@ -190,35 +179,27 @@ export default function SortableTable<R extends SortableValue>(props: SortableTa
   //   typeof baseRowHeight === 'number'
   //     ? scaling * baseRowHeight
   //     : (row: NoInfer<R>) => scaling * baseRowHeight(row)
-  const atom = props.paginationAtom?.get()
-  const currentPageIndex = atom?.pageIndex
-  const currentPage = currentPageIndex !== undefined ? dataQuery?.data?.pages[0] : undefined
-  const currentPageRows = currentPage
-    ? $R(currentPage).match(
-        (result) => result.results,
-        (e) => {
-          console.error(e)
-          return []
-        }
-      )
-    : []
 
-  // called on scroll and possibly on mount to fetch more data as the user scrolls and reaches bottom of table
-  function fetchMoreOnBottomReached() {
-    if (tableRef?.current && props.onScrolledToBottom) {
+  const fetchMoreOnBottomReached = useCallback(async () => {
+    if (tableRef?.current && onScrolledToBottom) {
       const { scrollHeight, scrollTop, clientHeight } = tableRef.current
       // once the user has scrolled within 500px of the bottom of the table, fetch more data if we can
-      if (scrollHeight - scrollTop - clientHeight < clientHeight / 2) {
-        props.onScrolledToBottom()
+      if (scrollHeight - scrollTop - clientHeight < 400) {
+        await onScrolledToBottom()
       }
     }
-  }
+  }, [onScrolledToBottom, tableRef])
+
+  // if (props.fetching) {
+  //   console.info('table now fetching')
+  //   return <Spinner />
+  // }
 
   // 6. Render markup from the table instance APIs
   return (
     <div
       className={className}
-      style={{ height: '100%', overflow: 'auto', flex: 1 }}
+      style={{ height: '100%', overflow: 'auto', textWrap: 'nowrap' }}
       ref={tableRef}
       onScroll={fetchMoreOnBottomReached}
     >
@@ -227,32 +208,32 @@ export default function SortableTable<R extends SortableValue>(props: SortableTa
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id} style={{ height: '1.75rem' }}>
               {headerGroup.headers.map((header, i) => {
-                const column = columns[i]
+                // const column = columns[i]
                 return (
-                  <OpenHomeCtxMenu
+                  // <OpenHomeCtxMenu
+                  //   key={header.id}
+                  //   elements={buildHeaderContextMenu({
+                  //     column,
+                  //     columns,
+                  //     sortColumns,
+                  //     rows: currentPageRows,
+                  //     filters,
+                  //     setFilters,
+                  //     hiddenColumns,
+                  //     setHiddenColumns,
+                  //   })}
+                  // >
+                  <th
                     key={header.id}
-                    elements={buildHeaderContextMenu({
-                      column,
-                      columns,
-                      sortColumns,
-                      rows: currentPageRows,
-                      filters,
-                      setFilters,
-                      hiddenColumns,
-                      setHiddenColumns,
-                    })}
+                    className="rdg-header-row"
+                    colSpan={header.colSpan}
+                    style={{
+                      minWidth: `${header.column.columnDef.size}rem`,
+                    }}
                   >
-                    <th
-                      key={header.id}
-                      className="rdg-header-row"
-                      colSpan={header.colSpan}
-                      style={{
-                        width: `${header.column.columnDef.size}rem`,
-                      }}
-                    >
-                      {header.isPlaceholder ? null : <table.FlexRender header={header} />}
-                    </th>
-                  </OpenHomeCtxMenu>
+                    {header.isPlaceholder ? null : <table.FlexRender header={header} />}
+                  </th>
+                  // </OpenHomeCtxMenu>
                 )
               })}
             </tr>
@@ -272,17 +253,11 @@ export default function SortableTable<R extends SortableValue>(props: SortableTa
                 const column = columns[i + 1]
                 return (
                   <td
-                    // className='rdg-cell'
                     className={cssClass('rdg-cell')
                       .with(typeof column?.cellClass === 'string' ? column?.cellClass : undefined)
                       .build()}
                     key={cell.id}
-                    style={{
-                      minWidth: cell.column.columnDef.minSize ?? `${cell.column.columnDef.size}rem`,
-                      width: `${cell.column.columnDef.size}rem`,
-                      // display: 'table-cell',
-                    }}
-                    onContextMenu={(e) => props.onCellContextMenu?.({ row: cell.row.original }, e)}
+                    // onContextMenu={(e) => props.onCellContextMenu?.({ row: cell.row.original }, e)}
                   >
                     <table.FlexRender cell={cell} />
                   </td>
@@ -290,14 +265,13 @@ export default function SortableTable<R extends SortableValue>(props: SortableTa
               })}
             </tr>
           ))}
-
-          <tr>
-            <td colSpan={100} style={{ position: 'relative', height: '2rem' }}>
-              {props.fetching === 'next' && (
+          {props.shouldLoadMore && (
+            <tr>
+              <td colSpan={100} style={{ position: 'relative', height: '2rem' }}>
                 <Spinner size="3" style={{ position: 'sticky', left: '50%' }} />
-              )}
-            </td>
-          </tr>
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>
