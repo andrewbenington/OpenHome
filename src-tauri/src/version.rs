@@ -508,6 +508,10 @@ pub fn update_convert_strat_json_dot_keys(data_controller: &impl DataController)
 }
 
 fn update_ohpkm_filenames_standard_format(data_controller: &impl DataController) -> Result<()> {
+    if !data_controller.file_or_dir_exists(DataDir::Storage, MONS_V2_DIR)? {
+        return Ok(());
+    }
+
     let gen12_lookup_old: HashMap<String, String> = data_controller
         .read_file_json_if_exists(DataDir::Storage, GEN12_FILENAME)
         .transpose()?

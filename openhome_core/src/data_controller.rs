@@ -161,6 +161,14 @@ pub trait DataController {
         }
     }
 
+    fn file_or_dir_exists<P>(&self, dir: DataDir, relative_path: P) -> Result<bool>
+    where
+        P: AsRef<Path>,
+    {
+        let absolute_path = self.absolute_path(dir, relative_path)?;
+        fs::exists(&absolute_path).map_err(|e| Error::file_access(&absolute_path, e))
+    }
+
     fn list_directory<P>(&self, dir: DataDir, relative_path: P) -> Result<Vec<DirEntry>>
     where
         P: AsRef<Path>,
