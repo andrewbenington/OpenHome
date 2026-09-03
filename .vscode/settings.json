@@ -56,7 +56,7 @@
     "${workspaceFolder}/Cargo.toml",
     "${workspaceFolder}/pkm_rs/Cargo.toml"
   ],
-  "editor.inlayHints.enabled": "off",
+  "editor.inlayHints.enabled": "on",
   "editor.tabSize": 2,
   "python.terminal.activateEnvironment": false,
   "rust-analyzer.cargo.extraEnv": {

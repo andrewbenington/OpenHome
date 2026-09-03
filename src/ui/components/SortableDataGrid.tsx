@@ -1,3 +1,5 @@
+import { PaginatedPage, PaginationCursor } from '@openhome-core/tauri/spectaCommands'
+import { $R, Errorable } from '@openhome-core/util/functional'
 import {
   booleanSorter,
   dayjsSorter,
@@ -10,6 +12,9 @@ import {
 } from '@openhome-core/util/sort'
 import { useSettings } from '@openhome-ui/state/appInfo'
 import { Flex } from '@radix-ui/themes'
+import { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
+import { Atom } from '@tanstack/react-store'
+import { useTable } from '@tanstack/react-table'
 import { isDayjs } from 'dayjs'
 import { ReactNode, useMemo, useRef, useState, type RefAttributes } from 'react'
 import {
@@ -24,8 +29,9 @@ import {
 import 'react-data-grid/lib/styles.css'
 import { Checkbox, Item, Label, OpenHomeCtxMenu, Separator, Submenu } from './context-menu'
 import { DropdownArrowIcon, FilterIcon } from './Icons'
-import SortableTable from './SortableTable'
+import SortableTable, { TableController } from './SortableTable'
 import './style.css'
+import { TABLE_FEATURES, toTanstackColumn } from './TanstackTableUtil'
 
 const dataGridProps = {
   rowHeight: '2.5rem',
@@ -144,6 +150,8 @@ export type SortableDataGridProps<R extends SortableValue> = {
   columns: SortableColumn<R>[]
   defaultSort?: string
   defaultSortOrder?: 'ASC' | 'DESC'
+  paginationAtom?: Atom<PaginationCursor>
+  dataQuery?: UseInfiniteQueryResult<InfiniteData<Errorable<PaginatedPage<R>>>>
 } & DataGridProps<R> &
   RefAttributes<DataGridHandle>
 
@@ -224,7 +232,7 @@ export default function SortableDataGrid<R extends SortableValue>(props: Sortabl
   const { settings } = useSettings()
 
   if (settings.tableType === 'tanstack') {
-    return <SortableTable {...props} />
+    return <TanstackTable {...props} />
   }
 
   return (
@@ -439,4 +447,34 @@ function HeaderWithContextMenu<R extends Record<string, unknown>>({
       </Flex>
     </OpenHomeCtxMenu>
   )
+}
+
+function TanstackTable<R extends SortableValue>(props: SortableDataGridProps<R>) {
+  const atom = props.paginationAtom?.get()
+  const currentPageIndex = atom?.pageIndex
+  const currentPage = currentPageIndex !== undefined ? props.dataQuery?.data?.pages[0] : undefined
+  const currentPageRows = currentPage
+    ? $R(currentPage).match(
+        (result) => result.results,
+        (e) => {
+          console.error(e)
+          return []
+        }
+      )
+    : []
+
+  // 5. Create the table instance
+  const table: TableController<R> = useTable({
+    key: 'person-table', // needed for devtools, omit if you don't want to use the devtools
+    features: TABLE_FEATURES,
+    columns: props.columns.filter((col) => col.key !== 'rdg-select-column').map(toTanstackColumn),
+    atoms: { pagination: props.paginationAtom },
+    data: currentPageRows,
+    // onPaginationChange: (e) => console.dir(e),
+    // rowCount: dataQuery?.data?,
+    manualPagination: true,
+    pageCount: -1,
+  })
+
+  return <SortableTable {...props} table={table} />
 }

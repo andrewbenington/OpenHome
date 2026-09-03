@@ -4,6 +4,7 @@ use crate::synced_state;
 use openhome_core::Error;
 use openhome_core::data_controller::{DataController, DataDir, MONS_V2_DIR};
 use openhome_core::ohpkm_store::OhpkmBytesStore;
+use openhome_core::pagination::{PaginatedPage, PaginationCursor};
 use serde::Serialize;
 use std::path::Path;
 use std::{collections::HashMap, fs};
@@ -29,6 +30,15 @@ pub fn get_ohpkm_store(
     synced_state: tauri::State<'_, synced_state::AllSyncedState>,
 ) -> CommandResult<Vec<(String, String)>> {
     Ok(synced_state.ohpkm_store_b64()?)
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn search_ohpkm_store(
+    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
+    pagination_cursor: PaginationCursor,
+) -> CommandResult<PaginatedPage<String>> {
+    Ok(synced_state.search_ohpkm_store(pagination_cursor)?)
 }
 
 #[tauri::command]

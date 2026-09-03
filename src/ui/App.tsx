@@ -26,6 +26,7 @@ import { SavesProvider } from '@openhome-ui/state/saves'
 import ErrorMessageModal from '@openhome-ui/top-level/ErrorMessageModal'
 import UpdateMessageModal from '@openhome-ui/top-level/UpdateMessageModal'
 import { Flex, Text, Theme } from '@radix-ui/themes'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useCallback, useEffect, useEffectEvent, useReducer, useState } from 'react'
 import BanksAndBoxesProvider from './state-zustand/banks-and-boxes/Provider'
 import { useBanksAndBoxes } from './state-zustand/banks-and-boxes/store'
@@ -37,6 +38,8 @@ const ZOOM_MIN_PCT = 50
 const ZOOM_MAX_PCT = 160
 
 const REDIRECT_WEB_CONSOLE = false
+
+const queryClient = new QueryClient()
 
 export default function App() {
   const isDarkMode = useIsDarkMode()
@@ -53,9 +56,11 @@ export default function App() {
       <div id="app-container" className="root">
         <BackendContext value={TauriBackend}>
           <ErrorContext value={[errorState, errorDispatch]}>
-            <BanksAndBoxesProvider>
-              <AppWithBackend />
-            </BanksAndBoxesProvider>
+            <QueryClientProvider client={queryClient}>
+              <BanksAndBoxesProvider>
+                <AppWithBackend />
+              </BanksAndBoxesProvider>
+            </QueryClientProvider>
           </ErrorContext>
         </BackendContext>
       </div>

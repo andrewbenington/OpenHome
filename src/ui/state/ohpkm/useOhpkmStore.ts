@@ -10,6 +10,7 @@ import {
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
 import { SAVClass } from '@openhome-core/save/util'
+import { PaginationCursor } from '@openhome-core/tauri/spectaCommands'
 import { expectExhaustive } from '@openhome-core/util'
 import { $R, Errorable, Option, R, Result } from '@openhome-core/util/functional'
 import { FourMoves } from '@openhome-core/util/types'
@@ -84,6 +85,10 @@ export function useOhpkmStore() {
       .loadOhpkmStore()
       .then(R.map((mons) => Object.fromEntries(Object.entries(mons).slice(0, 100))))
       .then(R.ok)
+  }
+
+  async function searchStore(cursor: PaginationCursor) {
+    return backend.searchOhpkmStore(cursor)
   }
 
   async function getAllStoredIds() {
@@ -356,6 +361,7 @@ export function useOhpkmStore() {
     setMonNickname,
     setMonMove,
 
+    searchStore,
     getAllStored,
     getAllStoredIds,
     updateAndConvertForSave,
