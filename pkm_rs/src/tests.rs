@@ -219,14 +219,20 @@ pub fn assert_pkm_match<T: Debug>(
     expected_bytes: &[u8],
     path: Option<PathBuf>,
 ) -> TestResult<()> {
+    let mut preamble = "\nLeft = ACTUAL, Right = EXPECTED".to_owned();
+    if let Some(path) = &path {
+        preamble = format!("{preamble}\nPath: {}\n", path.to_string_lossy());
+    }
+
     let actual_debug = format!(
-        "{}\n{path:#?}: \n{actual_pkm:#?}",
+        "{preamble}\n{}\n{path:#?}: \n{actual_pkm:#?}",
         pretty_hex(&actual_bytes)
     );
     let expected_debug = format!(
-        "{}\n{path:#?}: \n{expected_pkm:#?}",
+        "{preamble}\n{}\n{path:#?}: \n{expected_pkm:#?}",
         pretty_hex(&expected_bytes)
     );
+
     assert_eq!(actual_debug, expected_debug);
 
     Ok(())
@@ -276,6 +282,10 @@ impl ByteRange {
     pub const fn range(&self) -> RangeInclusive<usize> {
         self.start_idx..=self.end_idx
     }
+
+    pub const fn size(&self) -> usize {
+        self.end_idx - self.start_idx
+    }
 }
 
 fn u8_slice_to_hex_string(slice: &[u8]) -> String {
@@ -310,9 +320,7 @@ fn find_inconsistencies_from_file<PKM: Pkm + Debug>(path: &Path) -> TestResult<(
 #[cfg(feature = "randomize")]
 pub fn find_inconsistencies_to_from_bytes<PKM: Pkm>(mon: PKM) -> TestResult<()> {
     let expected = mon.to_box_bytes();
-    println!("to bytes: {}", u8_slice_to_hex_string(&expected));
     let actual = PKM::from_bytes(&expected)?.to_box_bytes();
-    println!("actual: {}", u8_slice_to_hex_string(&actual));
 
     let differences = find_differing_ranges(&actual, &expected);
 
@@ -387,8 +395,8 @@ pub fn compare_pkhex_json<PKM: Pkm + PkhexJson>(pkm_path: &Path) -> TestResult<(
 
     let mut json_path = Path::new("pkhex-json").join(pkm_path);
     json_path.set_extension("json");
-    let mut file = File::open(json_path)
-        .map_err(|e| Error::other(&format!("Failed to open JSON file: {e}")))?;
+    let mut file = File::open(&json_path)
+        .map_err(|e| Error::other(&format!("Failed to open JSON file {json_path:?}: {e}")))?;
 
     let mut pkhex_json = String::new();
     file.read_to_string(&mut pkhex_json)
@@ -630,7 +638,10 @@ pub fn assert_unchanged<T: std::hash::Hash>(
 
 fn format_byte_range_differences(diffs: &[ByteRange], actual: &[u8], expected: &[u8]) -> String {
     let mut output = String::new();
+    let mut total_differences = 0usize;
     for diff in diffs {
+        total_differences += diff.size();
+
         let actual_bytes = &actual[diff.range()];
         let expected_bytes = &expected[diff.range()];
         output.push_str(&format!(
@@ -643,6 +654,10 @@ fn format_byte_range_differences(diffs: &[ByteRange], actual: &[u8], expected: &
         output.push_str(&format!("  expected:  {expected_hex}\n"));
         output.push_str(&format!("  actual:    {actual_hex}\n"));
     }
+    output.push_str(&format!(
+        "Total:      {total_differences} ({} chunks)\n",
+        diffs.len()
+    ));
     output
 }
 

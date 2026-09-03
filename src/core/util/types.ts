@@ -1,5 +1,5 @@
 import { PathData } from '@openhome-core/save/util/path'
-import { BinaryGender, Gender, OriginGame, Stats16Le } from '@pkm-rs/pkg'
+import { BinaryGender, Gender, OriginGame, Stats16 } from '@pkm-rs/pkg'
 import { PluginIdentifier } from '../save/interfaces'
 
 export type Type =
@@ -107,7 +107,7 @@ export function writePKMDateToBytes(dataView: DataView, offset: number, date: PK
   dataView.setUint8(offset + 2, date ? date.day : 0)
 }
 
-export type Stats = Stats16Le
+export type Stats = Stats16
 
 export function isStandardStats(stats?: object): stats is Stats {
   return (

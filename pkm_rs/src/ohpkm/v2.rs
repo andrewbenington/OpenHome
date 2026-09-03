@@ -14,12 +14,10 @@ use crate::ohpkm::id::OpenHomeId;
 use crate::ohpkm::issues::OhpkmIssue;
 use crate::ohpkm::v1::OhpkmV1;
 use crate::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, StoredPkmBytes, UnconvertedPkm};
+use crate::ohpkm::v2_sections::{COLO_UNUSED_DATA_SIZE, ColoUnusedData, OrreData};
 use crate::result::{Error, Result};
 use crate::sectioned_data::{DataSection, SectionTag, SectionedData};
 use crate::traits::{HasSpeciesAndForm, IsShiny, PkmBytes};
-
-#[cfg(feature = "wasm")]
-use arrayref::array_ref;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::{MoveIndex, MoveSlots, la_tutor, lza_tm, sv_tm, swsh_tr};
@@ -30,8 +28,8 @@ use pkm_rs_resources::species::SpeciesMetadata;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, FlagSet, Gender, Geolocations, HyperTraining, Ivs,
-    Language, MarkingsSixShapesColors, OriginGame, PokeDate, Pokerus, ShinyLeaves, Stats8,
-    Stats16Le, StatsPreSplit, TeraType, TrainerData, TrainerMemory,
+    Language, MarkingsSixShapesColors, OriginGame, PokeDate, Pokerus, ShinyLeaves, Stats8, Stats16,
+    StatsPreSplit, TeraType, TrainerData, TrainerMemory,
 };
 use serde::Serialize;
 use strum_macros::Display;
@@ -47,6 +45,8 @@ use crate::gen9_lza::{LZA_BASE_TM_BYTES, LZA_DLC_TM_BYTES};
 use crate::gen9_sv;
 #[cfg(feature = "wasm")]
 use crate::ohpkm::v2_sections::{MonTag, pkm_bytes};
+#[cfg(feature = "wasm")]
+use arrayref::array_ref;
 #[cfg(feature = "wasm")]
 use pkm_rs_resources::abilities::AbilityIndexWasm;
 #[cfg(feature = "wasm")]
@@ -133,6 +133,8 @@ pub enum OhpkmSectionTag {
     UnconvertedPkm = 0x0E,
     PastHandlerV2 = 0x0F,
     LearnedMoves = 0x10,
+    OrreData = 0x12,
+    ColosseumUnusedData = 0x13,
 
     // deprecated, but can't mark it as such without warnings
     PastHandlerV1 = 0x08,
@@ -143,6 +145,8 @@ impl OhpkmSectionTag {
         match tag {
             0x00 => Some(Self::MainData),
             0x01 => Some(Self::GameboyData),
+            0x12 => Some(Self::OrreData),
+            0x13 => Some(Self::ColosseumUnusedData),
             0x02 => Some(Self::Gen45Data),
             0x03 => Some(Self::Gen67Data),
             0x04 => Some(Self::SwordShield),
@@ -189,6 +193,8 @@ impl OhpkmSectionTag {
             Self::OriginalBackup => 2, // Size of the tag
             Self::UnconvertedPkm => 2, // Size of the tag
             Self::LearnedMoves => 2,   // Size of length field
+            Self::OrreData => 10,      // id (2), purification (4), exp (4)
+            Self::ColosseumUnusedData => COLO_UNUSED_DATA_SIZE,
 
             #[allow(deprecated)]
             Self::PastHandlerV1 => 39,
@@ -215,20 +221,29 @@ impl SectionTag for OhpkmSectionTag {
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct OhpkmV2 {
     main_data: MainDataV2,
+
     gameboy_data: Option<GameboyData>,
+
+    orre_data: Option<OrreData>,
+    #[serde(skip)]
+    colo_unused_data: Option<ColoUnusedData>,
+
     gen45_data: Option<Gen45Data>,
     gen67_data: Option<Gen67Data>,
     swsh_data: Option<SwordShieldData>,
     la_data: Option<LegendsArceusData>,
     sv_data: Option<ScarletVioletData>,
     lza_data: Option<LegendsZaData>,
+
     handler_data: Vec<PastHandlerDataV2>,
     learned_moves: Option<LearnedMoves>,
     plugin_data: Option<PluginData>,
     notes: Option<Notes>,
     most_recent_save: Option<MostRecentSave>,
+
     #[cfg_attr(feature = "randomize", randomize(skip))]
     tags: Option<MonTags>,
+
     #[cfg_attr(feature = "randomize", randomize(skip))]
     #[serde(skip)]
     original_data: Option<OriginalBackup>,
@@ -243,10 +258,23 @@ impl OhpkmV2 {
     pub fn convert_without_backup<PKM: OhpkmConvert>(other: &PKM) -> Self {
         let mut ohpkm = Self {
             main_data: other.to_main_data(),
+            gameboy_data: None,
+            gen45_data: None,
+            orre_data: other.to_orre_data(),
+            colo_unused_data: other.to_colo_unused_data(),
             gen67_data: other.to_gen_67_data(),
             swsh_data: other.to_swsh_data(),
+            la_data: None,
             sv_data: other.to_sv_data(),
-            ..Default::default()
+            lza_data: other.to_lza_data(),
+            handler_data: vec![],
+            learned_moves: other.to_learned_moves(),
+            plugin_data: None,
+            notes: None,
+            most_recent_save: None,
+            tags: None,
+            original_data: None,
+            unconverted_pkm: None,
         };
 
         ohpkm.regenerate_openhome_id();
@@ -872,6 +900,28 @@ impl OhpkmV2 {
         })
     }
 
+    // Gamecube
+
+    #[cfg(feature = "wasm")]
+    pub const fn orre_data(&self) -> Option<OrreData> {
+        self.orre_data
+    }
+
+    #[cfg(feature = "wasm")]
+    pub const fn set_orre_data(&mut self, v: Option<OrreData>) {
+        self.orre_data = v
+    }
+
+    #[cfg(feature = "wasm")]
+    pub const fn colo_unused_data(&self) -> Option<ColoUnusedData> {
+        self.colo_unused_data
+    }
+
+    #[cfg(feature = "wasm")]
+    pub const fn set_colo_unused_data(&mut self, v: Option<ColoUnusedData>) {
+        self.colo_unused_data = v
+    }
+
     // Gen 4/5
 
     pub fn encounter_type(&self) -> Option<u8> {
@@ -1131,16 +1181,16 @@ impl OhpkmV2 {
         }
     }
 
-    pub fn avs(&self) -> Option<Stats16Le> {
+    pub fn avs(&self) -> Option<Stats16> {
         Some(self.gen67_data?.avs)
     }
 
-    pub fn set_avs(&mut self, value: Option<Stats16Le>) {
+    pub fn set_avs(&mut self, value: Option<Stats16>) {
         match value {
             Some(avs) => self.gen67_data.get_or_insert_default().avs = avs,
             None => {
                 if let Some(gen67_data) = &mut self.gen67_data {
-                    gen67_data.avs = Stats16Le::default()
+                    gen67_data.avs = Stats16::default()
                 }
             }
         }
@@ -1597,6 +1647,8 @@ impl OhpkmV2 {
         Ok(Self {
             main_data: MainDataV2::new(national_dex, form_index)?,
             gameboy_data: None,
+            orre_data: None,
+            colo_unused_data: None,
             gen45_data: None,
             gen67_data: None,
             swsh_data: None,
@@ -1636,6 +1688,8 @@ impl OhpkmV2 {
             main_data: MainDataV2::extract_from(&sectioned_data)?
                 .ok_or(Error::other("Main data not present in OHPKM V2 file"))?,
             gameboy_data: GameboyData::extract_from(&sectioned_data)?,
+            orre_data: OrreData::extract_from(&sectioned_data)?,
+            colo_unused_data: ColoUnusedData::extract_from(&sectioned_data)?,
             gen45_data: Gen45Data::extract_from(&sectioned_data)?,
             gen67_data: Gen67Data::extract_from(&sectioned_data)?,
             swsh_data: SwordShieldData::extract_from(&sectioned_data)?,
@@ -1677,6 +1731,8 @@ impl OhpkmV2 {
             main_data: MainDataV2::extract_from(&sectioned_data)?
                 .ok_or(Error::other("Main data not present in OHPKM V2 file"))?,
             gameboy_data: GameboyData::extract_from(&sectioned_data).ok().flatten(),
+            orre_data: OrreData::extract_from(&sectioned_data).ok().flatten(),
+            colo_unused_data: ColoUnusedData::extract_from(&sectioned_data).ok().flatten(),
             gen45_data: Gen45Data::extract_from(&sectioned_data).ok().flatten(),
             gen67_data: Gen67Data::extract_from(&sectioned_data).ok().flatten(),
             swsh_data: SwordShieldData::extract_from(&sectioned_data)
@@ -1713,6 +1769,8 @@ impl OhpkmV2 {
         Self {
             main_data: MainDataV2::from_v1(old),
             gameboy_data: GameboyData::from_v1(old),
+            orre_data: OrreData::from_v1(old),
+            colo_unused_data: None,
             gen45_data: Gen45Data::from_v1(old),
             gen67_data: Gen67Data::from_v1(old),
             swsh_data: SwordShieldData::from_v1(old),
@@ -1740,6 +1798,8 @@ impl OhpkmV2 {
         let Self {
             main_data,
             gameboy_data,
+            orre_data,
+            colo_unused_data,
             gen45_data,
             gen67_data,
             swsh_data,
@@ -1759,6 +1819,8 @@ impl OhpkmV2 {
         sectioned_data
             .add(main_data)
             .add_if_some(gameboy_data)
+            .add_if_some(orre_data)
+            .add_if_some(colo_unused_data)
             .add_if_some(gen45_data)
             .add_if_some(gen67_data)
             .add_if_some(swsh_data)
@@ -1999,6 +2061,8 @@ impl OhpkmV2 {
         let Self {
             main_data,
             gameboy_data,
+            orre_data,
+            colo_unused_data,
             gen45_data,
             gen67_data,
             swsh_data,
@@ -2022,6 +2086,8 @@ impl OhpkmV2 {
         )?;
 
         add_section_bytes_to_js_object(&obj, gameboy_data)?;
+        add_section_bytes_to_js_object(&obj, orre_data)?;
+        add_section_bytes_to_js_object(&obj, colo_unused_data)?;
         add_section_bytes_to_js_object(&obj, gen45_data)?;
         add_section_bytes_to_js_object(&obj, gen67_data)?;
         add_section_bytes_to_js_object(&obj, swsh_data)?;
@@ -2206,11 +2272,11 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = evs)]
-    pub fn evs_js(&self) -> Stats16Le {
+    pub fn evs_js(&self) -> Stats16 {
         self.evs().into()
     }
     #[wasm_bindgen(setter = evs)]
-    pub fn set_evs_js(&mut self, v: Stats16Le) {
+    pub fn set_evs_js(&mut self, v: Stats16) {
         self.set_evs(&v.try_into().expect("evs should not exceed 255 each"));
     }
 
@@ -2306,11 +2372,11 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = ivs)]
-    pub fn ivs_js(&self) -> Stats16Le {
+    pub fn ivs_js(&self) -> Stats16 {
         self.ivs().into()
     }
     #[wasm_bindgen(setter = ivs)]
-    pub fn set_ivs_js(&mut self, v: &Stats16Le) {
+    pub fn set_ivs_js(&mut self, v: &Stats16) {
         self.set_ivs(v.to_ivs_capped());
     }
 
@@ -3082,17 +3148,17 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = avs)]
-    pub fn avs_js(&self) -> Option<Stats16Le> {
+    pub fn avs_js(&self) -> Option<Stats16> {
         Some(self.gen67_data?.avs)
     }
 
     #[wasm_bindgen(setter = avs)]
-    pub fn set_avs_js(&mut self, value: Option<Stats16Le>) {
+    pub fn set_avs_js(&mut self, value: Option<Stats16>) {
         match value {
             Some(avs) => self.gen67_data.get_or_insert_default().avs = avs,
             None => {
                 if let Some(gen67_data) = &mut self.gen67_data {
-                    gen67_data.avs = Stats16Le::default()
+                    gen67_data.avs = Stats16::default()
                 }
             }
         }
@@ -3176,12 +3242,12 @@ impl OhpkmV2 {
     // Legends Arceus
 
     #[wasm_bindgen(getter = gvs)]
-    pub fn gvs_js(&self) -> Option<Stats16Le> {
+    pub fn gvs_js(&self) -> Option<Stats16> {
         Some(self.la_data?.gvs.into())
     }
 
     #[wasm_bindgen(setter = gvs)]
-    pub fn set_gvs_js(&mut self, value: Option<Stats16Le>) {
+    pub fn set_gvs_js(&mut self, value: Option<Stats16>) {
         match value {
             Some(gvs) => {
                 self.la_data.get_or_insert_default().gvs =
@@ -3486,7 +3552,6 @@ impl OhpkmV2 {
         match value {
             Some(flags) => {
                 let mut new_bytes = [0u8; LZA_DLC_TM_BYTES];
-                dbg!(new_bytes, LZA_DLC_TM_BYTES);
                 new_bytes.copy_from_slice(&flags);
                 self.lza_data.get_or_insert_default().tm_flags_dlc =
                     FlagSet::<LZA_DLC_TM_BYTES>::from_bytes(new_bytes);

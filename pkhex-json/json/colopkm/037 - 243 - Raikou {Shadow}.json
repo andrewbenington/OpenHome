@@ -1,0 +1,99 @@
+{
+  "pokemon_index": 243,
+  "held_item_index": null,
+  "trainer_id": 57413,
+  "secret_id": 24795,
+  "exp": 80000,
+  "ability_num": "First",
+  "markings": {
+    "circle": false,
+    "square": false,
+    "triangle": false,
+    "heart": false
+  },
+  "personality_value": 1499423931,
+  "is_fateful_encounter": false,
+  "gender": "Genderless",
+  "evs": {
+    "hp": 0,
+    "atk": 0,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 0
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "pokerus": "strain 0, 0 days remaining",
+  "ribbons": [],
+  "nickname": "RAIKOU",
+  "nickname_trash": "005200410049004B004F005500000000000000000000",
+  "moves": [
+    {
+      "move_index": "Rain Dance",
+      "pp": 5,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Leer",
+      "pp": 30,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Quick Attack",
+      "pp": 30,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Thunder",
+      "pp": 10,
+      "pp_ups": 0
+    }
+  ],
+  "ivs": {
+    "hp": 16,
+    "atk": 21,
+    "def": 6,
+    "spa": 15,
+    "spd": 18,
+    "spe": 12
+  },
+  "is_egg": false,
+  "trainer_name": "RoC",
+  "trainer_name_trash": "0052006F004300000000000000000000000000000000",
+  "trainer_friendship": 0,
+  "shadow_data": {
+    "id": {
+      "colo": 34
+    },
+    "exp": 0,
+    "purification": {
+      "shadow_gauge": 13000
+    }
+  },
+  "current_region": "Pal",
+  "original_region": "NtscUsa",
+  "met_location_index": 69,
+  "ball": "Ultra",
+  "met_level": 40,
+  "trainer_gender": "Male",
+  "game_of_origin": "Colosseum/XD",
+  "language": "English",
+  "stat_level": 40,
+  "current_hp": 128,
+  "stats": {
+    "hp": 128,
+    "atk": 81,
+    "def": 67,
+    "spa": 103,
+    "spd": 92,
+    "spe": 101
+  },
+  "level": 40
+}

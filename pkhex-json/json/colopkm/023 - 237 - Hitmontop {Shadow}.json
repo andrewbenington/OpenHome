@@ -1,0 +1,99 @@
+{
+  "pokemon_index": 237,
+  "held_item_index": 207,
+  "trainer_id": 57413,
+  "secret_id": 24795,
+  "exp": 54872,
+  "ability_num": "First",
+  "markings": {
+    "circle": false,
+    "square": false,
+    "triangle": false,
+    "heart": false
+  },
+  "personality_value": 1304690821,
+  "is_fateful_encounter": false,
+  "gender": "Male",
+  "evs": {
+    "hp": 0,
+    "atk": 0,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 0
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "pokerus": "strain 0, 0 days remaining",
+  "ribbons": [],
+  "nickname": "HITMONTOP",
+  "nickname_trash": "004800490054004D004F004E0054004F005000000000",
+  "moves": [
+    {
+      "move_index": "Agility",
+      "pp": 30,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Focus Energy",
+      "pp": 30,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Triple Kick",
+      "pp": 10,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Rapid Spin",
+      "pp": 40,
+      "pp_ups": 0
+    }
+  ],
+  "ivs": {
+    "hp": 31,
+    "atk": 0,
+    "def": 23,
+    "spa": 1,
+    "spd": 18,
+    "spe": 16
+  },
+  "is_egg": false,
+  "trainer_name": "RoC",
+  "trainer_name_trash": "0052006F004300000000000000000000000000000000",
+  "trainer_friendship": 0,
+  "shadow_data": {
+    "id": {
+      "colo": 20
+    },
+    "exp": 0,
+    "purification": {
+      "shadow_gauge": 5700
+    }
+  },
+  "current_region": "Pal",
+  "original_region": "NtscUsa",
+  "met_location_index": 39,
+  "ball": "Great",
+  "met_level": 38,
+  "trainer_gender": "Male",
+  "game_of_origin": "Colosseum/XD",
+  "language": "English",
+  "stat_level": 38,
+  "current_hp": 97,
+  "stats": {
+    "hp": 97,
+    "atk": 77,
+    "def": 76,
+    "spa": 31,
+    "spd": 104,
+    "spe": 64
+  },
+  "level": 38
+}

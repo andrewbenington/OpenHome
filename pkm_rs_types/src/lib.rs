@@ -1,21 +1,27 @@
 mod bounded;
+mod colosseum;
 mod games;
 mod language;
 mod markings;
 mod national_dex;
 mod pkm_types;
+mod region;
 mod result;
 mod stats;
 mod structures;
 mod traits;
 mod util;
 
+pub mod shadow;
+
 pub use bounded::*;
+pub use colosseum::*;
 pub use games::*;
 pub use language::*;
 pub use markings::*;
 pub use national_dex::*;
 pub use pkm_types::*;
+pub use region::*;
 pub use result::*;
 pub use stats::*;
 pub use structures::*;
