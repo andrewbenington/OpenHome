@@ -1,4 +1,4 @@
-import { buildErr, buildOk, Mapper, NullableOption, OnOk, Option, Result } from './functional'
+import { Mapper, NullableOption, OnOk, Option } from './functional'
 
 export function isSome<T>(v: Option<T>): v is T & {} {
   return v !== undefined && v !== null
@@ -15,7 +15,7 @@ function flatMap<T, U>(transform: Mapper<T, Option<U>>): (option: NullableOption
 // Wrapper function for an Option utility
 export function $O<T>(v: T | undefined | null) {
   return {
-    orElse: <E>(error: E): Result<T, E> => (isSome(v) ? buildOk(v) : buildErr(error)),
+    orElse: (fallback: T): T => (isSome(v) ? v : fallback),
     map: <R>(onOk: OnOk<T, R>) => $O(map(onOk)(v)),
     flatMap: <R>(onOk: OnOk<T, Option<R>>) => $O(flatMap(onOk)(v)),
     get: () => (isSome(v) ? v : undefined),

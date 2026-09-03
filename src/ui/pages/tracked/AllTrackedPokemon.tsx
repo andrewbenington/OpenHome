@@ -1,21 +1,22 @@
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
-import { Option } from '@openhome-core/util/functional'
-import { stringSorter } from '@openhome-core/util/sort'
+import { PaginationCursor } from '@openhome-core/tauri/spectaCommands'
+import { $R, Option, R } from '@openhome-core/util/functional'
+import { $O } from '@openhome-core/util/option'
+import { filterUndefined } from '@openhome-core/util/sort'
 import useOhpkmColumns from '@openhome-ui/columns/ohpkm'
-import {
-  CtxMenuElementBuilder,
-  Item,
-  Label,
-  OpenHomeCtxMenu,
-  Separator,
-} from '@openhome-ui/components/context-menu'
-import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
+import { CtxMenuElementBuilder, Item, Label, Separator } from '@openhome-ui/components/context-menu'
+import SortableTable, { TableController } from '@openhome-ui/components/SortableTable'
+import { TABLE_FEATURES, toTanstackColumn } from '@openhome-ui/components/TanstackTableUtil'
 import { useBanksAndBoxes } from '@openhome-ui/state-zustand/banks-and-boxes/store'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
-import { useCallback, useEffect, useEffectEvent, useState } from 'react'
+import { Spinner } from '@radix-ui/themes'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { useCreateAtom } from '@tanstack/react-store'
+import { useTable } from '@tanstack/react-table'
+import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import './style.css'
 
@@ -30,6 +31,10 @@ export default function AllTrackedPokemon({
   findSaveForMon,
   findSavesForAllMons,
 }: AllTrackedPokemonProps) {
+  const paginationAtom = useCreateAtom<PaginationCursor>({
+    pageIndex: 0, // initial page index
+    pageSize: 100, // default page size
+  })
   const ohpkmStore = useOhpkmStore()
   const saves = useSaves()
   const { findHomeLocation } = useBanksAndBoxes()
@@ -44,14 +49,13 @@ export default function AllTrackedPokemon({
   const navigate = useNavigate()
   const { switchBoxCurrentBank } = useBanksAndBoxes()
   const [mons, setMons] = useState<OHPKM[]>()
+  const tableContainerRef = useRef<HTMLDivElement>(null) // for listening to scroll
 
   const getAllStoredMons = useEffectEvent(ohpkmStore.getAllStored)
 
   useEffect(() => {
     getAllStoredMons().then((mons) => setMons(mons ? Object.values(mons) : []))
   }, [])
-
-  console.log(mons?.length)
 
   const buildContextElements = useCallback(
     (mon: OHPKM) => {
@@ -104,30 +108,111 @@ export default function AllTrackedPokemon({
     return row.openhomeId
   }
 
+  const { data, fetchNextPage, isFetching, isLoading } = useInfiniteQuery({
+    queryKey: [
+      'all-tracked',
+      'cursor',
+      paginationAtom.get().pageIndex,
+      paginationAtom.get().pageSize,
+      'sorting',
+      'globalFilter',
+    ],
+    queryFn: async (d) => {
+      const pageParam = paginationAtom.get() ?? d.pageParam
+      return await ohpkmStore.searchStore(pageParam)
+    },
+    initialPageParam: { pageIndex: 0, pageSize: 100 },
+    getNextPageParam: (lastPage) => {
+      return $R(lastPage).match(
+        (page) => page.nextCursor,
+        (e) => {
+          console.error(e)
+          return paginationAtom.get()
+        }
+      )
+    },
+  })
+
+  const atom = paginationAtom?.get()
+  const currentPageIndex = atom?.pageIndex
+  const currentPage = currentPageIndex !== undefined ? data?.pages[0] : undefined
+  const currentPageRows = currentPage
+    ? $R(currentPage).match(
+        (result) => result.results,
+        (e) => {
+          console.error(e)
+          return []
+        }
+      )
+    : []
+
+  // flatten the array of arrays from the useInfiniteQuery hook
+  const flatData = useMemo(() => {
+    console.log('flattening')
+    return (
+      data?.pages
+        .flatMap(R.ok)
+        .filter(filterUndefined)
+        .flatMap((page) => page.results) ?? []
+    )
+  }, [data])
+
+  const totalDBRowCount = $O(data?.pages[0])
+    .flatMap(R.ok)
+    .map((page) => page.totalCount)
+    .orElse(0)
+  const totalFetched = flatData.length
+
+  const NO_FETCH = false
+  // called on scroll and possibly on mount to fetch more data as the user scrolls and reaches bottom of table
+  const fetchMoreOnBottomReached = async () => {
+    console.log(tableContainerRef.current, isFetching, totalFetched >= totalDBRowCount)
+    if (!tableContainerRef.current || isFetching || totalFetched >= totalDBRowCount || NO_FETCH) {
+      return
+    }
+    console.log('fetching next page')
+    await fetchNextPage()
+  }
+
+  // 5. Create the table instance
+  const table: TableController<OHPKM> = useTable({
+    key: 'person-table', // needed for devtools, omit if you don't want to use the devtools
+    features: TABLE_FEATURES,
+    columns: columns.filter((col) => col.key !== 'rdg-select-column').map(toTanstackColumn),
+    // atoms: { pagination: paginationAtom },
+    data: flatData,
+    // onPaginationChange: (e) => console.dir(e),
+    // rowCount: dataQuery?.data?,
+    manualPagination: true,
+    // pageCount: -1,
+  })
+
+  if (isLoading) return <Spinner />
+
   return (
-    <OpenHomeCtxMenu
-      elements={contextMenuBuilders}
-      onOpenChange={(open: boolean) => {
-        if (!open) setCtxMenuMonId(undefined)
-      }}
-      style={{ overflow: 'hidden' }}
-    >
+    // <OpenHomeCtxMenu
+    //   elements={contextMenuBuilders}
+    //   onOpenChange={(open: boolean) => {
+    //     if (!open) setCtxMenuMonId(undefined)
+    //   }}
+    <div style={{ overflow: 'hidden', height: '100%' }}>
       {/* this div is necessary to give the context menu a target */}
       <div style={{ height: '100%', width: '100%', backgroundColor: 'var(--gray-3)' }}>
-        <SortableDataGrid
-          rows={mons?.toSorted(stringSorter((mon) => mon.openhomeId)) ?? []}
+        <SortableTable
+          tableRef={tableContainerRef}
+          table={table}
           columns={columns}
           style={{ borderLeft: 'none' }}
           rowKeyGetter={keyGetter}
-          onCellContextMenu={(props, e) => {
-            setCtxMenuMonId(props.row.openhomeId)
-            setContextMenuBuilders(buildContextElements(props.row))
-            // ooh i hate this, radix please expose your context menu api
-            const menu = document.querySelector('[data-radix-popper-content-wrapper]')
-            if (menu) {
-              ;(menu as HTMLElement).style.transform = `translate(${e.clientX}px, ${e.clientY}px)`
-            }
-          }}
+          // onCellContextMenu={(props, e) => {
+          //   setCtxMenuMonId(props.row.openhomeId)
+          //   setContextMenuBuilders(buildContextElements(props.row))
+          //   // ooh i hate this, radix please expose your context menu api
+          //   const menu = document.querySelector('[data-radix-popper-content-wrapper]')
+          //   if (menu) {
+          //     ;(menu as HTMLElement).style.transform = `translate(${e.clientX}px, ${e.clientY}px)`
+          //   }
+          // }}
           rowClass={(row) =>
             trackedMonsToRelease.includes(row.openhomeId)
               ? 'releasing-mon-row'
@@ -141,9 +226,12 @@ export default function AllTrackedPokemon({
           onSelectedRowsChange={(ids) =>
             selectionController.forceSetSelectedIds(ids as Set<OhpkmIdentifier>)
           }
+          paginationAtom={paginationAtom}
+          onScrolledToBottom={fetchMoreOnBottomReached}
+          fetching={isFetching ? 'next' : undefined}
         />
       </div>
-    </OpenHomeCtxMenu>
+    </div>
   )
 }
 

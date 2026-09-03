@@ -254,6 +254,16 @@ export const commands = {
       else return { status: 'error', error: e as any }
     }
   },
+  async searchOhpkmStore(
+    paginationCursor: PaginationCursor
+  ): Promise<Result<PaginatedPage<string>, CommandError>> {
+    try {
+      return { status: 'ok', data: await TAURI_INVOKE('search_ohpkm_store', { paginationCursor }) }
+    } catch (e) {
+      if (e instanceof Error) throw e
+      else return { status: 'error', error: e as any }
+    }
+  },
   async getOhpkmBytesById(openhomeId: string): Promise<Result<number[] | null, CommandError>> {
     try {
       return { status: 'ok', data: await TAURI_INVOKE('get_ohpkm_bytes_by_id', { openhomeId }) }
@@ -367,6 +377,14 @@ export type MetDataStrategy = 'UseLocationNameMatch' | 'MaximizeLegality'
 export type NamedStrategy = { name: string; strategy: ConvertStrategy }
 export type NatureStrategy = 'KeepOriginalNature' | 'KeepMintNature'
 export type NicknameCapitalization = 'GameDefault' | 'Modern'
+export type PaginatedPage<T> = {
+  results: T[]
+  nextPageExists: boolean
+  thisCursor: PaginationCursor
+  nextCursor: PaginationCursor
+  totalCount: number
+}
+export type PaginationCursor = { pageSize: number; pageIndex: number }
 export type PathData = { raw: string; name: string; dir: string; ext: string; separator: string }
 export type PluginIdentifier = 'radical_red' | 'unbound' | 'luminescent_platinum' | 'compass'
 export type PluginMetadataWithIcon = {

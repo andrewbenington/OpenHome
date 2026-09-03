@@ -31,6 +31,8 @@ import {
   LogFilterJs,
   LogFilter as LogFilterRust,
   LogsResponse as LogsResponseRust,
+  PaginatedPage,
+  PaginationCursor,
   StoredBankDataWasm as StoredBankDataRust,
 } from './spectaCommands'
 
@@ -84,6 +86,18 @@ export const TauriBackend: BackendInterface = {
           ])
         )
       )
+    )
+  },
+  searchOhpkmStore: async function (
+    cursor: PaginationCursor
+  ): Promise<Errorable<PaginatedPage<OHPKM>>> {
+    return Commands.searchOhpkmStore(cursor).then(
+      R.map((PaginatedPage) => ({
+        ...PaginatedPage,
+        results: PaginatedPage.results.map((b64String) =>
+          OHPKM.fromBytes(Uint8Array.fromBase64(b64String).buffer)
+        ),
+      }))
     )
   },
   lookupOhpkmById: async function (id: OhpkmIdentifier): Promise<Errorable<Option<OHPKM>>> {

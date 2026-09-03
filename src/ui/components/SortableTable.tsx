@@ -1,3 +1,4 @@
+import { $R } from '@openhome-core/util/functional'
 import {
   booleanSorter,
   dayjsSorter,
@@ -9,17 +10,17 @@ import {
   stringSorter,
 } from '@openhome-core/util/sort'
 import { cssClass } from '@openhome-ui/util/style'
-import { Flex } from '@radix-ui/themes'
-import type { ColumnDef } from '@tanstack/react-table'
-import { columnSizingFeature, tableFeatures, useTable } from '@tanstack/react-table'
+import { Flex, Spinner } from '@radix-ui/themes'
+import type { ColumnDef, ReactTable } from '@tanstack/react-table'
 import { isDayjs } from 'dayjs'
-import { ReactNode, useMemo, useState } from 'react'
+import { ReactNode, RefObject, useMemo, useState } from 'react'
 import { type SortColumn } from 'react-data-grid'
 import 'react-data-grid/lib/styles.css'
 import { Checkbox, Item, Label, OpenHomeCtxMenu, Separator, Submenu } from './context-menu'
 import { DropdownArrowIcon, FilterIcon } from './Icons'
 import { SortableDataGridProps } from './SortableDataGrid'
 import './style.css'
+import { TABLE_FEATURES } from './TanstackTableUtil'
 
 const dataGridProps = {
   rowHeight: '2.5rem',
@@ -134,51 +135,32 @@ type Filters<T extends Record<string, any>> = Partial<{
   [K in keyof T]: string[]
 }>
 
-const TABLE_FEATURES = tableFeatures({ columnSizingFeature })
+export type TableController<R extends SortableValue> = ReactTable<typeof TABLE_FEATURES, R>
+export type SortableTableColumn<R extends SortableValue> = ColumnDef<typeof TABLE_FEATURES, R>
 
-function toTanstackColumn<T extends SortableValue>(
-  rdgColumn: SortableColumn<T>
-): ColumnDef<typeof TABLE_FEATURES, T> {
-  console.log(rdgColumn.name, rdgColumn.width)
-  return {
-    id: rdgColumn.key,
-    header: typeof rdgColumn.name === 'string' ? rdgColumn.name : rdgColumn.key,
-    accessorFn: (row) => {
-      try {
-        return rdgColumn.key in row ? row[rdgColumn.key] : rdgColumn.getFilterValue?.(row)
-      } catch (e) {
-        console.error(e)
-        console.dir({ row, rdgColumn })
-        return String(e)
-      }
-    },
-    cell: (info) => {
-      try {
-        return rdgColumn.renderValue?.(info.row.original)
-      } catch (e) {
-        console.error(e)
-        console.dir({ info, value: info.getValue() })
-        return String(e)
-      }
-    },
-    size: rdgColumn.width ? parseInt(rdgColumn.width.slice(0, -3)) : undefined,
-    minSize: rdgColumn.minWidth ?? undefined,
-    maxSize: rdgColumn.maxWidth ?? undefined,
-    // size: 10,
-  }
-}
+export type SortableTableProps<R extends SortableValue> = {
+  table: TableController<R>
+  columns: SortableColumn<R>[]
+  tableRef?: RefObject<HTMLDivElement | null>
+  fetching?: 'prev' | 'next'
+  onScrolledToBottom?: () => Promise<void>
+} & Omit<SortableDataGridProps<R>, 'columns' | 'rows'>
 
-export default function SortableTable<R extends SortableValue>(props: SortableDataGridProps<R>) {
+export default function SortableTable<R extends SortableValue>(props: SortableTableProps<R>) {
   const {
-    rows,
+    // rows,
     columns,
     defaultSort,
     defaultSortOrder,
     rowHeight,
     defaultColumnOptions,
     className,
+    dataQuery,
+    table,
+    tableRef,
     ...otherProps
   } = props
+
   const [sortColumns, setSortColumns] = useState<SortColumn[]>(
     defaultSort ? [{ columnKey: defaultSort, direction: defaultSortOrder ?? 'ASC' }] : []
   )
@@ -187,45 +169,65 @@ export default function SortableTable<R extends SortableValue>(props: SortableDa
   )
   const [filters, setFilters] = useState<Filters<R>>({})
 
-  const sortedRows = useMemo(
-    () => sortRows(rows, columns, sortColumns),
-    [rows, columns, sortColumns]
-  )
+  // const sortedRows = useMemo(
+  //   () => sortRows(rows, columns, sortColumns),
+  //   [rows, columns, sortColumns]
+  // )
 
-  const filteredRows = useMemo(
-    () => filterRows(sortedRows, columns, filters),
-    [sortedRows, filters, columns]
-  )
+  // const filteredRows = useMemo(
+  //   () => filterRows(sortedRows, columns, filters),
+  //   [sortedRows, filters, columns]
+  // )
 
-  console.log(sortedRows, filteredRows, rows)
+  // console.log(sortedRows, filteredRows, rows)
 
   // The data grid library only accepts a row height in pixels, so we need to manually calculate it
   // based on the site ui scaling
-  const baseRowHeight = rowHeight ?? 28
-  const scalingVar = getComputedStyle(document.documentElement).getPropertyValue('--scaling').trim()
-  const scaling = parseFloat(scalingVar) || 1
-  const scaledRowHeight =
-    typeof baseRowHeight === 'number'
-      ? scaling * baseRowHeight
-      : (row: NoInfer<R>) => scaling * baseRowHeight(row)
+  // const baseRowHeight = rowHeight ?? 28
+  // const scalingVar = getComputedStyle(document.documentElement).getPropertyValue('--scaling').trim()
+  // const scaling = parseFloat(scalingVar) || 1
+  // const scaledRowHeight =
+  //   typeof baseRowHeight === 'number'
+  //     ? scaling * baseRowHeight
+  //     : (row: NoInfer<R>) => scaling * baseRowHeight(row)
+  const atom = props.paginationAtom?.get()
+  const currentPageIndex = atom?.pageIndex
+  const currentPage = currentPageIndex !== undefined ? dataQuery?.data?.pages[0] : undefined
+  const currentPageRows = currentPage
+    ? $R(currentPage).match(
+        (result) => result.results,
+        (e) => {
+          console.error(e)
+          return []
+        }
+      )
+    : []
 
-  // 5. Create the table instance
-  const table = useTable({
-    key: 'person-table', // needed for devtools, omit if you don't want to use the devtools
-    features: TABLE_FEATURES,
-    columns: columns.filter((col) => col.key !== 'rdg-select-column').map(toTanstackColumn),
-    data: filteredRows,
-  })
+  // called on scroll and possibly on mount to fetch more data as the user scrolls and reaches bottom of table
+  function fetchMoreOnBottomReached() {
+    if (tableRef?.current && props.onScrolledToBottom) {
+      const { scrollHeight, scrollTop, clientHeight } = tableRef.current
+      // once the user has scrolled within 500px of the bottom of the table, fetch more data if we can
+      if (scrollHeight - scrollTop - clientHeight < clientHeight / 2) {
+        props.onScrolledToBottom()
+      }
+    }
+  }
 
   // 6. Render markup from the table instance APIs
   return (
-    <div className={className} style={{ height: '100%', overflow: 'auto', flex: 1 }}>
+    <div
+      className={className}
+      style={{ height: '100%', overflow: 'auto', flex: 1 }}
+      ref={tableRef}
+      onScroll={fetchMoreOnBottomReached}
+    >
       <table className="datagrid">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id} style={{ height: '1.75rem' }}>
               {headerGroup.headers.map((header, i) => {
-                const column = columns[i + 1]
+                const column = columns[i]
                 return (
                   <OpenHomeCtxMenu
                     key={header.id}
@@ -233,7 +235,7 @@ export default function SortableTable<R extends SortableValue>(props: SortableDa
                       column,
                       columns,
                       sortColumns,
-                      rows,
+                      rows: currentPageRows,
                       filters,
                       setFilters,
                       hiddenColumns,
@@ -241,6 +243,7 @@ export default function SortableTable<R extends SortableValue>(props: SortableDa
                     })}
                   >
                     <th
+                      key={header.id}
                       className="rdg-header-row"
                       colSpan={header.colSpan}
                       style={{
@@ -279,6 +282,7 @@ export default function SortableTable<R extends SortableValue>(props: SortableDa
                       width: `${cell.column.columnDef.size}rem`,
                       // display: 'table-cell',
                     }}
+                    onContextMenu={(e) => props.onCellContextMenu?.({ row: cell.row.original }, e)}
                   >
                     <table.FlexRender cell={cell} />
                   </td>
@@ -286,6 +290,14 @@ export default function SortableTable<R extends SortableValue>(props: SortableDa
               })}
             </tr>
           ))}
+
+          <tr>
+            <td colSpan={100} style={{ position: 'relative', height: '2rem' }}>
+              {props.fetching === 'next' && (
+                <Spinner size="3" style={{ position: 'sticky', left: '50%' }} />
+              )}
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>

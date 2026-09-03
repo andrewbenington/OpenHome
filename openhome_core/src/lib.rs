@@ -3,6 +3,7 @@ pub mod data_controller;
 pub mod error;
 pub mod lookup;
 pub mod ohpkm_store;
+pub mod pagination;
 pub mod pkm_storage;
 pub mod saves;
 pub mod startup_config;
