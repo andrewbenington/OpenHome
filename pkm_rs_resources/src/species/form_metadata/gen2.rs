@@ -95,4 +95,27 @@ mod tests {
             Ok(())
         }
     }
+
+    // types are oddly represented in gen 1/2, so lets verify the "new" types are parsed correctly
+    #[test]
+    fn magnemite_types() -> Result<(), &'static str> {
+        let types = METADATA_TABLE_GS
+            .get_types(NationalDex::Magnemite as u16, 0)
+            .ok_or("Failed to get types for Magnemite")?;
+
+        assert_eq!(types, (PkmType::Electric, Some(PkmType::Steel)));
+
+        Ok(())
+    }
+
+    #[test]
+    fn murkrow_types() -> Result<(), &'static str> {
+        let types = METADATA_TABLE_GS
+            .get_types(NationalDex::Murkrow as u16, 0)
+            .ok_or("Failed to get types for Murkrow")?;
+
+        assert_eq!(types, (PkmType::Dark, Some(PkmType::Flying)));
+
+        Ok(())
+    }
 }

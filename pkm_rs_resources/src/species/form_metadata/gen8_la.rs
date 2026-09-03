@@ -34,11 +34,12 @@ impl PersonalInfoLa {
     }
 
     pub fn forms_offset(&self) -> Option<u16> {
-        let stored_index = i16::from_le_bytes(self.0[0x1E..0x20].try_into().unwrap());
-        if stored_index == -1 {
+        // while other modern games store -1 (0xff) for mons not present, legends arceus stores 0
+        let stored_index = u16::from_le_bytes(self.0[0x1E..0x20].try_into().unwrap());
+        if stored_index == 0 {
             None
         } else {
-            Some(stored_index as u16)
+            Some(stored_index)
         }
     }
 
@@ -88,5 +89,17 @@ impl PersonalInfo for PersonalInfoLa {
 
     fn source_name(&self) -> &'static str {
         "Legends: Arceus"
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn spiky_pichu_not_present() {
+        let index = METADATA_TABLE_LA.get_game_index(NationalDex::Pichu as u16, 1);
+
+        assert!(index.is_none());
     }
 }

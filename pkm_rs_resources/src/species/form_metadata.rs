@@ -359,6 +359,8 @@ fn most_recent_metadata_table_for(
         &METADATA_TABLE_SWSH
     } else if METADATA_TABLE_LGPE.form_is_present(national_dex, form_index) {
         &METADATA_TABLE_LGPE
+    } else if METADATA_TABLE_LA.form_is_present(national_dex, form_index) {
+        &METADATA_TABLE_LA // tbis is a last resort because abilities are inaccurate and unused in this game, but Arceus Legend is not present in any other game metadata
     } else if national_dex == NationalDex::Pichu as u16 && form_index == form::PICHU_SPIKY_EARED {
         &METADATA_TABLE_HGSS
     } else {
@@ -489,8 +491,6 @@ mod tests {
 
     use crate::species::{FormMetadata, GetSpeciesMetadata, form_metadata::MetadataSource};
 
-    const ARCEUS_LEGEND: u16 = 18;
-
     const METADATA_SOURCES_IMPLEMENTED: [MetadataSource; 22] = [
         MetadataSource::RedBlue,
         MetadataSource::Yellow,
@@ -520,21 +520,12 @@ mod tests {
         metadata_table_by_source(source).form_is_present(national_dex, form_index)
     }
 
-    fn form_has_current_data(form: &FormMetadata) -> bool {
-        !(form.form_name.contains("Totem")
-        || (form.national_dex == NationalDex::Xerneas && form.form_index == 1) // Active Xerneas
-            || (form.national_dex == NationalDex::Arceus && form.form_index == ARCEUS_LEGEND))
-    }
-
     fn try_all_forms(callback: impl Fn(&FormMetadata) -> Result<(), String>) -> Result<(), String> {
         for national_dex in NationalDex::Bulbasaur as u16..=NationalDex::MAX as u16 {
             let species_metadata = NationalDex::new(national_dex)
                 .expect("1-1025 are valid national dex indices")
                 .get_species_metadata();
             for form in species_metadata.forms {
-                if !form_has_current_data(form) {
-                    continue;
-                }
                 callback(form)?;
             }
         }
@@ -624,8 +615,21 @@ mod tests {
         try_all_forms(|form| {
             METADATA_SOURCES_IMPLEMENTED.into_iter().for_each(|source| {
                 base_stats_lookup(form.national_dex, form.form_index, source);
+                types_lookup(form.national_dex, form.form_index, Some(source));
             });
+            let most_recent_types = types_lookup(form.national_dex, form.form_index, None);
+            assert!(most_recent_types.is_some());
+
             Ok(())
         })
+    }
+
+    #[test]
+    fn arceus_legend_has_types() -> Result<(), String> {
+        let types = types_lookup(NationalDex::Arceus, 18, None);
+
+        assert_eq!(types, Some((PkmType::Normal, None)));
+
+        Ok(())
     }
 }

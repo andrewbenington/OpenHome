@@ -96,7 +96,8 @@ impl PkmType {
             // 6: Unused bird type
             7 => Some(Self::Bug),
             8 => Some(Self::Ghost),
-            // 9-19: Dummy 'normal' types
+            9 => Some(Self::Steel),
+            // 10-19: Dummy 'normal' types
             20 => Some(Self::Fire),
             21 => Some(Self::Water),
             22 => Some(Self::Grass),
@@ -104,6 +105,7 @@ impl PkmType {
             24 => Some(Self::Psychic),
             25 => Some(Self::Ice),
             26 => Some(Self::Dragon),
+            27 => Some(Self::Dark),
             _ => None,
         }
     }
