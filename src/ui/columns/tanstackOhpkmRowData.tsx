@@ -52,7 +52,6 @@ export function toRowData(
   findHomeLocation: (identifier: string) => Option<BankBoxCoordinates>,
   _releasingIds: string[]
 ): OhpkmRowData {
-  const metadata = mon.metadata
   return {
     nationalDex: mon.nationalDex,
     formIndex: mon.formIndex,
@@ -64,8 +63,8 @@ export function toRowData(
     trainerName: mon.trainerName,
     startedTrackingTimestamp: mon.startedTrackingTimestamp,
     stats: mon.stats,
-    type1Index: metadata?.type1Index,
-    type2Index: metadata?.type2Index,
+    type1Index: mon.type1Index,
+    type2Index: mon.type2Index,
     natureName: mon.nature.name,
     isShiny: mon.isShiny(),
     gender: mon.gender,

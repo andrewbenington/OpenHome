@@ -3589,6 +3589,18 @@ impl OhpkmV2 {
         self.register_handler(handler, plugin)
     }
 
+    // Species/form metadata
+
+    #[wasm_bindgen(getter = type1Index)]
+    pub fn type1_index_wasm(&self) -> u8 {
+        self.get_forme_metadata().type_1_index()
+    }
+
+    #[wasm_bindgen(getter = type2Index)]
+    pub fn type2_index_wasm(&self) -> Option<u8> {
+        self.get_forme_metadata().type_2_index()
+    }
+
     // Notes
     #[wasm_bindgen(getter = notes)]
     pub fn notes_js(&self) -> Option<String> {
