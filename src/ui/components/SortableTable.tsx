@@ -1,18 +1,13 @@
 import {
-  booleanSorter,
-  dayjsSorter,
   numericSorter,
   SortableColumn,
   SortableValue,
-  Sorter,
-  SortType,
   stringSorter,
 } from '@openhome-core/util/sort'
 import { cssClass } from '@openhome-ui/util/style'
 import { Flex, Spinner } from '@radix-ui/themes'
 import type { ColumnDef, ReactTable } from '@tanstack/react-table'
-import { isDayjs } from 'dayjs'
-import { ReactNode, RefObject, useCallback, useMemo } from 'react'
+import { RefObject, useCallback, useMemo } from 'react'
 import { type SortColumn } from 'react-data-grid'
 import 'react-data-grid/lib/styles.css'
 import { Checkbox, Item, Label, OpenHomeCtxMenu, Separator, Submenu } from './context-menu'
@@ -20,106 +15,6 @@ import { DropdownArrowIcon, FilterIcon } from './Icons'
 import { SortableDataGridProps } from './SortableDataGrid'
 import './style.css'
 import { TABLE_FEATURES } from './TanstackTableUtil'
-
-const dataGridProps = {
-  rowHeight: '2.5rem',
-  style: { height: '100%', fontSize: '0.9rem', overflow: 'auto' },
-}
-
-function sorterBySortType<T>(
-  sortType: SortType,
-  columnKey: string & keyof T
-): Sorter<T> | undefined {
-  switch (sortType) {
-    case 'string':
-      return stringSorter((row: T) => {
-        const val = row[columnKey]
-
-        return typeof val === 'string' ? val : undefined
-      })
-    case 'number':
-      return numericSorter((row: T) => {
-        const val = row[columnKey]
-
-        return typeof val === 'number' ? val : undefined
-      })
-    case 'dayjs':
-      return dayjsSorter((row: T) => {
-        const val = row[columnKey]
-
-        return isDayjs(val) ? val : undefined
-      })
-    case 'boolean':
-      return booleanSorter((row: T) => {
-        const val = row[columnKey]
-
-        return typeof val === 'boolean' ? val : undefined
-      })
-    default:
-      return undefined
-  }
-}
-
-// function sortRows<T extends SortableValue>(
-//   rows: readonly T[],
-//   columns: SortableTableColumn<T>[],
-//   sortColumns: SortColumn[]
-// ) {
-//   return rows.toSorted((a, b) => {
-//     for (const sortParamColumn of sortColumns) {
-//       const column = columns.find((col) => col.key === sortParamColumn.columnKey)
-
-//       if (!column) continue
-
-//       let colComparer = column?.sortFunction
-
-//       if (column?.sortType) {
-//         const columnKey = column.key
-
-//         colComparer = sorterBySortType(column.sortType, columnKey)
-//       }
-
-//       if (colComparer) {
-//         const orderedComparer =
-//           sortParamColumn.direction === 'ASC'
-//             ? colComparer
-//             : (a: T, b: T) => (colComparer?.(a, b) ?? 0) * -1
-//         const comparison = orderedComparer(a, b)
-
-//         if (comparison !== 0) {
-//           return comparison
-//         }
-//       }
-//     }
-
-//     return 0
-//   })
-// }
-
-function filterRows<T extends SortableValue>(
-  rows: readonly T[],
-  columns: SortableColumn<T>[],
-  filters: Partial<Filters<T>>
-) {
-  function shouldShow(row: T) {
-    for (const [colKey, values] of Object.entries(filters)) {
-      const column = columns.find((c) => c.key === colKey)
-
-      if (!column) continue
-      const renderFilterItem = buildFilterValueGetter(rows, column)
-
-      const filteredValue = renderFilterItem?.(row)
-
-      if (filteredValue && values && !values.includes(filteredValue)) {
-        return false
-      }
-    }
-
-    return true
-  }
-
-  return rows.filter(shouldShow)
-}
 
 // SortableColumn restricts 'width' to an rem value to ensure proper scaling,
 // but here we need to be more permissive for compatibility with react-data-grid
@@ -139,7 +34,6 @@ export type SortableTableColumn<R extends SortableValue> = ColumnDef<typeof TABL
 
 export type SortableTableProps<R extends SortableValue> = {
   table: TableController<R>
-  columns: SortableColumn<R>[]
   tableRef?: RefObject<HTMLDivElement | null>
   fetching?: 'prev' | 'next'
   onScrolledToBottom?: () => Promise<void>
@@ -147,26 +41,7 @@ export type SortableTableProps<R extends SortableValue> = {
 } & Omit<SortableDataGridProps<R>, 'columns' | 'rows'>
 
 export default function SortableTable<R extends SortableValue>(props: SortableTableProps<R>) {
-  const { columns, className, table, tableRef, onScrolledToBottom } = props
-
-  console.warn('rendering SortableTable')
-  // const [sortColumns, setSortColumns] = useState<SortColumn[]>(
-  //   defaultSort ? [{ columnKey: defaultSort, direction: defaultSortOrder ?? 'ASC' }] : []
-  // )
-  // const [hiddenColumns, setHiddenColumns] = useState<string[]>(
-  //   columns.filter((col) => col.hideByDefault).map((col) => col.key) ?? []
-  // )
-  // const [filters, setFilters] = useState<Filters<R>>({})
-
-  // const sortedRows = useMemo(
-  //   () => sortRows(rows, columns, sortColumns),
-  //   [rows, columns, sortColumns]
-  // )
-
-  // const filteredRows = useMemo(
-  //   () => filterRows(sortedRows, columns, filters),
-  //   [sortedRows, filters, columns]
-  // )
+  const { className, table, tableRef, onScrolledToBottom } = props
 
   // console.log(sortedRows, filteredRows, rows)
 
@@ -215,14 +90,15 @@ export default function SortableTable<R extends SortableValue>(props: SortableTa
                   //   elements={buildHeaderContextMenu({
                   //     column,
                   //     columns,
-                  //     sortColumns,
-                  //     rows: currentPageRows,
-                  //     filters,
-                  //     setFilters,
-                  //     hiddenColumns,
-                  //     setHiddenColumns,
+                  //     // sortColumns,
+                  //     // rows: currentPageRows,
+                  //     // filters,
+                  //     // setFilters,
+                  //     // hiddenColumns,
+                  //     // setHiddenColumns,
                   //   })}
                   // >
+
                   <th
                     key={header.id}
                     className="rdg-header-row"
@@ -249,15 +125,15 @@ export default function SortableTable<R extends SortableValue>(props: SortableTa
                 .build()}
               key={row.id}
             >
-              {row.getAllCells().map((cell, i) => {
-                const column = columns[i + 1]
+              {row.getAllCells().map((cell) => {
                 return (
                   <td
-                    className={cssClass('rdg-cell')
-                      .with(typeof column?.cellClass === 'string' ? column?.cellClass : undefined)
-                      .build()}
+                    className="rdg-cell"
                     key={cell.id}
-                    // onContextMenu={(e) => props.onCellContextMenu?.({ row: cell.row.original }, e)}
+                    onContextMenu={(e) =>
+                      // TODO: fix types
+                      props.onCellContextMenu?.({ row: cell.row.original } as any, e as any)
+                    }
                   >
                     <table.FlexRender cell={cell} />
                   </td>
@@ -276,43 +152,6 @@ export default function SortableTable<R extends SortableValue>(props: SortableTa
       </table>
     </div>
   )
-}
-
-// return (
-//   <div className={className} style={{ height: '100%', overflow: 'hidden ', flex: 1 }}>
-//     <DataGrid
-//       ref={gridRef}
-//       className="datagrid"
-//       {...dataGridProps}
-//       {...otherProps}
-//       rowHeight={scaledRowHeight}
-//       rows={filteredRows}
-//       columns={modifiedColumns}
-//       sortColumns={sortColumns}
-//       onSortColumnsChange={(params) => setSortColumns(params)}
-//       onColumnsReorder={(col1, col2) => {
-//         const movedColumnIdx = reorderedColumns.findIndex((col) => col.key === col1)
-//         const targetColumnIdx = reorderedColumns.findIndex((col) => col.key === col2)
-//         const newColumns = [...reorderedColumns]
-//         const movedColumn = newColumns.splice(movedColumnIdx, 1)[0]
-
-//         setReorderedColumns([
-//           ...newColumns.slice(0, targetColumnIdx),
-//           movedColumn,
-//           ...newColumns.slice(targetColumnIdx),
-//         ])
-//       }}
-//       defaultColumnOptions={{ ...defaultColumnOptions, minWidth: 30 }}
-//       style={{ fontSize: 12, height: 'inherit', ...otherProps.style }}
-//     />
-//   </div>
-// )
-// }
-
-function hasRenderValueMethod<T extends SortableValue>(
-  col: SortableColumn<T>
-): col is SortableColumn<T> & { renderValue: (value: T) => ReactNode } {
-  return col.renderValue !== undefined
 }
 
 type HeaderWithContextMenuProps<R extends Record<string, unknown>> = {

@@ -1,4 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
+import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Moves } from '@openhome-core/resources'
 import { Option } from '@openhome-core/util/functional'
@@ -7,6 +8,7 @@ import Badge from '@openhome-ui/components/badge/Badge'
 import GenderIcon from '@openhome-ui/components/pokemon/GenderIcon'
 import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
+import { SortableTableColumn } from '@openhome-ui/components/SortableTable'
 import { TABLE_FEATURES } from '@openhome-ui/components/TanstackTableUtil'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import {
@@ -48,7 +50,7 @@ export type OhpkmRowData = Pick<
 export function toRowData(
   mon: OHPKM,
   findHomeLocation: (identifier: string) => Option<BankBoxCoordinates>,
-  releasingIds: string[]
+  _releasingIds: string[]
 ): OhpkmRowData {
   const metadata = mon.metadata
   return {
@@ -77,10 +79,12 @@ export function toRowData(
   }
 }
 
-export function useTanstackOhpkmColumnsPrecomputed(onSelectMon: (mon: OHPKM) => void) {
+export function useTanstackOhpkmColumnsPrecomputed(
+  onSelectMon: (openhomeId: OhpkmIdentifier) => void
+) {
   const { getBankName, getBoxName } = useBanksAndBoxes()
 
-  const columns = useMemo(
+  const columns: SortableTableColumn<OhpkmRowData>[] = useMemo(
     () =>
       columnHelper.columns([
         columnHelper.accessor((mon) => mon, {
@@ -257,10 +261,13 @@ export function useTanstackOhpkmColumnsPrecomputed(onSelectMon: (mon: OHPKM) => 
   return columns
 }
 
-function MonDisplayButton(props: { mon: OHPKM; onSelectMon?: (mon: OHPKM) => void }) {
+function MonDisplayButton(props: {
+  mon: OhpkmRowData
+  onSelectMon?: (openhomeId: OhpkmIdentifier) => void
+}) {
   return (
     <div className="flex-row-centered">
-      <button onClick={() => props.onSelectMon?.(props.mon)} className="mon-icon-button">
+      <button onClick={() => props.onSelectMon?.(props.mon.openhomeId)} className="mon-icon-button">
         <PokemonIcon
           nationalDex={props.mon.nationalDex}
           formIndex={props.mon.formIndex}

@@ -1,5 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { Option } from '@openhome-core/util/functional'
+import { OhpkmRowData } from '@openhome-ui/columns/tanstackOhpkmRowData'
 import React, { ReactNode } from 'react'
 import PokemonIcon from '../PokemonIcon'
 
@@ -99,7 +100,7 @@ export class Label implements CtxMenuElementBuilder {
     return new Label({ component })
   }
 
-  static mon(mon: PKMInterface): Label {
+  static mon(mon: PKMInterface | OhpkmRowData): Label {
     return Label.component(
       React.createElement(
         React.Fragment,
