@@ -1,6 +1,6 @@
 use crate::data_controller::{DataController, DataDir, MONS_V2_DIR};
 use crate::error::{Error, Result};
-use crate::pagination::{self, PaginatedPage, PaginationCursor};
+use crate::pagination;
 use crate::util;
 use base64::prelude::*;
 use pkm_rs::ohpkm::OhpkmV2;
@@ -117,7 +117,14 @@ impl OhpkmBytesStore {
         current_cursor: pagination::PaginationCursor,
         filters: Vec<pagination::Filter>,
     ) -> pagination::PaginatedPage<String> {
-        let entries = self.0.values().map(|bytes| BASE64_STANDARD.encode(bytes));
+        let entries = self
+            .0
+            .values()
+            .filter(|bytes| match OhpkmV2::from_bytes(bytes) {
+                Ok(ohpkm) => filters.iter().all(|filter| filter.applies(&ohpkm)),
+                Err(_) => false,
+            })
+            .map(|bytes| BASE64_STANDARD.encode(bytes));
 
         pagination::PaginatedPage::next_after_cursor(current_cursor, entries, self.0.len())
     }

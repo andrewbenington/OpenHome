@@ -27,7 +27,7 @@ import { SelectColumn } from 'react-data-grid'
 
 export default function useOhpkmColumns(
   trackedMonsToRelease: OhpkmIdentifier[],
-  onSelectMon?: (mon: OHPKM) => void
+  onSelectMon?: (id: OhpkmIdentifier) => void
 ): SortableColumn<OHPKM>[] {
   const { getBankName, getBoxName, findHomeLocation } = useBanksAndBoxes()
 
@@ -44,7 +44,7 @@ export default function useOhpkmColumns(
       frozen: true,
       renderValue: (value) => (
         <div className="flex-row-centered">
-          <button onClick={() => onSelectMon?.(value)} className="mon-icon-button">
+          <button onClick={() => onSelectMon?.(value.openhomeId)} className="mon-icon-button">
             <PokemonIcon
               nationalDex={value.nationalDex}
               formIndex={value.formIndex}

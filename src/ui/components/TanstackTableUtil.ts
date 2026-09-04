@@ -4,6 +4,7 @@ import {
   columnFilteringFeature,
   columnSizingFeature,
   createPaginatedRowModel,
+  globalFilteringFeature,
   rowPaginationFeature,
   tableFeatures,
 } from '@tanstack/react-table'
@@ -12,6 +13,7 @@ export const TABLE_FEATURES = tableFeatures({
   columnSizingFeature,
   rowPaginationFeature,
   columnFilteringFeature,
+  globalFilteringFeature,
   paginatedRowModel: createPaginatedRowModel(),
 })
 

@@ -27,6 +27,7 @@ import { platform } from '@tauri-apps/plugin-os'
 import dayjs, { Dayjs } from 'dayjs'
 import { Commands } from './commands'
 import {
+  Filter,
   LogEntry as LogEntryRust,
   LogFilterJs,
   LogFilter as LogFilterRust,
@@ -89,9 +90,10 @@ export const TauriBackend: BackendInterface = {
     )
   },
   searchOhpkmStore: async function (
-    cursor: PaginationCursor
+    cursor: PaginationCursor,
+    filters: Filter[]
   ): Promise<Errorable<PaginatedPage<OHPKM>>> {
-    return Commands.searchOhpkmStore(cursor).then(
+    return Commands.searchOhpkmStore(cursor, filters).then(
       R.map((PaginatedPage) => ({
         ...PaginatedPage,
         results: PaginatedPage.results.map((b64String) =>

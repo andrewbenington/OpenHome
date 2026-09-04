@@ -16,7 +16,15 @@ import { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
 import { Atom } from '@tanstack/react-store'
 import { useTable } from '@tanstack/react-table'
 import { isDayjs } from 'dayjs'
-import { ReactNode, useMemo, useRef, useState, type RefAttributes } from 'react'
+import {
+  ReactNode,
+  RefObject,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type RefAttributes,
+} from 'react'
 import {
   DataGrid,
   RenderCellProps,
@@ -152,6 +160,10 @@ export type SortableDataGridProps<R extends SortableValue> = {
   defaultSortOrder?: 'ASC' | 'DESC'
   paginationAtom?: Atom<PaginationCursor>
   dataQuery?: UseInfiniteQueryResult<InfiniteData<Errorable<PaginatedPage<R>>>>
+  tableRef?: RefObject<HTMLDivElement | null>
+  fetching?: 'prev' | 'next'
+  onScrolledToBottom?: () => Promise<void>
+  shouldLoadMore?: boolean
 } & DataGridProps<R> &
   RefAttributes<DataGridHandle>
 
@@ -164,6 +176,8 @@ export default function SortableDataGrid<R extends SortableValue>(props: Sortabl
     rowHeight,
     defaultColumnOptions,
     className,
+    onScrolledToBottom,
+    tableRef,
     ...otherProps
   } = props
   const [sortColumns, setSortColumns] = useState<SortColumn[]>(
@@ -229,6 +243,17 @@ export default function SortableDataGrid<R extends SortableValue>(props: Sortabl
     [columns, filters, hiddenColumns, reorderedColumns, sortColumns, sortedRows]
   )
 
+  const fetchMoreOnBottomReached = useCallback(async () => {
+    console.log('fetching more', gridRef.current)
+    if (gridRef?.current?.element && onScrolledToBottom) {
+      const { scrollHeight, scrollTop, clientHeight } = gridRef.current.element
+      // once the user has scrolled within 500px of the bottom of the table, fetch more data if we can
+      if (scrollHeight - scrollTop - clientHeight < 400) {
+        await onScrolledToBottom()
+      }
+    }
+  }, [onScrolledToBottom, gridRef])
+
   const { settings } = useSettings()
 
   if (settings.tableType === 'tanstack') {
@@ -236,7 +261,11 @@ export default function SortableDataGrid<R extends SortableValue>(props: Sortabl
   }
 
   return (
-    <div className={className} style={{ height: '100%', overflow: 'hidden ', flex: 1 }}>
+    <div
+      className={className}
+      style={{ height: '100%', overflow: 'hidden ', flex: 1 }}
+      ref={tableRef}
+    >
       <DataGrid
         ref={gridRef}
         className="datagrid"
@@ -261,6 +290,7 @@ export default function SortableDataGrid<R extends SortableValue>(props: Sortabl
         }}
         defaultColumnOptions={{ ...defaultColumnOptions, minWidth: 30 }}
         style={{ fontSize: 12, height: 'inherit', ...otherProps.style }}
+        onScroll={fetchMoreOnBottomReached}
       />
     </div>
   )
