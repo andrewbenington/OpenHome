@@ -9,6 +9,7 @@ import MessageRibbon from '@openhome-ui/components/MessageRibbon'
 import SideTabNavigation from '@openhome-ui/components/side-tabs/SideTabNavigation'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/PokemonDetailsModal'
+import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { SaveError, saveErrorMessage, saveErrorTitle, useSaves } from '@openhome-ui/state/saves'
 import { Button, DropdownMenu, Flex } from '@radix-ui/themes'
 import { PropsWithChildren, ReactNode, useState } from 'react'
@@ -29,6 +30,8 @@ export default function TrackedPokemonPage() {
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const { findSaveForMon, findingSaveState, findSavesForAllMons, clearFindingState } =
     useManageTracked()
+  const ohpkmStore = useOhpkmStore()
+  const displayError = useDisplayError()
 
   return (
     <SideTabNavigation
@@ -40,7 +43,18 @@ export default function TrackedPokemonPage() {
           display: 'All Pokémon',
           component: (
             <AllTrackedPokemon
-              onSelectMon={setSelectedMon}
+              onSelectMon={async (openhomeId) =>
+                ohpkmStore.tryLoadFromId(openhomeId).then(
+                  R.match(
+                    (mon) => setSelectedMon(mon),
+                    (error) =>
+                      displayError(
+                        'Failed to find Pokémon data',
+                        `Pokémon with identifier ${error.identifier} could not be found`
+                      )
+                  )
+                )
+              }
               findSaveForMon={findSaveForMon}
               findSavesForAllMons={findSavesForAllMons}
             />

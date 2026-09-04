@@ -1,5 +1,4 @@
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
 import { PaginationCursor } from '@openhome-core/tauri/spectaCommands'
 import { $R, Option, R } from '@openhome-core/util/functional'
@@ -10,7 +9,13 @@ import {
   toRowData,
   useTanstackOhpkmColumnsPrecomputed,
 } from '@openhome-ui/columns/tanstackOhpkmRowData'
-import { CtxMenuElementBuilder, Item, Label, Separator } from '@openhome-ui/components/context-menu'
+import {
+  CtxMenuElementBuilder,
+  Item,
+  Label,
+  OpenHomeCtxMenu,
+  Separator,
+} from '@openhome-ui/components/context-menu'
 import SortableTable, { TableController } from '@openhome-ui/components/SortableTable'
 import { TABLE_FEATURES } from '@openhome-ui/components/TanstackTableUtil'
 import { useBanksAndBoxes } from '@openhome-ui/state-zustand/banks-and-boxes/store'
@@ -25,7 +30,7 @@ import { useNavigate } from 'react-router'
 import './style.css'
 
 export type AllTrackedPokemonProps = {
-  onSelectMon: (mon: OHPKM) => void
+  onSelectMon: (openhomeId: OhpkmIdentifier) => void
   findSaveForMon: (identifier: string) => Promise<SAV | undefined>
   findSavesForAllMons: () => Promise<void>
 }
@@ -54,7 +59,7 @@ export default function AllTrackedPokemon({
   const tableContainerRef = useRef<HTMLDivElement>(null) // for listening to scroll
 
   const buildContextElements = useCallback(
-    (mon: OHPKM) => {
+    (mon: OhpkmRowData) => {
       const homeLocation = findHomeLocation(mon.openhomeId)
       const actions: CtxMenuElementBuilder[] = [
         Label.mon(mon),
@@ -171,28 +176,28 @@ export default function AllTrackedPokemon({
   if (isLoading) return <Spinner />
 
   return (
-    // <OpenHomeCtxMenu
-    //   elements={contextMenuBuilders}
-    //   onOpenChange={(open: boolean) => {
-    //     if (!open) setCtxMenuMonId(undefined)
-    //   }}
-    <div style={{ overflow: 'hidden', height: '100%' }}>
+    <OpenHomeCtxMenu
+      elements={contextMenuBuilders}
+      onOpenChange={(open: boolean) => {
+        if (!open) setCtxMenuMonId(undefined)
+      }}
+      style={{ overflow: 'hidden', height: '100%' }}
+    >
       {/* this div is necessary to give the context menu a target */}
       <div style={{ height: '100%', width: '100%', backgroundColor: 'var(--gray-3)' }}>
-        <SortableTable
+        <SortableTable<OhpkmRowData>
           tableRef={tableContainerRef}
           table={table}
-          columns={columns}
           style={{ borderLeft: 'none' }}
-          // onCellContextMenu={(props, e) => {
-          //   setCtxMenuMonId(props.row.openhomeId)
-          //   setContextMenuBuilders(buildContextElements(props.row))
-          //   // ooh i hate this, radix please expose your context menu api
-          //   const menu = document.querySelector('[data-radix-popper-content-wrapper]')
-          //   if (menu) {
-          //     ;(menu as HTMLElement).style.transform = `translate(${e.clientX}px, ${e.clientY}px)`
-          //   }
-          // }}
+          onCellContextMenu={(props, e) => {
+            setCtxMenuMonId(props.row.openhomeId)
+            setContextMenuBuilders(buildContextElements(props.row))
+            // ooh i hate this, radix please expose your context menu api
+            const menu = document.querySelector('[data-radix-popper-content-wrapper]')
+            if (menu) {
+              ;(menu as HTMLElement).style.transform = `translate(${e.clientX}px, ${e.clientY}px)`
+            }
+          }}
           rowClass={(row) =>
             trackedMonsToRelease.includes(row.openhomeId)
               ? 'releasing-mon-row'
@@ -212,7 +217,7 @@ export default function AllTrackedPokemon({
           shouldLoadMore={flatData.length < totalDBRowCount}
         />
       </div>
-    </div>
+    </OpenHomeCtxMenu>
   )
 }
 
