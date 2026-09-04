@@ -11,7 +11,7 @@ import { isLoaded, LoadingSaveSuggestion, SaveSuggestion } from './suggestions'
 export type SaveSuggestionCardProps = {
   suggestion: SaveSuggestion | LoadingSaveSuggestion
   size?: number
-  onOpen: () => void
+  onOpen: () => Promise<void>
   onRemove?: () => void
 }
 
