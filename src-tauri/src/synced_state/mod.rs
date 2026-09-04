@@ -91,7 +91,7 @@ impl AllSyncedState {
     }
 
     pub fn search_ohpkm_store(&self, cursor: PaginationCursor) -> Result<PaginatedPage<String>> {
-        Ok(self.lock()?.ohpkm_store.0.get_paginated_b64_bytes(cursor))
+        Ok(self.lock()?.ohpkm_store.0.get_b64_bytes_page_after(cursor))
     }
 
     pub fn ohpkm_lookup(&self, id: OpenHomeId) -> Result<Option<OhpkmV2>> {

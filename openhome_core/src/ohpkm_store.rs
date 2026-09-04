@@ -112,22 +112,13 @@ impl OhpkmBytesStore {
             .collect()
     }
 
-    pub fn get_paginated_b64_bytes(&self, this_cursor: PaginationCursor) -> PaginatedPage<String> {
+    pub fn get_b64_bytes_page_after(
+        &self,
+        current_cursor: PaginationCursor,
+    ) -> PaginatedPage<String> {
         let entries = self.0.values().map(|bytes| BASE64_STANDARD.encode(bytes));
 
-        let page = entries
-            .skip(this_cursor.get_skip_count())
-            .take(this_cursor.get_page_size());
-
-        let next_cursor = this_cursor.next();
-
-        PaginatedPage {
-            results: page.collect(),
-            next_page_exists: next_cursor.get_skip_count() < self.0.len(),
-            this_cursor,
-            next_cursor,
-            total_count: self.0.len(),
-        }
+        PaginatedPage::next_after_cursor(current_cursor, entries, self.0.len())
     }
 
     pub fn lookup(&self, identifier: &OpenHomeId) -> Result<Option<OhpkmV2>> {

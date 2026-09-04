@@ -1,6 +1,7 @@
 import { SortableColumn, SortableValue } from '@openhome-core/util/sort'
 import {
   ColumnDef,
+  columnFilteringFeature,
   columnSizingFeature,
   createPaginatedRowModel,
   rowPaginationFeature,
@@ -10,6 +11,7 @@ import {
 export const TABLE_FEATURES = tableFeatures({
   columnSizingFeature,
   rowPaginationFeature,
+  columnFilteringFeature,
   paginatedRowModel: createPaginatedRowModel(),
 })
 
