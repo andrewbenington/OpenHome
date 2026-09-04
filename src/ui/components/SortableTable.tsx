@@ -25,10 +25,6 @@ type SortableColumnAnyWidth<T extends Record<string, unknown>> = Omit<
   width?: string | number | undefined
 }
 
-type Filters<T extends Record<string, any>> = Partial<{
-  [K in keyof T]: string[]
-}>
-
 export type TableController<R extends SortableValue> = ReactTable<typeof TABLE_FEATURES, R>
 export type SortableTableColumn<R extends SortableValue> = ColumnDef<typeof TABLE_FEATURES, R>
 

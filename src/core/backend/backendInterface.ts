@@ -5,6 +5,7 @@ import { PathData, PossibleSaves } from '@openhome-core/save/util/path'
 import { SaveFolder, StoredBankData } from '@openhome-core/save/util/storage'
 import {
   ConvertStrategyEntries,
+  Filter,
   PaginatedPage,
   PaginationCursor,
 } from '@openhome-core/tauri/spectaCommands'
@@ -69,7 +70,10 @@ export default interface BackendInterface {
 
   /* ohpkm bytes store by identifier */
   loadOhpkmStore: () => Promise<Errorable<OhpkmStore>>
-  searchOhpkmStore(paginationCursor: PaginationCursor): Promise<Errorable<PaginatedPage<OHPKM>>>
+  searchOhpkmStore(
+    cursor: PaginationCursor,
+    filters: Filter[]
+  ): Promise<Errorable<PaginatedPage<OHPKM>>>
   lookupOhpkmById: (id: OhpkmIdentifier) => Promise<Errorable<Option<OHPKM>>>
   addToOhpkmStore: (updates: OhpkmStore) => Promise<Errorable<null>>
   deleteHomeMons: (identifiers: string[]) => Promise<Errorable<null>>

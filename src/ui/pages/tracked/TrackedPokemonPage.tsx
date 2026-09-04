@@ -9,13 +9,15 @@ import MessageRibbon from '@openhome-ui/components/MessageRibbon'
 import SideTabNavigation from '@openhome-ui/components/side-tabs/SideTabNavigation'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/PokemonDetailsModal'
+import { useSettings } from '@openhome-ui/state/appInfo'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { SaveError, saveErrorMessage, saveErrorTitle, useSaves } from '@openhome-ui/state/saves'
 import { Button, DropdownMenu, Flex } from '@radix-ui/themes'
-import { PropsWithChildren, ReactNode, useState } from 'react'
+import { PropsWithChildren, ReactNode, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { boxNameOrDefault, useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import AllTrackedPokemon from './AllTrackedPokemon'
+import AllTrackedPokemonRdg from './AllTrackedPokemonRdg'
 import Gen12Lookup from './Gen12Lookup'
 import Gen345Lookup from './Gen345Lookup'
 import './style.css'
@@ -30,8 +32,24 @@ export default function TrackedPokemonPage() {
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const { findSaveForMon, findingSaveState, findSavesForAllMons, clearFindingState } =
     useManageTracked()
-  const ohpkmStore = useOhpkmStore()
+  const { settings } = useSettings()
+  const { tryLoadFromId } = useOhpkmStore()
   const displayError = useDisplayError()
+
+  const onSelectMon = useCallback(
+    async (openhomeId: OhpkmIdentifier) =>
+      tryLoadFromId(openhomeId).then(
+        R.match(
+          (mon) => setSelectedMon(mon),
+          (error) =>
+            displayError(
+              'Failed to find Pokémon data',
+              `Pokémon with identifier ${error.identifier} could not be found`
+            )
+        )
+      ),
+    [displayError, tryLoadFromId]
+  )
 
   return (
     <SideTabNavigation
@@ -41,24 +59,20 @@ export default function TrackedPokemonPage() {
         {
           route: 'all',
           display: 'All Pokémon',
-          component: (
-            <AllTrackedPokemon
-              onSelectMon={async (openhomeId) =>
-                ohpkmStore.tryLoadFromId(openhomeId).then(
-                  R.match(
-                    (mon) => setSelectedMon(mon),
-                    (error) =>
-                      displayError(
-                        'Failed to find Pokémon data',
-                        `Pokémon with identifier ${error.identifier} could not be found`
-                      )
-                  )
-                )
-              }
-              findSaveForMon={findSaveForMon}
-              findSavesForAllMons={findSavesForAllMons}
-            />
-          ),
+          component:
+            settings.tableType === 'tanstack' ? (
+              <AllTrackedPokemon
+                onSelectMon={onSelectMon}
+                findSaveForMon={findSaveForMon}
+                findSavesForAllMons={findSavesForAllMons}
+              />
+            ) : (
+              <AllTrackedPokemonRdg
+                onSelectMon={onSelectMon}
+                findSaveForMon={findSaveForMon}
+                findSavesForAllMons={findSavesForAllMons}
+              />
+            ),
         },
         {
           route: 'gen12',
