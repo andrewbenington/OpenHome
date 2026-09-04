@@ -170,6 +170,7 @@ export default function AllTrackedPokemon({
     // onPaginationChange: (e) => console.dir(e),
     // rowCount: dataQuery?.data?,
     manualPagination: true,
+    manualFiltering: true,
     // pageCount: -1,
   })
 
