@@ -23,6 +23,7 @@ tsify = "0.5.6"
 num_enum = "0.7.6"
 chrono = "0.4.45"
 pastey = "0.2.3"
+specta = { version = "=2.0.0-rc.22", features = [ "serde_json", "derive" ], optional = true }
 
 [lib]
 name = "pkm_rs_types"
@@ -35,3 +36,4 @@ missing_const_for_fn = "warn"
 [features]
 wasm = ["wasm-bindgen", "js-sys", "serde-wasm-bindgen", "getrandom/wasm_js"]
 randomize = ["rand"]
+specta = ["dep:specta"]

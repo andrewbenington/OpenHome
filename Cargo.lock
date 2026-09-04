@@ -105,9 +105,9 @@ checksum = "330a5ed07fa54e4702c9d6c4174f74427fc0ef6e214bbd677ae50a5099946470"
 
 [[package]]
 name = "arbitrary-int"
-version = "2.1.1"
+version = "2.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "993a810118f8f37e9c4411c86f1c4c940a09a7ab34b7bf2d88d06f50c553fab7"
+checksum = "0ab387a0c4143b4fd3804e193946e78c8ab16cf26c5fde2048e4ac3d618c3b64"
 
 [[package]]
 name = "arrayref"
@@ -2735,10 +2735,13 @@ dependencies = [
 name = "openhome_core"
 version = "1.17.1"
 dependencies = [
+ "arbitrary-int",
  "base64 0.22.1",
  "dirs",
  "pkm_rs",
  "pkm_rs_derive",
+ "pkm_rs_resources",
+ "pkm_rs_types",
  "semver",
  "serde",
  "serde_json",
@@ -2984,6 +2987,7 @@ dependencies = [
  "serde",
  "serde-wasm-bindgen",
  "serde_json",
+ "specta",
  "static_assertions",
  "strum",
  "strum_macros",
@@ -3005,6 +3009,7 @@ dependencies = [
  "rand",
  "serde",
  "serde-wasm-bindgen",
+ "specta",
  "static_assertions",
  "strum",
  "strum_macros",

@@ -4,10 +4,13 @@ version = "1.17.1"
 edition = "2024"
 
 [dependencies]
+arbitrary-int = "2.2.0"
 base64 = "0.22.1"
 dirs = "6.0.0"
 pkm_rs = {path = "../pkm_rs"}
 pkm_rs_derive = {path = "../pkm_rs_derive"}
+pkm_rs_resources = {path = "../pkm_rs_resources"}
+pkm_rs_types = {path = "../pkm_rs_types"}
 semver = "1.0.28"
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
@@ -22,4 +25,4 @@ name = "openhome_core"
 path = "src/lib.rs"
 
 [features]
-desktop = ["specta"]
+desktop = ["specta", "pkm_rs_resources/specta", "pkm_rs_types/specta"]

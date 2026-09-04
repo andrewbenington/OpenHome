@@ -1,3 +1,9 @@
+use pkm_rs::ohpkm::OhpkmV2;
+use pkm_rs::traits::HasSpeciesAndForm;
+use pkm_rs_resources::moves::MoveIndex;
+use pkm_rs_resources::natures::NatureIndex;
+use pkm_rs_types::{Gender, NationalDex, OriginGame, PkmType};
+
 #[cfg_attr(feature = "desktop", derive(specta::Type))]
 #[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -55,3 +61,45 @@ impl<T> PaginatedPage<T> {
         }
     }
 }
+
+#[cfg_attr(feature = "desktop", derive(specta::Type))]
+#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub enum Filter {
+    NationalDex(NationalDex),
+    FormIndex(u16),
+    HasType(PkmType),
+    LastSave(OriginGame),
+    OriginGame(OriginGame),
+    Nature(NatureIndex),
+    IsShiny(bool),
+    Gender(Gender),
+    Level(u8),
+    Move(u8, MoveIndex),
+}
+
+impl Filter {
+    pub fn applies(&self, ohpkm: &OhpkmV2) -> bool {
+        match *self {
+            Self::NationalDex(national_dex) => ohpkm.species_and_form().get_ndex() == national_dex,
+            Self::FormIndex(form_index) => ohpkm.species_and_form().get_forme_index() == form_index,
+            Self::HasType(pkm_type) => {
+                ohpkm.type1() == pkm_type || ohpkm.type2().is_some_and(|t2| t2 == pkm_type)
+            }
+            Self::LastSave(game) => ohpkm
+                .most_recent_save()
+                .is_some_and(|save| save.game == game),
+            Self::OriginGame(game) => ohpkm.game_of_origin() == game,
+            Self::Nature(nature_index) => ohpkm.nature() == nature_index,
+            Self::IsShiny(is_shiny) => ohpkm.is_shiny() == is_shiny,
+            Self::Gender(gender) => ohpkm.gender() == gender,
+            Self::Level(level) => ohpkm.calculate_level() == level,
+            Self::Move(index, move_id) => {
+                let u2_index = arbitrary_int::u2::extract_u8(index, 0);
+                index <= 3 && ohpkm.moves().at(u2_index).move_index == move_id
+            }
+        }
+    }
+}
+
+pub type Filters = Vec<Filter>;

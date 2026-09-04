@@ -15,10 +15,13 @@ use wasm_bindgen::prelude::*;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
-#[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
+#[cfg_attr(feature = "wasm", derive(Tsify))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
-#[derive(Debug, Default, EnumString, Display, Serialize, PartialEq, Eq, Clone, Copy)]
+#[derive(
+    Debug, Default, EnumString, Display, Serialize, Deserialize, PartialEq, Eq, Clone, Copy,
+)]
 #[repr(u8)]
 pub enum PkmType {
     #[default]
