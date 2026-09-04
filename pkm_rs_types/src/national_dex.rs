@@ -1,5 +1,6 @@
 use num_enum::TryFromPrimitive;
 use pkm_rs_derive::EnumMax;
+use serde::Deserialize;
 use std::fmt::Display;
 
 #[cfg(feature = "wasm")]
@@ -76,6 +77,7 @@ impl PartialEq<NationalDex> for u16 {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[derive(
     Debug,
     Clone,
@@ -87,6 +89,7 @@ impl PartialEq<NationalDex> for u16 {
     Hash,
     TryFromPrimitive,
     EnumMax,
+    Deserialize,
     enum_iterator::Sequence,
 )]
 #[repr(u16)]

@@ -37,3 +37,4 @@ missing_const_for_fn = "warn"
 [features]
 wasm = ["wasm-bindgen", "js-sys", "serde-wasm-bindgen", "getrandom/wasm_js"]
 randomize = ["rand"]
+specta = ["dep:specta"]
