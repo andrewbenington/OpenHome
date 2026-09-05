@@ -36,9 +36,6 @@ importers:
       '@radix-ui/themes':
         specifier: ^3.3.0
         version: 3.3.0(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      '@tanstack/react-table':
-        specifier: ^9.2.4
-        version: 9.2.4(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@tanstack/react-virtual':
         specifier: ^3.14.9
         version: 3.14.9(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -1520,12 +1517,6 @@ packages:
       '@types/react-dom': '>=18.0.0'
       react: '>=18'
       react-dom: '>=18'
-
-  '@tanstack/react-table@9.2.4':
-    resolution: {integrity: sha512-Rzp1Q4e0/nIgEjmISYR5HeEgLTNtrG+C7NFZf/AbCxPO5hg+zC3yNGwcoECigUk8SFzzvhXbd2rFdtP2ZiGrfA==}
-    engines: {node: '>=20'}
-    peerDependencies:
-      react: '>=18'
 
   '@tanstack/react-virtual@3.14.9':
     resolution: {integrity: sha512-qZyr0FZDP8rDC4WBhsryIZmAd9bveJvFGUJJtskWaew6/0dTRS6wZxnR6VQ5bY2KwL3LjerrHqQLk3a0GKcPXQ==}
@@ -4859,14 +4850,6 @@ snapshots:
       - solid-js
       - svelte
       - vue
-
-  '@tanstack/react-table@9.2.4(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
-    dependencies:
-      '@tanstack/react-store': 0.11.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      '@tanstack/table-core': 9.2.4
-      react: 19.2.8
-    transitivePeerDependencies:
-      - react-dom
 
   '@tanstack/react-virtual@3.14.9(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
