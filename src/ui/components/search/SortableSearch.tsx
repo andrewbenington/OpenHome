@@ -1,5 +1,5 @@
 import { SortableColumn, SortableValue } from '@openhome-core/util/sort'
-import { Flex } from '@radix-ui/themes'
+import { Flex, Spinner } from '@radix-ui/themes'
 import OhoButton from '../OhoButton'
 import OhoFlex from '../OhoFlex'
 import SortableDataGrid from '../SortableDataGrid'
@@ -18,7 +18,7 @@ export default function SortableSearch<T extends SortableValue, SC extends Searc
   props: SortableSearchProps<T, SC>
 ) {
   const { FormComponent, controller, columns, topRightComponent, onSelectedChange } = props
-  const { reset, results, selectedId, setSelectedId } = controller
+  const { reset, loading, results, selectedId, setSelectedId } = controller
 
   const updateSelected = (item: T) => {
     const itemId = controller.getRowId(item)
@@ -42,16 +42,21 @@ export default function SortableSearch<T extends SortableValue, SC extends Searc
           {topRightComponent}
         </Flex>
       </form>
-      <SortableDataGrid
-        className="search-results-grid"
-        rows={results}
-        columns={columns}
-        onCellClick={(props) => updateSelected(props.row)}
-        rowKeyGetter={controller.getRowId}
-        rowClass={(row) =>
-          controller.getRowId(row) === selectedId ? 'search-row-selected' : undefined
-        }
-      />
+      // TODO: is this ugly/uncentered?
+      {loading ? (
+        <Spinner />
+      ) : (
+        <SortableDataGrid
+          className="search-results-grid"
+          rows={results ?? []}
+          columns={columns}
+          onCellClick={(props) => updateSelected(props.row)}
+          rowKeyGetter={controller.getRowId}
+          rowClass={(row) =>
+            controller.getRowId(row) === selectedId ? 'search-row-selected' : undefined
+          }
+        />
+      )}
     </Flex>
   )
 }

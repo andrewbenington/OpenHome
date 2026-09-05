@@ -1,4 +1,4 @@
-use serde::{Serialize, Serializer};
+use serde::{Deserialize, Serialize, Serializer};
 
 use crate::{Error, stats::Stat};
 
@@ -10,8 +10,9 @@ use rand::RngExt;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, Default, PartialEq, Eq, Clone, Copy, Deserialize)]
 pub struct NatureIndex(u8);
 
 impl NatureIndex {

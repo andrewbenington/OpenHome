@@ -30,7 +30,7 @@ use pkm_rs_resources::species::SpeciesMetadata;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, FlagSet, Gender, Geolocations, HyperTraining, Ivs,
-    Language, MarkingsSixShapesColors, OriginGame, PokeDate, Pokerus, ShinyLeaves, Stats8,
+    Language, MarkingsSixShapesColors, OriginGame, PkmType, PokeDate, Pokerus, ShinyLeaves, Stats8,
     Stats16Le, StatsPreSplit, TeraType, TrainerData, TrainerMemory,
 };
 use serde::Serialize;
@@ -819,6 +819,16 @@ impl OhpkmV2 {
             .map(DsGen3Ribbon::from_index)
             .map(DsGen3Ribbon::to_openhome)
             .for_each(|r| self.main_data.ribbons.add_ribbon(r));
+    }
+
+    // Species/Form metadata
+
+    pub fn type1(&self) -> PkmType {
+        self.get_forme_metadata().type_1()
+    }
+
+    pub fn type2(&self) -> Option<PkmType> {
+        self.get_forme_metadata().type_2()
     }
 
     // Plugins
@@ -3587,6 +3597,18 @@ impl OhpkmV2 {
         plugin: Option<String>,
     ) -> DataUpdated {
         self.register_handler(handler, plugin)
+    }
+
+    // Species/Form metadata
+
+    #[wasm_bindgen(getter = type1Index)]
+    pub fn type1_index_wasm(&self) -> u8 {
+        self.get_forme_metadata().type_1_index()
+    }
+
+    #[wasm_bindgen(getter = type2Index)]
+    pub fn type2_index_wasm(&self) -> Option<u8> {
+        self.get_forme_metadata().type_2_index()
     }
 
     // Notes

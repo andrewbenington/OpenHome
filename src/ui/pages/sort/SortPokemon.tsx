@@ -2,6 +2,8 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { getSortFunction, SortType, SortTypes } from '@openhome-core/pkm/sort'
 import { SAV } from '@openhome-core/save/interfaces'
+import { R } from '@openhome-core/util/functional'
+import { $O } from '@openhome-core/util/option'
 import { filterUndefined } from '@openhome-core/util/sort'
 import Badge from '@openhome-ui/components/badge/Badge'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
@@ -11,6 +13,7 @@ import { Typeahead } from '@openhome-ui/components/typeahead'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/PokemonDetailsModal'
 import SavesModal from '@openhome-ui/saves/SavesModal'
 import { getDetailsOfficialSave, getDetailsPluginSave } from '@openhome-ui/saves/util'
+import useOhpkmBatchIdLookup from '@openhome-ui/state/ohpkm/useOhpkmIdBatchLookup'
 import { useSaves } from '@openhome-ui/state/saves'
 import { HomeMonLocation, SaveMonLocation } from '@openhome-ui/state/saves/reducer'
 import { OriginGames } from '@pkm-rs/pkg'
@@ -42,28 +45,57 @@ export default function SortPokemon() {
   const ohpkmStore = useOhpkmStore()
   const banksAndBoxes = useBanksAndBoxes()
 
-  const allMonsWithColors: MonWithColors[] = useMemo(() => {
-    return savesAndBanks.allOpenSaves
-      .flatMap((save) =>
-        save.getAllMons().map((mon) => {
-          const backgroundColor = save.pluginIdentifier
-            ? OriginGames.pluginColor(save.pluginIdentifier)
-            : OriginGames.color(save.origin)
-          return {
-            mon: ohpkmStore.monOrOhpkmIfTracked(mon),
-            color: backgroundColor,
-            isHome: false,
-          }
-        })
+  const allOpenSaveMons = useMemo(
+    () =>
+      savesAndBanks.allOpenSaves.flatMap((save) =>
+        save.getAllMons().map((mon) => [mon, save] as const)
+      ),
+    [savesAndBanks.allOpenSaves]
+  )
+
+  const { batchResults: openSaveMonsByOpenhomeId } = useOhpkmBatchIdLookup(
+    allOpenSaveMons
+      .map(([mon]) => mon)
+      .map(ohpkmStore.getPotentialOhpkmId)
+      .filter(filterUndefined)
+  )
+
+  const allCurrentBankMons = useMemo(() => savesAndBanks.allMonsInCurrentBank(), [savesAndBanks])
+
+  const { loading: currentBankOhpkmsLoading, batchResults: currentBankOhpkms } =
+    useOhpkmBatchIdLookup(allCurrentBankMons)
+
+  const currentBankMons =
+    currentBankOhpkmsLoading || !currentBankOhpkms ? [] : Array.from(currentBankOhpkms.values())
+
+  const currentBankMonsWithColors: MonWithColors[] = currentBankMons
+    .map(
+      R.match(
+        (mon: OHPKM) => ({ mon, color: OPENHOME_COLOR, isHome: true }),
+        (_) => undefined
       )
-      .concat(
-        savesAndBanks
-          .allMonsInCurrentBank()
-          .map((identifier) => (identifier ? ohpkmStore.getById(identifier) : undefined))
-          .filter(filterUndefined)
-          .map((mon) => ({ mon, color: OPENHOME_COLOR, isHome: true }))
-      )
-  }, [ohpkmStore, savesAndBanks])
+    )
+    .filter(filterUndefined)
+
+  const openSaveMonsWithColors: MonWithColors[] = allOpenSaveMons?.map(([mon, save]) => {
+    const backgroundColor = save.pluginIdentifier
+      ? OriginGames.pluginColor(save.pluginIdentifier)
+      : OriginGames.color(save.origin)
+    const monOrOhpkm =
+      $O(ohpkmStore.getPotentialOhpkmId(mon))
+        .flatMap((openhomeId) => openSaveMonsByOpenhomeId?.get(openhomeId))
+        .map(R.dropError)
+        .get() ?? mon
+
+    return {
+      mon: monOrOhpkm,
+      color: backgroundColor,
+      isHome: false,
+    }
+  })
+
+  const allMonsWithColors: MonWithColors[] =
+    openSaveMonsWithColors.concat(currentBankMonsWithColors)
 
   const sortedMonsWithColors = useMemo(() => {
     return sort

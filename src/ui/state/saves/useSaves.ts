@@ -8,6 +8,7 @@ import { monSupportedBySave, SAVClass } from '@openhome-core/save/util'
 import { buildSaveFile, getPossibleSaveTypes } from '@openhome-core/save/util/load'
 import { PathData } from '@openhome-core/save/util/path'
 import { Errorable, Option, R, Result } from '@openhome-core/util/functional'
+import { $O } from '@openhome-core/util/option'
 import {
   OPENHOME_BOX_SLOTS,
   useBanksAndBoxes,
@@ -32,7 +33,7 @@ import {
 export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'homeData'>> & {
   allOpenSaves: readonly SAV[]
 
-  importMonsToLocation(mons: PKMInterface[], startingAt: MonLocation): void
+  importMonsToLocation(mons: PKMInterface[], startingAt: MonLocation): Promise<OpenSavesState>
 
   addSave(save: SAV): Promise<Result<SAV, SaveError>>
   buildAndOpenSave: (filePath?: PathData | undefined) => Promise<Result<Option<SAV>, SaveError>>
@@ -41,10 +42,10 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'home
   saveBoxNavigateRight(save: SAV): void
   saveFromIdentifier: (identifier: SaveIdentifier) => SAV
 
-  getMonAtLocation(location: MonLocation): Option<PKMInterface | OHPKM>
-  overwriteMonAtLocation(location: MonLocation, mon: Option<OhpkmIdentifier>): void
-  setMonHeldItem(item: Item | undefined, location: MonLocation): void
-  moveMon(source: MonWithLocation, dest: MonLocation): void
+  getMonAtLocation(location: MonLocation): Promise<Option<PKMInterface>>
+  overwriteMonAtLocation(location: MonLocation, mon: Option<OhpkmIdentifier>): Promise<void>
+  setMonHeldItem(item: Item | undefined, location: MonLocation): Promise<Errorable<null>>
+  moveMon(source: MonWithLocation, dest: MonLocation): Promise<Errorable<null>>
   recoverMonToBox(id: OhpkmIdentifier, bankIndex: number): void
 
   releaseMonAtLocation(location: MonLocation): void
@@ -52,20 +53,26 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'home
   trackedMonsToRelease: OhpkmIdentifier[]
 
   // Bulk operations
-  moveBoxToBank(save: SAV): number
-  moveSaveToBank(save: SAV): number
+  moveBoxToBank(save: SAV): Promise<MovedPokemonCount>
+  moveSaveToBank(save: SAV): Promise<MovedPokemonCount>
 
   // OHPKM modification
-  moveMonItemToBag: (monLocation: MonLocation) => void
-  giveItemToMon: (monLocation: MonLocation, item: Item) => void
-  revertMonAbility: (monId: OhpkmIdentifier) => void
+  moveMonItemToBag: (monLocation: MonLocation) => Promise<void>
+  giveItemToMon: (monLocation: MonLocation, item: Item) => Promise<void>
+  revertMonAbility: (monId: OhpkmIdentifier) => Promise<Result<null, IdentifierNotPresentError>>
 
   allMonsInCurrentBank: () => OhpkmIdentifier[]
 }
 
+const SCAN_FULL_STORE_AND_FIX_HANDLERS = false // warning - this can cause slowdown when opening a save if many OHPKMs are tracked
+
 function MissingOhpkmData(identifier: string) {
   return R.Err(`Missing OHPKM data for identifier ${identifier}`)
 }
+
+export type OhpkmSaveImportResult = Result<Option<PKMInterface>, IdentifierNotPresentError>
+export type DisplacedMonOpenHomeId = Option<OhpkmIdentifier>
+type MovedPokemonCount = number
 
 export function useSaves(): SavesAndBanksManager {
   const ohpkmStore = useOhpkmStore()
@@ -108,61 +115,60 @@ export function useSaves(): SavesAndBanksManager {
   )
 
   const getMonAtLocation = useCallback(
-    (location: MonLocation) => {
+    async (location: MonLocation): Promise<Option<PKMInterface>> => {
       let identifier: OhpkmIdentifier | undefined
       if (!location.isHome) {
         const mon = getMonAtSaveLocation(location)
-        if (!mon) return undefined
-        return ohpkmStore.loadIfTracked(mon) ?? mon
+        if (!mon) return Promise.resolve(undefined)
+
+        return ohpkmStore.loadIfTracked(mon) ?? Promise.resolve(mon)
       } else {
         identifier = getMonAtHomeLocation(location)
-        if (!identifier) return undefined
-        const monResult = ohpkmStore.tryLoadFromId(identifier)
-        if (R.isErr(monResult)) {
-          console.error('COULD NOT FIND MON WITH IDENTIFIER: ' + monResult.error.identifier)
-          return undefined
-        }
+        if (!identifier) return Promise.resolve(undefined)
 
-        return monResult.data
+        // TODO: should this function return an error if the lookup fails? for now the error is replaced with undefined (via R.ok())
+        return ohpkmStore.tryLoadFromId(identifier).then(R.dropError)
       }
     },
     [getMonAtHomeLocation, getMonAtSaveLocation, ohpkmStore]
   )
 
   const moveMonBetweenSaves = useCallback(
-    (
+    async (
       sourceSaveIdentifier: Option<SaveIdentifier>,
-      mon: PKMInterface | undefined,
+      mon: Option<PKMInterface>,
       dest: SaveMonLocation
-    ): Errorable<Option<PKMInterface>> => {
+    ): Promise<Errorable<Option<PKMInterface>>> => {
       const sourceSave = sourceSaveIdentifier ? saveFromIdentifier(sourceSaveIdentifier) : undefined
       const destSave = openSavesState.openSaves[dest.saveIdentifier].save
 
-      let ohpkm: Option<OHPKM>
-      if (mon) {
-        ohpkm =
-          ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTrackingNewMon(mon, sourceSave, destSave)
-      }
+      let ohpkm: Option<OHPKM> = await $O(mon)
+        .map(async (mon) => ohpkmStore.loadOrStartTracking(mon, sourceSave, destSave))
+        .getPromise()
 
-      const converted = ohpkm ? ohpkmStore.updateAndConvertForSave(ohpkm, destSave) : undefined
-      if (converted && R.isErr(converted)) {
-        return converted
-      }
-
-      const displacedMon = destSave.getMonAt(dest.box, dest.boxSlot)
-      destSave.setMonAt(dest.box, dest.boxSlot, converted?.data)
-      destSave.updatedBoxSlots.push({ box: dest.box, boxSlot: dest.boxSlot })
-
-      return R.Ok(displacedMon)
+      return (
+        (await $O(ohpkm)
+          .map((ohpkm) =>
+            ohpkmStore.updateAndConvertForSave(ohpkm, destSave).then(
+              R.map((mon) => {
+                const displacedMon = destSave.getMonAt(dest.box, dest.boxSlot)
+                destSave.setMonAt(dest.box, dest.boxSlot, mon)
+                destSave.updatedBoxSlots.push({ box: dest.box, boxSlot: dest.boxSlot })
+                return displacedMon
+              })
+            )
+          )
+          .getPromise()) ?? R.Ok(undefined)
+      )
     },
     [ohpkmStore, openSavesState.openSaves, saveFromIdentifier]
   )
 
   const moveOhpkmToSave = useCallback(
-    (
+    async (
       identifier: Option<OhpkmIdentifier>,
       dest: SaveMonLocation
-    ): Result<Option<PKMInterface>, IdentifierNotPresentError> => {
+    ): Promise<OhpkmSaveImportResult> => {
       const save = openSavesState.openSaves[dest.saveIdentifier].save
 
       if (!identifier) {
@@ -172,13 +178,13 @@ export function useSaves(): SavesAndBanksManager {
         return R.Ok(displacedMon)
       }
 
-      const monResult = ohpkmStore.tryLoadFromId(identifier)
+      const monResult = await ohpkmStore.tryLoadFromId(identifier)
       if (R.isErr(monResult)) {
         return monResult
       }
 
       const ohpkm = monResult.data
-      const converted = ohpkmStore.updateAndConvertForSave(ohpkm, save)
+      const converted = await ohpkmStore.updateAndConvertForSave(ohpkm, save)
       if (R.isErr(converted)) {
         return R.Ok(undefined)
       }
@@ -205,19 +211,17 @@ export function useSaves(): SavesAndBanksManager {
   )
 
   const moveMonToHome = useCallback(
-    <P extends PKMInterface>(
+    async <P extends PKMInterface>(
       sourceSaveIdentifier: Option<SaveIdentifier>,
       mon: Option<P>,
       location: HomeMonLocation
-    ): Option<OhpkmIdentifier> => {
+    ): Promise<DisplacedMonOpenHomeId> => {
       const sourceSave = sourceSaveIdentifier ? saveFromIdentifier(sourceSaveIdentifier) : undefined
       const displacedMonId = getMonAtHomeLocation(location)
 
       let ohpkm: Option<OHPKM>
       if (mon) {
-        ohpkm =
-          ohpkmStore.loadIfTracked(mon) ??
-          ohpkmStore.startTrackingNewMon(mon, sourceSave, undefined)
+        ohpkm = await ohpkmStore.loadOrStartTracking(mon, sourceSave, undefined)
       }
 
       if (!mon) {
@@ -255,9 +259,9 @@ export function useSaves(): SavesAndBanksManager {
   )
 
   const overwriteMonAtLocation = useCallback(
-    (location: MonLocation, ohpkmId: Option<OhpkmIdentifier>) => {
+    async (location: MonLocation, ohpkmId: Option<OhpkmIdentifier>) => {
       if (!location.isHome) {
-        moveOhpkmToSave(ohpkmId, location)
+        await moveOhpkmToSave(ohpkmId, location)
       } else {
         moveOhpkmToHome(ohpkmId, location)
       }
@@ -266,7 +270,7 @@ export function useSaves(): SavesAndBanksManager {
   )
 
   const importMonsToLocation = useCallback(
-    (mons: PKMInterface[], startingAt: MonLocation) => {
+    async (mons: PKMInterface[], startingAt: MonLocation): Promise<OpenSavesState> => {
       const addedMons: OHPKM[] = []
       const dest = startingAt
 
@@ -300,7 +304,7 @@ export function useSaves(): SavesAndBanksManager {
         let nextIndex = dest.boxSlot
         const tempSave = saveFromIdentifier(dest.saveIdentifier)
 
-        mons.forEach((mon) => {
+        mons.forEach(async (mon) => {
           while (
             tempSave.getMonAt(dest.box, nextIndex) &&
             nextIndex < tempSave.boxRows * tempSave.boxColumns
@@ -310,7 +314,7 @@ export function useSaves(): SavesAndBanksManager {
           if (nextIndex < tempSave.boxRows * tempSave.boxColumns) {
             const homeMon = mon instanceof OHPKM ? mon : OHPKM.fromMonInSave(mon, tempSave)
 
-            const converted = ohpkmStore.updateAndConvertForSave(homeMon, tempSave)
+            const converted = await ohpkmStore.updateAndConvertForSave(homeMon, tempSave)
             if (R.isErr(converted)) {
               return R.Ok(null)
             }
@@ -372,26 +376,38 @@ export function useSaves(): SavesAndBanksManager {
           console.error('Error registering pokedex entries from save:', result.error)
         }
 
-        const allOhpkms = ohpkmStore.getAllStored()
-        for (const mon of allOhpkms) {
-          if (!monSupportedBySave(save, mon)) continue
+        // TODO - PERFORMACE:
+        // this currently looks for tracked Pokémon that have a handler name/gender but no other data for that handler,
+        // checks to see if the save file matches the handler data, and fills out the other handler data from the save
+        // file if so. This was for fixing mons from before visited save data was fully tracked.
+        //
+        // In the interest of performance, all "full scans" of the OHPKM data store should be eliminated aside from
+        // when manually triggered by a user willing to wait. This handler fixing functionality should be made a manual
+        // task so the app doesn't freeze every time a save is opened.
+        if (SCAN_FULL_STORE_AND_FIX_HANDLERS) {
+          const allOhpkms = await ohpkmStore.getAllStored()
+          if (allOhpkms) {
+            for (const mon of Object.values(allOhpkms)) {
+              if (!monSupportedBySave(save, mon)) continue
 
-          const matchingHandler = mon.matchingUnknownHandler(save.name, save.trainerGender)
-          if (!matchingHandler) continue
+              const matchingHandler = mon.matchingUnknownHandler(save.name, save.trainerGender)
+              if (!matchingHandler) continue
 
-          mon.updateTrainerData(
-            save,
-            matchingHandler.friendship,
-            matchingHandler.affection,
-            matchingHandler.memory
-          )
+              mon.updateTrainerData(
+                save,
+                matchingHandler.friendship,
+                matchingHandler.affection,
+                matchingHandler.memory
+              )
 
-          ohpkmStore.insertOrUpdate(mon)
+              ohpkmStore.insertOrUpdate(mon)
+            }
+          }
         }
 
         const toUpdate: OhpkmStoreData = {}
         for (const mon of save.getAllMons()) {
-          const trackedData = ohpkmStore.loadIfTracked(mon)
+          const trackedData = await ohpkmStore.loadIfTracked(mon)
           if (trackedData) {
             const updates = trackedData.syncWithGameData(mon, save)
 
@@ -499,14 +515,14 @@ export function useSaves(): SavesAndBanksManager {
   )
 
   const setMonHeldItem = useCallback(
-    (item: Item | undefined, location: MonLocation): Errorable<null> => {
+    async (item: Item | undefined, location: MonLocation): Promise<Errorable<null>> => {
       const itemIndex = item?.index ?? 0
       let ohpkm: OHPKM
       if (location.isHome) {
         const identifier = getMonAtHomeLocation(location)
         if (!identifier) return R.Ok(null)
 
-        const result = ohpkmStore.tryLoadFromId(identifier)
+        const result = await ohpkmStore.tryLoadFromId(identifier)
         if (R.isErr(result)) {
           return MissingOhpkmData(identifier)
         }
@@ -517,7 +533,7 @@ export function useSaves(): SavesAndBanksManager {
         if (!mon) return R.Ok(null)
 
         const save = saveFromIdentifier(location.saveIdentifier)
-        ohpkm = ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTrackingNewMon(mon, save, save)
+        ohpkm = await ohpkmStore.loadOrStartTracking(mon, save, save)
 
         const converted = save.convertOhpkm(ohpkm, defaultConvertStrategy)
         if (R.isErr(converted)) {
@@ -543,19 +559,20 @@ export function useSaves(): SavesAndBanksManager {
   )
 
   const revertMonAbility = useCallback(
-    (identifier: OhpkmIdentifier) => {
-      const result = ohpkmStore.tryLoadFromId(identifier)
+    async (identifier: OhpkmIdentifier): Promise<Result<null, IdentifierNotPresentError>> => {
+      const result = await ohpkmStore.tryLoadFromId(identifier)
       if (R.isErr(result)) return result
 
       const mon = result.data
       mon.revertAbilityByNum()
 
-      ohpkmStore.insertOrUpdate(mon)
+      await ohpkmStore.insertOrUpdate(mon)
+      return R.Ok(null)
     },
     [ohpkmStore]
   )
 
-  function moveMon(source: MonLocation, dest: MonLocation): Errorable<null> {
+  async function moveMon(source: MonLocation, dest: MonLocation): Promise<Errorable<null>> {
     if (source.isHome) {
       const sourceMonId = getMonAtHomeLocation(source)
       if (!sourceMonId) return R.Ok(null)
@@ -564,7 +581,7 @@ export function useSaves(): SavesAndBanksManager {
         const displacedMonId = moveOhpkmToHome(sourceMonId, dest)
         moveOhpkmToHome(displacedMonId, source)
       } else {
-        const result = moveOhpkmToSave(sourceMonId, dest)
+        const result = await moveOhpkmToSave(sourceMonId, dest)
         if (R.isErr(result)) {
           return MissingOhpkmData(sourceMonId)
         }
@@ -579,10 +596,10 @@ export function useSaves(): SavesAndBanksManager {
       if (!sourceMon) return R.Ok(null)
 
       if (dest.isHome) {
-        const displacedMonId = moveMonToHome(source.saveIdentifier, sourceMon, dest)
+        const displacedMonId = await moveMonToHome(source.saveIdentifier, sourceMon, dest)
         moveOhpkmToSave(displacedMonId, source)
       } else {
-        const swappedMonResult = moveMonBetweenSaves(source.saveIdentifier, sourceMon, dest)
+        const swappedMonResult = await moveMonBetweenSaves(source.saveIdentifier, sourceMon, dest)
         if (R.isErr(swappedMonResult)) {
           return swappedMonResult
         }
@@ -653,7 +670,7 @@ export function useSaves(): SavesAndBanksManager {
   )
 
   const moveBoxToBank = useCallback(
-    (save: SAV): number => {
+    async (save: SAV): Promise<MovedPokemonCount> => {
       let movedCount = 0
       const boxSize = OPENHOME_BOX_SLOTS
       let currentBankBox = banksAndBoxes.getCurrentBox().index
@@ -691,8 +708,7 @@ export function useSaves(): SavesAndBanksManager {
           banksAndBoxes.addBoxCurrentBank('end')
         }
 
-        const ohpkm =
-          ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTrackingNewMon(mon, save, undefined)
+        const ohpkm = await ohpkmStore.loadOrStartTracking(mon, save, undefined)
 
         banksAndBoxes.setAtHomeLocation(
           {
@@ -716,7 +732,7 @@ export function useSaves(): SavesAndBanksManager {
   )
 
   const moveSaveToBank = useCallback(
-    (save: SAV): number => {
+    async (save: SAV): Promise<MovedPokemonCount> => {
       let totalMoved = 0
       let currentBankBox = banksAndBoxes.getCurrentBox().index
       let currentSlot = 0
@@ -754,8 +770,7 @@ export function useSaves(): SavesAndBanksManager {
             banksAndBoxes.addBoxCurrentBank('end')
           }
 
-          const ohpkm =
-            ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTrackingNewMon(mon, save, undefined)
+          const ohpkm = await ohpkmStore.loadOrStartTracking(mon, save, undefined)
 
           banksAndBoxes.setAtHomeLocation(
             {
@@ -780,18 +795,18 @@ export function useSaves(): SavesAndBanksManager {
   )
 
   const moveMonItemToBag = useCallback(
-    (monLocation: MonLocation) => {
-      const destMon = getMonAtLocation(monLocation)
+    async (monLocation: MonLocation) => {
+      const destMon = await getMonAtLocation(monLocation)
       if (!destMon?.heldItemIndex) return
       ItemBag.addItem(destMon.heldItemIndex, 1)
-      setMonHeldItem(undefined, monLocation)
+      await setMonHeldItem(undefined, monLocation)
     },
     [getMonAtLocation, ItemBag, setMonHeldItem]
   )
 
   const giveItemToMon = useCallback(
-    (monLocation: MonLocation, item: Item) => {
-      const destMon = getMonAtLocation(monLocation)
+    async (monLocation: MonLocation, item: Item) => {
+      const destMon = await getMonAtLocation(monLocation)
       if (!destMon) return
 
       ItemBag.removeItem(item.index, 1)

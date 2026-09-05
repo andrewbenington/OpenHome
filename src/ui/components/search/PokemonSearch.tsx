@@ -1,6 +1,4 @@
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
-
-import useOhpkmColumns from '@openhome-ui/columns/ohpkm'
+import { OhpkmRowData, useOhpkmColumns } from '@openhome-ui/ohpkmGrid'
 import { useSaves } from '@openhome-ui/state/saves'
 import { Callout } from '@radix-ui/themes'
 import { ErrorIcon } from '../Icons'
@@ -17,7 +15,7 @@ function PokemonSearch({ controller }: PokemonSearchProps) {
   const columns = useOhpkmColumns(trackedMonsToRelease)
 
   return (
-    <SortableSearch<OHPKM, PokemonSearchController>
+    <SortableSearch<OhpkmRowData, PokemonSearchController>
       FormComponent={SearchFieldsForm.Pokemon}
       controller={controller}
       columns={columns}

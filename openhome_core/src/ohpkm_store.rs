@@ -1,5 +1,6 @@
 use crate::data_controller::{DataController, DataDir, MONS_V2_DIR};
 use crate::error::{Error, Result};
+use crate::pagination;
 use crate::util;
 use base64::prelude::*;
 use pkm_rs::ohpkm::OhpkmV2;
@@ -106,10 +107,34 @@ impl OhpkmBytesStore {
 
     pub fn to_b64_entries(&self) -> Vec<(String, String)> {
         self.0
-            .clone()
-            .into_iter()
+            .iter()
             .map(|(k, v)| (k.to_string(), BASE64_STANDARD.encode(v)))
             .collect()
+    }
+
+    pub fn get_b64_bytes_page_after(
+        &self,
+        current_cursor: pagination::PaginationCursor,
+        filters: Vec<pagination::Filter>,
+    ) -> pagination::PaginatedPage<String> {
+        let entries = self
+            .0
+            .values()
+            .filter(|bytes| match OhpkmV2::from_bytes(bytes) {
+                Ok(ohpkm) => filters.iter().all(|filter| filter.applies(&ohpkm)),
+                Err(_) => false,
+            })
+            .map(|bytes| BASE64_STANDARD.encode(bytes));
+
+        pagination::PaginatedPage::next_after_cursor(current_cursor, entries, self.0.len())
+    }
+
+    pub fn lookup(&self, identifier: &OpenHomeId) -> Result<Option<OhpkmV2>> {
+        Ok(self
+            .0
+            .get(identifier)
+            .map(|bytes| OhpkmV2::from_bytes(bytes))
+            .transpose()?)
     }
 
     pub fn includes(&self, identifier: &OpenHomeId) -> bool {

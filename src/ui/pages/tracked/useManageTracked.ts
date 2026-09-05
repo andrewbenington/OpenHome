@@ -28,7 +28,10 @@ import { RR_TRANSFER_RESTRICTIONS } from '@openhome-core/save/radicalred/G3RRSAV
 import { UB_TRANSFER_RESTRICTIONS } from '@openhome-core/save/unbound/G3UBSAV'
 import { buildUnknownSaveFile } from '@openhome-core/save/util/load'
 import { isRestricted, TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
-import { Option, R, range } from '@openhome-core/util/functional'
+import { PaginatedPage, PaginationCursor } from '@openhome-core/tauri/spectaCommands'
+import { isErr, not, Option, R, range, Result } from '@openhome-core/util/functional'
+import { $O } from '@openhome-core/util/option'
+import { filterUndefined } from '@openhome-core/util/sort'
 import { SaveRef } from '@openhome-core/util/types'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { useBanksAndBoxes } from '@openhome-ui/state-zustand/banks-and-boxes/store'
@@ -40,7 +43,7 @@ import { useCallback, useContext, useMemo, useState } from 'react'
 
 export function useManageTracked() {
   const ohpkmStore = useOhpkmStore()
-  const { findHomeLocation } = useBanksAndBoxes()
+  const { hasHomeLocation } = useBanksAndBoxes()
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const { lookups } = useLookups()
   const backend = useBackend()
@@ -55,7 +58,7 @@ export function useManageTracked() {
         setFindingSaveState({ type: 'finding_one', state })
       }
 
-      const mon = ohpkmStore.getById(identifier)
+      const mon = await ohpkmStore.getById(identifier)
       if (!mon) {
         console.error('mon not tracked!')
 
@@ -157,16 +160,40 @@ export function useManageTracked() {
       return
     }
 
-    const allStoredById = ohpkmStore.byId
-    const allStoredIdsNotInBoxes = new Set(
-      Object.keys(allStoredById).filter((id) => findHomeLocation(id) === undefined)
-    )
-    const totalMons = allStoredIdsNotInBoxes.size
+    let cursor: PaginationCursor = { pageIndex: 0, pageSize: 500 }
+    let allOhpkmIdsNotInBoxes: Set<OhpkmIdentifier> = new Set()
+
+    while (true) {
+      const result: Result<PaginatedPage<OhpkmIdentifier>> = await ohpkmStore
+        .searchStore(cursor, [])
+        .then(
+          R.map((page) => {
+            const notInBoxes = page.results
+              .map((ohpkm) => ohpkm.openhomeId)
+              .filter(not(hasHomeLocation))
+            return { ...page, results: notInBoxes }
+          })
+        )
+
+      if (isErr(result)) {
+        displayError('Error paging through stored Pokémon', result.error)
+        return
+      }
+
+      allOhpkmIdsNotInBoxes = allOhpkmIdsNotInBoxes.union(new Set(result.data.results))
+
+      if (!result.data.nextPageExists) break
+
+      cursor = result.data.nextCursor
+    }
+
+    const totalMons = allOhpkmIdsNotInBoxes.size
     let foundMonIds = new Set<string>()
 
     const saveRefs = result.data
 
     const toUpdate: OhpkmStoreData = {}
+    const notFoundIds: Set<OhpkmIdentifier> = new Set()
 
     for (const [i, saveRef] of saveRefs.entries()) {
       setState({
@@ -194,52 +221,30 @@ export function useManageTracked() {
       }
 
       const save = result.data
+      const loadedMons = await ohpkmStore.tryLoadBatch(
+        save.getAllMons().map(ohpkmStore.getPotentialOhpkmId).filter(filterUndefined)
+      )
+
       for (const saveMon of save.getAllMons()) {
-        let saveMonId: Option<OhpkmIdentifier> = undefined
+        const saveMonId = ohpkmStore.getPotentialOhpkmId(saveMon)
 
-        switch (save.lookupType) {
-          case 'gen12': {
-            const gen12Id = getMonGen12Identifier(saveMon)
-            if (gen12Id && lookups.gen12[gen12Id]) {
-              saveMonId = lookups.gen12[gen12Id]
-            } else {
-              saveMonId = getMonFileIdentifier(saveMon)
-            }
-            break
-          }
-          case 'gen345': {
-            const gen345Id = getMonGen345Identifier(saveMon, true)
-            if (gen345Id && lookups.gen345[gen345Id]) {
-              saveMonId = lookups.gen345[gen345Id]
-            } else {
-              saveMonId = getMonFileIdentifier(saveMon)
-            }
-            break
-          }
-          default: {
-            saveMonId = getMonFileIdentifier(saveMon)
-          }
-        }
-
-        if (
-          saveMonId === undefined ||
-          foundMonIds.has(saveMonId) ||
-          !allStoredIdsNotInBoxes.has(saveMonId)
-        ) {
+        if (saveMonId === undefined || foundMonIds.has(saveMonId) || hasHomeLocation(saveMonId)) {
           continue
         }
 
-        const trackedMon = allStoredById[saveMonId]
-        if (trackedMon) {
-          trackedMon.syncWithGameData(saveMon, save)
-          toUpdate[trackedMon.openhomeId] = trackedMon
-          foundMonIds.add(saveMonId)
-        }
+        $O(loadedMons.get(saveMonId))
+          .flatMap(R.dropError)
+          .do((trackedMon) => {
+            trackedMon.syncWithGameData(saveMon, save)
+            toUpdate[trackedMon.openhomeId] = trackedMon
+            foundMonIds.add(saveMonId)
+          })
       }
     }
+
     ohpkmStore.insertOrUpdateAll(toUpdate)
 
-    const allMissingIdsNotInBoxes = Array.from(allStoredIdsNotInBoxes.difference(foundMonIds))
+    const allMissingIdsNotInBoxes = Array.from(notFoundIds.difference(foundMonIds))
 
     setState({
       type: 'complete',
@@ -247,15 +252,7 @@ export function useManageTracked() {
       totalMons,
       missingMonIds: allMissingIdsNotInBoxes,
     })
-  }, [
-    backend,
-    displayError,
-    enabledSaveTypes,
-    findHomeLocation,
-    lookups.gen12,
-    lookups.gen345,
-    ohpkmStore,
-  ])
+  }, [backend, displayError, enabledSaveTypes, hasHomeLocation, ohpkmStore])
 
   return {
     findSaveForMon,

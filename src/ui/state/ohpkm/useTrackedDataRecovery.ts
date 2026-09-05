@@ -2,7 +2,7 @@ import { baseEvolutionsMatch } from '@openhome-core/pkm'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { expectExhaustive } from '@openhome-core/util'
-import { $R, Option, R, Result } from '@openhome-core/util/functional'
+import { Option, R, Result } from '@openhome-core/util/functional'
 import { usePokemonSearch } from '@openhome-ui/components/search/usePokemonSearch'
 import { useState } from 'react'
 import { MonLocation, useSaves } from '../saves'
@@ -35,12 +35,12 @@ export default function useTrackedDataRecovery() {
   const savesManager = useSaves()
   const [state, setState] = useState<ReassociationState>({ state: 'initial' })
 
-  function startRecovery(monToRecoverLocation: MonLocation) {
-    const monAtLocation = savesManager.getMonAtLocation(monToRecoverLocation)
+  async function startRecovery(monToRecoverLocation: MonLocation) {
+    const monAtLocation = await savesManager.getMonAtLocation(monToRecoverLocation)
     if (!monAtLocation)
       return R.Err({ message: 'No Pokémon at source location', data: monToRecoverLocation })
 
-    const sourceMonOhpkmId = ohpkmStore.getIdIfTracked(monAtLocation)
+    const sourceMonOhpkmId = await ohpkmStore.getIdIfTracked(monAtLocation)
     setState({ state: 'pending_ohpkm_select', monToRecoverLocation, sourceMonOhpkmId })
 
     return R.Ok(null)
@@ -56,7 +56,7 @@ export default function useTrackedDataRecovery() {
     })
   }
 
-  function confirmRecovery(): Result<null, RecoveryError> {
+  async function confirmRecovery(): Promise<Result<null, RecoveryError>> {
     if (state.state !== 'pending_confirm')
       return R.Err({ message: 'Invalid state', data: { state } })
 
@@ -70,7 +70,7 @@ export default function useTrackedDataRecovery() {
       })
     }
 
-    const mon = savesManager.getMonAtLocation(state.monToRecoverLocation)
+    const mon = await savesManager.getMonAtLocation(state.monToRecoverLocation)
     if (!mon) {
       console.error(state.monToRecoverLocation)
       return R.Err({
@@ -83,7 +83,7 @@ export default function useTrackedDataRecovery() {
       ? undefined
       : savesManager.saveFromIdentifier(state.monToRecoverLocation.saveIdentifier)
 
-    return $R(ohpkmStore.syncOhpkmIfTracked(state.recoveredDataOhpkmId, mon, save)).match(
+    return (await ohpkmStore.syncOhpkmIfTracked(state.recoveredDataOhpkmId, mon, save)).match(
       (updated) => {
         savesManager.overwriteMonAtLocation(state.monToRecoverLocation, updated?.openhomeId)
         if (state.sourceMonOhpkmId) {
@@ -115,9 +115,9 @@ export default function useTrackedDataRecovery() {
     }
   }
 
-  function relevantOhpkmFilter(potentiallyRelevant: OHPKM) {
+  async function relevantOhpkmFilter(potentiallyRelevant: OHPKM) {
     if (state.state === 'initial') return true
-    const monAtLocation = savesManager.getMonAtLocation(state.monToRecoverLocation)
+    const monAtLocation = await savesManager.getMonAtLocation(state.monToRecoverLocation)
     if (monAtLocation === undefined) return true
 
     return baseEvolutionsMatch(monAtLocation, potentiallyRelevant)

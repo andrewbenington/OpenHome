@@ -74,7 +74,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
 
   return (
     <DndContext
-      onDragEnd={(e) => {
+      onDragEnd={async (e) => {
         setDragOverId(null)
 
         const dest = e.over?.data.current
@@ -110,20 +110,20 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
 
         if (dropElementId === 'to_release') {
           if (dragState.multiSelectEnabled && isSourceSelected) {
-            selectedLocations.forEach((loc) => {
-              const m = savesAndBanks.getMonAtLocation(loc)
-              if (m) savesAndBanks.releaseMonAtLocation(loc)
-            })
+            for (const location of selectedLocations) {
+              const mon = await savesAndBanks.getMonAtLocation(location)
+              if (mon) savesAndBanks.releaseMonAtLocation(location)
+            }
             clearSelections()
           } else {
             savesAndBanks.releaseMonAtLocation(firstMonWithLocation)
           }
         } else if (dropElementId === 'item-bag') {
           if (dragState.multiSelectEnabled && isSourceSelected) {
-            selectedLocations.forEach((loc) => {
-              const m = savesAndBanks.getMonAtLocation(loc)
-              if (m) savesAndBanks.moveMonItemToBag(loc)
-            })
+            for (const location of selectedLocations) {
+              const mon = await savesAndBanks.getMonAtLocation(location)
+              if (mon) savesAndBanks.moveMonItemToBag(location)
+            }
             clearSelections()
           } else {
             savesAndBanks.moveMonItemToBag(firstMonWithLocation)
@@ -190,7 +190,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
             for (const sourceLoc of selectedLocations) {
               if (!nextDestination) break
 
-              const currMon = savesAndBanks.getMonAtLocation(sourceLoc)
+              const currMon = await savesAndBanks.getMonAtLocation(sourceLoc)
               if (!currMon) continue
 
               if (

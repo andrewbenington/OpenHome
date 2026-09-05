@@ -56,7 +56,6 @@
 }
 
 .centered-cell {
-  display: flex;
   width: 100%;
   align-items: center;
   justify-content: center;
@@ -64,7 +63,6 @@
 }
 
 .number-cell {
-  display: flex;
   width: 100%;
   align-items: center;
   justify-content: end;
@@ -188,17 +186,22 @@
   position: relative;
   background-color: var(--gray-3);
   --header-font-size: var(--font-size-text);
+  border-spacing: 0px;
+  border-collapse: collapse;
 
   .rdg-cell[role='columnheader'] {
     background-color: var(--gray-8);
+  }
+
+  .rdg-cell {
+    padding: 0.1rem 0.5rem;
   }
 
   .rdg-row .rdg-cell {
     outline: none;
     border-bottom: none;
     font-size: var(--font-size-text);
-    border-color: var(--gray-8);
-    border-width: 0.5px;
+    border-left: 1px solid var(--gray-8);
 
     &:first-child {
       border-radius: var(--row-border-radius) 0 0 var(--row-border-radius);
@@ -211,6 +214,11 @@
   .rdg-header-row {
     font-size: var(--header-font-size);
     line-height: 1rem;
+    position: sticky;
+    top: 0;
+    background-color: var(--gray-3);
+    z-index: 1;
+    min-height: 2rem;
   }
 
   .selected-row {
@@ -233,7 +241,7 @@
   }
 
   .rdg-row-odd:not([aria-selected='true']):not(.selected-row) {
-    background-color: var(--gray-3);
+    background-color: var(--gray-4);
   }
 
   .rdg-row-even:not([aria-selected='true']).releasing-mon-row {

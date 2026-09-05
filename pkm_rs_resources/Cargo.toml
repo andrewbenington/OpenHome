@@ -21,6 +21,8 @@ strum_macros = "0.28.0"
 rand = { version = "0.10.2", optional = true }
 arbitrary-int = "2.1.1"
 tsify = "0.5.6"
+specta = { version = "=2.0.0-rc.22", features = [ "serde_json", "derive" ], optional = true }
+
 
 [lib]
 name = "pkm_rs_resources"
@@ -33,3 +35,4 @@ missing_const_for_fn = "warn"
 [features]
 wasm = ["wasm-bindgen", "js-sys", "serde-wasm-bindgen", "getrandom/wasm_js", "pkm_rs_types/wasm"]
 randomize = ["rand", "pkm_rs_types/randomize"]
+specta = ["dep:specta"]

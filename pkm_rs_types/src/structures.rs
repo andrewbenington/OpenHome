@@ -24,7 +24,10 @@ const MASK_BITS_2_3: u8 = 0b00001100;
 const MASK_BITS_2_3_INVERTED: u8 = 0b11110011;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, EnumString, Display, Default, Serialize, Clone, Copy, Eq, PartialEq)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
+#[derive(
+    Debug, EnumString, Display, Default, Serialize, Deserialize, Clone, Copy, Eq, PartialEq,
+)]
 pub enum Gender {
     #[default]
     Male,

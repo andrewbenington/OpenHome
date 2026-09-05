@@ -36,6 +36,7 @@ interface BoxCellProps {
   onClick: () => void
   onDrop: (_: PKMInterface[]) => void
   disabled?: boolean
+  loading?: boolean
   disabledReason?: string
   mon: PKMInterface | undefined
   borderColor?: string
@@ -58,7 +59,8 @@ function BoxCell(props: BoxCellProps) {
   const { updateMonTags, updateMonDisplayColor, setMonNickname } = ohpkmStore
   const [renameOpen, setRenameOpen] = useState(false)
   const [renameValue, setRenameValue] = useState('')
-  const { showBackgroundColor } = useMonDisplay()
+  const monDisplayState = useMonDisplay()
+  const { showBackgroundColor } = monDisplayState
 
   const isFilteredOut = useMemo(() => {
     return (
@@ -232,6 +234,7 @@ function BoxCell(props: BoxCellProps) {
                 style={{
                   width: '100%',
                   height: '100%',
+                  opacity: props.loading ? 0.6 : 1,
                   ...getBackgroundDetails(),
                 }}
                 dragData={dragData}
@@ -241,6 +244,7 @@ function BoxCell(props: BoxCellProps) {
                 topRightIndicator={topRightIndicator}
                 showItem={showItem}
                 showShiny={showShiny}
+                monDisplayState={monDisplayState}
               />
             </DroppableSpace>
           ) : (

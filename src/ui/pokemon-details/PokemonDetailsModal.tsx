@@ -5,7 +5,7 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM, originalDataTagToMonFormat } from '@openhome-core/pkm/OHPKM'
 import { isRomHackFormat } from '@openhome-core/pkm/PKM'
 import { FileSchemas } from '@openhome-core/pkm/schema'
-import { $R, Option, R, Result } from '@openhome-core/util/functional'
+import { $R, isResult, Option, R, Result } from '@openhome-core/util/functional'
 import Badge from '@openhome-ui/components/badge/Badge'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import Fallback from '@openhome-ui/components/Fallback'
@@ -35,7 +35,7 @@ import SummaryDisplay from './tabs/SummaryTab'
 import TrainersDisplay from './tabs/TrainersTab'
 
 export type PokemonDetailsModalProps = {
-  mon?: PKMInterface
+  mon?: PKMInterface | Result<PKMInterface>
   onClose?: () => void
   navigateLeft?: () => void
   navigateRight?: () => void
@@ -43,7 +43,7 @@ export type PokemonDetailsModalProps = {
 }
 
 export default function PokemonDetailsModal(props: PokemonDetailsModalProps) {
-  const { mon, onClose, navigateLeft, navigateRight, boxIndicatorProps } = props
+  const { onClose, navigateLeft, navigateRight, boxIndicatorProps } = props
   const [boxIndicatorVisible, setBoxIndicatorVisible] = useState(false)
   const [boxIndicatorTimeout, setBoxIndicatorTimeout] = useState<NodeJS.Timeout>()
 
@@ -85,7 +85,10 @@ export default function PokemonDetailsModal(props: PokemonDetailsModalProps) {
     return () => window.removeEventListener('keydown', handler, true)
   }, [navigateLeftWithIndicator, navigateRightWithIndicator])
 
-  if (!mon) return null
+  const mon = props.mon && isResult(props.mon) ? $R(props.mon).dropError() : props.mon
+  const error = props.mon && isResult(props.mon) ? $R(props.mon).err() : undefined
+
+  if (!mon && !error) return null
 
   return (
     <Dialog.Root open onOpenChange={(open) => !open && onClose?.()}>
@@ -97,37 +100,40 @@ export default function PokemonDetailsModal(props: PokemonDetailsModalProps) {
             <Dialog.Description>Detailed information about the selected Pokémon</Dialog.Description>
           </VisuallyHidden>
           <Fallback>
-            <ModalContents mon={mon} />
+            {mon && <ModalContents mon={mon} />}
+            {error && <MessageRibbon type="error">{error}</MessageRibbon>}
           </Fallback>
-          <div className="modal-footer">
-            <Flex gap="1" align="center" minWidth="7rem">
-              <PokemonIcon
-                nationalDex={mon.nationalDex}
-                formIndex={mon.formIndex}
-                style={{ width: '1rem', height: '1rem' }}
-              />
-              {mon.nickname}
-            </Flex>
-            <Flex gap="1" align="center" minWidth="5rem">
-              <Badge.Game
-                originGame={mon.gameOfOrigin}
-                plugin={mon.pluginOrigin}
-                style={{ minWidth: 15, height: 15 }}
-              />
-              {mon.trainerName}
-            </Flex>
-            {mon.personalityValue && (
-              <code>PID {mon.personalityValue.toString(16).padStart(8, '0')}</code>
-            )}
-            <div>Level {mon.getLevel()}</div>
-            <div style={{ flex: 1 }} />
-            {mon instanceof OHPKM && (
-              <>
-                <div>OpenHome ID: {mon.openhomeId}</div>
-                <div>Tracked since {mon.startedTrackingTimestamp?.format('MMMM D, YYYY')}</div>
-              </>
-            )}
-          </div>
+          {mon && (
+            <div className="modal-footer">
+              <Flex gap="1" align="center" minWidth="7rem">
+                <PokemonIcon
+                  nationalDex={mon.nationalDex}
+                  formIndex={mon.formIndex}
+                  style={{ width: '1rem', height: '1rem' }}
+                />
+                {mon.nickname}
+              </Flex>
+              <Flex gap="1" align="center" minWidth="5rem">
+                <Badge.Game
+                  originGame={mon.gameOfOrigin}
+                  plugin={mon.pluginOrigin}
+                  style={{ minWidth: 15, height: 15 }}
+                />
+                {mon.trainerName}
+              </Flex>
+              {mon.personalityValue && (
+                <code>PID {mon.personalityValue.toString(16).padStart(8, '0')}</code>
+              )}
+              <div>Level {mon.getLevel()}</div>
+              <div style={{ flex: 1 }} />
+              {mon instanceof OHPKM && (
+                <>
+                  <div>OpenHome ID: {mon.openhomeId}</div>
+                  <div>Tracked since {mon.startedTrackingTimestamp?.format('MMMM D, YYYY')}</div>
+                </>
+              )}
+            </div>
+          )}
         </Dialog.Popup>
         {navigateLeft && (
           <button className="modal-arrow modal-arrow-left" onClick={navigateLeftWithIndicator}>

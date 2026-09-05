@@ -5,6 +5,7 @@ use num_enum::TryFromPrimitive;
 use pkm_rs_derive::EnumMax;
 #[cfg(feature = "randomize")]
 use rand::RngExt;
+use serde::Deserialize;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -77,7 +78,10 @@ impl PartialEq<NationalDex> for u16 {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, TryFromPrimitive, EnumMax)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, TryFromPrimitive, EnumMax, Deserialize,
+)]
 #[repr(u16)]
 pub enum NationalDex {
     Bulbasaur = 1,

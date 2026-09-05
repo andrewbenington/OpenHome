@@ -1,9 +1,9 @@
 use crate::commands::CommandResult;
 use crate::data_controller::TauriDataController;
 use crate::synced_state;
-use openhome_core::Error;
 use openhome_core::data_controller::{DataController, DataDir, MONS_V2_DIR};
 use openhome_core::ohpkm_store::OhpkmBytesStore;
+use openhome_core::{Error, pagination};
 use serde::Serialize;
 use std::path::Path;
 use std::{collections::HashMap, fs};
@@ -29,6 +29,27 @@ pub fn get_ohpkm_store(
     synced_state: tauri::State<'_, synced_state::AllSyncedState>,
 ) -> CommandResult<Vec<(String, String)>> {
     Ok(synced_state.ohpkm_store_b64()?)
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn search_ohpkm_store(
+    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
+    pagination_cursor: pagination::PaginationCursor,
+    filters: Vec<pagination::Filter>,
+) -> CommandResult<pagination::PaginatedPage<String>> {
+    Ok(synced_state.search_ohpkm_store(pagination_cursor, filters)?)
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn get_ohpkm_bytes_by_id(
+    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
+    openhome_id: String,
+) -> CommandResult<Option<Vec<u8>>> {
+    Ok(synced_state
+        .ohpkm_lookup(openhome_id.parse()?)?
+        .map(|ohpkm| ohpkm.to_bytes().to_vec()))
 }
 
 #[tauri::command]

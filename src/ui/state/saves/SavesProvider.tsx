@@ -78,7 +78,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
             const data = save.getMonAt(boxNum, boxSlot)
             if (!data) continue
 
-            const trackedData = ohpkmStore.loadIfTracked(data)
+            const trackedData = await ohpkmStore.loadIfTracked(data)
             if (!trackedData) continue
 
             trackedData.tradeToSave(save)

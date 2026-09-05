@@ -7,11 +7,12 @@ import BackendInterface, {
   OhpkmStore,
   StoredLookups,
 } from '@openhome-core/backend/backendInterface'
+import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SaveWriter } from '@openhome-core/save/interfaces'
 import { PathData, PossibleSaves } from '@openhome-core/save/util/path'
 import { SaveFolder, SimpleOpenHomeBox, StoredBankData } from '@openhome-core/save/util/storage'
-import { Errorable, R } from '@openhome-core/util/functional'
+import { Errorable, Option, R } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
 import { JSONObject, LoadSaveResponse, SaveRef } from '@openhome-core/util/types'
 import { LogFilter } from '@openhome-ui/pages/logs'
@@ -26,10 +27,13 @@ import { platform } from '@tauri-apps/plugin-os'
 import dayjs, { Dayjs } from 'dayjs'
 import { Commands } from './commands'
 import {
+  Filter,
   LogEntry as LogEntryRust,
   LogFilterJs,
   LogFilter as LogFilterRust,
   LogsResponse as LogsResponseRust,
+  PaginatedPage,
+  PaginationCursor,
   StoredBankDataWasm as StoredBankDataRust,
 } from './spectaCommands'
 
@@ -83,6 +87,24 @@ export const TauriBackend: BackendInterface = {
           ])
         )
       )
+    )
+  },
+  searchOhpkmStore: async function (
+    cursor: PaginationCursor,
+    filters: Filter[]
+  ): Promise<Errorable<PaginatedPage<OHPKM>>> {
+    return Commands.searchOhpkmStore(cursor, filters).then(
+      R.map((PaginatedPage) => ({
+        ...PaginatedPage,
+        results: PaginatedPage.results.map((b64String) =>
+          OHPKM.fromBytes(Uint8Array.fromBase64(b64String).buffer)
+        ),
+      }))
+    )
+  },
+  lookupOhpkmById: async function (id: OhpkmIdentifier): Promise<Errorable<Option<OHPKM>>> {
+    return Commands.getOhpkmBytesById(id).then(
+      R.map((bytes) => (bytes ? OHPKM.fromBytes(new Uint8Array(bytes).buffer) : undefined))
     )
   },
   removeDangling: Commands.removeDangling,
