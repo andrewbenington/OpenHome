@@ -2,9 +2,7 @@ import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
 import { PaginatedPage, PaginationCursor } from '@openhome-core/tauri/spectaCommands'
-import { $R, Option, R, Result } from '@openhome-core/util/functional'
-import { $O, OptionBox } from '@openhome-core/util/option'
-import { filterUndefined } from '@openhome-core/util/sort'
+import { $R, Option, R } from '@openhome-core/util/functional'
 import {
   CtxMenuElementBuilder,
   Item,
@@ -57,7 +55,7 @@ export default function AllTrackedPokemon({
     selectionController
   )
 
-  function preloadOhpkmPage(page: PaginatedPage<OHPKM>): PaginatedPage<OhpkmRowData> {
+  function preloadOhpkmPage(page: PaginatedPage<OHPKM>): Page {
     return {
       ...page,
       results: page.results.map((mon) =>
@@ -98,17 +96,11 @@ export default function AllTrackedPokemon({
 
   // flatten the array of arrays from the useInfiniteQuery hook
   const flatData = useMemo(() => {
-    return (
-      data?.pages
-        .flatMap(R.ok)
-        .filter(filterUndefined)
-        .flatMap((page) => page.results) ?? []
-    )
+    return data?.pages.filter(R.isOk).flatMap((page) => page.data.results) ?? []
   }, [data])
 
-  const a: OptionBox<Result<PaginatedPage<OhpkmRowData>>> = $O(data?.pages[0])
-  a.map(R.map((page) => page.totalCount)).map(R.orElse(0))
-  const totalDBRowCount = a.map(R.mapOr((page) => page.totalCount, 0)).get()
+  const totalDBRowCount = data?.pages.find((result) => R.isOk(result))?.data.totalCount ?? 0
+
   const totalFetched = flatData.length
 
   // called on scroll and possibly on mount to fetch more data as the user scrolls and reaches bottom of table
@@ -165,6 +157,8 @@ export default function AllTrackedPokemon({
     </OpenHomeCtxMenu>
   )
 }
+
+type Page = PaginatedPage<OhpkmRowData>
 
 function useSelectedMons() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())

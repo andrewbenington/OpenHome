@@ -85,7 +85,7 @@ export default function PokemonDetailsModal(props: PokemonDetailsModalProps) {
     return () => window.removeEventListener('keydown', handler, true)
   }, [navigateLeftWithIndicator, navigateRightWithIndicator])
 
-  const mon = props.mon && isResult(props.mon) ? $R(props.mon).ok() : props.mon
+  const mon = props.mon && isResult(props.mon) ? $R(props.mon).dropError() : props.mon
   const error = props.mon && isResult(props.mon) ? $R(props.mon).err() : undefined
 
   if (!mon && !error) return null

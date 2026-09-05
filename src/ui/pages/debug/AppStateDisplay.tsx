@@ -1,23 +1,20 @@
-import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { DebugDataDisplay } from '@openhome-ui/components/DebugDataDisplay'
 import { InfoGrid } from '@openhome-ui/components/InfoGrid'
 import { useTransactionState } from '@openhome-ui/state/app-state'
 import { AppInfoContext, AppInfoState } from '@openhome-ui/state/appInfo'
 import { ErrorContext } from '@openhome-ui/state/error'
 import { ItemBagContext, ItemBagState } from '@openhome-ui/state/items'
-import { Item, Lookup, OriginGames, SpeciesLookup } from '@pkm-rs/pkg'
+import { Item } from '@pkm-rs/pkg'
 import { Card, Flex, Heading, Separator } from '@radix-ui/themes'
 import { useContext } from 'react'
 import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
-import { useOhpkmStore } from '../../state/ohpkm'
 
 export default function AppStateDisplay() {
   const transactionState = useTransactionState()
   const [appInfoState] = useContext(AppInfoContext)
   const [errorState, dispatchErrorState] = useContext(ErrorContext)
   const [bagState] = useContext(ItemBagContext)
-  const ohpkmStore = useOhpkmStore()
+  // const ohpkmStore = useOhpkmStore()
 
   return (
     <Flex direction="column">
@@ -31,7 +28,7 @@ export default function AppStateDisplay() {
       <Card className="flex-row" style={{ margin: 8, gap: 8 }}>
         <DebugDataDisplay data={appInfoDisplay(appInfoState)} label="App Info State" />
         <DebugDataDisplay data={useBanksAndBoxesDisplay()} label="Saves/Mons State" />
-        <DebugDataDisplay data={ohpkmStoreDisplay(ohpkmStore.byId)} label="OHPKM Store" />
+        {/* <DebugDataDisplay data={ohpkmStoreDisplay(ohpkmStore.byId)} label="OHPKM Store" /> */}
         <DebugDataDisplay data={bagDisplay(bagState)} label="Bag State" />
         <DebugDataDisplay data={errorState} label="Error State" />
         <button
@@ -66,20 +63,20 @@ function useBanksAndBoxesDisplay() {
   }
 }
 
-function ohpkmStoreDisplay(state: Record<string, OHPKM>) {
-  return Object.fromEntries(Object.entries(state).map(([key, val]) => [key, monDisplay(val)]))
-}
+// function ohpkmStoreDisplay(state: Record<string, OHPKM>) {
+//   return Object.fromEntries(Object.entries(state).map(([key, val]) => [key, monDisplay(val)]))
+// }
 
-function monDisplay(mon: PKMInterface) {
-  const species = SpeciesLookup(mon.nationalDex)
+// function monDisplay(mon: PKMInterface) {
+//   const species = SpeciesLookup(mon.nationalDex)
 
-  return {
-    species: Lookup.speciesName(mon.nationalDex, mon.language),
-    form: species?.forms[mon.formIndex ?? 0].formeName,
-    nickname: mon.nickname,
-    origin: mon.gameOfOrigin ? `Pokémon ${OriginGames.gameNameFull(mon.gameOfOrigin)}` : undefined,
-  }
-}
+//   return {
+//     species: Lookup.speciesName(mon.nationalDex, mon.language),
+//     form: species?.forms[mon.formIndex ?? 0].formeName,
+//     nickname: mon.nickname,
+//     origin: mon.gameOfOrigin ? `Pokémon ${OriginGames.gameNameFull(mon.gameOfOrigin)}` : undefined,
+//   }
+// }
 
 function bagDisplay(state: ItemBagState) {
   return {

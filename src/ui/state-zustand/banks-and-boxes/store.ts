@@ -69,6 +69,7 @@ export interface BanksAndBoxesState {
   allMonsCurrentBank: () => LocationsByIdentifier
   allMonsInBoxCurrentBank: (boxIndex: number) => OhpkmIdentifier[]
   findHomeLocation: (identifier: OhpkmIdentifier) => Option<BankBoxCoordinates>
+  hasHomeLocation: (identifier: OhpkmIdentifier) => boolean
   indexOfBoxId: (id: string) => Option<number>
 }
 
@@ -263,6 +264,9 @@ export const createBanksAndBoxesStore = (
         },
         findHomeLocation: (identifier: OhpkmIdentifier): Option<BankBoxCoordinates> => {
           return readonlyState().reverseLookup.get(identifier)
+        },
+        hasHomeLocation: (identifier: OhpkmIdentifier): boolean => {
+          return readonlyState().reverseLookup.get(identifier) !== undefined
         },
         indexOfBoxId: (id: string): Option<number> => {
           return Array.from(readonlyState().getCurrentBank().boxes).find(
@@ -478,6 +482,7 @@ export function useBanksAndBoxes() {
   const clearAtHomeLocation = withSelectors.use.clearAtLocation()
   const setAtHomeLocation = withSelectors.use.setAtLocation()
   const findHomeLocation = withSelectors.use.findHomeLocation()
+  const hasHomeLocation = withSelectors.use.hasHomeLocation()
 
   const allMonsInCurrentBankWithLocations = withSelectors.use.allMonsCurrentBank()
   const allMonsInCurrentBank = () => Object.keys(allMonsInCurrentBankWithLocations())
@@ -625,6 +630,7 @@ export function useBanksAndBoxes() {
     clearAtHomeLocation,
     setAtHomeLocation,
     findHomeLocation,
+    hasHomeLocation,
 
     allMonsInCurrentBank,
     allMonsInHomeBoxCurrentBank,
