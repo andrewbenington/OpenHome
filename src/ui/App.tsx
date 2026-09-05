@@ -105,6 +105,19 @@ function AppWithBackend() {
 
   useEffect(() => listenForSave(), [])
 
+  const listenForSave = useEffectEvent(() => {
+    // returns a function to stop listening
+    const stopListening = backend.onMenuEvent('save', saveChanges)
+
+    // the "stop listening" function should be called when the effect returns,
+    // otherwise duplicate listeners will exist
+    return () => {
+      stopListening()
+    }
+  })
+
+  useEffect(() => listenForSave(), [])
+
   // only on app start
   useEffect(() => {
     if (appInfoState.error) {
