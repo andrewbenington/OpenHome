@@ -1,19 +1,14 @@
-import { Mapper, NullableOption, OnOk, Option, Result } from './functional'
+import { Mapper, NullableOption, Option } from './functional'
 
-// Terms:
-// Map - if present,
+export type OnSome<T, R> = Mapper<T, R>
+
+export type OnNone<R> = () => R
 
 export function isSome<T>(v: Option<T>): v is T & {} {
   return v !== undefined && v !== null
 }
 
 function map<T, U>(transform: Mapper<T, U>): (option: NullableOption<T>) => Option<U> {
-  return (option) => (isSome(option) ? transform(option) : undefined)
-}
-
-function tryMap<Type1, Type2, Error>(
-  transform: Mapper<Type1, Result<Type2, Error>>
-): (option: NullableOption<Type1>) => Option<Result<Type2, Error>> {
   return (option) => (isSome(option) ? transform(option) : undefined)
 }
 
@@ -33,8 +28,8 @@ type NullableOptionNowOrLater<T> = NullableOption<Promise<NullableOption<T>>>
 class PromisedOptionBox<T> {
   constructor(private readonly v: NullableOptionNowOrLater<T>) {}
 
-  then<R>(onOk: OnOk<T, R>): PromisedOptionBox<R> {
-    return O.after(this.v?.then(map(onOk)))
+  then<R>(onSome: OnSome<T, R>): PromisedOptionBox<R> {
+    return O.after(this.v?.then(map(onSome)))
   }
 
   async get(): Promise<Option<T>> {
@@ -58,16 +53,26 @@ export class OptionBox<T> {
     return isSome(this.v) ? this.v : fallback
   }
 
-  map<R>(onOk: OnOk<T, R> | OnOk<T, Option<R>>): OptionBox<R> {
-    return $O(map(onOk)(this.v))
+  do(onSome: (_: T) => void) {
+    if (this.v) {
+      onSome(this.v)
+    }
   }
 
-  tryMap<R, E>(onOk: OnOk<T, Result<R, E>>): OptionBox<R> {
-    return $O(tryMap(onOk)(this.v))
+  map<R>(onSome: OnSome<T, R>): OptionBox<R> {
+    return $O(map(onSome)(this.v))
   }
 
-  awaitFlatMap<R>(onOk: OnOk<T, Promise<Option<R>>>): PromisedOptionBox<R> {
-    return O.after(isSome(this.v) ? onOk(this.v) : undefined)
+  flatMap<R>(onSome: OnSome<T, Option<R>>): OptionBox<R> {
+    return $O(map(onSome)(this.v))
+  }
+
+  update<R>(onSome: OnSome<T, OptionBox<R>>): OptionBox<R> {
+    return this.v ? onSome(this.v) : (this as unknown as OptionBox<R>) // v is null/undefined, so reuse the same object
+  }
+
+  awaitFlatMap<R>(onSome: OnSome<T, Promise<Option<R>>>): PromisedOptionBox<R> {
+    return O.after(isSome(this.v) ? onSome(this.v) : undefined)
   }
 
   get(): T | undefined {

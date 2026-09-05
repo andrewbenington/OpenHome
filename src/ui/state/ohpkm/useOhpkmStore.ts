@@ -39,7 +39,7 @@ export function useOhpkmStore() {
 
   const getById = useCallback(
     (id: string): Promise<Option<OHPKM>> => {
-      return backend.lookupOhpkmById(id).then(R.ok)
+      return backend.lookupOhpkmById(id).then(R.dropError)
     },
     [backend]
   )
@@ -80,21 +80,8 @@ export function useOhpkmStore() {
     return replacedItem
   }
 
-  async function getAllStored() {
-    return backend
-      .loadOhpkmStore()
-      .then(R.map((mons) => Object.fromEntries(Object.entries(mons).slice(0, 100))))
-      .then(R.ok)
-  }
-
   async function searchStore(cursor: PaginationCursor, filters: Filter[]) {
     return backend.searchOhpkmStore(cursor, filters)
-  }
-
-  async function getAllStoredIds() {
-    const allStored = await getAllStored()
-
-    return allStored ? Object.keys(allStored) : undefined
   }
 
   async function handleLookupsUpdate(ohpkm: OHPKM, save: SAV) {
@@ -362,8 +349,6 @@ export function useOhpkmStore() {
     setMonMove,
 
     searchStore,
-    getAllStored,
-    getAllStoredIds,
     updateAndConvertForSave,
     startTrackingNewMon,
     getIdIfTracked,

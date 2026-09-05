@@ -3,8 +3,8 @@ import { type CSSProperties } from 'react'
 
 import './style.css'
 
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SortableValue } from '@openhome-core/util/sort'
+import { OhpkmRowData } from '@openhome-ui/ohpkmGrid'
 import { Dialog } from '../dialog/Dialog'
 import OhoButton, { OhoButtonType } from '../OhoButton'
 import { ModalController, type SearchController } from './controllers'
@@ -90,7 +90,7 @@ function SearchModal<T extends SortableValue, SC extends SearchController<T>>(
   )
 }
 
-type PokemonSearchModalProps = SearchModalProps<OHPKM, PokemonSearchController>
+type PokemonSearchModalProps = SearchModalProps<OhpkmRowData, PokemonSearchController>
 
 function PokemonSearchModal(props: PokemonSearchModalProps) {
   return <SearchModal {...props} typeName="Pokémon" SearchComponent={Search.Pokemon} />

@@ -1,4 +1,4 @@
-import useOhpkmColumns, { OhpkmRowData } from '@openhome-ui/ohpkmGrid/ohpkm'
+import { OhpkmRowData, useOhpkmColumns } from '@openhome-ui/ohpkmGrid'
 import { useSaves } from '@openhome-ui/state/saves'
 import { Callout } from '@radix-ui/themes'
 import { ErrorIcon } from '../Icons'

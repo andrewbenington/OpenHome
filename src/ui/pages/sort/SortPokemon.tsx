@@ -84,7 +84,7 @@ export default function SortPokemon() {
     const monOrOhpkm =
       $O(ohpkmStore.getPotentialOhpkmId(mon))
         .flatMap((openhomeId) => openSaveMonsByOpenhomeId?.get(openhomeId))
-        .map(R.ok)
+        .map(R.dropError)
         .get() ?? mon
 
     return {

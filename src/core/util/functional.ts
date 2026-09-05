@@ -43,6 +43,12 @@ export type Nullable<T> = T | null
 export type NullableOption<T> = T | null | undefined
 export type Errorable<T> = Result<T, string>
 
+type BooleanFn<Args extends unknown[] = unknown[]> = (...args: Args) => boolean
+
+export function not<Args extends unknown[]>(f: BooleanFn<Args>) {
+  return (...args: Args) => !f(...args)
+}
+
 export function buildOk<T = never, E = never>(value: T): Result<T, E> {
   return { status: 'ok', data: value }
 }
@@ -75,7 +81,7 @@ function orElse<T, E>(fallback: T): (result: Result<T, E>) => T {
   return (result) => (isOk(result) ? result.data : fallback)
 }
 
-function noWorriesIfNot<T, E>(result: Result<T, E>): Option<T> {
+function dropError<T, E>(result: Result<T, E>): Option<T> {
   return isOk(result) ? result.data : undefined
 }
 
@@ -138,7 +144,7 @@ export type Ok<T> = {
 
 export type Result<T, E = string> = Ok<T> | Err<E>
 
-export function isResult(v: object): v is Result<unknown, unknown> {
+export function isResult<T, V>(v: object): v is Result<T, V> {
   return (
     v !== null &&
     'status' in v &&
@@ -155,7 +161,7 @@ export const R = {
   asyncFlatMap,
   assert,
   orElse,
-  ok: noWorriesIfNot,
+  dropError,
   err,
   fromNullable,
   Ok: buildOk,
@@ -172,20 +178,7 @@ export type OnOk<T, R> = Mapper<T, R>
 
 export type OnErr<E, R> = Mapper<E, R>
 
-// // Wrapper function exposing Result utility functions as "methods"
-// export function $R<T, E>(r: Result<T, E>) {
-//   return {
-//     match: <U>(onOk: OnOk<T, U>, onErr: OnErr<E, U>) => match(onOk, onErr)(r),
-//     map: <U>(onOk: OnOk<T, U>) => $R(map<T, E, U>(onOk)(r)),
-//     ok: () => ok(r),
-//     err: () => err(r),
-//     flatMap: <U>(onOk: OnOk<T, Result<U, E>>) => flatMap<T, E, U>(onOk)(r),
-//     mapErr: <U>(onErr: OnErr<E, U>) => mapErr<T, E, U>(onErr)(r),
-//     orElse: (ifErr: T) => orElse<T, E>(ifErr)(r),
-//   }
-// }
-
-class ResultBox<T, E> {
+export class ResultBox<T, E> {
   constructor(private readonly r: Result<T, E>) {}
 
   match<U>(onOk: OnOk<T, U>, onErr: OnErr<E, U>): U {
@@ -196,8 +189,8 @@ class ResultBox<T, E> {
     return $R(map<T, E, U>(onOk)(this.r))
   }
 
-  ok() {
-    return noWorriesIfNot(this.r)
+  dropError() {
+    return dropError(this.r)
   }
 
   err() {

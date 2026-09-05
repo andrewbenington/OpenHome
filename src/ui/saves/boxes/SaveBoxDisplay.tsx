@@ -86,7 +86,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
     const lookupResult = saveOhpkms?.get(potentialOhpkmId)
     if (!lookupResult) return selectedSlot
 
-    return R.ok(lookupResult) ?? selectedSlot
+    return R.dropError(lookupResult) ?? selectedSlot
   }, [selectedIndex, save, ohpkmStore, saveOhpkms])
 
   const attemptImportMons = async (mons: PKMInterface[], location: MonLocation) => {
@@ -163,7 +163,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
         $O(save.getMonAt(location.box, location.boxSlot))
           .flatMap(ohpkmStore.getPotentialOhpkmId)
           .flatMap((openhomeId) => saveOhpkms?.get(openhomeId))
-          .map(R.ok)
+          .map(R.dropError)
           .get() ?? mon
 
       return { save, mon: monOrOhpkm }
