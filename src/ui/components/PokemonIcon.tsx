@@ -12,8 +12,8 @@ import {
   Generation,
   MetadataSummaryLookup,
 } from '@pkm-rs/pkg'
-import { HTMLAttributes, MouseEventHandler, ReactNode, useState } from 'react'
-import { useMonDisplay } from '../hooks/monDisplay'
+import { HTMLAttributes, memo, MouseEventHandler, ReactNode, useState } from 'react'
+import { MonDisplayState, useMonDisplay } from '../hooks/monDisplay'
 import { boxIconImagePath, FormsUsingImages } from '../pokemon-details/useBoxIconImage'
 import { classNames, grayscaleIf } from '../util/style'
 import { MonTag } from '../util/tags'
@@ -33,6 +33,7 @@ export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
   extraFormIndex?: ExtraFormIndex
   tags?: MonTag[]
   hasNotes?: boolean
+  monDisplayState?: MonDisplayState
 }
 
 function getBackgroundPosition(formeMetadata?: FormMetadata, isEgg?: boolean) {
@@ -70,7 +71,7 @@ function iconType(
   return shouldUseImage ? 'image' : 'spritesheet'
 }
 
-export default function PokemonIcon(props: PokemonIconProps) {
+const PokemonIcon = memo((props: PokemonIconProps) => {
   const { nationalDex, formIndex, isShiny, heldItemIndex, onlyItem, silhouette, isEgg } = props
   const { grayedOut, topRightIndicator, tags, hasNotes, style, onClick, extraFormIndex } = props
   const { showNotesIndicator, showTags } = useMonDisplay()
@@ -138,12 +139,10 @@ export default function PokemonIcon(props: PokemonIconProps) {
           draggable={false}
           src={getPublicImageURL(getItemIconPath(heldItemIndex))}
         />
-      ) : (
-        <></>
-      )}
+      ) : null}
     </div>
   )
-}
+})
 
 interface PokemonIconUsingSheetProps {
   formeMetadata: FormMetadata
@@ -237,3 +236,5 @@ function PokemonIconUsingImage(props: PokemonIconUsingImageProps) {
     />
   )
 }
+
+export default PokemonIcon

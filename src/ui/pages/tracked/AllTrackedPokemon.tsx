@@ -1,11 +1,10 @@
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
-import { PaginationCursor } from '@openhome-core/tauri/spectaCommands'
-import { $R, Option, R } from '@openhome-core/util/functional'
-import { $O } from '@openhome-core/util/option'
+import { PaginatedPage, PaginationCursor } from '@openhome-core/tauri/spectaCommands'
+import { $R, Option, R, Result } from '@openhome-core/util/functional'
+import { $O, OptionBox } from '@openhome-core/util/option'
 import { filterUndefined } from '@openhome-core/util/sort'
-import useOhpkmColumns from '@openhome-ui/columns/ohpkm'
-import { OhpkmRowData, toRowData } from '@openhome-ui/columns/tanstackOhpkmRowData'
 import {
   CtxMenuElementBuilder,
   Item,
@@ -14,6 +13,7 @@ import {
   Separator,
 } from '@openhome-ui/components/context-menu'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
+import { OhpkmRowData, toRowData, useOhpkmColumns } from '@openhome-ui/ohpkmGrid'
 import { useBanksAndBoxes } from '@openhome-ui/state-zustand/banks-and-boxes/store'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
@@ -42,64 +42,33 @@ export default function AllTrackedPokemon({
   const ohpkmStore = useOhpkmStore()
   const saves = useSaves()
   const { findHomeLocation } = useBanksAndBoxes()
-  const selectionController = useSelectedMons()
-  const { selectedIds, deselectIds } = selectionController
   const [contextMenuBuilders, setContextMenuBuilders] = useState<Option<CtxMenuElementBuilder>[]>(
     []
   )
   const [ctxMenuMonId, setCtxMenuMonId] = useState<Option<OhpkmIdentifier>>()
-  const { releaseMonsById, trackedMonsToRelease } = saves
+  const selectionController = useSelectedMons()
+  const { selectedIds, forceSetSelectedIds } = selectionController
+  const { trackedMonsToRelease } = saves
   const columns = useOhpkmColumns(trackedMonsToRelease, onSelectMon)
-  const navigate = useNavigate()
-  const { switchBoxCurrentBank } = useBanksAndBoxes()
   const tableContainerRef = useRef<HTMLDivElement>(null) // for listening to scroll
-
-  const buildContextElements = useCallback(
-    (mon: OhpkmRowData) => {
-      const homeLocation = findHomeLocation(mon.openhomeId)
-      const actions: CtxMenuElementBuilder[] = [
-        Label.mon(mon),
-        homeLocation
-          ? Item.label('Jump to Box').action(() => {
-              switchBoxCurrentBank(homeLocation.box)
-              navigate('/home')
-            })
-          : Item.label('Find Containing Save').action(() => findSaveForMon(mon.openhomeId)),
-        Item.label(`Move To Release Area`).action(() => {
-          releaseMonsById(mon.openhomeId)
-          deselectIds(mon.openhomeId)
-        }),
-      ]
-
-      if (selectedIds.size > 0) {
-        actions.push(
-          Separator,
-          Label.label(`Bulk Actions (${selectedIds.size} selected)`),
-          Item.label(`Move Selected To Release Area`).action(() => {
-            releaseMonsById(...selectedIds)
-            deselectIds(...selectedIds)
-          })
-        )
-      }
-
-      actions.push(
-        Separator,
-        Label.label(`For All Tracked`),
-        Item.label('Recover Missing Pokémon...').action(findSavesForAllMons)
-      )
-      return actions
-    },
-    [
-      deselectIds,
-      findHomeLocation,
-      findSaveForMon,
-      findSavesForAllMons,
-      navigate,
-      releaseMonsById,
-      selectedIds,
-      switchBoxCurrentBank,
-    ]
+  const { buildContextElements } = useContextMenu(
+    findSaveForMon,
+    findSavesForAllMons,
+    selectionController
   )
+
+  function preloadOhpkmPage(page: PaginatedPage<OHPKM>): PaginatedPage<OhpkmRowData> {
+    return {
+      ...page,
+      results: page.results.map((mon) =>
+        toRowData(
+          mon,
+          findHomeLocation,
+          saves.monsToRelease.filter((monOrId) => typeof monOrId === 'string')
+        )
+      ),
+    }
+  }
 
   const { data, fetchNextPage, isFetching, isLoading } = useInfiniteQuery({
     queryKey: [
@@ -112,18 +81,8 @@ export default function AllTrackedPokemon({
     ],
     queryFn: async (d) => {
       const pageParam = paginationAtom.get() ?? d.pageParam
-      return await ohpkmStore.searchStore(pageParam, []).then(
-        R.map((page) => ({
-          ...page,
-          results: page.results.map((mon) =>
-            toRowData(
-              mon,
-              findHomeLocation,
-              saves.monsToRelease.filter((monOrId) => typeof monOrId === 'string')
-            )
-          ),
-        }))
-      )
+      const searchPromise = ohpkmStore.searchStore(pageParam, []).then(R.map(preloadOhpkmPage))
+      return await searchPromise
     },
     initialPageParam: { pageIndex: 0, pageSize: 300 },
     getNextPageParam: (lastPage) => {
@@ -147,10 +106,9 @@ export default function AllTrackedPokemon({
     )
   }, [data])
 
-  const totalDBRowCount = $O(data?.pages[0])
-    .flatMap(R.ok)
-    .map((page) => page.totalCount)
-    .orElse(0)
+  const a: OptionBox<Result<PaginatedPage<OhpkmRowData>>> = $O(data?.pages[0])
+  a.map(R.map((page) => page.totalCount)).map(R.orElse(0))
+  const totalDBRowCount = a.map(R.mapOr((page) => page.totalCount, 0)).get()
   const totalFetched = flatData.length
 
   // called on scroll and possibly on mount to fetch more data as the user scrolls and reaches bottom of table
@@ -197,9 +155,7 @@ export default function AllTrackedPokemon({
           isRowSelectionDisabled={(row) => trackedMonsToRelease.includes(row.openhomeId)}
           selectedRows={selectedIds}
           // onSortColumnsChange={onColOrderingChange}
-          onSelectedRowsChange={(ids) =>
-            selectionController.forceSetSelectedIds(ids as Set<OhpkmIdentifier>)
-          }
+          onSelectedRowsChange={(ids) => forceSetSelectedIds(ids as Set<OhpkmIdentifier>)}
           paginationAtom={paginationAtom}
           onScrolledToBottom={fetchMoreOnBottomReached}
           fetching={isFetching ? 'next' : undefined}
@@ -231,4 +187,64 @@ function useSelectedMons() {
     deselectIds,
     forceSetSelectedIds,
   }
+}
+
+type SelectionController = ReturnType<typeof useSelectedMons>
+
+function useContextMenu(
+  findSaveForMon: (identifier: string) => Promise<SAV | undefined>,
+  findSavesForAllMons: () => Promise<void>,
+  selectionController: SelectionController
+) {
+  const navigate = useNavigate()
+  const { switchBoxCurrentBank, findHomeLocation } = useBanksAndBoxes()
+  const { releaseMonsById } = useSaves()
+  const { selectedIds, deselectIds } = selectionController
+
+  const buildContextElements = useCallback(
+    (mon: OhpkmRowData) => {
+      const homeLocation = findHomeLocation(mon.openhomeId)
+      const actions: CtxMenuElementBuilder[] = [
+        Label.mon(mon),
+        homeLocation
+          ? Item.label('Jump to Box').action(() => {
+              switchBoxCurrentBank(homeLocation.box)
+              navigate('/home')
+            })
+          : Item.label('Find Containing Save').action(() => findSaveForMon(mon.openhomeId)),
+        Item.label(`Move To Release Area`).action(() => {
+          releaseMonsById(mon.openhomeId)
+          deselectIds(mon.openhomeId)
+        }),
+      ]
+
+      if (selectedIds.size > 0) {
+        actions.push(
+          Separator,
+          Label.label(`Bulk Actions (${selectedIds.size} selected)`),
+          Item.label(`Move Selected To Release Area`).action(() => {
+            releaseMonsById(...selectedIds)
+            deselectIds(...selectedIds)
+          })
+        )
+      }
+      actions.push(
+        Separator,
+        Label.label(`For All Tracked`),
+        Item.label('Recover Missing Pokémon...').action(findSavesForAllMons)
+      )
+      return actions
+    },
+    [
+      deselectIds,
+      findHomeLocation,
+      findSaveForMon,
+      findSavesForAllMons,
+      navigate,
+      releaseMonsById,
+      selectedIds,
+      switchBoxCurrentBank,
+    ]
+  )
+  return { buildContextElements }
 }

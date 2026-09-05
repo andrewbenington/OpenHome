@@ -59,7 +59,8 @@ function BoxCell(props: BoxCellProps) {
   const { updateMonTags, updateMonDisplayColor, setMonNickname } = ohpkmStore
   const [renameOpen, setRenameOpen] = useState(false)
   const [renameValue, setRenameValue] = useState('')
-  const { showBackgroundColor } = useMonDisplay()
+  const monDisplayState = useMonDisplay()
+  const { showBackgroundColor } = monDisplayState
 
   const isFilteredOut = useMemo(() => {
     return (
@@ -243,6 +244,7 @@ function BoxCell(props: BoxCellProps) {
                 topRightIndicator={topRightIndicator}
                 showItem={showItem}
                 showShiny={showShiny}
+                monDisplayState={monDisplayState}
               />
             </DroppableSpace>
           ) : (

@@ -1,12 +1,16 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Moves } from '@openhome-core/resources'
 import { $R, Nullable, NullableOption, Option, R, Result } from '@openhome-core/util/functional'
+import { $O } from '@openhome-core/util/option'
+import useOhpkmGrid, { OhpkmRowData, toRowData } from '@openhome-ui/ohpkmGrid'
+import { useBanksAndBoxes } from '@openhome-ui/state-zustand/banks-and-boxes/store'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
+import { useSaves } from '@openhome-ui/state/saves'
 import { OriginGame } from '@pkm-rs/pkg'
 import { useState } from 'react'
 import { SearchController } from './controllers'
 
-export type PokemonSearchController = SearchController<OHPKM> & {
+export type PokemonSearchController = SearchController<OhpkmRowData> & {
   nickname: Nullable<string>
   setNickname: (name: Nullable<string>) => void
   knownMove: Nullable<string>
@@ -101,21 +105,31 @@ export function usePokemonSearch(
   const [originGame, setOriginGame] = useState<Nullable<OriginGame>>(null)
   const [selectedId, setSelectedId] = useState<Option<string>>()
   const ohpkmStore = useOhpkmStore()
-  const [results, setResults] = useState<Option<OHPKM[]>>()
+  const { preloadRowData } = useOhpkmGrid()
+  const { monsToRelease } = useSaves()
+  const { findHomeLocation } = useBanksAndBoxes()
+  const [results, setResults] = useState<Option<OhpkmRowData[]>>()
   const [loading, setLoading] = useState(false)
 
   // TODO: do not get all of these at once
-  async function getResults(): Promise<OHPKM[]> {
+  async function getResults(): Promise<OhpkmRowData[]> {
     setLoading(true)
     const mons = await ohpkmStore.getAllStored()
 
-    const results = mons
+    const results = Object.values(mons ?? {})
       ?.filter(async (mon) => (await prefilter?.(mon)) !== false)
       .filter((mon) => prefixMatches(nickname, mon.nickname))
       .filter((mon) =>
         mon.moves.some((moveIndex) => prefixMatches(knownMove, Moves[moveIndex]?.name))
       )
       .filter((mon) => originGame === null || mon.gameOfOrigin === originGame)
+      .map((ohpkm) =>
+        toRowData(
+          ohpkm,
+          findHomeLocation,
+          monsToRelease.filter((toRelease) => typeof toRelease === 'string')
+        )
+      )
 
     setLoading(false)
     setResults(results)
@@ -135,7 +149,7 @@ export function usePokemonSearch(
   }
 
   async function getSelectedMon() {
-    return selectedId ? ohpkmStore.getById(selectedId) : undefined
+    return $O(selectedId).awaitFlatMap(ohpkmStore.getById).then(preloadRowData)
   }
 
   return {

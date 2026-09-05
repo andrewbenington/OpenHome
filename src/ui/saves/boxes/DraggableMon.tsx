@@ -6,7 +6,7 @@ import { MonWithLocation } from '@openhome-ui/state/saves'
 import { MetadataSummaryLookup } from '@pkm-rs/pkg'
 import { CSSProperties, useMemo } from 'react'
 import PokemonIcon from '../../components/PokemonIcon'
-import { TopRightBadgeType } from '../../hooks/monDisplay'
+import { MonDisplayState, TopRightBadgeType } from '../../hooks/monDisplay'
 import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
 import { MonTag } from '../../util/tags'
 
@@ -33,6 +33,7 @@ interface DraggableMonProps {
   topRightIndicator?: TopRightBadgeType | null
   showShiny?: boolean
   showItem?: boolean
+  monDisplayState: MonDisplayState
 }
 
 type MonWithManagementData = PKMInterface & {
@@ -51,6 +52,7 @@ const DraggableMon = (props: DraggableMonProps) => {
     topRightIndicator,
     showItem,
     showShiny,
+    monDisplayState,
   } = props
   const { attributes, listeners, setNodeRef, isDragging, active } = useDraggable({
     id: (dragID ?? '') + mon.personalityValue?.toString(),
@@ -114,6 +116,7 @@ const DraggableMon = (props: DraggableMonProps) => {
         hasNotes={
           typeof monWithManagement.notes === 'string' && monWithManagement.notes.trim().length > 0
         }
+        monDisplayState={monDisplayState}
       />
     </div>
   )
