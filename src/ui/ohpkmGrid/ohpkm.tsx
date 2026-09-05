@@ -20,10 +20,10 @@ import {
   BankBoxCoordinates,
   useBanksAndBoxes,
 } from '@openhome-ui/state-zustand/banks-and-boxes/store'
-import { Language, Lookup, OriginGames } from '@pkm-rs/pkg'
+import { Language, Lookup } from '@pkm-rs/pkg'
 import { useRef } from 'react'
 import { SelectColumn } from 'react-data-grid'
-import { OhpkmRowData } from './tanstackOhpkmRowData'
+import { OhpkmRowData } from '.'
 
 export default function useOhpkmColumns(
   trackedMonsToRelease: OhpkmIdentifier[],
@@ -34,6 +34,8 @@ export default function useOhpkmColumns(
   // this is necessary because the renderer functions do not update correctly when dependencies change
   const trackedMonsRef = useRef(trackedMonsToRelease)
   trackedMonsRef.current = trackedMonsToRelease
+
+  const shinyImage = getPublicImageURL('icons/Shiny.png')
 
   return [
     { ...SelectColumn, minWidth: 36, width: undefined },
@@ -50,6 +52,7 @@ export default function useOhpkmColumns(
               formIndex={value.formIndex}
               style={{ height: '1.75rem', width: '1.75rem' }}
             />
+            {value.nationalDex}
           </button>
         </div>
       ),
@@ -103,6 +106,9 @@ export default function useOhpkmColumns(
       name: 'Bank',
       width: '10rem',
       renderValue: (mon) => {
+        $O(mon.homeLocation)
+          .map((location) => getBankName(location.bank))
+          .get()
         if (trackedMonsRef.current.includes(mon.openhomeId)) {
           return 'Release Area'
         }
@@ -117,7 +123,7 @@ export default function useOhpkmColumns(
       sortFunction: numericSorter((mon) =>
         trackedMonsToRelease.includes(mon.openhomeId)
           ? Number.POSITIVE_INFINITY
-          : findHomeLocation(mon.openhomeId)?.bank
+          : mon.homeLocation?.bank
       ),
     },
     {
@@ -128,10 +134,14 @@ export default function useOhpkmColumns(
         if (trackedMonsRef.current.includes(mon.openhomeId)) {
           return 'Release Area'
         }
-        const location = findHomeLocation(mon.openhomeId)
-        return location ? (
+        return mon.homeLocation ? (
           <span>
-            <b>{getBoxName(location.bank, location.box)}</b> [slot {location.boxSlot + 1}]
+            <b>
+              {$O(mon.homeLocation)
+                .map((location) => getBoxName(location.bank, location.box))
+                .get()}
+            </b>{' '}
+            [slot {mon.homeLocation.boxSlot + 1}]
           </span>
         ) : undefined
       },
@@ -139,15 +149,15 @@ export default function useOhpkmColumns(
         if (trackedMonsToRelease.includes(mon.openhomeId)) {
           return 'Release Area'
         }
-        const location = findHomeLocation(mon.openhomeId)
-        return location ? `Box ${location.box + 1}` : 'Not in OpenHome Boxes'
+        return mon.homeLocation
+          ? getBoxName(mon.homeLocation.bank, mon.homeLocation.box)
+          : 'Not in OpenHome Boxes'
       },
       sortFunction: stringSorter((mon) => {
         if (trackedMonsToRelease.includes(mon.openhomeId)) {
           return '$RELEASE'
         }
-        const location = findHomeLocation(mon.openhomeId)
-        return locationToSortableString(location)
+        return locationToSortableString(mon.homeLocation)
       }),
     },
     {
@@ -156,16 +166,16 @@ export default function useOhpkmColumns(
       width: '10rem',
       renderValue: (value) => (
         <div className="flex-row-centered">
-          <Badge.Game
+          {value.mostRecentSaveWasm?.game}
+          {/* <Badge.Game
             originGame={value.mostRecentSaveWasm?.game}
             withName
             tooltip={value.mostRecentSaveWasm?.file_path}
-          />
+          /> */}
         </div>
       ),
       getFilterValue: (mon) => {
-        const game = mon.mostRecentSaveWasm?.game
-        return game ? OriginGames.gameNameFull(game) : '(Unknown)'
+        return mon.originGameName ?? '(Unknown)'
       },
       cellClass: 'centered-cell',
       sortFunction: gameSorter((mon) => mon.mostRecentSaveWasm?.game),
@@ -179,7 +189,7 @@ export default function useOhpkmColumns(
           <Badge.Game originGame={value.gameOfOrigin} plugin={value.pluginOrigin} withName />
         </div>
       ),
-      getFilterValue: (mon) => OriginGames.gameNameFull(mon.gameOfOrigin),
+      getFilterValue: (mon) => mon.originGameName,
       sortFunction: gameOrPluginSorter(
         (mon) => mon.gameOfOrigin,
         (mon) => mon.pluginOrigin
@@ -217,7 +227,7 @@ export default function useOhpkmColumns(
             className="grid-shiny-icon invert-light"
             alt="shiny icon"
             draggable={false}
-            src={getPublicImageURL('icons/Shiny.png')}
+            src={shinyImage}
           />
         ) : null,
       getFilterValue: (mon) => (mon.isShiny ? 'Shiny' : 'Not Shiny'),
@@ -248,7 +258,7 @@ export default function useOhpkmColumns(
       key: 'hp',
       name: 'HP',
       width: '3.5rem',
-      renderValue: (mon) => mon.stats.hp.toString(),
+      renderValue: (mon) => mon.stats.hp,
       getFilterValue: (mon) => mon.stats.hp.toString(),
       sortFunction: numericSorter((mon) => mon.stats.hp),
       cellClass: 'number-cell',
@@ -258,7 +268,7 @@ export default function useOhpkmColumns(
       key: 'atk',
       name: 'ATK',
       width: '3.5rem',
-      renderValue: (mon) => mon.stats.atk.toString(),
+      renderValue: (mon) => mon.stats.atk,
       getFilterValue: (mon) => mon.stats.atk.toString(),
       sortFunction: numericSorter((mon) => mon.stats.atk),
       cellClass: 'number-cell',
@@ -268,7 +278,7 @@ export default function useOhpkmColumns(
       key: 'def',
       name: 'DEF',
       width: '3.5rem',
-      renderValue: (mon) => mon.stats.def.toString(),
+      renderValue: (mon) => mon.stats.def,
       getFilterValue: (mon) => mon.stats.def.toString(),
       sortFunction: numericSorter((mon) => mon.stats.def),
       cellClass: 'number-cell',
@@ -278,7 +288,7 @@ export default function useOhpkmColumns(
       key: 'spa',
       name: 'SPA',
       width: '3.5rem',
-      renderValue: (mon) => mon.stats.spa.toString(),
+      renderValue: (mon) => mon.stats.spa,
       getFilterValue: (mon) => mon.stats.spa.toString(),
       sortFunction: numericSorter((mon) => mon.stats.spa),
       cellClass: 'number-cell',
@@ -288,7 +298,7 @@ export default function useOhpkmColumns(
       key: 'spd',
       name: 'SPD',
       width: '3.5rem',
-      renderValue: (mon) => mon.stats.spd.toString(),
+      renderValue: (mon) => mon.stats.spd,
       getFilterValue: (mon) => mon.stats.spd.toString(),
       sortFunction: numericSorter((mon) => mon.stats.spd),
       cellClass: 'number-cell',
@@ -298,7 +308,7 @@ export default function useOhpkmColumns(
       key: 'spe',
       name: 'SPE',
       width: '3.5rem',
-      renderValue: (mon) => mon.stats.spe.toString(),
+      renderValue: (mon) => mon.stats.spe,
       getFilterValue: (mon) => mon.stats.spe.toString(),
       sortFunction: numericSorter((mon) => mon.stats.spe),
       cellClass: 'number-cell',

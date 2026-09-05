@@ -1,6 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { Option } from '@openhome-core/util/functional'
-import { OhpkmRowData } from '@openhome-ui/columns/tanstackOhpkmRowData'
+import { OhpkmRowData } from '@openhome-ui/ohpkmGrid'
 import React, { ReactNode } from 'react'
 import PokemonIcon from '../PokemonIcon'
 
