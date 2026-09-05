@@ -1,5 +1,5 @@
 import { PaginatedPage, PaginationCursor } from '@openhome-core/tauri/spectaCommands'
-import { $R, Errorable } from '@openhome-core/util/functional'
+import { Errorable, Option } from '@openhome-core/util/functional'
 import {
   booleanSorter,
   dayjsSorter,
@@ -10,11 +10,9 @@ import {
   SortType,
   stringSorter,
 } from '@openhome-core/util/sort'
-import { useSettings } from '@openhome-ui/state/appInfo'
 import { Flex } from '@radix-ui/themes'
 import { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
 import { Atom } from '@tanstack/react-store'
-import { useTable } from '@tanstack/react-table'
 import { isDayjs } from 'dayjs'
 import {
   ReactNode,
@@ -37,9 +35,7 @@ import {
 import 'react-data-grid/lib/styles.css'
 import { Checkbox, Item, Label, OpenHomeCtxMenu, Separator, Submenu } from './context-menu'
 import { DropdownArrowIcon, FilterIcon } from './Icons'
-import SortableTable, { TableController } from './SortableTable'
 import './style.css'
-import { TABLE_FEATURES, toTanstackColumn } from './TanstackTableUtil'
 
 const dataGridProps = {
   rowHeight: '2.5rem',
@@ -244,7 +240,6 @@ export default function SortableDataGrid<R extends SortableValue>(props: Sortabl
   )
 
   const fetchMoreOnBottomReached = useCallback(async () => {
-    console.log('fetching more', gridRef.current)
     if (gridRef?.current?.element && onScrolledToBottom) {
       const { scrollHeight, scrollTop, clientHeight } = gridRef.current.element
       // once the user has scrolled within 500px of the bottom of the table, fetch more data if we can
@@ -253,12 +248,6 @@ export default function SortableDataGrid<R extends SortableValue>(props: Sortabl
       }
     }
   }, [onScrolledToBottom, gridRef])
-
-  const { settings } = useSettings()
-
-  if (settings.tableType === 'tanstack') {
-    return <TanstackTable {...props} />
-  }
 
   return (
     <div
@@ -366,88 +355,68 @@ function HeaderWithContextMenu<R extends Record<string, unknown>>({
 
   const activeFilter = columnFilter !== undefined && columnFilter.length !== filterValues.length
 
-  const headerCtxMenuBuilders = useMemo(
-    () => [
-      Label.component(column.name),
-      Separator,
-      getFilterValue
-        ? Submenu.label('Filter...')
-            .with(
-              Item.label(activeFilter ? 'Select All' : 'Deselect All').action(() =>
-                setFilters({
-                  ...filters,
-                  [columnKey]: activeFilter ? undefined : [],
-                })
-              )
-            )
-            .with(
-              ...filterValues.toSorted(filterDropdownSorter).map((filterValue) =>
-                Checkbox.label(filterValue)
-                  .handleValueChanged(() => {
-                    if (columnFilter === undefined) {
-                      setFilters({
-                        ...filters,
-                        [columnKey]: filterValues.filter(
-                          (otherValue) => filterValue !== otherValue
-                        ),
-                      })
-                    } else if (columnFilter.includes(filterValue)) {
-                      setFilters({
-                        ...filters,
-                        [columnKey]: columnFilter.filter(
-                          (otherValue) => filterValue !== otherValue
-                        ),
-                      })
-                    } else {
-                      setFilters({
-                        ...filters,
-                        [columnKey]: [...columnFilter, filterValue],
-                      })
-                    }
-                  })
-                  .handleIsChecked(() => !columnFilter || columnFilter.includes(filterValue))
-              )
-            )
-        : undefined,
-      getFilterValue ? Item.label('Clear Filters').action(() => setFilters({})) : undefined,
-      getFilterValue ? Separator : undefined,
-      Submenu.label('Show/Hide Columns').with(
-        ...columns
-          .filter((col) => !!col.name)
-          .map((col) =>
-            Checkbox.component(col.name)
-              .handleValueChanged(() => {
-                if (visibleColumnKeys.has(col.key)) {
-                  if (visibleColumnKeys.size > 1) {
-                    setHiddenColumns([...hiddenColumns, col.key])
-                  }
-                } else {
-                  setHiddenColumns([...hiddenColumns.filter((k) => k !== col.key)])
-                }
-              })
-              .handleIsChecked(() => visibleColumnKeys.has(col.key))
-          )
-      ),
-      Item.label('Reset to Default').action(() =>
-        setHiddenColumns(columns.filter((c) => c.hideByDefault).map((c) => c.key))
-      ),
-    ],
-    [
-      activeFilter,
-      column.name,
-      columnFilter,
-      columnKey,
-      columns,
-      filterDropdownSorter,
-      filterValues,
-      filters,
-      getFilterValue,
-      hiddenColumns,
-      setFilters,
-      setHiddenColumns,
-      visibleColumnKeys,
-    ]
+  const setFilter = useCallback(
+    (columnKey: keyof R, values: Option<string[]>) =>
+      setFilters({ ...filters, [columnKey]: values }),
+    [filters, setFilters]
   )
+
+  const buildFilterCheckboxHandler = (filterValue: string) => () => {
+    if (columnFilter === undefined) {
+      setFilter(
+        columnKey,
+        filterValues.filter((otherValue) => filterValue !== otherValue)
+      )
+    } else if (columnFilter.includes(filterValue)) {
+      setFilter(
+        columnKey,
+        columnFilter.filter((otherValue) => filterValue !== otherValue)
+      )
+    } else {
+      setFilter(columnKey, [...columnFilter, filterValue])
+    }
+  }
+
+  const headerCtxMenuBuilders = [
+    Label.component(column.name),
+    getFilterValue
+      ? Submenu.label('Filter...')
+          .with(
+            Item.label(activeFilter ? 'Select All' : 'Deselect All').action(() =>
+              setFilter(columnKey, activeFilter ? undefined : [])
+            )
+          )
+          .with(
+            ...filterValues.toSorted(filterDropdownSorter).map((filterValue) =>
+              Checkbox.label(filterValue)
+                .handleValueChanged(buildFilterCheckboxHandler(filterValue))
+                .handleIsChecked(() => !columnFilter || columnFilter.includes(filterValue))
+            )
+          )
+      : undefined,
+    getFilterValue ? Item.label('Clear Filters').action(() => setFilters({})) : undefined,
+    getFilterValue ? Separator : undefined,
+    Submenu.label('Show/Hide Columns').with(
+      ...columns
+        .filter((col) => !!col.name)
+        .map((col) =>
+          Checkbox.component(col.name)
+            .handleValueChanged(() => {
+              if (visibleColumnKeys.has(col.key)) {
+                if (visibleColumnKeys.size > 1) {
+                  setHiddenColumns([...hiddenColumns, col.key])
+                }
+              } else {
+                setHiddenColumns([...hiddenColumns.filter((k) => k !== col.key)])
+              }
+            })
+            .handleIsChecked(() => visibleColumnKeys.has(col.key))
+        )
+    ),
+    Item.label('Reset to Default').action(() =>
+      setHiddenColumns(columns.filter((c) => c.hideByDefault).map((c) => c.key))
+    ),
+  ]
 
   return (
     <OpenHomeCtxMenu elements={headerCtxMenuBuilders}>
@@ -477,34 +446,4 @@ function HeaderWithContextMenu<R extends Record<string, unknown>>({
       </Flex>
     </OpenHomeCtxMenu>
   )
-}
-
-function TanstackTable<R extends SortableValue>(props: SortableDataGridProps<R>) {
-  const atom = props.paginationAtom?.get()
-  const currentPageIndex = atom?.pageIndex
-  const currentPage = currentPageIndex !== undefined ? props.dataQuery?.data?.pages[0] : undefined
-  const currentPageRows = currentPage
-    ? $R(currentPage).match(
-        (result) => result.results,
-        (e) => {
-          console.error(e)
-          return []
-        }
-      )
-    : []
-
-  // 5. Create the table instance
-  const table: TableController<R> = useTable({
-    key: 'person-table', // needed for devtools, omit if you don't want to use the devtools
-    features: TABLE_FEATURES,
-    columns: props.columns.filter((col) => col.key !== 'rdg-select-column').map(toTanstackColumn),
-    atoms: { pagination: props.paginationAtom },
-    data: currentPageRows,
-    // onPaginationChange: (e) => console.dir(e),
-    // rowCount: dataQuery?.data?,
-    manualPagination: true,
-    pageCount: -1,
-  })
-
-  return <SortableTable {...props} table={table} />
 }

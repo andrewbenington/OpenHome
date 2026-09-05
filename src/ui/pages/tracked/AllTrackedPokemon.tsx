@@ -4,11 +4,8 @@ import { PaginationCursor } from '@openhome-core/tauri/spectaCommands'
 import { $R, Option, R } from '@openhome-core/util/functional'
 import { $O } from '@openhome-core/util/option'
 import { filterUndefined } from '@openhome-core/util/sort'
-import {
-  OhpkmRowData,
-  toRowData,
-  useTanstackOhpkmColumnsPrecomputed,
-} from '@openhome-ui/columns/tanstackOhpkmRowData'
+import useOhpkmColumns from '@openhome-ui/columns/ohpkm'
+import { OhpkmRowData, toRowData } from '@openhome-ui/columns/tanstackOhpkmRowData'
 import {
   CtxMenuElementBuilder,
   Item,
@@ -16,15 +13,13 @@ import {
   OpenHomeCtxMenu,
   Separator,
 } from '@openhome-ui/components/context-menu'
-import SortableTable, { TableController } from '@openhome-ui/components/SortableTable'
-import { TABLE_FEATURES } from '@openhome-ui/components/TanstackTableUtil'
+import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
 import { useBanksAndBoxes } from '@openhome-ui/state-zustand/banks-and-boxes/store'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
 import { Spinner } from '@radix-ui/themes'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { useCreateAtom } from '@tanstack/react-store'
-import { useTable } from '@tanstack/react-table'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import './style.css'
@@ -54,6 +49,7 @@ export default function AllTrackedPokemon({
   )
   const [ctxMenuMonId, setCtxMenuMonId] = useState<Option<OhpkmIdentifier>>()
   const { releaseMonsById, trackedMonsToRelease } = saves
+  const columns = useOhpkmColumns(trackedMonsToRelease, onSelectMon)
   const navigate = useNavigate()
   const { switchBoxCurrentBank } = useBanksAndBoxes()
   const tableContainerRef = useRef<HTMLDivElement>(null) // for listening to scroll
@@ -116,10 +112,16 @@ export default function AllTrackedPokemon({
     ],
     queryFn: async (d) => {
       const pageParam = paginationAtom.get() ?? d.pageParam
-      return await ohpkmStore.searchStore(pageParam).then(
+      return await ohpkmStore.searchStore(pageParam, []).then(
         R.map((page) => ({
           ...page,
-          results: page.results.map((mon) => toRowData(mon, findHomeLocation, [])),
+          results: page.results.map((mon) =>
+            toRowData(
+              mon,
+              findHomeLocation,
+              saves.monsToRelease.filter((monOrId) => typeof monOrId === 'string')
+            )
+          ),
         }))
       )
     },
@@ -159,21 +161,6 @@ export default function AllTrackedPokemon({
     await fetchNextPage()
   }
 
-  const columns = useTanstackOhpkmColumnsPrecomputed(onSelectMon)
-  // 5. Create the table instance
-  const table: TableController<OhpkmRowData> = useTable({
-    key: 'person-table', // needed for devtools, omit if you don't want to use the devtools
-    features: TABLE_FEATURES,
-    columns: columns,
-    // atoms: { pagination: paginationAtom },
-    data: flatData,
-    // onPaginationChange: (e) => console.dir(e),
-    // rowCount: dataQuery?.data?,
-    manualPagination: true,
-    manualFiltering: true,
-    // pageCount: -1,
-  })
-
   if (isLoading) return <Spinner />
 
   return (
@@ -186,9 +173,10 @@ export default function AllTrackedPokemon({
     >
       {/* this div is necessary to give the context menu a target */}
       <div style={{ height: '100%', width: '100%', backgroundColor: 'var(--gray-3)' }}>
-        <SortableTable<OhpkmRowData>
+        <SortableDataGrid
+          columns={columns}
+          rows={flatData}
           tableRef={tableContainerRef}
-          table={table}
           style={{ borderLeft: 'none' }}
           onCellContextMenu={(props, e) => {
             setCtxMenuMonId(props.row.openhomeId)
