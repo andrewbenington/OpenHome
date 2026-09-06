@@ -11,6 +11,7 @@ var pkmFileDirs = Directory.EnumerateDirectories(Path.Join("test-files", "pkm-fi
 var pkmClassByDir = new Dictionary<string, Func<byte[], PKM>>
 {
     { "pk3", bytes => new PK3(bytes) },
+    { "colopkm", bytes => new CK3(bytes) },
     { "pk7", bytes => new PK7(bytes) },
     { "pk8", bytes => new PK8(bytes) },
     { "pk9", bytes => new PK9(bytes) },
@@ -25,6 +26,10 @@ static object PkmToJsonObject(PKM pk)
     else if (pk is PK3 pk3)
     {
         return Pk3Object.Build(pk3);
+    }
+    else if (pk is CK3 ck3)
+    {
+        return ColopkmObject.Build(ck3);
     }
     else if (pk is PK8 pk8)
     {
@@ -55,7 +60,7 @@ foreach (var dir in pkmFileDirs)
     }
     var factory = pkmClassByDir[Path.GetFileName(dir)];
 
-    foreach (var path in Directory.EnumerateFiles(dir, "*.pk*", SearchOption.AllDirectories))
+    foreach (var path in Directory.EnumerateFiles(dir, "*.*pk*", SearchOption.AllDirectories))
     {
         Console.WriteLine($"Processing: {path}");
         var pk = factory(File.ReadAllBytes(path));

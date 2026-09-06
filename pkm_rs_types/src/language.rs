@@ -63,6 +63,19 @@ impl Language {
         }
     }
 
+    pub const fn to_gcn(&self) -> u8 {
+        match *self {
+            Self::None => 0,
+            Self::Japanese => 1,
+            Self::English => 2,
+            Self::German => 3,
+            Self::French => 4,
+            Self::Italian => 5,
+            Self::SpanishSpain | Self::SpanishLatinAmerica => 6,
+            _ => 0,
+        }
+    }
+
     pub const fn egg_name(&self) -> &'static str {
         match self {
             Language::None => "",

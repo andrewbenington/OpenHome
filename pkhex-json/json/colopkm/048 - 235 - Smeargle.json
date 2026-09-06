@@ -1,0 +1,97 @@
+{
+  "pokemon_index": 235,
+  "held_item_index": null,
+  "trainer_id": 57413,
+  "secret_id": 24795,
+  "exp": 72900,
+  "ability_num": "First",
+  "markings": {
+    "circle": false,
+    "square": false,
+    "triangle": false,
+    "heart": false
+  },
+  "personality_value": 3387307807,
+  "is_fateful_encounter": false,
+  "gender": "Female",
+  "evs": {
+    "hp": 0,
+    "atk": 0,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 0
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "pokerus": "strain 0, 0 days remaining",
+  "ribbons": ["National"],
+  "nickname": "SMEARGLE",
+  "nickname_trash": "0053004D0045004100520047004C0045000000000000",
+  "moves": [
+    {
+      "move_index": "Sketch",
+      "pp": 1,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Tail Whip",
+      "pp": 30,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Double Slap",
+      "pp": 10,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Iron Tail",
+      "pp": 15,
+      "pp_ups": 0
+    }
+  ],
+  "ivs": {
+    "hp": 29,
+    "atk": 28,
+    "def": 17,
+    "spa": 25,
+    "spd": 15,
+    "spe": 26
+  },
+  "is_egg": false,
+  "trainer_name": "RoC",
+  "trainer_name_trash": "0052006F004300000000000000000000000000000000",
+  "trainer_friendship": 70,
+  "shadow_data": {
+    "id": {
+      "colo": 55
+    },
+    "exp": 0,
+    "purification": "purified"
+  },
+  "current_region": "Pal",
+  "original_region": "NtscUsa",
+  "met_location_index": 132,
+  "ball": "Ultra",
+  "met_level": 45,
+  "trainer_gender": "Male",
+  "game_of_origin": "Colosseum/XD",
+  "language": "English",
+  "stat_level": 45,
+  "current_hp": 117,
+  "stats": {
+    "hp": 117,
+    "atk": 35,
+    "def": 48,
+    "spa": 34,
+    "spd": 52,
+    "spe": 75
+  },
+  "level": 45
+}

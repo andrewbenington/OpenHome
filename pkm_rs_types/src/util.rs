@@ -88,9 +88,52 @@ macro_rules! read_u16_le {
 }
 
 #[macro_export]
+macro_rules! read_u16_be {
+    ($bytes:expr, $start:expr) => {
+        u16::from_le_bytes([$bytes[$start + 1], $bytes[$start]])
+    };
+}
+
+#[macro_export]
 macro_rules! read_u32_le {
     ($bytes:expr, $start:expr) => {
         u32::from_le_bytes([
+            $bytes[$start],
+            $bytes[$start + 1],
+            $bytes[$start + 2],
+            $bytes[$start + 3],
+        ])
+    };
+}
+
+#[macro_export]
+macro_rules! read_u32_be {
+    ($bytes:expr, $start:expr) => {
+        u32::from_le_bytes([
+            $bytes[$start + 3],
+            $bytes[$start + 2],
+            $bytes[$start + 1],
+            $bytes[$start],
+        ])
+    };
+}
+
+#[macro_export]
+macro_rules! read_i32_be {
+    ($bytes:expr, $start:expr) => {
+        i32::from_le_bytes([
+            $bytes[$start + 3],
+            $bytes[$start + 2],
+            $bytes[$start + 1],
+            $bytes[$start],
+        ])
+    };
+}
+
+#[macro_export]
+macro_rules! read_i32_le {
+    ($bytes:expr, $start:expr) => {
+        i32::from_le_bytes([
             $bytes[$start],
             $bytes[$start + 1],
             $bytes[$start + 2],

@@ -2958,6 +2958,7 @@ dependencies = [
  "static_assertions",
  "strum",
  "strum_macros",
+ "thiserror 2.0.20",
  "tsify",
  "wasm-bindgen",
 ]
@@ -2999,6 +3000,7 @@ dependencies = [
  "chrono",
  "getrandom 0.4.3",
  "js-sys",
+ "num",
  "num_enum",
  "pastey",
  "pkm_rs_derive",
@@ -3008,6 +3010,7 @@ dependencies = [
  "static_assertions",
  "strum",
  "strum_macros",
+ "thiserror 2.0.20",
  "time",
  "tsify",
  "wasm-bindgen",

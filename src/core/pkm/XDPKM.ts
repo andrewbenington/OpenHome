@@ -17,6 +17,8 @@ import {
   MarkingsFourShapes,
   MetadataSummaryLookup,
   NatureIndex,
+  OriginGame,
+  OriginGames,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import * as stringLogic from '../util/stringConversion'
@@ -90,10 +92,11 @@ export default class XDPKM {
       this.trainerID = dataView.getUint16(0x26, false)
       this.personalityValue = dataView.getUint32(0x28, false)
       this.isFatefulEncounter = byteLogic.getFlag(dataView, 0x33, 0)
-      this.gameOfOrigin = dataView.getUint8(0x34)
+      this.gameOfOrigin =
+        OriginGames.fromGamecubeIndex(dataView.getUint8(0x34)) || OriginGame.ColosseumXd
       this.language = Languages.fromByteOrNoneGcn(dataView.getUint8(0x37))
-      this.trainerName = stringLogic.utf16BytesToString(buffer, 0x38, 11)
-      this.nickname = stringLogic.utf16BytesToString(buffer, 0x4e, 11)
+      this.trainerName = stringLogic.utf16BytesToString(buffer, 0x38, 11, true)
+      this.nickname = stringLogic.utf16BytesToString(buffer, 0x4e, 11, true)
       this.moves = [
         dataView.getUint16(0x80, false),
         dataView.getUint16(0x82, false),
@@ -197,10 +200,13 @@ export default class XDPKM {
     dataView.setUint16(0x26, this.trainerID, false)
     dataView.setUint32(0x28, this.personalityValue, false)
     byteLogic.setFlag(dataView, 0x33, 0, this.isFatefulEncounter)
-    dataView.setUint8(0x34, this.gameOfOrigin)
+    dataView.setUint8(
+      0x34,
+      OriginGames.toGamecubeIndex(this.gameOfOrigin) || OriginGame.ColosseumXd
+    )
     dataView.setUint8(0x37, Languages.toGcnByte(this.language))
-    stringLogic.writeUTF16StringToBytes(dataView, this.trainerName, 0x38, 11)
-    stringLogic.writeUTF16StringToBytes(dataView, this.nickname, 0x4e, 11)
+    stringLogic.writeUTF16StringToBytes(dataView, this.trainerName, 0x38, 11, true)
+    stringLogic.writeUTF16StringToBytes(dataView, this.nickname, 0x4e, 11, true)
     for (let i = 0; i < 4; i++) {
       dataView.setUint16(0x80 + i * 2, this.moves[i], false)
     }

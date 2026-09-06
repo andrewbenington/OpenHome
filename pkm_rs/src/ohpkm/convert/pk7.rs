@@ -1,6 +1,6 @@
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::{metadata_source::MetadataSource, ribbons::OpenHomeRibbonSet};
-use pkm_rs_types::{AbilityNumber, Stats16Le};
+use pkm_rs_types::{AbilityNumber, Stats16};
 
 use crate::convert_strategy::ConvertStrategy;
 use crate::convert_strategy::PkmConverter;
@@ -191,7 +191,7 @@ impl OhpkmConvert for Pk7 {
             form_argument_remain: 0,
             form_argument_elapsed: 0,
             current_hp: 0,
-            stats: Stats16Le::default(),
+            stats: Stats16::default(),
         };
 
         mon.stat_level = mon.calculate_level();

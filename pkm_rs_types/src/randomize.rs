@@ -15,6 +15,12 @@ impl Randomize for bool {
     }
 }
 
+impl Randomize for i32 {
+    fn randomized<R: Rng>(rng: &mut R) -> Self {
+        rng.random()
+    }
+}
+
 impl Randomize for u8 {
     fn randomized<R: Rng>(rng: &mut R) -> Self {
         rng.random()

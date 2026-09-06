@@ -226,7 +226,7 @@ impl Gen7AlolaSave {
             .try_into()
             .expect("end should be exactly BOX_NAME_BYTE_LENGTH after start");
 
-        SizedUtf16String::from_bytes(name_bytes)
+        SizedUtf16String::from_le_bytes(name_bytes)
     }
 
     fn convert_ohpkm(
@@ -415,7 +415,7 @@ impl TrainerDataGen7Alola {
             game_code: block_bytes[4],
             language: Language::try_from(block_bytes[0x35]).unwrap_or(Language::None),
             trainer_gender: BinaryGender::from(util::get_flag(block_bytes, 5, 0)),
-            trainer_name: SizedUtf16String::from_bytes(block_bytes[56..82].try_into().unwrap()),
+            trainer_name: SizedUtf16String::from_le_bytes(block_bytes[56..82].try_into().unwrap()),
         }
     }
 

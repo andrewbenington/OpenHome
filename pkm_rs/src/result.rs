@@ -161,9 +161,7 @@ impl Display for Error {
             Self::AbilityIndex { ability_index } => format!(
                 "Invalid ability index {ability_index} (must be between 1 and {ABILITY_MAX}"
             ),
-            Self::AbilityNumber(InvalidAbilityNumber(num)) => {
-                format!("Invalid ability number {num} (must be between 1 and 3)")
-            }
+            Self::AbilityNumber(invalid_number) => invalid_number.to_string(),
             Self::FieldError { field, source } => {
                 format!("Self reading field {field}: {source}")
             }

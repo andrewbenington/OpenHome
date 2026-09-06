@@ -12,7 +12,6 @@ pkm_rs_types = {path = "../pkm_rs_types", features=["wasm"]}
 pkm_rs_resources = {path = "../pkm_rs_resources", features=["wasm"]}
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
-num = "0.4.3"
 wasm-bindgen = { version = "0.2.127", optional = true }
 js-sys = { version = "0.3.104", optional = true }
 serde-wasm-bindgen = { version = "0.6.5", optional = true }
@@ -34,6 +33,8 @@ serde_bytes = "0.11.19"
 pretty_assertions = "1.4.1"
 pretty-hex = "0.4.2"
 arrayref = "0.3.9"
+thiserror = "2.0.20"
+num = "0.4.3"
 
 [lib]
 name = "pkm_rs"

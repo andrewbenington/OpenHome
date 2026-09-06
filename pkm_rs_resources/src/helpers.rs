@@ -1,4 +1,4 @@
-use pkm_rs_types::{HyperTraining, Stats, Stats16Le};
+use pkm_rs_types::{HyperTraining, Stats, Stats16};
 
 use crate::{
     metadata_source::MetadataSource,
@@ -79,15 +79,15 @@ pub fn calculate_stats_modern<I: Stats + Copy, E: Stats>(
     level: u8,
     nature: &'static NatureMetadata,
     hyper_training: Option<HyperTraining>,
-) -> Option<Stats16Le> {
+) -> Option<Stats16> {
     let Some(BaseStats::Modern(stats8)) = species_and_form.get_base_stats_from(metadata_source)
     else {
         return None;
     };
 
     let de_facto_ivs = DeFactoIvs::new(*ivs, hyper_training);
-    let base_stats = Stats16Le::from(stats8);
-    Some(Stats16Le {
+    let base_stats = Stats16::from(stats8);
+    Some(Stats16 {
         hp: calculate_hp_modern(
             base_stats,
             de_facto_ivs.get_hp(),
@@ -137,7 +137,7 @@ pub fn calculate_stats_modern<I: Stats + Copy, E: Stats>(
     })
 }
 
-pub const fn calculate_hp_modern(base_stats: Stats16Le, hp_iv: u16, hp_ev: u16, level: u16) -> u16 {
+pub const fn calculate_hp_modern(base_stats: Stats16, hp_iv: u16, hp_ev: u16, level: u16) -> u16 {
     let level_factor = 2 * base_stats.hp + hp_iv + hp_ev.div_euclid(4);
     let numerator = level_factor * level;
 

@@ -215,7 +215,7 @@ impl DataSection for PastHandlerDataV2 {
         Ok(Self {
             id: Option::<NonZeroU16>::from_ohpkm_bytes(bytes[0..=1].try_into().unwrap()),
             secret_id: Option::<NonZeroU16>::from_ohpkm_bytes(bytes[2..=3].try_into().unwrap()),
-            name: SizedUtf16String::<26>::from_bytes(bytes[4..=29].try_into().unwrap()),
+            name: SizedUtf16String::<26>::from_le_bytes(bytes[4..=29].try_into().unwrap()),
             friendship: bytes[30],
             memory: TrainerMemory::from_bytes_in_order(bytes[31..=35].try_into().unwrap()),
             affection: bytes[36],

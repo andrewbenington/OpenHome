@@ -28,7 +28,7 @@ public static class Pk7Object
             evs = Util.EVs(pk),
             contest = Util.ContestStats(pk),
             resort_event_status = pk.ResortEventStatus,
-            pokerus = pk.PokerusState,
+            pokerus = Util.Pokerus(pk.PokerusStrain, pk.PokerusDays),
             super_training_flags = pk.SuperTrainBitFlags,
             ribbons = Util.GetRibbons(pk),
             contest_memory_count = pk.RibbonCountMemoryContest,

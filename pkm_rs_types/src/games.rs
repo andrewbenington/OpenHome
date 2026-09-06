@@ -83,6 +83,18 @@ impl OriginGame {
         }
     }
 
+    pub const fn try_from_gamecube_u8(value: u8) -> Option<Self> {
+        match value {
+            1 => Some(Self::FireRed),
+            2 => Some(Self::LeafGreen),
+            8 => Some(Self::Sapphire),
+            9 => Some(Self::Ruby),
+            10 => Some(Self::Emerald),
+            11 => Some(Self::ColosseumXd),
+            _ => None,
+        }
+    }
+
     pub const fn game_name_full(&self) -> &'static str {
         match *self {
             Self::Red => "Red",
@@ -156,6 +168,7 @@ impl OriginGame {
             _ => self.game_name_full(),
         }
     }
+
     pub const fn generation(&self) -> Generation {
         match *self {
             Self::Red | Self::BlueGreen | Self::BlueJpn | Self::Yellow => Generation::G1,
@@ -235,7 +248,6 @@ impl OriginGame {
             Self::Ruby => Some(9),
             Self::Emerald => Some(10),
             Self::ColosseumXd => Some(11),
-            Self::BattleRevolution => Some(12),
             _ => None,
         }
     }
@@ -563,8 +575,13 @@ impl OriginGames {
             .map(|r| r.to_string())
     }
 
-    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "gamecubeIndex"))]
-    pub fn gamecube_index(value: u8) -> Option<u8> {
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "fromGamecubeIndex"))]
+    pub fn from_gamecube_index(value: u8) -> Option<u8> {
+        OriginGame::try_from_gamecube_u8(value).map(|v| v as u8)
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "toGamecubeIndex"))]
+    pub fn to_gamecube_index(value: u8) -> Option<u8> {
         OriginGame::from(value).gamecube_index()
     }
 

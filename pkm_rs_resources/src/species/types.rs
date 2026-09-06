@@ -23,7 +23,7 @@ use crate::species::form_metadata::current_base_stats;
 #[cfg(feature = "wasm")]
 use crate::stats::Stat;
 #[cfg(feature = "wasm")]
-use pkm_rs_types::{Gender, Stats16Le};
+use pkm_rs_types::{Gender, Stats16};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -504,9 +504,9 @@ impl FormMetadata {
     }
 
     #[wasm_bindgen(getter = baseStats)]
-    pub fn get_base_stats(&self) -> Stats16Le {
+    pub fn get_base_stats(&self) -> Stats16 {
         current_base_stats(self.national_dex, self.form_index)
-            .map(Stats16Le::from)
+            .map(Stats16::from)
             .unwrap_or_default()
     }
 

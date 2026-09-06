@@ -41,7 +41,7 @@
     "sheen": 0
   },
   "resort_event_status": 0,
-  "pokerus": 0,
+  "pokerus": "strain 0, 0 days remaining",
   "super_training_flags": 0,
   "ribbons": [],
   "contest_memory_count": 0,

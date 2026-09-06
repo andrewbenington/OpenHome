@@ -29,7 +29,7 @@ public static class Pk8Object
             gender = Util.FormatGender(pk.Gender),
             evs = Util.EVs(pk),
             contest = Util.ContestStats(pk),
-            pokerus = pk.PokerusState,
+            pokerus = Util.Pokerus(pk.PokerusStrain, pk.PokerusDays),
             ribbons = Util.GetRibbons(pk),
             contest_memory_count = pk.RibbonCountMemoryContest,
             battle_memory_count = pk.RibbonCountMemoryBattle,

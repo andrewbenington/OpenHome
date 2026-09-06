@@ -12,7 +12,7 @@ use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesForm;
 
 use pkm_rs_types::strings::SizedUtf16String;
-use pkm_rs_types::{ContestStats, Ivs, Language, Pokerus, Stats8, Stats16Le, StatsPreSplit};
+use pkm_rs_types::{ContestStats, Ivs, Language, Pokerus, Stats8, Stats16, StatsPreSplit};
 use pkm_rs_types::{Gender, OriginGame, PokeDate, ShinyLeaves, TrainerMemory};
 use pkm_rs_types::{Geolocations, HyperTraining, MarkingsSixShapesColors};
 
@@ -56,7 +56,7 @@ pub struct OhpkmV1 {
     pub moves: [MoveIndex; 4],
     pub move_pp: [u8; 4],
     pub nickname: SizedUtf16String<26>,
-    pub avs: Stats16Le,
+    pub avs: Stats16,
     pub move_pp_ups: [u8; 4],
     pub relearn_moves: [MoveIndex; 4],
     pub ivs: Stats8,
@@ -193,8 +193,8 @@ impl OhpkmV1 {
                 MoveIndex::from(u16::from_le_bytes(bytes[90..92].try_into().unwrap())),
             ],
             move_pp: [bytes[92], bytes[93], bytes[94], bytes[95]],
-            nickname: SizedUtf16String::<26>::from_bytes(bytes[96..122].try_into().unwrap()),
-            avs: Stats16Le::from_bytes(bytes[122..134].try_into().unwrap()),
+            nickname: SizedUtf16String::<26>::from_le_bytes(bytes[96..122].try_into().unwrap()),
+            avs: Stats16::from_bytes_le(bytes[122..134].try_into().unwrap()),
             move_pp_ups: [bytes[134], bytes[135], bytes[136], bytes[137]],
             relearn_moves: [
                 MoveIndex::from(u16::from_le_bytes(bytes[138..140].try_into().unwrap())),
@@ -211,7 +211,9 @@ impl OhpkmV1 {
             unknown_a0: u32::from_le_bytes(bytes[160..164].try_into().unwrap()),
             gvs: Stats8::from_bytes(bytes[164..170].try_into().unwrap()),
             dvs: StatsPreSplit::from_dv_bytes(bytes[170..172].try_into().unwrap()),
-            handler_name: SizedUtf16String::<26>::from_bytes(bytes[184..210].try_into().unwrap()),
+            handler_name: SizedUtf16String::<26>::from_le_bytes(
+                bytes[184..210].try_into().unwrap(),
+            ),
             handler_language: bytes[211],
             is_current_handler: util::get_flag(bytes, 212, 0),
             resort_event_status: bytes[213],
@@ -253,7 +255,9 @@ impl OhpkmV1 {
             geolocations: Geolocations::from_bytes(bytes[249..259].try_into().unwrap()),
             encounter_type: bytes[270],
             performance: bytes[271],
-            trainer_name: SizedUtf16String::<26>::from_bytes(bytes[272..298].try_into().unwrap()),
+            trainer_name: SizedUtf16String::<26>::from_le_bytes(
+                bytes[272..298].try_into().unwrap(),
+            ),
             trainer_friendship: bytes[298],
             trainer_memory: TrainerMemory {
                 intensity: bytes[299],
@@ -285,7 +289,7 @@ impl OhpkmV1 {
                 [0u8; 13]
             },
             plugin_origin: if bytes.len() >= 465 {
-                SizedUtf16String::<32>::from_bytes(bytes[433..465].try_into().unwrap())
+                SizedUtf16String::<32>::from_le_bytes(bytes[433..465].try_into().unwrap())
             } else {
                 SizedUtf16String::<32>::default()
             },
@@ -375,7 +379,7 @@ impl PkmBytes for OhpkmV1 {
         bytes[95] = self.move_pp[3];
 
         bytes[96..122].copy_from_slice(&self.nickname);
-        bytes[122..134].copy_from_slice(&self.avs.to_bytes());
+        bytes[122..134].copy_from_slice(&self.avs.to_bytes_le());
 
         bytes[134] = self.move_pp_ups[0];
         bytes[135] = self.move_pp_ups[1];

@@ -9,7 +9,6 @@ mod util;
 pub mod bytes;
 pub mod convert_strategy;
 pub mod format;
-#[cfg(feature = "wasm")]
 pub mod gen3;
 #[cfg(feature = "wasm")]
 pub mod gen7_alola;

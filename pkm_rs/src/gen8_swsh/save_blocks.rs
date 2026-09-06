@@ -198,7 +198,7 @@ impl MyStatusBlock {
     const BUFFER_ERROR: &'static str = "MyStatusBlock buffer is not the correct size";
 
     pub fn trainer_name(&self) -> SizedUtf16String<{ MyStatusBlock::NAME_BYTE_LENGTH }> {
-        SizedUtf16String::from_bytes(
+        SizedUtf16String::from_le_bytes(
             self.0.bytes()[Self::NAME_OFFSET..Self::NAME_OFFSET + Self::NAME_BYTE_LENGTH]
                 .try_into()
                 .expect(Self::BUFFER_ERROR),
@@ -284,7 +284,7 @@ impl BoxLayout {
             .try_into()
             .expect("end should be exactly BOX_NAME_LENGTH after start");
 
-        SizedUtf16String::from_bytes(name_bytes)
+        SizedUtf16String::from_le_bytes(name_bytes)
     }
 
     fn into_block(self) -> swish_crypto::Block {

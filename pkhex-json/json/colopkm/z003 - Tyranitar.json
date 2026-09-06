@@ -1,0 +1,97 @@
+{
+  "pokemon_index": 248,
+  "held_item_index": 110,
+  "trainer_id": 57413,
+  "secret_id": 24795,
+  "exp": 1250000,
+  "ability_num": "First",
+  "markings": {
+    "circle": false,
+    "square": false,
+    "triangle": false,
+    "heart": false
+  },
+  "personality_value": 641156593,
+  "is_fateful_encounter": false,
+  "gender": "Male",
+  "evs": {
+    "hp": 252,
+    "atk": 252,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 6
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "pokerus": "strain 0, 0 days remaining",
+  "ribbons": ["National"],
+  "nickname": "TYRANITAR",
+  "nickname_trash": "0054005900520041004E004900540041005200000000",
+  "moves": [
+    {
+      "move_index": "Crunch",
+      "pp": 15,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Thunder",
+      "pp": 10,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Rock Slide",
+      "pp": 10,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Blizzard",
+      "pp": 5,
+      "pp_ups": 0
+    }
+  ],
+  "ivs": {
+    "hp": 5,
+    "atk": 27,
+    "def": 29,
+    "spa": 23,
+    "spd": 30,
+    "spe": 27
+  },
+  "is_egg": false,
+  "trainer_name": "RoC",
+  "trainer_name_trash": "0052006F004300000000000000000000000000000000",
+  "trainer_friendship": 70,
+  "shadow_data": {
+    "id": {
+      "colo": 44
+    },
+    "exp": 0,
+    "purification": "purified"
+  },
+  "current_region": "Pal",
+  "original_region": "NtscUsa",
+  "met_location_index": 118,
+  "ball": "Ultra",
+  "met_level": 55,
+  "trainer_gender": "Male",
+  "game_of_origin": "Colosseum/XD",
+  "language": "English",
+  "stat_level": 100,
+  "current_hp": 378,
+  "stats": {
+    "hp": 378,
+    "atk": 363,
+    "def": 254,
+    "spa": 218,
+    "spd": 235,
+    "spe": 155
+  },
+  "level": 100
+}

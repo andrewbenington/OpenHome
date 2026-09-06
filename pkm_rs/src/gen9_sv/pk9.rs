@@ -20,7 +20,7 @@ use pkm_rs_resources::species::{FormMetadata, SpeciesForm, SpeciesMetadata};
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, FlagSet, HyperTraining, Ivs, Language,
-    MarkingsSixShapesColors, OriginGame, Stats8, Stats16Le, TeraType,
+    MarkingsSixShapesColors, OriginGame, Stats8, Stats16, TeraType,
 };
 use pkm_rs_types::{Gender, PokeDate, TrainerMemory};
 use serde::Serialize;
@@ -123,7 +123,7 @@ pub struct Pk9 {
     #[cfg_attr(feature = "randomize", randomize(skip))]
     pub current_hp: u16,
     #[cfg_attr(feature = "randomize", randomize(skip))]
-    pub stats: Stats16Le,
+    pub stats: Stats16,
 }
 
 impl Pk9 {
@@ -347,7 +347,7 @@ impl Pk9 {
         self.checksum = self.calculate_checksum();
     }
 
-    pub fn calculate_stats(&self) -> Stats16Le {
+    pub fn calculate_stats(&self) -> Stats16 {
         helpers::calculate_stats_modern(
             MetadataSource::ScarletViolet,
             self.species_and_form.0,
@@ -540,22 +540,22 @@ impl Pk9 {
     }
 
     #[wasm_bindgen(getter = evs)]
-    pub fn evs_wasm(&self) -> Stats16Le {
+    pub fn evs_wasm(&self) -> Stats16 {
         self.evs.into()
     }
 
     #[wasm_bindgen(setter = evs)]
-    pub fn set_evs_wasm(&mut self, v: Stats16Le) {
+    pub fn set_evs_wasm(&mut self, v: Stats16) {
         self.evs = v.to_stats8_truncated()
     }
 
     #[wasm_bindgen(getter = ivs)]
-    pub fn ivs_wasm(&self) -> Stats16Le {
+    pub fn ivs_wasm(&self) -> Stats16 {
         self.ivs.into()
     }
 
     #[wasm_bindgen(setter = ivs)]
-    pub fn set_ivs_wasm(&mut self, v: Stats16Le) {
+    pub fn set_ivs_wasm(&mut self, v: Stats16) {
         self.ivs = v.to_ivs_capped()
     }
 
@@ -620,7 +620,7 @@ impl Pk9 {
     }
 
     #[wasm_bindgen(js_name = calculateStats)]
-    pub fn calculate_stats_wasm(&self) -> Stats16Le {
+    pub fn calculate_stats_wasm(&self) -> Stats16 {
         self.calculate_stats()
     }
 

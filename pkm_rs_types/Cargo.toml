@@ -23,6 +23,8 @@ tsify = "0.5.6"
 num_enum = "0.7.6"
 chrono = "0.4.45"
 pastey = "0.2.3"
+thiserror = "2.0.20"
+num = "0.4.3"
 
 [lib]
 name = "pkm_rs_types"

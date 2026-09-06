@@ -1,6 +1,8 @@
+use arbitrary_int::traits::Integer;
 use arbitrary_int::{u3, u4};
 use chrono::Datelike;
 use serde::{Deserialize, Serialize, Serializer};
+use std::fmt::Display;
 
 use strum_macros::{Display, EnumString};
 
@@ -130,6 +132,24 @@ impl From<bool> for BinaryGender {
         match value {
             true => Self::Female,
             false => Self::Male,
+        }
+    }
+}
+
+impl From<u8> for BinaryGender {
+    fn from(value: u8) -> Self {
+        match value {
+            0 => Self::Male,
+            _ => Self::Female,
+        }
+    }
+}
+
+impl From<BinaryGender> for u8 {
+    fn from(value: BinaryGender) -> Self {
+        match value {
+            BinaryGender::Male => 0,
+            BinaryGender::Female => 1,
         }
     }
 }
@@ -265,9 +285,9 @@ impl FlagSet<2> {
     }
 }
 
-impl<const N: usize, FLAG: Copy + Into<usize>> Serialize for FlagSet<N, FLAG>
+impl<const N: usize, FLAG> Serialize for FlagSet<N, FLAG>
 where
-    FLAG: Serialize,
+    FLAG: Serialize + Copy + Into<usize>,
 {
     fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
     where
@@ -286,9 +306,48 @@ impl<const N: usize, FLAG: Copy + Into<usize>> Default for FlagSet<N, FLAG> {
     }
 }
 
-impl<const N: usize, T: Into<usize>> FromIterator<T> for FlagSet<N> {
+impl<const N: usize, T: Into<usize> + From<usize> + Copy> FromIterator<T> for FlagSet<N, T> {
     fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
-        Self::from_flags(iter.into_iter().map(|x| x.into()))
+        Self::from_flags(iter)
+    }
+}
+
+// Custom iterator: walks bit positions, yields FLAG for each set bit.
+pub struct FlagSetIter<'a, const N: usize, FLAG: Copy + Into<usize> + From<usize>> {
+    flag_set: &'a FlagSet<N, FLAG>,
+    index: usize,
+    _marker: core::marker::PhantomData<FLAG>,
+}
+
+impl<'a, const N: usize, FLAG: Copy + Into<usize> + From<usize>> Iterator
+    for FlagSetIter<'a, N, FLAG>
+{
+    type Item = FLAG;
+
+    fn next(&mut self) -> Option<FLAG> {
+        while self.index < N * 8 {
+            let flag = FLAG::from(self.index);
+            self.index += 1;
+            if self.flag_set.get_flag(flag) {
+                return Some(flag);
+            }
+        }
+        None
+    }
+}
+
+impl<'a, const N: usize, FLAG: Copy + Into<usize> + From<usize>> IntoIterator
+    for &'a FlagSet<N, FLAG>
+{
+    type Item = FLAG;
+    type IntoIter = FlagSetIter<'a, N, FLAG>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        FlagSetIter {
+            flag_set: self,
+            index: 0,
+            _marker: core::marker::PhantomData,
+        }
     }
 }
 
@@ -852,6 +911,15 @@ impl From<bool> for SimpleAbilityNumber {
     }
 }
 
+impl From<SimpleAbilityNumber> for bool {
+    fn from(value: SimpleAbilityNumber) -> Self {
+        match value {
+            SimpleAbilityNumber::First => false,
+            SimpleAbilityNumber::Second => true,
+        }
+    }
+}
+
 impl From<SimpleAbilityNumber> for AbilityNumber {
     fn from(value: SimpleAbilityNumber) -> Self {
         match value {
@@ -889,7 +957,7 @@ impl AbilityNumber {
             1 => Ok(Self::First),
             2 => Ok(Self::Second),
             4 => Ok(Self::Hidden),
-            invalid => Err(InvalidAbilityNumber(u3::new(invalid))),
+            invalid => Err(InvalidAbilityNumber::U8(invalid)),
         }
     }
 
@@ -910,16 +978,49 @@ impl TryFrom<u3> for AbilityNumber {
             1 => Ok(Self::First),
             2 => Ok(Self::Second),
             4 => Ok(Self::Hidden),
-            _ => Err(InvalidAbilityNumber(value)),
+            _ => Err(InvalidAbilityNumber::U8(value.as_u8())),
+        }
+    }
+}
+
+impl From<bool> for AbilityNumber {
+    fn from(value: bool) -> Self {
+        match value {
+            false => AbilityNumber::First,
+            true => AbilityNumber::Second,
+        }
+    }
+}
+
+impl TryFrom<AbilityNumber> for bool {
+    type Error = InvalidAbilityNumber;
+
+    fn try_from(value: AbilityNumber) -> Result<Self, Self::Error> {
+        match value {
+            AbilityNumber::First => Ok(false),
+            AbilityNumber::Second => Ok(true),
+            AbilityNumber::Hidden => Err(InvalidAbilityNumber::HiddenNotAllowed),
         }
     }
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct InvalidAbilityNumber(pub u3);
+pub enum InvalidAbilityNumber {
+    U8(u8),
+    HiddenNotAllowed,
+}
+
+impl Display for InvalidAbilityNumber {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            InvalidAbilityNumber::U8(value) => write!(f, "Invalid ability number: {value}"),
+            InvalidAbilityNumber::HiddenNotAllowed => write!(f, "Hidden ability not allowed"),
+        }
+    }
+}
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Clone, Copy, Default, Serialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub struct Pokerus(u8);
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Serialize, Deserialize))]
@@ -1037,6 +1138,26 @@ impl Randomize for Pokerus {
         };
 
         Self::from_components(strain, days_remaining)
+    }
+}
+
+impl Display for Pokerus {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "strain {}, {} days remaining",
+            self.strain(),
+            self.days_remaining()
+        )
+    }
+}
+
+impl Serialize for Pokerus {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        self.to_string().serialize(serializer)
     }
 }
 
