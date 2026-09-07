@@ -143,6 +143,33 @@ impl PkmTypes {
         }
     }
 
+    #[wasm_bindgen(js_name = "toGameboyIndex")]
+    #[allow(clippy::missing_const_for_fn)]
+    pub fn to_gameboy_index(t: &PkmType) -> u8 {
+        match t {
+            PkmType::Normal => 0,
+            PkmType::Fighting => 1,
+            PkmType::Flying => 2,
+            PkmType::Poison => 3,
+            PkmType::Ground => 4,
+            PkmType::Rock => 5,
+            // 6: Unused bird type
+            PkmType::Bug => 7,
+            PkmType::Ghost => 8,
+            PkmType::Steel => 9,
+            // 10-19: Dummy 'normal' types
+            PkmType::Fire => 20,
+            PkmType::Water => 21,
+            PkmType::Grass => 22,
+            PkmType::Electric => 23,
+            PkmType::Psychic => 24,
+            PkmType::Ice => 25,
+            PkmType::Dragon => 26,
+            PkmType::Dark => 27,
+            _ => 0,
+        }
+    }
+
     #[wasm_bindgen(js_name = "toString")]
     pub fn to_string(value: u8) -> String {
         let pkm_type = PkmType::from_byte(value).expect("Invalid type byte");

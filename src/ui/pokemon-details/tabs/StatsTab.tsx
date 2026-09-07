@@ -216,8 +216,6 @@ export default function StatsDisplay(props: { mon: PKMInterface }) {
           data={{ labels, datasets: [dataset] }}
         />
       </div>
-      {JSON.stringify(displayedStats)}
-      {String(isStandardStats(displayedStats)) + String(isStatsPreSplit(displayedStats))}
       {isStandardStats(displayedStats) ? (
         <StatsTable.Standard
           stats={displayedStats}

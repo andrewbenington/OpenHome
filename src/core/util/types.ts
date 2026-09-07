@@ -484,16 +484,17 @@ export function markingsSixShapesWithColorToBytes(
 export function readDVsFromBytes(dataView: DataView, offset: number): StatsPreSplit {
   const dvBytes = dataView.getUint16(offset, false)
 
+  const spc = dvBytes & 0x0f
+  const spe = (dvBytes >> 4) & 0x0f
+  const def = (dvBytes >> 8) & 0x0f
+  const atk = (dvBytes >> 12) & 0x0f
+
   return {
-    spc: dvBytes & 0x0f,
-    spe: (dvBytes >> 4) & 0x0f,
-    def: (dvBytes >> 8) & 0x0f,
-    atk: (dvBytes >> 12) & 0x0f,
-    hp:
-      (((dvBytes >> 12) & 1) << 3) |
-      (((dvBytes >> 8) & 1) << 2) |
-      (((dvBytes >> 4) & 1) << 1) |
-      (dvBytes & 1),
+    spc,
+    spe,
+    def,
+    atk,
+    hp: ((atk & 1) << 3) | ((def & 1) << 2) | ((spe & 1) << 1) | (spc & 1),
   }
 }
 
