@@ -27,6 +27,7 @@ use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_resources::species::SpeciesMetadata;
+use pkm_rs_types::Dvs;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, FlagSet, Gender, Geolocations, HyperTraining, Ivs,
@@ -838,7 +839,7 @@ impl OhpkmV2 {
 
     // Game Boy
 
-    pub fn dvs(&self) -> StatsPreSplit {
+    pub fn dvs(&self) -> Dvs {
         match self.gameboy_data {
             Some(data) => data.dvs,
             None => GameboyData::from_main_data(&self.main_data).dvs,
@@ -861,7 +862,7 @@ impl OhpkmV2 {
 
     pub const fn set_gameboy_data(
         &mut self,
-        dvs: StatsPreSplit,
+        dvs: Dvs,
         met_time_of_day: u8,
         evs_g12: StatsPreSplit,
     ) {
@@ -2752,6 +2753,7 @@ impl OhpkmV2 {
             Some(data) => data.dvs,
             None => GameboyData::from_main_data(&self.main_data).dvs,
         }
+        .into()
     }
 
     #[wasm_bindgen(getter = metTimeOfDay)]
@@ -2779,7 +2781,7 @@ impl OhpkmV2 {
         evs_g12: StatsPreSplit,
     ) {
         self.gameboy_data = Some(GameboyData {
-            dvs,
+            dvs: dvs.into(),
             met_time_of_day,
             evs_g12,
         })

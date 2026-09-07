@@ -1,8 +1,10 @@
-use std::{fmt::Display, num::TryFromIntError};
-
 use crate::util::bit_is_set;
+
 use pkm_rs_derive::Stats;
+
 use serde::{Deserialize, Serialize};
+use std::fmt::Display;
+use std::num::TryFromIntError;
 
 #[cfg(feature = "wasm")]
 use tsify::Tsify;
@@ -592,30 +594,67 @@ impl StatsPreSplit {
         }
     }
 
-    pub const fn to_dv_bytes(self) -> [u8; 2] {
-        let dv_val_u16: u16 = self.atk & 0x0f;
-        let dv_val_u16 = (dv_val_u16 << 4) | (self.def & 0x0f);
-        let dv_val_u16 = (dv_val_u16 << 4) | (self.spe & 0x0f);
-        let dv_val_u16 = (dv_val_u16 << 4) | (self.spc & 0x0f);
-
-        dv_val_u16.to_be_bytes()
-    }
-
     pub const fn is_empty(&self) -> bool {
         self.hp == 0 && self.atk == 0 && self.def == 0 && self.spc == 0 && self.spe == 0
     }
+}
 
-    pub const fn dvs_from_ivs_lossy(ivs: &Ivs) -> Self {
-        Self {
-            hp: iv_to_dv(ivs.0.hp) as u16,
-            atk: iv_to_dv(ivs.0.atk) as u16,
-            def: iv_to_dv(ivs.0.def) as u16,
-            spc: iv_to_dv((ivs.0.spa + ivs.0.spd) / 2) as u16,
-            spe: iv_to_dv(ivs.0.spe) as u16,
-        }
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, serde::Serialize, serde::Deserialize)]
+pub struct Dvs(u16);
+
+impl Dvs {
+    pub const fn get_hp(&self) -> u16 {
+        ((self.get_atk() & 1) << 3)
+            | ((self.get_def() & 1) << 2)
+            | ((self.get_spe() & 1) << 1)
+            | (self.get_spc() & 1)
     }
 
-    pub const fn shiny_dvs_from_ivs(ivs: &Ivs) -> Self {
+    pub const fn get_atk(&self) -> u16 {
+        (self.0 >> 12) & 0x0f
+    }
+
+    pub const fn get_def(&self) -> u16 {
+        (self.0 >> 8) & 0x0f
+    }
+
+    pub const fn get_spe(&self) -> u16 {
+        (self.0 >> 4) & 0x0f
+    }
+
+    pub const fn get_spc(&self) -> u16 {
+        self.0 & 0x0f
+    }
+
+    pub const fn set_all(&mut self, atk: u16, def: u16, spe: u16, spc: u16) {
+        self.0 = (atk & 0x0f) << 12 | (def & 0x0f) << 8 | (spe & 0x0f) << 4 | (spc & 0x0f)
+    }
+
+    pub const fn from_all(atk: u16, def: u16, spe: u16, spc: u16) -> Self {
+        let mut dvs = Self(0);
+        dvs.set_all(atk, def, spe, spc);
+        dvs
+    }
+
+    pub const fn from_bytes(bytes: &[u8; 2]) -> Self {
+        Self(u16::from_be_bytes(*bytes))
+    }
+
+    pub const fn to_bytes(&self) -> [u8; 2] {
+        self.0.to_be_bytes()
+    }
+
+    pub const fn from_ivs_lossy(ivs: &Ivs) -> Self {
+        Self::from_all(
+            iv_to_dv(ivs.0.atk),
+            iv_to_dv(ivs.0.def),
+            iv_to_dv(ivs.0.spe),
+            iv_to_dv((ivs.0.spa + ivs.0.spd) / 2),
+        )
+    }
+
+    pub const fn shiny_from_ivs(ivs: &Ivs) -> Self {
         let mut atk = (ivs.0.atk.saturating_sub(1)).div_ceil(2) as u16;
         if atk & 0b11 == 0b01 {
             atk += 1;
@@ -623,32 +662,103 @@ impl StatsPreSplit {
             atk += 2
         }
 
-        Self {
-            hp: (atk & 1) << 3,
-            atk,
-            def: 10,
-            spc: 10,
-            spe: 10,
-        }
+        Self::from_all(atk, 10, 10, 10)
     }
 
-    pub const fn force_dvs_for_unown_letter(&mut self, letter_index: u16) -> Self {
+    pub const fn to_unown_letter(&self, letter_index: u16) -> Self {
         let letter_bits = letter_index * 10;
-        self.atk = (self.atk & 0b1001) | (((letter_bits >> 6) & 0b11) << 1);
-        self.def = (self.def & 0b1001) | (((letter_bits >> 4) & 0b11) << 1);
-        self.spe = (self.spe & 0b1001) | (((letter_bits >> 2) & 0b11) << 1);
-        self.spc = (self.spc & 0b1001) | ((letter_bits & 0b11) << 1);
-        *self
+        let atk = (self.get_atk() & 0b1001) | (((letter_bits >> 6) & 0b11) << 1);
+        let def = (self.get_def() & 0b1001) | (((letter_bits >> 4) & 0b11) << 1);
+        let spe = (self.get_spe() & 0b1001) | (((letter_bits >> 2) & 0b11) << 1);
+        let spc = (self.get_spc() & 0b1001) | ((letter_bits & 0b11) << 1);
+
+        Self::from_all(atk, def, spe, spc)
+    }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+#[allow(clippy::missing_const_for_fn)]
+impl Dvs {
+    #[wasm_bindgen(getter = hp)]
+    pub fn get_hp_wasm(&self) -> u16 {
+        self.get_hp()
+    }
+
+    #[wasm_bindgen(getter = atk)]
+    pub fn get_atk_wasm(&self) -> u16 {
+        self.get_atk()
+    }
+
+    #[wasm_bindgen(getter = def)]
+    pub fn get_def_wasm(&self) -> u16 {
+        self.get_def()
+    }
+
+    #[wasm_bindgen(getter = spe)]
+    pub fn get_spe_wasm(&self) -> u16 {
+        self.get_spe()
+    }
+
+    #[wasm_bindgen(getter = spc)]
+    pub fn get_spc_wasm(&self) -> u16 {
+        self.get_spc()
+    }
+}
+
+impl From<StatsPreSplit> for Dvs {
+    fn from(value: StatsPreSplit) -> Self {
+        Self::from_all(value.atk, value.def, value.spe, value.spc)
+    }
+}
+
+impl From<Dvs> for StatsPreSplit {
+    fn from(value: Dvs) -> Self {
+        Self {
+            hp: value.get_hp(),
+            atk: value.get_atk(),
+            def: value.get_def(),
+            spc: value.get_spc(),
+            spe: value.get_spe(),
+        }
+    }
+}
+
+impl Display for Dvs {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "Dvs(hp: {}, atk: {}, def: {}, spc: {}, spe: {})",
+            self.get_hp(),
+            self.get_atk(),
+            self.get_def(),
+            self.get_spc(),
+            self.get_spe()
+        )
+    }
+}
+
+#[cfg(feature = "randomize")]
+impl Randomize for Dvs {
+    fn randomized<R: rand::prelude::Rng>(rng: &mut R) -> Self {
+        use rand::RngExt;
+
+        Self::from_all(
+            rng.random_range(0..=DV_MAX),
+            rng.random_range(0..=DV_MAX),
+            rng.random_range(0..=DV_MAX),
+            rng.random_range(0..=DV_MAX),
+        )
     }
 }
 
 const IV_MAX: u8 = 31;
-#[cfg(test)]
-const DV_MAX: u8 = 15;
+#[cfg(any(test, feature = "randomize"))]
+const DV_MAX: u16 = 15;
 
-const fn iv_to_dv(iv: u8) -> u8 {
+const fn iv_to_dv(iv: u8) -> u16 {
     match iv {
-        0..=IV_MAX => iv / 2,
+        0..=IV_MAX => iv as u16 / 2,
         _ => 0,
     }
 }
@@ -657,9 +767,9 @@ const fn iv_to_dv(iv: u8) -> u8 {
 /// by multiplying by two and adding 1. This way a max DV corresponds to a max IV, with the
 /// side effect of the minimum possible IV from a DV being 1.
 #[cfg(test)]
-const fn dv_to_iv(dv: u8) -> u8 {
+const fn dv_to_iv(dv: u16) -> u8 {
     match dv {
-        0..=DV_MAX => (dv * 2) + 1,
+        0..=DV_MAX => (dv as u8 * 2) + 1,
         _ => 0,
     }
 }

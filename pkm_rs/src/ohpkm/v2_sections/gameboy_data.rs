@@ -1,4 +1,5 @@
-use pkm_rs_types::{NationalDex, StatsPreSplit};
+use arrayref::array_ref;
+use pkm_rs_types::{Dvs, NationalDex, StatsPreSplit};
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
@@ -19,7 +20,7 @@ use crate::{
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct GameboyData {
-    pub dvs: StatsPreSplit,
+    pub dvs: Dvs,
     pub met_time_of_day: u8,
     pub evs_g12: StatsPreSplit,
 }
@@ -42,17 +43,17 @@ impl GameboyData {
             let letter_index = main_data.species_and_form.get_forme_index();
 
             Self {
-                dvs: StatsPreSplit::dvs_from_ivs_lossy(&main_data.ivs)
-                    .force_dvs_for_unown_letter(letter_index),
+                dvs: Dvs::from_ivs_lossy(&main_data.ivs).to_unown_letter(letter_index),
                 ..Default::default()
             }
         } else {
+            let dvs = if main_data.is_shiny() {
+                Dvs::shiny_from_ivs(&main_data.ivs)
+            } else {
+                Dvs::from_ivs_lossy(&main_data.ivs)
+            };
             Self {
-                dvs: if main_data.is_shiny() {
-                    StatsPreSplit::shiny_dvs_from_ivs(&main_data.ivs)
-                } else {
-                    StatsPreSplit::dvs_from_ivs_lossy(&main_data.ivs)
-                },
+                dvs,
                 ..Default::default()
             }
         }
@@ -70,7 +71,7 @@ impl DataSection for GameboyData {
 
         // try_into() will always succeed thanks to the buffer size check
         Ok(Self {
-            dvs: StatsPreSplit::from_dv_bytes(bytes[0..2].try_into().unwrap()),
+            dvs: Dvs::from(StatsPreSplit::from_dv_bytes(array_ref!(bytes, 0, 2))), // stored as StatsPreSplit before the Dvs struct was added, so byte (de)serializerion still uses StatsPreSplit
             met_time_of_day: bytes[2],
             evs_g12: StatsPreSplit::from_bytes_u16_le(bytes[3..13].try_into().unwrap()),
         })
@@ -79,7 +80,7 @@ impl DataSection for GameboyData {
     fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = [0u8; 13];
 
-        bytes[0..2].copy_from_slice(&self.dvs.to_dv_bytes());
+        bytes[0..2].copy_from_slice(&StatsPreSplit::from(self.dvs).to_bytes()); // stored as StatsPreSplit before the Dvs struct was added, so byte (de)serializerion still uses StatsPreSplit
         bytes[2] = self.met_time_of_day;
         bytes[3..13].copy_from_slice(&self.evs_g12.to_bytes());
 

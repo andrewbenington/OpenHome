@@ -162,11 +162,6 @@ export default class PK2 {
         spe: 0,
         spc: 0,
       }
-      this.dvs.hp =
-        ((this.dvs.atk & 1) << 3) |
-        ((this.dvs.def & 1) << 2) |
-        ((this.dvs.spe & 1) << 1) |
-        (this.dvs.spc & 1) // old OHPKMs calculated this incorrectly
 
       this.trainerFriendship = other.trainerFriendship ?? 0
       this.pokerusByte = other.pokerusByte ?? 0
