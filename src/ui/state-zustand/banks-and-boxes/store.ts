@@ -10,7 +10,7 @@ import {
 import { Option, partitionResults, R, range, Result } from '@openhome-core/util/functional'
 import { numericSorter } from '@openhome-core/util/sort'
 import { IdentifierNotPresentError, useOhpkmStore } from '@openhome-ui/state/ohpkm'
-import { createContext, useCallback, useContext, useEffect } from 'react'
+import { createContext, useCallback, useContext } from 'react'
 import { v4 as UuidV4 } from 'uuid'
 import { create, StateCreator, StoreApi, UseBoundStore } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
@@ -586,17 +586,6 @@ export function useBanksAndBoxes() {
     })
     await reloadBankStore()
   }, [backend, banks, getCurrentBank, reloadBankStore])
-
-  useEffect(() => {
-    // returns a function to stop listening
-    const stopListening = backend.onMenuEvent('save', saveChanges)
-
-    // the "stop listening" function should be called when the effect returns,
-    // otherwise duplicate listeners will exist
-    return () => {
-      stopListening()
-    }
-  }, [backend, saveChanges, reloadBankStore])
 
   return {
     saveChanges,
