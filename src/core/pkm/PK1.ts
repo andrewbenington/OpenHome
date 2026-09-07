@@ -20,7 +20,7 @@ import { MoveFilter } from '../util/util'
 import * as conversion from './conversion'
 import { PkmConverter } from './conversion/converter'
 import { PkmConstructorOptions } from './PKM'
-import { getLevelGen12, getStats } from './util/statCalc'
+import { getStats } from './util/statCalc'
 
 export default class PK1 {
   static getFormat() {
@@ -145,7 +145,7 @@ export default class PK1 {
       this.nickname = converter.nickname(other)
     }
 
-    this.level = getLevelGen12(this.nationalDex, this.exp)
+    this.level = this.getLevel()
   }
 
   static fromBytes(buffer: ArrayBuffer): PK1 {
@@ -226,7 +226,7 @@ export default class PK1 {
   }
 
   public getLevel() {
-    return getLevelGen12(this.nationalDex, this.exp)
+    return this.speciesMetadata?.calculateLevel(this.exp) ?? 1
   }
 
   isShiny() {

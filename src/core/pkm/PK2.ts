@@ -19,7 +19,7 @@ import * as types from '../util/types'
 import { MoveFilter } from '../util/util'
 import { PkmConverter } from './conversion/converter'
 import { PkmConstructorOptions } from './PKM'
-import { getLevelGen12, getStats } from './util/statCalc'
+import { getStats } from './util/statCalc'
 
 export default class PK2 {
   static getFormat() {
@@ -171,7 +171,7 @@ export default class PK2 {
       this.trainerName = other.trainerName
       this.nickname = converter.nickname(other)
       this.trainerGender = other.trainerGender
-      this.level = getLevelGen12(this.nationalDex, this.exp)
+      this.level = this.getLevel()
     }
   }
 
@@ -266,7 +266,7 @@ export default class PK2 {
   }
 
   public getLevel() {
-    return getLevelGen12(this.nationalDex, this.exp)
+    return this.speciesMetadata?.calculateLevel(this.exp) ?? 1
   }
 
   isShiny() {
