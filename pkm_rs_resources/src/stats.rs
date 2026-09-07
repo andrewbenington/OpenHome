@@ -1,77 +1,14 @@
-use crate::{
-    metadata_source::MetadataSource,
-    natures::NatureMetadata,
-    species::{SpeciesForm, form_metadata::BaseStats},
-};
+#[cfg(feature = "wasm")]
+use crate::natures::NatureIndex;
+use crate::natures::NatureMetadata;
+use crate::species::SpeciesForm;
+use crate::species::metadata_table::BaseStats;
+use crate::{metadata_source::MetadataSource, species::metadata_table::MetadataTableReader};
 
-use num::integer::Roots;
-use pkm_rs_types::{HyperTraining, Stats, Stats16Le, StatsPreSplit};
-use std::fmt::Display;
+use pkm_rs_types::{HyperTraining, Stat, Stats, Stats16Le, StatsPreSplit};
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
-
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
-pub enum Stat {
-    HP,
-    Attack,
-    Defense,
-    SpecialAttack,
-    SpecialDefense,
-    Speed,
-}
-
-impl Stat {
-    pub const fn abbr(self) -> &'static str {
-        match self {
-            Stat::HP => "HP",
-            Stat::Attack => "Atk",
-            Stat::Defense => "Def",
-            Stat::SpecialAttack => "SpA",
-            Stat::SpecialDefense => "SpD",
-            Stat::Speed => "Spe",
-        }
-    }
-}
-
-impl Display for Stat {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(match *self {
-            Stat::HP => "HP",
-            Stat::Attack => "Attack",
-            Stat::Defense => "Defense",
-            Stat::SpecialAttack => "Special Attack",
-            Stat::SpecialDefense => "Special Defense",
-            Stat::Speed => "Speed",
-        })
-    }
-}
-
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
-pub struct StatAbbr;
-
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[allow(clippy::missing_const_for_fn)]
-impl StatAbbr {
-    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getLower"))]
-    pub fn get_lower(stat: Stat) -> String {
-        stat.abbr().to_lowercase()
-    }
-
-    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "toStat"))]
-    pub fn to_stat(abbr: &str) -> Option<Stat> {
-        match abbr {
-            "HP" => Some(Stat::HP),
-            "Atk" => Some(Stat::Attack),
-            "Def" => Some(Stat::Defense),
-            "SpA" => Some(Stat::SpecialAttack),
-            "SpD" => Some(Stat::SpecialDefense),
-            "Spe" => Some(Stat::Speed),
-            _ => None,
-        }
-    }
-}
 
 struct DeFactoIvs<I: Stats> {
     ivs: I,
@@ -87,7 +24,9 @@ impl<I: Stats> DeFactoIvs<I> {
             hyper_training: hyper_training.unwrap_or_default(),
         }
     }
+}
 
+impl<I: Stats> Stats for DeFactoIvs<I> {
     fn get_hp(&self) -> u16 {
         if self.hyper_training.hp {
             MAX_IV
@@ -137,87 +76,114 @@ impl<I: Stats> DeFactoIvs<I> {
     }
 }
 
-pub fn calculate_all_modern<I: Stats + Copy, E: Stats>(
+pub fn calculate_all_modern_for_source<I: Stats, E: Stats>(
     metadata_source: MetadataSource,
-    species_and_form: SpeciesForm,
+    species_form: SpeciesForm,
     ivs: &I,
     evs: &E,
-    level: u8,
+    level: u16,
     nature: &'static NatureMetadata,
     hyper_training: Option<HyperTraining>,
 ) -> Option<Stats16Le> {
-    let Some(BaseStats::Modern(stats8)) = species_and_form.get_base_stats_from(metadata_source)
-    else {
+    let metadata_reader = species_form.metadata_reader_for_source(metadata_source)?;
+    let BaseStats::Modern(stats8) = metadata_reader.get_base_stats() else {
         return None;
     };
 
-    let de_facto_ivs = DeFactoIvs::new(*ivs, hyper_training);
+    let ivs = DeFactoIvs::new(ivs, hyper_training);
     let base_stats = Stats16Le::from(stats8);
+
     Some(Stats16Le {
-        hp: calculate_hp_modern(
-            base_stats,
-            de_facto_ivs.get_hp(),
-            evs.get_hp(),
-            level as u16,
-        ),
-        atk: calculate_stat_modern(
-            base_stats.atk,
-            de_facto_ivs.get_atk(),
-            evs.get_atk(),
-            level as u16,
-            nature,
-            Stat::Attack,
-        ),
-        def: calculate_stat_modern(
-            base_stats.def,
-            de_facto_ivs.get_def(),
-            evs.get_def(),
-            level as u16,
-            nature,
-            Stat::Defense,
-        ),
-        spa: calculate_stat_modern(
-            base_stats.spa,
-            de_facto_ivs.get_spa(),
-            evs.get_spa(),
-            level as u16,
-            nature,
-            Stat::SpecialAttack,
-        ),
-        spd: calculate_stat_modern(
-            base_stats.spd,
-            de_facto_ivs.get_spd(),
-            evs.get_spd(),
-            level as u16,
-            nature,
-            Stat::SpecialDefense,
-        ),
-        spe: calculate_stat_modern(
-            base_stats.spe,
-            de_facto_ivs.get_spe(),
-            evs.get_spe(),
-            level as u16,
-            nature,
-            Stat::Speed,
-        ),
+        hp: calculate_modern(Stat::Hp, &base_stats, &ivs, &evs, level, nature),
+        atk: calculate_modern(Stat::Attack, &base_stats, &ivs, &evs, level, nature),
+        def: calculate_modern(Stat::Defense, &base_stats, &ivs, &evs, level, nature),
+        spa: calculate_modern(Stat::SpAttack, &base_stats, &ivs, &evs, level, nature),
+        spd: calculate_modern(Stat::SpDefense, &base_stats, &ivs, &evs, level, nature),
+        spe: calculate_modern(Stat::Speed, &base_stats, &ivs, &evs, level, nature),
     })
 }
 
-pub const fn calculate_hp_modern(base_stats: Stats16Le, hp_iv: u16, hp_ev: u16, level: u16) -> u16 {
+pub fn calculate_all_modern<I: Stats, E: Stats>(
+    metadata_reader: MetadataTableReader,
+    ivs: &I,
+    evs: &E,
+    level: u16,
+    nature: &'static NatureMetadata,
+    hyper_training: Option<HyperTraining>,
+) -> Option<Stats16Le> {
+    let BaseStats::Modern(stats8) = metadata_reader.get_base_stats() else {
+        return None;
+    };
+
+    let ivs = DeFactoIvs::new(ivs, hyper_training);
+    let base_stats = Stats16Le::from(stats8);
+
+    Some(Stats16Le {
+        hp: calculate_modern(Stat::Hp, &base_stats, &ivs, &evs, level, nature),
+        atk: calculate_modern(Stat::Attack, &base_stats, &ivs, &evs, level, nature),
+        def: calculate_modern(Stat::Defense, &base_stats, &ivs, &evs, level, nature),
+        spa: calculate_modern(Stat::SpAttack, &base_stats, &ivs, &evs, level, nature),
+        spd: calculate_modern(Stat::SpDefense, &base_stats, &ivs, &evs, level, nature),
+        spe: calculate_modern(Stat::Speed, &base_stats, &ivs, &evs, level, nature),
+    })
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = calculateStats))]
+pub fn calculate_modern_stats_wasm(
+    species_form: SpeciesForm,
+    ivs: &Stats16Le,
+    evs: &Stats16Le,
+    level: u16,
+    nature: &NatureIndex, // this must be a reference or JavaScript will move the value and cause errors
+    hyper_training: Option<HyperTraining>,
+    metadata_source: Option<MetadataSource>,
+) -> Stats16Le {
+    let Some(metadata_reader) = (match metadata_source {
+        Some(source) => species_form.metadata_reader_for_source(source),
+        None => Some(species_form.current_metadata_reader()),
+    }) else {
+        return Stats16Le::default();
+    };
+
+    calculate_all_modern(
+        metadata_reader,
+        ivs,
+        evs,
+        level,
+        nature.get_metadata(),
+        hyper_training,
+    )
+    .unwrap_or_default()
+}
+
+pub const fn calculate_hp_modern(
+    base_stats: &Stats16Le,
+    hp_iv: u16,
+    hp_ev: u16,
+    level: u16,
+) -> u16 {
     let level_factor = 2 * base_stats.hp + hp_iv + hp_ev.div_euclid(4);
     let numerator = level_factor * level;
 
     (numerator / 100) + level + 10
 }
 
-pub const fn calculate_stat_modern(
-    base_stat: u16,
-    iv: u16,
-    ev: u16,
+fn calculate_modern<I: Stats, E: Stats>(
+    stat: Stat,
+    base_stats: &Stats16Le,
+    ivs: &DeFactoIvs<I>,
+    evs: &E,
     level: u16,
     nature: &'static NatureMetadata,
-    stat: Stat,
 ) -> u16 {
+    let base_stat = base_stats.get_stat(stat);
+    let iv = ivs.get_stat(stat);
+    let ev = evs.get_stat(stat);
+
+    if stat == Stat::Hp {
+        return calculate_hp_modern(base_stats, iv, ev, level);
+    }
+
     let level_factor = 2 * base_stat + iv + ev.div_euclid(4);
     let numerator = level_factor * level;
     let nature_multiplier = nature.multiplier_for(stat);
@@ -225,60 +191,87 @@ pub const fn calculate_stat_modern(
     (((numerator / 100) + 5) as f32 * nature_multiplier).floor() as u16
 }
 
+fn calculate_hp_gameboy(base_stat: u16, dv: u16, ev: u16, level: u16) -> u16 {
+    calculate_stat_gameboy(base_stat, dv, ev, level, true)
+}
+
+fn calculate_non_hp_gameboy(base_stat: u16, dv: u16, ev: u16, level: u16) -> u16 {
+    calculate_stat_gameboy(base_stat, dv, ev, level, false)
+}
+
+fn calculate_stat_gameboy(base_stat: u16, dv: u16, ev: u16, level: u16, is_hp: bool) -> u16 {
+    let level_factor = 2 * (base_stat + dv) + ((ev as f32).sqrt().ceil() as u16).div_euclid(4);
+    let numerator = level_factor * level;
+    let starting_point: u16 = if is_hp { level + 10 } else { 5 };
+
+    starting_point + numerator / 100
+}
+
+pub fn calculate_stats_gen1(
+    species_form: SpeciesForm,
+    dvs: &StatsPreSplit,
+    evs: &StatsPreSplit,
+    level: u16,
+) -> Option<StatsPreSplit> {
+    let BaseStats::PreSplit(base) = species_form.get_base_stats_from(MetadataSource::Yellow)?
+    else {
+        panic!("Pokémon Yellow base stats should have a unified Special stat")
+    };
+
+    Some(StatsPreSplit {
+        hp: calculate_hp_gameboy(base.hp, dvs.hp, evs.hp, level),
+        atk: calculate_non_hp_gameboy(base.atk, dvs.atk, evs.atk, level),
+        def: calculate_non_hp_gameboy(base.def, dvs.def, evs.def, level),
+        spc: calculate_non_hp_gameboy(base.spc, dvs.spc, evs.spc, level),
+        spe: calculate_non_hp_gameboy(base.spe, dvs.spe, evs.spe, level),
+    })
+}
+
 pub fn calculate_stats_gen2(
-    species_and_form: SpeciesForm,
+    species_form: SpeciesForm,
     dvs: &StatsPreSplit,
     evs: &StatsPreSplit,
     level: u16,
 ) -> Option<Stats16Le> {
-    let Some(BaseStats::Modern(base)) =
-        species_and_form.get_base_stats_from(MetadataSource::Crystal)
-    else {
-        return None;
+    let BaseStats::Modern(base) = species_form.get_base_stats_from(MetadataSource::Crystal)? else {
+        panic!("Pokémon Crystal base stats should have a split Special stat")
     };
     let base = Stats16Le::from(base);
 
     Some(Stats16Le {
-        hp: calculate_stat_gen2(base.hp, dvs.hp, evs.hp, level, Stat::HP),
-        atk: calculate_stat_gen2(base.atk, dvs.atk, evs.atk, level, Stat::Attack),
-        def: calculate_stat_gen2(base.def, dvs.def, evs.def, level, Stat::Defense),
-        spa: calculate_stat_gen2(base.spa, dvs.spc, evs.spc, level, Stat::SpecialAttack),
-        spd: calculate_stat_gen2(base.spd, dvs.spc, evs.spc, level, Stat::SpecialDefense),
-        spe: calculate_stat_gen2(base.spe, dvs.spe, evs.spe, level, Stat::Speed),
+        hp: calculate_hp_gameboy(base.hp, dvs.hp, evs.hp, level),
+        atk: calculate_non_hp_gameboy(base.atk, dvs.atk, evs.atk, level),
+        def: calculate_non_hp_gameboy(base.def, dvs.def, evs.def, level),
+        spa: calculate_non_hp_gameboy(base.spa, dvs.spc, evs.spc, level),
+        spd: calculate_non_hp_gameboy(base.spd, dvs.spc, evs.spc, level),
+        spe: calculate_non_hp_gameboy(base.spe, dvs.spe, evs.spe, level),
     })
 }
 
-pub fn calculate_hp_gen2(base_stat: u16, dv: u16, ev: u16, level: u16, stat: Stat) -> u16 {
-    let level_factor = 2 * (base_stat + dv) + ev.nth_root(2) / 4;
-    let numerator = level_factor * level;
-    let starting_point: u16 = if stat == Stat::HP { level + 10 } else { 5 };
-    dbg!(stat, level_factor, numerator, starting_point);
-
-    starting_point + numerator / 100
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = calculateStatsGen1))]
+pub fn calculate_stats_gen1_wasm(
+    species_form: SpeciesForm,
+    dvs: &StatsPreSplit,
+    evs: &StatsPreSplit,
+    level: u16,
+) -> StatsPreSplit {
+    calculate_stats_gen1(species_form, dvs, evs, level).unwrap_or_default()
 }
 
-pub fn calculate_stat_gen2(base_stat: u16, dv: u16, ev: u16, level: u16, stat: Stat) -> u16 {
-    let level_factor = 2 * (base_stat + dv) + ((ev as f32).sqrt().ceil() as u16).div_euclid(4);
-    let numerator = level_factor * level;
-    let starting_point: u16 = if stat == Stat::HP { level + 10 } else { 5 };
-    dbg!(
-        stat,
-        ev.sqrt() / 4,
-        2 * (base_stat + dv),
-        numerator,
-        numerator / 100,
-        starting_point,
-        starting_point + numerator / 100
-    );
-
-    starting_point + numerator / 100
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = calculateStatsGen2))]
+pub fn calculate_stats_gen2_wasm(
+    species_form: SpeciesForm,
+    dvs: &StatsPreSplit,
+    evs: &StatsPreSplit,
+    level: u16,
+) -> Stats16Le {
+    calculate_stats_gen2(species_form, dvs, evs, level).unwrap_or_default()
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::species::SpeciesForm;
-    use crate::stats::Stat;
 
     use pkm_rs_types::{NationalDex, Stats16Le, StatsPreSplit};
 
@@ -289,7 +282,7 @@ mod tests {
         let hp_ev: u16 = 22850;
         let level: u16 = 81;
 
-        let hp_stat_calculated = calculate_stat_gen2(base_hp, hp_dv, hp_ev, level, Stat::HP);
+        let hp_stat_calculated = calculate_hp_gameboy(base_hp, hp_dv, hp_ev, level);
 
         assert_eq!(hp_stat_calculated, 189);
     }

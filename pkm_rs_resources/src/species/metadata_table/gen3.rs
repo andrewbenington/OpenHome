@@ -1,7 +1,7 @@
 use crate::pkhex_bin::{EMERALD_LEVELUP_PKL, EMERALD_PERSONAL_FILE};
 use crate::pkhex_bin::{FRLG_LEVELUP_PKL, FRLG_PERSONAL_FILE};
 use crate::pkhex_bin::{RS_LEVELUP_PKL, RS_PERSONAL_FILE};
-use crate::species::form_metadata::{BaseStats, GameMetadata, PersonalInfo};
+use crate::species::metadata_table::{BaseStats, GameMetadata, PersonalInfo};
 use pkm_rs_types::{NationalDex, PkmType, Stats8, log::ExpectLog};
 
 const GEN3_ENTRY_SIZE: usize = 0x1C;

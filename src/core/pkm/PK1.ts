@@ -9,6 +9,7 @@ import {
   ItemGen1,
   Language,
   Lookup,
+  MetadataSource,
   MetadataSummaryLookup,
   OriginGames,
   SpeciesLookup,
@@ -198,7 +199,7 @@ export default class PK1 {
   }
 
   public getStats() {
-    return getStats(this)
+    return getStats(this, MetadataSource.Yellow)
   }
 
   public get gender() {

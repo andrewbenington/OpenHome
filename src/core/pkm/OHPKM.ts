@@ -69,7 +69,7 @@ import {
   ivsFromDVs,
 } from './util'
 import { AllPKMFields } from './util/pkmInterface'
-import { getStandardPKMStats } from './util/statCalc'
+import { getStats } from './util/statCalc'
 import { convertPokeDate, convertPokeDateOptional } from './wasm/convert'
 
 export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
@@ -591,7 +591,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   public getStats(): Stats {
-    return getStandardPKMStats(this)
+    return getStats(this)
   }
 
   public toBytes() {
@@ -689,7 +689,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   public get stats(): Stats {
-    return getStandardPKMStats(this)
+    return getStats(this)
   }
 
   public get currentHP(): number {

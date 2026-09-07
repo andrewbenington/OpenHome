@@ -1,20 +1,35 @@
-use crate::pkhex_bin::{BDSP_LEVELUP_PKL, BDSP_PERSONAL_FILE};
-use crate::species::form_metadata::{BaseStats, GameMetadata, PersonalInfo};
+use crate::levelup::{LevelupLearnsetFileReader, LevelupLearnsetReader};
+use crate::pkhex_bin::{LZA_LEVELUP_PKL, LZA_PERSONAL_FILE, LZA_PLUS_MOVES_PKL};
+use crate::species::metadata_table::{BaseStats, GameMetadata, PersonalInfo};
 use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
-const BDSP_ENTRY_SIZE: usize = 0x44;
+const LZA_ENTRY_SIZE: usize = 0x50;
 
-type GameMetadataBdsp = GameMetadata<PersonalInfoBdsp, BDSP_ENTRY_SIZE>;
+type GameMetadataLza = GameMetadata<PersonalInfoLza, LZA_ENTRY_SIZE>;
 
-pub static METADATA_TABLE_BDSP: GameMetadataBdsp =
-    GameMetadataBdsp::from_binary(BDSP_PERSONAL_FILE, BDSP_LEVELUP_PKL);
+pub static METADATA_TABLE_LZA: GameMetadataLza =
+    GameMetadataLza::from_binary(LZA_PERSONAL_FILE, LZA_LEVELUP_PKL);
+
+const LZA_PLUS_MOVE_MASTERY: LevelupLearnsetFileReader =
+    LevelupLearnsetFileReader::from_pkl(LZA_PLUS_MOVES_PKL);
+
+pub fn get_levelup_plus_move_mastery(
+    national_dex: u16,
+    form_index: u16,
+) -> Option<LevelupLearnsetReader> {
+    LZA_PLUS_MOVE_MASTERY.learnset_at_index(
+        METADATA_TABLE_LZA
+            .personal
+            .get_game_index(national_dex, form_index)?,
+    )
+}
 
 #[derive(Debug, Clone, Copy)]
-pub struct PersonalInfoBdsp([u8; BDSP_ENTRY_SIZE]);
+pub struct PersonalInfoLza(&'static [u8]);
 
-impl PersonalInfoBdsp {
-    pub fn from_pkl_bytes(bytes: &[u8]) -> Self {
-        Self(bytes.try_into().unwrap())
+impl PersonalInfoLza {
+    pub const fn from_pkl_bytes(bytes: &'static [u8]) -> Self {
+        Self(bytes)
     }
 
     pub fn stats(&self) -> Stats8 {
@@ -22,7 +37,7 @@ impl PersonalInfoBdsp {
     }
 
     pub fn forms_offset(&self) -> Option<u16> {
-        let stored_index = i16::from_le_bytes(self.0[0x1e..0x20].try_into().unwrap());
+        let stored_index = i16::from_le_bytes(self.0[0x18..0x1A].try_into().unwrap());
         if stored_index == -1 {
             None
         } else {
@@ -47,16 +62,16 @@ impl PersonalInfoBdsp {
     }
 
     pub const fn form_count(&self) -> u8 {
-        self.0[0x20]
+        self.0[0x1A]
     }
 
-    const fn is_present_in_game(&self) -> bool {
-        ((self.0[0x21] >> 6) & 1) == 1
+    pub const fn is_present_in_game(&self) -> bool {
+        self.0[0x1C] == 1
     }
 }
 
-impl PersonalInfo for PersonalInfoBdsp {
-    const MAX_NATIONAL_DEX: NationalDex = NationalDex::Arceus;
+impl PersonalInfo for PersonalInfoLza {
+    const MAX_NATIONAL_DEX: NationalDex = NationalDex::Baxcalibur;
 
     fn from_pkl_bytes(bytes: &'static [u8]) -> Self {
         Self::from_pkl_bytes(bytes)
@@ -75,6 +90,6 @@ impl PersonalInfo for PersonalInfoBdsp {
     }
 
     fn source_name(&self) -> &'static str {
-        "Brilliant Diamond/Shining Pearl"
+        "Legends: Z-A"
     }
 }

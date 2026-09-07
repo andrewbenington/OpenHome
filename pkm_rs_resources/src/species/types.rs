@@ -3,10 +3,11 @@ use crate::ExpectLog;
 use crate::levelup::LevelupLearnsetMove;
 use crate::levelup::{LearnsetReader, LevelupLearnsetReader};
 use crate::species::GetSpeciesMetadata;
-use crate::species::form_metadata::{
-    BaseStats, base_stats_lookup, move_mastery_la_lookup, plus_moves_lza_lookup,
+use crate::species::metadata_table::{
+    BaseStats, MetadataTableReader, base_stats_lookup, current_metadata_reader,
+    metadata_reader_for, move_mastery_la_lookup, plus_moves_lza_lookup,
 };
-use crate::species::form_metadata::{levelup_learnset_lookup, types_lookup};
+use crate::species::metadata_table::{levelup_learnset_lookup, types_lookup};
 use crate::{Error, Result, abilities::AbilityIndexWasm, metadata_source::MetadataSource};
 use crate::{abilities::AbilityIndexBounded, levelup::LearnsetMoveJs};
 use pkm_rs_types::{AbilityNumber, GameSetting, Generation, NationalDex, PkmType, TeraType};
@@ -19,9 +20,9 @@ use pkm_rs_types::randomize::Randomize;
 use rand::RngExt;
 
 #[cfg(feature = "wasm")]
-use crate::species::form_metadata::current_base_stats;
+use crate::species::metadata_table::current_base_stats;
 #[cfg(feature = "wasm")]
-use crate::stats::Stat;
+use pkm_rs_types::Stat;
 #[cfg(feature = "wasm")]
 use pkm_rs_types::{Gender, Stats16Le};
 #[cfg(feature = "wasm")]
@@ -353,7 +354,7 @@ impl FormMetadata {
 
     #[cfg(feature = "wasm")]
     fn has_data_for_source(&self, source: MetadataSource) -> bool {
-        use crate::species::form_metadata::source_has_form_metadata;
+        use crate::species::metadata_table::source_has_form_metadata;
         source_has_form_metadata(source, self.national_dex as u16, self.form_index)
     }
 
@@ -519,11 +520,11 @@ impl FormMetadata {
     pub fn get_base_stat(&self, stat: Stat) -> u16 {
         let base_stats = self.get_base_stats();
         match stat {
-            Stat::HP => base_stats.hp,
+            Stat::Hp => base_stats.hp,
             Stat::Attack => base_stats.atk,
             Stat::Defense => base_stats.def,
-            Stat::SpecialAttack => base_stats.spa,
-            Stat::SpecialDefense => base_stats.spd,
+            Stat::SpAttack => base_stats.spa,
+            Stat::SpDefense => base_stats.spd,
             Stat::Speed => base_stats.spe,
         }
     }
@@ -720,15 +721,24 @@ impl SpeciesForm {
     pub fn get_plus_moves_lza(&self) -> Option<LevelupLearnsetReader> {
         plus_moves_lza_lookup(self.national_dex as u16, self.form_index)
     }
-}
 
-impl SpeciesForm {
     pub const fn get_species_metadata(&self) -> &'static SpeciesMetadata {
         super::get_ndex_species_metadata(self.national_dex)
     }
 
     pub const fn get_forme_metadata(&self) -> &'static FormMetadata {
         &self.get_species_metadata().forms[self.form_index as usize]
+    }
+
+    pub fn metadata_reader_for_source(
+        &self,
+        source: MetadataSource,
+    ) -> Option<MetadataTableReader> {
+        metadata_reader_for(source, self.national_dex as u16, self.form_index)
+    }
+
+    pub fn current_metadata_reader(&self) -> MetadataTableReader {
+        current_metadata_reader(self.national_dex as u16, self.form_index)
     }
 
     pub fn get_base_stats_from(&self, source: MetadataSource) -> Option<BaseStats> {

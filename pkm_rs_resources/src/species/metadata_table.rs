@@ -31,7 +31,7 @@ use crate::{
     metadata_source::MetadataSource,
     species::{
         form,
-        form_metadata::{
+        metadata_table::{
             gen1::{METADATA_TABLE_RB, METADATA_TABLE_YELLOW},
             gen2::{METADATA_TABLE_CRYSTAL, METADATA_TABLE_GS},
             gen3::{METADATA_TABLE_EMERALD, METADATA_TABLE_FRLG, METADATA_TABLE_RS},
@@ -301,7 +301,7 @@ impl MetadataTableReader {
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "baseStats"))]
-    pub fn base_stats(&self) -> BaseStats {
+    pub fn get_base_stats_wasm(&self) -> BaseStats {
         self.get_base_stats()
     }
 }
@@ -320,12 +320,13 @@ pub fn metadata_reader_for(
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "currentMetadataReader"))]
-pub fn current_metadata_reader(national_dex: u16, form_index: u16) -> Option<MetadataTableReader> {
+pub fn current_metadata_reader(national_dex: u16, form_index: u16) -> MetadataTableReader {
     MetadataTableReader::new(
         Box::new(most_recent_metadata_table_for(national_dex, form_index)),
         national_dex,
         form_index,
     )
+    .expect("most recent metadata table is not missing data for mon")
 }
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Serialize, Deserialize))]
@@ -489,7 +490,7 @@ mod tests {
     use super::*;
     use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
-    use crate::species::{FormMetadata, GetSpeciesMetadata, form_metadata::MetadataSource};
+    use crate::species::{FormMetadata, GetSpeciesMetadata, metadata_table::MetadataSource};
 
     const METADATA_SOURCES_IMPLEMENTED: [MetadataSource; 22] = [
         MetadataSource::RedBlue,

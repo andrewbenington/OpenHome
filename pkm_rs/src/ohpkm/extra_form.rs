@@ -7,7 +7,7 @@ use pkm_rs_resources::species::GenderRatio;
 use pkm_rs_resources::species::MegaEvolutionMetadata;
 use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_resources::species::SpeciesMetadata;
-use pkm_rs_resources::species::form_metadata::types_lookup;
+use pkm_rs_resources::species::metadata_table::types_lookup;
 use pkm_rs_types::AbilityNumber;
 use pkm_rs_types::GameSetting;
 use pkm_rs_types::Generation;
@@ -18,7 +18,7 @@ use strum::EnumIter;
 use strum::IntoEnumIterator;
 
 #[cfg(feature = "wasm")]
-use pkm_rs_resources::species::form_metadata::current_base_stats;
+use pkm_rs_resources::species::metadata_table::current_base_stats;
 #[cfg(feature = "wasm")]
 use pkm_rs_types::{Gender, Stats16Le};
 #[cfg(feature = "wasm")]

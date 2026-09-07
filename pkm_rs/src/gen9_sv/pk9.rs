@@ -142,12 +142,12 @@ impl Pk9 {
             .get_species_metadata()
             .calculate_level(buf.exp());
         let mint_nature: NatureIndex = buf.mint_nature()?;
-        let stats = stats::calculate_all_modern(
+        let stats = stats::calculate_all_modern_for_source(
             MetadataSource::ScarletViolet,
             species_and_form,
             &buf.ivs(),
             &buf.evs(),
-            level,
+            level as u16,
             mint_nature.get_metadata(),
             Some(buf.hyper_training()),
         )
@@ -348,12 +348,12 @@ impl Pk9 {
     }
 
     pub fn calculate_stats(&self) -> Stats16Le {
-        stats::calculate_all_modern(
+        stats::calculate_all_modern_for_source(
             MetadataSource::ScarletViolet,
             self.species_and_form.0,
             &self.ivs,
             &self.evs,
-            self.calculate_level(),
+            self.calculate_level() as u16,
             self.mint_nature.get_metadata(),
             Some(self.hyper_training),
         )

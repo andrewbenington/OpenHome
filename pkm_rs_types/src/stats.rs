@@ -1,4 +1,4 @@
-use std::num::TryFromIntError;
+use std::{fmt::Display, num::TryFromIntError};
 
 use crate::util::bit_is_set;
 use pkm_rs_derive::Stats;
@@ -11,13 +11,15 @@ use wasm_bindgen::prelude::*;
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum Stat {
     Hp,
-    Atk,
-    Def,
-    Spa,
-    Spd,
-    Spe,
+    Attack,
+    Defense,
+    SpAttack,
+    SpDefense,
+    Speed,
 }
 
 pub trait Stats: Sized {
@@ -27,8 +29,94 @@ pub trait Stats: Sized {
     fn get_spa(&self) -> u16;
     fn get_spd(&self) -> u16;
     fn get_spe(&self) -> u16;
+    fn get_stat(&self, stat: Stat) -> u16 {
+        match stat {
+            Stat::Hp => self.get_hp(),
+            Stat::Attack => self.get_atk(),
+            Stat::Defense => self.get_def(),
+            Stat::SpAttack => self.get_spa(),
+            Stat::SpDefense => self.get_spd(),
+            Stat::Speed => self.get_spe(),
+        }
+    }
 }
 
+impl<T: Stats> Stats for &T {
+    fn get_hp(&self) -> u16 {
+        (*self).get_hp()
+    }
+
+    fn get_atk(&self) -> u16 {
+        (*self).get_atk()
+    }
+
+    fn get_def(&self) -> u16 {
+        (*self).get_def()
+    }
+
+    fn get_spa(&self) -> u16 {
+        (*self).get_spa()
+    }
+
+    fn get_spd(&self) -> u16 {
+        (*self).get_spd()
+    }
+
+    fn get_spe(&self) -> u16 {
+        (*self).get_spe()
+    }
+}
+
+impl Stat {
+    pub const fn abbr(self) -> &'static str {
+        match self {
+            Stat::Hp => "HP",
+            Stat::Attack => "Atk",
+            Stat::Defense => "Def",
+            Stat::SpAttack => "SpA",
+            Stat::SpDefense => "SpD",
+            Stat::Speed => "Spe",
+        }
+    }
+}
+
+impl Display for Stat {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(match *self {
+            Stat::Hp => "HP",
+            Stat::Attack => "Attack",
+            Stat::Defense => "Defense",
+            Stat::SpAttack => "Special Attack",
+            Stat::SpDefense => "Special Defense",
+            Stat::Speed => "Speed",
+        })
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+pub struct StatAbbr;
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[allow(clippy::missing_const_for_fn)]
+impl StatAbbr {
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getLower"))]
+    pub fn get_lower(stat: Stat) -> String {
+        stat.abbr().to_lowercase()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "toStat"))]
+    pub fn to_stat(abbr: &str) -> Option<Stat> {
+        match abbr {
+            "HP" => Some(Stat::Hp),
+            "Atk" => Some(Stat::Attack),
+            "Def" => Some(Stat::Defense),
+            "SpA" => Some(Stat::SpAttack),
+            "SpD" => Some(Stat::SpDefense),
+            "Spe" => Some(Stat::Speed),
+            _ => None,
+        }
+    }
+}
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Deserialize, Clone, Copy, Stats, PartialEq, Eq)]
 pub struct Stats8 {
@@ -130,22 +218,22 @@ impl Stats8 {
     pub const fn get(&self, stat: Stat) -> u8 {
         match stat {
             Stat::Hp => self.hp,
-            Stat::Atk => self.atk,
-            Stat::Def => self.def,
-            Stat::Spa => self.spa,
-            Stat::Spd => self.spd,
-            Stat::Spe => self.spe,
+            Stat::Attack => self.atk,
+            Stat::Defense => self.def,
+            Stat::SpAttack => self.spa,
+            Stat::SpDefense => self.spd,
+            Stat::Speed => self.spe,
         }
     }
 
     pub const fn set(&mut self, stat: Stat, value: u8) {
         match stat {
             Stat::Hp => self.hp = value,
-            Stat::Atk => self.atk = value,
-            Stat::Def => self.def = value,
-            Stat::Spa => self.spa = value,
-            Stat::Spd => self.spd = value,
-            Stat::Spe => self.spe = value,
+            Stat::Attack => self.atk = value,
+            Stat::Defense => self.def = value,
+            Stat::SpAttack => self.spa = value,
+            Stat::SpDefense => self.spd = value,
+            Stat::Speed => self.spe = value,
         }
     }
 }
@@ -226,34 +314,34 @@ impl Randomize for Ivs {
 
 impl Stats for Ivs {
     fn get_hp(&self) -> u16 {
-        self.0.hp as u16
+        self.0.get_hp()
     }
 
     fn get_atk(&self) -> u16 {
-        self.0.atk as u16
+        self.0.get_atk()
     }
 
     fn get_def(&self) -> u16 {
-        self.0.def as u16
+        self.0.get_def()
     }
 
     fn get_spa(&self) -> u16 {
-        self.0.spa as u16
+        self.0.get_spa()
     }
 
     fn get_spd(&self) -> u16 {
-        self.0.spd as u16
+        self.0.get_spd()
     }
 
     fn get_spe(&self) -> u16 {
-        self.0.spe as u16
+        self.0.get_spe()
     }
 }
 
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[cfg_attr(feature = "wasm", derive(Tsify))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
-#[derive(Debug, Default, PartialEq, Eq, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Eq, Clone, Copy, Serialize, Deserialize, Stats)]
 pub struct Stats16Le {
     pub hp: u16,
     pub atk: u16,
@@ -363,11 +451,11 @@ impl IntoIterator for Stats8 {
     fn into_iter(self) -> Self::IntoIter {
         [
             (Stat::Hp, self.hp),
-            (Stat::Atk, self.atk),
-            (Stat::Def, self.def),
-            (Stat::Spa, self.spa),
-            (Stat::Spd, self.spd),
-            (Stat::Spe, self.spe),
+            (Stat::Attack, self.atk),
+            (Stat::Defense, self.def),
+            (Stat::SpAttack, self.spa),
+            (Stat::SpDefense, self.spd),
+            (Stat::Speed, self.spe),
         ]
         .into_iter()
     }
@@ -414,11 +502,11 @@ impl HyperTraining {
     pub const fn by_stat(self, stat: Stat) -> bool {
         match stat {
             Stat::Hp => self.hp,
-            Stat::Atk => self.atk,
-            Stat::Def => self.def,
-            Stat::Spa => self.spa,
-            Stat::Spd => self.spd,
-            Stat::Spe => self.spe,
+            Stat::Attack => self.atk,
+            Stat::Defense => self.def,
+            Stat::SpAttack => self.spa,
+            Stat::SpDefense => self.spd,
+            Stat::Speed => self.spe,
         }
     }
 
@@ -441,11 +529,11 @@ impl IntoIterator for HyperTraining {
     fn into_iter(self) -> Self::IntoIter {
         [
             (Stat::Hp, self.hp),
-            (Stat::Atk, self.atk),
-            (Stat::Def, self.def),
-            (Stat::Spa, self.spa),
-            (Stat::Spd, self.spd),
-            (Stat::Spe, self.spe),
+            (Stat::Attack, self.atk),
+            (Stat::Defense, self.def),
+            (Stat::SpAttack, self.spa),
+            (Stat::SpDefense, self.spd),
+            (Stat::Speed, self.spe),
         ]
         .into_iter()
     }

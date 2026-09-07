@@ -322,12 +322,12 @@ impl Pk8 {
     }
 
     pub fn calculate_stats(&self) -> Stats16Le {
-        stats::calculate_all_modern(
+        stats::calculate_all_modern_for_source(
             MetadataSource::SwordShield,
             self.species_and_form.0,
             &self.ivs,
             &self.evs,
-            self.calculate_level(),
+            self.calculate_level() as u16,
             self.mint_nature.get_metadata(),
             Some(self.hyper_training),
         )
