@@ -4,12 +4,12 @@ import { Errorable, R } from '@openhome-core/util/functional'
 import { FourMoves } from '@openhome-core/util/types'
 import {
   BinaryGender,
+  calculateStatsGen1,
   ConvertStrategy,
   Generation,
   ItemGen1,
   Language,
   Lookup,
-  MetadataSource,
   MetadataSummaryLookup,
   OriginGames,
   SpeciesLookup,
@@ -21,7 +21,6 @@ import { MoveFilter } from '../util/util'
 import * as conversion from './conversion'
 import { PkmConverter } from './conversion/converter'
 import { PkmConstructorOptions } from './PKM'
-import { getStats } from './util/statCalc'
 
 export default class PK1 {
   static getFormat() {
@@ -199,7 +198,7 @@ export default class PK1 {
   }
 
   public getStats() {
-    return getStats(this, MetadataSource.Yellow)
+    return calculateStatsGen1(this.nationalDex, this.dvs, this.evsG12, this.level)
   }
 
   public get gender() {

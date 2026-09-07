@@ -24,12 +24,12 @@ import * as types from '../util/types'
 import { MoveFilter } from '../util/util'
 import { PkmConstructorOptions } from './PKM'
 import { PkmConverter } from './conversion/converter'
+import { modernStatCalc } from './util'
 import {
   filterRibbons,
   gen3ContestRibbonsFromBytes,
   gen3ContestRibbonsToBytes,
 } from './util/ribbonLogic'
-import { getStats } from './util/statCalc'
 
 export default class COLOPKM {
   static getFormat() {
@@ -223,7 +223,7 @@ export default class COLOPKM {
   }
 
   public getStats() {
-    return getStats(this)
+    return modernStatCalc(this)
   }
 
   public get gender() {

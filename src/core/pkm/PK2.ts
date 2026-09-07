@@ -5,6 +5,7 @@ import { Errorable, R } from '@openhome-core/util/functional'
 import { FourMoves } from '@openhome-core/util/types'
 import {
   BinaryGender,
+  calculateStatsGen2,
   ConvertStrategy,
   Generation,
   ItemGen2,
@@ -19,7 +20,6 @@ import * as types from '../util/types'
 import { MoveFilter } from '../util/util'
 import { PkmConverter } from './conversion/converter'
 import { PkmConstructorOptions } from './PKM'
-import { getStats } from './util/statCalc'
 
 export default class PK2 {
   static getFormat() {
@@ -234,7 +234,7 @@ export default class PK2 {
   }
 
   public getStats() {
-    return getStats(this)
+    return calculateStatsGen2(this.nationalDex, this.dvs, this.evsG12, this.level)
   }
 
   public get gender() {

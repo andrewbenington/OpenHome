@@ -5,11 +5,11 @@ import {
   LGPE_TRANSFER_RESTRICTIONS,
 } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { isContestStats, isStandardStats, isStatsPreSplit, Stats } from '@openhome-core/util/types'
+import { isContestStats, isStandardStats, isStatsPreSplit } from '@openhome-core/util/types'
 import SheenStars from '@openhome-ui/components/pokemon/SheenStars'
 import StatsTable from '@openhome-ui/components/pokemon/StatsTable'
 import { colorIsDark } from '@openhome-ui/util/color'
-import { StatAbbr, StatsPreSplit } from '@pkm-rs/pkg'
+import { StatAbbr } from '@pkm-rs/pkg'
 import { Select } from '@radix-ui/themes'
 import {
   ChartDataset,
@@ -152,19 +152,11 @@ export default function StatsDisplay(props: { mon: PKMInterface }) {
   }
 
   const labels = useMemo(() => {
-    switch (display) {
-      case 'Contest':
-        return ['Cool', 'Beauty', 'Cute', 'Smart', 'Tough']
-      case 'EVs':
-        return evType === 'Game Boy'
-          ? ['HP', 'Atk', 'Def', 'Spe', 'Spc']
-          : ['HP', 'Atk', 'Def', 'Spe', 'SpD', 'SpA']
-      case 'DVs':
-        return ['HP', 'Atk', 'Def', 'Spe', 'Spc']
-      default:
-        return ['HP', 'Atk', 'Def', 'Spe', 'SpD', 'SpA']
-    }
-  }, [display, evType])
+    if (isStatsPreSplit(displayedStats)) return ['HP', 'Atk', 'Def', 'Spe', 'Spc']
+    if (isContestStats(displayedStats)) return ['Cool', 'Beauty', 'Cute', 'Smart', 'Tough']
+
+    return ['HP', 'Atk', 'Def', 'Spe', 'SpD', 'SpA']
+  }, [displayedStats])
 
   const plugins = {
     tooltip: {
@@ -224,13 +216,15 @@ export default function StatsDisplay(props: { mon: PKMInterface }) {
           data={{ labels, datasets: [dataset] }}
         />
       </div>
+      {JSON.stringify(displayedStats)}
+      {String(isStandardStats(displayedStats)) + String(isStatsPreSplit(displayedStats))}
       {isStandardStats(displayedStats) ? (
         <StatsTable.Standard
-          stats={displayedStats as unknown as Stats}
+          stats={displayedStats}
           hyperTrain={display === 'IVs' ? mon.hyperTraining : undefined}
         />
       ) : isStatsPreSplit(displayedStats) ? (
-        <StatsTable.GameBoy stats={displayedStats as unknown as StatsPreSplit} />
+        <StatsTable.GameBoy stats={displayedStats} />
       ) : isContestStats(displayedStats) ? (
         <StatsTable.Contest stats={displayedStats} />
       ) : null}

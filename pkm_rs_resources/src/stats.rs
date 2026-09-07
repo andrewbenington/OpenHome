@@ -5,7 +5,7 @@ use crate::species::SpeciesForm;
 use crate::species::metadata_table::BaseStats;
 use crate::{metadata_source::MetadataSource, species::metadata_table::MetadataTableReader};
 
-use pkm_rs_types::{HyperTraining, Stat, Stats, Stats16Le, StatsPreSplit};
+use pkm_rs_types::{HyperTraining, NationalDex, Stat, Stats, Stats16Le, StatsPreSplit};
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
@@ -208,12 +208,13 @@ fn calculate_stat_gameboy(base_stat: u16, dv: u16, ev: u16, level: u16, is_hp: b
 }
 
 pub fn calculate_stats_gen1(
-    species_form: SpeciesForm,
+    national_dex: NationalDex,
     dvs: &StatsPreSplit,
     evs: &StatsPreSplit,
     level: u16,
 ) -> Option<StatsPreSplit> {
-    let BaseStats::PreSplit(base) = species_form.get_base_stats_from(MetadataSource::Yellow)?
+    let BaseStats::PreSplit(base) =
+        SpeciesForm::base_form(national_dex).get_base_stats_from(MetadataSource::Yellow)?
     else {
         panic!("Pokémon Yellow base stats should have a unified Special stat")
     };
@@ -228,12 +229,14 @@ pub fn calculate_stats_gen1(
 }
 
 pub fn calculate_stats_gen2(
-    species_form: SpeciesForm,
+    national_dex: NationalDex,
     dvs: &StatsPreSplit,
     evs: &StatsPreSplit,
     level: u16,
 ) -> Option<Stats16Le> {
-    let BaseStats::Modern(base) = species_form.get_base_stats_from(MetadataSource::Crystal)? else {
+    let BaseStats::Modern(base) =
+        SpeciesForm::base_form(national_dex).get_base_stats_from(MetadataSource::Crystal)?
+    else {
         panic!("Pokémon Crystal base stats should have a split Special stat")
     };
     let base = Stats16Le::from(base);
@@ -250,28 +253,33 @@ pub fn calculate_stats_gen2(
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = calculateStatsGen1))]
 pub fn calculate_stats_gen1_wasm(
-    species_form: SpeciesForm,
+    national_dex: u16,
     dvs: &StatsPreSplit,
     evs: &StatsPreSplit,
     level: u16,
 ) -> StatsPreSplit {
-    calculate_stats_gen1(species_form, dvs, evs, level).unwrap_or_default()
+    let Ok(national_dex) = NationalDex::try_from(national_dex) else {
+        return Default::default();
+    };
+    calculate_stats_gen1(national_dex, dvs, evs, level).unwrap_or_default()
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = calculateStatsGen2))]
 pub fn calculate_stats_gen2_wasm(
-    species_form: SpeciesForm,
+    national_dex: u16,
     dvs: &StatsPreSplit,
     evs: &StatsPreSplit,
     level: u16,
 ) -> Stats16Le {
-    calculate_stats_gen2(species_form, dvs, evs, level).unwrap_or_default()
+    let Ok(national_dex) = NationalDex::try_from(national_dex) else {
+        return Default::default();
+    };
+    calculate_stats_gen2(national_dex, dvs, evs, level).unwrap_or_default()
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::species::SpeciesForm;
 
     use pkm_rs_types::{NationalDex, Stats16Le, StatsPreSplit};
 
@@ -305,13 +313,8 @@ mod tests {
         };
         let level: u16 = 81;
 
-        let stats_calculated = calculate_stats_gen2(
-            SpeciesForm::base_form(NationalDex::Pikachu),
-            &dvs,
-            &evs,
-            level,
-        )
-        .expect("Pikachu stat calc via Pokémon Crystal is not None");
+        let stats_calculated = calculate_stats_gen2(NationalDex::Pikachu, &dvs, &evs, level)
+            .expect("Pikachu stat calc via Pokémon Crystal is not None");
 
         assert_eq!(
             stats_calculated,
