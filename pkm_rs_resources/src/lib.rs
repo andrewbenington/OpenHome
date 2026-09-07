@@ -4,7 +4,6 @@ mod result;
 
 pub mod abilities;
 pub mod ball;
-pub mod helpers;
 pub mod items;
 pub mod levelup;
 pub mod lookup;

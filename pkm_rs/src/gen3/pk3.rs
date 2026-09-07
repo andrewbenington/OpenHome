@@ -24,7 +24,7 @@ use pkm_rs_resources::moves::MoveSlots;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::Gen3RibbonSet;
 use pkm_rs_resources::species::{FormMetadata, SpeciesForm, SpeciesMetadata};
-use pkm_rs_resources::{helpers, lookup};
+use pkm_rs_resources::{lookup, stats};
 #[cfg(feature = "wasm")]
 use pkm_rs_types::AbilityNumber;
 #[cfg(feature = "randomize")]
@@ -258,7 +258,7 @@ impl Pk3 {
     }
 
     pub fn calculate_stats(&self) -> Stats16Le {
-        helpers::calculate_stats_modern(
+        stats::calculate_all_modern(
             MetadataSource::Emerald,
             self.species_and_form(),
             &self.ivs,
