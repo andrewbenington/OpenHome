@@ -71,7 +71,7 @@ impl DataSection for GameboyData {
 
         // try_into() will always succeed thanks to the buffer size check
         Ok(Self {
-            dvs: Dvs::from(StatsPreSplit::from_dv_bytes(array_ref!(bytes, 0, 2))), // stored as StatsPreSplit before the Dvs struct was added, so byte (de)serializerion still uses StatsPreSplit
+            dvs: Dvs::from_bytes(array_ref!(bytes, 0, 2)), // stored as StatsPreSplit before the Dvs struct was added, so byte (de)serializerion still uses StatsPreSplit
             met_time_of_day: bytes[2],
             evs_g12: StatsPreSplit::from_bytes_u16_le(bytes[3..13].try_into().unwrap()),
         })
@@ -80,7 +80,7 @@ impl DataSection for GameboyData {
     fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = [0u8; 13];
 
-        bytes[0..2].copy_from_slice(&StatsPreSplit::from(self.dvs).to_bytes()); // stored as StatsPreSplit before the Dvs struct was added, so byte (de)serializerion still uses StatsPreSplit
+        bytes[0..2].copy_from_slice(&self.dvs.to_bytes()); // stored as StatsPreSplit before the Dvs struct was added, so byte (de)serializerion still uses StatsPreSplit
         bytes[2] = self.met_time_of_day;
         bytes[3..13].copy_from_slice(&self.evs_g12.to_bytes());
 
