@@ -177,7 +177,7 @@ impl MetadataSource {
     }
 
     pub fn supports_form(&self, species_form: SpeciesForm) -> bool {
-        species::form_metadata::source_has_form_metadata(
+        species::metadata_table::source_has_form_metadata(
             *self,
             species_form.get_ndex() as u16,
             species_form.get_forme_index(),
