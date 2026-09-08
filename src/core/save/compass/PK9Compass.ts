@@ -2,7 +2,7 @@ import { PluginPKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import PK9 from '@openhome-core/pkm/PK9'
 import { PkmConstructorOptions } from '@openhome-core/pkm/PKM'
-import { getStats } from '@openhome-core/pkm/util/statCalc'
+import { modernStatCalc } from '@openhome-core/pkm/util'
 import { Errorable, R } from '@openhome-core/util/functional'
 import { ConvertStrategy, OriginGames, Pk9Wasm, PkmFormat } from '@pkm-rs/pkg'
 import { PluginIdentifier } from '../interfaces'
@@ -47,6 +47,6 @@ export default class PK9Compass extends PK9 implements PluginPKMInterface {
   }
 
   public getStats() {
-    return getStats(this)
+    return modernStatCalc(this)
   }
 }

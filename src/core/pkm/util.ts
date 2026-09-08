@@ -15,6 +15,7 @@ import { FourMoves, Stats } from '@openhome-core/util/types'
 import {
   AbilityIndex,
   AbilityNumber,
+  calculateStats,
   currentMetadataReader,
   extraFormTypeOverride,
   FormMetadata,
@@ -28,6 +29,7 @@ import {
   StatsPreSplit,
 } from '@pkm-rs/pkg'
 import Prando from 'prando'
+import { AllPKMs, PKMWithModernEVs, PKMWithModernIVs, PKMWithNature } from './util/interfaces'
 
 export const getAbilityFromNumber = (
   nationalDex: number,
@@ -424,3 +426,30 @@ export function toHex(bytes: Uint8Array) {
 }
 
 export type PkmOrOhpkmFormat = PkmFormat | 'OHPKM'
+
+interface PKMWithStandardStats extends AllPKMs, PKMWithModernIVs, PKMWithModernEVs, PKMWithNature {}
+
+export const modernStatCalc = (
+  mon: PKMWithStandardStats,
+  metadataSource: MetadataSource = MetadataSource.ScarletViolet
+): Stats => {
+  const speciesForm = SpeciesForm.tryNew(mon.nationalDex, mon.formIndex)
+  return speciesForm
+    ? calculateStats(
+        speciesForm,
+        mon.ivs,
+        mon.evs,
+        mon.getLevel(),
+        mon.nature,
+        mon.hyperTraining,
+        metadataSource
+      )
+    : {
+        hp: 0,
+        atk: 0,
+        def: 0,
+        spe: 0,
+        spa: 0,
+        spd: 0,
+      }
+}

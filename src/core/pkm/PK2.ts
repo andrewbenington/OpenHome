@@ -5,6 +5,7 @@ import { Errorable, R } from '@openhome-core/util/functional'
 import { FourMoves } from '@openhome-core/util/types'
 import {
   BinaryGender,
+  calculateStatsGen2,
   ConvertStrategy,
   Generation,
   ItemGen2,
@@ -19,7 +20,6 @@ import * as types from '../util/types'
 import { MoveFilter } from '../util/util'
 import { PkmConverter } from './conversion/converter'
 import { PkmConstructorOptions } from './PKM'
-import { getLevelGen12, getStats } from './util/statCalc'
 
 export default class PK2 {
   static getFormat() {
@@ -154,6 +154,7 @@ export default class PK2 {
         spe: 0,
         spc: 0,
       }
+
       this.dvs = other.dvs ?? {
         hp: 0,
         atk: 0,
@@ -161,6 +162,7 @@ export default class PK2 {
         spe: 0,
         spc: 0,
       }
+
       this.trainerFriendship = other.trainerFriendship ?? 0
       this.pokerusByte = other.pokerusByte ?? 0
       this.metTimeOfDay = other.metTimeOfDay ?? 0
@@ -171,7 +173,7 @@ export default class PK2 {
       this.trainerName = other.trainerName
       this.nickname = converter.nickname(other)
       this.trainerGender = other.trainerGender
-      this.level = getLevelGen12(this.nationalDex, this.exp)
+      this.level = this.getLevel()
     }
   }
 
@@ -234,7 +236,7 @@ export default class PK2 {
   }
 
   public getStats() {
-    return getStats(this)
+    return calculateStatsGen2(this.nationalDex, this.dvs, this.evsG12, this.level)
   }
 
   public get gender() {
@@ -266,7 +268,7 @@ export default class PK2 {
   }
 
   public getLevel() {
-    return getLevelGen12(this.nationalDex, this.exp)
+    return this.speciesMetadata?.calculateLevel(this.exp) ?? 1
   }
 
   isShiny() {

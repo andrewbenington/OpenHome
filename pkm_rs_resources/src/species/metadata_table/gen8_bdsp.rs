@@ -1,30 +1,18 @@
-use crate::levelup::{LevelupLearnsetFileReader, LevelupLearnsetReader};
-use crate::pkhex_bin::{LA_LEVELUP_PKL, LA_MASTERY_PKL, LA_PERSONAL_FILE};
-use crate::species::form_metadata::{BaseStats, GameMetadata, PersonalInfo};
+use crate::pkhex_bin::{BDSP_LEVELUP_PKL, BDSP_PERSONAL_FILE};
+use crate::species::metadata_table::{BaseStats, GameMetadata, PersonalInfo};
 use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
-const LA_ENTRY_SIZE: usize = 0xB0;
+const BDSP_ENTRY_SIZE: usize = 0x44;
 
-type GameMetadataLa = GameMetadata<PersonalInfoLa, LA_ENTRY_SIZE>;
+type GameMetadataBdsp = GameMetadata<PersonalInfoBdsp, BDSP_ENTRY_SIZE>;
 
-pub static METADATA_TABLE_LA: GameMetadataLa =
-    GameMetadataLa::from_binary(LA_PERSONAL_FILE, LA_LEVELUP_PKL);
-
-const LA_MOVE_MASTERY: LevelupLearnsetFileReader =
-    LevelupLearnsetFileReader::from_pkl(LA_MASTERY_PKL);
-
-pub fn get_levelup_mastery(national_dex: u16, form_index: u16) -> Option<LevelupLearnsetReader> {
-    LA_MOVE_MASTERY.learnset_at_index(
-        METADATA_TABLE_LA
-            .personal
-            .get_game_index(national_dex, form_index)?,
-    )
-}
+pub static METADATA_TABLE_BDSP: GameMetadataBdsp =
+    GameMetadataBdsp::from_binary(BDSP_PERSONAL_FILE, BDSP_LEVELUP_PKL);
 
 #[derive(Debug, Clone, Copy)]
-pub struct PersonalInfoLa([u8; LA_ENTRY_SIZE]);
+pub struct PersonalInfoBdsp([u8; BDSP_ENTRY_SIZE]);
 
-impl PersonalInfoLa {
+impl PersonalInfoBdsp {
     pub fn from_pkl_bytes(bytes: &[u8]) -> Self {
         Self(bytes.try_into().unwrap())
     }
@@ -34,12 +22,11 @@ impl PersonalInfoLa {
     }
 
     pub fn forms_offset(&self) -> Option<u16> {
-        // while other modern games store -1 (0xff) for mons not present, legends arceus stores 0
-        let stored_index = u16::from_le_bytes(self.0[0x1E..0x20].try_into().unwrap());
-        if stored_index == 0 {
+        let stored_index = i16::from_le_bytes(self.0[0x1e..0x20].try_into().unwrap());
+        if stored_index == -1 {
             None
         } else {
-            Some(stored_index)
+            Some(stored_index as u16)
         }
     }
 
@@ -60,7 +47,7 @@ impl PersonalInfoLa {
     }
 
     pub const fn form_count(&self) -> u8 {
-        self.0[0x1A]
+        self.0[0x20]
     }
 
     const fn is_present_in_game(&self) -> bool {
@@ -68,8 +55,8 @@ impl PersonalInfoLa {
     }
 }
 
-impl PersonalInfo for PersonalInfoLa {
-    const MAX_NATIONAL_DEX: NationalDex = NationalDex::Enamorus;
+impl PersonalInfo for PersonalInfoBdsp {
+    const MAX_NATIONAL_DEX: NationalDex = NationalDex::Arceus;
 
     fn from_pkl_bytes(bytes: &'static [u8]) -> Self {
         Self::from_pkl_bytes(bytes)
@@ -88,18 +75,6 @@ impl PersonalInfo for PersonalInfoLa {
     }
 
     fn source_name(&self) -> &'static str {
-        "Legends: Arceus"
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn spiky_pichu_not_present() {
-        let index = METADATA_TABLE_LA.get_game_index(NationalDex::Pichu as u16, 1);
-
-        assert!(index.is_none());
+        "Brilliant Diamond/Shining Pearl"
     }
 }

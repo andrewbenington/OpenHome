@@ -1,6 +1,7 @@
+use pkm_rs_types::Stat;
 use serde::{Serialize, Serializer};
 
-use crate::{Error, stats::Stat};
+use crate::Error;
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
@@ -183,7 +184,7 @@ const ADAMANT: NatureMetadata = NatureMetadata {
     name: "Adamant",
     stats: Some(NatureStatData {
         increase: Stat::Attack,
-        decrease: Stat::SpecialAttack,
+        decrease: Stat::SpAttack,
     }),
 };
 
@@ -191,7 +192,7 @@ const NAUGHTY: NatureMetadata = NatureMetadata {
     name: "Naughty",
     stats: Some(NatureStatData {
         increase: Stat::Attack,
-        decrease: Stat::SpecialDefense,
+        decrease: Stat::SpDefense,
     }),
 };
 
@@ -220,7 +221,7 @@ const IMPISH: NatureMetadata = NatureMetadata {
     name: "Impish",
     stats: Some(NatureStatData {
         increase: Stat::Defense,
-        decrease: Stat::SpecialAttack,
+        decrease: Stat::SpAttack,
     }),
 };
 
@@ -228,7 +229,7 @@ const LAX: NatureMetadata = NatureMetadata {
     name: "Lax",
     stats: Some(NatureStatData {
         increase: Stat::Defense,
-        decrease: Stat::SpecialDefense,
+        decrease: Stat::SpDefense,
     }),
 };
 
@@ -257,7 +258,7 @@ const JOLLY: NatureMetadata = NatureMetadata {
     name: "Jolly",
     stats: Some(NatureStatData {
         increase: Stat::Speed,
-        decrease: Stat::SpecialAttack,
+        decrease: Stat::SpAttack,
     }),
 };
 
@@ -265,14 +266,14 @@ const NAIVE: NatureMetadata = NatureMetadata {
     name: "Naive",
     stats: Some(NatureStatData {
         increase: Stat::Speed,
-        decrease: Stat::SpecialDefense,
+        decrease: Stat::SpDefense,
     }),
 };
 
 const MODEST: NatureMetadata = NatureMetadata {
     name: "Modest",
     stats: Some(NatureStatData {
-        increase: Stat::SpecialAttack,
+        increase: Stat::SpAttack,
         decrease: Stat::Attack,
     }),
 };
@@ -280,7 +281,7 @@ const MODEST: NatureMetadata = NatureMetadata {
 const MILD: NatureMetadata = NatureMetadata {
     name: "Mild",
     stats: Some(NatureStatData {
-        increase: Stat::SpecialAttack,
+        increase: Stat::SpAttack,
         decrease: Stat::Defense,
     }),
 };
@@ -288,7 +289,7 @@ const MILD: NatureMetadata = NatureMetadata {
 const QUIET: NatureMetadata = NatureMetadata {
     name: "Quiet",
     stats: Some(NatureStatData {
-        increase: Stat::SpecialAttack,
+        increase: Stat::SpAttack,
         decrease: Stat::Speed,
     }),
 };
@@ -301,15 +302,15 @@ const BASHFUL: NatureMetadata = NatureMetadata {
 const RASH: NatureMetadata = NatureMetadata {
     name: "Rash",
     stats: Some(NatureStatData {
-        increase: Stat::SpecialAttack,
-        decrease: Stat::SpecialDefense,
+        increase: Stat::SpAttack,
+        decrease: Stat::SpDefense,
     }),
 };
 
 const CALM: NatureMetadata = NatureMetadata {
     name: "Calm",
     stats: Some(NatureStatData {
-        increase: Stat::SpecialDefense,
+        increase: Stat::SpDefense,
         decrease: Stat::Attack,
     }),
 };
@@ -317,7 +318,7 @@ const CALM: NatureMetadata = NatureMetadata {
 const GENTLE: NatureMetadata = NatureMetadata {
     name: "Gentle",
     stats: Some(NatureStatData {
-        increase: Stat::SpecialDefense,
+        increase: Stat::SpDefense,
         decrease: Stat::Defense,
     }),
 };
@@ -325,7 +326,7 @@ const GENTLE: NatureMetadata = NatureMetadata {
 const SASSY: NatureMetadata = NatureMetadata {
     name: "Sassy",
     stats: Some(NatureStatData {
-        increase: Stat::SpecialDefense,
+        increase: Stat::SpDefense,
         decrease: Stat::Speed,
     }),
 };
@@ -333,8 +334,8 @@ const SASSY: NatureMetadata = NatureMetadata {
 const CAREFUL: NatureMetadata = NatureMetadata {
     name: "Careful",
     stats: Some(NatureStatData {
-        increase: Stat::SpecialDefense,
-        decrease: Stat::SpecialAttack,
+        increase: Stat::SpDefense,
+        decrease: Stat::SpAttack,
     }),
 };
 

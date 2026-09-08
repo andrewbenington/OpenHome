@@ -32,9 +32,9 @@ import { MoveFilter } from '../util/util'
 import * as conversion from './conversion'
 import { PkmConverter } from './conversion/converter'
 import { PkmConstructorOptions } from './PKM'
+import { modernStatCalc } from './util'
 import * as encryption from './util/encryption'
 import { filterRibbons } from './util/ribbonLogic'
-import { getStats } from './util/statCalc'
 
 export default class PA9 {
   static getFormat() {
@@ -485,7 +485,7 @@ export default class PA9 {
   }
 
   public getStats() {
-    return getStats(this)
+    return modernStatCalc(this)
   }
 
   public recalculateStats() {

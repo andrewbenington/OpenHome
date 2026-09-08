@@ -143,14 +143,14 @@ impl MetadataSources {
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "supportsForm"))]
     pub fn supports_form(source: MetadataSource, national_dex: u16, form_index: u16) -> bool {
-        species::form_metadata::source_has_form_metadata(source, national_dex, form_index)
+        species::metadata_table::source_has_form_metadata(source, national_dex, form_index)
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "supportedGameOrigins"))]
     pub fn supported_game_origins(national_dex: u16, form_index: u16) -> Vec<OriginGame> {
         MetadataSource::iter()
             .filter(|source| {
-                species::form_metadata::source_has_form_metadata(*source, national_dex, form_index)
+                species::metadata_table::source_has_form_metadata(*source, national_dex, form_index)
             })
             .flat_map(MetadataSource::all_origin_games)
             .collect()

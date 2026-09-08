@@ -2,7 +2,7 @@ import { getMoveMaxPP } from '@openhome-core/pkm'
 import { PkmConverter } from '@openhome-core/pkm/conversion/converter'
 import { PluginPKMInterface, RomHackFormat } from '@openhome-core/pkm/interfaces'
 import { PkmConstructorOptions } from '@openhome-core/pkm/PKM'
-import { getStandardPKMStats } from '@openhome-core/pkm/util/index'
+import { modernStatCalc } from '@openhome-core/pkm/util'
 import {
   generatePersonalityValuePreservingAttributes,
   getFlag,
@@ -433,7 +433,7 @@ export default abstract class PK3CFRU implements PluginPKMInterface {
   }
 
   public getStats() {
-    return getStandardPKMStats(this)
+    return modernStatCalc(this)
   }
 
   public get gender() {

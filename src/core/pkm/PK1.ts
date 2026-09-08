@@ -4,13 +4,17 @@ import { Errorable, R } from '@openhome-core/util/functional'
 import { FourMoves } from '@openhome-core/util/types'
 import {
   BinaryGender,
+  calculateStatsGen1,
   ConvertStrategy,
   Generation,
   ItemGen1,
   Language,
   Lookup,
+  metadataReaderFor,
+  MetadataSource,
   MetadataSummaryLookup,
   OriginGames,
+  PkmTypes,
   SpeciesLookup,
   StatsPreSplit,
 } from '@pkm-rs/pkg'
@@ -20,7 +24,9 @@ import { MoveFilter } from '../util/util'
 import * as conversion from './conversion'
 import { PkmConverter } from './conversion/converter'
 import { PkmConstructorOptions } from './PKM'
-import { getLevelGen12, getStats } from './util/statCalc'
+
+const BOX_SIZE_WESTERN = 69
+const BOX_SIZE_JAPAN = 59
 
 export default class PK1 {
   static getFormat() {
@@ -109,11 +115,15 @@ export default class PK1 {
       this.gameOfOrigin = other.gameOfOrigin
       this.language = other.language
       this.nationalDex = other.nationalDex
-      this.currentHP = other.currentHP ?? 0
-      this.level = 0
       this.statusCondition = 0
-      this.type1 = 0
-      this.type2 = 0
+
+      const metadataReader = metadataReaderFor(MetadataSource.Yellow, this.nationalDex, 0)
+
+      const type1Enum = metadataReader?.type1()
+      this.type1 = type1Enum ? PkmTypes.toGameboyIndex(type1Enum) : 0
+      const type2Enum = metadataReader?.type2()
+      this.type2 = type2Enum ? PkmTypes.toGameboyIndex(type2Enum) : 0
+
       this.heldItemIndexGen1 = ItemGen1.fromModern(other.heldItemIndex)
 
       const moveFilter = MoveFilter.fromPkmClass(PK1)
@@ -140,12 +150,15 @@ export default class PK1 {
         spe: 0,
         spc: 0,
       }
+
       this.dvs = other.dvs
+
       this.trainerName = other.trainerName
       this.nickname = converter.nickname(other)
     }
 
-    this.level = getLevelGen12(this.nationalDex, this.exp)
+    this.level = this.getLevel()
+    this.currentHP = this.getStats().hp
   }
 
   static fromBytes(buffer: ArrayBuffer): PK1 {
@@ -157,7 +170,9 @@ export default class PK1 {
   }
 
   toBytes(options?: types.ToBytesOptions): ArrayBuffer {
-    const buffer = new ArrayBuffer(options?.includeExtraFields ? 66 : 33)
+    const buffer = new ArrayBuffer(
+      this.language === Language.Japanese ? BOX_SIZE_JAPAN : BOX_SIZE_WESTERN
+    )
     const dataView = new DataView(buffer)
 
     dataView.setUint8(0x0, conversion.toGen1PokemonIndex(this.nationalDex))
@@ -187,6 +202,14 @@ export default class PK1 {
       byteLogic.uIntToBufferBits(dataView, this.movePPUps[i], 0x1d + i, 6, 2, false)
     }
 
+    const stats = this.getStats()
+    dataView.setUint8(0x21, this.getLevel())
+    dataView.setUint16(0x22, stats.hp, false)
+    dataView.setUint16(0x24, stats.atk, false)
+    dataView.setUint16(0x26, stats.def, false)
+    dataView.setUint16(0x28, stats.spe, false)
+    dataView.setUint16(0x2a, stats.spc, false)
+
     if (options?.includeExtraFields) {
       stringLogic.writeGameBoyStringToBytes(dataView, this.trainerName, 0x2c, 8, true)
     }
@@ -198,7 +221,7 @@ export default class PK1 {
   }
 
   public getStats() {
-    return getStats(this)
+    return calculateStatsGen1(this.nationalDex, this.dvs, this.evsG12, this.level)
   }
 
   public get gender() {
@@ -226,7 +249,7 @@ export default class PK1 {
   }
 
   public getLevel() {
-    return getLevelGen12(this.nationalDex, this.exp)
+    return this.speciesMetadata?.calculateLevel(this.exp) ?? 1
   }
 
   isShiny() {
