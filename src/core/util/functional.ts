@@ -152,6 +152,40 @@ export function isResult<T, V>(v: object): v is Result<T, V> {
   )
 }
 
+// A Result that may still be in flight. Unlike Option, a Result always carries a
+// definite ok/error status, so there's no "nothing yet" state to fold in here the
+// way PromisedOptionBox does with null/undefined - it's just "now" or "later".
+type ResultNowOrLater<T, E> = Result<T, E> | Promise<Result<T, E>>
+
+// Wrapper class for a Promise<Result> utility
+class PromisedResultBox<T, E> {
+  constructor(private readonly v: ResultNowOrLater<T, E>) {}
+
+  then<U>(onOk: OnOk<T, U>): PromisedResultBox<U, E> {
+    return R.after(Promise.resolve(this.v).then(map<T, E, U>(onOk)))
+  }
+
+  thenErr<U>(onErr: OnErr<E, U>): PromisedResultBox<T, U> {
+    return R.after(Promise.resolve(this.v).then(mapErr<T, E, U>(onErr)))
+  }
+
+  flatMap<U>(onOk: OnOk<T, Promise<Result<U, E>>>): PromisedResultBox<U, E> {
+    return R.after(
+      Promise.resolve(this.v).then((result) =>
+        isErr(result) ? Promise.resolve(result) : onOk(result.data)
+      )
+    )
+  }
+
+  async get(): Promise<Result<T, E>> {
+    return this.v
+  }
+
+  async await(): Promise<ResultBox<T, E>> {
+    return Promise.resolve(this.v).then($R)
+  }
+}
+
 export const R = {
   match,
   map,
@@ -170,6 +204,7 @@ export const R = {
   isErr,
   tryFrom,
   tryPromise,
+  after: <T, E>(v: ResultNowOrLater<T, E>) => new PromisedResultBox<T, E>(v),
 }
 
 export type Mapper<T, R> = (val: T) => R
@@ -181,12 +216,34 @@ export type OnErr<E, R> = Mapper<E, R>
 export class ResultBox<T, E> {
   constructor(private readonly r: Result<T, E>) {}
 
+  static ok<T = never, E = never>(value: T): ResultBox<T, E> {
+    return $R<T, E>(buildOk(value))
+  }
+
+  static err<T = never, E = never>(error: E): ResultBox<T, E> {
+    return $R<T, E>(buildErr(error))
+  }
+
   match<U>(onOk: OnOk<T, U>, onErr: OnErr<E, U>): U {
     return match(onOk, onErr)(this.r)
   }
 
   map<U>(onOk: OnOk<T, U>): ResultBox<U, E> {
     return $R(map<T, E, U>(onOk)(this.r))
+  }
+
+  do(task: (v: T) => void): ResultBox<T, E> {
+    if (isOk(this.r)) {
+      task(this.r.data)
+    }
+    return this
+  }
+
+  doErr(task: (e: E) => void): ResultBox<T, E> {
+    if (isErr(this.r)) {
+      task(this.r.error)
+    }
+    return this
   }
 
   dropError() {
@@ -201,12 +258,36 @@ export class ResultBox<T, E> {
     return flatMap<T, E, U>(onOk)(this.r)
   }
 
+  // Like flatMap, but stays in ResultBox-land so you can keep chaining .map/.do/etc.
+  // without unwrapping to a raw Result first.
+  update<U>(onOk: OnOk<T, ResultBox<U, E>>): ResultBox<U, E> {
+    return isOk(this.r) ? onOk(this.r.data) : (this as unknown as ResultBox<U, E>)
+  }
+
+  // Chains an async operation off the ok channel, short-circuiting on error.
+  awaitFlatMap<U>(onOk: OnOk<T, Promise<Result<U, E>>>): PromisedResultBox<U, E> {
+    return R.after(isErr(this.r) ? Promise.resolve(this.r) : onOk(this.r.data))
+  }
+
   mapErr<U>(onErr: OnErr<E, U>) {
     return mapErr<T, E, U>(onErr)(this.r)
   }
 
   orElse(ifErr: T) {
     return orElse<T, E>(ifErr)(this.r)
+  }
+
+  // Throws if this is an error, otherwise returns the ok value.
+  assert(): T {
+    return assert(this.r)
+  }
+
+  get(): Result<T, E> {
+    return this.r
+  }
+
+  getPromise(): Promise<Result<T, E>> {
+    return Promise.resolve(this.r)
   }
 }
 
