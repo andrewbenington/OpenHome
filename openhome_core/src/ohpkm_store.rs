@@ -3,8 +3,8 @@ use crate::error::{Error, Result};
 use crate::pagination;
 use crate::util;
 use base64::prelude::*;
-use pkm_rs::ohpkm::OhpkmV2;
 use pkm_rs::ohpkm::OpenHomeId;
+use pkm_rs::ohpkm::{OhpkmV2, UnknownHandlerSave};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::num::NonZeroU64;
@@ -112,6 +112,14 @@ impl OhpkmBytesStore {
             .collect()
     }
 
+    pub fn parsed_iter(&self) -> impl Iterator<Item = OhpkmV2> {
+        self.0
+            .values()
+            .map(Vec::as_slice)
+            .map(OhpkmV2::from_bytes)
+            .filter_map(std::result::Result::ok)
+    }
+
     pub fn get_b64_bytes_page_after(
         &self,
         current_cursor: pagination::PaginationCursor,
@@ -127,6 +135,17 @@ impl OhpkmBytesStore {
             .map(|bytes| BASE64_STANDARD.encode(bytes));
 
         pagination::PaginatedPage::next_after_cursor(current_cursor, entries, self.0.len())
+    }
+
+    pub fn get_all_with_unknown_handler(
+        &self,
+        save: &UnknownHandlerSave,
+    ) -> impl Iterator<Item = OhpkmV2> {
+        self.parsed_iter().filter(move |ohpkm| {
+            save.get_metadata_source()
+                .supports_form(ohpkm.species_and_form())
+                && ohpkm.matching_unknown_handler(save).is_some()
+        })
     }
 
     pub fn lookup(&self, identifier: &OpenHomeId) -> Result<Option<OhpkmV2>> {

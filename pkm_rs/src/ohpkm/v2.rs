@@ -13,6 +13,7 @@ use crate::ohpkm::extra_form::ExtraFormIndex;
 use crate::ohpkm::id::OpenHomeId;
 use crate::ohpkm::issues::OhpkmIssue;
 use crate::ohpkm::v1::OhpkmV1;
+use crate::ohpkm::v2_sections::UnknownHandlerSave;
 use crate::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, StoredPkmBytes, UnconvertedPkm};
 use crate::result::{Error, Result};
 use crate::sectioned_data::{DataSection, SectionTag, SectionedData};
@@ -1462,15 +1463,11 @@ impl OhpkmV2 {
         self.handler_data.clone()
     }
 
-    pub fn matching_unknown_handler(
-        &mut self,
-        name: String,
-        gender: BinaryGender,
-    ) -> Option<PastHandlerDataV2> {
-        let sized_string = SizedUtf16String::<26>::from(name);
+    pub fn matching_unknown_handler(&self, save: &UnknownHandlerSave) -> Option<PastHandlerDataV2> {
+        let sized_string = SizedUtf16String::<26>::from(save.get_name());
         self.handler_data
             .iter()
-            .find(|h| h.unknown_trainer_data_matches(&sized_string, gender))
+            .find(|h| h.unknown_trainer_data_matches(&sized_string, save.get_gender()))
             .cloned()
     }
 

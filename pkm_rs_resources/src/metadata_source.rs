@@ -1,4 +1,5 @@
 use pkm_rs_types::OriginGame;
+use serde::{Deserialize, Serialize};
 #[cfg(feature = "wasm")]
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
@@ -8,10 +9,11 @@ use wasm_bindgen::prelude::*;
 #[cfg(feature = "wasm")]
 use pkm_rs_types::OriginMark;
 
-use crate::species;
+use crate::species::{self, SpeciesForm};
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, EnumIter)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, EnumIter, Serialize, Deserialize)]
 pub enum MetadataSource {
     RedBlue,
     Yellow,
@@ -120,6 +122,14 @@ impl MetadataSource {
             Self::ScarletViolet => "Scarlet/Violet",
             Self::LegendsZa => "Legends: Z-A",
         }
+    }
+
+    pub fn supports_form(&self, species_form: SpeciesForm) -> bool {
+        species::form_metadata::source_has_form_metadata(
+            *self,
+            species_form.get_ndex() as u16,
+            species_form.get_forme_index(),
+        )
     }
 }
 

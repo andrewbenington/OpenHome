@@ -2,7 +2,7 @@ use std::ops::Deref;
 use std::sync::Mutex;
 
 use openhome_core::pagination;
-use pkm_rs::ohpkm::{OhpkmV2, OpenHomeId};
+use pkm_rs::ohpkm::{OhpkmV2, OpenHomeId, UnknownHandlerSave};
 use serde::Serialize;
 use tauri::Emitter;
 
@@ -100,6 +100,18 @@ impl AllSyncedState {
             .ohpkm_store
             .0
             .get_b64_bytes_page_after(cursor, filters))
+    }
+
+    pub fn search_ohpkms_matching_unknown_handler(
+        &self,
+        save: &UnknownHandlerSave,
+    ) -> Result<Vec<OhpkmV2>> {
+        Ok(self
+            .lock()?
+            .ohpkm_store
+            .0
+            .get_all_with_unknown_handler(save)
+            .collect())
     }
 
     pub fn ohpkm_lookup(&self, id: OpenHomeId) -> Result<Option<OhpkmV2>> {

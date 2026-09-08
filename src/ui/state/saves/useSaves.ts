@@ -384,6 +384,8 @@ export function useSaves(): SavesAndBanksManager {
         // In the interest of performance, all "full scans" of the OHPKM data store should be eliminated aside from
         // when manually triggered by a user willing to wait. This handler fixing functionality should be made a manual
         // task so the app doesn't freeze every time a save is opened.
+
+        // TODO: send backend save name + gender, backend responds with mons that match matchingUnknownHandler()
         if (SCAN_FULL_STORE_AND_FIX_HANDLERS) {
           const allOhpkms = await ohpkmStore.getAllStored()
           if (allOhpkms) {

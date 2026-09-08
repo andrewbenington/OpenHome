@@ -4,9 +4,14 @@ use crate::synced_state;
 use openhome_core::data_controller::{DataController, DataDir, MONS_V2_DIR};
 use openhome_core::ohpkm_store::OhpkmBytesStore;
 use openhome_core::{Error, pagination};
+use pkm_rs::ohpkm::UnknownHandlerSave;
+use pkm_rs_resources::metadata_source::MetadataSource;
+use pkm_rs_types::BinaryGender;
 use serde::Serialize;
 use std::path::Path;
 use std::{collections::HashMap, fs};
+
+use base64::prelude::*;
 
 impl synced_state::SyncedState for OhpkmBytesStore {
     type Action = Self;
@@ -39,6 +44,30 @@ pub fn search_ohpkm_store(
     filters: Vec<pagination::Filter>,
 ) -> CommandResult<pagination::PaginatedPage<String>> {
     Ok(synced_state.search_ohpkm_store(pagination_cursor, filters)?)
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn search_ohpkms_matching_unknown_handler(
+    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
+    save_name: &str,
+    save_gender: BinaryGender,
+    save_metadata_source: MetadataSource,
+) -> CommandResult<Vec<(String, String)>> {
+    Ok(synced_state
+        .search_ohpkms_matching_unknown_handler(&UnknownHandlerSave::new(
+            save_name.to_owned(),
+            save_gender,
+            save_metadata_source,
+        ))?
+        .into_iter()
+        .map(|ohpkm| {
+            (
+                ohpkm.openhome_id().to_string(),
+                BASE64_STANDARD.encode(ohpkm.to_bytes()),
+            )
+        })
+        .collect())
 }
 
 #[tauri::command]
