@@ -3,7 +3,7 @@ use crate::data_controller::TauriDataController;
 use crate::synced_state;
 use openhome_core::data_controller::{DataController, DataDir, MONS_V2_DIR};
 use openhome_core::ohpkm_store::OhpkmBytesStore;
-use openhome_core::{Error, pagination};
+use openhome_core::{Error, search};
 use pkm_rs::ohpkm::UnknownHandlerSave;
 use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_types::{BinaryGender, OriginGame};
@@ -38,9 +38,9 @@ pub fn get_ohpkm_store(
 #[specta::specta]
 pub fn search_ohpkm_store(
     synced_state: tauri::State<'_, synced_state::AllSyncedState>,
-    pagination_cursor: pagination::PaginationCursor,
-    filters: Vec<pagination::Filter>,
-) -> CommandResult<pagination::PaginatedPage<String>> {
+    pagination_cursor: search::PaginationCursor,
+    filters: Vec<search::Filter>,
+) -> CommandResult<search::PaginatedPage<String>> {
     Ok(synced_state.search_ohpkm_store(pagination_cursor, filters)?)
 }
 

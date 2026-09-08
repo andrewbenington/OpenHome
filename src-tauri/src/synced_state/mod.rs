@@ -1,7 +1,7 @@
 use std::ops::Deref;
 use std::sync::Mutex;
 
-use openhome_core::pagination;
+use openhome_core::search;
 use pkm_rs::ohpkm::{OhpkmV2, OpenHomeId, UnknownHandlerSave};
 use serde::Serialize;
 use tauri::Emitter;
@@ -92,9 +92,9 @@ impl AllSyncedState {
 
     pub fn search_ohpkm_store(
         &self,
-        cursor: pagination::PaginationCursor,
-        filters: Vec<pagination::Filter>,
-    ) -> Result<pagination::PaginatedPage<String>> {
+        cursor: search::PaginationCursor,
+        filters: Vec<search::Filter>,
+    ) -> Result<search::PaginatedPage<String>> {
         Ok(self
             .lock()?
             .ohpkm_store
