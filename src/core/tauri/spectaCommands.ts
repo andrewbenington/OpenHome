@@ -268,18 +268,18 @@ export const commands = {
       else return { status: 'error', error: e as any }
     }
   },
-  async searchOhpkmsMatchingUnknownHandler(
+  async getOhpkmIdsMatchingUnknownHandler(
     saveName: string,
     saveGender: BinaryGender,
-    saveMetadataSource: MetadataSource
-  ): Promise<Result<[string, string][], CommandError>> {
+    saveGameOriginIndex: number
+  ): Promise<Result<string[], CommandError>> {
     try {
       return {
         status: 'ok',
-        data: await TAURI_INVOKE('search_ohpkms_matching_unknown_handler', {
+        data: await TAURI_INVOKE('get_ohpkm_ids_matching_unknown_handler', {
           saveName,
           saveGender,
-          saveMetadataSource,
+          saveGameOriginIndex,
         }),
       }
     } catch (e) {
@@ -410,29 +410,6 @@ export type LookupStateStringIds = {
   gen345: Partial<{ [key in string]: string }>
 }
 export type MetDataStrategy = 'UseLocationNameMatch' | 'MaximizeLegality'
-export type MetadataSource =
-  | 'RedBlue'
-  | 'Yellow'
-  | 'GoldSilver'
-  | 'Crystal'
-  | 'RubySapphire'
-  | 'Emerald'
-  | 'FireRedLeafGreen'
-  | 'DiamondPearl'
-  | 'Platinum'
-  | 'HeartGoldSoulSilver'
-  | 'BlackWhite'
-  | 'Black2White2'
-  | 'XY'
-  | 'OmegaRubyAlphaSapphire'
-  | 'SunMoon'
-  | 'UltraSunUltraMoon'
-  | 'LetsGoPikachuEevee'
-  | 'SwordShield'
-  | 'BrilliantDiamondShiningPearl'
-  | 'LegendsArceus'
-  | 'ScarletViolet'
-  | 'LegendsZa'
 export type MoveIndex = number | null
 export type NamedStrategy = { name: string; strategy: ConvertStrategy }
 export type NationalDex =

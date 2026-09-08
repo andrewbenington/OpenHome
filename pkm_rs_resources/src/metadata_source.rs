@@ -68,6 +68,58 @@ impl MetadataSource {
         }
     }
 
+    pub const fn from_origin_game(game: OriginGame) -> Option<Self> {
+        match game {
+            OriginGame::Red | OriginGame::BlueGreen | OriginGame::BlueJpn => Some(Self::RedBlue),
+            OriginGame::Yellow => Some(Self::Yellow),
+
+            OriginGame::Gold | OriginGame::Silver => Some(Self::GoldSilver),
+            OriginGame::Crystal => Some(Self::Crystal),
+
+            OriginGame::Sapphire | OriginGame::Ruby => Some(Self::RubySapphire),
+            OriginGame::Emerald => Some(Self::Emerald),
+            OriginGame::FireRed | OriginGame::LeafGreen => Some(Self::FireRedLeafGreen),
+            OriginGame::ColosseumXd => None,
+
+            OriginGame::Diamond | OriginGame::Pearl => Some(Self::DiamondPearl),
+            OriginGame::Platinum => Some(Self::Platinum),
+            OriginGame::HeartGold | OriginGame::SoulSilver => Some(Self::HeartGoldSoulSilver),
+            OriginGame::BattleRevolution => None,
+
+            OriginGame::White | OriginGame::Black => Some(Self::BlackWhite),
+            OriginGame::White2 | OriginGame::Black2 => Some(Self::Black2White2),
+
+            OriginGame::X | OriginGame::Y => Some(Self::XY),
+            OriginGame::AlphaSapphire | OriginGame::OmegaRuby => Some(Self::OmegaRubyAlphaSapphire),
+
+            OriginGame::Sun | OriginGame::Moon => Some(Self::SunMoon),
+            OriginGame::UltraSun | OriginGame::UltraMoon => Some(Self::UltraSunUltraMoon),
+            OriginGame::LetsGoPikachu | OriginGame::LetsGoEevee => Some(Self::LetsGoPikachuEevee),
+
+            OriginGame::Sword | OriginGame::Shield => Some(Self::SwordShield),
+            OriginGame::LegendsArceus => Some(Self::LegendsArceus),
+            OriginGame::BrilliantDiamond | OriginGame::ShiningPearl => {
+                Some(Self::BrilliantDiamondShiningPearl)
+            }
+
+            OriginGame::Scarlet | OriginGame::Violet => Some(Self::ScarletViolet),
+            OriginGame::LegendsZa => Some(Self::LegendsZa),
+
+            OriginGame::Go | OriginGame::Home => None,
+
+            OriginGame::Invalid0
+            | OriginGame::Invalid6
+            | OriginGame::Invalid9
+            | OriginGame::Invalid13
+            | OriginGame::Invalid14
+            | OriginGame::Invalid17
+            | OriginGame::Invalid18
+            | OriginGame::Invalid19
+            | OriginGame::Invalid28
+            | OriginGame::Invalid29 => None,
+        }
+    }
+
     pub fn all_origin_games(self) -> Vec<OriginGame> {
         match self {
             Self::RedBlue => vec![OriginGame::Red, OriginGame::BlueGreen, OriginGame::BlueJpn],
@@ -97,7 +149,7 @@ impl MetadataSource {
         }
     }
 
-    pub const fn display(self) -> &'static str {
+    pub const fn display(&self) -> &'static str {
         match self {
             Self::RedBlue => "Red/Green/Blue",
             Self::Yellow => "Yellow",

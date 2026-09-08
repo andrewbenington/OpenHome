@@ -1,8 +1,7 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { Moves } from '@openhome-core/resources'
 import { $R, Nullable, NullableOption, Option, R, Result } from '@openhome-core/util/functional'
 import { $O } from '@openhome-core/util/option'
-import useOhpkmGrid, { OhpkmRowData, toRowData } from '@openhome-ui/ohpkmGrid'
+import useOhpkmGrid, { OhpkmRowData } from '@openhome-ui/ohpkmGrid'
 import { useBanksAndBoxes } from '@openhome-ui/state-zustand/banks-and-boxes/store'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
@@ -112,30 +111,30 @@ export function usePokemonSearch(
   const [loading, setLoading] = useState(false)
 
   // TODO: do not get all of these at once
-  async function getResults(): Promise<OhpkmRowData[]> {
-    setLoading(true)
-    const mons = await ohpkmStore.getAllStored()
+  // async function getResults(): Promise<OhpkmRowData[]> {
+  //   setLoading(true)
+  //   const mons = await ohpkmStore.getAllStored()
 
-    const results = Object.values(mons ?? {})
-      ?.filter(async (mon) => (await prefilter?.(mon)) !== false)
-      .filter((mon) => prefixMatches(nickname, mon.nickname))
-      .filter((mon) =>
-        mon.moves.some((moveIndex) => prefixMatches(knownMove, Moves[moveIndex]?.name))
-      )
-      .filter((mon) => originGame === null || mon.gameOfOrigin === originGame)
-      .map((ohpkm) =>
-        toRowData(
-          ohpkm,
-          findHomeLocation,
-          monsToRelease.filter((toRelease) => typeof toRelease === 'string')
-        )
-      )
+  //   const results = Object.values(mons ?? {})
+  //     ?.filter(async (mon) => (await prefilter?.(mon)) !== false)
+  //     .filter((mon) => prefixMatches(nickname, mon.nickname))
+  //     .filter((mon) =>
+  //       mon.moves.some((moveIndex) => prefixMatches(knownMove, Moves[moveIndex]?.name))
+  //     )
+  //     .filter((mon) => originGame === null || mon.gameOfOrigin === originGame)
+  //     .map((ohpkm) =>
+  //       toRowData(
+  //         ohpkm,
+  //         findHomeLocation,
+  //         monsToRelease.filter((toRelease) => typeof toRelease === 'string')
+  //       )
+  //     )
 
-    setLoading(false)
-    setResults(results)
+  //   setLoading(false)
+  //   setResults(results)
 
-    return results
-  }
+  //   return results
+  // }
 
   function clearFields() {
     setNickname(null)
@@ -165,7 +164,7 @@ export function usePokemonSearch(
 
     loading,
     results,
-    getResults,
+    getResults: () => Promise.resolve([]),
 
     getRowId: (mon) => mon.openhomeId,
     selectedId,

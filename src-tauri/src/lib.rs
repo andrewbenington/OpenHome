@@ -63,7 +63,7 @@ pub fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
         synced_state::lookup::remove_dangling,
         synced_state::ohpkm_store::get_ohpkm_store,
         synced_state::ohpkm_store::search_ohpkm_store,
-        synced_state::ohpkm_store::search_ohpkms_matching_unknown_handler,
+        synced_state::ohpkm_store::get_ohpkm_ids_matching_unknown_handler,
         synced_state::ohpkm_store::get_ohpkm_bytes_by_id,
         synced_state::ohpkm_store::permanently_delete_ohpkms,
         logging::get_logs_today,

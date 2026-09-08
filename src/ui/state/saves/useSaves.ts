@@ -4,7 +4,7 @@ import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { displayIndexAdder, isBattleFormeItem } from '@openhome-core/pkm/util'
 import { getSaveRef, SAV, SaveIdentifier } from '@openhome-core/save/interfaces'
-import { monSupportedBySave, SAVClass } from '@openhome-core/save/util'
+import { SAVClass } from '@openhome-core/save/util'
 import { buildSaveFile, getPossibleSaveTypes } from '@openhome-core/save/util/load'
 import { PathData } from '@openhome-core/save/util/path'
 import { Errorable, Option, R, Result } from '@openhome-core/util/functional'
@@ -64,7 +64,7 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'home
   allMonsInCurrentBank: () => OhpkmIdentifier[]
 }
 
-const SCAN_FULL_STORE_AND_FIX_HANDLERS = false // warning - this can cause slowdown when opening a save if many OHPKMs are tracked
+const SCAN_FULL_STORE_AND_FIX_HANDLERS = true // warning - this can cause slowdown when opening a save if many OHPKMs are tracked
 
 function MissingOhpkmData(identifier: string) {
   return R.Err(`Missing OHPKM data for identifier ${identifier}`)
@@ -376,35 +376,12 @@ export function useSaves(): SavesAndBanksManager {
           console.error('Error registering pokedex entries from save:', result.error)
         }
 
-        // TODO - PERFORMACE:
-        // this currently looks for tracked Pokémon that have a handler name/gender but no other data for that handler,
+        // this looks for tracked Pokémon that have a handler name/gender but no other data for that handler,
         // checks to see if the save file matches the handler data, and fills out the other handler data from the save
-        // file if so. This was for fixing mons from before visited save data was fully tracked.
-        //
-        // In the interest of performance, all "full scans" of the OHPKM data store should be eliminated aside from
-        // when manually triggered by a user willing to wait. This handler fixing functionality should be made a manual
-        // task so the app doesn't freeze every time a save is opened.
-
-        // TODO: send backend save name + gender, backend responds with mons that match matchingUnknownHandler()
+        // file if so. This is for fixing mons from before visited save data was fully tracked.
+        // if this
         if (SCAN_FULL_STORE_AND_FIX_HANDLERS) {
-          const allOhpkms = await ohpkmStore.getAllStored()
-          if (allOhpkms) {
-            for (const mon of Object.values(allOhpkms)) {
-              if (!monSupportedBySave(save, mon)) continue
-
-              const matchingHandler = mon.matchingUnknownHandler(save.name, save.trainerGender)
-              if (!matchingHandler) continue
-
-              mon.updateTrainerData(
-                save,
-                matchingHandler.friendship,
-                matchingHandler.affection,
-                matchingHandler.memory
-              )
-
-              ohpkmStore.insertOrUpdate(mon)
-            }
-          }
+          await ohpkmStore.scanFullStoreAndFixHandlers(save)
         }
 
         const toUpdate: OhpkmStoreData = {}

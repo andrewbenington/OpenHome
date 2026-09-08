@@ -33,7 +33,7 @@ export function useOhpkmStore() {
   const { lookups, updateLookups } = useLookups()
   const { gen12: gen12Lookup, gen345: gen345Lookup } = lookups
   const backend = useBackend()
-  const { addToOhpkmStore } = useBackend()
+  const { addToOhpkmStore } = backend
 
   const updateStore = addToOhpkmStore
 
@@ -332,6 +332,25 @@ export function useOhpkmStore() {
     })
   }
 
+  async function scanFullStoreAndFixHandlers(save: SAV) {
+    return R.after(backend.getOhpkmIdsMatchingUnknownHandler(save)).then(async (ohpkmIds) => {
+      const lookupResults = await tryLoadBatch(ohpkmIds)
+      for (const mon of Object.values(lookupResults)) {
+        const matchingHandler = mon.matchingUnknownHandler(save.name, save.trainerGender)
+        if (!matchingHandler) continue
+
+        mon.updateTrainerData(
+          save,
+          matchingHandler.friendship,
+          matchingHandler.affection,
+          matchingHandler.memory
+        )
+
+        insertOrUpdate(mon)
+      }
+    })
+  }
+
   return {
     getById,
     tryLoadFromId,
@@ -345,6 +364,7 @@ export function useOhpkmStore() {
     updateMonTags,
     updateMonAffixedRibbon,
     updateMonDisplayColor,
+    replaceHeldItem,
     setMonNickname,
     setMonMove,
 
@@ -359,7 +379,7 @@ export function useOhpkmStore() {
     monOrOhpkmIfTrackedAll,
     syncOhpkmIfTracked,
 
-    replaceHeldItem,
+    scanFullStoreAndFixHandlers,
   }
 }
 

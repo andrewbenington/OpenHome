@@ -9,7 +9,7 @@ import BackendInterface, {
 } from '@openhome-core/backend/backendInterface'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { SaveWriter } from '@openhome-core/save/interfaces'
+import { SAV, SaveWriter } from '@openhome-core/save/interfaces'
 import { PathData, PossibleSaves } from '@openhome-core/save/util/path'
 import { SaveFolder, SimpleOpenHomeBox, StoredBankData } from '@openhome-core/save/util/storage'
 import { Errorable, Option, R } from '@openhome-core/util/functional'
@@ -18,6 +18,7 @@ import { JSONObject, LoadSaveResponse, SaveRef } from '@openhome-core/util/types
 import { LogFilter } from '@openhome-ui/pages/logs'
 import { defaultSettings, Settings } from '@openhome-ui/state/appInfo'
 import { Pokedex, PokedexEntry } from '@openhome-ui/util/pokedex'
+import { BinaryGender } from '@pkm-rs/pkg'
 import { path } from '@tauri-apps/api'
 import { Event, listen, UnlistenFn } from '@tauri-apps/api/event'
 import { getCurrentWindow } from '@tauri-apps/api/window'
@@ -102,6 +103,12 @@ export const TauriBackend: BackendInterface = {
       }))
     )
   },
+  getOhpkmIdsMatchingUnknownHandler: (save: SAV) =>
+    Commands.getOhpkmIdsMatchingUnknownHandler(
+      save.name,
+      save.trainerGender === BinaryGender.Female ? 'Female' : 'Male',
+      save.origin
+    ),
   lookupOhpkmById: async function (id: OhpkmIdentifier): Promise<Errorable<Option<OHPKM>>> {
     return Commands.getOhpkmBytesById(id).then(
       R.map((bytes) => (bytes ? OHPKM.fromBytes(new Uint8Array(bytes).buffer) : undefined))

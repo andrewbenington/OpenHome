@@ -515,6 +515,12 @@ impl From<u8> for OriginGame {
     }
 }
 
+impl std::fmt::Display for OriginGame {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.game_name_full())
+    }
+}
+
 impl From<arbitrary_int::u4> for OriginGame {
     fn from(value: arbitrary_int::u4) -> Self {
         OriginGame::from(value.value())

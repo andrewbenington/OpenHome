@@ -1,6 +1,6 @@
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { SaveWriter } from '@openhome-core/save/interfaces'
+import { SAV, SaveWriter } from '@openhome-core/save/interfaces'
 import { PathData, PossibleSaves } from '@openhome-core/save/util/path'
 import { SaveFolder, StoredBankData } from '@openhome-core/save/util/storage'
 import {
@@ -74,6 +74,7 @@ export default interface BackendInterface {
     cursor: PaginationCursor,
     filters: Filter[]
   ): Promise<Errorable<PaginatedPage<OHPKM>>>
+  getOhpkmIdsMatchingUnknownHandler(save: SAV): Promise<Errorable<OhpkmIdentifier[]>>
   lookupOhpkmById: (id: OhpkmIdentifier) => Promise<Errorable<Option<OHPKM>>>
   addToOhpkmStore: (updates: OhpkmStore) => Promise<Errorable<null>>
   deleteHomeMons: (identifiers: string[]) => Promise<Errorable<null>>
