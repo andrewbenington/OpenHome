@@ -8,3 +8,6 @@ codegen-units = 1
 lto = true
 opt-level = "s"
 strip = true
+
+[workspace.dependencies]
+glib = ">=0.22.9"

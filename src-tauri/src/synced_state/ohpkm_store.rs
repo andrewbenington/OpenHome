@@ -7,6 +7,8 @@ use openhome_core::ohpkm_store::OhpkmBytesStore;
 use serde::Serialize;
 use std::path::Path;
 use std::{collections::HashMap, fs};
+use tauri::State;
+use crate::synced_state::ohpkm_cache_changes::OhpkmCacheChanges;
 
 impl synced_state::SyncedState for OhpkmBytesStore {
     type Action = Self;
@@ -23,24 +25,25 @@ impl synced_state::SyncedState for OhpkmBytesStore {
     }
 }
 
-#[tauri::command]
-#[specta::specta]
-pub fn get_ohpkm_store(
-    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
-) -> CommandResult<Vec<(String, String)>> {
-    Ok(synced_state.ohpkm_store_b64()?)
-}
+// TODO Renable this later if necessary
+// #[tauri::command]
+// #[specta::specta]
+// pub fn get_ohpkm_store(
+//     synced_state: tauri::State<'_, synced_state::LazyState>,
+// ) -> CommandResult<Vec<(String, String)>> {
+//     Ok(synced_state.ohpkm_store_b64()?)
+// }
 
 #[tauri::command]
 #[specta::specta]
-pub fn add_to_ohpkm_store(
+pub fn add_to_ohpkm_cache(
     app_handle: tauri::AppHandle,
-    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
-    updates: OhpkmBytesStore,
+    synced_state: tauri::State<'_, synced_state::LazyState>,
+    updates: OhpkmCacheChanges,
 ) -> CommandResult<()> {
     Ok(synced_state
         .lock()?
-        .ohpkm_store
+        .ohpkm_cache
         .update(&app_handle, updates)?)
 }
 
@@ -48,15 +51,15 @@ type DeleteResultsById = HashMap<String, Option<String>>;
 
 #[tauri::command]
 #[specta::specta]
-pub fn permanently_delete_ohpkms(
+pub fn permanently_delete_ohpkms_in_cache(
     app_handle: tauri::AppHandle,
-    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
+    synced_state: tauri::State<'_, synced_state::LazyState>,
     openhome_ids: Vec<String>,
 ) -> CommandResult<DeleteResultsById> {
     // first remove from the ohpkm store
     synced_state
         .lock()?
-        .ohpkm_store
+        .ohpkm_cache
         .replace(&app_handle, |store| {
             let mut new_store = store.clone();
             for identifier in openhome_ids.iter().filter_map(|id_str| id_str.parse().ok()) {

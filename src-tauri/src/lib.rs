@@ -11,21 +11,24 @@ mod synced_state;
 mod util;
 mod version;
 
+
+
 use crate::data_controller::ToDataController;
-use crate::synced_state::AllSyncedState;
+pub use synced_state::lazy_state::LazyState;
 use openhome_core::convert_strategies::ConvertStrategies;
 use openhome_core::lookup::LookupState;
-use openhome_core::ohpkm_store::OhpkmBytesStore;
 use openhome_core::{Error, Result};
-use pkm_rs::ohpkm::OhpkmV2;
 use std::env;
 use tauri::Manager;
+use openhome_core::pkm_storage::{load_banks, StoredBankData};
+use openhome_core::box_pointer::BoxPointer;
+use openhome_core::ohpkm_store_partial::OhpkmStorePartial;
 
 const RAW_HANDLER: fn(tauri::ipc::Invoke<tauri::Wry>) -> bool = tauri::generate_handler![
     commands::get_file_bytes,
     commands::get_storage_file_json,
     commands::write_storage_file_json,
-    synced_state::ohpkm_store::add_to_ohpkm_store,
+    synced_state::ohpkm_store::add_to_ohpkm_cache,
     logging::log,
 ];
 
@@ -60,9 +63,13 @@ pub fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
         synced_state::convert_strategies::update_convert_strategies,
         synced_state::lookup::get_lookups,
         synced_state::lookup::add_to_lookups,
-        synced_state::lookup::remove_dangling,
-        synced_state::ohpkm_store::get_ohpkm_store,
-        synced_state::ohpkm_store::permanently_delete_ohpkms,
+
+        // TODO: Re-enable this command later when we can fully implement it
+        // synced_state::lookup::remove_dangling,
+
+        // TODO: replace implementations of this method with appropriate counterparts
+        // synced_state::ohpkm_store::get_ohpkm_store,
+        // synced_state::permanently_delete_ohpkms,
         logging::get_logs_today,
         logging::clear_logs_for_range,
     ])
@@ -106,10 +113,11 @@ pub fn run() {
 
             let controller = app.handle().controller();
 
-            let ohpkm_store = match OhpkmBytesStore::load_from_mons_v2(&controller) {
-                Ok(state) => state,
+            // TODO: Only get information on the current bank and load that one.
+            let mut bank_info = match load_banks(&controller) {
+                Ok(bank_info) => bank_info,
                 Err(err) => {
-                    util::show_error_dialog(app, err, launch_error_msg("OHPKM Load"));
+                    util::show_error_dialog(app, err, launch_error_msg("Unable to obtain information on your Pokemon bank info!"));
 
                     app.handle().exit(1);
                     std::process::exit(1);
@@ -126,12 +134,6 @@ pub fn run() {
                 }
             };
 
-            lookup_state.with_recalculated(
-                ohpkm_store
-                    .all_entries()
-                    .filter_map(|(_, bytes)| OhpkmV2::from_bytes(bytes).ok()),
-            );
-
             let conversion_settings = match ConvertStrategies::load_from_storage(&controller) {
                 Ok(settings) => settings,
                 Err(err) => {
@@ -143,7 +145,8 @@ pub fn run() {
             };
 
             let synced_state =
-                AllSyncedState::from_states(lookup_state, ohpkm_store, conversion_settings);
+                LazyState::from_partial_states(lookup_state, get_bank_pointer(bank_info),
+                                               conversion_settings);
             app.manage(synced_state);
 
             let pokedex_state = match state::PokedexState::load_from_storage(&controller) {
@@ -186,6 +189,10 @@ pub fn run() {
         })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+fn get_bank_pointer(bank_data: StoredBankData) -> BoxPointer {
+    bank_data.get_current_box_pointer()
 }
 
 fn launch_error_msg(error_category: &str) -> String {

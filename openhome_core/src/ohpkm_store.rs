@@ -16,6 +16,9 @@ use tracing::warn;
 pub struct OhpkmBytesStore(HashMap<OpenHomeId, Vec<u8>>);
 
 impl OhpkmBytesStore {
+
+    //noinspection DuplicatedCode
+    // TODO Undo later if need be
     fn load_from_directory(path: &Path) -> Result<Self> {
         let mon_files = fs::read_dir(path).map_err(|e| Error::file_access(&path, e))?;
 
