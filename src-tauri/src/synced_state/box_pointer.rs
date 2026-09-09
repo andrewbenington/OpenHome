@@ -22,14 +22,8 @@ impl Serialize for BoxPointer {
     }
 }
 
-impl IpcResponse for BoxPointer {
-    fn body(self) -> tauri::Result<InvokeResponseBody> {
-        todo!()
-    }
-}
 
 impl SyncedState for BoxPointer {
-
     // TODO
     type Action = ();
     const ID: &'static str = "box_pointer";

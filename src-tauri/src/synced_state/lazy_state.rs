@@ -93,7 +93,7 @@ impl LazyState {
                             e,
                         )
                     })?;
-                self.lock()?.lazy_state_change_list.0.update(action);
+                self.lock()?.update_with_action(action);
             }
             _ => {
                 return Err(Error::unexpeted_condition(format!(

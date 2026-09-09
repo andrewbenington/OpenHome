@@ -98,7 +98,7 @@ pub fn remove_dangling(
 ) -> CommandResult<()> {
     // definitely unnecessary clones here
     let mut synced_state = synced_state.lock()?;
-    let ohpkm_store = synced_state.ohpkm_store_partial.read().clone();
+    let ohpkm_store = synced_state.calculateEntireStore().read().clone();
 
     synced_state
         .lookups
