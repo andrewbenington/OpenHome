@@ -1,15 +1,14 @@
+use num_enum::TryFromPrimitive;
+use pkm_rs_derive::EnumMax;
 use std::fmt::Display;
 
-use num_enum::TryFromPrimitive;
-
-use pkm_rs_derive::EnumMax;
-#[cfg(feature = "randomize")]
-use rand::RngExt;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
 #[cfg(feature = "randomize")]
 use crate::randomize::Randomize;
+#[cfg(feature = "randomize")]
+use rand::RngExt;
 
 impl NationalDex {
     pub fn new(index: u16) -> crate::Result<NationalDex> {
@@ -77,7 +76,19 @@ impl PartialEq<NationalDex> for u16 {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, TryFromPrimitive, EnumMax)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    TryFromPrimitive,
+    EnumMax,
+    enum_iterator::Sequence,
+)]
 #[repr(u16)]
 pub enum NationalDex {
     Bulbasaur = 1,
@@ -1106,4 +1117,10 @@ pub enum NationalDex {
     Terapagos,
     #[max]
     Pecharunt,
+}
+
+impl NationalDex {
+    pub fn all() -> impl Iterator<Item = NationalDex> {
+        enum_iterator::all()
+    }
 }

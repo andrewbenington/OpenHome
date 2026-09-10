@@ -431,7 +431,7 @@ interface PKMWithStandardStats extends AllPKMs, PKMWithModernIVs, PKMWithModernE
 
 export const modernStatCalc = (
   mon: PKMWithStandardStats,
-  metadataSource: MetadataSource = MetadataSource.ScarletViolet
+  metadataSource?: MetadataSource
 ): Stats => {
   const speciesForm = SpeciesForm.tryNew(mon.nationalDex, mon.formIndex)
   return speciesForm

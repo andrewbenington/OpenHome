@@ -490,7 +490,7 @@ mod tests {
     use super::*;
     use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
-    use crate::species::{FormMetadata, GetSpeciesMetadata, metadata_table::MetadataSource};
+    use crate::species::metadata_table::MetadataSource;
 
     const METADATA_SOURCES_IMPLEMENTED: [MetadataSource; 22] = [
         MetadataSource::RedBlue,
@@ -521,18 +521,6 @@ mod tests {
         metadata_table_by_source(source).form_is_present(national_dex, form_index)
     }
 
-    fn try_all_forms(callback: impl Fn(&FormMetadata) -> Result<(), String>) -> Result<(), String> {
-        for national_dex in NationalDex::Bulbasaur as u16..=NationalDex::MAX as u16 {
-            let species_metadata = NationalDex::new(national_dex)
-                .expect("1-1025 are valid national dex indices")
-                .get_species_metadata();
-            for form in species_metadata.forms {
-                callback(form)?;
-            }
-        }
-        Ok(())
-    }
-
     #[test]
     fn test_get_stats() {
         assert_eq!(
@@ -551,7 +539,7 @@ mod tests {
 
     #[test]
     fn all_forms_have_types() -> Result<(), String> {
-        try_all_forms(|form| {
+        crate::tests::try_all_form_metadata(|form| {
             types_lookup(form.national_dex, form.form_index, None)
                 .ok_or(format!("Missing types for {}", form.form_name))?;
             Ok(())
@@ -560,7 +548,7 @@ mod tests {
 
     #[test]
     fn no_form_duplicates_type() -> Result<(), String> {
-        try_all_forms(|form| {
+        crate::tests::try_all_form_metadata(|form| {
             let form_name = &form.form_name;
             let (type1, type2) = types_lookup(form.national_dex, form.form_index, None)
                 .ok_or(format!("Missing types for {form_name}"))?;
@@ -578,7 +566,7 @@ mod tests {
 
     #[test]
     fn no_zero_stats() -> Result<(), String> {
-        try_all_forms(|form| {
+        crate::tests::try_all_form_metadata(|form| {
             let form_name = &form.form_name;
             let stats = current_base_stats(form.national_dex, form.form_index)
                 .ok_or(format!("Missing stats for {form_name}"))?;
@@ -613,12 +601,12 @@ mod tests {
 
     #[test]
     fn no_form_panics_for_any_source() -> Result<(), String> {
-        try_all_forms(|form| {
+        crate::tests::try_all_forms(|form| {
             METADATA_SOURCES_IMPLEMENTED.into_iter().for_each(|source| {
-                base_stats_lookup(form.national_dex, form.form_index, source);
-                types_lookup(form.national_dex, form.form_index, Some(source));
+                base_stats_lookup(form.get_ndex(), form.get_forme_index(), source);
+                types_lookup(form.get_ndex(), form.get_forme_index(), Some(source));
             });
-            let most_recent_types = types_lookup(form.national_dex, form.form_index, None);
+            let most_recent_types = types_lookup(form.get_ndex(), form.get_forme_index(), None);
             assert!(most_recent_types.is_some());
 
             Ok(())

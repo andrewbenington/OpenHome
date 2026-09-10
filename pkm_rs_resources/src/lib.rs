@@ -1,6 +1,8 @@
 mod pkhex_bin;
 mod pkhex_text;
 mod result;
+#[cfg(test)]
+mod tests;
 
 pub mod abilities;
 pub mod ball;

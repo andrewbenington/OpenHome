@@ -321,4 +321,17 @@ mod tests {
             Stats16Le::new(189, 137, 101, 128, 112, 190)
         )
     }
+
+    #[test]
+    fn stats_for_all_forms() -> Result<(), String> {
+        crate::tests::try_all_forms(|species_form| {
+            match species_form.current_metadata_reader().get_base_stats() {
+                BaseStats::PreSplit(stats_pre_split) => {
+                    assert_ne!(stats_pre_split, Default::default())
+                }
+                BaseStats::Modern(stats8) => assert_ne!(stats8, Default::default()),
+            };
+            Ok(())
+        })
+    }
 }
