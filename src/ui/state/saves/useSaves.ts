@@ -64,7 +64,7 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'home
   allMonsInCurrentBank: () => OhpkmIdentifier[]
 }
 
-const SCAN_FULL_STORE_AND_FIX_HANDLERS = true // warning - this can cause slowdown when opening a save if many OHPKMs are tracked
+const SCAN_FULL_STORE_AND_FIX_HANDLERS = false // warning - this can cause slowdown when opening a save if many OHPKMs are tracked
 
 function MissingOhpkmData(identifier: string) {
   return R.Err(`Missing OHPKM data for identifier ${identifier}`)
@@ -370,9 +370,12 @@ export function useSaves(): SavesAndBanksManager {
   const addSave = useCallback(
     async (save: SAV): Promise<Result<SAV, SaveError>> => {
       try {
-        await backend.addRecentSave(getSaveRef(save))
+        alert('adding recent save')
+        await backend.addRecentSave(getSaveRef(save)).catch(alert)
+        alert('added recent save')
         const result = await backend.registerInPokedex(pokedexSeenFromSave(save))
         if (R.isErr(result)) {
+          alert('Error registering pokedex entries from save: ' + result.error)
           console.error('Error registering pokedex entries from save:', result.error)
         }
 
@@ -381,8 +384,10 @@ export function useSaves(): SavesAndBanksManager {
         // file if so. This is for fixing mons from before visited save data was fully tracked.
         // if this
         if (SCAN_FULL_STORE_AND_FIX_HANDLERS) {
+          alert('scanning')
           await ohpkmStore.scanFullStoreAndFixHandlers(save)
         }
+        alert('scanned')
 
         const toUpdate: OhpkmStoreData = {}
         for (const mon of save.getAllMons()) {
@@ -418,6 +423,7 @@ export function useSaves(): SavesAndBanksManager {
         openSavesDispatch({ type: 'add_save', payload: save })
         return R.Ok(save)
       } catch (e) {
+        alert(e)
         console.error(e)
         return R.Err({ type: 'OTHER', cause: String(e) })
       }
