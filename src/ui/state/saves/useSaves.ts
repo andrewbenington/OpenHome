@@ -121,7 +121,7 @@ export function useSaves(): SavesAndBanksManager {
         const mon = getMonAtSaveLocation(location)
         if (!mon) return Promise.resolve(undefined)
 
-        return ohpkmStore.loadIfTracked(mon) ?? Promise.resolve(mon)
+        return ohpkmStore.loadIfTracked(mon).then((loaded) => loaded ?? mon)
       } else {
         identifier = getMonAtHomeLocation(location)
         if (!identifier) return Promise.resolve(undefined)

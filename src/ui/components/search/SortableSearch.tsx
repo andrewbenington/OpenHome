@@ -1,5 +1,5 @@
 import { SortableColumn, SortableValue } from '@openhome-core/util/sort'
-import { Flex, Spinner } from '@radix-ui/themes'
+import { Flex } from '@radix-ui/themes'
 import OhoButton from '../OhoButton'
 import OhoFlex from '../OhoFlex'
 import SortableDataGrid from '../SortableDataGrid'
@@ -42,10 +42,7 @@ export default function SortableSearch<T extends SortableValue, SC extends Searc
           {topRightComponent}
         </Flex>
       </form>
-      // TODO: is this ugly/uncentered?
-      {loading ? (
-        <Spinner />
-      ) : (
+      {
         <SortableDataGrid
           className="search-results-grid"
           rows={results ?? []}
@@ -55,8 +52,9 @@ export default function SortableSearch<T extends SortableValue, SC extends Searc
           rowClass={(row) =>
             controller.getRowId(row) === selectedId ? 'search-row-selected' : undefined
           }
+          fetching={loading ? 'next' : undefined}
         />
-      )}
+      }
     </Flex>
   )
 }

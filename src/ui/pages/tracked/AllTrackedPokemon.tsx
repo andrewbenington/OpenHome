@@ -1,8 +1,6 @@
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
-import { PaginatedPage, PaginationCursor } from '@openhome-core/tauri/spectaCommands'
-import { $R, Option, R } from '@openhome-core/util/functional'
+import { Option } from '@openhome-core/util/functional'
 import {
   CtxMenuElementBuilder,
   Item,
@@ -11,14 +9,12 @@ import {
   Separator,
 } from '@openhome-ui/components/context-menu'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
-import { OhpkmRowData, toRowData, useOhpkmColumns } from '@openhome-ui/ohpkmGrid'
+import { usePokemonTable } from '@openhome-ui/hooks/pokemonTable'
+import { OhpkmRowData, useOhpkmColumns } from '@openhome-ui/ohpkmGrid'
 import { useBanksAndBoxes } from '@openhome-ui/state-zustand/banks-and-boxes/store'
-import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
 import { Spinner } from '@radix-ui/themes'
-import { useInfiniteQuery } from '@tanstack/react-query'
-import { useCreateAtom } from '@tanstack/react-store'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import './style.css'
 
@@ -33,13 +29,7 @@ export default function AllTrackedPokemon({
   findSaveForMon,
   findSavesForAllMons,
 }: AllTrackedPokemonProps) {
-  const paginationAtom = useCreateAtom<PaginationCursor>({
-    pageIndex: 0, // initial page index
-    pageSize: 100, // default page size
-  })
-  const ohpkmStore = useOhpkmStore()
   const saves = useSaves()
-  const { findHomeLocation } = useBanksAndBoxes()
   const [contextMenuBuilders, setContextMenuBuilders] = useState<Option<CtxMenuElementBuilder>[]>(
     []
   )
@@ -47,7 +37,7 @@ export default function AllTrackedPokemon({
   const selectionController = useSelectedMons()
   const { selectedIds, forceSetSelectedIds } = selectionController
   const { trackedMonsToRelease } = saves
-  const columns = useOhpkmColumns(trackedMonsToRelease, onSelectMon)
+  const columns = useOhpkmColumns(onSelectMon)
   const tableContainerRef = useRef<HTMLDivElement>(null) // for listening to scroll
   const { buildContextElements } = useContextMenu(
     findSaveForMon,
@@ -55,61 +45,10 @@ export default function AllTrackedPokemon({
     selectionController
   )
 
-  function preloadOhpkmPage(page: PaginatedPage<OHPKM>): Page {
-    return {
-      ...page,
-      results: page.results.map((mon) =>
-        toRowData(
-          mon,
-          findHomeLocation,
-          saves.monsToRelease.filter((monOrId) => typeof monOrId === 'string')
-        )
-      ),
-    }
-  }
+  const { currentRows, fetchMoreOnBottomReached, query, totalRowCount, paginationAtom } =
+    usePokemonTable('all-tracked-pokemon', [])
 
-  const { data, fetchNextPage, isFetching, isLoading } = useInfiniteQuery({
-    queryKey: [
-      'all-tracked',
-      'cursor',
-      paginationAtom.get().pageIndex,
-      paginationAtom.get().pageSize,
-      'sorting',
-      'globalFilter',
-    ],
-    queryFn: async (d) => {
-      const pageParam = paginationAtom.get() ?? d.pageParam
-      const searchPromise = ohpkmStore.searchStore(pageParam, []).then(R.map(preloadOhpkmPage))
-      return await searchPromise
-    },
-    initialPageParam: { pageIndex: 0, pageSize: 300 },
-    getNextPageParam: (lastPage) => {
-      return $R(lastPage).match(
-        (page) => page.nextCursor,
-        (e) => {
-          console.error(e)
-          return paginationAtom.get()
-        }
-      )
-    },
-  })
-
-  // flatten the array of arrays from the useInfiniteQuery hook
-  const flatData = useMemo(() => {
-    return data?.pages.filter(R.isOk).flatMap((page) => page.data.results) ?? []
-  }, [data])
-
-  const totalDBRowCount = data?.pages.find((result) => R.isOk(result))?.data.totalCount ?? 0
-
-  const totalFetched = flatData.length
-
-  // called on scroll and possibly on mount to fetch more data as the user scrolls and reaches bottom of table
-  const fetchMoreOnBottomReached = async () => {
-    if (!tableContainerRef.current || isFetching || totalFetched >= totalDBRowCount) {
-      return
-    }
-    await fetchNextPage()
-  }
+  const { isFetching, isLoading } = query
 
   if (isLoading) return <Spinner />
 
@@ -125,7 +64,7 @@ export default function AllTrackedPokemon({
       <div style={{ height: '100%', width: '100%', backgroundColor: 'var(--gray-3)' }}>
         <SortableDataGrid
           columns={columns}
-          rows={flatData}
+          rows={currentRows}
           tableRef={tableContainerRef}
           style={{ borderLeft: 'none' }}
           onCellContextMenu={(props, e) => {
@@ -151,14 +90,12 @@ export default function AllTrackedPokemon({
           paginationAtom={paginationAtom}
           onScrolledToBottom={fetchMoreOnBottomReached}
           fetching={isFetching ? 'next' : undefined}
-          shouldLoadMore={flatData.length < totalDBRowCount}
+          shouldLoadMore={currentRows.length < totalRowCount}
         />
       </div>
     </OpenHomeCtxMenu>
   )
 }
-
-type Page = PaginatedPage<OhpkmRowData>
 
 function useSelectedMons() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())

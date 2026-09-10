@@ -1,10 +1,10 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { $R, Nullable, NullableOption, Option, R, Result } from '@openhome-core/util/functional'
+import { Filter } from '@openhome-core/tauri/spectaCommands'
+import { $R, Nullable, Option, R, Result } from '@openhome-core/util/functional'
 import { $O } from '@openhome-core/util/option'
+import { usePokemonTable } from '@openhome-ui/hooks/pokemonTable'
 import useOhpkmGrid, { OhpkmRowData } from '@openhome-ui/ohpkmGrid'
-import { useBanksAndBoxes } from '@openhome-ui/state-zustand/banks-and-boxes/store'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
-import { useSaves } from '@openhome-ui/state/saves'
 import { OriginGame } from '@pkm-rs/pkg'
 import { useState } from 'react'
 import { SearchController } from './controllers'
@@ -89,52 +89,20 @@ export function usePokemonEdit() {
   }
 }
 
-function prefixMatches(prefix: NullableOption<string>, value: NullableOption<string>): boolean {
-  if (!prefix) return true
-  return (
-    typeof value === 'string' && value.toLocaleUpperCase().startsWith(prefix.toLocaleUpperCase())
-  )
-}
-
-export function usePokemonSearch(
-  prefilter?: (mon: OHPKM) => Promise<boolean>
-): PokemonSearchController {
+export function usePokemonSearch(...prefilter: Filter[]): PokemonSearchController {
   const [nickname, setNickname] = useState<Nullable<string>>(null)
   const [knownMove, setKnownMove] = useState<Nullable<string>>(null)
   const [originGame, setOriginGame] = useState<Nullable<OriginGame>>(null)
   const [selectedId, setSelectedId] = useState<Option<string>>()
   const ohpkmStore = useOhpkmStore()
   const { preloadRowData } = useOhpkmGrid()
-  const { monsToRelease } = useSaves()
-  const { findHomeLocation } = useBanksAndBoxes()
-  const [results, setResults] = useState<Option<OhpkmRowData[]>>()
-  const [loading, setLoading] = useState(false)
 
-  // TODO: do not get all of these at once
-  // async function getResults(): Promise<OhpkmRowData[]> {
-  //   setLoading(true)
-  //   const mons = await ohpkmStore.getAllStored()
+  let filters: Filter[] = prefilter ?? []
+  if (knownMove) filters.push({ moveTextPrefixEng: knownMove })
+  if (nickname) filters.push({ nicknamePrefix: nickname })
+  if (originGame) filters.push({ originGame })
 
-  //   const results = Object.values(mons ?? {})
-  //     ?.filter(async (mon) => (await prefilter?.(mon)) !== false)
-  //     .filter((mon) => prefixMatches(nickname, mon.nickname))
-  //     .filter((mon) =>
-  //       mon.moves.some((moveIndex) => prefixMatches(knownMove, Moves[moveIndex]?.name))
-  //     )
-  //     .filter((mon) => originGame === null || mon.gameOfOrigin === originGame)
-  //     .map((ohpkm) =>
-  //       toRowData(
-  //         ohpkm,
-  //         findHomeLocation,
-  //         monsToRelease.filter((toRelease) => typeof toRelease === 'string')
-  //       )
-  //     )
-
-  //   setLoading(false)
-  //   setResults(results)
-
-  //   return results
-  // }
+  const table = usePokemonTable('ohpkm-search', filters)
 
   function clearFields() {
     setNickname(null)
@@ -162,9 +130,14 @@ export function usePokemonSearch(
     fieldsEmpty: !nickname,
     clearFields,
 
-    loading,
-    results,
-    getResults: () => Promise.resolve([]),
+    loading: table.query.isLoading,
+    results: table.currentRows,
+    getResults: () =>
+      table.query
+        .refetch()
+        .then(
+          (results) => results.data?.pages.filter(R.isOk).flatMap((page) => page.data.results) ?? []
+        ),
 
     getRowId: (mon) => mon.openhomeId,
     selectedId,

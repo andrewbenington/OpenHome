@@ -20,16 +20,17 @@ import {
   BankBoxCoordinates,
   useBanksAndBoxes,
 } from '@openhome-ui/state-zustand/banks-and-boxes/store'
+import { useSaves } from '@openhome-ui/state/saves'
 import { Language, Lookup } from '@pkm-rs/pkg'
 import { useRef } from 'react'
 import { SelectColumn } from 'react-data-grid'
 import { OhpkmRowData } from '.'
 
 export default function useOhpkmColumns(
-  trackedMonsToRelease: OhpkmIdentifier[],
   onSelectMon?: (id: OhpkmIdentifier) => void
 ): SortableColumn<OhpkmRowData>[] {
   const { getBankName, getBoxName, findHomeLocation } = useBanksAndBoxes()
+  const { trackedMonsToRelease } = useSaves()
 
   // this is necessary because the renderer functions do not update correctly when dependencies change
   const trackedMonsRef = useRef(trackedMonsToRelease)

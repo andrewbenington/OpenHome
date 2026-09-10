@@ -125,6 +125,7 @@ impl OhpkmBytesStore {
         current_cursor: search::PaginationCursor,
         filters: Vec<search::Filter>,
     ) -> search::PaginatedPage<String> {
+        dbg!(&filters);
         let entries = self
             .0
             .values()

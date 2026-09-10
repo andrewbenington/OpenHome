@@ -1,22 +1,22 @@
-import { baseEvolutionsMatch } from '@openhome-core/pkm'
+import { getBaseEvolution } from '@openhome-core/pkm'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { Filter } from '@openhome-core/tauri/spectaCommands'
 import { expectExhaustive } from '@openhome-core/util'
 import { Option, R, Result } from '@openhome-core/util/functional'
 import { usePokemonSearch } from '@openhome-ui/components/search/usePokemonSearch'
 import { useState } from 'react'
-import { MonLocation, useSaves } from '../saves'
+import { MonLocation, MonWithLocation, useSaves } from '../saves'
 import { useOhpkmStore } from './useOhpkmStore'
 
 type InitialState = { state: 'initial' }
 type PendingSelectState = {
   state: 'pending_ohpkm_select'
-  monToRecoverLocation: MonLocation
+  monToRecoverLocation: MonWithLocation
   sourceMonOhpkmId: Option<OhpkmIdentifier>
 }
 type PendingConfirmState = {
   state: 'pending_confirm'
-  monToRecoverLocation: MonLocation
+  monToRecoverLocation: MonWithLocation
   sourceMonOhpkmId: Option<OhpkmIdentifier>
   recoveredDataOhpkmId: string
 }
@@ -41,7 +41,11 @@ export default function useTrackedDataRecovery() {
       return R.Err({ message: 'No Pokémon at source location', data: monToRecoverLocation })
 
     const sourceMonOhpkmId = await ohpkmStore.getIdIfTracked(monAtLocation)
-    setState({ state: 'pending_ohpkm_select', monToRecoverLocation, sourceMonOhpkmId })
+    setState({
+      state: 'pending_ohpkm_select',
+      monToRecoverLocation: { ...monToRecoverLocation, mon: monAtLocation },
+      sourceMonOhpkmId,
+    })
 
     return R.Ok(null)
   }
@@ -115,15 +119,13 @@ export default function useTrackedDataRecovery() {
     }
   }
 
-  async function relevantOhpkmFilter(potentiallyRelevant: OHPKM) {
-    if (state.state === 'initial') return true
-    const monAtLocation = await savesManager.getMonAtLocation(state.monToRecoverLocation)
-    if (monAtLocation === undefined) return true
-
-    return baseEvolutionsMatch(monAtLocation, potentiallyRelevant)
+  const filters: Filter[] = []
+  if ('monToRecoverLocation' in state) {
+    const baseEvolution = getBaseEvolution(state.monToRecoverLocation.mon.nationalDex)?.nationalDex
+    if (baseEvolution) filters.push({ baseEvolution })
   }
 
-  const pokemonSearchController = usePokemonSearch(relevantOhpkmFilter)
+  const pokemonSearchController = usePokemonSearch(...filters)
 
   const sourceMonOhpkmId = 'sourceMonOhpkmId' in state ? state.sourceMonOhpkmId : undefined
   const selectDataPrompt = sourceMonOhpkmId
