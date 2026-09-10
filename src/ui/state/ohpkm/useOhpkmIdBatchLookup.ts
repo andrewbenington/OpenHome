@@ -1,5 +1,6 @@
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { Option } from '@openhome-core/util/functional'
+import { isThenable } from '@openhome-core/util/promise'
 import { useEffect, useEffectEvent, useState } from 'react'
 import { OhpkmBatchLookupResults, useOhpkmStore } from './useOhpkmStore'
 
@@ -24,12 +25,18 @@ export default function useOhpkmIdBatchLookup(
     setLoading(true)
     setBatchResults(undefined)
 
-    loadBatch().then((result) => {
-      if (!ignore) {
-        setBatchResults(result)
-        setLoading(false)
-      }
-    })
+    const batchResult = loadBatch()
+    if (isThenable(batchResult)) {
+      batchResult.then((result) => {
+        if (!ignore) {
+          setBatchResults(result)
+          setLoading(false)
+        }
+      })
+    } else {
+      setBatchResults(batchResult)
+      setLoading(false)
+    }
 
     return () => {
       ignore = true

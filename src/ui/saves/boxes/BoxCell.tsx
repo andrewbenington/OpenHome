@@ -20,7 +20,7 @@ import { PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { DISPLAY_COLOR_PRESETS, TAG_PRESETS } from '@openhome-ui/util/tags'
 import { Lookup } from '@pkm-rs/pkg'
 import { Flex, TextField } from '@radix-ui/themes'
-import { useCallback, useMemo, useState } from 'react'
+import { CSSProperties, useCallback, useMemo, useState } from 'react'
 import '../style.css'
 import DraggableMon from './DraggableMon'
 import DroppableSpace from './DroppableSpace'
@@ -46,6 +46,7 @@ interface BoxCellProps {
   isSelected?: boolean
   onToggleSelect?: () => void
   multiSelectEnabled?: boolean
+  style?: CSSProperties
 }
 
 function BoxCell(props: BoxCellProps) {
@@ -217,6 +218,7 @@ function BoxCell(props: BoxCellProps) {
           style={{
             backgroundColor: cellBackgroundColor,
             borderColor: isSelected ? '#4ade80' : borderColor,
+            ...props.style,
           }}
           onDrop={(e) => {
             e.preventDefault()

@@ -12,7 +12,7 @@ import {
   Generation,
   MetadataSummaryLookup,
 } from '@pkm-rs/pkg'
-import { HTMLAttributes, memo, MouseEventHandler, ReactNode, useState } from 'react'
+import { HTMLAttributes, MouseEventHandler, ReactNode, useState } from 'react'
 import { MonDisplayState, useMonDisplay } from '../hooks/monDisplay'
 import { boxIconImagePath, FormsUsingImages } from '../pokemon-details/useBoxIconImage'
 import { classNames, grayscaleIf } from '../util/style'
@@ -71,7 +71,7 @@ function iconType(
   return shouldUseImage ? 'image' : 'spritesheet'
 }
 
-const PokemonIcon = memo((props: PokemonIconProps) => {
+const PokemonIcon = (props: PokemonIconProps) => {
   const { nationalDex, formIndex, isShiny, heldItemIndex, onlyItem, silhouette, isEgg } = props
   const { grayedOut, topRightIndicator, tags, hasNotes, style, onClick, extraFormIndex } = props
   const { showNotesIndicator, showTags } = useMonDisplay()
@@ -142,7 +142,7 @@ const PokemonIcon = memo((props: PokemonIconProps) => {
       ) : null}
     </div>
   )
-})
+}
 
 interface PokemonIconUsingSheetProps {
   formeMetadata: FormMetadata

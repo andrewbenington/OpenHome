@@ -7,8 +7,9 @@ import { getSaveRef, SAV, SaveIdentifier } from '@openhome-core/save/interfaces'
 import { SAVClass } from '@openhome-core/save/util'
 import { buildSaveFile, getPossibleSaveTypes } from '@openhome-core/save/util/load'
 import { PathData } from '@openhome-core/save/util/path'
-import { Errorable, Option, R, Result } from '@openhome-core/util/functional'
+import { $R, Errorable, Option, R, Result } from '@openhome-core/util/functional'
 import { $O } from '@openhome-core/util/option'
+import { isThenable } from '@openhome-core/util/promise'
 import {
   OPENHOME_BOX_SLOTS,
   useBanksAndBoxes,
@@ -127,7 +128,12 @@ export function useSaves(): SavesAndBanksManager {
         if (!identifier) return Promise.resolve(undefined)
 
         // TODO: should this function return an error if the lookup fails? for now the error is replaced with undefined (via R.ok())
-        return ohpkmStore.tryLoadFromId(identifier).then(R.dropError)
+        const result = ohpkmStore.tryLoadFromId(identifier)
+        if (isThenable(result)) {
+          return result.then(R.dropError)
+        } else {
+          return Promise.resolve($R(result).dropError())
+        }
       }
     },
     [getMonAtHomeLocation, getMonAtSaveLocation, ohpkmStore]

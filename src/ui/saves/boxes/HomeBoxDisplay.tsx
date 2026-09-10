@@ -5,6 +5,7 @@ import { SortTypes } from '@openhome-core/pkm/sort'
 import { monSupportedBySave } from '@openhome-core/save/util'
 import { mapToObject } from '@openhome-core/util'
 import { $R, Option, R, range } from '@openhome-core/util/functional'
+import { NowOrLater } from '@openhome-core/util/promise'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import { Item, Separator, Submenu } from '@openhome-ui/components/context-menu/types'
 import { DebugDataDisplay } from '@openhome-ui/components/DebugDataDisplay'
@@ -253,7 +254,7 @@ type MissingIdData = {
 
 type SlotData = {
   monResult?: OhpkmLookupResult
-  monPromise: Option<Promise<Option<OHPKM>>>
+  monPromise: Option<NowOrLater<Option<OHPKM>>>
   location: HomeMonLocation
   identifier: Option<OhpkmIdentifier>
   // loading: boolean

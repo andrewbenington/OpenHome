@@ -1,6 +1,5 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Option } from '@openhome-core/util/functional'
 import { CtxMenuElementBuilder } from '@openhome-ui/components/context-menu'
 import { MonLocation } from '@openhome-ui/state/saves'
@@ -11,7 +10,7 @@ import BoxCell from './BoxCell'
 interface BoxCellAsyncProps {
   title?: string
   onClick: () => void
-  monPromise?: Promise<Option<OHPKM>>
+  monPromise?: Promise<Option<PKMInterface>> | Option<PKMInterface>
   onDrop: (_: PKMInterface[]) => void
   disabled?: boolean
   disabledReason?: string
@@ -38,20 +37,32 @@ function BoxCellAsync(props: BoxCellAsyncProps) {
         />
       }
     >
-      <BoxCellAsyncInner {...props} monPromise={props.monPromise} />{' '}
+      <BoxCellAsyncInner {...props} monPromise={props.monPromise} />
     </Suspense>
   ) : (
-    <BoxCell {...props} mon={undefined} />
+    <BoxCell {...props} mon={props.monPromise} />
   )
 }
 
-function BoxCellAsyncInner(props: BoxCellAsyncProps & { monPromise: Promise<Option<OHPKM>> }) {
+function BoxCellAsyncInner(
+  props: BoxCellAsyncProps & { monPromise: Promise<Option<PKMInterface>> | Option<PKMInterface> }
+) {
   const { monPromise, ...boxCellProps } = props
   const deferredMonPromise = useDeferredValue(monPromise) // this prevents the icon from returning to the loading icon when two are swapped
-  const mon = use(deferredMonPromise)
+  const mon = isThenable(deferredMonPromise) ? use(deferredMonPromise) : deferredMonPromise
   const isStale = deferredMonPromise !== monPromise
 
-  return <BoxCell {...boxCellProps} mon={mon} loading={isStale} />
+  return (
+    <BoxCell {...boxCellProps} mon={mon} loading={isStale} style={{ backgroundColor: 'purple' }} />
+  )
 }
 
 export default BoxCellAsync
+
+function isThenable<T>(value: unknown): value is PromiseLike<T> {
+  return (
+    value !== null &&
+    (typeof value === 'object' || typeof value === 'function') &&
+    typeof (value as { then?: unknown }).then === 'function'
+  )
+}

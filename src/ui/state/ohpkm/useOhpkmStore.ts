@@ -14,6 +14,7 @@ import { Filter, PaginationCursor } from '@openhome-core/tauri/spectaCommands'
 import { expectExhaustive } from '@openhome-core/util'
 import { $R, Errorable, Option, R, Result } from '@openhome-core/util/functional'
 import { LRUCache } from '@openhome-core/util/lruCache'
+import { isThenable, NowOrLater } from '@openhome-core/util/promise'
 import { FourMoves } from '@openhome-core/util/types'
 import { Lookup, MarkingsSixShapesColors, ModernRibbon, OriginGames } from '@pkm-rs/pkg/pkm_rs'
 import dayjs from 'dayjs'
@@ -83,9 +84,9 @@ export function useOhpkmStore() {
   const updateStore = addToOhpkmStore
 
   const getById = useCallback(
-    (id: string): Promise<Option<OHPKM>> => {
+    (id: string): NowOrLater<Option<OHPKM>> => {
       const cached = ohpkmCache.get(id)
-      if (cached) return Promise.resolve(cached)
+      if (cached) return cached
 
       return backend
         .lookupOhpkmById(id)
@@ -100,7 +101,7 @@ export function useOhpkmStore() {
     [backend]
   )
 
-  async function tryLoadFromId(id: string): Promise<OhpkmLookupResult> {
+  function tryLoadFromId(id: string): NowOrLater<OhpkmLookupResult> {
     const cached = ohpkmCache.get(id)
     if (cached) return Promise.resolve(R.Ok(cached))
 
@@ -110,19 +111,27 @@ export function useOhpkmStore() {
       .then(R.flatMap((ohpkm) => (ohpkm ? R.Ok(ohpkm) : R.Err(IdentifierNotPresent(id)))))
   }
 
-  async function tryLoadBatch(ids: OhpkmIdentifier[]): Promise<OhpkmBatchLookupResults> {
+  function tryLoadBatch(ids: OhpkmIdentifier[]): NowOrLater<OhpkmBatchLookupResults> {
     const batchResults: OhpkmBatchLookupResults = new Map()
 
+    let pendingMons: Promise<[string, OhpkmLookupResult]>[] = []
     for (const identifier of ids) {
-      const cached = ohpkmCache.get(identifier)
-      if (cached) {
-        batchResults.set(identifier, R.Ok(cached))
+      const resultOrPromise = tryLoadFromId(identifier)
+      if (!isThenable(resultOrPromise)) {
+        batchResults.set(identifier, resultOrPromise)
       } else {
-        batchResults.set(identifier, await tryLoadFromId(identifier))
+        pendingMons.push(resultOrPromise.then((ohpkm) => [identifier, ohpkm]))
       }
     }
 
-    return batchResults
+    if (pendingMons.length === 0) {
+      return batchResults
+    }
+
+    return Promise.all(pendingMons).then((results) => {
+      results.forEach(([id, ohpkm]) => batchResults.set(id, ohpkm))
+      return batchResults
+    })
   }
 
   async function monIsStored(id: string): Promise<boolean> {

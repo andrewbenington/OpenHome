@@ -28,7 +28,7 @@ import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
 import { cssClass } from '../../util/style'
 import { useBoxNavigator } from '../util'
 import ArrowButton from './ArrowButton'
-import BoxCell from './BoxCell'
+import BoxCellAsync from './BoxCellAsync'
 
 interface OpenSaveDisplayProps {
   saveIndex: number
@@ -214,14 +214,14 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
               const slotMetadata = save.getSlotMetadata?.(save.currentPCBox, index)
 
               return (
-                <BoxCell
+                <BoxCellAsync
                   key={uniqueKey}
                   onClick={() => setSelectedIndex(index)}
                   dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${index}`}
                   location={location}
                   disabled={isDisabled(mon) || slotMetadata?.isDisabled}
                   disabledReason={slotMetadata?.disabledReason}
-                  mon={mon}
+                  monPromise={mon}
                   onDrop={(importedMons) => {
                     if (importedMons) {
                       attemptImportMons(importedMons, location)

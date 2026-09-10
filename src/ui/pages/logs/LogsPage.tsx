@@ -3,6 +3,7 @@ import { LogEntry, LogLevel } from '@openhome-core/backend/backendInterface'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { $R, Option } from '@openhome-core/util/functional'
+import { isThenable } from '@openhome-core/util/promise'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import { ExpandIcon, FilterIcon } from '@openhome-ui/components/Icons'
 import { InfoGrid } from '@openhome-ui/components/InfoGrid'
@@ -122,7 +123,14 @@ export default function LogsPage(props: LogsPageProps) {
                   key={virtualRow.index}
                   log={log}
                   ohpkmButton={!openhomeIdFilter}
-                  onOhpkmClick={(identifier) => ohpkmStore.getById(identifier).then(setSelectedMon)}
+                  onOhpkmClick={(identifier) => {
+                    const result = ohpkmStore.getById(identifier)
+                    if (isThenable(result)) {
+                      result.then(setSelectedMon)
+                    } else {
+                      setSelectedMon(result)
+                    }
+                  }}
                   onDetailsClick={() => setDisplayedLog(log)}
                   displayError={displayError}
                   style={{
