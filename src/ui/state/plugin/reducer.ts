@@ -24,7 +24,7 @@ export interface OpenHomePlugin {
   icon: string
   assets: Record<string, string>
   icon_image: ImageResponse | null
-  getMonSpritePath?: (params: MonSpriteData) => string | null
+  getMonSpritePath?: (params: MonSpriteData & { dexNum: number; formNum: number }) => string | null
 }
 
 export type PluginStateInternal = { plugins: OpenHomePlugin[]; loaded: boolean }

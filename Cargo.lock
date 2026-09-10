@@ -10,9 +10,9 @@ checksum = "fe438c63458706e03479442743baae6c88256498e6431708f6dfc520a26515d3"
 
 [[package]]
 name = "OpenHome"
-version = "1.16.0"
+version = "1.17.1"
 dependencies = [
- "base64 0.22.1",
+ "base64 0.23.1",
  "bytes",
  "chrono",
  "native-dialog",
@@ -20,6 +20,8 @@ dependencies = [
  "openhome_core",
  "pkm_rs",
  "pkm_rs_derive",
+ "pkm_rs_resources",
+ "pkm_rs_types",
  "reqwest",
  "semver",
  "serde",
@@ -105,9 +107,9 @@ checksum = "330a5ed07fa54e4702c9d6c4174f74427fc0ef6e214bbd677ae50a5099946470"
 
 [[package]]
 name = "arbitrary-int"
-version = "2.1.1"
+version = "2.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "993a810118f8f37e9c4411c86f1c4c940a09a7ab34b7bf2d88d06f50c553fab7"
+checksum = "0ab387a0c4143b4fd3804e193946e78c8ab16cf26c5fde2048e4ac3d618c3b64"
 
 [[package]]
 name = "arrayref"
@@ -200,6 +202,12 @@ name = "base64"
 version = "0.22.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "72b3254f16251a8381aa12e40e3c4d2f0199f8c6508fbecb9d91f575e0fbb8c6"
+
+[[package]]
+name = "base64"
+version = "0.23.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ac07cdecf99051d9a5238b80f35af32cdeba5b336e55d957b318b50137e18da5"
 
 [[package]]
 name = "bit-set"
@@ -1007,6 +1015,26 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "75030f3c4f45dafd7586dd6780965a8c7e8e285a5ecb86713e63a79c5b2766f3"
 dependencies = [
  "cfg-if",
+]
+
+[[package]]
+name = "enum-iterator"
+version = "2.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a4549325971814bda7a44061bf3fe7e487d447cba01e4220a4b454d630d7a016"
+dependencies = [
+ "enum-iterator-derive",
+]
+
+[[package]]
+name = "enum-iterator-derive"
+version = "1.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "685adfa4d6f3d765a26bc5dbc936577de9abf756c1feeb3089b01dd395034842"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.119",
 ]
 
 [[package]]
@@ -2733,12 +2761,15 @@ dependencies = [
 
 [[package]]
 name = "openhome_core"
-version = "1.16.0"
+version = "1.17.1"
 dependencies = [
- "base64 0.22.1",
+ "arbitrary-int",
+ "base64 0.23.1",
  "dirs",
  "pkm_rs",
  "pkm_rs_derive",
+ "pkm_rs_resources",
+ "pkm_rs_types",
  "semver",
  "serde",
  "serde_json",
@@ -2930,7 +2961,7 @@ checksum = "19f132c84eca552bf34cab8ec81f1c1dcc229b811638f9d283dceabe58c5569e"
 
 [[package]]
 name = "pkm_rs"
-version = "1.16.0"
+version = "1.17.1"
 dependencies = [
  "aes",
  "arbitrary-int",
@@ -2964,7 +2995,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_derive"
-version = "1.16.0"
+version = "1.17.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2973,7 +3004,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_resources"
-version = "1.16.0"
+version = "1.17.1"
 dependencies = [
  "arbitrary-int",
  "getrandom 0.4.3",
@@ -2984,6 +3015,7 @@ dependencies = [
  "serde",
  "serde-wasm-bindgen",
  "serde_json",
+ "specta",
  "static_assertions",
  "strum",
  "strum_macros",
@@ -2993,10 +3025,11 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_types"
-version = "1.16.0"
+version = "1.17.1"
 dependencies = [
  "arbitrary-int",
  "chrono",
+ "enum-iterator",
  "getrandom 0.4.3",
  "js-sys",
  "num_enum",
@@ -3005,6 +3038,7 @@ dependencies = [
  "rand",
  "serde",
  "serde-wasm-bindgen",
+ "specta",
  "static_assertions",
  "strum",
  "strum_macros",

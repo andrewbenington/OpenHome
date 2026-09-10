@@ -1,32 +1,20 @@
-use crate::levelup::{LevelupLearnsetFileReader, LevelupLearnsetReader};
-use crate::pkhex_bin::{LA_LEVELUP_PKL, LA_MASTERY_PKL, LA_PERSONAL_FILE};
-use crate::species::form_metadata::{BaseStats, GameMetadata, PersonalInfo};
+use crate::pkhex_bin::{SWSH_LEVELUP_PKL, SWSH_PERSONAL_FILE};
+use crate::species::metadata_table::{BaseStats, GameMetadata, PersonalInfo};
 use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
-const LA_ENTRY_SIZE: usize = 0xB0;
+const SWSH_ENTRY_SIZE: usize = 0xB0;
 
-type GameMetadataLa = GameMetadata<PersonalInfoLa, LA_ENTRY_SIZE>;
+type GameMetadataSwsh = GameMetadata<PersonalInfoSwsh, SWSH_ENTRY_SIZE>;
 
-pub static METADATA_TABLE_LA: GameMetadataLa =
-    GameMetadataLa::from_binary(LA_PERSONAL_FILE, LA_LEVELUP_PKL);
-
-const LA_MOVE_MASTERY: LevelupLearnsetFileReader =
-    LevelupLearnsetFileReader::from_pkl(LA_MASTERY_PKL);
-
-pub fn get_levelup_mastery(national_dex: u16, form_index: u16) -> Option<LevelupLearnsetReader> {
-    LA_MOVE_MASTERY.learnset_at_index(
-        METADATA_TABLE_LA
-            .personal
-            .get_game_index(national_dex, form_index)?,
-    )
-}
+pub static METADATA_TABLE_SWSH: GameMetadataSwsh =
+    GameMetadataSwsh::from_binary(SWSH_PERSONAL_FILE, SWSH_LEVELUP_PKL);
 
 #[derive(Debug, Clone, Copy)]
-pub struct PersonalInfoLa([u8; LA_ENTRY_SIZE]);
+pub struct PersonalInfoSwsh(&'static [u8]);
 
-impl PersonalInfoLa {
-    pub fn from_pkl_bytes(bytes: &[u8]) -> Self {
-        Self(bytes.try_into().unwrap())
+impl PersonalInfoSwsh {
+    pub const fn from_pkl_bytes(bytes: &'static [u8]) -> Self {
+        Self(bytes)
     }
 
     pub fn stats(&self) -> Stats8 {
@@ -50,6 +38,7 @@ impl PersonalInfoLa {
             return Some(national_dex);
         }
         if let Some(forms_offset) = self.forms_offset()
+            && form_index > 0
             && form_index < self.form_count() as u16
         {
             Some(forms_offset + form_index - 1)
@@ -59,7 +48,7 @@ impl PersonalInfoLa {
     }
 
     pub const fn form_count(&self) -> u8 {
-        self.0[0x1A]
+        self.0[0x20]
     }
 
     const fn is_present_in_game(&self) -> bool {
@@ -67,8 +56,8 @@ impl PersonalInfoLa {
     }
 }
 
-impl PersonalInfo for PersonalInfoLa {
-    const MAX_NATIONAL_DEX: NationalDex = NationalDex::Enamorus;
+impl PersonalInfo for PersonalInfoSwsh {
+    const MAX_NATIONAL_DEX: NationalDex = NationalDex::Calyrex;
 
     fn from_pkl_bytes(bytes: &'static [u8]) -> Self {
         Self::from_pkl_bytes(bytes)
@@ -87,6 +76,6 @@ impl PersonalInfo for PersonalInfoLa {
     }
 
     fn source_name(&self) -> &'static str {
-        "Legends: Arceus"
+        "Sword/Shield"
     }
 }

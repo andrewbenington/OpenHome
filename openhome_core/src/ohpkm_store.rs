@@ -1,8 +1,10 @@
 use crate::data_controller::{DataController, DataDir, MONS_V2_DIR};
 use crate::error::{Error, Result};
+use crate::search;
 use crate::util;
 use base64::prelude::*;
-use pkm_rs::ohpkm::OhpkmV2;
+use pkm_rs::ohpkm::OpenHomeId;
+use pkm_rs::ohpkm::{OhpkmV2, UnknownHandlerSave};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::num::NonZeroU64;
@@ -11,9 +13,8 @@ use std::time::{Duration, UNIX_EPOCH};
 use std::{collections::HashMap, fs};
 use tracing::warn;
 
-#[cfg_attr(feature = "desktop", derive(specta::Type))]
 #[derive(Default, Serialize, Deserialize, Clone)]
-pub struct OhpkmBytesStore(HashMap<String, Vec<u8>>);
+pub struct OhpkmBytesStore(HashMap<OpenHomeId, Vec<u8>>);
 
 impl OhpkmBytesStore {
     fn load_from_directory(path: &Path) -> Result<Self> {
@@ -61,7 +62,7 @@ impl OhpkmBytesStore {
                     let errors_fixed_msgs: Vec<String> =
                         errors.into_iter().map(|e| e.to_string()).collect();
                     let errors_fixed_serialized = json!({"errors_fixed": errors_fixed_msgs});
-                    warn!(event = "ohpkm_errors_fixed", context = %errors_fixed_serialized, ohpkm_id = mon.openhome_id(), "Fixed Ohpkm {identifier} with nickname {}", mon.get_nickname());
+                    warn!(event = "ohpkm_errors_fixed", context = %errors_fixed_serialized, ohpkm_id = mon.openhome_id().to_string(), "Fixed Ohpkm {identifier} with nickname {}", mon.get_nickname());
                     *bytes = mon.to_bytes();
                 }
             }
@@ -98,7 +99,7 @@ impl OhpkmBytesStore {
     pub fn to_b64_map(&self) -> HashMap<String, String> {
         let mut output: HashMap<String, String> = HashMap::new();
         for (k, v) in self.0.clone() {
-            output.insert(k, BASE64_STANDARD.encode(v));
+            output.insert(k.to_string(), BASE64_STANDARD.encode(v));
         }
 
         output
@@ -106,25 +107,69 @@ impl OhpkmBytesStore {
 
     pub fn to_b64_entries(&self) -> Vec<(String, String)> {
         self.0
-            .clone()
-            .into_iter()
-            .map(|(k, v)| (k, BASE64_STANDARD.encode(v)))
+            .iter()
+            .map(|(k, v)| (k.to_string(), BASE64_STANDARD.encode(v)))
             .collect()
     }
 
-    pub fn includes(&self, identifier: &str) -> bool {
+    pub fn parsed_iter(&self) -> impl Iterator<Item = OhpkmV2> {
+        self.0
+            .values()
+            .map(Vec::as_slice)
+            .map(OhpkmV2::from_bytes)
+            .filter_map(std::result::Result::ok)
+    }
+
+    pub fn get_b64_bytes_page_after(
+        &self,
+        current_cursor: search::PaginationCursor,
+        filters: Vec<search::Filter>,
+    ) -> search::PaginatedPage<String> {
+        dbg!(&filters);
+        let entries = self
+            .0
+            .values()
+            .filter(|bytes| match OhpkmV2::from_bytes(bytes) {
+                Ok(ohpkm) => filters.iter().all(|filter| filter.applies(&ohpkm)),
+                Err(_) => false,
+            })
+            .map(|bytes| BASE64_STANDARD.encode(bytes));
+
+        search::PaginatedPage::next_after_cursor(current_cursor, entries, self.0.len())
+    }
+
+    pub fn get_all_with_unknown_handler(
+        &self,
+        save: &UnknownHandlerSave,
+    ) -> impl Iterator<Item = OhpkmV2> {
+        self.parsed_iter().filter(move |ohpkm| {
+            save.get_metadata_source()
+                .supports_form(ohpkm.species_and_form())
+                && ohpkm.matching_unknown_handler(save).is_some()
+        })
+    }
+
+    pub fn lookup(&self, identifier: &OpenHomeId) -> Result<Option<OhpkmV2>> {
+        Ok(self
+            .0
+            .get(identifier)
+            .map(|bytes| OhpkmV2::from_bytes(bytes))
+            .transpose()?)
+    }
+
+    pub fn includes(&self, identifier: &OpenHomeId) -> bool {
         self.0.contains_key(identifier)
     }
 
-    pub fn insert(&mut self, identifier: &str, bytes: &[u8]) {
+    pub fn insert(&mut self, identifier: &OpenHomeId, bytes: &[u8]) {
         self.0.insert(identifier.to_owned(), bytes.to_vec());
     }
 
-    pub fn remove(&mut self, identifier: &str) -> bool {
+    pub fn remove(&mut self, identifier: &OpenHomeId) -> bool {
         self.0.remove(identifier).is_some()
     }
 
-    pub fn all_entries(&self) -> impl Iterator<Item = (&String, &Vec<u8>)> {
+    pub fn all_entries(&self) -> impl Iterator<Item = (&OpenHomeId, &Vec<u8>)> {
         self.0.iter()
     }
 }

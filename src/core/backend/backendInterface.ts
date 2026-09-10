@@ -1,10 +1,15 @@
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { SaveWriter } from '@openhome-core/save/interfaces'
+import { SAV, SaveWriter } from '@openhome-core/save/interfaces'
 import { PathData, PossibleSaves } from '@openhome-core/save/util/path'
 import { SaveFolder, StoredBankData } from '@openhome-core/save/util/storage'
-import { ConvertStrategyEntries } from '@openhome-core/tauri/spectaCommands'
-import { Errorable } from '@openhome-core/util/functional'
+import {
+  ConvertStrategyEntries,
+  Filter,
+  PaginatedPage,
+  PaginationCursor,
+} from '@openhome-core/tauri/spectaCommands'
+import { Errorable, Option } from '@openhome-core/util/functional'
 import { LoadSaveResponse, LookupMap, SaveRef } from '@openhome-core/util/types'
 import { LogFilter } from '@openhome-ui/pages/logs'
 import { AppTheme, Settings } from '@openhome-ui/state/appInfo'
@@ -65,11 +70,19 @@ export default interface BackendInterface {
 
   /* ohpkm bytes store by identifier */
   loadOhpkmStore: () => Promise<Errorable<OhpkmStore>>
+  searchOhpkmStore(
+    cursor: PaginationCursor,
+    filters: Filter[]
+  ): Promise<Errorable<PaginatedPage<OHPKM>>>
+  getOhpkmIdsMatchingUnknownHandler(save: SAV): Promise<Errorable<OhpkmIdentifier[]>>
+  lookupOhpkmById: (id: OhpkmIdentifier) => Promise<Errorable<Option<OHPKM>>>
   addToOhpkmStore: (updates: OhpkmStore) => Promise<Errorable<null>>
   deleteHomeMons: (identifiers: string[]) => Promise<Errorable<null>>
 
-  /* prompt user to select new data directory location */
+  /* prompt user to select new data directory location, then restart using that location */
   promptChangeDataDir: () => Promise<Errorable<null>>
+  /* prompt user to select new data directory location, copy all data there, and restart using that location */
+  promptMoveDataDir: () => Promise<Errorable<null>>
   /* get the current data directory path */
   getDataDirPath: () => Promise<Errorable<string>>
 

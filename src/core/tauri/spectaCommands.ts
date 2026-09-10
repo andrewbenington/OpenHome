@@ -118,15 +118,15 @@ export const commands = {
       else return { status: 'error', error: e as any }
     }
   },
-  async changeDataDir(): Promise<Result<null, CommandError>> {
+  async changeDataDir(shouldMove: boolean): Promise<Result<null, CommandError>> {
     try {
-      return { status: 'ok', data: await TAURI_INVOKE('change_data_dir') }
+      return { status: 'ok', data: await TAURI_INVOKE('change_data_dir', { shouldMove }) }
     } catch (e) {
       if (e instanceof Error) throw e
       else return { status: 'error', error: e as any }
     }
   },
-  async loadBanks(): Promise<Result<StoredBankData, CommandError>> {
+  async loadBanks(): Promise<Result<StoredBankDataWasm, CommandError>> {
     try {
       return { status: 'ok', data: await TAURI_INVOKE('load_banks') }
     } catch (e) {
@@ -134,7 +134,7 @@ export const commands = {
       else return { status: 'error', error: e as any }
     }
   },
-  async writeBanks(bankData: StoredBankData): Promise<Result<null, CommandError>> {
+  async writeBanks(bankData: StoredBankDataWasm): Promise<Result<null, CommandError>> {
     try {
       return { status: 'ok', data: await TAURI_INVOKE('write_banks', { bankData }) }
     } catch (e) {
@@ -222,7 +222,7 @@ export const commands = {
       else return { status: 'error', error: e as any }
     }
   },
-  async getLookups(): Promise<Result<LookupState, CommandError>> {
+  async getLookups(): Promise<Result<LookupStateStringIds, CommandError>> {
     try {
       return { status: 'ok', data: await TAURI_INVOKE('get_lookups') }
     } catch (e) {
@@ -230,7 +230,7 @@ export const commands = {
       else return { status: 'error', error: e as any }
     }
   },
-  async addToLookups(newEntries: LookupState): Promise<Result<null, CommandError>> {
+  async addToLookups(newEntries: LookupStateStringIds): Promise<Result<null, CommandError>> {
     try {
       return { status: 'ok', data: await TAURI_INVOKE('add_to_lookups', { newEntries }) }
     } catch (e) {
@@ -249,6 +249,47 @@ export const commands = {
   async getOhpkmStore(): Promise<Result<[string, string][], CommandError>> {
     try {
       return { status: 'ok', data: await TAURI_INVOKE('get_ohpkm_store') }
+    } catch (e) {
+      if (e instanceof Error) throw e
+      else return { status: 'error', error: e as any }
+    }
+  },
+  async searchOhpkmStore(
+    paginationCursor: PaginationCursor,
+    filters: Filter[]
+  ): Promise<Result<PaginatedPage<string>, CommandError>> {
+    try {
+      return {
+        status: 'ok',
+        data: await TAURI_INVOKE('search_ohpkm_store', { paginationCursor, filters }),
+      }
+    } catch (e) {
+      if (e instanceof Error) throw e
+      else return { status: 'error', error: e as any }
+    }
+  },
+  async getOhpkmIdsMatchingUnknownHandler(
+    saveName: string,
+    saveGender: BinaryGender,
+    saveGameOriginIndex: number
+  ): Promise<Result<string[], CommandError>> {
+    try {
+      return {
+        status: 'ok',
+        data: await TAURI_INVOKE('get_ohpkm_ids_matching_unknown_handler', {
+          saveName,
+          saveGender,
+          saveGameOriginIndex,
+        }),
+      }
+    } catch (e) {
+      if (e instanceof Error) throw e
+      else return { status: 'error', error: e as any }
+    }
+  },
+  async getOhpkmBytesById(openhomeId: string): Promise<Result<number[] | null, CommandError>> {
+    try {
+      return { status: 'ok', data: await TAURI_INVOKE('get_ohpkm_bytes_by_id', { openhomeId }) }
     } catch (e) {
       if (e instanceof Error) throw e
       else return { status: 'error', error: e as any }
@@ -302,14 +343,15 @@ export type AppStateInner = {
   new_features_since_update: UpdateFeatures[]
   transaction: TransactionState
 }
-export type Bank = {
+export type BankWasm = {
   id?: string
   name: string | null
   index: number
-  boxes: Box[]
+  boxes: BoxWasm[]
   current_box?: number
 }
-export type Box = {
+export type BinaryGender = 'Male' | 'Female'
+export type BoxWasm = {
   id?: string
   name: string | null
   index: number
@@ -329,6 +371,21 @@ export type ConvertStrategyEntries = {
   ids_and_strategies: [string, NamedStrategy][]
   default_strategy_id: string
 }
+export type Filter =
+  | { nationalDex: number }
+  | { formIndex: number }
+  | { hasType: PkmType }
+  | { lastSave: number }
+  | { originGame: number }
+  | { nature: NatureIndex }
+  | { isShiny: boolean }
+  | { gender: Gender }
+  | { level: number }
+  | { move: [number, MoveIndex] }
+  | { moveTextPrefixEng: string }
+  | { nicknamePrefix: string }
+  | { baseEvolution: number }
+export type Gender = 'Male' | 'Female' | 'Genderless' | 'Invalid'
 export type ImageResponse = { base64: string; extension: string }
 export type JsonValue =
   null | boolean | number | string | JsonValue[] | Partial<{ [key in string]: JsonValue }>
@@ -351,15 +408,44 @@ export type LogFilterJs = {
 }
 export type LogLevel = 'TRACE' | 'DEBUG' | 'INFO' | 'WARN' | 'ERROR'
 export type LogsResponse = { current: LogFilter; next: LogFilter; remaining_file_lines: LogEntry[] }
-export type LookupState = {
+export type LookupStateStringIds = {
   gen12: Partial<{ [key in string]: string }>
   gen345: Partial<{ [key in string]: string }>
 }
 export type MetDataStrategy = 'UseLocationNameMatch' | 'MaximizeLegality'
+export type MoveIndex = number | null
 export type NamedStrategy = { name: string; strategy: ConvertStrategy }
+export type NatureIndex = number
 export type NatureStrategy = 'KeepOriginalNature' | 'KeepMintNature'
 export type NicknameCapitalization = 'GameDefault' | 'Modern'
+export type PaginatedPage<T> = {
+  results: T[]
+  nextPageExists: boolean
+  currentCursor: PaginationCursor
+  nextCursor: PaginationCursor
+  totalCount: number
+}
+export type PaginationCursor = { pageSize: number; pageIndex: number }
 export type PathData = { raw: string; name: string; dir: string; ext: string; separator: string }
+export type PkmType =
+  | 'Normal'
+  | 'Fighting'
+  | 'Flying'
+  | 'Poison'
+  | 'Ground'
+  | 'Rock'
+  | 'Bug'
+  | 'Ghost'
+  | 'Steel'
+  | 'Fire'
+  | 'Water'
+  | 'Grass'
+  | 'Electric'
+  | 'Psychic'
+  | 'Ice'
+  | 'Dragon'
+  | 'Dark'
+  | 'Fairy'
 export type PluginIdentifier = 'radical_red' | 'unbound' | 'luminescent_platinum' | 'compass'
 export type PluginMetadataWithIcon = {
   id: string
@@ -383,7 +469,7 @@ export type SaveRef = {
   valid: boolean
   pluginIdentifier: PluginIdentifier | null
 }
-export type StoredBankData = { banks: Bank[]; current_bank?: number }
+export type StoredBankDataWasm = { banks: BankWasm[]; current_bank?: number }
 export type TransactionState = { open_transaction: boolean; temp_files: string[] }
 export type UpdateFeatures = { version: string; feature_messages: string[] }
 

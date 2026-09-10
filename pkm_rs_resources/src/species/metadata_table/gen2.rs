@@ -1,7 +1,7 @@
 use crate::ExpectLog;
 use crate::pkhex_bin::{CRYSTAL_LEVELUP_PKL, CRYSTAL_PERSONAL_FILE};
 use crate::pkhex_bin::{GS_LEVELUP_PKL, GS_PERSONAL_FILE};
-use crate::species::form_metadata::{BaseStats, GameMetadata, PersonalInfo};
+use crate::species::metadata_table::{BaseStats, GameMetadata, PersonalInfo};
 use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
 const GEN2_ENTRY_SIZE: usize = 0x20;
@@ -94,5 +94,28 @@ mod tests {
         } else {
             Ok(())
         }
+    }
+
+    // types are oddly represented in gen 1/2, so lets verify the "new" types are parsed correctly
+    #[test]
+    fn magnemite_types() -> Result<(), &'static str> {
+        let types = METADATA_TABLE_GS
+            .get_types(NationalDex::Magnemite as u16, 0)
+            .ok_or("Failed to get types for Magnemite")?;
+
+        assert_eq!(types, (PkmType::Electric, Some(PkmType::Steel)));
+
+        Ok(())
+    }
+
+    #[test]
+    fn murkrow_types() -> Result<(), &'static str> {
+        let types = METADATA_TABLE_GS
+            .get_types(NationalDex::Murkrow as u16, 0)
+            .ok_or("Failed to get types for Murkrow")?;
+
+        assert_eq!(types, (PkmType::Dark, Some(PkmType::Flying)));
+
+        Ok(())
     }
 }

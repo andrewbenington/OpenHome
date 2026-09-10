@@ -3,7 +3,7 @@ import { R } from '@openhome-core/util/functional'
 import { stringSorter } from '@openhome-core/util/sort'
 import ContentCard from '@openhome-ui/components/ContentCard'
 import SideTabNavigation from '@openhome-ui/components/side-tabs/SideTabNavigation'
-import { AppInfoContext, AppTheme } from '@openhome-ui/state/appInfo'
+import { AppInfoContext, AppTheme, TableType } from '@openhome-ui/state/appInfo'
 import {
   BoolOption,
   ConvertStrategies,
@@ -96,6 +96,20 @@ function GeneralSettings() {
           </RadioGroup.Root>
         </div>
         <div>
+          <GroupHeader name="Table Type" />
+          <RadioGroup.Root
+            onValueChange={(newValue: TableType) => {
+              if (!newValue) return
+              dispatchAppInfoState({ type: 'set_table_type', payload: newValue })
+            }}
+            value={appInfoState.settings.tableType}
+            style={{ margin: 8 }}
+          >
+            <RadioGroup.Item value="rdg">React Data Grid</RadioGroup.Item>
+            <RadioGroup.Item value="tanstack">Tanstack (Alpha)</RadioGroup.Item>
+          </RadioGroup.Root>
+        </div>
+        <div>
           <GroupHeader name="Data" />
           <Flex direction="column" gap="2">
             <div>
@@ -106,17 +120,35 @@ function GeneralSettings() {
               <b>Current Data Directory:</b>
               <div>{dataDirPath}</div>
               <PromptDialog
+                title="Switch Data Directory"
+                description="Switch data directory? The app will restart using the specified directory as its datastore. No data will be copied or moved. THis is useful when you'd like to treat different directories as multiple 'profiles'. Note that Pokémon tracking data is independent per-directory."
+                triggerButton="Switch Profile"
+                actions={[
+                  { uniqueLabel: 'Cancel', action: () => {}, type: 'cancel' },
+                  {
+                    uniqueLabel: 'Select Directory...',
+                    action: () => {
+                      backend
+                        .promptChangeDataDir()
+                        .then(
+                          R.mapErr((err) => displayError('Error switching data directory', err))
+                        )
+                    },
+                  },
+                ]}
+              />
+              <PromptDialog
                 title="Move Data Directory?"
                 description="Are you sure you want to move the data directory? All files will be copied to the new location, and the app will restart. After they are copied to the new directory successfully, your storage and plugins will be removed from the old directory."
-                triggerButton="Change"
+                triggerButton="Move Data"
                 actions={[
                   { uniqueLabel: 'Cancel', action: () => {}, type: 'cancel' },
                   {
                     uniqueLabel: 'Select New Directory...',
                     action: () => {
                       backend
-                        .promptChangeDataDir()
-                        .then(R.mapErr((err) => displayError('Error changing data directory', err)))
+                        .promptMoveDataDir()
+                        .then(R.mapErr((err) => displayError('Error moving data', err)))
                     },
                     type: 'destructive',
                   },

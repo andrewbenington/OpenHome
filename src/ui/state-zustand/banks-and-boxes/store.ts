@@ -10,7 +10,7 @@ import {
 import { Option, partitionResults, R, range, Result } from '@openhome-core/util/functional'
 import { numericSorter } from '@openhome-core/util/sort'
 import { IdentifierNotPresentError, useOhpkmStore } from '@openhome-ui/state/ohpkm'
-import { createContext, useCallback, useContext, useEffect } from 'react'
+import { createContext, useCallback, useContext } from 'react'
 import { v4 as UuidV4 } from 'uuid'
 import { create, StateCreator, StoreApi, UseBoundStore } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
@@ -69,6 +69,7 @@ export interface BanksAndBoxesState {
   allMonsCurrentBank: () => LocationsByIdentifier
   allMonsInBoxCurrentBank: (boxIndex: number) => OhpkmIdentifier[]
   findHomeLocation: (identifier: OhpkmIdentifier) => Option<BankBoxCoordinates>
+  hasHomeLocation: (identifier: OhpkmIdentifier) => boolean
   indexOfBoxId: (id: string) => Option<number>
 }
 
@@ -263,6 +264,9 @@ export const createBanksAndBoxesStore = (
         },
         findHomeLocation: (identifier: OhpkmIdentifier): Option<BankBoxCoordinates> => {
           return readonlyState().reverseLookup.get(identifier)
+        },
+        hasHomeLocation: (identifier: OhpkmIdentifier): boolean => {
+          return readonlyState().reverseLookup.get(identifier) !== undefined
         },
         indexOfBoxId: (id: string): Option<number> => {
           return Array.from(readonlyState().getCurrentBank().boxes).find(
@@ -478,6 +482,7 @@ export function useBanksAndBoxes() {
   const clearAtHomeLocation = withSelectors.use.clearAtLocation()
   const setAtHomeLocation = withSelectors.use.setAtLocation()
   const findHomeLocation = withSelectors.use.findHomeLocation()
+  const hasHomeLocation = withSelectors.use.hasHomeLocation()
 
   const allMonsInCurrentBankWithLocations = withSelectors.use.allMonsCurrentBank()
   const allMonsInCurrentBank = () => Object.keys(allMonsInCurrentBankWithLocations())
@@ -496,12 +501,14 @@ export function useBanksAndBoxes() {
     switchBoxCurrentBank((getCurrentBank().current_box + 1) % currentBankBoxCount)
   }
 
-  function sortHomeBox(
+  async function sortHomeBox(
     boxIndex: number,
     sortType: string
-  ): Result<null, IdentifierNotPresentError[]> {
-    const loadResults = ohpkmStore.tryLoadFromIds(allMonsInHomeBoxCurrentBank(boxIndex))
-    const { successes: mons, failures } = partitionResults(loadResults)
+  ): Promise<Result<null, IdentifierNotPresentError[]>> {
+    const loadResults = await ohpkmStore.tryLoadBatch(allMonsInHomeBoxCurrentBank(boxIndex))
+
+    const { successes: mons, failures } = partitionResults(Array.from(loadResults.values()))
+
     if (failures.length) {
       return R.Err(failures)
     }
@@ -525,10 +532,13 @@ export function useBanksAndBoxes() {
     return R.Ok(null)
   }
 
-  function sortAllHomeBoxes(sortType: string): Result<null, IdentifierNotPresentError[]> {
+  async function sortAllHomeBoxes(
+    sortType: string
+  ): Promise<Result<null, IdentifierNotPresentError[]>> {
     const currentBankMons = allMonsInCurrentBankWithLocations()
-    const loadResults = ohpkmStore.tryLoadFromIds(Object.keys(currentBankMons))
-    const { successes: allMons, failures } = partitionResults(loadResults)
+    const loadResults = await ohpkmStore.tryLoadBatch(Object.keys(currentBankMons))
+    const { successes: allMons, failures } = partitionResults(Array.from(loadResults.values()))
+
     if (failures.length) {
       failures.forEach((failure) => {
         const location = currentBankMons[failure.identifier]
@@ -587,17 +597,6 @@ export function useBanksAndBoxes() {
     await reloadBankStore()
   }, [backend, banks, getCurrentBank, reloadBankStore])
 
-  useEffect(() => {
-    // returns a function to stop listening
-    const stopListening = backend.onMenuEvent('save', saveChanges)
-
-    // the "stop listening" function should be called when the effect returns,
-    // otherwise duplicate listeners will exist
-    return () => {
-      stopListening()
-    }
-  }, [backend, saveChanges, reloadBankStore])
-
   return {
     saveChanges,
     reloadBankStore,
@@ -631,6 +630,7 @@ export function useBanksAndBoxes() {
     clearAtHomeLocation,
     setAtHomeLocation,
     findHomeLocation,
+    hasHomeLocation,
 
     allMonsInCurrentBank,
     allMonsInHomeBoxCurrentBank,

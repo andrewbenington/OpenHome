@@ -1,6 +1,8 @@
 use std::ops::Deref;
 use std::sync::Mutex;
 
+use openhome_core::search;
+use pkm_rs::ohpkm::{OhpkmV2, OpenHomeId, UnknownHandlerSave};
 use serde::Serialize;
 use tauri::Emitter;
 
@@ -86,6 +88,34 @@ impl AllSyncedState {
 
     pub fn ohpkm_store_b64(&self) -> Result<Vec<(String, String)>> {
         Ok(self.lock()?.ohpkm_store.0.to_b64_entries())
+    }
+
+    pub fn search_ohpkm_store(
+        &self,
+        cursor: search::PaginationCursor,
+        filters: Vec<search::Filter>,
+    ) -> Result<search::PaginatedPage<String>> {
+        Ok(self
+            .lock()?
+            .ohpkm_store
+            .0
+            .get_b64_bytes_page_after(cursor, filters))
+    }
+
+    pub fn search_ohpkms_matching_unknown_handler(
+        &self,
+        save: &UnknownHandlerSave,
+    ) -> Result<Vec<OhpkmV2>> {
+        Ok(self
+            .lock()?
+            .ohpkm_store
+            .0
+            .get_all_with_unknown_handler(save)
+            .collect())
+    }
+
+    pub fn ohpkm_lookup(&self, id: OpenHomeId) -> Result<Option<OhpkmV2>> {
+        self.lock()?.ohpkm_store.0.lookup(&id)
     }
 
     pub fn get_convert_strategies(&self) -> Result<ConvertStrategies> {

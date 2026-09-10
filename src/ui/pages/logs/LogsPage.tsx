@@ -2,7 +2,7 @@ import { Input, Separator } from '@base-ui/react'
 import { LogEntry, LogLevel } from '@openhome-core/backend/backendInterface'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { Option } from '@openhome-core/util/functional'
+import { $R, Option } from '@openhome-core/util/functional'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import { ExpandIcon, FilterIcon } from '@openhome-ui/components/Icons'
 import { InfoGrid } from '@openhome-ui/components/InfoGrid'
@@ -10,11 +10,13 @@ import MiniButton from '@openhome-ui/components/MiniButton'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { Popover } from '@openhome-ui/components/popover/Popover'
 import ToggleButton from '@openhome-ui/components/ToggleButton'
+import useDisplayError, { ErrorDisplayFn } from '@openhome-ui/hooks/displayError'
 import useSimpleVirtualizer from '@openhome-ui/hooks/simpleVirtualizer'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/PokemonDetailsModal'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
+import useOhpkm from '@openhome-ui/state/ohpkm/useOhpkm'
 import { cssClass } from '@openhome-ui/util/style'
-import { CheckboxGroup, Spinner, Text, TextField, Tooltip } from '@radix-ui/themes'
+import { Button, CheckboxGroup, Spinner, Text, TextField, Tooltip } from '@radix-ui/themes'
 import dayjs from 'dayjs'
 import { CSSProperties, useMemo, useRef, useState } from 'react'
 import { LOG_LEVELS, LogController, useLogController } from '.'
@@ -36,6 +38,7 @@ export default function LogsPage(props: LogsPageProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [observing, setObserving] = useState(false)
   const [displayedLog, setDisplayedLog] = useState<LogEntry>()
+  const displayError = useDisplayError()
 
   const virtualizer = useSimpleVirtualizer(
     (filteredLogs?.length ?? 0) + 1,
@@ -119,8 +122,9 @@ export default function LogsPage(props: LogsPageProps) {
                   key={virtualRow.index}
                   log={log}
                   ohpkmButton={!openhomeIdFilter}
-                  onOhpkmClick={(identifier) => setSelectedMon(ohpkmStore.getById(identifier))}
+                  onOhpkmClick={(identifier) => ohpkmStore.getById(identifier).then(setSelectedMon)}
                   onDetailsClick={() => setDisplayedLog(log)}
+                  displayError={displayError}
                   style={{
                     height: `${virtualRow.size}px`,
                     transform: `translateY(${virtualRow.start}px)`,
@@ -279,13 +283,13 @@ type LogLineProps = {
   ohpkmButton: boolean
   onOhpkmClick?: (openhomeId: OhpkmIdentifier) => void
   onDetailsClick: () => void
+  displayError: ErrorDisplayFn
   style?: CSSProperties
 }
 
 function LogLine(props: LogLineProps) {
-  const { log, style, onOhpkmClick, ohpkmButton, onDetailsClick } = props
+  const { log, style, onOhpkmClick, ohpkmButton, onDetailsClick, displayError } = props
   const { ohpkm_id, timestamp, level, message, event } = log
-  const mon = useOhpkmStore().getById(ohpkm_id ?? '')
 
   return (
     <div className="log-line" key={timestamp.toISOString()} style={style}>
@@ -300,17 +304,51 @@ function LogLine(props: LogLineProps) {
       >
         {message}
       </span>
-      {ohpkm_id && ohpkmButton && onOhpkmClick && mon && (
-        <button className="log-ohpkm-button" onClick={() => onOhpkmClick(ohpkm_id)}>
-          <PokemonIcon
-            nationalDex={mon.nationalDex}
-            formIndex={mon.formIndex}
-            style={{ '--pokemon-icon-size': '1.5rem' }}
-          />
-        </button>
+      {ohpkm_id && ohpkmButton && onOhpkmClick && (
+        <OhpkmLogButton identifier={ohpkm_id} onClick={onOhpkmClick} onError={displayError} />
       )}
       <MiniButton onClick={onDetailsClick} icon={ExpandIcon} />
     </div>
+  )
+}
+
+type OhpkmLogButtonProps = {
+  identifier: OhpkmIdentifier
+  onClick: (identifier: OhpkmIdentifier) => void
+  onError: ErrorDisplayFn
+}
+
+function OhpkmLogButton(props: OhpkmLogButtonProps) {
+  const { identifier, onClick } = props
+  const { loading, ohpkmResult } = useOhpkm(identifier)
+
+  const onError = () =>
+    props.onError(
+      'OHPKM Data Not found',
+      `This log is associated with the OHPKM with id ${identifier}, but that data could not be found.`
+    )
+
+  return !loading && ohpkmResult ? (
+    $R(ohpkmResult).match(
+      (ohpkm) => (
+        <button className="log-ohpkm-button" onClick={() => onClick(identifier)}>
+          <PokemonIcon
+            nationalDex={ohpkm.nationalDex}
+            formIndex={ohpkm.formIndex}
+            style={{ '--pokemon-icon-size': '1.5rem' }}
+          />
+        </button>
+      ),
+      () => (
+        <Tooltip content={identifier}>
+          <Button className="box-slot-missing-id" radius="full" size="1" onClick={onError}>
+            !
+          </Button>
+        </Tooltip>
+      )
+    )
+  ) : (
+    <Spinner />
   )
 }
 

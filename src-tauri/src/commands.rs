@@ -5,7 +5,7 @@ use crate::util::ImageResponse;
 use crate::{menu, util};
 use openhome_core::data_controller::{DataController, DataDir};
 use openhome_core::error::{Error, Result};
-use openhome_core::pkm_storage::StoredBankData;
+use openhome_core::pkm_storage::StoredBankDataWasm;
 use openhome_core::saves::{self, SaveFileSearch};
 use serde_json::Value;
 use std::fs;
@@ -250,17 +250,18 @@ pub async fn find_suggested_saves(
 
 #[tauri::command]
 #[specta::specta]
-pub fn load_banks(app_handle: tauri::AppHandle) -> CommandResult<StoredBankData> {
-    Ok(openhome_core::pkm_storage::load_banks(
-        &app_handle.controller(),
-    )?)
+pub fn load_banks(app_handle: tauri::AppHandle) -> CommandResult<StoredBankDataWasm> {
+    Ok(openhome_core::pkm_storage::load_banks(&app_handle.controller())?.into())
 }
 
 #[tauri::command]
 #[specta::specta]
-pub fn write_banks(app_handle: tauri::AppHandle, bank_data: StoredBankData) -> CommandResult<()> {
+pub fn write_banks(
+    app_handle: tauri::AppHandle,
+    bank_data: StoredBankDataWasm,
+) -> CommandResult<()> {
     Ok(openhome_core::pkm_storage::write_banks(
         &app_handle.controller(),
-        bank_data,
+        bank_data.into(),
     )?)
 }

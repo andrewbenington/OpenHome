@@ -1,7 +1,7 @@
 use crate::ExpectLog;
 use crate::pkhex_bin::{RB_LEVELUP_PKL, RB_PERSONAL_FILE};
 use crate::pkhex_bin::{YELLOW_LEVELUP_PKL, YELLOW_PERSONAL_FILE};
-use crate::species::form_metadata::{BaseStats, GameMetadata, PersonalInfo};
+use crate::species::metadata_table::{BaseStats, GameMetadata, PersonalInfo};
 use pkm_rs_types::{NationalDex, PkmType, StatsPreSplit};
 
 const GEN1_ENTRY_SIZE: usize = 0x1c;

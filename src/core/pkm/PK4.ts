@@ -24,9 +24,9 @@ import * as types from '../util/types'
 import { generatePersonalityValuePreservingAttributes, MoveFilter } from '../util/util'
 import { PkmConverter } from './conversion/converter'
 import { PkmConstructorOptions } from './PKM'
+import { modernStatCalc } from './util'
 import * as encryption from './util/encryption'
 import { filterRibbons } from './util/ribbonLogic'
-import { getStats } from './util/statCalc'
 
 const DP_FARAWAY_PLACE = 0xbba
 
@@ -404,7 +404,7 @@ export default class PK4 {
   }
 
   public getStats() {
-    return getStats(this)
+    return modernStatCalc(this)
   }
 
   public get heldItemName() {

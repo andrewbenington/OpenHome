@@ -1,10 +1,10 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { getMonFileIdentifier, OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
+import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SortTypes } from '@openhome-core/pkm/sort'
 import { monSupportedBySave } from '@openhome-core/save/util'
 import { mapToObject } from '@openhome-core/util'
-import { $R, R, range } from '@openhome-core/util/functional'
+import { $R, Option, R, range } from '@openhome-core/util/functional'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import { Item, Separator, Submenu } from '@openhome-ui/components/context-menu/types'
 import { DebugDataDisplay } from '@openhome-ui/components/DebugDataDisplay'
@@ -24,15 +24,14 @@ import PokemonSearchModal from '@openhome-ui/components/search/SearchModal'
 import ToggleButton from '@openhome-ui/components/ToggleButton'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/PokemonDetailsModal'
-import { ErrorContext } from '@openhome-ui/state/error'
-import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
+import { OhpkmLookupResult, useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import useTrackedDataRecovery from '@openhome-ui/state/ohpkm/useTrackedDataRecovery'
-import { HomeMonLocation, MonLocation, MonWithLocation, useSaves } from '@openhome-ui/state/saves'
+import { HomeMonLocation, MonWithLocation, useSaves } from '@openhome-ui/state/saves'
 import { cssClass } from '@openhome-ui/util/style'
 import { Language, Lookup } from '@pkm-rs/pkg'
 import { Button, Card, DropdownMenu, Flex, Heading, TextField, Tooltip } from '@radix-ui/themes'
 import { ToggleGroup } from 'radix-ui'
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { BsFillGrid3X3GapFill } from 'react-icons/bs'
 import { FaSquare } from 'react-icons/fa'
 import {
@@ -46,13 +45,11 @@ import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
 import { useOpenHomeBoxNavigator } from '../util'
 import AllHomeBoxes from './AllHomeBoxes'
 import ArrowButton from './ArrowButton'
-import BoxCell from './BoxCell'
+import BoxCellAsync from './BoxCellAsync'
 import DroppableSpace from './DroppableSpace'
 import './style.css'
 
 export type BoxViewMode = 'one' | 'all'
-
-const ALLOW_DUPE_IMPORT = true
 
 export default function HomeBoxDisplay() {
   const [editing, setEditing] = useState(false)
@@ -233,15 +230,17 @@ export default function HomeBoxDisplay() {
       {viewMode === 'one' ? (
         <SingleBoxMonDisplay />
       ) : (
-        <AllHomeBoxes
-          onBoxSelect={(boxIndex) => {
-            switchBoxCurrentBank(boxIndex)
-            setViewMode('one')
-          }}
-          moving={moving}
-          deleting={deleting}
-          debugMode={debugMode}
-        />
+        viewMode === 'all' && (
+          <AllHomeBoxes
+            onBoxSelect={(boxIndex) => {
+              switchBoxCurrentBank(boxIndex)
+              setViewMode('one')
+            }}
+            moving={moving}
+            deleting={deleting}
+            debugMode={debugMode}
+          />
+        )
       )}
     </Card>
   )
@@ -252,6 +251,14 @@ type MissingIdData = {
   location: BankBoxCoordinates
 }
 
+type SlotData = {
+  monResult?: OhpkmLookupResult
+  monPromise: Option<Promise<Option<OHPKM>>>
+  location: HomeMonLocation
+  identifier: Option<OhpkmIdentifier>
+  // loading: boolean
+}
+
 function SingleBoxMonDisplay() {
   const ohpkmStore = useOhpkmStore()
   const displayError = useDisplayError()
@@ -259,7 +266,6 @@ function SingleBoxMonDisplay() {
   const { getCurrentBox, getCurrentBank, clearAtHomeLocation, removeAllHomeDupes } =
     useBanksAndBoxes()
   const [missingIdData, setMissingIdData] = useState<MissingIdData>()
-  const [, dispatchError] = useContext(ErrorContext)
   const { dragState, isSelected, toggleSelection } = useDragAndDrop()
   const { sortHomeBox, sortAllHomeBoxes } = useBanksAndBoxes()
   const {
@@ -267,7 +273,15 @@ function SingleBoxMonDisplay() {
     setCurrentIndex: setSelectedIndex,
     navigateNext: navigateRight,
     navigatePrev: navigateLeft,
+    selectedMon,
   } = useOpenHomeBoxNavigator()
+
+  const currentBox = getCurrentBox()
+  const getById = ohpkmStore.getById
+  const lookupOhpkmById = useCallback(
+    (identifier: OhpkmIdentifier) => getById(identifier),
+    [getById]
+  )
 
   const TrackedDataRecovery = useTrackedDataRecovery()
   const dataRecoverySearchModal = {
@@ -278,38 +292,6 @@ function SingleBoxMonDisplay() {
       }
     },
   }
-
-  const attemptImportMons = useCallback(
-    (mons: PKMInterface[], location: MonLocation) => {
-      for (const mon of mons) {
-        try {
-          const identifier = getMonFileIdentifier(OHPKM.fromMonUnknownSave(mon))
-
-          if (!identifier) continue
-
-          if (!ALLOW_DUPE_IMPORT && ohpkmStore.monIsStored(identifier)) {
-            const message =
-              mons.length === 1
-                ? 'This Pokémon has been moved into OpenHome before.'
-                : 'One or more of these Pokémon has been moved into OpenHome before.'
-
-            dispatchError({
-              type: 'set_message',
-              payload: { title: 'Import Failed', messages: [message] },
-            })
-            return
-          }
-        } catch (e) {
-          dispatchError({
-            type: 'set_message',
-            payload: { title: 'Import Failed', messages: [`${e}`] },
-          })
-        }
-      }
-      importMonsToLocation(mons, location)
-    },
-    [dispatchError, importMonsToLocation, ohpkmStore]
-  )
 
   const dragData: MonWithLocation | undefined = useMemo(() => {
     const payload = dragState.payload
@@ -328,23 +310,11 @@ function SingleBoxMonDisplay() {
     [dragData, saveFromIdentifier]
   )
 
-  const currentBox = getCurrentBox()
-
-  const selectedMon = useMemo(() => {
-    if (!currentBox || selectedIndex === undefined || selectedIndex >= OPENHOME_BOX_SLOTS) {
-      return undefined
-    }
-    const selectedMonIdentifier = currentBox.identifiers.get(selectedIndex)
-    if (!selectedMonIdentifier) return undefined
-
-    return ohpkmStore.getById(selectedMonIdentifier)
-  }, [currentBox, ohpkmStore, selectedIndex])
-
   const contextElements = useMemo(
     () => [
       Submenu.label('Sort this box...').with(
         ...SortTypes.map((sortType) =>
-          Item.label(`By ${sortType}`).action(() => sortHomeBox(getCurrentBox().index, sortType))
+          Item.label(`By ${sortType}`).action(() => sortHomeBox(currentBox.index, sortType))
         )
       ),
       Submenu.label('Sort all boxes...').with(
@@ -353,7 +323,7 @@ function SingleBoxMonDisplay() {
         )
       ),
     ],
-    [getCurrentBox, sortAllHomeBoxes, sortHomeBox]
+    [currentBox, sortAllHomeBoxes, sortHomeBox]
   )
 
   const removeDupesItem = Item.label('Remove duplicates from this box').action(removeAllHomeDupes)
@@ -371,77 +341,87 @@ function SingleBoxMonDisplay() {
     dismissMissingIdDialog()
   }
 
+  const currentBankIndex = getCurrentBank().index
+  const currentBoxIndex = getCurrentBox().index
+
+  const slots: SlotData[] = useMemo(
+    () =>
+      range(OPENHOME_BOX_SLOTS)
+        .map((index: number) => currentBox.identifiers.get(index))
+        .map((identifier, index) => {
+          const location: HomeMonLocation = {
+            bank: currentBankIndex,
+            box: currentBoxIndex,
+            boxSlot: index,
+            isHome: true,
+          }
+
+          return {
+            monPromise: identifier ? lookupOhpkmById(identifier) : undefined,
+            location,
+            identifier,
+          }
+        }),
+    [currentBankIndex, currentBox.identifiers, currentBoxIndex, lookupOhpkmById]
+  )
+
   return (
     <>
       <OpenHomeCtxMenu sections={[contextElements, [removeDupesItem]]}>
         <div className="home-box-grid">
-          {range(OPENHOME_BOX_SLOTS)
-            .map((index: number) => currentBox.identifiers.get(index))
-            .map((identifier, index) => {
-              const currentBankIndex = getCurrentBank().index
-              const currentBoxIndex = getCurrentBox().index
+          {slots.map(({ monResult, monPromise, location, identifier }, index) => {
+            // if underlying data changes but this key doesn't, the box cell will be stale and may not display the correct species
+            let uniqueKey = identifier ?? `${currentBoxIndex}-${index}`
 
-              const thisLocation: HomeMonLocation = {
-                bank: currentBankIndex,
-                box: currentBoxIndex,
-                boxSlot: index,
-                isHome: true,
-              }
-
-              // if underlying data changes but this key doesn't, the box cell will be stale and may not display the correct species
-              let uniqueKey = `${currentBoxIndex}-${index}-${identifier}`
-
-              const result = identifier ? ohpkmStore.tryLoadFromId(identifier) : undefined
-              if (result && R.isErr(result)) {
-                return (
-                  <Tooltip key={uniqueKey} content={identifier}>
-                    <Button
-                      className="box-slot-missing-id"
-                      radius="full"
-                      size="1"
-                      onClick={() =>
-                        identifier && setMissingIdData({ id: identifier, location: thisLocation })
-                      }
-                    >
-                      !
-                    </Button>
-                  </Tooltip>
-                )
-              }
-
-              const mon = result?.data
-
+            if (monResult && R.isErr(monResult)) {
               return (
-                <BoxCell
-                  key={uniqueKey}
-                  onClick={() => setSelectedIndex(index)}
-                  dragID={`home_${currentBoxIndex}_${index}`}
-                  location={thisLocation}
-                  mon={mon}
-                  onDrop={(importedMons) => {
-                    if (importedMons) {
-                      attemptImportMons(importedMons, thisLocation)
-                    }
-                  }}
-                  disabled={
-                    // don't allow a swap with a pokémon not supported by the source save
-                    mon && dragData && !dragData.isHome && !sourceSupportsMon(mon)
-                  }
-                  contextMenu={[
-                    Item.label('Merge/Recover Tracking Data').action(() =>
-                      $R(TrackedDataRecovery.startRecovery(thisLocation)).mapErr((err) =>
-                        displayError('Error starting recovery process', err.message, err.data)
-                      )
-                    ),
-                    Separator,
-                    ...contextElements,
-                  ]}
-                  multiSelectEnabled={dragState.multiSelectEnabled}
-                  isSelected={isSelected(thisLocation)}
-                  onToggleSelect={() => toggleSelection(thisLocation)}
-                />
+                <Tooltip key={uniqueKey} content={identifier}>
+                  <Button
+                    className="box-slot-missing-id"
+                    radius="full"
+                    size="1"
+                    onClick={() => identifier && setMissingIdData({ id: identifier, location })}
+                  >
+                    !
+                  </Button>
+                </Tooltip>
               )
-            })}
+            }
+
+            const mon = monResult?.data
+
+            return (
+              <BoxCellAsync
+                key={uniqueKey}
+                monPromise={monPromise}
+                onClick={() => setSelectedIndex(index)}
+                dragID={`home_${currentBoxIndex}_${index}`}
+                location={location}
+                openhomeId={identifier}
+                onDrop={(importedMons) => {
+                  if (importedMons) {
+                    importMonsToLocation(importedMons, location)
+                  }
+                }}
+                disabled={
+                  // don't allow a swap with a pokémon not supported by the source save
+                  mon && dragData && !dragData.isHome && !sourceSupportsMon(mon)
+                }
+                contextMenu={[
+                  Item.label('Merge/Recover Tracking Data').action(async () =>
+                    $R(await TrackedDataRecovery.startRecovery(location)).mapErr((err) =>
+                      displayError('Error starting recovery process', err.message, err.data)
+                    )
+                  ),
+                  Separator,
+                  ...contextElements,
+                ]}
+                multiSelectEnabled={dragState.multiSelectEnabled}
+                isSelected={isSelected(location)}
+                onToggleSelect={() => toggleSelection(location)}
+              />
+            )
+          })}
         </div>
       </OpenHomeCtxMenu>
       <PokemonDetailsModal
@@ -492,8 +472,8 @@ function SingleBoxMonDisplay() {
           },
           {
             uniqueLabel: 'Confirm',
-            action: () => {
-              $R(TrackedDataRecovery.confirmRecovery()).mapErr((err) => {
+            action: async () => {
+              $R(await TrackedDataRecovery.confirmRecovery()).mapErr((err) => {
                 TrackedDataRecovery.goBack()
                 displayError('Error recovering Pokémon data', err.message, err.data)
               })

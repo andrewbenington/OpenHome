@@ -1,4 +1,5 @@
 import BackendInterface from '@openhome-core/backend/backendInterface'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
   pluginGameName,
   PluginIdentifier,
@@ -8,12 +9,12 @@ import {
 import { Option } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
 import { CtxMenuElementBuilder, Item } from '@openhome-ui/components/context-menu/types'
+import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { OriginGames } from '@pkm-rs/pkg'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { getOriginIconPath } from '../images/game'
 import { OPENHOME_BOX_SLOTS, useBanksAndBoxes } from '../state-zustand/banks-and-boxes/store'
-import { useOhpkmStore } from '../state/ohpkm'
 
 export type SaveViewMode = 'card' | 'grid'
 
@@ -107,20 +108,34 @@ function moduloUnderflowWrap(a: number, b: number): number {
 
 export function useOpenHomeBoxNavigator() {
   const { getCurrentBox } = useBanksAndBoxes()
-  const ohpkmStore = useOhpkmStore()
   const [currentIndex, setCurrentIndex] = useState<number>()
+  const [selectedMon, setSelectedMon] = useState<Option<OHPKM>>()
+  const ohpkmStore = useOhpkmStore()
+
+  function selectMon(index: Option<number>) {
+    setCurrentIndex(index)
+    if (index === undefined) {
+      setSelectedMon(undefined)
+      return
+    }
+
+    const identifier = getCurrentBox().identifiers.get(index)
+    if (identifier) {
+      ohpkmStore.getById(identifier).then(setSelectedMon)
+      return true
+    } else {
+      return false
+    }
+  }
 
   function navigateNext() {
     if (currentIndex === undefined) return
-    const currentBox = getCurrentBox()
     for (
       let i = (currentIndex + 1) % OPENHOME_BOX_SLOTS;
       i !== currentIndex;
       i = (i + 1) % OPENHOME_BOX_SLOTS
     ) {
-      const identifier = currentBox.identifiers.get(i)
-      if (identifier && ohpkmStore.monIsStored(identifier)) {
-        setCurrentIndex(i)
+      if (selectMon(i)) {
         break
       }
     }
@@ -128,15 +143,12 @@ export function useOpenHomeBoxNavigator() {
 
   function navigatePrev() {
     if (currentIndex === undefined) return
-    const currentBox = getCurrentBox()
     for (
       let i = moduloUnderflowWrap(currentIndex - 1, OPENHOME_BOX_SLOTS);
       i !== currentIndex;
       i = moduloUnderflowWrap(i - 1, OPENHOME_BOX_SLOTS)
     ) {
-      const identifier = currentBox.identifiers.get(i)
-      if (identifier && ohpkmStore.monIsStored(identifier)) {
-        setCurrentIndex(i)
+      if (selectMon(i)) {
         break
       }
     }
@@ -144,7 +156,8 @@ export function useOpenHomeBoxNavigator() {
 
   return {
     currentIndex,
-    setCurrentIndex,
+    setCurrentIndex: selectMon,
+    selectedMon,
     navigatePrev,
     navigateNext,
   }

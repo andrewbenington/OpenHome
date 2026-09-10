@@ -16,7 +16,7 @@ import { isLoaded, LoadingSaveSuggestion, SaveSuggestion } from './suggestions'
 import { SaveViewMode } from './util'
 
 interface SaveFileSelectorProps {
-  onOpen: (path: PathData) => void
+  onOpen: (path: PathData) => Promise<void>
   view: SaveViewMode
   cardSize: number
 }

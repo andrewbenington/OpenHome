@@ -1,20 +1,20 @@
-use crate::pkhex_bin::{SWSH_LEVELUP_PKL, SWSH_PERSONAL_FILE};
-use crate::species::form_metadata::{BaseStats, GameMetadata, PersonalInfo};
+use crate::pkhex_bin::{BDSP_LEVELUP_PKL, BDSP_PERSONAL_FILE};
+use crate::species::metadata_table::{BaseStats, GameMetadata, PersonalInfo};
 use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
-const SWSH_ENTRY_SIZE: usize = 0xB0;
+const BDSP_ENTRY_SIZE: usize = 0x44;
 
-type GameMetadataSwsh = GameMetadata<PersonalInfoSwsh, SWSH_ENTRY_SIZE>;
+type GameMetadataBdsp = GameMetadata<PersonalInfoBdsp, BDSP_ENTRY_SIZE>;
 
-pub static METADATA_TABLE_SWSH: GameMetadataSwsh =
-    GameMetadataSwsh::from_binary(SWSH_PERSONAL_FILE, SWSH_LEVELUP_PKL);
+pub static METADATA_TABLE_BDSP: GameMetadataBdsp =
+    GameMetadataBdsp::from_binary(BDSP_PERSONAL_FILE, BDSP_LEVELUP_PKL);
 
 #[derive(Debug, Clone, Copy)]
-pub struct PersonalInfoSwsh(&'static [u8]);
+pub struct PersonalInfoBdsp([u8; BDSP_ENTRY_SIZE]);
 
-impl PersonalInfoSwsh {
-    pub const fn from_pkl_bytes(bytes: &'static [u8]) -> Self {
-        Self(bytes)
+impl PersonalInfoBdsp {
+    pub fn from_pkl_bytes(bytes: &[u8]) -> Self {
+        Self(bytes.try_into().unwrap())
     }
 
     pub fn stats(&self) -> Stats8 {
@@ -22,7 +22,7 @@ impl PersonalInfoSwsh {
     }
 
     pub fn forms_offset(&self) -> Option<u16> {
-        let stored_index = i16::from_le_bytes(self.0[0x1E..0x20].try_into().unwrap());
+        let stored_index = i16::from_le_bytes(self.0[0x1e..0x20].try_into().unwrap());
         if stored_index == -1 {
             None
         } else {
@@ -38,7 +38,6 @@ impl PersonalInfoSwsh {
             return Some(national_dex);
         }
         if let Some(forms_offset) = self.forms_offset()
-            && form_index > 0
             && form_index < self.form_count() as u16
         {
             Some(forms_offset + form_index - 1)
@@ -56,8 +55,8 @@ impl PersonalInfoSwsh {
     }
 }
 
-impl PersonalInfo for PersonalInfoSwsh {
-    const MAX_NATIONAL_DEX: NationalDex = NationalDex::Calyrex;
+impl PersonalInfo for PersonalInfoBdsp {
+    const MAX_NATIONAL_DEX: NationalDex = NationalDex::Arceus;
 
     fn from_pkl_bytes(bytes: &'static [u8]) -> Self {
         Self::from_pkl_bytes(bytes)
@@ -76,6 +75,6 @@ impl PersonalInfo for PersonalInfoSwsh {
     }
 
     fn source_name(&self) -> &'static str {
-        "Sword/Shield"
+        "Brilliant Diamond/Shining Pearl"
     }
 }

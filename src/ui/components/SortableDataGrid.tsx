@@ -1,3 +1,5 @@
+import { PaginatedPage, PaginationCursor } from '@openhome-core/tauri/spectaCommands'
+import { Errorable, Option } from '@openhome-core/util/functional'
 import {
   booleanSorter,
   dayjsSorter,
@@ -9,8 +11,18 @@ import {
   stringSorter,
 } from '@openhome-core/util/sort'
 import { Flex } from '@radix-ui/themes'
+import { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
+import { Atom } from '@tanstack/react-store'
 import { isDayjs } from 'dayjs'
-import { ReactNode, useMemo, useRef, useState, type RefAttributes } from 'react'
+import {
+  ReactNode,
+  RefObject,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type RefAttributes,
+} from 'react'
 import {
   DataGrid,
   RenderCellProps,
@@ -138,10 +150,16 @@ type Filters<T extends Record<string, any>> = Partial<{
   [K in keyof T]: string[]
 }>
 
-type SortableDataGridProps<R extends SortableValue> = {
+export type SortableDataGridProps<R extends SortableValue> = {
   columns: SortableColumn<R>[]
   defaultSort?: string
   defaultSortOrder?: 'ASC' | 'DESC'
+  paginationAtom?: Atom<PaginationCursor>
+  dataQuery?: UseInfiniteQueryResult<InfiniteData<Errorable<PaginatedPage<R>>>>
+  tableRef?: RefObject<HTMLDivElement | null>
+  fetching?: 'prev' | 'next'
+  onScrolledToBottom?: () => Promise<void>
+  shouldLoadMore?: boolean
 } & DataGridProps<R> &
   RefAttributes<DataGridHandle>
 
@@ -154,6 +172,8 @@ export default function SortableDataGrid<R extends SortableValue>(props: Sortabl
     rowHeight,
     defaultColumnOptions,
     className,
+    onScrolledToBottom,
+    tableRef,
     ...otherProps
   } = props
   const [sortColumns, setSortColumns] = useState<SortColumn[]>(
@@ -219,8 +239,22 @@ export default function SortableDataGrid<R extends SortableValue>(props: Sortabl
     [columns, filters, hiddenColumns, reorderedColumns, sortColumns, sortedRows]
   )
 
+  const fetchMoreOnBottomReached = useCallback(async () => {
+    if (gridRef?.current?.element && onScrolledToBottom) {
+      const { scrollHeight, scrollTop, clientHeight } = gridRef.current.element
+      // once the user has scrolled within 500px of the bottom of the table, fetch more data if we can
+      if (scrollHeight - scrollTop - clientHeight < 400) {
+        await onScrolledToBottom()
+      }
+    }
+  }, [onScrolledToBottom, gridRef])
+
   return (
-    <div className={className} style={{ height: '100%', overflow: 'hidden ', flex: 1 }}>
+    <div
+      className={className}
+      style={{ height: '100%', overflow: 'hidden ', flex: 1 }}
+      ref={tableRef}
+    >
       <DataGrid
         ref={gridRef}
         className="datagrid"
@@ -245,6 +279,7 @@ export default function SortableDataGrid<R extends SortableValue>(props: Sortabl
         }}
         defaultColumnOptions={{ ...defaultColumnOptions, minWidth: 30 }}
         style={{ fontSize: 12, height: 'inherit', ...otherProps.style }}
+        onScroll={fetchMoreOnBottomReached}
       />
     </div>
   )
@@ -320,88 +355,68 @@ function HeaderWithContextMenu<R extends Record<string, unknown>>({
 
   const activeFilter = columnFilter !== undefined && columnFilter.length !== filterValues.length
 
-  const headerCtxMenuBuilders = useMemo(
-    () => [
-      Label.component(column.name),
-      Separator,
-      getFilterValue
-        ? Submenu.label('Filter...')
-            .with(
-              Item.label(activeFilter ? 'Select All' : 'Deselect All').action(() =>
-                setFilters({
-                  ...filters,
-                  [columnKey]: activeFilter ? undefined : [],
-                })
-              )
-            )
-            .with(
-              ...filterValues.toSorted(filterDropdownSorter).map((filterValue) =>
-                Checkbox.label(filterValue)
-                  .handleValueChanged(() => {
-                    if (columnFilter === undefined) {
-                      setFilters({
-                        ...filters,
-                        [columnKey]: filterValues.filter(
-                          (otherValue) => filterValue !== otherValue
-                        ),
-                      })
-                    } else if (columnFilter.includes(filterValue)) {
-                      setFilters({
-                        ...filters,
-                        [columnKey]: columnFilter.filter(
-                          (otherValue) => filterValue !== otherValue
-                        ),
-                      })
-                    } else {
-                      setFilters({
-                        ...filters,
-                        [columnKey]: [...columnFilter, filterValue],
-                      })
-                    }
-                  })
-                  .handleIsChecked(() => !columnFilter || columnFilter.includes(filterValue))
-              )
-            )
-        : undefined,
-      getFilterValue ? Item.label('Clear Filters').action(() => setFilters({})) : undefined,
-      getFilterValue ? Separator : undefined,
-      Submenu.label('Show/Hide Columns').with(
-        ...columns
-          .filter((col) => !!col.name)
-          .map((col) =>
-            Checkbox.component(col.name)
-              .handleValueChanged(() => {
-                if (visibleColumnKeys.has(col.key)) {
-                  if (visibleColumnKeys.size > 1) {
-                    setHiddenColumns([...hiddenColumns, col.key])
-                  }
-                } else {
-                  setHiddenColumns([...hiddenColumns.filter((k) => k !== col.key)])
-                }
-              })
-              .handleIsChecked(() => visibleColumnKeys.has(col.key))
-          )
-      ),
-      Item.label('Reset to Default').action(() =>
-        setHiddenColumns(columns.filter((c) => c.hideByDefault).map((c) => c.key))
-      ),
-    ],
-    [
-      activeFilter,
-      column.name,
-      columnFilter,
-      columnKey,
-      columns,
-      filterDropdownSorter,
-      filterValues,
-      filters,
-      getFilterValue,
-      hiddenColumns,
-      setFilters,
-      setHiddenColumns,
-      visibleColumnKeys,
-    ]
+  const setFilter = useCallback(
+    (columnKey: keyof R, values: Option<string[]>) =>
+      setFilters({ ...filters, [columnKey]: values }),
+    [filters, setFilters]
   )
+
+  const buildFilterCheckboxHandler = (filterValue: string) => () => {
+    if (columnFilter === undefined) {
+      setFilter(
+        columnKey,
+        filterValues.filter((otherValue) => filterValue !== otherValue)
+      )
+    } else if (columnFilter.includes(filterValue)) {
+      setFilter(
+        columnKey,
+        columnFilter.filter((otherValue) => filterValue !== otherValue)
+      )
+    } else {
+      setFilter(columnKey, [...columnFilter, filterValue])
+    }
+  }
+
+  const headerCtxMenuBuilders = [
+    Label.component(column.name),
+    getFilterValue
+      ? Submenu.label('Filter...')
+          .with(
+            Item.label(activeFilter ? 'Select All' : 'Deselect All').action(() =>
+              setFilter(columnKey, activeFilter ? undefined : [])
+            )
+          )
+          .with(
+            ...filterValues.toSorted(filterDropdownSorter).map((filterValue) =>
+              Checkbox.label(filterValue)
+                .handleValueChanged(buildFilterCheckboxHandler(filterValue))
+                .handleIsChecked(() => !columnFilter || columnFilter.includes(filterValue))
+            )
+          )
+      : undefined,
+    getFilterValue ? Item.label('Clear Filters').action(() => setFilters({})) : undefined,
+    getFilterValue ? Separator : undefined,
+    Submenu.label('Show/Hide Columns').with(
+      ...columns
+        .filter((col) => !!col.name)
+        .map((col) =>
+          Checkbox.component(col.name)
+            .handleValueChanged(() => {
+              if (visibleColumnKeys.has(col.key)) {
+                if (visibleColumnKeys.size > 1) {
+                  setHiddenColumns([...hiddenColumns, col.key])
+                }
+              } else {
+                setHiddenColumns([...hiddenColumns.filter((k) => k !== col.key)])
+              }
+            })
+            .handleIsChecked(() => visibleColumnKeys.has(col.key))
+        )
+    ),
+    Item.label('Reset to Default').action(() =>
+      setHiddenColumns(columns.filter((c) => c.hideByDefault).map((c) => c.key))
+    ),
+  ]
 
   return (
     <OpenHomeCtxMenu elements={headerCtxMenuBuilders}>

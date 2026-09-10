@@ -1,10 +1,11 @@
 import useBackend from '@openhome-core/backend/useBackend'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
 import { monSupportedBySave } from '@openhome-core/save/util'
-import { $R, range } from '@openhome-core/util/functional'
+import { $R, R, range } from '@openhome-core/util/functional'
+import { $O } from '@openhome-core/util/option'
+import { filterUndefined } from '@openhome-core/util/sort'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import { Item, OpenHomeCtxMenu, Submenu } from '@openhome-ui/components/context-menu'
 import PromptDialog from '@openhome-ui/components/dialog/PromptDialog'
@@ -15,11 +16,12 @@ import useDisplayError from '@openhome-ui/hooks/displayError'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/PokemonDetailsModal'
 import { ErrorContext } from '@openhome-ui/state/error'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
+import useOhpkmBatchIdLookup from '@openhome-ui/state/ohpkm/useOhpkmIdBatchLookup'
 import useTrackedDataRecovery from '@openhome-ui/state/ohpkm/useTrackedDataRecovery'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { colorIsDark } from '@openhome-ui/util/color'
 import { MetadataSummaryLookup } from '@pkm-rs/pkg'
-import { Button, Dialog, Flex, Grid, Separator } from '@radix-ui/themes'
+import { Button, Dialog, Flex, Grid, Separator, Spinner } from '@radix-ui/themes'
 import { useCallback, useContext, useMemo, useState } from 'react'
 import { MdClose } from 'react-icons/md'
 import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
@@ -31,8 +33,6 @@ import BoxCell from './BoxCell'
 interface OpenSaveDisplayProps {
   saveIndex: number
 }
-
-const ALLOW_DUPE_IMPORT = true
 
 const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const savesManager = useSaves()
@@ -46,6 +46,14 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
 
   const save = useMemo(() => allOpenSaves[saveIndex], [allOpenSaves, saveIndex])
   const displayError = useDisplayError()
+
+  const allSaveMons = useMemo(() => save.getAllMons().map((mon) => [mon, save] as const), [save])
+  const { loading: saveOhpkmsLoading, batchResults: saveOhpkms } = useOhpkmBatchIdLookup(
+    allSaveMons
+      .map(([mon]) => mon)
+      .map(ohpkmStore.getPotentialOhpkmId)
+      .filter(filterUndefined)
+  )
 
   const TrackedDataRecovery = useTrackedDataRecovery()
 
@@ -70,10 +78,18 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
       return undefined
     }
     const selectedSlot = save.getMonAt(save.currentPCBox, selectedIndex)
-    return selectedSlot ? ohpkmStore.monOrOhpkmIfTracked(selectedSlot) : undefined
-  }, [save, ohpkmStore, selectedIndex])
+    if (!selectedSlot) return undefined
 
-  const attemptImportMons = (mons: PKMInterface[], location: MonLocation) => {
+    const potentialOhpkmId = ohpkmStore.getPotentialOhpkmId(selectedSlot)
+    if (!potentialOhpkmId) return selectedSlot
+
+    const lookupResult = saveOhpkms?.get(potentialOhpkmId)
+    if (!lookupResult) return selectedSlot
+
+    return R.dropError(lookupResult) ?? selectedSlot
+  }, [selectedIndex, save, ohpkmStore, saveOhpkms])
+
+  const attemptImportMons = async (mons: PKMInterface[], location: MonLocation) => {
     const unsupportedMons = mons.filter((mon) => !monSupportedBySave(save, mon))
 
     if (unsupportedMons.length) {
@@ -90,31 +106,6 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
       return
     }
 
-    for (const mon of mons) {
-      try {
-        const identifier = getMonFileIdentifier(OHPKM.fromMonUnknownSave(mon))
-
-        if (!identifier) continue
-
-        if (!ALLOW_DUPE_IMPORT && ohpkmStore.monIsStored(identifier)) {
-          const message =
-            mons.length === 1
-              ? 'This Pokémon has been moved into OpenHome before.'
-              : 'One or more of these Pokémon has been moved into OpenHome before.'
-
-          dispatchError({
-            type: 'set_message',
-            payload: { title: 'Import Failed', messages: [message] },
-          })
-          return
-        }
-      } catch (e) {
-        dispatchError({
-          type: 'set_message',
-          payload: { title: 'Import Failed', messages: [`${e}`] },
-        })
-      }
-    }
     importMonsToLocation(mons, location)
   }
 
@@ -158,6 +149,28 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
     .map((index: number) => save.getMonAt(save.currentPCBox, index))
     .every(isDisabled)
 
+  const slots = range(save.boxColumns * save.boxRows)
+    .map((index: number) => save.getMonAt(save.currentPCBox, index))
+    .map((_, index) => {
+      const location: MonLocation = {
+        isHome: false,
+        box: save.currentPCBox,
+        boxSlot: index,
+        saveIdentifier: save.identifier,
+      }
+      const mon = save.getMonAt(location.box, location.boxSlot)
+      const monOrOhpkm =
+        $O(save.getMonAt(location.box, location.boxSlot))
+          .flatMap(ohpkmStore.getPotentialOhpkmId)
+          .flatMap((openhomeId) => saveOhpkms?.get(openhomeId))
+          .map(R.dropError)
+          .get() ?? mon
+
+      return { save, mon: monOrOhpkm }
+    })
+
+  if (saveOhpkmsLoading) return <Spinner />
+
   return save && save.currentPCBox !== undefined ? (
     <>
       <Flex direction="column" width="100%">
@@ -186,65 +199,55 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
             />
           </div>
           <Grid className="box-grid" columns={save.boxColumns.toString()}>
-            {range(save.boxColumns * save.boxRows)
-              .map((index: number) => save.getMonAt(save.currentPCBox, index))
-              .map((_, index) => {
-                const location: MonLocation = {
-                  isHome: false,
-                  box: save.currentPCBox,
-                  boxSlot: index,
-                  saveIdentifier: save.identifier,
-                }
-                let mon = save.getMonAt(location.box, location.boxSlot)
-                if (mon) {
-                  mon = ohpkmStore.monOrOhpkmIfTracked(mon)
-                }
+            {slots.map(({ save, mon }, index) => {
+              const location: MonLocation = {
+                isHome: false,
+                box: save.currentPCBox,
+                boxSlot: index,
+                saveIdentifier: save.identifier,
+              }
 
-                const uniqueKey = mon
-                  ? `${save.currentPCBox}-${index}-${mon.encryptionConstant ?? mon.personalityValue ?? JSON.stringify(mon.dvs)}-${mon.nickname}`
-                  : `${save.currentPCBox}-${index}`
+              const uniqueKey = mon
+                ? `${save.currentPCBox}-${index}-${mon.encryptionConstant ?? mon.personalityValue ?? JSON.stringify(mon.dvs)}-${mon.nickname}`
+                : `${save.currentPCBox}-${index}`
 
-                const slotMetadata = save.getSlotMetadata?.(save.currentPCBox, index)
+              const slotMetadata = save.getSlotMetadata?.(save.currentPCBox, index)
 
-                return (
-                  <BoxCell
-                    key={uniqueKey}
-                    onClick={() => setSelectedIndex(index)}
-                    dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${index}`}
-                    location={location}
-                    disabled={isDisabled(mon) || slotMetadata?.isDisabled}
-                    disabledReason={slotMetadata?.disabledReason}
-                    mon={mon}
-                    onDrop={(importedMons) => {
-                      if (importedMons) {
-                        attemptImportMons(importedMons, location)
-                      }
-                    }}
-                    multiSelectEnabled={dragState.multiSelectEnabled}
-                    isSelected={isSelected(location)}
-                    onToggleSelect={() => toggleSelection(location)}
-                    contextMenu={
-                      mon
-                        ? [
-                            Item.label(
-                              mon instanceof OHPKM
-                                ? 'Merge/Recover Tracking Data'
-                                : 'Fix Missing Tracking Data'
-                            ).action(() =>
-                              $R(TrackedDataRecovery.startRecovery(location)).mapErr((err) =>
-                                displayError(
-                                  'Error starting recovery process',
-                                  err.message,
-                                  err.data
-                                )
-                              )
-                            ),
-                          ]
-                        : []
+              return (
+                <BoxCell
+                  key={uniqueKey}
+                  onClick={() => setSelectedIndex(index)}
+                  dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${index}`}
+                  location={location}
+                  disabled={isDisabled(mon) || slotMetadata?.isDisabled}
+                  disabledReason={slotMetadata?.disabledReason}
+                  mon={mon}
+                  onDrop={(importedMons) => {
+                    if (importedMons) {
+                      attemptImportMons(importedMons, location)
                     }
-                  />
-                )
-              })}
+                  }}
+                  multiSelectEnabled={dragState.multiSelectEnabled}
+                  isSelected={isSelected(location)}
+                  onToggleSelect={() => toggleSelection(location)}
+                  contextMenu={
+                    mon
+                      ? [
+                          Item.label(
+                            mon instanceof OHPKM
+                              ? 'Merge/Recover Tracking Data'
+                              : 'Fix Missing Tracking Data'
+                          ).action(async () =>
+                            $R(await TrackedDataRecovery.startRecovery(location)).mapErr((err) =>
+                              displayError('Error starting recovery process', err.message, err.data)
+                            )
+                          ),
+                        ]
+                      : []
+                  }
+                />
+              )
+            })}
           </Grid>
         </div>
         <Dialog.Root open={detailsModal} onOpenChange={setDetailsModal}>
@@ -302,8 +305,8 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           },
           {
             uniqueLabel: 'Confirm',
-            action: () => {
-              $R(TrackedDataRecovery.confirmRecovery()).mapErr((err) => {
+            action: async () => {
+              $R(await TrackedDataRecovery.confirmRecovery()).mapErr((err) => {
                 TrackedDataRecovery.goBack()
                 displayError('Error recovering Pokémon data', err.message, err.data)
               })

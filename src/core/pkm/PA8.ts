@@ -1,5 +1,6 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { ModernRibbons } from '@openhome-core/resources'
+import { movesFromLaTutorFlags } from '@openhome-core/resources/moves/flags'
 import * as byteLogic from '@openhome-core/util/byteLogic'
 import { Errorable, Option, R } from '@openhome-core/util/functional'
 import { FourMoves } from '@openhome-core/util/types'
@@ -10,7 +11,6 @@ import {
   ContestStats,
   ConvertStrategy,
   getMoveMasteredLevelLa,
-  HyperTraining,
   Item,
   Language,
   Languages,
@@ -25,9 +25,9 @@ import * as types from '../util/types'
 import { getHeightCalculated, getWeightCalculated, MoveFilter } from '../util/util'
 import { PkmConverter } from './conversion/converter'
 import { PkmConstructorOptions } from './PKM'
+import { modernStatCalc } from './util'
 import * as encryption from './util/encryption'
 import { filterRibbons } from './util/ribbonLogic'
-import { getStats } from './util/statCalc'
 
 export default class PA8 {
   static getFormat() {
@@ -67,8 +67,7 @@ export default class PA8 {
   moves: FourMoves
   movePP: FourMoves
   nickname: string
-  movePPUps: FourMoves
-  relearnMoves: FourMoves
+  movePPUps: FourMoves = [0, 0, 0, 0]
   currentHP: number
   ivs: types.Stats
   isEgg: boolean
@@ -101,7 +100,7 @@ export default class PA8 {
   eggLocationIndex: number
   metLocationIndex: number
   metLevel: number
-  hyperTraining: HyperTraining
+  // hyperTraining: HyperTraining
   moveFlagsLA: Uint8Array
   homeTracker: bigint
   tutorFlagsLA: Uint8Array
@@ -168,18 +167,12 @@ export default class PA8 {
         dataView.getUint8(0x5f),
       ]
       this.nickname = stringLogic.utf16BytesToString(buffer, 0x60, 12)
-      this.movePPUps = [
-        dataView.getUint8(0x86),
-        dataView.getUint8(0x87),
-        dataView.getUint8(0x88),
-        dataView.getUint8(0x89),
-      ]
-      this.relearnMoves = [
-        dataView.getUint16(0x8a, true),
-        dataView.getUint16(0x8c, true),
-        dataView.getUint16(0x8e, true),
-        dataView.getUint16(0x90, true),
-      ]
+      // this.movePPUps = [
+      //   dataView.getUint8(0x86),
+      //   dataView.getUint8(0x87),
+      //   dataView.getUint8(0x88),
+      //   dataView.getUint8(0x89),
+      // ]
       this.currentHP = dataView.getUint16(0x92, true)
       this.ivs = types.read30BitIVsFromBytes(dataView, 0x94)
       this.isEgg = byteLogic.getFlag(dataView, 0x94, 30)
@@ -212,7 +205,7 @@ export default class PA8 {
       this.eggLocationIndex = dataView.getUint16(0x138, true)
       this.metLocationIndex = dataView.getUint16(0x13a, true)
       this.metLevel = byteLogic.uIntFromBufferBits(dataView, 0x13d, 0, 7, true)
-      this.hyperTraining = types.readHyperTrainStatsFromBytes(dataView, 0x13e)
+      // this.hyperTraining = types.readHyperTrainStatsFromBytes(dataView, 0x13e)
       this.moveFlagsLA = new Uint8Array(buffer).slice(0x13f, 0x14d)
       this.homeTracker = dataView.getBigUint64(0x14d)
       this.tutorFlagsLA = new Uint8Array(buffer).slice(0x155, 0x15d)
@@ -276,9 +269,8 @@ export default class PA8 {
 
       const moveFilter = MoveFilter.fromMoveIndices(LA_VALID_MOVES, this.format)
       this.moves = moveFilter.moves(other)
-      this.movePP = moveFilter.movePp(other, this.format)
-      this.movePPUps = moveFilter.movePpUps(other)
-      this.relearnMoves = moveFilter.relearnMovesOrDefault(other)
+      this.movePP = moveFilter.movePp(other, this.format, true)
+      // this.movePPUps = moveFilter.movePpUps(other)
 
       this.currentHP = other.currentHP
       this.ivs = converter.ivs(other)
@@ -323,7 +315,7 @@ export default class PA8 {
       this.gameOfOrigin = metData.gameOfOrigin
       this.metLocationIndex = metData.locationIndex
       this.metLevel = other.metLevel
-      this.hyperTraining = other.hyperTraining
+      // this.hyperTraining = other.hyperTraining
       this.moveFlagsLA = other.moveFlagsLA ?? new Uint8Array(14)
       this.homeTracker = other.homeTracker ?? 0n
       this.tutorFlagsLA = other.tutorFlagsLA ?? new Uint8Array(8)
@@ -391,13 +383,10 @@ export default class PA8 {
       dataView.setUint8(0x5c + i, this.movePP[i])
     }
     stringLogic.writeUTF16StringToBytes(dataView, this.nickname, 0x60, 12)
-    for (let i = 0; i < 4; i++) {
-      dataView.setUint8(0x86 + i, this.movePPUps[i])
-    }
+    // for (let i = 0; i < 4; i++) {
+    //   dataView.setUint8(0x86 + i, this.movePPUps[i])
+    // }
 
-    for (let i = 0; i < 4; i++) {
-      dataView.setUint16(0x8a + i * 2, this.relearnMoves[i], true)
-    }
     dataView.setUint16(0x92, this.currentHP, true)
     types.write30BitIVsToBytes(dataView, 0x94, this.ivs)
     byteLogic.setFlag(dataView, 0x94, 30, this.isEgg)
@@ -430,7 +419,7 @@ export default class PA8 {
     dataView.setUint16(0x138, this.eggLocationIndex, true)
     dataView.setUint16(0x13a, this.metLocationIndex, true)
     byteLogic.uIntToBufferBits(dataView, this.metLevel, 317, 0, 7, true)
-    types.writeHyperTrainStatsToBytes(dataView, 0x13e, this.hyperTraining)
+    // types.writeHyperTrainStatsToBytes(dataView, 0x13e, this.hyperTraining)
     new Uint8Array(buffer).set(new Uint8Array(this.moveFlagsLA.slice(0, 14)), 0x13f)
     dataView.setBigUint64(0x14d, this.homeTracker)
     new Uint8Array(buffer).set(new Uint8Array(this.tutorFlagsLA.slice(0, 8)), 0x155)
@@ -458,8 +447,8 @@ export default class PA8 {
     dataView.setFloat32(0xac, getHeightCalculated(this), true)
     dataView.setFloat32(0xb0, getHeightCalculated(this), true)
     byteLogic.setGenderFlag(dataView, 0x13d, 7, this.trainerGender)
-    dataView.setUint8(0x148, this.level)
-    types.writeStatsToBytesU16(dataView, 0x14a, this.stats)
+    // dataView.setUint8(0x168, this.level)
+    // types.writeStatsToBytesU16(dataView, 0x16a, this.stats)
     return buffer
   }
 
@@ -476,8 +465,12 @@ export default class PA8 {
     return masteredAtLevel !== undefined && this.level >= masteredAtLevel
   }
 
+  get tutorMovesLa() {
+    return this.tutorFlagsLA ? movesFromLaTutorFlags(this.tutorFlagsLA) : []
+  }
+
   public getStats() {
-    return getStats(this)
+    return modernStatCalc(this)
   }
 
   public get heldItemName() {

@@ -2,7 +2,7 @@ use crate::pkhex_bin::{DP_LEVELUP_PKL, DP_PERSONAL_FILE};
 use crate::pkhex_bin::{HGSS_LEVELUP_PKL, HGSS_PERSONAL_FILE};
 use crate::pkhex_bin::{PT_LEVELUP_PKL, PT_PERSONAL_FILE};
 use crate::species::form;
-use crate::species::form_metadata::{BaseStats, GameMetadata, PersonalInfo};
+use crate::species::metadata_table::{BaseStats, GameMetadata, PersonalInfo};
 use pkm_rs_types::{NationalDex, PkmType, Stats8, log::ExpectLog};
 
 const GEN4_ENTRY_SIZE: usize = 0x2C;

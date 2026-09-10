@@ -1,7 +1,7 @@
 use pkm_rs_types::{NationalDex, PkmType, Stats8, log::ExpectLog};
 
 use crate::pkhex_bin::{B2W2_LEVELUP_PKL, B2W2_PERSONAL_FILE, BW_LEVELUP_PKL, BW_PERSONAL_FILE};
-use crate::species::form_metadata::{BaseStats, GameMetadata, PersonalInfo};
+use crate::species::metadata_table::{BaseStats, GameMetadata, PersonalInfo};
 
 const BW_ENTRY_SIZE: usize = 0x3C;
 const B2W2_ENTRY_SIZE: usize = 0x4C;

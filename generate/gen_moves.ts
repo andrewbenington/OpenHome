@@ -85,11 +85,12 @@ pub mod sv_tm;
 pub mod swsh_tr;
 
 use crate::metadata_source::MetadataSource;
+use pkm_rs_types::{Generation, PkmType, read_u16_le};
+use serde::{Deserialize, Serialize, Serializer};
+use std::num::NonZeroU16;
+
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
-use pkm_rs_types::{Generation, PkmType, read_u16_le};
-use serde::{Serialize, Serializer};
-use std::num::NonZeroU16;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -194,6 +195,10 @@ impl MoveSlots {
             MoveSlot::new(moves[2], pp[2], pp_ups[2]),
             MoveSlot::new(moves[3], pp[3], pp_ups[3]),
         ])
+    }
+
+    pub fn at(&self, index: arbitrary_int::u2) -> MoveSlot {
+        self.0[usize::from(index.value())]
     }
 
     pub fn write_spans<T: Into<usize> + Copy>(
@@ -393,8 +398,9 @@ pub struct MoveDataOffsets<T: Into<usize> = usize> {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
-#[derive(Debug, PartialOrd, Ord, Default, PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, PartialOrd, Ord, Default, PartialEq, Eq, Clone, Copy, Deserialize)]
 pub struct MoveIndex(Option<NonZeroU16>);
 
 impl MoveIndex {

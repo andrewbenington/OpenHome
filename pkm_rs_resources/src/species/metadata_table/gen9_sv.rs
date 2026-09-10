@@ -1,6 +1,6 @@
 use crate::ExpectLog;
 use crate::pkhex_bin::{SV_LEVELUP_PKL, SV_PERSONAL_FILE};
-use crate::species::form_metadata::{BaseStats, GameMetadata, PersonalInfo};
+use crate::species::metadata_table::{BaseStats, GameMetadata, PersonalInfo};
 use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
 pub const SV_ENTRY_SIZE: usize = 0x50;

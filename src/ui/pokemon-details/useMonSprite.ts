@@ -19,10 +19,18 @@ export function findPluginSprite(
   enabledPlugins: OpenHomePlugin[]
 ): Option<PluginSpriteResult> {
   for (const plugin of enabledPlugins) {
-    const spritePath = plugin.getMonSpritePath?.(mon)
+    try {
+      const spritePath = plugin.getMonSpritePath?.({
+        dexNum: mon.nationalDex,
+        formNum: mon.formIndex,
+        ...mon,
+      })
 
-    if (spritePath) {
-      return { plugin, spritePath }
+      if (spritePath) {
+        return { plugin, spritePath }
+      }
+    } catch (error) {
+      console.error(`error looking up ${plugin.name} sprite for mon:`, mon, error)
     }
   }
 }

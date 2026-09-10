@@ -1,5 +1,5 @@
 use crate::pkhex_bin::{ORAS_LEVELUP_PKL, ORAS_PERSONAL_FILE, XY_LEVELUP_PKL, XY_PERSONAL_FILE};
-use crate::species::form_metadata::{BaseStats, GameMetadata, PersonalInfo};
+use crate::species::metadata_table::{BaseStats, GameMetadata, PersonalInfo};
 use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
 const XY_ENTRY_SIZE: usize = 0x40;

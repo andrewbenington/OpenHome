@@ -1,5 +1,5 @@
 use crate::pkhex_bin::{LGPE_LEVELUP_PKL, LGPE_PERSONAL_FILE};
-use crate::species::form_metadata::{BaseStats, GameMetadata, PersonalInfo};
+use crate::species::metadata_table::{BaseStats, GameMetadata, PersonalInfo};
 use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
 const LGPE_ENTRY_SIZE: usize = 0x54;

@@ -1,7 +1,7 @@
 use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
 use crate::pkhex_bin::{SM_LEVELUP_PKL, SM_PERSONAL_FILE, USUM_LEVELUP_PKL, USUM_PERSONAL_FILE};
-use crate::species::form_metadata::{BaseStats, GameMetadata, PersonalInfo};
+use crate::species::metadata_table::{BaseStats, GameMetadata, PersonalInfo};
 
 const GEN7_ALOLA_ENTRY_SIZE: usize = 0x54;
 

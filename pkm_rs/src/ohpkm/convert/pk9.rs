@@ -11,6 +11,7 @@ use crate::gen8_swsh;
 use crate::gen9_sv::Pk9;
 use crate::ohpkm;
 use crate::ohpkm::OhpkmV2;
+use crate::ohpkm::id::OpenHomeId;
 use crate::ohpkm::v2_sections::ScarletVioletData;
 use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
 use crate::result::{Error, Result};
@@ -19,6 +20,12 @@ use crate::traits::HasSpeciesAndForm;
 impl OhpkmConvert for Pk9 {
     fn to_main_data(&self) -> ohpkm::v2_sections::MainDataV2 {
         ohpkm::v2_sections::MainDataV2 {
+            openhome_id: OpenHomeId::new(
+                self.species_and_form.into_inner().get_ndex(),
+                self.trainer_id,
+                self.secret_id,
+                self.personality_value,
+            ),
             personality_value: self.personality_value,
             encryption_constant: self.encryption_constant,
             species_and_form: self.species_and_form.into_inner(),

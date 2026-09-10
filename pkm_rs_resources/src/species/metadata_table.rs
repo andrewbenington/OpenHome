@@ -31,7 +31,7 @@ use crate::{
     metadata_source::MetadataSource,
     species::{
         form,
-        form_metadata::{
+        metadata_table::{
             gen1::{METADATA_TABLE_RB, METADATA_TABLE_YELLOW},
             gen2::{METADATA_TABLE_CRYSTAL, METADATA_TABLE_GS},
             gen3::{METADATA_TABLE_EMERALD, METADATA_TABLE_FRLG, METADATA_TABLE_RS},
@@ -301,7 +301,7 @@ impl MetadataTableReader {
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "baseStats"))]
-    pub fn base_stats(&self) -> BaseStats {
+    pub fn get_base_stats_wasm(&self) -> BaseStats {
         self.get_base_stats()
     }
 }
@@ -320,12 +320,13 @@ pub fn metadata_reader_for(
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "currentMetadataReader"))]
-pub fn current_metadata_reader(national_dex: u16, form_index: u16) -> Option<MetadataTableReader> {
+pub fn current_metadata_reader(national_dex: u16, form_index: u16) -> MetadataTableReader {
     MetadataTableReader::new(
         Box::new(most_recent_metadata_table_for(national_dex, form_index)),
         national_dex,
         form_index,
     )
+    .expect("most recent metadata table is not missing data for mon")
 }
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Serialize, Deserialize))]
@@ -359,6 +360,8 @@ fn most_recent_metadata_table_for(
         &METADATA_TABLE_SWSH
     } else if METADATA_TABLE_LGPE.form_is_present(national_dex, form_index) {
         &METADATA_TABLE_LGPE
+    } else if METADATA_TABLE_LA.form_is_present(national_dex, form_index) {
+        &METADATA_TABLE_LA // tbis is a last resort because abilities are inaccurate and unused in this game, but Arceus Legend is not present in any other game metadata
     } else if national_dex == NationalDex::Pichu as u16 && form_index == form::PICHU_SPIKY_EARED {
         &METADATA_TABLE_HGSS
     } else {
@@ -487,9 +490,7 @@ mod tests {
     use super::*;
     use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
-    use crate::species::{FormMetadata, GetSpeciesMetadata, form_metadata::MetadataSource};
-
-    const ARCEUS_LEGEND: u16 = 18;
+    use crate::species::metadata_table::MetadataSource;
 
     const METADATA_SOURCES_IMPLEMENTED: [MetadataSource; 22] = [
         MetadataSource::RedBlue,
@@ -520,27 +521,6 @@ mod tests {
         metadata_table_by_source(source).form_is_present(national_dex, form_index)
     }
 
-    fn form_has_current_data(form: &FormMetadata) -> bool {
-        !(form.form_name.contains("Totem")
-        || (form.national_dex == NationalDex::Xerneas && form.form_index == 1) // Active Xerneas
-            || (form.national_dex == NationalDex::Arceus && form.form_index == ARCEUS_LEGEND))
-    }
-
-    fn try_all_forms(callback: impl Fn(&FormMetadata) -> Result<(), String>) -> Result<(), String> {
-        for national_dex in NationalDex::Bulbasaur as u16..=NationalDex::MAX as u16 {
-            let species_metadata = NationalDex::new(national_dex)
-                .expect("1-1025 are valid national dex indices")
-                .get_species_metadata();
-            for form in species_metadata.forms {
-                if !form_has_current_data(form) {
-                    continue;
-                }
-                callback(form)?;
-            }
-        }
-        Ok(())
-    }
-
     #[test]
     fn test_get_stats() {
         assert_eq!(
@@ -559,7 +539,7 @@ mod tests {
 
     #[test]
     fn all_forms_have_types() -> Result<(), String> {
-        try_all_forms(|form| {
+        crate::tests::try_all_form_metadata(|form| {
             types_lookup(form.national_dex, form.form_index, None)
                 .ok_or(format!("Missing types for {}", form.form_name))?;
             Ok(())
@@ -568,7 +548,7 @@ mod tests {
 
     #[test]
     fn no_form_duplicates_type() -> Result<(), String> {
-        try_all_forms(|form| {
+        crate::tests::try_all_form_metadata(|form| {
             let form_name = &form.form_name;
             let (type1, type2) = types_lookup(form.national_dex, form.form_index, None)
                 .ok_or(format!("Missing types for {form_name}"))?;
@@ -586,7 +566,7 @@ mod tests {
 
     #[test]
     fn no_zero_stats() -> Result<(), String> {
-        try_all_forms(|form| {
+        crate::tests::try_all_form_metadata(|form| {
             let form_name = &form.form_name;
             let stats = current_base_stats(form.national_dex, form.form_index)
                 .ok_or(format!("Missing stats for {form_name}"))?;
@@ -621,11 +601,24 @@ mod tests {
 
     #[test]
     fn no_form_panics_for_any_source() -> Result<(), String> {
-        try_all_forms(|form| {
+        crate::tests::try_all_forms(|form| {
             METADATA_SOURCES_IMPLEMENTED.into_iter().for_each(|source| {
-                base_stats_lookup(form.national_dex, form.form_index, source);
+                base_stats_lookup(form.get_ndex(), form.get_forme_index(), source);
+                types_lookup(form.get_ndex(), form.get_forme_index(), Some(source));
             });
+            let most_recent_types = types_lookup(form.get_ndex(), form.get_forme_index(), None);
+            assert!(most_recent_types.is_some());
+
             Ok(())
         })
+    }
+
+    #[test]
+    fn arceus_legend_has_types() -> Result<(), String> {
+        let types = types_lookup(NationalDex::Arceus, 18, None);
+
+        assert_eq!(types, Some((PkmType::Normal, None)));
+
+        Ok(())
     }
 }

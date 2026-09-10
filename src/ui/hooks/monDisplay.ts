@@ -86,6 +86,11 @@ export const TopRightIndicatorTypes = [
   'Alpha',
   'Gigantamax',
   'Pokérus',
+  'TR Count (Sword/Shield)',
+  'Tutor Moves Count (Legends Arceus)',
+  'TM Count (Scarlet/Violet)',
+  'TM Count (Legends Z-A)',
+  'Plus Moves Known',
 ] as const
 
 export type TopRightBadgeType = (typeof TopRightIndicatorTypes)[number]
