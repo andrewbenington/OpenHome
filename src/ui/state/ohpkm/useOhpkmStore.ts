@@ -13,10 +13,11 @@ import { SAVClass } from '@openhome-core/save/util'
 import { Filter, PaginationCursor } from '@openhome-core/tauri/spectaCommands'
 import { expectExhaustive } from '@openhome-core/util'
 import { $R, Errorable, Option, R, Result } from '@openhome-core/util/functional'
+import { LRUCache } from '@openhome-core/util/lruCache'
 import { FourMoves } from '@openhome-core/util/types'
 import { Lookup, MarkingsSixShapesColors, ModernRibbon, OriginGames } from '@pkm-rs/pkg/pkm_rs'
 import dayjs from 'dayjs'
-import { createContext, useCallback } from 'react'
+import { createContext, useCallback, useSyncExternalStore } from 'react'
 import { OhpkmStoreData } from '.'
 import { useConvertStrategies } from '../convert-strategies'
 import { useLookups } from '../lookups'
@@ -27,6 +28,50 @@ export type MoveSlotIndex = 0 | 1 | 2 | 3
 
 export type OhpkmLookupResult = Result<OHPKM, IdentifierNotPresentError>
 export type OhpkmBatchLookupResults = Map<OhpkmIdentifier, OhpkmLookupResult>
+
+function createOhpkmStore(capacity: number) {
+  const cache = new LRUCache<OhpkmIdentifier, OHPKM>(capacity)
+  const listeners = new Map<OhpkmIdentifier, Set<() => void>>()
+  const globalListeners = new Set<() => void>()
+
+  function notify(id: OhpkmIdentifier) {
+    listeners.get(id)?.forEach((l) => l())
+    globalListeners.forEach((l) => l())
+  }
+
+  return {
+    get: (id: OhpkmIdentifier) => cache.get(id),
+    peek: (id: OhpkmIdentifier) => cache.peek(id),
+    set: (id: OhpkmIdentifier, pkm: OHPKM) => {
+      const evicted = cache.set(id, pkm)
+      if (evicted !== undefined) notify(evicted) // let evicted entry's subscribers know
+      notify(id)
+    },
+    delete: (id: OhpkmIdentifier) => {
+      const existed = cache.delete(id)
+      if (existed) notify(id)
+      return existed
+    },
+    subscribe: (id: OhpkmIdentifier, cb: () => void) => {
+      if (!listeners.has(id)) listeners.set(id, new Set())
+      listeners.get(id)?.add(cb)
+      return () => listeners.get(id)?.delete(cb)
+    },
+    subscribeAll: (cb: () => void) => {
+      globalListeners.add(cb)
+      return () => globalListeners.delete(cb)
+    },
+  }
+}
+
+const ohpkmCache = createOhpkmStore(500) // module-level singleton, tune capacity as needed
+
+function useOhpkmEntry(id: OhpkmIdentifier) {
+  return useSyncExternalStore(
+    (cb) => ohpkmCache.subscribe(id, cb),
+    () => ohpkmCache.peek(id) // peek, not get — reading in render shouldn't mutate LRU order
+  )
+}
 
 export function useOhpkmStore() {
   const { defaultConvertStrategy } = useConvertStrategies()
@@ -39,12 +84,26 @@ export function useOhpkmStore() {
 
   const getById = useCallback(
     (id: string): Promise<Option<OHPKM>> => {
-      return backend.lookupOhpkmById(id).then(R.dropError)
+      const cached = ohpkmCache.get(id)
+      if (cached) return Promise.resolve(cached)
+
+      return backend
+        .lookupOhpkmById(id)
+        .then(R.dropError)
+        .then((ohpkm) => {
+          if (ohpkm) {
+            ohpkmCache.set(ohpkm.openhomeId, ohpkm)
+          }
+          return ohpkm
+        })
     },
     [backend]
   )
 
   async function tryLoadFromId(id: string): Promise<OhpkmLookupResult> {
+    const cached = ohpkmCache.get(id)
+    if (cached) return Promise.resolve(R.Ok(cached))
+
     return backend
       .lookupOhpkmById(id)
       .then(R.mapErr(() => IdentifierNotPresent(id)))
@@ -55,7 +114,12 @@ export function useOhpkmStore() {
     const batchResults: OhpkmBatchLookupResults = new Map()
 
     for (const identifier of ids) {
-      batchResults.set(identifier, await tryLoadFromId(identifier))
+      const cached = ohpkmCache.get(identifier)
+      if (cached) {
+        batchResults.set(identifier, R.Ok(cached))
+      } else {
+        batchResults.set(identifier, await tryLoadFromId(identifier))
+      }
     }
 
     return batchResults
@@ -404,6 +468,7 @@ export type IdentifierNotPresentError = { identifier: OhpkmIdentifier }
 function IdentifierNotPresent(identifier: OhpkmIdentifier): IdentifierNotPresentError {
   return { identifier }
 }
+
 export const OhpkmStoreContext = createContext<
   [OhpkmStoreData, (updated: OhpkmStoreData) => Promise<Errorable<null>>]
 >([{}, async () => R.Err('Uninitialized')])
