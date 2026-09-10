@@ -13,15 +13,3 @@ pub struct LazyStateInner {
     pub ohpkm_cache: SyncedStateWrapper<OhpkmCache>,
     pub lazy_state_change_list: SyncedStateWrapper<OhpkmCacheChanges>,
 }
-
-impl LazyStateInner {
-
-
-    fn update_with_action() {
-
-    }
-
-    fn update() {
-
-    }
-}

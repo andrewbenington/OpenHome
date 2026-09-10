@@ -12,11 +12,13 @@ use crate::synced_state::SyncedState;
 
 impl SyncedState for OhpkmCacheChanges {
     // TODO
-    type Action = ();
+    type Action = Self;
     const ID: &'static str = "lazy_state_change_list";
 
-    fn update(&mut self, action: Self::Action) {
-        todo!()
+    fn update(&mut self, other: Self::Action) {
+        other.all_entries().for_each(|(k, v)| {
+            self.0.insert(*k, (*v.clone()).to_owned());
+        });
     }
 
     fn to_command_response(&self) -> impl Clone + Serialize + IpcResponse {
@@ -71,19 +73,4 @@ impl OhpkmCacheChanges {
         }
     }
 
-    fn emit_update() {
-
-    }
-
-    fn read() {
-
-    }
-
-    fn update() {
-
-    }
-
-    fn replace() {
-
-    }
 }

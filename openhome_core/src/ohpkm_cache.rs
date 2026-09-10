@@ -25,7 +25,7 @@ impl OhpkmCache {
     // noinspection DuplicatedCode
     // TODO If necessary, if this ends up still being duplicated,
     // TODO Maybe refactor a common interface out of ohpkm_store and ohpkm_cache
-    fn fix_errors(&mut self) {
+    fn _fix_errors(&mut self) {
         for (identifier, bytes) in self.0.iter_mut() {
             if let Ok(mut mon) = OhpkmV2::from_bytes(bytes) {
                 let errors = mon.fix_errors();

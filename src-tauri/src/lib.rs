@@ -22,7 +22,6 @@ use std::env;
 use tauri::Manager;
 use openhome_core::pkm_storage::{load_banks, StoredBankData};
 use openhome_core::box_pointer::BoxPointer;
-use openhome_core::ohpkm_store_partial::OhpkmStorePartial;
 
 const RAW_HANDLER: fn(tauri::ipc::Invoke<tauri::Wry>) -> bool = tauri::generate_handler![
     commands::get_file_bytes,
@@ -114,7 +113,7 @@ pub fn run() {
             let controller = app.handle().controller();
 
             // TODO: Only get information on the current bank and load that one.
-            let mut bank_info = match load_banks(&controller) {
+            let bank_info = match load_banks(&controller) {
                 Ok(bank_info) => bank_info,
                 Err(err) => {
                     util::show_error_dialog(app, err, launch_error_msg("Unable to obtain information on your Pokemon bank info!"));
@@ -124,7 +123,7 @@ pub fn run() {
                 }
             };
 
-            let mut lookup_state = match LookupState::load_from_storage(&controller) {
+            let lookup_state = match LookupState::load_from_storage(&controller) {
                 Ok(lookup) => lookup,
                 Err(err) => {
                     util::show_error_dialog(app, err, launch_error_msg("Lookup File"));

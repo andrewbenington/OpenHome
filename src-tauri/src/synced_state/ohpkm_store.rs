@@ -1,27 +1,26 @@
 use crate::commands::CommandResult;
 use crate::data_controller::TauriDataController;
 use crate::synced_state;
-use openhome_core::Error;
+use crate::synced_state::ohpkm_cache_changes::OhpkmCacheChanges;
 use openhome_core::data_controller::{DataController, DataDir, MONS_V2_DIR};
 use openhome_core::ohpkm_store::OhpkmBytesStore;
+use openhome_core::Error;
 use serde::Serialize;
 use std::path::Path;
 use std::{collections::HashMap, fs};
-use tauri::State;
-use crate::synced_state::ohpkm_cache_changes::OhpkmCacheChanges;
 
 impl synced_state::SyncedState for OhpkmBytesStore {
     type Action = Self;
     const ID: &'static str = "ohpkm_store";
 
-    fn to_command_response(&self) -> impl Clone + Serialize + tauri::ipc::IpcResponse {
-        self.to_b64_map()
-    }
-
     fn update(&mut self, other: Self) {
         other.all_entries().for_each(|(k, v)| {
             self.insert(k, v);
         });
+    }
+
+    fn to_command_response(&self) -> impl Clone + Serialize + tauri::ipc::IpcResponse {
+        self.to_b64_map()
     }
 }
 
@@ -47,15 +46,18 @@ pub fn add_to_ohpkm_cache(
         .update(&app_handle, updates)?)
 }
 
-type DeleteResultsById = HashMap<String, Option<String>>;
+type _DeleteResultsById = HashMap<String, Option<String>>;
 
+// TODO Make sure this is called
+// Note that this is not the same thing as clearing the cache, which leaves the cache intact
+// but leaves the Pokemon behind.
 #[tauri::command]
 #[specta::specta]
-pub fn permanently_delete_ohpkms_in_cache(
+pub fn _permanently_delete_ohpkms_in_cache(
     app_handle: tauri::AppHandle,
     synced_state: tauri::State<'_, synced_state::LazyState>,
     openhome_ids: Vec<String>,
-) -> CommandResult<DeleteResultsById> {
+) -> CommandResult<_DeleteResultsById> {
     // first remove from the ohpkm store
     synced_state
         .lock()?

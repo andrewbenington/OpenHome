@@ -1,17 +1,15 @@
+use crate::synced_state::lazy_state_change::LazyStateChange;
+use crate::synced_state::lazy_state_inner::LazyStateInner;
+use crate::synced_state::ohpkm_cache::OhpkmCache;
+use crate::synced_state::ohpkm_cache_changes::OhpkmCacheChanges;
+use crate::synced_state::{SyncedState, SyncedStateWrapper};
+use openhome_core::box_pointer::BoxPointer;
+use openhome_core::convert_strategies::ConvertStrategies;
+use openhome_core::lookup::LookupState;
+use openhome_core::{data_controller, Error};
 use std::collections::HashMap;
 use std::ops::Deref;
 use std::sync::Mutex;
-use openhome_core::box_pointer::BoxPointer;
-use openhome_core::convert_strategies::ConvertStrategies;
-use openhome_core::{data_controller, Error};
-use openhome_core::lookup::LookupState;
-use openhome_core::ohpkm_store::OhpkmBytesStore;
-use openhome_core::ohpkm_store_partial::OhpkmStorePartial;
-use crate::synced_state::lazy_state_inner::LazyStateInner;
-use crate::synced_state::ohpkm_cache::OhpkmCache;
-use crate::synced_state::{SyncedState, SyncedStateWrapper};
-use crate::synced_state::lazy_state_change::LazyStateChange;
-use crate::synced_state::ohpkm_cache_changes::OhpkmCacheChanges;
 
 pub struct LazyState(pub Mutex<LazyStateInner>);
 
