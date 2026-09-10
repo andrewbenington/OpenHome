@@ -4,7 +4,7 @@ use crate::synced_state;
 use openhome_core::data_controller::{DataController, DataDir, MONS_V2_DIR};
 use openhome_core::ohpkm_store::OhpkmBytesStore;
 use openhome_core::{Error, search};
-use pkm_rs::ohpkm::UnknownHandlerSave;
+use pkm_rs::ohpkm::{OhpkmV2, OpenHomeId, UnknownHandlerSave};
 use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_types::{BinaryGender, OriginGame};
 use serde::Serialize;
@@ -72,6 +72,29 @@ pub fn get_ohpkm_bytes_by_id(
     Ok(synced_state
         .ohpkm_lookup(openhome_id.parse()?)?
         .map(|ohpkm| ohpkm.to_bytes().to_vec()))
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn get_ohpkm_bytes_by_id_batch(
+    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
+    openhome_ids: Vec<String>,
+) -> CommandResult<HashMap<String, Option<Vec<u8>>>> {
+    let parsed_ids: Vec<OpenHomeId> = openhome_ids
+        .into_iter()
+        .filter_map(|id| id.parse().ok())
+        .collect();
+
+    Ok(synced_state
+        .ohpkm_lookup_batch(&parsed_ids)?
+        .into_iter()
+        .map(|(id, ohpkm_result)| {
+            (
+                id.to_string(),
+                ohpkm_result.as_ref().map(OhpkmV2::to_bytes).ok(),
+            )
+        })
+        .collect())
 }
 
 #[tauri::command]

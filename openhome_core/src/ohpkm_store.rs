@@ -157,6 +157,20 @@ impl OhpkmBytesStore {
             .transpose()?)
     }
 
+    pub fn lookup_batch(&self, identifiers: &[OpenHomeId]) -> HashMap<OpenHomeId, Result<OhpkmV2>> {
+        identifiers
+            .iter()
+            .filter_map(|&identifier| {
+                self.0.get(&identifier).map(|bytes| {
+                    (
+                        identifier,
+                        OhpkmV2::from_bytes(bytes).map_err(|source| Error::PkmRs { source }),
+                    )
+                })
+            })
+            .collect()
+    }
+
     pub fn includes(&self, identifier: &OpenHomeId) -> bool {
         self.0.contains_key(identifier)
     }

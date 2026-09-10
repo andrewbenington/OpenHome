@@ -295,6 +295,19 @@ export const commands = {
       else return { status: 'error', error: e as any }
     }
   },
+  async getOhpkmBytesByIdBatch(
+    openhomeIds: string[]
+  ): Promise<Result<Partial<{ [key in string]: number[] | null }>, CommandError>> {
+    try {
+      return {
+        status: 'ok',
+        data: await TAURI_INVOKE('get_ohpkm_bytes_by_id_batch', { openhomeIds }),
+      }
+    } catch (e) {
+      if (e instanceof Error) throw e
+      else return { status: 'error', error: e as any }
+    }
+  },
   async permanentlyDeleteOhpkms(
     openhomeIds: string[]
   ): Promise<Result<Partial<{ [key in string]: string | null }>, CommandError>> {

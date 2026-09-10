@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::ops::Deref;
 use std::sync::Mutex;
 
@@ -116,6 +117,13 @@ impl AllSyncedState {
 
     pub fn ohpkm_lookup(&self, id: OpenHomeId) -> Result<Option<OhpkmV2>> {
         self.lock()?.ohpkm_store.0.lookup(&id)
+    }
+
+    pub fn ohpkm_lookup_batch(
+        &self,
+        ids: &[OpenHomeId],
+    ) -> Result<HashMap<OpenHomeId, Result<OhpkmV2>>> {
+        Ok(self.lock()?.ohpkm_store.0.lookup_batch(ids))
     }
 
     pub fn get_convert_strategies(&self) -> Result<ConvertStrategies> {

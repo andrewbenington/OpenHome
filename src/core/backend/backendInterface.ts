@@ -9,11 +9,12 @@ import {
   PaginatedPage,
   PaginationCursor,
 } from '@openhome-core/tauri/spectaCommands'
-import { Errorable, Option } from '@openhome-core/util/functional'
+import { Errorable, Option, Result } from '@openhome-core/util/functional'
 import { LoadSaveResponse, LookupMap, SaveRef } from '@openhome-core/util/types'
 import { LogFilter } from '@openhome-ui/pages/logs'
 import { AppTheme, Settings } from '@openhome-ui/state/appInfo'
 import { ConvertStrategies } from '@openhome-ui/state/convert-strategies/ConvertStrategiesProvider'
+import { OhpkmBatchLookupResults } from '@openhome-ui/state/ohpkm'
 import { PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
 import { Pokedex, PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { Dayjs } from 'dayjs'
@@ -76,6 +77,7 @@ export default interface BackendInterface {
   ): Promise<Errorable<PaginatedPage<OHPKM>>>
   getOhpkmIdsMatchingUnknownHandler(save: SAV): Promise<Errorable<OhpkmIdentifier[]>>
   lookupOhpkmById: (id: OhpkmIdentifier) => Promise<Errorable<Option<OHPKM>>>
+  lookupOhpkmBatch: (ids: OhpkmIdentifier[]) => Promise<Result<OhpkmBatchLookupResults>>
   addToOhpkmStore: (updates: OhpkmStore) => Promise<Errorable<null>>
   deleteHomeMons: (identifiers: string[]) => Promise<Errorable<null>>
 
