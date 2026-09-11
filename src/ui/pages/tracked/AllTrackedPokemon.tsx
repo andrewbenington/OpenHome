@@ -65,6 +65,7 @@ export default function AllTrackedPokemon({
         <SortableDataGrid
           columns={columns}
           rows={currentRows}
+          rowKeyGetter={(row) => row.openhomeId}
           tableRef={tableContainerRef}
           style={{ borderLeft: 'none' }}
           onCellContextMenu={(props, e) => {
