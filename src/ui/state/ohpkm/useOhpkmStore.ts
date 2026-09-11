@@ -351,7 +351,6 @@ export function useOhpkmStore() {
         return getMonFileIdentifier(mon)
       }
       default:
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         expectExhaustive(mon.format, `unrecognized format: ${mon.format}`)
     }
   }

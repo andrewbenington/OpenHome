@@ -57,7 +57,7 @@ export function filterApplies(filter: Filter, mon: monData) {
   ) {
     return false
   }
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+
   if (filter.gameOfOrigin !== undefined && mon.gameOfOrigin !== (filter.gameOfOrigin as number)) {
     return false
   }
