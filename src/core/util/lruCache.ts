@@ -9,8 +9,6 @@ export class LRUCache<K, V> {
     if (value) {
       this.map.delete(key)
       this.map.set(key, value) // move to most-recently-used end
-    } else {
-      console.log(`cache miss: ${key}`)
     }
 
     return value

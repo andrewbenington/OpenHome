@@ -165,18 +165,33 @@ export function isResult<T, V>(v: object): v is Result<T, V> {
 type ResultNowOrLater<T, E> = Result<T, E> | Promise<Result<T, E>>
 
 // Wrapper class for a Promise<Result> utility
-class PromisedResultBox<T, E> {
+export class PromisedResultBox<T, E = string> {
   constructor(private readonly v: ResultNowOrLater<T, E>) {}
+
+  static ok<T = never, E = never>(value: T): PromisedResultBox<T, E> {
+    return new PromisedResultBox(Promise.resolve(R.Ok(value)))
+  }
 
   then<U>(onOk: OnOk<T, U>): PromisedResultBox<U, E> {
     return R.after(Promise.resolve(this.v).then(map<T, E, U>(onOk)))
   }
 
-  thenErr<U>(onErr: OnErr<E, U>): PromisedResultBox<T, U> {
+  andThen<U>(onOk: (v: T) => Promise<U>): PromisedResultBox<U, E> {
+    return R.after(
+      Promise.resolve(this.v).then(
+        R.match(
+          async (value) => R.Ok(await onOk(value)),
+          (error) => Promise.resolve(R.Err(error))
+        )
+      )
+    )
+  }
+
+  catch<U>(onErr: OnErr<E, U>): PromisedResultBox<T, U> {
     return R.after(Promise.resolve(this.v).then(mapErr<T, E, U>(onErr)))
   }
 
-  flatMap<U>(onOk: OnOk<T, Promise<Result<U, E>>>): PromisedResultBox<U, E> {
+  thenFlatMap<U>(onOk: OnOk<T, Promise<Result<U, E>>>): PromisedResultBox<U, E> {
     return R.after(
       Promise.resolve(this.v).then((result) =>
         isErr(result) ? Promise.resolve(result) : onOk(result.data)
@@ -188,7 +203,7 @@ class PromisedResultBox<T, E> {
     return this.v
   }
 
-  async await(): Promise<ResultBox<T, E>> {
+  async getBoxed(): Promise<ResultBox<T, E>> {
     return Promise.resolve(this.v).then($R)
   }
 }
@@ -278,7 +293,7 @@ export class ResultBox<T, E> {
   }
 
   mapErr<U>(onErr: OnErr<E, U>) {
-    return mapErr<T, E, U>(onErr)(this.r)
+    return new ResultBox(mapErr<T, E, U>(onErr)(this.r))
   }
 
   peekErr(onErr: (error: E) => void) {
@@ -296,10 +311,6 @@ export class ResultBox<T, E> {
 
   get(): Result<T, E> {
     return this.r
-  }
-
-  getPromise(): Promise<Result<T, E>> {
-    return Promise.resolve(this.r)
   }
 }
 

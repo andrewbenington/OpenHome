@@ -1,6 +1,6 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Filter } from '@openhome-core/tauri/spectaCommands'
-import { $R, Nullable, Option, R, Result } from '@openhome-core/util/functional'
+import { Nullable, Option, R, Result } from '@openhome-core/util/functional'
 import { O } from '@openhome-core/util/option'
 import { isThenable } from '@openhome-core/util/promise'
 import { usePokemonTable } from '@openhome-ui/hooks/pokemonTable'
@@ -66,9 +66,9 @@ export function usePokemonEdit() {
       return R.Err('No Pokémon is being edited.')
     }
 
-    return $R(await ohpkmStore.setMonNickname(editingId, formController.name)).mapErr(
-      (err): string => `Pokémon tracking data not found (id ${err.identifier}`
-    )
+    return ohpkmStore
+      .setMonNickname(editingId, formController.name)
+      .then(R.mapErr((err): string => `Pokémon tracking data not found (id ${err.identifier}`))
   }
 
   function startEditing(pokemon: OHPKM) {

@@ -9,8 +9,8 @@ import {
 } from '@dnd-kit/core'
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
 import { monSupportedBySave } from '@openhome-core/save/util'
-import { $R, R } from '@openhome-core/util/functional'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
+import useDisplayError from '@openhome-ui/hooks/displayError'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
 import { isMonLocation, MonLocation, useSaves } from '@openhome-ui/state/saves'
@@ -43,6 +43,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
   const { homeLocationIsEmpty, getCurrentBank } = useBanksAndBoxes()
   const { dragState, startDragging, endDragging, clearSelections } = useDragAndDrop()
   const [dragOverId, setDragOverId] = useState<UniqueIdentifier | null>(null)
+  const displayError = useDisplayError()
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -211,13 +212,9 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
                 savesAndBanks.moveMonItemToBag(sourceLoc)
               }
 
-              const result = await savesAndBanks.moveMon(
-                { ...sourceLoc, mon: currMon },
-                nextDestination
-              )
-              if (R.isErr(result)) {
-                console.error(result.error)
-              }
+              await savesAndBanks
+                .moveMon({ ...sourceLoc, mon: currMon }, nextDestination)
+                .catch((error) => displayError('Error moving Pokémon', error))
 
               nextDestination = nextDestination.isHome
                 ? nextHomeDestination(nextDestination.box, nextDestination.boxSlot + 1)
@@ -235,7 +232,9 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
               savesAndBanks.moveMonItemToBag(source)
             }
 
-            $R(await savesAndBanks.moveMon(source, dest)).peekErr(console.error)
+            savesAndBanks
+              .moveMon(source, dest)
+              .catch((error) => displayError('Could not move Pokémon', error))
           }
         }
 
