@@ -1,4 +1,4 @@
-import { PaginatedPage, PaginationCursor } from '@openhome-core/tauri/spectaCommands'
+import { PaginatedPage } from '@openhome-core/tauri/spectaCommands'
 import { Errorable, Option } from '@openhome-core/util/functional'
 import {
   booleanSorter,
@@ -12,7 +12,6 @@ import {
 } from '@openhome-core/util/sort'
 import { Flex } from '@radix-ui/themes'
 import { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
-import { Atom } from '@tanstack/react-store'
 import { isDayjs } from 'dayjs'
 import {
   ReactNode,
@@ -154,7 +153,6 @@ export type SortableDataGridProps<R extends SortableValue> = {
   columns: SortableColumn<R>[]
   defaultSort?: string
   defaultSortOrder?: 'ASC' | 'DESC'
-  paginationAtom?: Atom<PaginationCursor>
   dataQuery?: UseInfiniteQueryResult<InfiniteData<Errorable<PaginatedPage<R>>>>
   tableRef?: RefObject<HTMLDivElement | null>
   fetching?: 'prev' | 'next'

@@ -120,7 +120,7 @@ impl OhpkmBytesStore {
             .filter_map(std::result::Result::ok)
     }
 
-    pub fn get_b64_bytes_page_after(
+    pub fn get_b64_bytes_page(
         &self,
         current_cursor: search::PaginationCursor,
         filters: Vec<search::Filter>,
@@ -134,7 +134,7 @@ impl OhpkmBytesStore {
             })
             .map(|bytes| BASE64_STANDARD.encode(bytes));
 
-        search::PaginatedPage::next_after_cursor(current_cursor, entries, self.0.len())
+        search::PaginatedPage::get_for_cursor(current_cursor, entries, self.0.len())
     }
 
     pub fn get_all_with_unknown_handler(

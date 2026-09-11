@@ -1,21 +1,16 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { Filter, PaginatedPage, PaginationCursor } from '@openhome-core/tauri/spectaCommands'
+import { Filter, PaginatedPage } from '@openhome-core/tauri/spectaCommands'
 import { $R, R } from '@openhome-core/util/functional'
 import { OhpkmRowData, toRowData } from '@openhome-ui/ohpkmGrid'
 import { useBanksAndBoxes } from '@openhome-ui/state-zustand/banks-and-boxes/store'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { useCreateAtom } from '@tanstack/react-store'
 import { useMemo } from 'react'
 
 export type Page = PaginatedPage<OhpkmRowData>
 
 export function usePokemonTable(queryKey: string, filters: Filter[]) {
-  const paginationAtom = useCreateAtom<PaginationCursor>({
-    pageIndex: 0,
-    pageSize: 100,
-  })
   const ohpkmStore = useOhpkmStore()
   const { trackedMonsToRelease } = useSaves()
   const { findHomeLocation } = useBanksAndBoxes()
@@ -38,11 +33,10 @@ export function usePokemonTable(queryKey: string, filters: Filter[]) {
   )
 
   const query = useInfiniteQuery({
-    queryKey: [queryKey, paginationAtom.get().pageIndex, paginationAtom.get().pageSize, filtersKey],
+    queryKey: [queryKey, filtersKey],
     queryFn: async (d) => {
-      const pageParam = paginationAtom.get() ?? d.pageParam
-      const searchPromise = ohpkmStore.searchStore(pageParam, filters).then(R.map(preloadOhpkmPage))
-      return await searchPromise
+      const pageParam = d.pageParam
+      return await ohpkmStore.searchStore(pageParam, filters).then(R.map(preloadOhpkmPage))
     },
     initialPageParam: { pageIndex: 0, pageSize: 300 },
     getNextPageParam: (lastPage) => {
@@ -50,7 +44,7 @@ export function usePokemonTable(queryKey: string, filters: Filter[]) {
         (page) => page.nextCursor,
         (e) => {
           console.error(e)
-          return paginationAtom.get()
+          return { pageIndex: 0, pageSize: 300 }
         }
       )
     },
@@ -67,7 +61,6 @@ export function usePokemonTable(queryKey: string, filters: Filter[]) {
 
   const totalFetched = currentRows.length
 
-  // called on scroll and possibly on mount to fetch more data as the user scrolls and reaches bottom of table
   const fetchMoreOnBottomReached = async () => {
     if (isFetching || totalFetched >= totalRowCount) {
       return
@@ -75,5 +68,5 @@ export function usePokemonTable(queryKey: string, filters: Filter[]) {
     await fetchNextPage()
   }
 
-  return { currentRows, fetchMoreOnBottomReached, query, totalRowCount, paginationAtom }
+  return { currentRows, fetchMoreOnBottomReached, query, totalRowCount }
 }

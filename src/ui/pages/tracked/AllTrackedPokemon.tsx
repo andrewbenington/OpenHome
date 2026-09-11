@@ -45,8 +45,10 @@ export default function AllTrackedPokemon({
     selectionController
   )
 
-  const { currentRows, fetchMoreOnBottomReached, query, totalRowCount, paginationAtom } =
-    usePokemonTable('all-tracked-pokemon', [])
+  const { currentRows, fetchMoreOnBottomReached, query, totalRowCount } = usePokemonTable(
+    'all-tracked-pokemon',
+    []
+  )
 
   const { isFetching, isLoading } = query
 
@@ -88,7 +90,6 @@ export default function AllTrackedPokemon({
           selectedRows={selectedIds}
           // onSortColumnsChange={onColOrderingChange}
           onSelectedRowsChange={(ids) => forceSetSelectedIds(ids as Set<OhpkmIdentifier>)}
-          paginationAtom={paginationAtom}
           onScrolledToBottom={fetchMoreOnBottomReached}
           fetching={isFetching ? 'next' : undefined}
           shouldLoadMore={currentRows.length < totalRowCount}

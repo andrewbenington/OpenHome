@@ -96,7 +96,7 @@ impl AllSyncedState {
             .lock()?
             .ohpkm_store
             .0
-            .get_b64_bytes_page_after(cursor, filters))
+            .get_b64_bytes_page(cursor, filters))
     }
 
     pub fn search_ohpkms_matching_unknown_handler(
