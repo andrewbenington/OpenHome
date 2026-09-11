@@ -73,6 +73,13 @@ function mapErr<T, E, U>(transform: Mapper<E, U>): (result: Result<T, E>) => Res
   return (result) => (isErr(result) ? buildErr(transform(result.error)) : result)
 }
 
+function peekErr<T, E>(onErr: (error: E) => void): (result: Result<T, E>) => Result<T, E> {
+  return (result) => {
+    if (isErr(result)) onErr(result.error)
+    return result
+  }
+}
+
 function mapOr<T, E, U>(transform: Mapper<T, U>, fallback: U): (result: Result<T, E>) => U {
   return (result) => (isOk(result) ? transform(result.data) : fallback)
 }
@@ -190,6 +197,7 @@ export const R = {
   match,
   map,
   mapErr,
+  peekErr,
   mapOr,
   flatMap,
   asyncFlatMap,
@@ -271,6 +279,10 @@ export class ResultBox<T, E> {
 
   mapErr<U>(onErr: OnErr<E, U>) {
     return mapErr<T, E, U>(onErr)(this.r)
+  }
+
+  peekErr(onErr: (error: E) => void) {
+    return peekErr(onErr)(this.r)
   }
 
   orElse(ifErr: T) {

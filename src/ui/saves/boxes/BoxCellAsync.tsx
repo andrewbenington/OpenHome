@@ -52,9 +52,7 @@ function BoxCellAsyncInner(
   const mon = isThenable(deferredMonPromise) ? use(deferredMonPromise) : deferredMonPromise
   const isStale = deferredMonPromise !== monPromise
 
-  return (
-    <BoxCell {...boxCellProps} mon={mon} loading={isStale} style={{ backgroundColor: 'purple' }} />
-  )
+  return <BoxCell {...boxCellProps} mon={mon} loading={isStale} />
 }
 
 export default BoxCellAsync

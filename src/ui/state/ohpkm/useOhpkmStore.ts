@@ -18,7 +18,7 @@ import { isThenable, NowOrLater } from '@openhome-core/util/promise'
 import { FourMoves } from '@openhome-core/util/types'
 import { Lookup, MarkingsSixShapesColors, ModernRibbon, OriginGames } from '@pkm-rs/pkg/pkm_rs'
 import dayjs from 'dayjs'
-import { createContext, useCallback, useSyncExternalStore } from 'react'
+import { createContext, useCallback } from 'react'
 import { OhpkmStoreData } from '.'
 import { useConvertStrategies } from '../convert-strategies'
 import { useLookups } from '../lookups'
@@ -66,13 +66,6 @@ function createOhpkmStore(capacity: number) {
 }
 
 const ohpkmCache = createOhpkmStore(500) // module-level singleton, tune capacity as needed
-
-function useOhpkmEntry(id: OhpkmIdentifier) {
-  return useSyncExternalStore(
-    (cb) => ohpkmCache.subscribe(id, cb),
-    () => ohpkmCache.peek(id) // peek, not get — reading in render shouldn't mutate LRU order
-  )
-}
 
 export function useOhpkmStore() {
   const { defaultConvertStrategy } = useConvertStrategies()

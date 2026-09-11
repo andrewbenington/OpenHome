@@ -192,6 +192,7 @@ export function useSaves(): SavesAndBanksManager {
       const ohpkm = monResult.data
       const converted = await ohpkmStore.updateAndConvertForSave(ohpkm, save)
       if (R.isErr(converted)) {
+        console.error(converted)
         return R.Ok(undefined)
       }
 
@@ -588,7 +589,9 @@ export function useSaves(): SavesAndBanksManager {
         if (R.isErr(swappedMonResult)) {
           return swappedMonResult
         }
-        moveMonBetweenSaves(dest.saveIdentifier, swappedMonResult.data, source)
+        return moveMonBetweenSaves(dest.saveIdentifier, swappedMonResult.data, source).then(
+          R.map(() => null)
+        )
       }
     }
 

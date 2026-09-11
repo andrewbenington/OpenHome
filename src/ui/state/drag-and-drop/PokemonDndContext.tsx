@@ -9,6 +9,7 @@ import {
 } from '@dnd-kit/core'
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
 import { monSupportedBySave } from '@openhome-core/save/util'
+import { $R, R } from '@openhome-core/util/functional'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
@@ -210,7 +211,13 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
                 savesAndBanks.moveMonItemToBag(sourceLoc)
               }
 
-              savesAndBanks.moveMon({ ...sourceLoc, mon: currMon }, nextDestination)
+              const result = await savesAndBanks.moveMon(
+                { ...sourceLoc, mon: currMon },
+                nextDestination
+              )
+              if (R.isErr(result)) {
+                console.error(result.error)
+              }
 
               nextDestination = nextDestination.isHome
                 ? nextHomeDestination(nextDestination.box, nextDestination.boxSlot + 1)
@@ -228,7 +235,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
               savesAndBanks.moveMonItemToBag(source)
             }
 
-            savesAndBanks.moveMon(source, dest)
+            $R(await savesAndBanks.moveMon(source, dest)).peekErr(console.error)
           }
         }
 
@@ -243,7 +250,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
       onDragCancel={endDragging}
       sensors={sensors}
     >
-      <DragOverlay style={{ cursor: 'grabbing' }}>
+      <DragOverlay style={{ cursor: 'grabbing' }} dropAnimation={{ duration: 0 }}>
         {dragState.payload?.kind === 'item' ? (
           <img
             className="draggable-item"
