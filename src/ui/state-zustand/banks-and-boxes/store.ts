@@ -132,7 +132,7 @@ export const createBanksAndBoxesStore = (
             for (const box of requireBank(state, state.currentBankIndex).boxes.values()) {
               // if an identifiers map is present for this box, overwrite the current with that.
               // otherwise clear the box
-              box.identifiers = boxSlotsByBoxIndex.get(box.index) ?? new Map()
+              box.identifiers = boxSlotsByBoxIndex.get(box.index) ?? new Map<number, string>()
             }
           }),
         getBankName: (bankIndex: number): string => {
@@ -204,7 +204,7 @@ export const createBanksAndBoxesStore = (
         ) =>
           set((state) => {
             const currentBank = currentBankMutable(state)
-            let newBox = buildNewBox(currentBank, boxName, identifiers)
+            const newBox = buildNewBox(currentBank, boxName, identifiers)
             currentBank.boxes = rebuildMapWithNewBox(currentBank.boxes, newBox, location)
           }),
         reorderBoxesCurrentBank: (idsInNewOrder: string[]) =>
@@ -346,7 +346,7 @@ function buildNewBox(
     id: UuidV4(),
     name: boxName ?? null,
     index: bank.boxes.size,
-    identifiers: identifiers ?? new Map(),
+    identifiers: identifiers ?? new Map<number, string>(),
   }
 }
 
@@ -436,7 +436,7 @@ const createSelectors = <S extends UseBoundStore<StoreApi<object>>>(_store: S) =
   const store = _store as WithSelectors<typeof _store>
   store.use = {}
   for (const k of Object.keys(store.getState())) {
-    ;(store.use as any)[k] = () => store((s) => s[k as keyof typeof s])
+    ;(store.use as Record<string, unknown>)[k] = () => store((s) => s[k as keyof typeof s])
   }
 
   return store

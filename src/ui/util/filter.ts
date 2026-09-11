@@ -57,7 +57,8 @@ export function filterApplies(filter: Filter, mon: monData) {
   ) {
     return false
   }
-  if (filter.gameOfOrigin !== undefined && mon.gameOfOrigin !== filter.gameOfOrigin) {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+  if (filter.gameOfOrigin !== undefined && mon.gameOfOrigin !== (filter.gameOfOrigin as number)) {
     return false
   }
   if (filter.ribbon !== undefined) {

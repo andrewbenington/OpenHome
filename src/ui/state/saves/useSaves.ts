@@ -37,7 +37,7 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'home
   importMonsToLocation(mons: PKMInterface[], startingAt: MonLocation): Promise<OpenSavesState>
 
   addSave(save: SAV): Promise<Result<SAV, SaveError>>
-  buildAndOpenSave: (filePath?: PathData | undefined) => Promise<Result<Option<SAV>, SaveError>>
+  buildAndOpenSave: (filePath?: PathData) => Promise<Result<Option<SAV>, SaveError>>
   removeSave(save: SAV): void
   saveBoxNavigateLeft(save: SAV): void
   saveBoxNavigateRight(save: SAV): void
@@ -390,7 +390,7 @@ export function useSaves(): SavesAndBanksManager {
             const updates = trackedData.syncWithGameData(mon, save)
 
             if (updates.length > 0) {
-              backend.log('DEBUG', `synced ${mon.nickname} with game data`, {
+              await backend.log('DEBUG', `synced ${mon.nickname} with game data`, {
                 ohpkm_id: trackedData.openhomeId,
                 event: 'game_data_sync',
                 updates,
@@ -398,7 +398,7 @@ export function useSaves(): SavesAndBanksManager {
             }
 
             for (const update of updates) {
-              backend.log(
+              await backend.log(
                 'INFO',
                 `${mon.nickname}: ${update.message ?? `Updated ${update.field} from ${JSON.stringify(update.prevValue)} to ${JSON.stringify(update.newValue)}`}`,
                 {
@@ -413,7 +413,7 @@ export function useSaves(): SavesAndBanksManager {
           }
         }
 
-        ohpkmStore.insertOrUpdateAll(toUpdate)
+        await ohpkmStore.insertOrUpdateAll(toUpdate)
         openSavesDispatch({ type: 'add_save', payload: save })
         return R.Ok(save)
       } catch (e) {
@@ -449,7 +449,7 @@ export function useSaves(): SavesAndBanksManager {
 
       const fileBytes = bytesResult.data.fileBytes
 
-      let saveTypes = getPossibleSaveTypes(fileBytes, getEnabledSaveTypes())
+      const saveTypes = getPossibleSaveTypes(fileBytes, getEnabledSaveTypes())
 
       let saveType: Option<SAVClass>
       switch (saveTypes.length) {
@@ -523,7 +523,7 @@ export function useSaves(): SavesAndBanksManager {
       }
 
       ohpkm.heldItemIndex = itemIndex
-      ohpkmStore.insertOrUpdate(ohpkm)
+      await ohpkmStore.insertOrUpdate(ohpkm)
 
       return R.Ok(null)
     },
@@ -576,12 +576,11 @@ export function useSaves(): SavesAndBanksManager {
           return null
         })
       } else {
-        return moveMonBetweenSaves(source.saveIdentifier, sourceMon, dest).thenFlatMap(
-          (swappedMon) =>
-            moveMonBetweenSaves(dest.saveIdentifier, swappedMon, source)
-              .andThen(async () => null)
-              .get()
-        )
+        return moveMonBetweenSaves(source.saveIdentifier, sourceMon, dest)
+          .thenFlatMap((swappedMon) =>
+            moveMonBetweenSaves(dest.saveIdentifier, swappedMon, source).get()
+          )
+          .then(() => null)
       }
     }
 
@@ -793,7 +792,7 @@ export function useSaves(): SavesAndBanksManager {
       if (destMon?.heldItemIndex !== undefined) {
         ItemBag.addItem(destMon.heldItemIndex, 1)
       }
-      setMonHeldItem(item, monLocation)
+      await setMonHeldItem(item, monLocation)
     },
     [setMonHeldItem, getMonAtLocation, ItemBag]
   )
