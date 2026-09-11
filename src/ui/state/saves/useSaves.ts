@@ -65,7 +65,7 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'home
   allMonsInCurrentBank: () => OhpkmIdentifier[]
 }
 
-const SCAN_FULL_STORE_AND_FIX_HANDLERS = true // warning - this can cause slowdown when opening a save if many OHPKMs are tracked
+const SCAN_FULL_STORE_AND_FIX_HANDLERS = true
 
 function MissingOhpkmData(identifier: string) {
   return R.Err(`Missing OHPKM data for identifier ${identifier}`)
@@ -148,7 +148,7 @@ export function useSaves(): SavesAndBanksManager {
       const sourceSave = sourceSaveIdentifier ? saveFromIdentifier(sourceSaveIdentifier) : undefined
       const destSave = openSavesState.openSaves[dest.saveIdentifier].save
 
-      const futureDisplacedMonResult = $O(sourceMon)
+      const displacedDestMon = $O(sourceMon)
         .awaitMap(async (sourceMon) =>
           ohpkmStore
             .loadOrStartTracking(sourceMon, sourceSave, destSave)
@@ -164,7 +164,7 @@ export function useSaves(): SavesAndBanksManager {
         )
         .orElse(R.Ok(undefined))
 
-      return R.after(futureDisplacedMonResult)
+      return R.after(displacedDestMon)
     },
     [ohpkmStore, openSavesState.openSaves, saveFromIdentifier]
   )
@@ -281,33 +281,28 @@ export function useSaves(): SavesAndBanksManager {
         let nextSlot = dest
 
         const currentBankBoxCount = getCurrentBank().boxes.size
-        mons.forEach((mon) => {
+        for (const mon of mons) {
           while (!homeLocationIsEmpty(nextSlot) && nextSlot.box < currentBankBoxCount) {
-            nextSlot.boxSlot++
-            if (nextSlot.boxSlot >= OPENHOME_BOX_SLOTS) {
-              nextSlot.boxSlot = 0
-              nextSlot.box++
+            if (nextSlot.boxSlot >= OPENHOME_BOX_SLOTS - 1) {
+              nextSlot = { ...nextSlot, boxSlot: 0, box: nextSlot.box + 1 }
+            } else {
+              nextSlot = { ...nextSlot, boxSlot: nextSlot.boxSlot + 1 }
             }
           }
 
           if (nextSlot.box < currentBankBoxCount) {
             const homeMon = mon instanceof OHPKM ? mon : OHPKM.fromMonUnknownSave(mon)
-            ohpkmStore.insertOrUpdate(homeMon)
+            await ohpkmStore.insertOrUpdate(homeMon)
 
             moveOhpkmToHome(homeMon.openhomeId, nextSlot, true)
             addedMons.push(homeMon)
-            nextSlot.boxSlot++
-            if (nextSlot.boxSlot >= OPENHOME_BOX_SLOTS) {
-              nextSlot.boxSlot = 0
-              nextSlot.box++
-            }
           }
-        })
+        }
       } else {
         let nextIndex = dest.boxSlot
         const tempSave = saveFromIdentifier(dest.saveIdentifier)
 
-        mons.forEach(async (mon) => {
+        for (const mon of mons) {
           while (
             tempSave.getMonAt(dest.box, nextIndex) &&
             nextIndex < tempSave.boxRows * tempSave.boxColumns
@@ -319,14 +314,15 @@ export function useSaves(): SavesAndBanksManager {
 
             const converted = await ohpkmStore.updateAndConvertForSave(homeMon, tempSave)
             if (R.isErr(converted)) {
-              return R.Ok(null)
+              console.error(converted.error)
+              continue
             }
 
-            moveMonBetweenSaves(undefined, converted.data, dest)
+            await moveMonBetweenSaves(undefined, converted.data, dest)
             addedMons.push(homeMon)
             nextIndex++
           }
-        })
+        }
 
         openSavesState.openSaves[dest.saveIdentifier].save = tempSave
       }
