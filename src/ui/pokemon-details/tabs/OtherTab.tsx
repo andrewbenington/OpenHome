@@ -35,7 +35,7 @@ import DynamaxLevel from '@openhome-ui/components/pokemon/DynamaxLevel'
 import GenderIcon from '@openhome-ui/components/pokemon/GenderIcon'
 import ShinyLeavesDisplay from '@openhome-ui/components/pokemon/ShinyLeaves'
 import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
-import { Generation, Language, OriginGames, Pokerus, StatsPreSplit, TeraType } from '@pkm-rs/pkg'
+import { Generation, Language, OriginGames, Pokerus, TeraType } from '@pkm-rs/pkg'
 import { Flex } from '@radix-ui/themes'
 
 const HECTOGRAMS_TO_POUNDS = 0.2204623
@@ -427,12 +427,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
           mon.nationalDex,
           mon.formIndex,
           mon.extraFormIndex
-        ) && (
-          <AttributeRow
-            label="Gen 1/2 ID"
-            value={getMonGen12Identifier(mon as PKMInterface & { dvs: StatsPreSplit })}
-          />
-        )}
+        ) && <AttributeRow label="Gen 1/2 ID" value={getMonGen12Identifier(mon)} />}
         {!isRestricted(
           HGSS_TRANSFER_RESTRICTIONS,
           mon.nationalDex,

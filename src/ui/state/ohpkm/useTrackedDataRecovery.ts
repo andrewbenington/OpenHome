@@ -116,6 +116,7 @@ export default function useTrackedDataRecovery() {
     } else if (state.state === 'pending_ohpkm_select') {
       setState({ state: 'initial' })
     } else if (state.state !== 'initial') {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       expectExhaustive(state, `unrecognized state: ${state}`)
     }
   }

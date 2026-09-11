@@ -137,9 +137,9 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.secretID = other.secretID
       this.exp = other.exp
 
-      this.moves = other.moves as FourMoves
+      this.moves = other.moves
       this.movePP = adjustMovePPBetweenFormats(this, other)
-      this.movePPUps = other.movePPUps as FourMoves
+      this.movePPUps = other.movePPUps
 
       this.nickname = other.nickname
       if (this.nicknameMatchesSpeciesIgnoreCase()) {

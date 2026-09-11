@@ -372,7 +372,7 @@ function SingleBoxMonDisplay() {
         <div className="home-box-grid">
           {slots.map(({ monResult, monPromise, location, identifier }, index) => {
             // if underlying data changes but this key doesn't, the box cell will be stale and may not display the correct species
-            let uniqueKey = identifier ?? `${currentBoxIndex}-${index}`
+            const uniqueKey = identifier ?? `${currentBoxIndex}-${index}`
 
             if (monResult && R.isErr(monResult)) {
               return (

@@ -118,7 +118,7 @@ export default function FilterPanel() {
       type: 'z_crystal',
       label: 'Z Crystal',
     },
-    ...ALL_ITEMS.map((item) => ({ type: 'specific_item', ...item }) as ItemOption),
+    ...ALL_ITEMS.map((item) => ({ ...item, type: 'specific_item' as const })),
   ]
 
   const currentMon = useMemo(

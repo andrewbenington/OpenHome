@@ -105,7 +105,7 @@ export function getSpriteName(mon: MonSpriteData, format?: string): string {
 function getRomHackSpritePath(mon: MonSpriteData) {
   const spriteName = getSpriteName(mon, mon.format)
   const monFormat = mon.format
-  let spriteFolder = fileToSpriteFolder[monFormat as MonFormat]
+  const spriteFolder = fileToSpriteFolder[monFormat as MonFormat]
 
   if (monFormat === 'PK3RR') {
     if (mon.nationalDex === NationalDex.Ursaluna && mon.formIndex === BLOOD_MOON) {

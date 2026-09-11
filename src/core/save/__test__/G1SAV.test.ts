@@ -13,7 +13,7 @@ import { emptyPathData } from '../util/path'
 import { initializeWasm } from './init'
 
 let blueSaveFile: G1SAV
-var slowbroOH: OHPKM
+let slowbroOH: OHPKM
 
 beforeAll(initializeWasm)
 

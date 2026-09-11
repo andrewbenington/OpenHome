@@ -80,7 +80,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
         setDragOverId(null)
 
         const dest = e.over?.data.current
-        let payload = dragState.payload
+        const payload = dragState.payload
 
         const dropElementId = e.over?.id
 

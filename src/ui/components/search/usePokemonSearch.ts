@@ -98,7 +98,7 @@ export function usePokemonSearch(...prefilter: Filter[]): PokemonSearchControlle
   const ohpkmStore = useOhpkmStore()
   const { preloadRowData } = useOhpkmGrid()
 
-  let filters: Filter[] = prefilter ?? []
+  const filters: Filter[] = prefilter ?? []
   if (knownMove) filters.push({ moveTextPrefixEng: knownMove })
   if (nickname) filters.push({ nicknamePrefix: nickname })
   if (originGame) filters.push({ originGame })

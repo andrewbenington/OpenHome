@@ -136,7 +136,7 @@ export class SwordShieldSave extends WasmOfficialSave<PK8, Pk8Wasm, SwordShieldS
   }
 
   getMonAt(boxIndex: number, boxSlot: number): PK8 | undefined {
-    let pk8Wasm = this.inner.getMonAt(boxIndex, boxSlot)
+    const pk8Wasm = this.inner.getMonAt(boxIndex, boxSlot)
     return pk8Wasm ? PK8.fromWasm(pk8Wasm) : undefined
   }
 

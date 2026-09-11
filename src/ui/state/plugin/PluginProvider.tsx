@@ -33,32 +33,32 @@ function usePlugins() {
 
   useEffect(() => {
     if (pluginState.loaded || !appInfoState.settingsLoaded) return
-    backend.listInstalledPlugins().then(
-      R.match(
-        (plugins) => {
-          const promises = plugins
-            .filter((plugin) => appInfoState.settings.enabledPlugins[plugin.id])
-            .map((plugin) => ({ ...plugin, ...backend.loadPluginCode(plugin.id) }))
+    backend
+      .listInstalledPlugins()
+      .then(
+        R.match(
+          async (plugins) => {
+            const promises = plugins
+              .filter((plugin) => appInfoState.settings.enabledPlugins[plugin.id])
+              .map(async (plugin) => ({ ...plugin, ...(await backend.loadPluginCode(plugin.id)) }))
 
-          Promise.all(promises).then((results) => {
-            const { failures, successes } = partitionResults(results)
-
+            const { failures, successes } = partitionResults(await Promise.all(promises))
             if (failures.length) {
               displayError('Some Plugins Failed to Load', failures)
             }
 
-            const plugins = successes.map(loadPlugin)
-
-            pluginDispatch({ type: 'register_plugins', payload: plugins })
+            const loadedPlugins = successes.map(loadPlugin)
+            pluginDispatch({ type: 'register_plugins', payload: loadedPlugins })
             pluginDispatch({ type: 'set_loaded', payload: true })
-          })
-        },
-        (err) => {
-          pluginDispatch({ type: 'set_loaded', payload: true })
-          displayError('Error Getting Installed Plugins', err)
-        }
+          },
+          // eslint-disable-next-line @typescript-eslint/require-await
+          async (err) => {
+            pluginDispatch({ type: 'set_loaded', payload: true })
+            displayError('Error Getting Installed Plugins', err)
+          }
+        )
       )
-    )
+      .catch(console.error)
   }, [
     backend,
     displayError,
@@ -87,6 +87,11 @@ function usePlugins() {
           displayError('Error Finding Available Plugins', `${e}`)
         }
       })
+      .catch((e) => {
+        console.error(e)
+        setAvailablePlugins({})
+        displayError('Error Finding Available Plugins', `${e}`)
+      })
       .finally(() => {
         pluginDispatch({ type: 'set_loaded', payload: true })
         setLoading(false)
@@ -97,12 +102,12 @@ function usePlugins() {
     async () =>
       backend.listInstalledPlugins().then(
         R.match(
-          (plugins) => {
+          async (plugins) => {
             const promises = plugins.map((plugin) => backend.loadPluginCode(plugin.id))
 
             const metadataById = Object.groupBy(plugins, (p) => p.id)
 
-            Promise.all(promises).then((results) => {
+            await Promise.all(promises).then((results) => {
               const { failures, successes } = partitionResults(results)
 
               if (failures.length) {
@@ -117,7 +122,8 @@ function usePlugins() {
               pluginDispatch({ type: 'set_loaded', payload: true })
             })
           },
-          (err) => {
+          // eslint-disable-next-line @typescript-eslint/require-await
+          async (err) => {
             pluginDispatch({ type: 'set_loaded', payload: true })
             displayError('Error Getting Installed Plugins', err)
           }
@@ -128,7 +134,7 @@ function usePlugins() {
 
   useEffect(() => {
     if (pluginState.plugins && pluginState.loaded) return
-    loadInstalled()
+    loadInstalled().catch(console.error)
   }, [loadInstalled, pluginState.loaded, pluginState.plugins])
 
   function currentApiVersion(plugin: OpenHomePlugin) {
@@ -150,7 +156,7 @@ function usePlugins() {
 
   function deletePlugin(pluginID: string) {
     pluginDispatch({ type: 'remove_plugin', payload: pluginID })
-    loadInstalled()
+    loadInstalled().catch(console.error)
   }
 
   return {

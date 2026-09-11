@@ -286,9 +286,7 @@ function PokedexDetails({
               value={metadataSource.toString()}
               onValueChange={(value) =>
                 setMetadataSource(
-                  value === MOST_CURRENT_SOURCE
-                    ? MOST_CURRENT_SOURCE
-                    : (parseInt(value) as MetadataSource)
+                  value === MOST_CURRENT_SOURCE ? MOST_CURRENT_SOURCE : parseInt(value)
                 )
               }
             >

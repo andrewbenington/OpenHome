@@ -506,7 +506,7 @@ describe('OHPKM sync updates SwSh data', () => {
   })
 
   test('trainer friendship (existing handler)', () => {
-    let savePath = saveTestFilePath('gen8-swsh', 'sword')
+    const savePath = saveTestFilePath('gen8-swsh', 'sword')
     const swordSaveBytes = new Uint8Array(readFileSync(savePath))
     const swordSave = new SwordShieldSave(emptyPathData, swordSaveBytes)
 
@@ -542,7 +542,7 @@ describe('OHPKM sync updates SwSh data', () => {
   })
 
   test('trainer friendship (new handler)', () => {
-    let savePath = saveTestFilePath('gen8-swsh', 'sword-friendship-update')
+    const savePath = saveTestFilePath('gen8-swsh', 'sword-friendship-update')
     const swordSaveBytes = new Uint8Array(readFileSync(savePath))
     const swordSave = new SwordShieldSave(emptyPathData, swordSaveBytes)
 

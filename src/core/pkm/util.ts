@@ -108,8 +108,8 @@ export const getBaseEvolution = (nationalDex: number, form?: number) => {
 }
 
 export function baseEvolutionsMatch(mon1: PKMInterface, mon2: PKMInterface): boolean {
-  let baseEvo1 = getBaseEvolution(mon1.nationalDex, mon1.formIndex)
-  let baseEvo2 = getBaseEvolution(mon2.nationalDex, mon2.formIndex)
+  const baseEvo1 = getBaseEvolution(mon1.nationalDex, mon1.formIndex)
+  const baseEvo2 = getBaseEvolution(mon2.nationalDex, mon2.formIndex)
 
   return (
     baseEvo1 !== undefined &&

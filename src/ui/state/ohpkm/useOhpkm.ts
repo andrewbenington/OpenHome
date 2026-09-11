@@ -19,13 +19,12 @@ export default function useOhpkm(openhomeId: OhpkmIdentifier): OhpkmLookupState 
 
       const result = await ohpkmStore.tryLoadFromId(openhomeId)
       setOhpkmResult(result)
-
       setLoading(false)
     }
   }
 
   if (!loading && !ohpkmResult) {
-    loadMon()
+    loadMon().catch(console.error)
   }
 
   return {

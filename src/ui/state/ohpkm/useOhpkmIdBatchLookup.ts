@@ -1,6 +1,7 @@
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { Option } from '@openhome-core/util/functional'
 import { isThenable } from '@openhome-core/util/promise'
+import useDisplayError from '@openhome-ui/hooks/displayError'
 import { useEffect, useEffectEvent, useState } from 'react'
 import { OhpkmBatchLookupResults, useOhpkmStore } from './useOhpkmStore'
 
@@ -18,6 +19,7 @@ export default function useOhpkmIdBatchLookup(
 
   const loadBatch = useEffectEvent(() => ohpkmStore.tryLoadBatch(openhomeIds))
   const openhomeIdsKey = hashStrings(openhomeIds)
+  const displayError = useEffectEvent(useDisplayError())
 
   useEffect(() => {
     // if this effect is cleaned up before the results return, the ignore flag tells the callback that it is outdated and should set the results
@@ -27,12 +29,14 @@ export default function useOhpkmIdBatchLookup(
 
     const batchResult = loadBatch()
     if (isThenable(batchResult)) {
-      batchResult.then((result) => {
-        if (!ignore) {
-          setBatchResults(result)
-          setLoading(false)
-        }
-      })
+      batchResult
+        .then((result) => {
+          if (!ignore) {
+            setBatchResults(result)
+            setLoading(false)
+          }
+        })
+        .catch((error) => displayError('Error loading OHPKM batch', `Error: '${error}'`))
     } else {
       setBatchResults(batchResult)
       setLoading(false)

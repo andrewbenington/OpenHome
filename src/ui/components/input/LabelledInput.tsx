@@ -42,7 +42,7 @@ function styleFromProps(props: LabelledInputProps): CSSProperties {
     flex: props.flex,
     gridColumn: gridColumnsCss(props.colSpan),
     ...props.style,
-  } as CSSProperties
+  }
 }
 
 type LabelledTextInputProps = {

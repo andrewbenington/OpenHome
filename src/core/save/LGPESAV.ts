@@ -76,11 +76,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
     super()
     this.bytes = bytes
     this.filePath = path
-    this.name = utf16BytesToString(
-      this.bytes.buffer as ArrayBuffer,
-      this.trainerDataOffset + 0x38,
-      0x10
-    )
+    this.name = utf16BytesToString(this.bytes.buffer, this.trainerDataOffset + 0x38, 0x10)
 
     const fullTrainerID = bytesToUint32LittleEndian(this.bytes, this.trainerDataOffset)
 

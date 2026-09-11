@@ -188,7 +188,7 @@ export function useManageTracked() {
     }
 
     const totalMons = allOhpkmIdsNotInBoxes.size
-    let foundMonIds = new Set<string>()
+    const foundMonIds = new Set<string>()
 
     const saveRefs = result.data
 

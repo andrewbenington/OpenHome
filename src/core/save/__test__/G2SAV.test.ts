@@ -22,7 +22,7 @@ function saveTestFilePath(...pathElements: string[]): string {
 }
 
 let crystalSaveFile: G2SAV
-var slowbroOH: OHPKM
+let slowbroOH: OHPKM
 
 beforeAll(async () => {
   await initializeWasm()

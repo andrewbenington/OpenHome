@@ -1,5 +1,4 @@
 import useBackend from '@openhome-core/backend/useBackend'
-import { PluginIdentifier } from '@openhome-core/save/interfaces'
 import { getPluginIdentifier } from '@openhome-core/save/util'
 import { PathData, splitPath } from '@openhome-core/save/util/path'
 import { R } from '@openhome-core/util/functional'
@@ -128,7 +127,7 @@ export default function RecentSaves(props: RecentSavesProps) {
         <div className="flex-row-centered">
           <Badge.Game
             originGame={value.game ?? undefined}
-            plugin={value.pluginIdentifier as PluginIdentifier}
+            plugin={value.pluginIdentifier}
             withName
             tooltip={value.filePath.raw}
           />

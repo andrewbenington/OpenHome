@@ -23,22 +23,7 @@ import PK9 from './PK9'
 import XDPKM from './XDPKM'
 
 export type PKM =
-  | PK1
-  | PK2
-  | PK3
-  | COLOPKM
-  | XDPKM
-  | PK4
-  | PK5
-  | PK6
-  | PK7
-  | PB7
-  | PK8
-  | PA8
-  | PB8
-  | PK9
-  | PA9
-  | PK7
+  PK1 | PK2 | PK3 | COLOPKM | XDPKM | PK4 | PK5 | PK6 | PK7 | PB7 | PK8 | PA8 | PB8 | PK9 | PA9
 
 const WasmPkmFormats = [PK3, PK7, PK8, PK9, PK9Compass]
 export type WasmPkmFormat = InstanceType<(typeof WasmPkmFormats)[number]>
