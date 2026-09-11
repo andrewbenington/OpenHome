@@ -70,7 +70,6 @@ export default interface BackendInterface {
   removeDangling: () => Promise<Errorable<null>>
 
   /* ohpkm bytes store by identifier */
-  loadOhpkmStore: () => Promise<Errorable<OhpkmStore>>
   searchOhpkmStore(
     cursor: PaginationCursor,
     filters: Filter[]

@@ -79,18 +79,6 @@ export const TauriBackend: BackendInterface = {
   addToLookups: Commands.addToLookups,
 
   /* ohpkm store */
-  loadOhpkmStore: async function (): Promise<Errorable<OhpkmStore>> {
-    return Commands.getOhpkmStore().then(
-      R.map((b64ByIdentifier) =>
-        Object.fromEntries(
-          b64ByIdentifier.map(([identifier, b64String]) => [
-            identifier,
-            OHPKM.fromBytes(Uint8Array.fromBase64(b64String).buffer),
-          ])
-        )
-      )
-    )
-  },
   searchOhpkmStore: async function (
     cursor: PaginationCursor,
     filters: Filter[]

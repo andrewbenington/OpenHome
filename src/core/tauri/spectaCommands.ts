@@ -246,14 +246,6 @@ export const commands = {
       else return { status: 'error', error: e as any }
     }
   },
-  async getOhpkmStore(): Promise<Result<[string, string][], CommandError>> {
-    try {
-      return { status: 'ok', data: await TAURI_INVOKE('get_ohpkm_store') }
-    } catch (e) {
-      if (e instanceof Error) throw e
-      else return { status: 'error', error: e as any }
-    }
-  },
   async searchOhpkmStore(
     paginationCursor: PaginationCursor,
     filters: Filter[]

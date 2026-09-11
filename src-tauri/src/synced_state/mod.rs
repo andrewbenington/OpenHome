@@ -87,10 +87,6 @@ impl AllSyncedState {
         Ok(self.lock()?.lookups.0.clone())
     }
 
-    pub fn ohpkm_store_b64(&self) -> Result<Vec<(String, String)>> {
-        Ok(self.lock()?.ohpkm_store.0.to_b64_entries())
-    }
-
     pub fn search_ohpkm_store(
         &self,
         cursor: search::PaginationCursor,

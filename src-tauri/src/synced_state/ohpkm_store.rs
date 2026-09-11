@@ -28,14 +28,6 @@ impl synced_state::SyncedState for OhpkmBytesStore {
 
 #[tauri::command]
 #[specta::specta]
-pub fn get_ohpkm_store(
-    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
-) -> CommandResult<Vec<(String, String)>> {
-    Ok(synced_state.ohpkm_store_b64()?)
-}
-
-#[tauri::command]
-#[specta::specta]
 pub fn search_ohpkm_store(
     synced_state: tauri::State<'_, synced_state::AllSyncedState>,
     pagination_cursor: search::PaginationCursor,

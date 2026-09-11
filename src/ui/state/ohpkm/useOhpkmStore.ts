@@ -12,13 +12,13 @@ import { SAV } from '@openhome-core/save/interfaces'
 import { SAVClass } from '@openhome-core/save/util'
 import { Filter, PaginationCursor } from '@openhome-core/tauri/spectaCommands'
 import { expectExhaustive } from '@openhome-core/util'
-import { $R, Errorable, Option, R, Result } from '@openhome-core/util/functional'
+import { $R, Option, R, Result } from '@openhome-core/util/functional'
 import { LRUCache } from '@openhome-core/util/lruCache'
 import { isThenable, NowOrLater } from '@openhome-core/util/promise'
 import { FourMoves } from '@openhome-core/util/types'
 import { Lookup, MarkingsSixShapesColors, ModernRibbon, OriginGames } from '@pkm-rs/pkg/pkm_rs'
 import dayjs from 'dayjs'
-import { createContext, useCallback } from 'react'
+import { useCallback } from 'react'
 import { OhpkmStoreData } from '.'
 import { useConvertStrategies } from '../convert-strategies'
 import { useLookups } from '../lookups'
@@ -72,9 +72,8 @@ export function useOhpkmStore() {
   const { lookups, updateLookups } = useLookups()
   const { gen12: gen12Lookup, gen345: gen345Lookup } = lookups
   const backend = useBackend()
-  const { addToOhpkmStore } = backend
 
-  const updateStore = addToOhpkmStore
+  const updateStore = backend.addToOhpkmStore
 
   const getById = useCallback(
     (id: string): NowOrLater<Option<OHPKM>> => {
@@ -470,7 +469,3 @@ export type IdentifierNotPresentError = { identifier: OhpkmIdentifier }
 function IdentifierNotPresent(identifier: OhpkmIdentifier): IdentifierNotPresentError {
   return { identifier }
 }
-
-export const OhpkmStoreContext = createContext<
-  [OhpkmStoreData, (updated: OhpkmStoreData) => Promise<Errorable<null>>]
->([{}, async () => R.Err('Uninitialized')])
