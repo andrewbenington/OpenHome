@@ -91,6 +91,9 @@ function AppWithBackend() {
   const reloadSettings = useEffectEvent(backend.getSettings)
   const getPlatform = useEffectEvent(backend.getPlatform)
 
+  // The save listener works if these are separated into effect events, but not
+  // if the whole effect function is (including the returned callback). Check
+  // that saving still persists movements after any updates to this.
   const onMenuEvent = useEffectEvent(backend.onMenuEvent)
   const saveChangesEvent = useEffectEvent(saveChanges)
 
