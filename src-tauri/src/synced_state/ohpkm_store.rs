@@ -1,9 +1,12 @@
 use crate::commands::CommandResult;
 use crate::data_controller::TauriDataController;
 use crate::synced_state;
-use openhome_core::Error;
 use openhome_core::data_controller::{DataController, DataDir, MONS_V2_DIR};
 use openhome_core::ohpkm_store::OhpkmBytesStore;
+use openhome_core::{Error, search};
+use pkm_rs::ohpkm::{OhpkmV2, OpenHomeId, UnknownHandlerSave};
+use pkm_rs_resources::metadata_source::MetadataSource;
+use pkm_rs_types::{BinaryGender, OriginGame};
 use serde::Serialize;
 use std::path::Path;
 use std::{collections::HashMap, fs};
@@ -25,10 +28,65 @@ impl synced_state::SyncedState for OhpkmBytesStore {
 
 #[tauri::command]
 #[specta::specta]
-pub fn get_ohpkm_store(
+pub fn search_ohpkm_store(
     synced_state: tauri::State<'_, synced_state::AllSyncedState>,
-) -> CommandResult<Vec<(String, String)>> {
-    Ok(synced_state.ohpkm_store_b64()?)
+    pagination_cursor: search::PaginationCursor,
+    filters: Vec<search::Filter>,
+) -> CommandResult<search::PaginatedPage<String>> {
+    Ok(synced_state.search_ohpkm_store(pagination_cursor, filters)?)
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn get_ohpkm_ids_matching_unknown_handler(
+    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
+    save_name: &str,
+    save_gender: BinaryGender,
+    save_game_origin_index: u8,
+) -> CommandResult<Vec<String>> {
+    let origin_game = OriginGame::try_from_u8(save_game_origin_index).ok_or(format!("Unsupported save game index encountered when trying to populate unknown handlers: {save_game_origin_index}"))?;
+
+    Ok(synced_state.search_ohpkms_matching_unknown_handler(&UnknownHandlerSave::new(
+            save_name.to_owned(),
+            save_gender,
+            MetadataSource::from_origin_game(origin_game).ok_or(format!("Unsupported save game type encountered when trying to populate unknown handlers: {save_game_origin_index}"))?,
+        ))?.into_iter()
+    .map(|ohpkm| ohpkm.openhome_id().to_string())
+    .collect())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn get_ohpkm_bytes_by_id(
+    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
+    openhome_id: String,
+) -> CommandResult<Option<Vec<u8>>> {
+    Ok(synced_state
+        .ohpkm_lookup(openhome_id.parse()?)?
+        .map(|ohpkm| ohpkm.to_bytes().to_vec()))
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn get_ohpkm_bytes_by_id_batch(
+    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
+    openhome_ids: Vec<String>,
+) -> CommandResult<HashMap<String, Option<Vec<u8>>>> {
+    let parsed_ids: Vec<OpenHomeId> = openhome_ids
+        .into_iter()
+        .filter_map(|id| id.parse().ok())
+        .collect();
+
+    Ok(synced_state
+        .ohpkm_lookup_batch(&parsed_ids)?
+        .into_iter()
+        .map(|(id, ohpkm_result)| {
+            (
+                id.to_string(),
+                ohpkm_result.as_ref().map(OhpkmV2::to_bytes).ok(),
+            )
+        })
+        .collect())
 }
 
 #[tauri::command]

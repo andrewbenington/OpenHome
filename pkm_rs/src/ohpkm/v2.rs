@@ -13,6 +13,7 @@ use crate::ohpkm::extra_form::ExtraFormIndex;
 use crate::ohpkm::id::OpenHomeId;
 use crate::ohpkm::issues::OhpkmIssue;
 use crate::ohpkm::v1::OhpkmV1;
+use crate::ohpkm::v2_sections::UnknownHandlerSave;
 use crate::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, StoredPkmBytes, UnconvertedPkm};
 use crate::result::{Error, Result};
 use crate::sectioned_data::{DataSection, SectionTag, SectionedData};
@@ -31,7 +32,7 @@ use pkm_rs_types::Dvs;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, FlagSet, Gender, Geolocations, HyperTraining, Ivs,
-    Language, MarkingsSixShapesColors, OriginGame, PokeDate, Pokerus, ShinyLeaves, Stats8,
+    Language, MarkingsSixShapesColors, OriginGame, PkmType, PokeDate, Pokerus, ShinyLeaves, Stats8,
     Stats16Le, StatsPreSplit, TeraType, TrainerData, TrainerMemory,
 };
 use serde::Serialize;
@@ -822,6 +823,16 @@ impl OhpkmV2 {
             .for_each(|r| self.main_data.ribbons.add_ribbon(r));
     }
 
+    // Species/Form metadata
+
+    pub fn type1(&self) -> PkmType {
+        self.get_forme_metadata().type_1()
+    }
+
+    pub fn type2(&self) -> Option<PkmType> {
+        self.get_forme_metadata().type_2()
+    }
+
     // Plugins
 
     pub fn plugin_origin(&self) -> Option<String> {
@@ -1452,15 +1463,11 @@ impl OhpkmV2 {
         self.handler_data.clone()
     }
 
-    pub fn matching_unknown_handler(
-        &mut self,
-        name: String,
-        gender: BinaryGender,
-    ) -> Option<PastHandlerDataV2> {
-        let sized_string = SizedUtf16String::<26>::from(name);
+    pub fn matching_unknown_handler(&self, save: &UnknownHandlerSave) -> Option<PastHandlerDataV2> {
+        let sized_string = SizedUtf16String::<26>::from(save.get_name());
         self.handler_data
             .iter()
-            .find(|h| h.unknown_trainer_data_matches(&sized_string, gender))
+            .find(|h| h.unknown_trainer_data_matches(&sized_string, save.get_gender()))
             .cloned()
     }
 
@@ -3488,7 +3495,6 @@ impl OhpkmV2 {
         match value {
             Some(flags) => {
                 let mut new_bytes = [0u8; LZA_DLC_TM_BYTES];
-                dbg!(new_bytes, LZA_DLC_TM_BYTES);
                 new_bytes.copy_from_slice(&flags);
                 self.lza_data.get_or_insert_default().tm_flags_dlc =
                     FlagSet::<LZA_DLC_TM_BYTES>::from_bytes(new_bytes);
@@ -3589,6 +3595,18 @@ impl OhpkmV2 {
         plugin: Option<String>,
     ) -> DataUpdated {
         self.register_handler(handler, plugin)
+    }
+
+    // Species/Form metadata
+
+    #[wasm_bindgen(getter = type1Index)]
+    pub fn type1_index_wasm(&self) -> u8 {
+        self.get_forme_metadata().type_1_index()
+    }
+
+    #[wasm_bindgen(getter = type2Index)]
+    pub fn type2_index_wasm(&self) -> Option<u8> {
+        self.get_forme_metadata().type_2_index()
     }
 
     // Notes

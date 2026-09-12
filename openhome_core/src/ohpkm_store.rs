@@ -1,9 +1,10 @@
 use crate::data_controller::{DataController, DataDir, MONS_V2_DIR};
 use crate::error::{Error, Result};
+use crate::search;
 use crate::util;
 use base64::prelude::*;
-use pkm_rs::ohpkm::OhpkmV2;
 use pkm_rs::ohpkm::OpenHomeId;
+use pkm_rs::ohpkm::{OhpkmV2, UnknownHandlerSave};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::num::NonZeroU64;
@@ -106,9 +107,66 @@ impl OhpkmBytesStore {
 
     pub fn to_b64_entries(&self) -> Vec<(String, String)> {
         self.0
-            .clone()
-            .into_iter()
+            .iter()
             .map(|(k, v)| (k.to_string(), BASE64_STANDARD.encode(v)))
+            .collect()
+    }
+
+    pub fn parsed_iter(&self) -> impl Iterator<Item = OhpkmV2> {
+        self.0
+            .values()
+            .map(Vec::as_slice)
+            .map(OhpkmV2::from_bytes)
+            .filter_map(std::result::Result::ok)
+    }
+
+    pub fn get_b64_bytes_page(
+        &self,
+        current_cursor: search::PaginationCursor,
+        filters: Vec<search::Filter>,
+    ) -> search::PaginatedPage<String> {
+        let entries = self
+            .0
+            .values()
+            .filter(|bytes| match OhpkmV2::from_bytes(bytes) {
+                Ok(ohpkm) => filters.iter().all(|filter| filter.applies(&ohpkm)),
+                Err(_) => false,
+            })
+            .map(|bytes| BASE64_STANDARD.encode(bytes));
+
+        search::PaginatedPage::get_for_cursor(current_cursor, entries, self.0.len())
+    }
+
+    pub fn get_all_with_unknown_handler(
+        &self,
+        save: &UnknownHandlerSave,
+    ) -> impl Iterator<Item = OhpkmV2> {
+        self.parsed_iter().filter(move |ohpkm| {
+            save.get_metadata_source()
+                .supports_form(ohpkm.species_and_form())
+                && ohpkm.matching_unknown_handler(save).is_some()
+        })
+    }
+
+    pub fn lookup(&self, identifier: &OpenHomeId) -> Result<Option<OhpkmV2>> {
+        Ok(self
+            .0
+            .get(identifier)
+            .map(|bytes| OhpkmV2::from_bytes(bytes))
+            .transpose()?)
+    }
+
+    pub fn lookup_batch(&self, identifiers: &[OpenHomeId]) -> HashMap<OpenHomeId, Result<OhpkmV2>> {
+        identifiers
+            .iter()
+            .filter_map(|&identifier| {
+                self.0.get(&identifier).map(|bytes| {
+                    (
+                        identifier,
+                        OhpkmV2::from_bytes(bytes).map_err(|source| Error::PkmRs { source }),
+                    )
+                })
+            })
             .collect()
     }
 

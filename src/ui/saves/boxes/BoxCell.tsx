@@ -20,7 +20,7 @@ import { PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { DISPLAY_COLOR_PRESETS, TAG_PRESETS } from '@openhome-ui/util/tags'
 import { Lookup } from '@pkm-rs/pkg'
 import { Flex, TextField } from '@radix-ui/themes'
-import { useCallback, useMemo, useState } from 'react'
+import { CSSProperties, useCallback, useMemo, useState } from 'react'
 import '../style.css'
 import DraggableMon from './DraggableMon'
 import DroppableSpace from './DroppableSpace'
@@ -36,6 +36,7 @@ interface BoxCellProps {
   onClick: () => void
   onDrop: (_: PKMInterface[]) => void
   disabled?: boolean
+  loading?: boolean
   disabledReason?: string
   mon: PKMInterface | undefined
   borderColor?: string
@@ -45,6 +46,7 @@ interface BoxCellProps {
   isSelected?: boolean
   onToggleSelect?: () => void
   multiSelectEnabled?: boolean
+  style?: CSSProperties
 }
 
 function BoxCell(props: BoxCellProps) {
@@ -58,7 +60,8 @@ function BoxCell(props: BoxCellProps) {
   const { updateMonTags, updateMonDisplayColor, setMonNickname } = ohpkmStore
   const [renameOpen, setRenameOpen] = useState(false)
   const [renameValue, setRenameValue] = useState('')
-  const { showBackgroundColor } = useMonDisplay()
+  const monDisplayState = useMonDisplay()
+  const { showBackgroundColor } = monDisplayState
 
   const isFilteredOut = useMemo(() => {
     return (
@@ -215,6 +218,7 @@ function BoxCell(props: BoxCellProps) {
           style={{
             backgroundColor: cellBackgroundColor,
             borderColor: isSelected ? '#4ade80' : borderColor,
+            ...props.style,
           }}
           onDrop={(e) => {
             e.preventDefault()
@@ -232,6 +236,7 @@ function BoxCell(props: BoxCellProps) {
                 style={{
                   width: '100%',
                   height: '100%',
+                  opacity: props.loading ? 0.6 : 1,
                   ...getBackgroundDetails(),
                 }}
                 dragData={dragData}
@@ -241,6 +246,7 @@ function BoxCell(props: BoxCellProps) {
                 topRightIndicator={topRightIndicator}
                 showItem={showItem}
                 showShiny={showShiny}
+                monDisplayState={monDisplayState}
               />
             </DroppableSpace>
           ) : (

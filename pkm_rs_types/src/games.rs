@@ -1,4 +1,4 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use strum_macros::{Display, EnumString};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
@@ -14,7 +14,8 @@ pub enum ColosseumOrXd {
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
-#[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
+#[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Deserialize)]
 #[repr(u8)]
 pub enum OriginGame {
     #[default]
@@ -511,6 +512,12 @@ impl From<u8> for OriginGame {
             52 => OriginGame::LegendsZa,
             _ => OriginGame::Invalid0,
         }
+    }
+}
+
+impl std::fmt::Display for OriginGame {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.game_name_full())
     }
 }
 

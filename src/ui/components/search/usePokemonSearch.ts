@@ -1,12 +1,16 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { Moves } from '@openhome-core/resources'
-import { $R, Nullable, NullableOption, Option, R, Result } from '@openhome-core/util/functional'
+import { Filter } from '@openhome-core/tauri/spectaCommands'
+import { Nullable, Option, R, Result } from '@openhome-core/util/functional'
+import { O } from '@openhome-core/util/option'
+import { isThenable } from '@openhome-core/util/promise'
+import { usePokemonTable } from '@openhome-ui/hooks/pokemonTable'
+import useOhpkmGrid, { OhpkmRowData } from '@openhome-ui/ohpkmGrid'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { OriginGame } from '@pkm-rs/pkg'
 import { useState } from 'react'
 import { SearchController } from './controllers'
 
-export type PokemonSearchController = SearchController<OHPKM> & {
+export type PokemonSearchController = SearchController<OhpkmRowData> & {
   nickname: Nullable<string>
   setNickname: (name: Nullable<string>) => void
   knownMove: Nullable<string>
@@ -62,9 +66,9 @@ export function usePokemonEdit() {
       return R.Err('No Pokémon is being edited.')
     }
 
-    return $R(ohpkmStore.setMonNickname(editingId, formController.name)).mapErr(
-      (err): string => `Pokémon tracking data not found (id ${err.identifier}`
-    )
+    return ohpkmStore
+      .setMonNickname(editingId, formController.name)
+      .then(R.mapErr((err): string => `Pokémon tracking data not found (id ${err.identifier}`))
   }
 
   function startEditing(pokemon: OHPKM) {
@@ -86,27 +90,20 @@ export function usePokemonEdit() {
   }
 }
 
-function prefixMatches(prefix: NullableOption<string>, value: NullableOption<string>): boolean {
-  if (!prefix) return true
-  return (
-    typeof value === 'string' && value.toLocaleUpperCase().startsWith(prefix.toLocaleUpperCase())
-  )
-}
-
-export function usePokemonSearch(prefilter?: (mon: OHPKM) => boolean): PokemonSearchController {
+export function usePokemonSearch(...prefilter: Filter[]): PokemonSearchController {
   const [nickname, setNickname] = useState<Nullable<string>>(null)
   const [knownMove, setKnownMove] = useState<Nullable<string>>(null)
   const [originGame, setOriginGame] = useState<Nullable<OriginGame>>(null)
   const [selectedId, setSelectedId] = useState<Option<string>>()
-  const mons = useOhpkmStore().getAllStored()
+  const ohpkmStore = useOhpkmStore()
+  const { preloadRowData } = useOhpkmGrid()
 
-  const filtered = mons
-    .filter((mon) => prefilter?.(mon) !== false)
-    .filter((mon) => prefixMatches(nickname, mon.nickname))
-    .filter((mon) =>
-      mon.moves.some((moveIndex) => prefixMatches(knownMove, Moves[moveIndex]?.name))
-    )
-    .filter((mon) => originGame === null || mon.gameOfOrigin === originGame)
+  let filters: Filter[] = prefilter ?? []
+  if (knownMove) filters.push({ moveTextPrefixEng: knownMove })
+  if (nickname) filters.push({ nicknamePrefix: nickname })
+  if (originGame) filters.push({ originGame })
+
+  const table = usePokemonTable('ohpkm-search', filters)
 
   function clearFields() {
     setNickname(null)
@@ -119,7 +116,16 @@ export function usePokemonSearch(prefilter?: (mon: OHPKM) => boolean): PokemonSe
     setSelectedId(undefined)
   }
 
-  const selectedItem = mons.find((mon) => mon.openhomeId === selectedId)
+  function getSelectedMon() {
+    if (!selectedId) return undefined
+
+    const lookupResult = ohpkmStore.getById(selectedId)
+    if (!lookupResult) return undefined
+
+    return isThenable(lookupResult)
+      ? O.after(lookupResult).then(preloadRowData).get()
+      : preloadRowData(lookupResult)
+  }
 
   return {
     nickname,
@@ -132,12 +138,19 @@ export function usePokemonSearch(prefilter?: (mon: OHPKM) => boolean): PokemonSe
     fieldsEmpty: !nickname,
     clearFields,
 
-    results: filtered,
+    loading: table.query.isLoading,
+    results: table.currentRows,
+    getResults: () =>
+      table.query
+        .refetch()
+        .then(
+          (results) => results.data?.pages.filter(R.isOk).flatMap((page) => page.data.results) ?? []
+        ),
 
     getRowId: (mon) => mon.openhomeId,
     selectedId,
     setSelectedId,
-    selectedItem,
+    getSelectedItem: getSelectedMon,
 
     reset,
   }

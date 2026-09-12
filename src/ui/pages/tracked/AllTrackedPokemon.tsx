@@ -1,9 +1,6 @@
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
 import { Option } from '@openhome-core/util/functional'
-import { stringSorter } from '@openhome-core/util/sort'
-import useOhpkmColumns from '@openhome-ui/columns/ohpkm'
 import {
   CtxMenuElementBuilder,
   Item,
@@ -12,15 +9,17 @@ import {
   Separator,
 } from '@openhome-ui/components/context-menu'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
+import { usePokemonTable } from '@openhome-ui/hooks/pokemonTable'
+import { OhpkmRowData, useOhpkmColumns } from '@openhome-ui/ohpkmGrid'
 import { useBanksAndBoxes } from '@openhome-ui/state-zustand/banks-and-boxes/store'
-import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
-import { useCallback, useState } from 'react'
+import { Spinner } from '@radix-ui/themes'
+import { useCallback, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import './style.css'
 
 export type AllTrackedPokemonProps = {
-  onSelectMon: (mon: OHPKM) => void
+  onSelectMon: (openhomeId: OhpkmIdentifier) => void
   findSaveForMon: (identifier: string) => Promise<SAV | undefined>
   findSavesForAllMons: () => Promise<void>
 }
@@ -30,70 +29,30 @@ export default function AllTrackedPokemon({
   findSaveForMon,
   findSavesForAllMons,
 }: AllTrackedPokemonProps) {
-  const ohpkmStore = useOhpkmStore()
   const saves = useSaves()
-  const { findHomeLocation } = useBanksAndBoxes()
-  const selectionController = useSelectedMons()
-  const { selectedIds, deselectIds } = selectionController
   const [contextMenuBuilders, setContextMenuBuilders] = useState<Option<CtxMenuElementBuilder>[]>(
     []
   )
   const [ctxMenuMonId, setCtxMenuMonId] = useState<Option<OhpkmIdentifier>>()
-  const { releaseMonsById, trackedMonsToRelease } = saves
-  const columns = useOhpkmColumns(trackedMonsToRelease, onSelectMon)
-  const navigate = useNavigate()
-  const { switchBoxCurrentBank } = useBanksAndBoxes()
-
-  const buildContextElements = useCallback(
-    (mon: OHPKM) => {
-      const homeLocation = findHomeLocation(mon.openhomeId)
-      const actions: CtxMenuElementBuilder[] = [
-        Label.mon(mon),
-        homeLocation
-          ? Item.label('Jump to Box').action(() => {
-              switchBoxCurrentBank(homeLocation.box)
-              navigate('/home')
-            })
-          : Item.label('Find Containing Save').action(() => findSaveForMon(mon.openhomeId)),
-        Item.label(`Move To Release Area`).action(() => {
-          releaseMonsById(mon.openhomeId)
-          deselectIds(mon.openhomeId)
-        }),
-      ]
-
-      if (selectedIds.size > 0) {
-        actions.push(
-          Separator,
-          Label.label(`Bulk Actions (${selectedIds.size} selected)`),
-          Item.label(`Move Selected To Release Area`).action(() => {
-            releaseMonsById(...selectedIds)
-            deselectIds(...selectedIds)
-          })
-        )
-      }
-
-      actions.push(
-        Separator,
-        Label.label(`For All Tracked`),
-        Item.label('Recover Missing Pokémon...').action(findSavesForAllMons)
-      )
-      return actions
-    },
-    [
-      deselectIds,
-      findHomeLocation,
-      findSaveForMon,
-      findSavesForAllMons,
-      navigate,
-      releaseMonsById,
-      selectedIds,
-      switchBoxCurrentBank,
-    ]
+  const selectionController = useSelectedMons()
+  const { selectedIds, forceSetSelectedIds } = selectionController
+  const { trackedMonsToRelease } = saves
+  const columns = useOhpkmColumns(onSelectMon)
+  const tableContainerRef = useRef<HTMLDivElement>(null) // for listening to scroll
+  const { buildContextElements } = useContextMenu(
+    findSaveForMon,
+    findSavesForAllMons,
+    selectionController
   )
 
-  const keyGetter = (row: NoInfer<OHPKM>): string => {
-    return row.openhomeId
-  }
+  const { currentRows, fetchMoreOnBottomReached, query, totalRowCount } = usePokemonTable(
+    'all-tracked-pokemon',
+    []
+  )
+
+  const { isFetching, isLoading } = query
+
+  if (isLoading) return <Spinner />
 
   return (
     <OpenHomeCtxMenu
@@ -101,15 +60,16 @@ export default function AllTrackedPokemon({
       onOpenChange={(open: boolean) => {
         if (!open) setCtxMenuMonId(undefined)
       }}
-      style={{ overflow: 'hidden' }}
+      style={{ overflow: 'hidden', height: '100%' }}
     >
       {/* this div is necessary to give the context menu a target */}
-      <div style={{ height: '100%', width: '100%' }}>
+      <div style={{ height: '100%', width: '100%', backgroundColor: 'var(--gray-3)' }}>
         <SortableDataGrid
-          rows={ohpkmStore.getAllStored().toSorted(stringSorter((mon) => mon.openhomeId))}
           columns={columns}
+          rows={currentRows}
+          rowKeyGetter={(row) => row.openhomeId}
+          tableRef={tableContainerRef}
           style={{ borderLeft: 'none' }}
-          rowKeyGetter={keyGetter}
           onCellContextMenu={(props, e) => {
             setCtxMenuMonId(props.row.openhomeId)
             setContextMenuBuilders(buildContextElements(props.row))
@@ -129,9 +89,10 @@ export default function AllTrackedPokemon({
           isRowSelectionDisabled={(row) => trackedMonsToRelease.includes(row.openhomeId)}
           selectedRows={selectedIds}
           // onSortColumnsChange={onColOrderingChange}
-          onSelectedRowsChange={(ids) =>
-            selectionController.forceSetSelectedIds(ids as Set<OhpkmIdentifier>)
-          }
+          onSelectedRowsChange={(ids) => forceSetSelectedIds(ids as Set<OhpkmIdentifier>)}
+          onScrolledToBottom={fetchMoreOnBottomReached}
+          fetching={isFetching ? 'next' : undefined}
+          shouldLoadMore={currentRows.length < totalRowCount}
         />
       </div>
     </OpenHomeCtxMenu>
@@ -159,4 +120,64 @@ function useSelectedMons() {
     deselectIds,
     forceSetSelectedIds,
   }
+}
+
+type SelectionController = ReturnType<typeof useSelectedMons>
+
+function useContextMenu(
+  findSaveForMon: (identifier: string) => Promise<SAV | undefined>,
+  findSavesForAllMons: () => Promise<void>,
+  selectionController: SelectionController
+) {
+  const navigate = useNavigate()
+  const { switchBoxCurrentBank, findHomeLocation } = useBanksAndBoxes()
+  const { releaseMonsById } = useSaves()
+  const { selectedIds, deselectIds } = selectionController
+
+  const buildContextElements = useCallback(
+    (mon: OhpkmRowData) => {
+      const homeLocation = findHomeLocation(mon.openhomeId)
+      const actions: CtxMenuElementBuilder[] = [
+        Label.mon(mon),
+        homeLocation
+          ? Item.label('Jump to Box').action(() => {
+              switchBoxCurrentBank(homeLocation.box)
+              navigate('/home')
+            })
+          : Item.label('Find Containing Save').action(() => findSaveForMon(mon.openhomeId)),
+        Item.label(`Move To Release Area`).action(() => {
+          releaseMonsById(mon.openhomeId)
+          deselectIds(mon.openhomeId)
+        }),
+      ]
+
+      if (selectedIds.size > 0) {
+        actions.push(
+          Separator,
+          Label.label(`Bulk Actions (${selectedIds.size} selected)`),
+          Item.label(`Move Selected To Release Area`).action(() => {
+            releaseMonsById(...selectedIds)
+            deselectIds(...selectedIds)
+          })
+        )
+      }
+      actions.push(
+        Separator,
+        Label.label(`For All Tracked`),
+        Item.label('Recover Missing Pokémon...').action(findSavesForAllMons)
+      )
+      return actions
+    },
+    [
+      deselectIds,
+      findHomeLocation,
+      findSaveForMon,
+      findSavesForAllMons,
+      navigate,
+      releaseMonsById,
+      selectedIds,
+      switchBoxCurrentBank,
+    ]
+  )
+  return { buildContextElements }
 }

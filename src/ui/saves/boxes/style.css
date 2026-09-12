@@ -79,9 +79,8 @@
   display: grid;
   gap: 0.2rem;
   width: 100%;
-  min-width: fit-content;
   grid-template-columns: repeat(12, minmax(var(--box-cell-size), 1fr));
-  min-height: fit-content;
+  min-height: calc(10 * var(--box-cell-size));
 }
 
 .sort-mon-cell .pokemon-icon-container {
@@ -132,6 +131,7 @@
 .home-box-header {
   padding: var(--padding-radius-sm-lg);
   width: 100%;
+  min-width: 40rem;
   height: fit-content;
   overflow: auto;
   display: flex;

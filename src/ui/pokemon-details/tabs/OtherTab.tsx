@@ -1,6 +1,10 @@
 import { PK3, PK4, PK5 } from '@openhome-core/pkm'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { getMonGen12Identifier, getMonGen345Identifier } from '@openhome-core/pkm/Lookup'
+import {
+  getMonFileIdentifier,
+  getMonGen12Identifier,
+  getMonGen345Identifier,
+} from '@openhome-core/pkm/Lookup'
 import { getLocationStringOrOrigin } from '@openhome-core/pkm/MetLocation'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
@@ -72,6 +76,9 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             <code>{u32Display(mon.encryptionConstant)}</code>
           </AttributeRow>
         )}
+        <AttributeRow label="OpenHome ID">
+          <code>{getMonFileIdentifier(mon)}</code>
+        </AttributeRow>
         <AttributeRow label="Origin Game" value={OriginGames.gameNameFull(mon.gameOfOrigin)} />
         <AttributeRow
           label="Met Location"

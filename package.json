@@ -84,6 +84,10 @@
   "devDependencies": {
     "@octokit/rest": "^22.0.1",
     "@stylistic/eslint-plugin": "^5.10.0",
+    "@tanstack/react-devtools": "^0.10.12",
+    "@tanstack/react-query": "^5.102.8",
+    "@tanstack/react-store": "^0.11.1",
+    "@tanstack/react-table-devtools": "^9.2.0",
     "@tauri-apps/cli": "^2.11.4",
     "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.2",

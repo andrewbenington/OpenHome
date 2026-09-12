@@ -1,14 +1,20 @@
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { SaveWriter } from '@openhome-core/save/interfaces'
+import { SAV, SaveWriter } from '@openhome-core/save/interfaces'
 import { PathData, PossibleSaves } from '@openhome-core/save/util/path'
 import { SaveFolder, StoredBankData } from '@openhome-core/save/util/storage'
-import { ConvertStrategyEntries } from '@openhome-core/tauri/spectaCommands'
-import { Errorable } from '@openhome-core/util/functional'
+import {
+  ConvertStrategyEntries,
+  Filter,
+  PaginatedPage,
+  PaginationCursor,
+} from '@openhome-core/tauri/spectaCommands'
+import { Errorable, Option, Result } from '@openhome-core/util/functional'
 import { LoadSaveResponse, LookupMap, SaveRef } from '@openhome-core/util/types'
 import { LogFilter } from '@openhome-ui/pages/logs'
 import { AppTheme, Settings } from '@openhome-ui/state/appInfo'
 import { ConvertStrategies } from '@openhome-ui/state/convert-strategies/ConvertStrategiesProvider'
+import { OhpkmBatchLookupResults } from '@openhome-ui/state/ohpkm'
 import { PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
 import { Pokedex, PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { Dayjs } from 'dayjs'
@@ -64,7 +70,13 @@ export default interface BackendInterface {
   removeDangling: () => Promise<Errorable<null>>
 
   /* ohpkm bytes store by identifier */
-  loadOhpkmStore: () => Promise<Errorable<OhpkmStore>>
+  searchOhpkmStore(
+    cursor: PaginationCursor,
+    filters: Filter[]
+  ): Promise<Errorable<PaginatedPage<OHPKM>>>
+  getOhpkmIdsMatchingUnknownHandler(save: SAV): Promise<Errorable<OhpkmIdentifier[]>>
+  lookupOhpkmById: (id: OhpkmIdentifier) => Promise<Errorable<Option<OHPKM>>>
+  lookupOhpkmBatch: (ids: OhpkmIdentifier[]) => Promise<Result<OhpkmBatchLookupResults>>
   addToOhpkmStore: (updates: OhpkmStore) => Promise<Errorable<null>>
   deleteHomeMons: (identifiers: string[]) => Promise<Errorable<null>>
 

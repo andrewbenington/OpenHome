@@ -15,6 +15,7 @@ pub mod v1;
 pub use convert::OhpkmConvert;
 pub use id::OpenHomeId;
 pub use v2::OhpkmV2;
+pub use v2_sections::UnknownHandlerSave;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::JsValue;
