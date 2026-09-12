@@ -34,7 +34,7 @@ import {
 export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'homeData'>> & {
   allOpenSaves: readonly SAV[]
 
-  importMonsToLocation(mons: PKMInterface[], startingAt: MonLocation): Promise<OpenSavesState>
+  importMonsToLocation: (mons: PKMInterface[], startingAt: MonLocation) => Promise<OpenSavesState>
 
   addSave(save: SAV): Promise<Result<SAV, SaveError>>
   buildAndOpenSave: (filePath?: PathData) => Promise<Result<Option<SAV>, SaveError>>

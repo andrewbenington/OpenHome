@@ -89,7 +89,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
 
     this.pokeListHeader = new PokeListHeader(bytes.buffer as ArrayBuffer)
 
-    this.boxes = Array(BOX_COUNT)
+    this.boxes = Array<Box<PB7>>(BOX_COUNT)
     for (let box = 0; box < BOX_COUNT; box++) {
       const boxName = `Box Slots ${box * 30} - ${Math.min((box + 1) * 30 - 1, BOX_SLOTS_TOTAL)}`
 

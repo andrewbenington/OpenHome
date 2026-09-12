@@ -229,7 +229,7 @@ export class G3SAV extends OfficialSAV<PK3> {
   primarySaveOffset: number
 
   origin: OriginGame
-  isPlugin: false = false
+  isPlugin = false as const
 
   boxRows = 5
   boxColumns = 6
@@ -338,7 +338,7 @@ export class G3SAV extends OfficialSAV<PK3> {
             pcBytes.set(new Uint8Array(mon.toPCBytes()), 0)
           }
         } catch (e) {
-          console.error(`G3SAV: ${e}`)
+          console.error(`G3SAV: ${String(e)}`)
         }
       }
       this.primarySave.pcDataContiguous.set(pcBytes, 4 + monOffset * 80)

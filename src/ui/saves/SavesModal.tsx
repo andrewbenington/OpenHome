@@ -37,7 +37,7 @@ const SavesModal = (props: SavesModalProps) => {
   )
 
   const openSaveAndCloseModal = useCallback(
-    async (filePath?: PathData) => {
+    async (filePath?: PathData) =>
       buildAndOpenSave(filePath).then(
         R.match(
           (save) => {
@@ -45,8 +45,7 @@ const SavesModal = (props: SavesModalProps) => {
           },
           (err) => displayError(saveErrorTitle(err.type), saveErrorMessage(err))
         )
-      )
-    },
+      ),
     [buildAndOpenSave, displayError, onClose]
   )
 

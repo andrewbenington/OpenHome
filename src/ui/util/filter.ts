@@ -58,7 +58,7 @@ export function filterApplies(filter: Filter, mon: monData) {
     return false
   }
 
-  if (filter.gameOfOrigin !== undefined && mon.gameOfOrigin !== (filter.gameOfOrigin as number)) {
+  if (filter.gameOfOrigin !== undefined && mon.gameOfOrigin !== filter.gameOfOrigin) {
     return false
   }
   if (filter.ribbon !== undefined) {

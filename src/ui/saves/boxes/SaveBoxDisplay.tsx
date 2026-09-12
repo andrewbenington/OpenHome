@@ -106,7 +106,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
       return
     }
 
-    importMonsToLocation(mons, location)
+    await importMonsToLocation(mons, location)
   }
 
   const isDisabled = useCallback(
@@ -219,9 +219,9 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                   isDisabled={(mon) => isDisabled(mon) || slotMetadata?.isDisabled === true}
                   disabledReason={slotMetadata?.disabledReason}
                   monPromise={mon}
-                  onDrop={(importedMons) => {
+                  onDrop={async (importedMons) => {
                     if (importedMons) {
-                      attemptImportMons(importedMons, location)
+                      await attemptImportMons(importedMons, location)
                     }
                   }}
                   multiSelectEnabled={dragState.multiSelectEnabled}
@@ -354,14 +354,12 @@ function SaveHeader({ save, setDetailsModal }: SaveHeaderProps) {
     Item.label('Open file location').action(() => backend.openDirectory(save.filePath.dir)),
     Submenu.label('Move to Bank...')
       .with(
-        Item.label(`This Box (${currentBoxMonCount})`).action(() => {
+        Item.label(`This Box (${currentBoxMonCount})`).action(() =>
           savesManager.moveBoxToBank(save)
-        })
+        )
       )
       .with(
-        Item.label(`Entire Save (${totalMonCount})`).action(() => {
-          savesManager.moveSaveToBank(save)
-        })
+        Item.label(`Entire Save (${totalMonCount})`).action(() => savesManager.moveSaveToBank(save))
       ),
   ]
 

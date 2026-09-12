@@ -26,6 +26,7 @@ export default tseslint.config(prettierRecommended, {
     'react-refresh/only-export-components': ['error', { allowConstantExport: true }],
     '@typescript-eslint/no-non-null-assertion': 'error',
     '@typescript-eslint/no-floating-promises': 'error',
+    '@typescript-eslint/no-misused-promises': 'warn',
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': 'off',
     'unused-imports/no-unused-imports': 'warn',

@@ -30,7 +30,7 @@ export type PKMInterface = AllPKMFields & {
 
 type OfficialFormat = PKM['format']
 export type RomHackFormat = RomHackPKM['format']
-export type MonFormat = OfficialFormat | RomHackFormat
+export type MonFormat = OfficialFormat
 
 export function isRomHackFormat(format: string): format is RomHackFormat {
   return format === 'PK3RR' || format === 'PK3UB' || format === 'PB8LUMI' || format === 'PK9Compass'
