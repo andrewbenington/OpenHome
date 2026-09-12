@@ -91,18 +91,18 @@ function AppWithBackend() {
   const reloadSettings = useEffectEvent(backend.getSettings)
   const getPlatform = useEffectEvent(backend.getPlatform)
 
-  const listenForSave = useEffectEvent(() => {
-    // returns a function to stop listening
-    const stopListening = backend.onMenuEvent('save', saveChanges)
+  const onMenuEvent = useEffectEvent(backend.onMenuEvent)
+  const saveChangesEvent = useEffectEvent(saveChanges)
+
+  useEffect(() => {
+    const stopListening = onMenuEvent('save', saveChangesEvent)
 
     // the "stop listening" function should be called when the effect returns,
     // otherwise duplicate listeners will exist
     return () => {
       stopListening()
     }
-  })
-
-  useEffect(() => listenForSave(), [])
+  }, [])
 
   // only on app start
   useEffect(() => {
