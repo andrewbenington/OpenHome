@@ -254,7 +254,7 @@ type MissingIdData = {
 
 type SlotData = {
   monResult?: OhpkmLookupResult
-  monPromise: Option<NowOrLater<Option<OHPKM>>>
+  monPromise: NowOrLater<Option<OHPKM>>
   location: HomeMonLocation
   identifier: Option<OhpkmIdentifier>
   // loading: boolean
@@ -389,8 +389,6 @@ function SingleBoxMonDisplay() {
               )
             }
 
-            const mon = monResult?.data
-
             return (
               <BoxCellAsync
                 key={uniqueKey}
@@ -404,9 +402,9 @@ function SingleBoxMonDisplay() {
                     importMonsToLocation(importedMons, location)
                   }
                 }}
-                disabled={
-                  // don't allow a swap with a pokémon not supported by the source save
-                  mon && dragData && !dragData.isHome && !sourceSupportsMon(mon)
+                // don't allow a swap with a pokémon not supported by the source save
+                isDisabled={(mon) =>
+                  dragData !== undefined && !dragData.isHome && !sourceSupportsMon(mon)
                 }
                 contextMenu={[
                   Item.label('Merge/Recover Tracking Data').action(async () =>

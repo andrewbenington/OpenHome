@@ -216,7 +216,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                   onClick={() => setSelectedIndex(index)}
                   dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${index}`}
                   location={location}
-                  disabled={isDisabled(mon) || slotMetadata?.isDisabled}
+                  isDisabled={(mon) => isDisabled(mon) || slotMetadata?.isDisabled === true}
                   disabledReason={slotMetadata?.disabledReason}
                   monPromise={mon}
                   onDrop={(importedMons) => {

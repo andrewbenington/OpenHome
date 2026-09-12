@@ -3,7 +3,7 @@ import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { Option } from '@openhome-core/util/functional'
 import { CtxMenuElementBuilder } from '@openhome-ui/components/context-menu'
 import { MonLocation } from '@openhome-ui/state/saves'
-import { Suspense, use, useDeferredValue } from 'react'
+import { Suspense, use } from 'react'
 import '../style.css'
 import BoxCell from './BoxCell'
 
@@ -12,7 +12,7 @@ interface BoxCellAsyncProps {
   onClick: () => void
   monPromise?: Promise<Option<PKMInterface>> | Option<PKMInterface>
   onDrop: (_: PKMInterface[]) => void
-  disabled?: boolean
+  isDisabled?: (mon: PKMInterface) => boolean
   disabledReason?: string
   openhomeId?: OhpkmIdentifier
   borderColor?: string
@@ -47,12 +47,10 @@ function BoxCellAsync(props: BoxCellAsyncProps) {
 function BoxCellAsyncInner(
   props: BoxCellAsyncProps & { monPromise: Promise<Option<PKMInterface>> | Option<PKMInterface> }
 ) {
-  const { monPromise, ...boxCellProps } = props
-  const deferredMonPromise = useDeferredValue(monPromise) // this prevents the icon from returning to the loading icon when two are swapped
-  const mon = isThenable(deferredMonPromise) ? use(deferredMonPromise) : deferredMonPromise
-  const isStale = deferredMonPromise !== monPromise
+  const { monPromise, isDisabled, ...boxCellProps } = props
+  const mon = isThenable(monPromise) ? use(monPromise) : monPromise
 
-  return <BoxCell {...boxCellProps} mon={mon} loading={isStale} />
+  return <BoxCell {...boxCellProps} mon={mon} disabled={mon && isDisabled?.(mon)} />
 }
 
 export default BoxCellAsync
