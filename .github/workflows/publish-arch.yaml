@@ -16,7 +16,7 @@ jobs:
           - platform: 'ubuntu-24.04'
             target: 'x86_64-unknown-linux-gnu'
             container: 'ghcr.io/pkgforge-dev/archlinux:amd64-v2026.09.04'
-            args: '--target aarch64-unknown-linux-gnu'
+            args: '--target x86_64-unknown-linux-gnu'
           - platform: 'ubuntu-24.04-arm'
             target: 'aarch64-unknown-linux-gnu'
             container: 'ghcr.io/pkgforge-dev/archlinux:arm64-v2026.09.04'
