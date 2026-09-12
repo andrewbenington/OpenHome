@@ -42,19 +42,17 @@ export default function SortableSearch<T extends SortableValue, SC extends Searc
           {topRightComponent}
         </Flex>
       </form>
-      {
-        <SortableDataGrid
-          className="search-results-grid"
-          rows={results ?? []}
-          columns={columns}
-          onCellClick={(props) => updateSelected(props.row)}
-          rowKeyGetter={controller.getRowId}
-          rowClass={(row) =>
-            controller.getRowId(row) === selectedId ? 'search-row-selected' : undefined
-          }
-          fetching={loading ? 'next' : undefined}
-        />
-      }
+      <SortableDataGrid
+        className="search-results-grid"
+        rows={results ?? []}
+        columns={columns}
+        onCellClick={(props) => updateSelected(props.row)}
+        rowKeyGetter={controller.getRowId}
+        rowClass={(row) =>
+          controller.getRowId(row) === selectedId ? 'search-row-selected' : undefined
+        }
+        fetching={loading ? 'next' : undefined}
+      />
     </Flex>
   )
 }
