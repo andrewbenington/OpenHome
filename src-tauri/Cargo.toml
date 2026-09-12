@@ -21,23 +21,23 @@ pkm_rs = {path = "../pkm_rs"}
 pkm_rs_derive = {path = "../pkm_rs_derive"}
 openhome_core = {path = "../openhome_core", features = ["desktop"] }
 tauri = { version = "2.11.5", features = [] }
-tauri-plugin-shell = "2.3.5"
+tauri-plugin-shell = "2.3.6"
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
 tauri-plugin-os = "2.3.2"
-tauri-plugin-dialog = "2.7.2"
-tauri-plugin-fs = "2.5.1"
-reqwest = { version = "0.13.4", features = [] }
+tauri-plugin-dialog = "2.7.3"
+tauri-plugin-fs = "2.5.2"
+reqwest = { version = "0.13.5", features = [] }
 base64 = "0.23.1"
 zip = "8.6.0"
 static_assertions = "1.1.0"
 sha2 = "0.11.0"
 num = "0.4.3"
-toml = "1.1.4"
+toml = "1.1.6"
 bytes = "1.12.1"
 semver = "1.0.28"
 strum = { version = "0.28.0", features = ["derive"] }
-uuid = { version = "1.24.0", features = ["v4"] }
+uuid = { version = "1.26.1", features = ["v4"] }
 tauri-plugin-process = "2"
 tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.23", features = ["env-filter", "json"] }
