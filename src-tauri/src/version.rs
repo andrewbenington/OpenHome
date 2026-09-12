@@ -183,6 +183,7 @@ pub enum SignificantUpdate {
     V1_16_0,
     V1_17_0,
     V1_17_1,
+    V1_18_0,
 }
 
 impl SignificantUpdate {
@@ -221,6 +222,7 @@ impl SignificantUpdate {
             Self::V1_16_0 => Version::parse("1.16.0"),
             Self::V1_17_0 => Version::parse("1.17.0"),
             Self::V1_17_1 => Version::parse("1.17.1"),
+            Self::V1_18_0 => Version::parse("1.18.0-rc.1"),
         }
         .expect("all versions are valid semver")
     }
@@ -386,6 +388,9 @@ impl SignificantUpdate {
                 "A bug preventing new users from launching the app has been fixed.",
                 "A bug where Arceus' Legend form caused a crash has been fixed.",
                 "A affecting Dark- and Steel- type Pokémon in the Gen 2 format has bene fixed.",
+            ]),
+            Self::V1_18_0 => Some(vec![
+                "OHPKM storage has been made asynchronous and dynamically loaded. This should make the app perform better on less powerful hardware, or for users with thousands of tracked mons.",
             ]),
             _ => None,
         }

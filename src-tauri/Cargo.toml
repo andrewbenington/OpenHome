@@ -1,6 +1,6 @@
 [package]
 name = "OpenHome"
-version = "1.17.1"
+version = "1.18.0-rc.1"
 description = "A tool for moving Pokémon between game saves"
 authors = ["Andrew Benington"]
 edition = "2024"
@@ -47,8 +47,8 @@ tokio = "1.53.1"
 specta = { version = "=2.0.0-rc.22", features = ["chrono", "serde_json", "uuid" ] }
 specta-typescript = "0.0.9"
 tauri-specta = { version = "=2.0.0-rc.21", features = ["derive", "typescript"] }
-pkm_rs_types = { version = "1.17.1", path = "../pkm_rs_types" }
-pkm_rs_resources = { version = "1.17.1", path = "../pkm_rs_resources" }
+pkm_rs_types = { version = "1.18.0-rc.1", path = "../pkm_rs_types" }
+pkm_rs_resources = { version = "1.18.0-rc.1", path = "../pkm_rs_resources" }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 native-dialog = "0.9.7"
