@@ -12,7 +12,7 @@ import { SAV } from '@openhome-core/save/interfaces'
 import { SAVClass } from '@openhome-core/save/util'
 import { Filter, PaginationCursor } from '@openhome-core/tauri/spectaCommands'
 import { expectExhaustive } from '@openhome-core/util'
-import { $R, Option, R, Result } from '@openhome-core/util/functional'
+import { $R, Option, PromisedResultBox, R, Result } from '@openhome-core/util/functional'
 import { LRUCache } from '@openhome-core/util/lruCache'
 import { isThenable, NowOrLater } from '@openhome-core/util/promise'
 import { FourMoves } from '@openhome-core/util/types'
@@ -382,7 +382,11 @@ export function useOhpkmStore() {
     return loadIfTracked(mon).then((ohpkm) => ohpkm?.openhomeId)
   }
 
-  async function syncOhpkmIfTracked(ohpkmId: OhpkmIdentifier, mon: PKMInterface, save?: SAV) {
+  function syncOhpkmIfTracked(
+    ohpkmId: OhpkmIdentifier,
+    mon: PKMInterface,
+    save?: SAV
+  ): PromisedResultBox<OHPKM, IdentifierNotPresentError> {
     return R.after(tryLoadFromId(ohpkmId)).andThen(async (trackedData) => {
       const updates = trackedData.syncWithGameData(mon, save)
 

@@ -191,6 +191,14 @@ export class PromisedResultBox<T, E = string> {
     return R.after(Promise.resolve(this.v).then(mapErr<T, E, U>(onErr)))
   }
 
+  andThenFlat<U>(onOk: OnOk<T, Promise<Result<U, E>>>): PromisedResultBox<U, E> {
+    return R.after(
+      Promise.resolve(this.v).then((result) =>
+        isErr(result) ? Promise.resolve(result) : onOk(result.data)
+      )
+    )
+  }
+
   thenFlatMap<U>(onOk: OnOk<T, Promise<Result<U, E>>>): PromisedResultBox<U, E> {
     return R.after(
       Promise.resolve(this.v).then((result) =>

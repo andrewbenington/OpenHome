@@ -187,7 +187,7 @@ export function useSaves(): SavesAndBanksManager {
         .catch(
           ({ identifier }) => `Could not move Pokémon with id ${identifier}: OHPKM data missing`
         )
-        .thenFlatMap((ohpkm) => ohpkmStore.updateAndConvertForSave(ohpkm, save))
+        .andThenFlat((ohpkm) => ohpkmStore.updateAndConvertForSave(ohpkm, save))
         .then((convertedForSave) => {
           // remember the mon that was present before we update that slot
           const displacedMon = save.getMonAt(dest.box, dest.boxSlot)
@@ -577,7 +577,7 @@ export function useSaves(): SavesAndBanksManager {
         })
       } else {
         return moveMonBetweenSaves(source.saveIdentifier, sourceMon, dest)
-          .thenFlatMap((swappedMon) =>
+          .andThenFlat((swappedMon) =>
             moveMonBetweenSaves(dest.saveIdentifier, swappedMon, source).get()
           )
           .then(() => null)

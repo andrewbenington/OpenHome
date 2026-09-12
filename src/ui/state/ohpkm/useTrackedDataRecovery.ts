@@ -87,8 +87,19 @@ export default function useTrackedDataRecovery() {
       ? undefined
       : savesManager.saveFromIdentifier(state.monToRecoverLocation.saveIdentifier)
 
-    await ohpkmStore.syncOhpkmIfTracked(state.recoveredDataOhpkmId, mon, save)
-    return R.Ok(null)
+    return ohpkmStore
+      .syncOhpkmIfTracked(state.recoveredDataOhpkmId, mon, save)
+      .thenFlatMap(async (updated) => {
+        await savesManager.overwriteMonAtLocation(state.monToRecoverLocation, updated?.openhomeId)
+        if (state.sourceMonOhpkmId) {
+          savesManager.releaseMonsById(state.sourceMonOhpkmId)
+        }
+
+        setState({ state: 'initial' })
+        return R.Ok(null)
+      })
+      .catch((err) => ({ message: 'Identifier not found', data: err }))
+      .get()
   }
 
   function cancelRecovery() {
