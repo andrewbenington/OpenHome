@@ -21,6 +21,7 @@ import { OhpkmBatchLookupResults, OhpkmLookupResult } from '@openhome-ui/state/o
 import { Pokedex, PokedexEntry } from '@openhome-ui/util/pokedex'
 import { BinaryGender } from '@pkm-rs/pkg'
 import { path } from '@tauri-apps/api'
+import { convertFileSrc } from '@tauri-apps/api/core'
 import { Event, listen, UnlistenFn } from '@tauri-apps/api/event'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { open as fileDialog, save } from '@tauri-apps/plugin-dialog'
@@ -313,6 +314,7 @@ export const TauriBackend: BackendInterface = {
     Commands.getDataDirPath().then(R.map((dataDirPath) => `${dataDirPath}/plugins/${pluginId}`)),
   openDirectory: Commands.openDirectory,
   openFileLocation: Commands.openFileLocation,
+  convertLocalImagePath: (localAbsolutePath: string) => convertFileSrc(localAbsolutePath),
   getPlatform: platform,
   getState: Commands.getState,
   getSettings: async () =>
@@ -335,7 +337,6 @@ export const TauriBackend: BackendInterface = {
   setTheme: Commands.setAppTheme,
   emitMenuEvent: Commands.handleWindowsAccelerator,
 
-  getImageData: Commands.getImageData,
   listInstalledPlugins: Commands.listInstalledPlugins,
   downloadPlugin: Commands.downloadPlugin,
   loadPluginCode: Commands.loadPluginCode,

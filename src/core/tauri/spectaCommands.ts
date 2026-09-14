@@ -19,14 +19,6 @@ export const commands = {
       else return { status: 'error', error: e as any }
     }
   },
-  async getImageData(absolutePath: string): Promise<Result<ImageResponse, CommandError>> {
-    try {
-      return { status: 'ok', data: await TAURI_INVOKE('get_image_data', { absolutePath }) }
-    } catch (e) {
-      if (e instanceof Error) throw e
-      else return { status: 'error', error: e as any }
-    }
-  },
   async writeFileBytes(absolutePath: string, bytes: number[]): Promise<Result<null, CommandError>> {
     try {
       return { status: 'ok', data: await TAURI_INVOKE('write_file_bytes', { absolutePath, bytes }) }
@@ -59,7 +51,7 @@ export const commands = {
       else return { status: 'error', error: e as any }
     }
   },
-  async listInstalledPlugins(): Promise<Result<PluginMetadataWithIcon[], CommandError>> {
+  async listInstalledPlugins(): Promise<Result<PluginMetadata[], CommandError>> {
     try {
       return { status: 'ok', data: await TAURI_INVOKE('list_installed_plugins') }
     } catch (e) {
@@ -391,7 +383,6 @@ export type Filter =
   | { nicknamePrefix: string }
   | { baseEvolution: number }
 export type Gender = 'Male' | 'Female' | 'Genderless' | 'Invalid'
-export type ImageResponse = { base64: string; extension: string }
 export type JsonValue =
   null | boolean | number | string | JsonValue[] | Partial<{ [key in string]: JsonValue }>
 export type LogEntry = {
@@ -452,13 +443,7 @@ export type PkmType =
   | 'Dark'
   | 'Fairy'
 export type PluginIdentifier = 'radical_red' | 'unbound' | 'luminescent_platinum' | 'compass'
-export type PluginMetadataWithIcon = {
-  id: string
-  name: string
-  version: string
-  api_version: number
-  icon_image: ImageResponse | null
-}
+export type PluginMetadata = { id: string; name: string; version: string; api_version: number }
 export type Pokedex = { byDexNumber: Partial<{ [key in number]: PokedexEntry }> }
 export type PokedexEntry = { formes: Partial<{ [key in number]: PokedexStatus }> }
 export type PokedexStatus = 'Seen' | 'Caught' | 'ShinyCaught'

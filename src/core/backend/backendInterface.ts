@@ -8,6 +8,7 @@ import {
   Filter,
   PaginatedPage,
   PaginationCursor,
+  PluginMetadata,
 } from '@openhome-core/tauri/spectaCommands'
 import { Errorable, Option, Result } from '@openhome-core/util/functional'
 import { LoadSaveResponse, LookupMap, SaveRef } from '@openhome-core/util/types'
@@ -15,7 +16,6 @@ import { LogFilter } from '@openhome-ui/pages/logs'
 import { AppTheme, Settings } from '@openhome-ui/state/appInfo'
 import { ConvertStrategies } from '@openhome-ui/state/convert-strategies/ConvertStrategiesProvider'
 import { OhpkmBatchLookupResults } from '@openhome-ui/state/ohpkm'
-import { PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
 import { Pokedex, PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { Dayjs } from 'dayjs'
 
@@ -127,6 +127,7 @@ export default interface BackendInterface {
   getResourcesPath: () => Promise<string>
   openDirectory: (directory: string) => Promise<Errorable<null>>
   openFileLocation: (filePath: string) => Promise<Errorable<null>>
+  convertLocalImagePath: (absolutePath: string) => string
   getPlatform: () => string
   registerListeners: (listeners: Partial<BackendListeners>) => () => void
   onMenuEvent: (event: MenuEvent, listener: () => void) => () => void
@@ -147,8 +148,7 @@ export default interface BackendInterface {
   onNewLog: (callback: (notification: NewLogNotification) => void) => () => void
 
   /* plugins */
-  getImageData: (absolutePath: string) => Promise<Errorable<ImageResponse>>
-  listInstalledPlugins: () => Promise<Errorable<PluginMetadataWithIcon[]>>
+  listInstalledPlugins: () => Promise<Errorable<PluginMetadata[]>>
   getPluginPath: (pluginId: string) => Promise<Errorable<string>>
   downloadPlugin(remoteUrl: string): Promise<Errorable<string>>
   loadPluginCode(pluginId: string): Promise<Errorable<string>>
