@@ -3,7 +3,7 @@ import { R } from '@openhome-core/util/functional'
 import { stringSorter } from '@openhome-core/util/sort'
 import ContentCard from '@openhome-ui/components/ContentCard'
 import SideTabNavigation from '@openhome-ui/components/side-tabs/SideTabNavigation'
-import { AppInfoContext, AppTheme, TableType } from '@openhome-ui/state/appInfo'
+import { AppInfoContext, AppTheme, Settings as SettingsType } from '@openhome-ui/state/appInfo'
 import {
   BoolOption,
   ConvertStrategies,
@@ -52,9 +52,14 @@ function GeneralSettings() {
     backend.getDataDirPath().then(R.match((value) => setDataDirPath(value), console.error))
   }, [backend, displayError])
 
-  useEffect(() => {
-    backend.updateSettings(appInfoState.settings).catch(console.error)
-  }, [appInfoState.settings, backend])
+  // useEffect(() => {
+  //   backend.updateSettings(appInfoState.settings).catch(console.error)
+  // }, [appInfoState.settings, backend])
+
+  async function updateSettings(newSettings: Partial<SettingsType>) {
+    const updated = { ...appInfoState.settings, ...newSettings }
+    await backend.updateSettings(updated).catch(console.error)
+  }
 
   return (
     <ContentCard>
@@ -66,12 +71,18 @@ function GeneralSettings() {
               <label className="flex-row" key={saveType.saveTypeName}>
                 <input
                   type="checkbox"
-                  onChange={(e) =>
+                  onChange={async (e) => {
                     dispatchAppInfoState({
                       type: 'set_savetype_enabled',
                       payload: { saveType, enabled: e.target.checked },
                     })
-                  }
+                    await updateSettings({
+                      enabledSaveTypes: {
+                        ...appInfoState.settings.enabledSaveTypes,
+                        [saveType.saveTypeID]: e.target.checked,
+                      },
+                    })
+                  }}
                   checked={appInfoState.settings.enabledSaveTypes[saveType.saveTypeID]}
                 />
                 {saveType.saveTypeName}
@@ -82,10 +93,11 @@ function GeneralSettings() {
         <div>
           <GroupHeader name="App Theme" />
           <RadioGroup.Root
-            onValueChange={(newValue: AppTheme) => {
+            onValueChange={async (newValue: AppTheme) => {
               if (!newValue) return
-              backend.setTheme(newValue)
+              await backend.setTheme(newValue)
               dispatchAppInfoState({ type: 'set_app_theme', payload: newValue })
+              await updateSettings({ appTheme: newValue })
             }}
             value={appInfoState.settings.appTheme}
             style={{ margin: 8 }}
@@ -93,20 +105,6 @@ function GeneralSettings() {
             <RadioGroup.Item value="system">System</RadioGroup.Item>
             <RadioGroup.Item value="light">Light</RadioGroup.Item>
             <RadioGroup.Item value="dark">Dark</RadioGroup.Item>
-          </RadioGroup.Root>
-        </div>
-        <div>
-          <GroupHeader name="Table Type" />
-          <RadioGroup.Root
-            onValueChange={(newValue: TableType) => {
-              if (!newValue) return
-              dispatchAppInfoState({ type: 'set_table_type', payload: newValue })
-            }}
-            value={appInfoState.settings.tableType}
-            style={{ margin: 8 }}
-          >
-            <RadioGroup.Item value="rdg">React Data Grid</RadioGroup.Item>
-            <RadioGroup.Item value="tanstack">Tanstack (Alpha)</RadioGroup.Item>
           </RadioGroup.Root>
         </div>
         <div>

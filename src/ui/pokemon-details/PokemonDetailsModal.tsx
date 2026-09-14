@@ -366,9 +366,9 @@ function getDisplayOhpkm(
 
   const ohpkm = mon instanceof OHPKM ? mon : OHPKM.fromMonUnknownSave(mon)
 
-  return $R(PkmClass.fromOhpkm(ohpkm, convertStrategy)).mapErr(
-    (error) => `Failed to convert OHPKM to ${PkmClass.getFormat()}: ${error}`
-  )
+  return $R(PkmClass.fromOhpkm(ohpkm, convertStrategy))
+    .mapErr((error) => `Failed to convert OHPKM to ${PkmClass.getFormat()}: ${error}`)
+    .get()
 }
 
 function getDisplayOriginalPkm(originalData: OriginalDataJs): Result<PKMInterface> {

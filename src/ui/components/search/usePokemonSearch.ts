@@ -1,7 +1,8 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Filter } from '@openhome-core/tauri/spectaCommands'
-import { $R, Nullable, Option, R, Result } from '@openhome-core/util/functional'
-import { $O } from '@openhome-core/util/option'
+import { Nullable, Option, R, Result } from '@openhome-core/util/functional'
+import { O } from '@openhome-core/util/option'
+import { isThenable } from '@openhome-core/util/promise'
 import { usePokemonTable } from '@openhome-ui/hooks/pokemonTable'
 import useOhpkmGrid, { OhpkmRowData } from '@openhome-ui/ohpkmGrid'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
@@ -65,9 +66,9 @@ export function usePokemonEdit() {
       return R.Err('No Pokémon is being edited.')
     }
 
-    return $R(await ohpkmStore.setMonNickname(editingId, formController.name)).mapErr(
-      (err): string => `Pokémon tracking data not found (id ${err.identifier}`
-    )
+    return ohpkmStore
+      .setMonNickname(editingId, formController.name)
+      .then(R.mapErr((err): string => `Pokémon tracking data not found (id ${err.identifier}`))
   }
 
   function startEditing(pokemon: OHPKM) {
@@ -115,8 +116,15 @@ export function usePokemonSearch(...prefilter: Filter[]): PokemonSearchControlle
     setSelectedId(undefined)
   }
 
-  async function getSelectedMon() {
-    return $O(selectedId).awaitFlatMap(ohpkmStore.getById).then(preloadRowData)
+  function getSelectedMon() {
+    if (!selectedId) return undefined
+
+    const lookupResult = ohpkmStore.getById(selectedId)
+    if (!lookupResult) return undefined
+
+    return isThenable(lookupResult)
+      ? O.after(lookupResult).then(preloadRowData).get()
+      : preloadRowData(lookupResult)
   }
 
   return {

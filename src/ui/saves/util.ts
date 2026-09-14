@@ -7,6 +7,7 @@ import {
   SAV,
 } from '@openhome-core/save/interfaces'
 import { Option } from '@openhome-core/util/functional'
+import { isThenable } from '@openhome-core/util/promise'
 import { SaveRef } from '@openhome-core/util/types'
 import { CtxMenuElementBuilder, Item } from '@openhome-ui/components/context-menu/types'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
@@ -121,7 +122,14 @@ export function useOpenHomeBoxNavigator() {
 
     const identifier = getCurrentBox().identifiers.get(index)
     if (identifier) {
-      ohpkmStore.getById(identifier).then(setSelectedMon)
+      let result = ohpkmStore.getById(identifier)
+      if (!result) return false
+
+      if (isThenable(result)) {
+        result.then(setSelectedMon)
+      } else {
+        setSelectedMon(result)
+      }
       return true
     } else {
       return false

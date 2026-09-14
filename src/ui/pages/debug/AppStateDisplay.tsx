@@ -14,7 +14,6 @@ export default function AppStateDisplay() {
   const [appInfoState] = useContext(AppInfoContext)
   const [errorState, dispatchErrorState] = useContext(ErrorContext)
   const [bagState] = useContext(ItemBagContext)
-  // const ohpkmStore = useOhpkmStore()
 
   return (
     <Flex direction="column">
@@ -28,7 +27,6 @@ export default function AppStateDisplay() {
       <Card className="flex-row" style={{ margin: 8, gap: 8 }}>
         <DebugDataDisplay data={appInfoDisplay(appInfoState)} label="App Info State" />
         <DebugDataDisplay data={useBanksAndBoxesDisplay()} label="Saves/Mons State" />
-        {/* <DebugDataDisplay data={ohpkmStoreDisplay(ohpkmStore.byId)} label="OHPKM Store" /> */}
         <DebugDataDisplay data={bagDisplay(bagState)} label="Bag State" />
         <DebugDataDisplay data={errorState} label="Error State" />
         <button
@@ -62,21 +60,6 @@ function useBanksAndBoxesDisplay() {
     })),
   }
 }
-
-// function ohpkmStoreDisplay(state: Record<string, OHPKM>) {
-//   return Object.fromEntries(Object.entries(state).map(([key, val]) => [key, monDisplay(val)]))
-// }
-
-// function monDisplay(mon: PKMInterface) {
-//   const species = SpeciesLookup(mon.nationalDex)
-
-//   return {
-//     species: Lookup.speciesName(mon.nationalDex, mon.language),
-//     form: species?.forms[mon.formIndex ?? 0].formeName,
-//     nickname: mon.nickname,
-//     origin: mon.gameOfOrigin ? `Pokémon ${OriginGames.gameNameFull(mon.gameOfOrigin)}` : undefined,
-//   }
-// }
 
 function bagDisplay(state: ItemBagState) {
   return {

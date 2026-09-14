@@ -41,7 +41,7 @@ pub struct PaginatedPage<T> {
 }
 
 impl<T> PaginatedPage<T> {
-    pub fn next_after_cursor(
+    pub fn get_for_cursor(
         current_cursor: PaginationCursor,
         data: impl Iterator<Item = T>,
         total_count: usize,
@@ -55,8 +55,8 @@ impl<T> PaginatedPage<T> {
         PaginatedPage {
             results: page.collect(),
             next_page_exists: next_cursor.get_offset() < total_count,
-            current_cursor: next_cursor,
-            next_cursor: next_cursor.next(),
+            current_cursor,
+            next_cursor,
             total_count,
         }
     }

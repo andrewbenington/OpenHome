@@ -21,14 +21,14 @@ import useTrackedDataRecovery from '@openhome-ui/state/ohpkm/useTrackedDataRecov
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { colorIsDark } from '@openhome-ui/util/color'
 import { MetadataSummaryLookup } from '@pkm-rs/pkg'
-import { Button, Dialog, Flex, Grid, Separator, Spinner } from '@radix-ui/themes'
+import { Button, Dialog, Flex, Grid, Separator } from '@radix-ui/themes'
 import { useCallback, useContext, useMemo, useState } from 'react'
 import { MdClose } from 'react-icons/md'
 import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
 import { cssClass } from '../../util/style'
 import { useBoxNavigator } from '../util'
 import ArrowButton from './ArrowButton'
-import BoxCell from './BoxCell'
+import BoxCellAsync from './BoxCellAsync'
 
 interface OpenSaveDisplayProps {
   saveIndex: number
@@ -47,8 +47,8 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const save = useMemo(() => allOpenSaves[saveIndex], [allOpenSaves, saveIndex])
   const displayError = useDisplayError()
 
-  const allSaveMons = useMemo(() => save.getAllMons().map((mon) => [mon, save] as const), [save])
-  const { loading: saveOhpkmsLoading, batchResults: saveOhpkms } = useOhpkmBatchIdLookup(
+  const allSaveMons = save.getAllMons().map((mon) => [mon, save] as const)
+  const { batchResults: saveOhpkms } = useOhpkmBatchIdLookup(
     allSaveMons
       .map(([mon]) => mon)
       .map(ohpkmStore.getPotentialOhpkmId)
@@ -159,17 +159,14 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
         saveIdentifier: save.identifier,
       }
       const mon = save.getMonAt(location.box, location.boxSlot)
-      const monOrOhpkm =
-        $O(save.getMonAt(location.box, location.boxSlot))
-          .flatMap(ohpkmStore.getPotentialOhpkmId)
-          .flatMap((openhomeId) => saveOhpkms?.get(openhomeId))
-          .map(R.dropError)
-          .get() ?? mon
+      const monOrOhpkm = $O(save.getMonAt(location.box, location.boxSlot))
+        .flatMap(ohpkmStore.getPotentialOhpkmId)
+        .flatMap((openhomeId) => saveOhpkms?.get(openhomeId))
+        .map(R.dropError) // we expect many "id lookups" to fail, because not all mons are necessarily tracked
+        .get()
 
-      return { save, mon: monOrOhpkm }
+      return { save, mon: monOrOhpkm ?? mon }
     })
-
-  if (saveOhpkmsLoading) return <Spinner />
 
   return save && save.currentPCBox !== undefined ? (
     <>
@@ -214,14 +211,14 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
               const slotMetadata = save.getSlotMetadata?.(save.currentPCBox, index)
 
               return (
-                <BoxCell
+                <BoxCellAsync
                   key={uniqueKey}
                   onClick={() => setSelectedIndex(index)}
                   dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${index}`}
                   location={location}
-                  disabled={isDisabled(mon) || slotMetadata?.isDisabled}
+                  isDisabled={(mon) => isDisabled(mon) || slotMetadata?.isDisabled === true}
                   disabledReason={slotMetadata?.disabledReason}
-                  mon={mon}
+                  monPromise={mon}
                   onDrop={(importedMons) => {
                     if (importedMons) {
                       attemptImportMons(importedMons, location)

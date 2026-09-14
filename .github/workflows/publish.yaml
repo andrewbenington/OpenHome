@@ -15,7 +15,7 @@ jobs:
         include:
           - platform: 'ubuntu-24.04'
             target: 'x86_64-unknown-linux-gnu'
-            args: ''
+            args: '--target x86_64-unknown-linux-gnu'
           - platform: 'ubuntu-24.04-arm'
             target: 'aarch64-unknown-linux-gnu'
             args: '--target aarch64-unknown-linux-gnu'

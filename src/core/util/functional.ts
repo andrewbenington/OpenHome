@@ -73,6 +73,13 @@ function mapErr<T, E, U>(transform: Mapper<E, U>): (result: Result<T, E>) => Res
   return (result) => (isErr(result) ? buildErr(transform(result.error)) : result)
 }
 
+function peekErr<T, E>(onErr: (error: E) => void): (result: Result<T, E>) => Result<T, E> {
+  return (result) => {
+    if (isErr(result)) onErr(result.error)
+    return result
+  }
+}
+
 function mapOr<T, E, U>(transform: Mapper<T, U>, fallback: U): (result: Result<T, E>) => U {
   return (result) => (isOk(result) ? transform(result.data) : fallback)
 }
@@ -106,10 +113,10 @@ function match<T, E, R>(onOk: (val: T) => R, onErr: (val: E) => R): (result: Res
 }
 
 function fromNullable<E>(err: E): <T>(value: T | undefined) => Result<T, E> {
-  return (value: any | undefined) => (value === undefined ? buildErr(err) : buildOk(value))
+  return <T>(value: T | undefined) => (value === undefined ? buildErr(err) : buildOk(value))
 }
 
-function buildStringErr<T = never>(err: any): Result<T, string> {
+function buildStringErr<T = never>(err: unknown): Result<T, string> {
   return buildErr(String(err))
 }
 
@@ -158,18 +165,41 @@ export function isResult<T, V>(v: object): v is Result<T, V> {
 type ResultNowOrLater<T, E> = Result<T, E> | Promise<Result<T, E>>
 
 // Wrapper class for a Promise<Result> utility
-class PromisedResultBox<T, E> {
+export class PromisedResultBox<T, E = string> {
   constructor(private readonly v: ResultNowOrLater<T, E>) {}
+
+  static ok<T = never, E = never>(value: T): PromisedResultBox<T, E> {
+    return new PromisedResultBox(Promise.resolve(R.Ok(value)))
+  }
 
   then<U>(onOk: OnOk<T, U>): PromisedResultBox<U, E> {
     return R.after(Promise.resolve(this.v).then(map<T, E, U>(onOk)))
   }
 
-  thenErr<U>(onErr: OnErr<E, U>): PromisedResultBox<T, U> {
+  andThen<U>(onOk: (v: T) => Promise<U>): PromisedResultBox<U, E> {
+    return R.after(
+      Promise.resolve(this.v).then(
+        R.match(
+          async (value) => R.Ok(await onOk(value)),
+          (error) => Promise.resolve(R.Err(error))
+        )
+      )
+    )
+  }
+
+  catch<U>(onErr: OnErr<E, U>): PromisedResultBox<T, U> {
     return R.after(Promise.resolve(this.v).then(mapErr<T, E, U>(onErr)))
   }
 
-  flatMap<U>(onOk: OnOk<T, Promise<Result<U, E>>>): PromisedResultBox<U, E> {
+  andThenFlat<U>(onOk: OnOk<T, Promise<Result<U, E>>>): PromisedResultBox<U, E> {
+    return R.after(
+      Promise.resolve(this.v).then((result) =>
+        isErr(result) ? Promise.resolve(result) : onOk(result.data)
+      )
+    )
+  }
+
+  thenFlatMap<U>(onOk: OnOk<T, Promise<Result<U, E>>>): PromisedResultBox<U, E> {
     return R.after(
       Promise.resolve(this.v).then((result) =>
         isErr(result) ? Promise.resolve(result) : onOk(result.data)
@@ -181,7 +211,7 @@ class PromisedResultBox<T, E> {
     return this.v
   }
 
-  async await(): Promise<ResultBox<T, E>> {
+  async getBoxed(): Promise<ResultBox<T, E>> {
     return Promise.resolve(this.v).then($R)
   }
 }
@@ -190,6 +220,7 @@ export const R = {
   match,
   map,
   mapErr,
+  peekErr,
   mapOr,
   flatMap,
   asyncFlatMap,
@@ -270,7 +301,11 @@ export class ResultBox<T, E> {
   }
 
   mapErr<U>(onErr: OnErr<E, U>) {
-    return mapErr<T, E, U>(onErr)(this.r)
+    return new ResultBox(mapErr<T, E, U>(onErr)(this.r))
+  }
+
+  peekErr(onErr: (error: E) => void) {
+    return peekErr(onErr)(this.r)
   }
 
   orElse(ifErr: T) {
@@ -284,10 +319,6 @@ export class ResultBox<T, E> {
 
   get(): Result<T, E> {
     return this.r
-  }
-
-  getPromise(): Promise<Result<T, E>> {
-    return Promise.resolve(this.r)
   }
 }
 

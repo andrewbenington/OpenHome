@@ -1,7 +1,8 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { SAV } from '@openhome-core/save/interfaces'
-import { R } from '@openhome-core/util/functional'
+import { $R, R } from '@openhome-core/util/functional'
+import { isThenable } from '@openhome-core/util/promise'
 import { numericSorter } from '@openhome-core/util/sort'
 import Badge from '@openhome-ui/components/badge/Badge'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
@@ -34,8 +35,22 @@ export default function TrackedPokemonPage() {
   const displayError = useDisplayError()
 
   const onSelectMon = useCallback(
-    async (openhomeId: OhpkmIdentifier) =>
-      tryLoadFromId(openhomeId).then(
+    async (openhomeId: OhpkmIdentifier) => {
+      const loadResult = tryLoadFromId(openhomeId)
+      if (!isThenable(loadResult)) {
+        $R(loadResult).match(
+          (mon) => setSelectedMon(mon),
+          (error) =>
+            displayError(
+              'Failed to find Pokémon data',
+              `Pokémon with identifier ${error.identifier} could not be found`
+            )
+        )
+
+        return
+      }
+
+      loadResult.then(
         R.match(
           (mon) => setSelectedMon(mon),
           (error) =>
@@ -44,7 +59,8 @@ export default function TrackedPokemonPage() {
               `Pokémon with identifier ${error.identifier} could not be found`
             )
         )
-      ),
+      )
+    },
     [displayError, tryLoadFromId]
   )
 

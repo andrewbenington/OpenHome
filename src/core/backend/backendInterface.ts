@@ -8,13 +8,14 @@ import {
   Filter,
   PaginatedPage,
   PaginationCursor,
+  PluginMetadata,
 } from '@openhome-core/tauri/spectaCommands'
-import { Errorable, Option } from '@openhome-core/util/functional'
+import { Errorable, Option, Result } from '@openhome-core/util/functional'
 import { LoadSaveResponse, LookupMap, SaveRef } from '@openhome-core/util/types'
 import { LogFilter } from '@openhome-ui/pages/logs'
 import { AppTheme, Settings } from '@openhome-ui/state/appInfo'
 import { ConvertStrategies } from '@openhome-ui/state/convert-strategies/ConvertStrategiesProvider'
-import { PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
+import { OhpkmBatchLookupResults } from '@openhome-ui/state/ohpkm'
 import { Pokedex, PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { Dayjs } from 'dayjs'
 
@@ -69,13 +70,13 @@ export default interface BackendInterface {
   removeDangling: () => Promise<Errorable<null>>
 
   /* ohpkm bytes store by identifier */
-  loadOhpkmStore: () => Promise<Errorable<OhpkmStore>>
   searchOhpkmStore(
     cursor: PaginationCursor,
     filters: Filter[]
   ): Promise<Errorable<PaginatedPage<OHPKM>>>
   getOhpkmIdsMatchingUnknownHandler(save: SAV): Promise<Errorable<OhpkmIdentifier[]>>
   lookupOhpkmById: (id: OhpkmIdentifier) => Promise<Errorable<Option<OHPKM>>>
+  lookupOhpkmBatch: (ids: OhpkmIdentifier[]) => Promise<Result<OhpkmBatchLookupResults>>
   addToOhpkmStore: (updates: OhpkmStore) => Promise<Errorable<null>>
   deleteHomeMons: (identifiers: string[]) => Promise<Errorable<null>>
 
@@ -126,6 +127,7 @@ export default interface BackendInterface {
   getResourcesPath: () => Promise<string>
   openDirectory: (directory: string) => Promise<Errorable<null>>
   openFileLocation: (filePath: string) => Promise<Errorable<null>>
+  convertLocalImagePath: (absolutePath: string) => string
   getPlatform: () => string
   registerListeners: (listeners: Partial<BackendListeners>) => () => void
   onMenuEvent: (event: MenuEvent, listener: () => void) => () => void
@@ -146,8 +148,7 @@ export default interface BackendInterface {
   onNewLog: (callback: (notification: NewLogNotification) => void) => () => void
 
   /* plugins */
-  getImageData: (absolutePath: string) => Promise<Errorable<ImageResponse>>
-  listInstalledPlugins: () => Promise<Errorable<PluginMetadataWithIcon[]>>
+  listInstalledPlugins: () => Promise<Errorable<PluginMetadata[]>>
   getPluginPath: (pluginId: string) => Promise<Errorable<string>>
   downloadPlugin(remoteUrl: string): Promise<Errorable<string>>
   loadPluginCode(pluginId: string): Promise<Errorable<string>>

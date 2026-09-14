@@ -39,6 +39,16 @@ class PromisedOptionBox<T> {
   async await(): Promise<OptionBox<T>> {
     return this.v?.then($O) ?? Promise.resolve(OptionBox.empty())
   }
+
+  thenBoxed<U>(onOk: (v: T) => Promise<U>): PromisedOptionBox<U> {
+    return new PromisedOptionBox(
+      Promise.resolve(this.v).then(O.map(async (value) => await onOk(value)))
+    )
+  }
+
+  orElse(fallback: T): Promise<T> {
+    return this.v?.then((v) => v ?? fallback) ?? Promise.resolve(fallback)
+  }
 }
 
 // Wrapper class for an Option utility
@@ -79,8 +89,10 @@ export class OptionBox<T> {
     return isSome(this.v) ? this.v : undefined
   }
 
-  getPromise(): Promise<T | undefined> {
-    return Promise.resolve(isSome(this.v) ? this.v : undefined)
+  awaitMap<U>(onOk: (v: T) => Promise<U>): PromisedOptionBox<U> {
+    return new PromisedOptionBox(
+      Promise.resolve(this.v).then(O.map(async (value) => await onOk(value)))
+    )
   }
 }
 

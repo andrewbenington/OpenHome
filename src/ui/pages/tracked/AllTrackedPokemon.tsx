@@ -45,8 +45,10 @@ export default function AllTrackedPokemon({
     selectionController
   )
 
-  const { currentRows, fetchMoreOnBottomReached, query, totalRowCount, paginationAtom } =
-    usePokemonTable('all-tracked-pokemon', [])
+  const { currentRows, fetchMoreOnBottomReached, query, totalRowCount } = usePokemonTable(
+    'all-tracked-pokemon',
+    []
+  )
 
   const { isFetching, isLoading } = query
 
@@ -65,6 +67,7 @@ export default function AllTrackedPokemon({
         <SortableDataGrid
           columns={columns}
           rows={currentRows}
+          rowKeyGetter={(row) => row.openhomeId}
           tableRef={tableContainerRef}
           style={{ borderLeft: 'none' }}
           onCellContextMenu={(props, e) => {
@@ -87,7 +90,6 @@ export default function AllTrackedPokemon({
           selectedRows={selectedIds}
           // onSortColumnsChange={onColOrderingChange}
           onSelectedRowsChange={(ids) => forceSetSelectedIds(ids as Set<OhpkmIdentifier>)}
-          paginationAtom={paginationAtom}
           onScrolledToBottom={fetchMoreOnBottomReached}
           fetching={isFetching ? 'next' : undefined}
           shouldLoadMore={currentRows.length < totalRowCount}

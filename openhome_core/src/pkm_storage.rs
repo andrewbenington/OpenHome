@@ -5,7 +5,6 @@ use crate::{
 use pkm_rs::ohpkm::OpenHomeId;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
-use tracing::{info, warn};
 use uuid::Uuid;
 
 pub const BANKS_FILENAME: &str = "banks.json";
@@ -125,16 +124,13 @@ impl Box {
     }
 
     fn remove_duplicates(&mut self, existing_ids: &mut HashSet<OpenHomeId>) {
-        info!(
-            "removing duplicates in box {} ({:?})",
-            self.index, self.name
-        );
         let mut slots_to_clear = Vec::<u8>::new();
         for (key, identifier) in self.identifiers.iter() {
             if !existing_ids.insert(*identifier) {
-                warn!(
+                tracing::warn!(
                     "removing duplicate with id {identifier} in box {} ({:?})",
-                    self.index, self.name
+                    self.index,
+                    self.name
                 );
                 slots_to_clear.push(*key);
             }

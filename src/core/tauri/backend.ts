@@ -12,14 +12,16 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV, SaveWriter } from '@openhome-core/save/interfaces'
 import { PathData, PossibleSaves } from '@openhome-core/save/util/path'
 import { SaveFolder, SimpleOpenHomeBox, StoredBankData } from '@openhome-core/save/util/storage'
-import { Errorable, Option, R } from '@openhome-core/util/functional'
+import { Errorable, Option, R, Result } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
 import { JSONObject, LoadSaveResponse, SaveRef } from '@openhome-core/util/types'
 import { LogFilter } from '@openhome-ui/pages/logs'
 import { defaultSettings, Settings } from '@openhome-ui/state/appInfo'
+import { OhpkmBatchLookupResults, OhpkmLookupResult } from '@openhome-ui/state/ohpkm'
 import { Pokedex, PokedexEntry } from '@openhome-ui/util/pokedex'
 import { BinaryGender } from '@pkm-rs/pkg'
 import { path } from '@tauri-apps/api'
+import { convertFileSrc } from '@tauri-apps/api/core'
 import { Event, listen, UnlistenFn } from '@tauri-apps/api/event'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { open as fileDialog, save } from '@tauri-apps/plugin-dialog'
@@ -80,18 +82,6 @@ export const TauriBackend: BackendInterface = {
   addToLookups: Commands.addToLookups,
 
   /* ohpkm store */
-  loadOhpkmStore: async function (): Promise<Errorable<OhpkmStore>> {
-    return Commands.getOhpkmStore().then(
-      R.map((b64ByIdentifier) =>
-        Object.fromEntries(
-          b64ByIdentifier.map(([identifier, b64String]) => [
-            identifier,
-            OHPKM.fromBytes(Uint8Array.fromBase64(b64String).buffer),
-          ])
-        )
-      )
-    )
-  },
   searchOhpkmStore: async function (
     cursor: PaginationCursor,
     filters: Filter[]
@@ -114,6 +104,26 @@ export const TauriBackend: BackendInterface = {
   lookupOhpkmById: async function (id: OhpkmIdentifier): Promise<Errorable<Option<OHPKM>>> {
     return Commands.getOhpkmBytesById(id).then(
       R.map((bytes) => (bytes ? OHPKM.fromBytes(new Uint8Array(bytes).buffer) : undefined))
+    )
+  },
+  lookupOhpkmBatch: async function (
+    ids: OhpkmIdentifier[]
+  ): Promise<Result<OhpkmBatchLookupResults>> {
+    return Commands.getOhpkmBytesByIdBatch(ids).then(
+      R.map((lookup) => {
+        const builtMons: Map<OhpkmIdentifier, OhpkmLookupResult> = new Map()
+        for (const [id, bytes] of Object.entries(lookup)) {
+          if (bytes) {
+            builtMons.set(
+              id,
+              bytes
+                ? R.Ok(OHPKM.fromBytes(new Uint8Array(bytes).buffer))
+                : R.Err({ identifier: id })
+            )
+          }
+        }
+        return builtMons
+      })
     )
   },
   removeDangling: Commands.removeDangling,
@@ -323,6 +333,7 @@ export const TauriBackend: BackendInterface = {
     Commands.getDataDirPath().then(R.map((dataDirPath) => `${dataDirPath}/plugins/${pluginId}`)),
   openDirectory: Commands.openDirectory,
   openFileLocation: Commands.openFileLocation,
+  convertLocalImagePath: (localAbsolutePath: string) => convertFileSrc(localAbsolutePath),
   getPlatform: platform,
   getState: Commands.getState,
   getSettings: async () =>
@@ -345,7 +356,6 @@ export const TauriBackend: BackendInterface = {
   setTheme: Commands.setAppTheme,
   emitMenuEvent: Commands.handleWindowsAccelerator,
 
-  getImageData: Commands.getImageData,
   listInstalledPlugins: Commands.listInstalledPlugins,
   downloadPlugin: Commands.downloadPlugin,
   loadPluginCode: Commands.loadPluginCode,

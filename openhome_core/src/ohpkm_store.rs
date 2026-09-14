@@ -120,12 +120,11 @@ impl OhpkmBytesStore {
             .filter_map(std::result::Result::ok)
     }
 
-    pub fn get_b64_bytes_page_after(
+    pub fn get_b64_bytes_page(
         &self,
         current_cursor: search::PaginationCursor,
         filters: Vec<search::Filter>,
     ) -> search::PaginatedPage<String> {
-        dbg!(&filters);
         let entries = self
             .0
             .values()
@@ -135,7 +134,7 @@ impl OhpkmBytesStore {
             })
             .map(|bytes| BASE64_STANDARD.encode(bytes));
 
-        search::PaginatedPage::next_after_cursor(current_cursor, entries, self.0.len())
+        search::PaginatedPage::get_for_cursor(current_cursor, entries, self.0.len())
     }
 
     pub fn get_all_with_unknown_handler(
@@ -155,6 +154,20 @@ impl OhpkmBytesStore {
             .get(identifier)
             .map(|bytes| OhpkmV2::from_bytes(bytes))
             .transpose()?)
+    }
+
+    pub fn lookup_batch(&self, identifiers: &[OpenHomeId]) -> HashMap<OpenHomeId, Result<OhpkmV2>> {
+        identifiers
+            .iter()
+            .filter_map(|&identifier| {
+                self.0.get(&identifier).map(|bytes| {
+                    (
+                        identifier,
+                        OhpkmV2::from_bytes(bytes).map_err(|source| Error::PkmRs { source }),
+                    )
+                })
+            })
+            .collect()
     }
 
     pub fn includes(&self, identifier: &OpenHomeId) -> bool {

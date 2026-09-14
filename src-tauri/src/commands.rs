@@ -1,7 +1,6 @@
 use crate::data_controller::ToDataController;
-use crate::plugin::{self, PluginMetadata, PluginMetadataWithIcon, list_downloaded_plugins};
+use crate::plugin;
 use crate::state::{AppState, AppStateInner};
-use crate::util::ImageResponse;
 use crate::{menu, util};
 use openhome_core::data_controller::{DataController, DataDir};
 use openhome_core::error::{Error, Result};
@@ -129,12 +128,6 @@ pub fn validate_recent_saves(
 
 #[tauri::command]
 #[specta::specta]
-pub fn get_image_data(absolute_path: String) -> CommandResult<ImageResponse> {
-    Ok(util::get_image_data(&PathBuf::from(absolute_path))?)
-}
-
-#[tauri::command]
-#[specta::specta]
 pub fn open_directory(absolute_path: String) -> CommandResult<()> {
     Ok(util::open_directory(&PathBuf::from(absolute_path))?)
 }
@@ -156,7 +149,7 @@ pub async fn download_plugin(
 ) -> CommandResult<String> {
     let metadata_url = format!("{remote_url}/plugin.json");
 
-    let plugin_metadata: PluginMetadata = util::download_json_file(&metadata_url).await?;
+    let plugin_metadata: plugin::PluginMetadata = util::download_json_file(&metadata_url).await?;
 
     Ok(plugin::download_async(app_handle, remote_url, plugin_metadata).await?)
 }
@@ -165,8 +158,8 @@ pub async fn download_plugin(
 #[specta::specta]
 pub fn list_installed_plugins(
     app_handle: tauri::AppHandle,
-) -> CommandResult<Vec<PluginMetadataWithIcon>> {
-    Ok(list_downloaded_plugins(&app_handle.controller())?)
+) -> CommandResult<Vec<plugin::PluginMetadata>> {
+    Ok(plugin::list_downloaded_plugins(&app_handle.controller())?)
 }
 
 #[tauri::command]

@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::ops::Deref;
 use std::sync::Mutex;
 
@@ -86,10 +87,6 @@ impl AllSyncedState {
         Ok(self.lock()?.lookups.0.clone())
     }
 
-    pub fn ohpkm_store_b64(&self) -> Result<Vec<(String, String)>> {
-        Ok(self.lock()?.ohpkm_store.0.to_b64_entries())
-    }
-
     pub fn search_ohpkm_store(
         &self,
         cursor: search::PaginationCursor,
@@ -99,7 +96,7 @@ impl AllSyncedState {
             .lock()?
             .ohpkm_store
             .0
-            .get_b64_bytes_page_after(cursor, filters))
+            .get_b64_bytes_page(cursor, filters))
     }
 
     pub fn search_ohpkms_matching_unknown_handler(
@@ -116,6 +113,13 @@ impl AllSyncedState {
 
     pub fn ohpkm_lookup(&self, id: OpenHomeId) -> Result<Option<OhpkmV2>> {
         self.lock()?.ohpkm_store.0.lookup(&id)
+    }
+
+    pub fn ohpkm_lookup_batch(
+        &self,
+        ids: &[OpenHomeId],
+    ) -> Result<HashMap<OpenHomeId, Result<OhpkmV2>>> {
+        Ok(self.lock()?.ohpkm_store.0.lookup_batch(ids))
     }
 
     pub fn get_convert_strategies(&self) -> Result<ConvertStrategies> {
