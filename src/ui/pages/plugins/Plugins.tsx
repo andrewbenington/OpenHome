@@ -1,8 +1,5 @@
-import useBackend from '@openhome-core/backend/useBackend'
 import SideTabs from '@openhome-ui/components/side-tabs/SideTabs'
 import { usePathSegment } from '@openhome-ui/hooks/routing'
-import { AppInfoContext } from '@openhome-ui/state/appInfo'
-import { useContext, useEffect } from 'react'
 import { Route, Routes } from 'react-router'
 import BrowsePlugins from './BrowsePlugins'
 import InstalledPlugins from './InstalledPlugins'
@@ -12,13 +9,6 @@ export const CURRENT_PLUGIN_API_VERSION = 3
 
 export default function PluginsPage() {
   const { currentSegment, setCurrentSegment } = usePathSegment('plugins', 'installed')
-  const [{ settings }] = useContext(AppInfoContext)
-  const backend = useBackend()
-
-  useEffect(() => {
-    backend.updateSettings(settings).catch(console.error)
-  }, [settings, backend])
-
   const browsePluginsElement = <InstalledPlugins />
 
   return (

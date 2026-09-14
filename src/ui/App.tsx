@@ -6,15 +6,9 @@ import { R } from '@openhome-core/util/functional'
 import '@openhome-ui/App.css'
 import AppTabs from '@openhome-ui/AppTabs'
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
-import useDebounce from '@openhome-ui/hooks/debounce'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { TransactionStateProvider } from '@openhome-ui/state/app-state'
-import {
-  AppInfoContext,
-  appInfoInitialState,
-  appInfoReducer,
-  Settings,
-} from '@openhome-ui/state/appInfo'
+import { AppInfoContext, appInfoInitialState, appInfoReducer } from '@openhome-ui/state/appInfo'
 import { DragMonContext, DragMonState, emptyDragState } from '@openhome-ui/state/drag-and-drop'
 import PokemonDndContext from '@openhome-ui/state/drag-and-drop/PokemonDndContext'
 import { ErrorContext, errorReducer } from '@openhome-ui/state/error'
@@ -82,14 +76,9 @@ function AppWithBackend() {
   const backend = useBackend()
   const displayError = useDisplayError()
 
-  const debouncedUpdateSettings = useEffectEvent(
-    useDebounce((backend: BackendInterface, settings: Settings) => {
-      backend.updateSettings(settings).catch(console.error)
-    }, 500)
-  )
-
   const reloadSettings = useEffectEvent(backend.getSettings)
   const getPlatform = useEffectEvent(backend.getPlatform)
+  const displayErrorEvent = useEffectEvent(displayError)
 
   // The save listener works if these are separated into effect events, but not
   // if the whole effect function is (including the returned callback). Check
@@ -116,11 +105,11 @@ function AppWithBackend() {
       .then(
         R.match(
           async (settings) => appInfoDispatch({ type: 'load_settings', payload: settings }),
-          async (err) => displayError('Error loading settings', err)
+          async (err) => displayErrorEvent('Error loading settings', err)
         )
       )
       .finally(() => setSettingsLoading(false))
-  }, [appInfoState.error, displayError])
+  }, [appInfoState.error])
 
   // only on app start
   useEffect(() => {
@@ -133,10 +122,10 @@ function AppWithBackend() {
     }
   }, [backend])
 
-  useEffect(() => {
-    if (!appInfoState.settingsLoaded) return
-    debouncedUpdateSettings(backend, appInfoState.settings)
-  }, [backend, appInfoState.settings, appInfoState.settingsLoaded])
+  // useEffect(() => {
+  //   if (!appInfoState.settingsLoaded) return
+  //   debouncedUpdateSettings(backend, appInfoState.settings)
+  // }, [backend, appInfoState.settings, appInfoState.settingsLoaded])
 
   const listenToMenuEvents = useEffectEvent(backend.onMenuEvents)
 

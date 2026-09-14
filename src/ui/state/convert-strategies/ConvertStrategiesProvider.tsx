@@ -43,24 +43,10 @@ function stateReducer(
   }
 }
 
-function assembleEntries(entries: ConvertStrategyEntries) {
-  let strategies_by_id: {
-    [x: string]: NamedStrategy
-  } = {}
-  entries.ids_and_strategies.forEach(([id, strategy]) => {
-    strategies_by_id[id] = strategy
-  })
-
-  return {
-    default_strategy_id: entries.default_strategy_id,
-    strategies_by_id,
-  }
-}
-
 function useSyncedConvertState(): SyncedStateController<
   ConvertStrategies,
   ConvertStrategyEntries,
-  ConvertStrategyEntries
+  ConvertStrategies
 > {
   const backend = useBackend()
 
@@ -78,6 +64,5 @@ function useSyncedConvertState(): SyncedStateController<
     stateGetter,
     stateReducer,
     stateUpdater,
-    convertRustState: assembleEntries,
   }
 }
