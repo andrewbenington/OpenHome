@@ -1,17 +1,13 @@
-use std::{
-    fs,
-    path::{Path, PathBuf},
-};
+use crate::data_controller::ToDataController;
+use crate::util;
 
-use crate::{
-    data_controller::ToDataController,
-    util::{self, ImageResponse},
-};
 use openhome_core::data_controller::{DataController, DataDir};
 use openhome_core::{Error, Result};
+use std::fs;
+use std::path::{Path, PathBuf};
 use tauri::Emitter;
 
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, specta::Type)]
 pub struct PluginMetadata {
     pub id: String,
     pub name: String,
@@ -19,30 +15,9 @@ pub struct PluginMetadata {
     pub api_version: u32,
 }
 
-impl PluginMetadata {
-    pub fn with_icon_bytes(self, path: &Path) -> PluginMetadataWithIcon {
-        PluginMetadataWithIcon {
-            id: self.id,
-            name: self.name,
-            version: self.version,
-            api_version: self.api_version,
-            icon_image: util::get_image_data(path).ok(),
-        }
-    }
-}
-
-#[derive(serde::Serialize, serde::Deserialize, Debug, specta::Type)]
-pub struct PluginMetadataWithIcon {
-    pub id: String,
-    pub name: String,
-    pub version: String,
-    pub api_version: u32,
-    pub icon_image: Option<ImageResponse>,
-}
-
 pub fn list_downloaded_plugins(
     data_controller: &impl DataController,
-) -> Result<Vec<PluginMetadataWithIcon>> {
+) -> Result<Vec<PluginMetadata>> {
     let plugins_path = data_controller.absolute_dir_path(DataDir::Plugins)?;
     if !plugins_path.exists() {
         return Ok(Vec::new());
@@ -51,7 +26,7 @@ pub fn list_downloaded_plugins(
     let plugin_dir_entries =
         fs::read_dir(&plugins_path).map_err(|err| Error::file_access(&plugins_path, err))?;
 
-    let mut plugins: Vec<PluginMetadataWithIcon> = vec![];
+    let mut plugins: Vec<PluginMetadata> = vec![];
 
     for dir_entry in plugin_dir_entries.flatten() {
         if !dir_entry.path().is_dir() {
@@ -63,10 +38,8 @@ pub fn list_downloaded_plugins(
             data_controller.read_file_json(DataDir::Plugins, plugin_dir_name.join("plugin.json"));
 
         match metadata_r {
-            Err(err) => eprintln!("Broken plugin entry: {err}"),
-            Ok(metadata) => {
-                plugins.push(metadata.with_icon_bytes(&dir_entry.path().join("icon.png")))
-            }
+            Err(err) => tracing::error!("Broken plugin entry: {err}"),
+            Ok(metadata) => plugins.push(metadata),
         }
     }
 
@@ -79,7 +52,7 @@ fn emit_download_progress(app_handle: &tauri::AppHandle, plugin_id: String, prog
         progress,
     );
     if let Err(err) = result {
-        eprintln!("error emitting download progress: {}", err)
+        tracing::error!("error emitting download progress: {}", err)
     }
 }
 

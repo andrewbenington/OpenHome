@@ -33,7 +33,6 @@ pub fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
     tauri_specta::Builder::<tauri::Wry>::new().commands(tauri_specta::collect_commands![
         commands::get_state,
         commands::get_file_created,
-        commands::get_image_data,
         commands::write_file_bytes,
         commands::set_app_theme,
         commands::validate_recent_saves,
