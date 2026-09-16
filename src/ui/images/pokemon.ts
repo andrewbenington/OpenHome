@@ -49,9 +49,6 @@ export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {
   const extraFormSprite = mon.extraFormIndex ? extraFormSpriteName(mon.extraFormIndex) : undefined
 
   let spriteFolder = extraFormSprite ? 'extra' : fileToSpriteFolder[monFormat as MonFormat]
-  if (mon.isShiny && spriteFolder !== 'gen1' && spriteFolder !== 'gen9') {
-    spriteFolder += '/shiny'
-  }
 
   const extension =
     spriteFolder === 'gen3gc'
@@ -59,6 +56,10 @@ export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {
       : spriteFolder === 'home' || spriteFolder === 'extra'
         ? 'webp'
         : 'png'
+
+  if (mon.isShiny && spriteFolder !== 'gen1' && spriteFolder !== 'gen9') {
+    spriteFolder += '/shiny'
+  }
 
   return getPokemonSpritePathInner(mon, spriteFolder, extension, monFormat)
 }
