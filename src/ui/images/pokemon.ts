@@ -94,7 +94,11 @@ export const getPokemonSpritePathInner = (
 
   const extraFormSprite = mon.extraFormIndex ? extraFormSpriteName(mon.extraFormIndex) : undefined
 
-  const spriteName = extraFormSprite ?? getSpriteName(mon, monFormat)
+  let spriteName = extraFormSprite ?? getSpriteName(mon, monFormat)
+
+  if (mon.nationalDex === NationalDex.Pyroar && mon.isFemale) {
+    spriteName += '-f'
+  }
 
   if (extraFormSprite) {
     spriteFolder = 'extra'

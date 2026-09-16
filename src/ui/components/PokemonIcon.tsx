@@ -3,7 +3,7 @@ import useIsDarkMode from '@openhome-ui/hooks/darkMode'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
 import { getPokemonSpritePathInner } from '@openhome-ui/images/pokemon'
-import { ExtraFormIndex, NationalDex } from '@pkm-rs/pkg'
+import { ExtraFormIndex, Gender, NationalDex } from '@pkm-rs/pkg'
 import { HTMLAttributes, memo, MouseEventHandler, ReactNode, useState } from 'react'
 import { MonDisplayState, useMonDisplay } from '../hooks/monDisplay'
 import { boxIconImagePath } from '../pokemon-details/useBoxIconImage'
@@ -16,6 +16,7 @@ export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
   nationalDex: number
   formIndex?: number
   isShiny?: boolean
+  gender?: Gender
   isEgg?: boolean
   heldItemIndex?: number
   onlyItem?: boolean
@@ -89,6 +90,7 @@ interface PokemonIconImageProps {
   silhouette?: boolean
   isEgg?: boolean
   isShiny?: boolean
+  gender?: Gender
   onClick?: MouseEventHandler
 }
 
@@ -102,6 +104,7 @@ function getHomeImage(props: PokemonIconImageProps) {
       format: 'OHPKM',
       extraFormIndex: props.extraFormIndex,
       isShiny: props.isShiny,
+      isFemale: props.gender === Gender.Female,
     })
   )
 }
