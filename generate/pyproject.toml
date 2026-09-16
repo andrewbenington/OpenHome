@@ -13,4 +13,5 @@ dependencies = [
 [dependency-groups]
 dev = [
     "mypy>=1.19.1",
+    "ruff>=0.16.8",
 ]

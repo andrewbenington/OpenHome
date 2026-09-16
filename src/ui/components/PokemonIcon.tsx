@@ -1,16 +1,18 @@
 import { CHAMPS_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { Option, R } from '@openhome-core/util/functional'
+import { $R, Option, R } from '@openhome-core/util/functional'
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
 import BoxIcons from '@openhome-ui/images/BoxIcons.webp'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
+import { getPokemonSpritePathInner } from '@openhome-ui/images/pokemon'
 import {
   ExtraFormIndex,
   extraFormSpriteName,
   FormMetadata,
   Generation,
   MetadataSummaryLookup,
+  NationalDex,
 } from '@pkm-rs/pkg'
 import { HTMLAttributes, memo, MouseEventHandler, ReactNode, useState } from 'react'
 import { MonDisplayState, useMonDisplay } from '../hooks/monDisplay'
@@ -49,7 +51,7 @@ function getBackgroundPosition(formeMetadata?: FormMetadata, isEgg?: boolean) {
 
 type IconType = 'spritesheet' | 'image'
 
-const FORCE_ICON_FROM_IMAGE = false
+const FORCE_ICON_FROM_IMAGE = true
 
 function iconType(
   nationalDex: number,
@@ -206,6 +208,21 @@ function PokemonIconUsingImage(props: PokemonIconUsingImageProps) {
       },
       (err: string) => {
         console.error(err)
+        $R(
+          boxIconImagePath({
+            nationalDex: nationalDex,
+            formIndex: formeNumber ?? 0,
+            format: 'OHPKM',
+            extraFormIndex,
+            isShiny: props.isShiny,
+          })
+        ).match(
+          (path) => setSpritePath(getPublicImageURL(path)),
+          (err) => {
+            setImageLoadFailed(true)
+            console.error(err)
+          }
+        )
       }
     )(spriteResult)
   }
@@ -217,7 +234,6 @@ function PokemonIconUsingImage(props: PokemonIconUsingImageProps) {
       draggable={false}
       src={spritePath}
       style={{
-        imageRendering: 'pixelated',
         filter: silhouette
           ? isDarkMode
             ? 'contrast(0%) brightness(85%)'
@@ -230,8 +246,25 @@ function PokemonIconUsingImage(props: PokemonIconUsingImageProps) {
           event: 'box-sprite-image-error',
           url: spritePath,
         })
-        setImageLoadFailed(true)
-        setSpritePath(DEFAULT_BOX_ICON)
+
+        const homePath = getPokemonSpritePathInner(
+          {
+            ...props,
+            formIndex: props.formeNumber ?? 0,
+            format: 'OHPKM',
+            extraFormIndex: props.extraFormIndex,
+          },
+          'box-home',
+          'webp'
+        )
+
+        if (spritePath !== getPublicImageURL(homePath)) {
+          setSpritePath(getPublicImageURL(homePath))
+        } else {
+          console.assert(props.nationalDex !== NationalDex.Farfetchd, getPublicImageURL(homePath))
+          setImageLoadFailed(true)
+          setSpritePath(DEFAULT_BOX_ICON)
+        }
       }}
     />
   )

@@ -20,7 +20,7 @@ with sqlite3.connect("pkm.db") as conn:
     POKEMON_DATA = database.get_species(conn)
 
 def download_all_sprites_all_mons():
-    os.makedirs("../public/sprites/box/shiny", exist_ok=True)
+    os.makedirs("../public/sprites/box-champions/shiny", exist_ok=True)
     os.makedirs("../public/sprites/home/shiny", exist_ok=True)
     os.makedirs("../public/sprites/gen1", exist_ok=True)
     os.makedirs("../public/sprites/gen2/shiny", exist_ok=True)
@@ -90,7 +90,7 @@ gender_differences = [
     257, 267, 269, 272, 274, 275, 307, 308, 315, 316, 317, 322, 323, 332, 350,
     369, 396, 397, 398, 399, 400, 401, 402, 403, 404, 405, 407, 415, 417, 418,
     419, 424, 443, 444, 445, 449, 450, 453, 454, 456, 457, 459, 460, 461, 464,
-    465, 473, 521, 592, 593, 668, 902]
+    465, 473, 521, 592, 593, 668,876, 902]
 
 
 IN_CHAMPIONS = [
@@ -104,8 +104,8 @@ IN_CHAMPIONS = [
     691, 693, 695, 697, 699, 700, 701, 702, 706, 707, 709, 711, 713, 715, 724, 727, 730, 733, 740,
     745, 748, 750, 752, 758, 763, 765, 766, 778, 780, 784, 823, 841, 842, 844, 855, 858, 861, 866,
     867, 869, 870, 877, 887, 899, 900, 902, 903, 904, 908, 911, 914, 925, 934, 936, 937, 939, 952,
-    956, 959, 964, 968, 970, 972, 979, 981, 983, 1000, 1013, 1018, 1019,
-]
+    956, 959, 964, 968, 970, 972, 979, 981, 983, 1000, 1013, 1018, 1019,40,53,83,122,317,373,673,
+    768,812,815,818,828,849,853,863,865,871,876,930,931,943,998,]
 
 # def excludeFormGen45(form: PokemonForm):
 #     if "-mega" in form.sprite_name or "-Fairy" in form.name:
@@ -175,7 +175,7 @@ def download_all_sprites(form: PokemonForm):
     if form.national_dex <= 1025 and form.has_home_sprite():
         download_sprite_variants_bulbagarden(form, "home", "home")
     if form.has_home_sprite() and form.national_dex in IN_CHAMPIONS:
-        download_sprite_variants_bulbagarden(form, "champions", "box")
+        download_sprite_variants_bulbagarden(form, "champions", "box-champions")
     # if dex_number <= 724 and not excludeFormLA(form: PokemonForm):
     #     download_sprite_variants_pokemon_db(
     #         dex_number, form.form_index, form_name, "legends-arceus", "gen8a")
