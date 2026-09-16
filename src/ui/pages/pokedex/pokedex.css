@@ -131,16 +131,31 @@
   margin: var(--padding-radius-sm-lg);
 }
 
-.pokedex-shiny-toggle {
+.pokedex-toggle {
   position: absolute;
-  top: var(--padding-radius-sm-lg);
-  right: var(--padding-radius-sm-lg);
   width: 2rem;
   height: 2rem;
   z-index: 20;
   border-radius: 50%;
   border: none;
   box-shadow: var(--raised-button-box-shadow);
+}
+
+.pokedex-shiny-toggle {
+  top: var(--padding-radius-sm-lg);
+  right: var(--padding-radius-sm-lg);
+}
+
+.pokedex-gender-toggle {
+  top: var(--padding-radius-sm-lg);
+  left: var(--padding-radius-sm-lg);
+  padding: 0;
+  text-align: center;
+
+  p {
+    font-size: 1.3rem;
+    margin: auto;
+  }
 }
 
 .pokedex-tab-row {

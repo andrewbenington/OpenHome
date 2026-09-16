@@ -40,11 +40,11 @@ def download_all_sprites_all_mons():
                 print(f"{form.name} INVALID INDEX: {len(mon.forms)} ({len(mon.forms)} present)")
             thread_all_sprite_downloads(form)
 
-def download_png(url: str | None, directory, filename: str):
+def download_png(url: str | None, directory, filename: str, overwrite=False):
     if url is None:
         return False, False
 
-    if os.path.isfile(os.path.join(directory, filename)) or os.path.isfile(os.path.join(directory, filename.replace("png", "webp"))):
+    if not overwrite and (os.path.isfile(os.path.join(directory, filename)) or os.path.isfile(os.path.join(directory, filename.replace("png", "webp")))):
         print(f"{filename} already exists in {directory}")
         return False, False
 
@@ -172,10 +172,12 @@ def download_all_sprites(form: PokemonForm):
     # elif form.national_dex <= 809 and not excludeFormGen7(form: PokemonForm):
     #     download_sprite_variants_pokemon_db(
     #         form.national_dex, form.form_index, form_name, "ultra-sun-ultra-moon", "gen7", form.national_dex != 133)
+    if form.national_dex not in gender_differences:
+        return
     if form.national_dex <= 1025 and form.has_home_sprite():
-        download_sprite_variants_bulbagarden(form, "home", "home")
-    if form.has_home_sprite() and form.national_dex in IN_CHAMPIONS:
-        download_sprite_variants_bulbagarden(form, "champions", "box-champions")
+        download_sprite_variants_bulbagarden(form, "home", "home", overwrite=True)
+    # if form.has_home_sprite() and form.national_dex in IN_CHAMPIONS:
+    #     download_sprite_variants_bulbagarden(form, "champions", "box-champions")
     # if dex_number <= 724 and not excludeFormLA(form: PokemonForm):
     #     download_sprite_variants_pokemon_db(
     #         dex_number, form.form_index, form_name, "legends-arceus", "gen8a")
@@ -199,34 +201,35 @@ def download_sprite_variants_pokemon_db(form: PokemonForm, game, folder, include
             download_png(form.pokemon_db_sprite_url(False, game, is_female=True), "../public/sprites/" + folder, sprite_name + "-f" + extension)
             download_png(form.pokemon_db_sprite_url(True, game, is_female=True), "../public/sprites/" + folder + "/shiny", sprite_name + "-f" + extension)
 
-def download_sprite_variants_bulbagarden(form: PokemonForm, game, folder, includeFemale=True):
+def download_sprite_variants_bulbagarden(form: PokemonForm, game, folder, includeFemale=True, overwrite=False):
     if "-totem" in form.name:
         return
     
     extension = ".gif" if "anim" in game else ".png"
+    overwrite = True
 
     for sprite_name in [form.sprite_name]:
         filename = sprite_name + extension
         filename = filename.replace("png", "webp")
 
-        if not os.path.isfile(os.path.join("../public/sprites/" + folder, filename)):
+        if overwrite or not os.path.isfile(os.path.join("../public/sprites/" + folder, filename)):
             print(f"downloading to {os.path.join("../public/sprites/" + folder, filename)}")
-            download_png(form.bulbagarden_sprite_url(False, game, False), "../public/sprites/" + folder, sprite_name + extension)
+            download_png(form.bulbagarden_sprite_url(False, game, False), "../public/sprites/" + folder, sprite_name + extension, overwrite=overwrite)
         
         if game == "red-blue" or game == 'scarlet-violet':
             continue
 
-        if not os.path.isfile(os.path.join("../public/sprites/" + folder + "/shiny", filename)):
-            download_png(form.bulbagarden_sprite_url(True, game, False), "../public/sprites/" + folder + "/shiny", sprite_name + extension)
+        if overwrite or not os.path.isfile(os.path.join("../public/sprites/" + folder + "/shiny", filename)):
+            download_png(form.bulbagarden_sprite_url(True, game, False), "../public/sprites/" + folder + "/shiny", sprite_name + extension, overwrite=overwrite)
 
         if includeFemale and form.national_dex in gender_differences and form.form_index == 0 and form.national_dex != 255 and form.national_dex != 418:
             filename = sprite_name + "-f" + extension
             filename = filename.replace("png", "webp")
-            if not os.path.isfile(os.path.join("../public/sprites/" + folder, filename)):
-                download_png(form.bulbagarden_sprite_url(False, game, is_female=True), "../public/sprites/" + folder, sprite_name + "-f" + extension)
+            if overwrite or not os.path.isfile(os.path.join("../public/sprites/" + folder, filename)):
+                download_png(form.bulbagarden_sprite_url(False, game, is_female=True), "../public/sprites/" + folder, sprite_name + "-f" + extension, overwrite=overwrite)
 
-            if not os.path.isfile(os.path.join("../public/sprites/" + folder + "/shiny", filename)):
-                download_png(form.bulbagarden_sprite_url(True, game, is_female=True), "../public/sprites/" + folder + "/shiny", sprite_name + "-f" + extension)
+            if overwrite or not os.path.isfile(os.path.join("../public/sprites/" + folder + "/shiny", filename)):
+                download_png(form.bulbagarden_sprite_url(True, game, is_female=True), "../public/sprites/" + folder + "/shiny", sprite_name + "-f" + extension, overwrite=overwrite)
 
 # def download_sprite_variants_pokencyclopedia_coloxd(form: PokemonForm):
 #     download_png(form.colo_xd_sprite_url(False), "../public/sprites/gen3gc", form.name + ".gif")

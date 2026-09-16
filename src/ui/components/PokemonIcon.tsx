@@ -30,8 +30,16 @@ export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 const PokemonIcon = memo((props: PokemonIconProps) => {
-  const { nationalDex, formIndex, isShiny, heldItemIndex, onlyItem, silhouette, isEgg } = props
-  const { grayedOut, topRightIndicator, tags, hasNotes, style, onClick, extraFormIndex } = props
+  const {
+    heldItemIndex,
+    onlyItem,
+    grayedOut,
+    topRightIndicator,
+    tags,
+    hasNotes,
+    style,
+    ...iconProps
+  } = props
   const { showNotesIndicator, showTags } = useMonDisplay()
 
   return (
@@ -39,18 +47,8 @@ const PokemonIcon = memo((props: PokemonIconProps) => {
       className={classNames('pokemon-icon-container', grayscaleIf(grayedOut), 'flex-centered')}
       style={style}
     >
-      {!onlyItem && (
-        <PokemonIconImage
-          nationalDex={nationalDex}
-          formIndex={formIndex}
-          extraFormIndex={extraFormIndex}
-          silhouette={silhouette}
-          onClick={onClick}
-          isShiny={isShiny}
-          isEgg={isEgg}
-        />
-      )}
-      {isShiny && (
+      {!onlyItem && <PokemonIconImage {...iconProps} />}
+      {props.isShiny && (
         <img
           alt="shiny icon"
           className="shiny-icon"
