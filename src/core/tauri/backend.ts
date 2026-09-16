@@ -25,7 +25,7 @@ import { convertFileSrc } from '@tauri-apps/api/core'
 import { Event, listen, UnlistenFn } from '@tauri-apps/api/event'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { open as fileDialog, save } from '@tauri-apps/plugin-dialog'
-import { FileInfo, readFile, stat } from '@tauri-apps/plugin-fs'
+import { FileInfo, readFile, stat, writeFile } from '@tauri-apps/plugin-fs'
 import { platform } from '@tauri-apps/plugin-os'
 import dayjs, { Dayjs } from 'dayjs'
 import { Commands } from './commands'
@@ -40,10 +40,15 @@ import {
   StoredBankDataWasm as StoredBankDataRust,
 } from './spectaCommands'
 
-const IS_ANDROID: boolean = true
+export const IS_ANDROID: boolean = true
 
 async function pathDataFromRaw(raw: string): Promise<PathData> {
-  const filename = await path.basename(raw)
+  let filename = raw
+  try {
+    filename = await path.basename(raw)
+  } catch (e) {
+    console.warn(e)
+  }
   const dir = await path.dirname(raw)
   const ext = '.' in path ? await path.extname(raw) : ''
 
@@ -172,7 +177,6 @@ export const TauriBackend: BackendInterface = {
 
   /* game saves */
   loadSaveFile: async (pathData: PathData): Promise<Errorable<LoadSaveResponse>> => {
-    console.log({ pathData })
     if (IS_ANDROID) {
       const fileBytes = await readFile(pathData.raw) // Commands.get_file_bytes(pathData.raw)
       return R.Ok({
@@ -184,10 +188,6 @@ export const TauriBackend: BackendInterface = {
 
     try {
       const bytesResult = await readFile(pathData.raw) // Commands.get_file_bytes(pathData.raw)
-      console.log({ bytesResult })
-      // if (R.isErr(bytesResult)) {
-      //   return bytesResult
-      // }
       const timestampResult = await Commands.getFileCreated(pathData.raw)
       if (R.isErr(timestampResult)) {
         return timestampResult
@@ -198,18 +198,46 @@ export const TauriBackend: BackendInterface = {
         createdDate: timestampResult.data ? new Date(timestampResult.data) : undefined,
       })
     } catch (e) {
-      console.log({ e })
       return R.Err(String(e))
     }
   },
-  writeSaveFile: async (path: string, bytes: Uint8Array) =>
-    Commands.writeFileBytes(path, Array.from(bytes)),
-  writeAllSaveFiles: async (saveWriters: SaveWriter[]) =>
-    Promise.all(
-      saveWriters.map((saveWriter) =>
-        Commands.writeFileBytes(saveWriter.filepath, Array.from(saveWriter.bytes))
+  writeSaveFile: async (path: string, bytes: Uint8Array) => {
+    if (IS_ANDROID) {
+      await writeFile(path, bytes) // Commands.get_file_bytes(pathData.raw)
+      return R.Ok(null)
+    }
+    return Commands.writeFileBytes(path, Array.from(bytes))
+  },
+  writeAllSaveFiles: async (saveWriters: SaveWriter[]): Promise<Result<null>[]> => {
+    if (IS_ANDROID) {
+      await Promise.all(
+        saveWriters.map((saveWriter) =>
+          readFile(saveWriter.filepath)
+            .then(console.info)
+            .catch((error) => {
+              console.error(error)
+              return R.Err<null, string>(String(error))
+            })
+        )
       )
-    ),
+      return await Promise.all(
+        saveWriters.map(async (saveWriter) =>
+          writeFile(saveWriter.filepath, saveWriter.bytes)
+            .then(() => R.Ok(null))
+            .catch((error) => {
+              console.error(error)
+              return R.Ok<null, string>(null)
+            })
+        )
+      )
+    }
+    return await Promise.all(
+      saveWriters.map(
+        async (saveWriter) =>
+          await Commands.writeFileBytes(saveWriter.filepath, Array.from(saveWriter.bytes))
+      )
+    )
+  },
   saveLocalFile: async (bytes: Uint8Array, suggestedName: string) => {
     const defaultPath = await path.join(await path.downloadDir(), suggestedName)
     const filePath = await save({ defaultPath })
@@ -217,10 +245,28 @@ export const TauriBackend: BackendInterface = {
   },
 
   /* game save management */
-  getRecentSaves: () =>
+  getRecentSaves: async () =>
     Commands.validateRecentSaves().then(
-      R.map((entries) => {
-        const saves: Record<string, SaveRef> = Object.fromEntries(entries)
+      R.asyncMap(async (entries) => {
+        if (!IS_ANDROID) {
+          return Object.fromEntries(entries)
+        }
+
+        const saves: Record<string, SaveRef> = Object.fromEntries(
+          await Promise.all(
+            entries.map(async ([path, save]) => {
+              try {
+                const fileInfo = await stat(save.filePath.raw)
+                save.valid = fileInfo.isFile
+              } catch (e) {
+                console.error(e)
+                save.valid = false
+              }
+
+              return [path, save]
+            })
+          )
+        )
         return saves
       })
     ),
@@ -319,9 +365,9 @@ export const TauriBackend: BackendInterface = {
 
   /* application */
   pickFile: async (): Promise<Errorable<PathData | undefined>> => {
-    const filePath = await fileDialog({ directory: false, title: 'Select File' })
+    let filePath = await fileDialog({ directory: false, title: 'Select File' })
     if (!filePath) return R.Ok(undefined)
-    console.log({ filePath })
+
     return R.Ok(await pathDataFromRaw(filePath))
   },
   pickFolder: async (): Promise<Errorable<string | undefined>> => {
@@ -563,3 +609,7 @@ function parseFilter(unparsed: LogFilterRust): LogFilter {
     ohpkm_id: unparsed.ohpkm_id ?? undefined,
   }
 }
+
+// function adaptFilepathForAndroid(path: string): string {
+//   i
+// }

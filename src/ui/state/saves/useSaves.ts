@@ -369,9 +369,7 @@ export function useSaves(): SavesAndBanksManager {
   const addSave = useCallback(
     async (save: SAV): Promise<Result<SAV, SaveError>> => {
       try {
-        alert('adding recent save')
         await backend.addRecentSave(getSaveRef(save)).catch(alert)
-        alert('added recent save')
         const result = await backend.registerInPokedex(pokedexSeenFromSave(save))
         if (R.isErr(result)) {
           alert('Error registering pokedex entries from save: ' + result.error)
@@ -385,7 +383,6 @@ export function useSaves(): SavesAndBanksManager {
         if (SCAN_FULL_STORE_AND_FIX_HANDLERS) {
           await ohpkmStore.scanFullStoreAndFixHandlers(save)
         }
-        alert('scanned')
 
         const toUpdate: OhpkmStoreData = {}
         for (const mon of save.getAllMons()) {
@@ -437,19 +434,19 @@ export function useSaves(): SavesAndBanksManager {
         filePickerOpen.current = false
 
         if (R.isErr(result)) {
-          return R.Err({ type: 'SELECT_FILE', cause: result.error })
+          return R.Err(SelectFile(result.error))
         }
         if (!result.data) return R.Ok(undefined)
         filePath = result.data
       }
 
       if (allOpenSaves.some((other) => other.filePath.raw === filePath.raw)) {
-        return R.Err({ type: 'ALREADY_OPEN' })
+        return R.Err(AlreadyOpen)
       }
 
       const bytesResult = await backend.loadSaveFile(filePath)
       if (R.isErr(bytesResult)) {
-        return R.Err({ type: 'READ_FILE', cause: bytesResult.error })
+        return R.Err(ReadFile(bytesResult.error))
       }
 
       const fileBytes = bytesResult.data.fileBytes
@@ -459,7 +456,7 @@ export function useSaves(): SavesAndBanksManager {
       let saveType: Option<SAVClass>
       switch (saveTypes.length) {
         case 0:
-          return R.Err({ type: 'UNRECOGNIZED' })
+          return R.Err(Unrecognized)
         case 1:
           saveType = saveTypes[0]
           break
@@ -474,15 +471,12 @@ export function useSaves(): SavesAndBanksManager {
       const result = buildSaveFile(filePath, fileBytes, saveType)
 
       if (R.isErr(result)) {
-        return R.Err({
-          type: 'BUILD_SAVE',
-          cause: result.error,
-        })
+        return R.Err(BuildSave(result.error))
       }
       const saveFile = result.data
 
       if (!saveFile) {
-        return R.Err({ type: 'UNRECOGNIZED' })
+        return R.Err(Unrecognized)
       } else {
         return addSave(saveFile)
       }
@@ -847,33 +841,40 @@ function moveMonWithinSave(save: SAV, source: SaveMonLocation, dest: SaveMonLoca
 }
 
 export type SaveError =
-  | {
-      type: 'ALREADY_OPEN'
-    }
-  | {
-      type: 'SELECT_FILE'
-      cause: string
-    }
-  | {
-      type: 'READ_FILE'
-      cause: string
-    }
-  | {
-      type: 'UNRECOGNIZED'
-    }
-  | {
-      type: 'BUILD_SAVE'
-      cause: string
-    }
-  | {
-      type: 'OTHER'
-      cause: string
-    }
+  | { type: 'ALREADY_OPEN' }
+  | { type: 'SELECT_FILE'; cause: string }
+  | { type: 'READ_FILE'; cause: string }
+  | { type: 'UNRECOGNIZED' }
+  | { type: 'BUILD_SAVE'; cause: string }
+  | { type: 'PKM_CONVERSION'; cause: string }
+  | { type: 'TRANSACTION_START'; cause: string }
+  | { type: 'TRANSACTION_COMMIT'; cause: string }
+  | { type: 'SAVE_ITEM_BAG_DATA'; cause: string }
+  | { type: 'BACKEND_SAVE_ERROR'; cause: string }
+  | { type: 'OTHER'; cause: string }
 
 export type SaveErrorType = SaveError['type']
 
+function buildError(type: SaveErrorType, cause: string): SaveError {
+  return { type, cause }
+}
+
+export const AlreadyOpen: SaveError = Object.freeze({ type: 'ALREADY_OPEN' })
+export const SelectFile = (cause: string) => buildError('SELECT_FILE', cause)
+export const ReadFile = (cause: string) => buildError('READ_FILE', cause)
+export const Unrecognized: SaveError = Object.freeze({ type: 'UNRECOGNIZED' })
+export const BuildSave = (cause: string) => buildError('BUILD_SAVE', cause)
+export const TransactionStart = (cause: string) => buildError('TRANSACTION_START', cause)
+export const TransactionCommit = (cause: string) => buildError('TRANSACTION_COMMIT', cause)
+export const SaveItemBagData = (cause: string) => buildError('SAVE_ITEM_BAG_DATA', cause)
+export const BackendSaveError = (cause: string) => buildError('BACKEND_SAVE_ERROR', cause)
+export const PkmConversion = (cause: string) => buildError('PKM_CONVERSION', cause)
+export const OtherError = (cause: string) => buildError('OTHER', cause)
+
 export function saveErrorTitle(errorType: SaveErrorType): string {
   switch (errorType) {
+    case 'ALREADY_OPEN':
+      return 'Already Open'
     case 'SELECT_FILE':
       return 'Error Selecting File'
     case 'READ_FILE':
@@ -882,8 +883,16 @@ export function saveErrorTitle(errorType: SaveErrorType): string {
       return 'Error Detecting Save'
     case 'BUILD_SAVE':
       return 'Save File Invalid'
-    case 'ALREADY_OPEN':
-      return 'Already Open'
+    case 'PKM_CONVERSION':
+      return 'Error Converting Pokémon'
+    case 'TRANSACTION_START':
+      return 'Error Starting Save Transaction'
+    case 'TRANSACTION_COMMIT':
+      return 'Error Committing Save Transaction'
+    case 'SAVE_ITEM_BAG_DATA':
+      return 'Error Saving Item Bag'
+    case 'BACKEND_SAVE_ERROR':
+      return 'Error Saving'
     case 'OTHER':
       return 'Error Opening Save'
   }
@@ -894,6 +903,11 @@ export function saveErrorMessage(error: SaveError): string {
     case 'SELECT_FILE':
     case 'READ_FILE':
     case 'BUILD_SAVE':
+    case 'PKM_CONVERSION':
+    case 'TRANSACTION_START':
+    case 'TRANSACTION_COMMIT':
+    case 'BACKEND_SAVE_ERROR':
+    case 'SAVE_ITEM_BAG_DATA':
     case 'OTHER':
       return error.cause
     case 'UNRECOGNIZED':

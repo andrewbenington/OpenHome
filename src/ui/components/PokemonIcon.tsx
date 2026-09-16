@@ -1,5 +1,6 @@
 import { CHAMPS_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
+import { IS_ANDROID } from '@openhome-core/tauri/backend'
 import { Option, R } from '@openhome-core/util/functional'
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
 import BoxIcons from '@openhome-ui/images/BoxIcons.webp'
@@ -49,7 +50,7 @@ function getBackgroundPosition(formeMetadata?: FormMetadata, isEgg?: boolean) {
 
 type IconType = 'spritesheet' | 'image'
 
-const FORCE_ICON_FROM_IMAGE = false
+const FORCE_ICON_FROM_IMAGE = IS_ANDROID // the spritesheet is too large to perform well on lower end Android devices
 
 function iconType(
   nationalDex: number,

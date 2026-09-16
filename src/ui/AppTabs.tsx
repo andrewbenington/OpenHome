@@ -1,5 +1,5 @@
 import { Separator } from '@base-ui/react/separator'
-import { Badge, Box, Flex, ThemePanel } from '@radix-ui/themes'
+import { Badge, Box, Button, Flex, ThemePanel } from '@radix-ui/themes'
 import { PropsWithChildren, useContext } from 'react'
 import { Route, Routes, useLocation, useNavigate } from 'react-router'
 import DebugOnly from './components/DebugOnly'
@@ -17,6 +17,7 @@ import Settings from './pages/Settings'
 import SortPokemon from './pages/sort/SortPokemon'
 import TrackedPokemonPage from './pages/tracked/TrackedPokemonPage'
 import { PluginContext } from './state/plugin/reducer'
+import { SavesContext } from './state/saves'
 
 export default function AppTabs() {
   const tab = useLocation().pathname.split('/')[1] || 'home'
@@ -25,6 +26,7 @@ export default function AppTabs() {
   const homeElement = <Home />
 
   const navigate = useNavigate()
+  const { saveChanges } = useContext(SavesContext)
 
   return (
     <Fallback fatal>
@@ -86,6 +88,13 @@ export default function AppTabs() {
               </Tabs.Tab>
             </DebugOnly>
             <Tabs.Indicator />
+            <Button
+              onClick={() => {
+                saveChanges(true)
+              }}
+            >
+              Save
+            </Button>
           </Tabs.IconList>
           <Separator className="Separator" orientation="vertical" />
           <Box style={{ flex: 1, width: '100%', height: '100%', overflowY: 'hidden' }}>

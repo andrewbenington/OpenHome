@@ -102,6 +102,13 @@ function flatMap<T, E, U>(
   return (result) => (isErr(result) ? result : transform(result.data))
 }
 
+function asyncMap<T, E, U>(
+  transform: (val: T) => Promise<U>
+): (result: Result<T, E>) => Promise<Result<U, E>> {
+  return async (result) =>
+    isErr(result) ? Promise.resolve(result) : R.Ok(await transform(result.data))
+}
+
 function asyncFlatMap<T, E, U>(
   transform: (val: T) => Promise<Result<U, E>>
 ): (result: Result<T, E>) => Promise<Result<U, E>> {
@@ -223,6 +230,7 @@ export const R = {
   peekErr,
   mapOr,
   flatMap,
+  asyncMap,
   asyncFlatMap,
   assert,
   orElse,
