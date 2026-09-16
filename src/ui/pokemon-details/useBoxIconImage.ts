@@ -3,13 +3,19 @@ import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { CHAMPS_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { R, Result } from '@openhome-core/util/functional'
-import { getPokemonSpritePath, getSpriteName } from '@openhome-ui/images/pokemon'
+import { getPokemonSpritePathInner, getSpriteName } from '@openhome-ui/images/pokemon'
 import { MonSpriteData } from '@openhome-ui/state/plugin/reducer'
 import { ExtraFormIndex, extraFormSpriteName, MetadataSummaryLookup } from '@pkm-rs/pkg'
 
 export const FormsUsingImages: Map<number, number[]> = new Map([
   [NationalDex.Eevee, [LGE_STARTER]], // Starter Eevee
   [NationalDex.Pichu, [SPIKY_EAR]], // Spiky-eared Pichu
+  // Megas not in Champions
+  [NationalDex.Heatran, [1]],
+  [NationalDex.Darkrai, [1]],
+  [NationalDex.Tatsugiri, [3, 4, 5]],
+  [NationalDex.Magearna, [2, 3]],
+  [NationalDex.Zeraora, [1]],
 ])
 
 const ExtraFormsUsingImages: Set<ExtraFormIndex> = new Set([
@@ -39,13 +45,12 @@ export function boxIconImagePath(mon: MonSpriteData): Result<string, string> {
 
   if (
     !isRestricted(CHAMPS_TRANSFER_RESTRICTIONS, mon.nationalDex, mon.formIndex) &&
-    !formeName?.endsWith(' Z') &&
     !formeName?.startsWith('Mega Raichu') &&
     !formeName?.includes('Battle Bond') &&
     (mon.nationalDex !== NationalDex.Floette || mon.formIndex >= ETERNAL_FLOWER)
   ) {
     const female = mon.isFemale ? '-f' : ''
-    return R.Ok(`sprites/box/${shinyFolder}${sprite}${female}.webp`)
+    return R.Ok(`sprites/box-champions/${shinyFolder}${sprite}${female}.webp`)
   }
 
   const boxIconOverride = FormsUsingImages.get(mon.nationalDex)?.includes(mon.formIndex)
@@ -53,5 +58,5 @@ export function boxIconImagePath(mon: MonSpriteData): Result<string, string> {
     return R.Ok(`icons/box/${getSpriteName(mon)}.webp`)
   }
 
-  return R.Ok(getPokemonSpritePath(mon))
+  return R.Ok(getPokemonSpritePathInner(mon, 'box-home', 'webp'))
 }
