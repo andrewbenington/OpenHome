@@ -222,7 +222,7 @@ impl SignificantUpdate {
             Self::V1_16_0 => Version::parse("1.16.0"),
             Self::V1_17_0 => Version::parse("1.17.0"),
             Self::V1_17_1 => Version::parse("1.17.1"),
-            Self::V1_18_0 => Version::parse("1.18.0-rc.1"),
+            Self::V1_18_0 => Version::parse("1.18.0-rc.2"),
         }
         .expect("all versions are valid semver")
     }
@@ -390,6 +390,12 @@ impl SignificantUpdate {
                 "A affecting Dark- and Steel- type Pokémon in the Gen 2 format has bene fixed.",
             ]),
             Self::V1_18_0 => Some(vec![
+                "Shiny box icons have been added for the newest additions to Pokémon Champions.",
+                "Gender differences are now shown in the box icons (when gendered icons exist).",
+                "Gender differences can be viewed in the Pokédex via a new toggle.",
+                "Box icons can now show Home sprites instead of Home box icons via Settings > General.",
+                "Various missing box icons and Home sprites have been fixed.",
+                "Bugs with Gen 1/2 stat and level calculation have been fixed.",
                 "OHPKM storage has been made asynchronous and dynamically loaded. This should make the app perform better on less powerful hardware, or for users with thousands of tracked mons.",
             ]),
             _ => None,

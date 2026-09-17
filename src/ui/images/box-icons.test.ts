@@ -5,7 +5,6 @@ import { all_species_data, NationalDex } from '@pkm-rs/pkg/pkm_rs'
 import { existsSync } from 'fs'
 import { resolve } from 'path'
 import { describe, expect, test } from 'vitest'
-import { iconType } from './images'
 import { getPokemonSpritePath } from './pokemon'
 
 test('all box icons are present', () => {
@@ -15,15 +14,16 @@ test('all box icons are present', () => {
   const missingSprites: string[] = []
 
   for (let species of allFormData) {
-    for (let form of species.forms.filter(
-      (f) => iconType(species.nationalDex, f.formIndex, undefined) === 'image'
-    )) {
-      const spriteResult = boxIconImagePath({
-        nationalDex: species.nationalDex,
-        formIndex: form.formIndex,
-        format: 'OHPKM',
-        extraFormIndex: undefined,
-      })
+    for (let form of species.forms) {
+      const spriteResult = boxIconImagePath(
+        {
+          nationalDex: species.nationalDex,
+          formIndex: form.formIndex,
+          format: 'OHPKM',
+          extraFormIndex: undefined,
+        },
+        'default'
+      )
       R.match(
         (spritePath: string) => {
           const absolutePath = resolve(projectRoot, 'public', spritePath)
@@ -49,9 +49,7 @@ describe('all home sprites are present', () => {
     const missingSprites: string[] = []
 
     for (let species of allFormData) {
-      for (let form of species.forms.filter(
-        (f) => iconType(species.nationalDex, f.formIndex, undefined) === 'image'
-      )) {
+      for (let form of species.forms) {
         const spritePath = getPokemonSpritePath({
           nationalDex: species.nationalDex,
           formIndex: form.formIndex,
@@ -76,9 +74,7 @@ describe('all home sprites are present', () => {
 
     const species = allFormData[NationalDex.Alcremie]
 
-    for (let form of species.forms.filter(
-      (f) => iconType(species.nationalDex, f.formIndex, undefined) === 'image'
-    )) {
+    for (let form of species.forms) {
       for (const sweet of Object.values(SWEETS).filter((s) => typeof s !== 'string')) {
         const spritePath = getPokemonSpritePath({
           nationalDex: species.nationalDex,

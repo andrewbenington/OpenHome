@@ -104,6 +104,7 @@ const DraggableMon = (props: DraggableMonProps) => {
         nationalDex={mon.nationalDex}
         formIndex={formeNumber}
         isShiny={showShiny && mon.isShiny()}
+        gender={mon.gender}
         isEgg={mon.isEgg}
         heldItemIndex={
           showItem && (!isDragging || dragState.mode !== 'item') ? mon.heldItemIndex : undefined

@@ -10,7 +10,10 @@ export type MonDisplayState = {
   showNotesIndicator: boolean
   showTags: boolean
   showBackgroundColor: boolean
+  boxIconSprites: BoxIconSpriteType
 }
+
+export type BoxIconSpriteType = 'home' | 'default'
 
 export function useMonDisplay() {
   const [{ settings }, dispatchAppInfo] = useContext(AppInfoContext)

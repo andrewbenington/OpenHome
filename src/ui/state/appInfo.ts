@@ -26,7 +26,7 @@ import { XYSAV } from '@openhome-core/save/XYSAV'
 import { MonDisplayState } from '@openhome-ui/hooks/monDisplay'
 import { SaveViewMode } from '@openhome-ui/saves/util'
 import { updateStyleForUiScale } from '@openhome-ui/util/style'
-import { Dispatch, Reducer, createContext, useContext } from 'react'
+import { Dispatch, Reducer, createContext } from 'react'
 
 export const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
   G1SAV,
@@ -51,7 +51,7 @@ export const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
 ]
 const EXTRA_SAVE_TYPES = [G3RRSAV, G3UBSAV, G8LumiSAV, CompassSave]
 
-function initialMonDisplayState() {
+function initialMonDisplayState(): MonDisplayState {
   return {
     filter: {},
     topRightIndicator: null,
@@ -60,6 +60,7 @@ function initialMonDisplayState() {
     showNotesIndicator: true,
     showTags: true,
     showBackgroundColor: true,
+    boxIconSprites: 'default',
   }
 }
 
@@ -236,9 +237,3 @@ export const appInfoInitialState: AppInfoState = {
 export const AppInfoContext = createContext<
   [AppInfoState, Dispatch<AppInfoAction>, () => SAVClass[]]
 >([appInfoInitialState, () => null, () => []])
-
-export function useSettings() {
-  const [{ settings }] = useContext(AppInfoContext)
-
-  return { settings }
-}

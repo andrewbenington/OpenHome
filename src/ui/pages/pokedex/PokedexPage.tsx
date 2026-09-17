@@ -1,3 +1,4 @@
+import { nationalDexHasGenderDifference } from '@openhome-core/pkm/util/index'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import useMonSprite from '@openhome-ui/pokemon-details/useMonSprite'
@@ -10,6 +11,7 @@ import {
   ExtraFormMetadata,
   extraFormsByNationalDex,
   FormMetadata,
+  Gender,
   MetadataSource,
   MetadataSources,
   NationalDex,
@@ -117,10 +119,13 @@ function PokedexDetails({
 }: PokedexDetailsProps) {
   const [imageError, setImageError] = useState(false)
   const [showShiny, setShowShiny] = useState(false)
+  const [showFemale, setShowFemale] = useState(false)
   const [currentView, setCurrentView] = useState<PokedexView>('summary')
   const [metadataSource, setMetadataSource] = useState<MetadataSource | MostCurrentSource>(
     MOST_CURRENT_SOURCE
   )
+
+  const isFemale = showFemale && nationalDexHasGenderDifference(species.nationalDex)
 
   const selectedFormStatus = getFormeStatus(pokedex, species.nationalDex, selectedForm.formIndex)
   const spriteResult = useMonSprite({
@@ -129,6 +134,7 @@ function PokedexDetails({
     format: 'OHPKM',
     isShiny: selectedFormStatus === 'ShinyCaught' && showShiny,
     extraFormIndex: isExtraFormMetadata(selectedForm) ? selectedForm.extraFormIndex : undefined,
+    isFemale,
   })
 
   useEffect(() => {
@@ -152,7 +158,7 @@ function PokedexDetails({
           <div className="pokedex-image-frame">
             {selectedFormStatus === 'ShinyCaught' && (
               <button
-                className="pokedex-shiny-toggle"
+                className="pokedex-toggle pokedex-shiny-toggle"
                 style={{
                   backgroundColor: showShiny ? 'var(--accent-9)' : 'var(--gray-9)',
                 }}
@@ -166,10 +172,22 @@ function PokedexDetails({
                 />
               </button>
             )}
+            {nationalDexHasGenderDifference(species.nationalDex) && (
+              <button
+                className="pokedex-toggle pokedex-gender-toggle"
+                style={{
+                  backgroundColor: showFemale ? 'var(--accent-9)' : 'var(--gray-9)',
+                }}
+                onClick={() => setShowFemale(!showFemale)}
+              >
+                <p>♀</p>
+              </button>
+            )}
             {imageError ? (
               <PokemonIcon
                 nationalDex={species.nationalDex}
                 formIndex={selectedForm.formIndex}
+                gender={isFemale ? Gender.Female : undefined}
                 style={{ width: '90%', height: 0, paddingBottom: '90%' }}
                 silhouette={!selectedFormCaught}
               />
@@ -200,7 +218,7 @@ function PokedexDetails({
             {species.forms.map((form) => (
               <Button
                 className="pokedex-raised-button"
-                key={form.formIndex}
+                key={`${species.nationalDex}~${form.formIndex}`} // must include both or it won't update when the species changes
                 variant={
                   form.formIndex === selectedForm.formIndex && !isExtraFormMetadata(selectedForm)
                     ? 'solid'

@@ -24,7 +24,7 @@ import {
   OriginGames,
 } from '@pkm-rs/pkg'
 import { Button, Flex, Badge as RadixBadge, Spinner, Tooltip } from '@radix-ui/themes'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { TagIcon } from '../../components/TagIcon'
 import useMonSprite from '../useMonSprite'
 import './SummaryTab.css'
@@ -35,6 +35,7 @@ type SummaryDisplayProps = {
 
 const SummaryDisplay = (props: SummaryDisplayProps) => {
   const { mon } = props
+  const [spriteError, setSpriteError] = useState<string>()
 
   const monMetadata = MetadataSummaryLookup(mon.nationalDex, mon.formIndex)
 
@@ -55,18 +56,23 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
   }, [mon, monMetadata])
   const { revertMonAbility } = useSaves()
 
+  const errorMessage = spriteError ?? spriteResult.errorMessage
+
   return (
     <Flex className="pokemon-modal-content" width="100%">
       <Flex direction="column" gap="2" width="24rem">
         <div className="mon-image-container">
           {spriteResult.loading ? (
             <Spinner style={{ margin: 'auto', height: 32 }} />
-          ) : spriteResult.path ? (
+          ) : spriteResult.path && !spriteError ? (
             <img
               className="summary-image"
               draggable={false}
               alt={itemAltText}
               src={spriteResult.path}
+              onError={() =>
+                setSpriteError(`Could not load image: ${decodeURIComponent(spriteResult.path)}`)
+              }
             />
           ) : (
             <PokemonIcon
@@ -80,8 +86,8 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
               }}
             />
           )}
-          {spriteResult.errorMessage && (
-            <Tooltip content={spriteResult.errorMessage}>
+          {errorMessage && (
+            <Tooltip content={errorMessage}>
               <RadixBadge
                 variant="solid"
                 color="tomato"

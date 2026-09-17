@@ -5,6 +5,7 @@ import {
   isMegaStone,
   PkmOrOhpkmFormat,
 } from '@openhome-core/pkm/util'
+import { nationalDexHasGenderDifference } from '@openhome-core/pkm/util/index'
 import { BLOOD_MOON, SWEETS } from '@openhome-core/resources/consts/Forms'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { getLumiFormIndexByExtraFormIndex } from '@openhome-core/save/luminescentplatinum/conversion/LuminescentPlatinumFormMap'
@@ -46,6 +47,30 @@ const fileToSpriteFolder: Record<PkmOrOhpkmFormat, string> = {
 export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {
   const monFormat = format ?? mon.format
 
+  const extraFormSprite = mon.extraFormIndex ? extraFormSpriteName(mon.extraFormIndex) : undefined
+
+  let spriteFolder = extraFormSprite ? 'extra' : fileToSpriteFolder[monFormat as MonFormat]
+
+  const extension =
+    spriteFolder === 'gen3gc'
+      ? 'gif'
+      : spriteFolder === 'home' || spriteFolder === 'extra'
+        ? 'webp'
+        : 'png'
+
+  if (mon.isShiny && spriteFolder !== 'gen1' && spriteFolder !== 'gen9') {
+    spriteFolder += '/shiny'
+  }
+
+  return getPokemonSpritePathInner(mon, spriteFolder, extension, monFormat)
+}
+
+export const getPokemonSpritePathInner = (
+  mon: MonSpriteData,
+  spriteFolder: string,
+  extension: string,
+  monFormat?: string
+) => {
   if (isMegaStone(mon.heldItemIndex)) {
     const megaForStone = MetadataSummaryLookup(mon.nationalDex, mon.formIndex)?.megaEvolutions.find(
       (mega) => mega.requiredItemId === mon.heldItemIndex
@@ -56,9 +81,7 @@ export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {
     mon.formIndex = displayIndexAdder(mon.heldItemIndex)(mon.formIndex)
   }
 
-  let spriteFolder = fileToSpriteFolder[monFormat as MonFormat]
-
-  if (isRomHackFormat(monFormat)) {
+  if (monFormat && isRomHackFormat(monFormat)) {
     const romHackSprite = getRomHackSpritePath(mon)
     if (romHackSprite) return romHackSprite
   }
@@ -72,22 +95,17 @@ export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {
 
   const extraFormSprite = mon.extraFormIndex ? extraFormSpriteName(mon.extraFormIndex) : undefined
 
-  const spriteName = extraFormSprite ?? getSpriteName(mon, monFormat)
+  let spriteName = extraFormSprite ?? getSpriteName(mon, monFormat)
+
+  if (nationalDexHasGenderDifference(mon.nationalDex) && mon.isFemale) {
+    spriteName += '-f'
+  }
 
   if (extraFormSprite) {
     spriteFolder = 'extra'
   }
 
-  const extension =
-    spriteFolder === 'gen3gc'
-      ? 'gif'
-      : spriteFolder === 'home' || spriteFolder === 'extra'
-        ? 'webp'
-        : 'png'
-
-  return `sprites/${spriteFolder}${
-    mon.isShiny && spriteFolder !== 'gen1' && spriteFolder !== 'gen9' ? '/shiny/' : '/'
-  }${spriteName}.${extension}`
+  return `sprites/${spriteFolder}/${spriteName}.${extension}`
 }
 
 export function getSpriteName(mon: MonSpriteData, format?: string): string {

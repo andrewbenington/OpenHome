@@ -13,7 +13,7 @@ import Home from './pages/home/Home'
 import LogsPage from './pages/logs/LogsPage'
 import PluginsPage from './pages/plugins/Plugins'
 import PokedexPage from './pages/pokedex/PokedexPage'
-import Settings from './pages/Settings'
+import SettingsPage from './pages/Settings'
 import SortPokemon from './pages/sort/SortPokemon'
 import TrackedPokemonPage from './pages/tracked/TrackedPokemonPage'
 import { PluginContext } from './state/plugin/reducer'
@@ -107,7 +107,7 @@ export default function AppTabs() {
                 <Route path="/pokedex" element={<PokedexPage />} />
                 <Route path="/plugins/*" element={<PluginsPage />} />
                 <Route path="/logs/*" element={<LogsPage />} />
-                <Route path="/settings/*" element={<Settings />} />
+                <Route path="/settings/*" element={<SettingsPage />} />
                 {useIsDebug() && (
                   <>
                     <Route path="/state" element={<AppStateDisplay />} />

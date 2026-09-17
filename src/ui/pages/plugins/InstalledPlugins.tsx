@@ -1,10 +1,10 @@
 import useBackend from '@openhome-core/backend/useBackend'
 import { R } from '@openhome-core/util/functional'
 import useDisplayError from '@openhome-ui/hooks/displayError'
-import { AppInfoContext } from '@openhome-ui/state/appInfo'
+import { AppInfoContext, Settings as SettingsType } from '@openhome-ui/state/appInfo'
 import { OpenHomePlugin, PluginContext } from '@openhome-ui/state/plugin/reducer'
 import { Badge, Spinner } from '@radix-ui/themes'
-import { useCallback, useContext, useEffect, useEffectEvent, useMemo, useState } from 'react'
+import { useContext, useEffect, useEffectEvent, useMemo, useState } from 'react'
 import { MdDelete } from 'react-icons/md'
 import { CURRENT_PLUGIN_API_VERSION } from './Plugins'
 import './style.css'
@@ -52,22 +52,17 @@ function InstalledPluginCard(props: { metadata: OpenHomePlugin; onDelete: (id: s
     return settings.enabledPlugins[metadata.id]
   }, [metadata, settings.enabledPlugins])
 
-  const enablePlugin = useCallback(() => {
-    dispatchAppInfoState({
-      type: 'set_plugin_enabled',
-      payload: { pluginID: metadata.id, enabled: true },
-    })
-  }, [dispatchAppInfoState, metadata.id])
+  async function updateSettings(newSettings: Partial<SettingsType>) {
+    const updated = { ...settings, ...newSettings }
+    await backend.updateSettings(updated).catch(console.error)
+  }
 
   const handleCardClick = () => {
-    if (enabled) {
-      dispatchAppInfoState({
-        type: 'set_plugin_enabled',
-        payload: { pluginID: metadata.id, enabled: false },
-      })
-    } else {
-      enablePlugin()
-    }
+    dispatchAppInfoState({
+      type: 'set_plugin_enabled',
+      payload: { pluginID: metadata.id, enabled: !enabled },
+    })
+    updateSettings({ enabledPlugins: { ...settings.enabledPlugins, [metadata.id]: !enabled } })
   }
 
   return (
