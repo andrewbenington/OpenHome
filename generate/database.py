@@ -28,11 +28,13 @@ def get_species(conn: sqlite3.Connection):
 
     return all_species
 
+
 all_species: list[SpeciesWithForms] = []
+
 
 def get_species_name(national_dex: int) -> str:
     global all_species
-    
+
     if not len(all_species):
         with sqlite3.connect("pkm.db") as conn:
             all_species = get_species(conn)

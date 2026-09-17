@@ -8,6 +8,7 @@ dependencies = [
     "beautifulsoup4>=4.14.3",
     "pydantic>=2.12.5",
     "requests>=2.34.2",
+    "ty>=0.0.81",
 ]
 
 [dependency-groups]

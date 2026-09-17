@@ -1,16 +1,16 @@
 import json
+import logging
 import os
 import re
+import sys
 import threading
 import urllib.request
 
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, ResultSet, Tag
 from mega_stones import MEGA_STONES_ZA
 
-# if not os.path.isdir('src/renderer/public'):
-#     print("current directory must be project source. aborting")
-#     exit(1)
+logger = logging.getLogger(__name__)
 
 ROOT_DIR = "out"
 
@@ -35,7 +35,17 @@ def getPokeSpriteMap():
         return json.loads(response.content)
     else:
         print("Error fetching item map. Status code:", response.status_code)
-        exit()
+        sys.exit()
+
+
+def image_src_from_columns(columns: ResultSet[Tag]):
+    if (
+        len(columns) >= 3
+        and (image := columns[2].find("img"))
+        and (sprite_uri := image["src"])
+        and (sprite_uri and isinstance(sprite_uri, str))
+    ):
+        return "https:" + sprite_uri
 
 
 def scrape_bulbapedia_gen_9():
@@ -50,35 +60,43 @@ def scrape_bulbapedia_gen_9():
     table = soup.find("table", class_="sortable")
 
     if not table:
-        print("Could not find the table. Exiting.")
-        exit()
+        logger.error("Could not find the table. Exiting.")
+        sys.exit()
 
     # Loop through each row in the table
     for row in table.find_all("tr")[1:]:
         # Extract the columns for each row
-        columns = row.find_all("td")
-        if len(columns) > 0:
-            # Extract the item index, name, and type
-            filename = f"{int(columns[0].text.strip()):04}.png"
-            sprite_src = "https:" + columns[2].find("img")["src"]
-            name = columns[3].text.strip()
-            directory = "src/renderer/public/items/index/"
-            if name.startswith("TM") and "Bag_TM_" in sprite_src:
-                directory = "src/renderer/public/items/tm/"
-                filename = sprite_src.split("Bag_TM_")[1].split("_")[0].lower() + ".png"
-            elif "TM_Material_Sprite" in sprite_src:
-                directory = "src/renderer/public/items/shared"
-                filename = "tm-material.png"
-            elif "Picnic_Set" in sprite_src:
-                directory = "src/renderer/public/items/shared"
-                filename = "picnic-set.png"
-            elif "Bag_None_Sprite" in sprite_src:
-                continue
 
-            thread = threading.Thread(
-                target=download_png, args=(sprite_src, directory, filename)
-            )
-            thread.start()
+        cells = row.find_all("td")
+
+        sprite_src = image_src_from_columns(cells)
+        if not sprite_src:
+            continue
+
+        # Extract the item index, name, and type
+        filename = f"{int(cells[0].text.strip()):04}.png"
+        sprite_src = image_src_from_columns(cells)
+        if not sprite_src:
+            continue
+
+        name = cells[3].text.strip()
+        directory = "src/renderer/public/items/index/"
+        if name.startswith("TM") and "Bag_TM_" in sprite_src:
+            directory = "src/renderer/public/items/tm/"
+            filename = sprite_src.split("Bag_TM_")[1].split("_")[0].lower() + ".png"
+        elif "TM_Material_Sprite" in sprite_src:
+            directory = "src/renderer/public/items/shared"
+            filename = "tm-material.png"
+        elif "Picnic_Set" in sprite_src:
+            directory = "src/renderer/public/items/shared"
+            filename = "picnic-set.png"
+        elif "Bag_None_Sprite" in sprite_src:
+            continue
+
+        thread = threading.Thread(
+            target=download_png, args=(sprite_src, directory, filename)
+        )
+        thread.start()
 
 
 def scrape_bulbapedia_gen_8():
@@ -91,59 +109,62 @@ def scrape_bulbapedia_gen_8():
 
     # Find the table on the page
     table = soup.find("table", class_="sortable")
+    if not table:
+        logger.warning("scrape_bulbapedia_gen_8 failed to find a table")
+        return
 
     # Loop through each row in the table
     for row in table.find_all("tr")[1:]:
         # Extract the columns for each row
-        columns = row.find_all("td")
-        if len(columns) > 0:
-            try:
-                # Extract the item index, name, and type
-                filename = f"{int(columns[0].text.strip()):04}.png"
-                sprite_src = "https:" + columns[2].find("img")["src"]
-                name = columns[3].text.strip()
-                if name in ["???", "[[]]"]:
-                    continue
-                directory = "src/renderer/public/items/index/"
-                if name.startswith("TM") and "TMV" not in name:
-                    directory = "src/renderer/public/items/tm/"
-                    filename = (
-                        sprite_src.split("Bag_TM_")[1].split("_")[0].lower() + ".png"
-                    )
-                elif name.startswith("TR"):
-                    directory = "src/renderer/public/items/tr/"
-                    filename = (
-                        sprite_src.split("Bag_TR_")[1].split("_")[0].lower() + ".png"
-                    )
-                elif name.startswith("HM"):
-                    continue
-                elif "TM_Material_Sprite" in sprite_src:
-                    directory = "src/renderer/public/items/shared"
-                    filename = "tm-material.png"
-                elif "Picnic_Set" in sprite_src:
-                    directory = "src/renderer/public/items/shared"
-                    filename = "picnic-set.png"
-                elif name.startswith("Data Card"):
-                    directory = "src/renderer/public/items/shared"
-                    filename = "data-card.png"
-                elif "Dynamax_Crystal" in sprite_src:
-                    directory = "src/renderer/public/items/shared"
-                    filename = "dynamax-crystal.png"
-                elif name.startswith("Recipe:"):
-                    directory = "src/renderer/public/items/shared"
-                    filename = "recipe.png"
-                elif name == "Lost Satchel":
-                    directory = "src/renderer/public/items/shared"
-                    filename = "lost-satchel.png"
-                elif name.startswith("Old Verse"):
-                    directory = "src/renderer/public/items/shared"
-                    filename = "old-verse.png"
-                thread = threading.Thread(
-                    target=download_png, args=(sprite_src, directory, filename)
-                )
-                thread.start()
-            except Exception as error:
-                print(error)
+        cells = row.find_all("td")
+        try:
+            sprite_src = image_src_from_columns(cells)
+            if not sprite_src:
+                continue
+
+            # Extract the item index, name, and type
+            filename = f"{int(cells[0].text.strip()):04}.png"
+
+            name = cells[3].text.strip()
+            if name in ["???", "[[]]"]:
+                continue
+
+            directory = "src/renderer/public/items/index/"
+            if name.startswith("TM") and "TMV" not in name:
+                directory = "src/renderer/public/items/tm/"
+                filename = sprite_src.split("Bag_TM_")[1].split("_")[0].lower() + ".png"
+            elif name.startswith("TR"):
+                directory = "src/renderer/public/items/tr/"
+                filename = sprite_src.split("Bag_TR_")[1].split("_")[0].lower() + ".png"
+            elif name.startswith("HM"):
+                continue
+            elif "TM_Material_Sprite" in sprite_src:
+                directory = "src/renderer/public/items/shared"
+                filename = "tm-material.png"
+            elif "Picnic_Set" in sprite_src:
+                directory = "src/renderer/public/items/shared"
+                filename = "picnic-set.png"
+            elif name.startswith("Data Card"):
+                directory = "src/renderer/public/items/shared"
+                filename = "data-card.png"
+            elif "Dynamax_Crystal" in sprite_src:
+                directory = "src/renderer/public/items/shared"
+                filename = "dynamax-crystal.png"
+            elif name.startswith("Recipe:"):
+                directory = "src/renderer/public/items/shared"
+                filename = "recipe.png"
+            elif name == "Lost Satchel":
+                directory = "src/renderer/public/items/shared"
+                filename = "lost-satchel.png"
+            elif name.startswith("Old Verse"):
+                directory = "src/renderer/public/items/shared"
+                filename = "old-verse.png"
+            thread = threading.Thread(
+                target=download_png, args=(sprite_src, directory, filename)
+            )
+            thread.start()
+        except Exception as error:  # noqa: BLE001
+            print(error)
 
 
 def scrape_bulbapedia_gen_3():
@@ -157,13 +178,26 @@ def scrape_bulbapedia_gen_3():
     # Find the table on the page
     table = soup.find("table", class_="sortable")
 
-    # Loop through each row in the table
+    if not table:
+        return
+
+    # Find all cells in the table with associated ids and images.
+    # Save these files locally, named after the id.
     for row in table.find_all("tr")[1:]:
-        # Extract the columns for each row
         columns = row.find_all("td")
         if len(columns) > 0:
-            # Extract the item index, name, and type
-            sprite_src = "https:" + columns[2].find("img")["src"]
+            sprite_src = image_src_from_columns(columns)
+            if not sprite_src:
+                continue
+            image = columns[2].find("img")
+            if not image:
+                continue
+
+            sprite_uri = image["src"]
+            if not sprite_uri or not isinstance(sprite_uri, str):
+                continue
+
+            sprite_src = "https:" + sprite_uri
             name = columns[3].text.strip()
             if name[-1] == "*":
                 name = name[:-1]
@@ -198,8 +232,6 @@ def scrape_bulbapedia_gen_3():
 
 
 def scrape_bulbapedia_mega_stones():
-    prefix = "out/items"
-
     # Set the URL of the Bulbapedia page
     sprite_src = "https://bulbapedia.bulbagarden.net/wiki/Mega_Stone"
 
@@ -212,7 +244,7 @@ def scrape_bulbapedia_mega_stones():
 
     if not table:
         print("Could not find the table. Exiting.")
-        exit()
+        sys.exit()
 
     # Loop through each row in the table
     for row in table.find_all("img", class_="mw-file-element"):
@@ -220,7 +252,7 @@ def scrape_bulbapedia_mega_stones():
         if not isinstance(sprite_src, str):
             continue
 
-        (index, name) = next(
+        index, name = next(
             (
                 stone
                 for stone in MEGA_STONES_ZA
@@ -256,11 +288,9 @@ def download_png(url, directory, filename, overwrite=False):
         urllib.request.urlretrieve(url, os.path.join(directory, filename))
         print(f"\tDownloaded {filename} to {directory}")
         return True, False
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         print(f"\tError downloading: {e}")
         return True, "404" not in str(e)
-    # print(f"{filename} from {url}")
-    # return False, False
 
 
 # scrape_bulbapedia_gen_9()
