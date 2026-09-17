@@ -218,7 +218,7 @@ function PokedexDetails({
             {species.forms.map((form) => (
               <Button
                 className="pokedex-raised-button"
-                key={form.formIndex}
+                key={`${species.nationalDex}~${form.formIndex}`} // must include both or it won't update when the species changes
                 variant={
                   form.formIndex === selectedForm.formIndex && !isExtraFormMetadata(selectedForm)
                     ? 'solid'
