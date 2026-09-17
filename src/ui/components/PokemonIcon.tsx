@@ -5,7 +5,7 @@ import { getItemIconPath } from '@openhome-ui/images/items'
 import { getPokemonSpritePathInner } from '@openhome-ui/images/pokemon'
 import { ExtraFormIndex, Gender, NationalDex } from '@pkm-rs/pkg'
 import { HTMLAttributes, memo, MouseEventHandler, ReactNode, useState } from 'react'
-import { MonDisplayState, useMonDisplay } from '../hooks/monDisplay'
+import { BoxIconSpriteType, MonDisplayState, useMonDisplay } from '../hooks/monDisplay'
 import { boxIconImagePath } from '../pokemon-details/useBoxIconImage'
 import { classNames, grayscaleIf } from '../util/style'
 import { MonTag } from '../util/tags'
@@ -40,14 +40,14 @@ const PokemonIcon = memo((props: PokemonIconProps) => {
     style,
     ...iconProps
   } = props
-  const { showNotesIndicator, showTags } = useMonDisplay()
+  const { showNotesIndicator, showTags, boxIconSprites } = useMonDisplay()
 
   return (
     <div
       className={classNames('pokemon-icon-container', grayscaleIf(grayedOut), 'flex-centered')}
       style={style}
     >
-      {!onlyItem && <PokemonIconImage {...iconProps} />}
+      {!onlyItem && <PokemonIconImage {...iconProps} spriteType={boxIconSprites} />}
       {props.isShiny && (
         <img
           alt="shiny icon"
@@ -90,20 +90,24 @@ interface PokemonIconImageProps {
   isShiny?: boolean
   gender?: Gender
   onClick?: MouseEventHandler
+  spriteType: BoxIconSpriteType
 }
 
 const DEFAULT_BOX_ICON = `/items/index/0000.png`
 
 function getBoxIconImage(props: PokemonIconImageProps) {
   return $R(
-    boxIconImagePath({
-      nationalDex: props.nationalDex,
-      formIndex: props.formIndex ?? 0,
-      format: 'OHPKM',
-      extraFormIndex: props.extraFormIndex,
-      isShiny: props.isShiny,
-      isFemale: props.gender === Gender.Female,
-    })
+    boxIconImagePath(
+      {
+        nationalDex: props.nationalDex,
+        formIndex: props.formIndex ?? 0,
+        format: 'OHPKM',
+        extraFormIndex: props.extraFormIndex,
+        isShiny: props.isShiny,
+        isFemale: props.gender === Gender.Female,
+      },
+      props.spriteType
+    )
   )
 }
 

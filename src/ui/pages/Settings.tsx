@@ -1,8 +1,10 @@
 import useBackend from '@openhome-core/backend/useBackend'
 import { R } from '@openhome-core/util/functional'
+import { $O } from '@openhome-core/util/option'
 import { stringSorter } from '@openhome-core/util/sort'
 import ContentCard from '@openhome-ui/components/ContentCard'
 import SideTabNavigation from '@openhome-ui/components/side-tabs/SideTabNavigation'
+import { BoxIconSpriteType } from '@openhome-ui/hooks/monDisplay'
 import useSettings from '@openhome-ui/hooks/settings'
 import { AppTheme } from '@openhome-ui/state/appInfo'
 import {
@@ -22,7 +24,7 @@ import useDisplayError from '../hooks/displayError'
 import { ConvertStrategyKey, useConvertStrategies } from '../state/convert-strategies'
 import './Settings.css'
 
-export default function Settings() {
+export default function SettingsPage() {
   return (
     <SideTabNavigation
       defaultTab="general"
@@ -44,7 +46,7 @@ export default function Settings() {
 }
 
 function GeneralSettings() {
-  const { settings, extraSaveTypes, updateSettings } = useSettings()
+  const { settings, extraSaveTypes, updateSettings, updateMonDisplayState } = useSettings()
   const backend = useBackend()
   const [dataDirPath, setDataDirPath] = useState<string>()
   const displayError = useDisplayError()
@@ -92,6 +94,22 @@ function GeneralSettings() {
             <RadioGroup.Item value="system">System</RadioGroup.Item>
             <RadioGroup.Item value="light">Light</RadioGroup.Item>
             <RadioGroup.Item value="dark">Dark</RadioGroup.Item>
+          </RadioGroup.Root>
+        </div>
+        <div>
+          <GroupHeader name="Box Icon Sprites" />
+          <RadioGroup.Root
+            onValueChange={async (newValue: string) => {
+              if (!newValue) return
+              await updateMonDisplayState({
+                boxIconSprites: newValue as BoxIconSpriteType,
+              })
+            }}
+            value={$O(settings.monDisplayState.boxIconSprites).orElse('default')}
+            style={{ margin: 8 }}
+          >
+            <RadioGroup.Item value="default">Home Icons (default)</RadioGroup.Item>
+            <RadioGroup.Item value="home">Full Home Sprites</RadioGroup.Item>
           </RadioGroup.Root>
         </div>
         <div>

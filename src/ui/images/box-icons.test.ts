@@ -18,12 +18,15 @@ test('all box icons are present', () => {
     for (let form of species.forms.filter(
       (f) => iconType(species.nationalDex, f.formIndex, undefined) === 'image'
     )) {
-      const spriteResult = boxIconImagePath({
-        nationalDex: species.nationalDex,
-        formIndex: form.formIndex,
-        format: 'OHPKM',
-        extraFormIndex: undefined,
-      })
+      const spriteResult = boxIconImagePath(
+        {
+          nationalDex: species.nationalDex,
+          formIndex: form.formIndex,
+          format: 'OHPKM',
+          extraFormIndex: undefined,
+        },
+        'default'
+      )
       R.match(
         (spritePath: string) => {
           const absolutePath = resolve(projectRoot, 'public', spritePath)

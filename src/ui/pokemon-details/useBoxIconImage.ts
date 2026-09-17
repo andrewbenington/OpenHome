@@ -4,7 +4,12 @@ import { NationalDex } from '@openhome-core/resources//consts/NationalDex'
 import { CHAMPS_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { R, Result } from '@openhome-core/util/functional'
-import { getPokemonSpritePathInner, getSpriteName } from '@openhome-ui/images/pokemon'
+import { BoxIconSpriteType } from '@openhome-ui/hooks/monDisplay'
+import {
+  getPokemonSpritePath,
+  getPokemonSpritePathInner,
+  getSpriteName,
+} from '@openhome-ui/images/pokemon'
 import { MonSpriteData } from '@openhome-ui/state/plugin/reducer'
 import { ExtraFormIndex, extraFormSpriteName, MetadataSummaryLookup } from '@pkm-rs/pkg'
 
@@ -30,8 +35,15 @@ const ExtraFormsUsingImages: Set<ExtraFormIndex> = new Set([
   ExtraFormIndex.GengarStitched,
 ])
 
-export function boxIconImagePath(mon: MonSpriteData): Result<string, string> {
+export function boxIconImagePath(
+  mon: MonSpriteData,
+  spriteType: BoxIconSpriteType
+): Result<string, string> {
   const shinyFolder = mon.isShiny ? 'shiny/' : ''
+  if (spriteType === 'home') {
+    return R.Ok(getPokemonSpritePath(mon, 'OHPKM'))
+  }
+
   if (mon.extraFormIndex && ExtraFormsUsingImages.has(mon.extraFormIndex)) {
     const extraFormSprite = extraFormSpriteName(mon.extraFormIndex)
     return R.Ok(`icons/box/${extraFormSprite}.webp`)
