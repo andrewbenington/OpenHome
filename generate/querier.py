@@ -41,13 +41,6 @@ class PokemonSpriteGroup(BaseModel):
     def file_exists_png_or_webp(self, directory: str, form: PokemonForm) -> bool:
         gender = "-f" if self.is_female else ""
         subdirectory = self.subdirectory(directory)
-        if not (
-            (subdirectory / self.filename(form)).exists()
-            or (subdirectory / f"{form.sprite_name}{gender}.webp").exists()
-        ):
-            logger.error(
-                f"NOT FOUND: {(subdirectory / self.filename(form))} OR {subdirectory / f"{form.sprite_name}{gender}.webp"}"
-            )
 
         return (
             (subdirectory / self.filename(form)).exists()
@@ -62,6 +55,7 @@ class PokemonSpriteGroup(BaseModel):
         if self.is_female:
             return (
                 include_female
+                and self.sprite_source.has_female()
                 and form.form_index == 0
                 and not form.name.endswith("-f")
                 and form.national_dex in GENDER_DIFFERENCES
@@ -255,6 +249,9 @@ class SpriteSource(StrEnum):
 
     def has_shinies(self) -> bool:
         return self != SpriteSource.RED_BLUE and self != SpriteSource.SCARLET_VIOLET
+    
+    def has_female(self) -> bool:
+        return self != SpriteSource.RED_BLUE and self != SpriteSource.CHAMPIONS
 
 
 class SpriteArchive(StrEnum):
