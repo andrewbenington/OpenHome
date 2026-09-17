@@ -1,5 +1,5 @@
 import { nationalDexHasGenderFormDifference } from '@openhome-core/pkm/util/index'
-import { ETERNAL_FLOWER, LGE_STARTER, SPIKY_EAR } from '@openhome-core/resources//consts/Forms'
+import { LGE_STARTER, SPIKY_EAR } from '@openhome-core/resources//consts/Forms'
 import { NationalDex } from '@openhome-core/resources//consts/NationalDex'
 import { CHAMPS_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
@@ -58,9 +58,7 @@ export function boxIconImagePath(
 
   if (
     !isRestricted(CHAMPS_TRANSFER_RESTRICTIONS, mon.nationalDex, mon.formIndex) &&
-    !formeName?.startsWith('Mega Raichu') &&
-    !formeName?.includes('Battle Bond') &&
-    (mon.nationalDex !== NationalDex.Floette || mon.formIndex >= ETERNAL_FLOWER)
+    !formeName?.includes('Battle Bond')
   ) {
     const female =
       mon.isFemale &&

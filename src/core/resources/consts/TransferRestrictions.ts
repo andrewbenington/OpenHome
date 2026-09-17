@@ -495,5 +495,6 @@ export const CHAMPS_TRANSFER_RESTRICTIONS: TransferRestrictions = {
     [NationalDex.Qwilfish]: [HISUI],
     [NationalDex.Greninja]: [GRENINJA_ASH],
     [NationalDex.Floette]: [0, 1, 2, 3, 4],
+    [NationalDex.MrMime]: [GALAR],
   },
 }
