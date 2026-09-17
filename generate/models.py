@@ -2,12 +2,9 @@ import logging
 import re
 from enum import Enum
 
-import requests
-from bs4 import BeautifulSoup
 from pydantic import BaseModel, Field
 
-from national_dex import NationalDex
-from querier import PokemonSpriteGroup, SpriteSource
+from national_dex import IN_CHAMPIONS, NationalDex
 
 logger = logging.getLogger(__name__)
 
@@ -79,33 +76,6 @@ sweets = [
     "ribbon",
 ]
 
-
-# fmt: off
-GENDER_DIFFERENCES = [
-    3, 12, 19, 20, 25, 26, 41, 42, 44, 45, 64, 65, 84, 85, 97, 111, 112, 118,
-    119, 123, 129, 130, 133, 154, 165, 166, 178, 185, 186, 190, 194, 195, 198,
-    202, 203, 207, 208, 212, 214, 215, 215, 217, 221, 224, 229, 232, 255, 256,
-    257, 267, 269, 272, 274, 275, 307, 308, 315, 316, 317, 322, 323, 332, 350,
-    369, 396, 397, 398, 399, 400, 401, 402, 403, 404, 405, 407, 415, 417, 418,
-    419, 424, 443, 444, 445, 449, 450, 453, 454, 456, 457, 459, 460, 461, 464,
-    465, 473, 521, 592, 593, 668, 876, 902]
-
-
-
-IN_CHAMPIONS = [
-    3, 6, 9, 15, 18, 24, 25, 26, 36, 38, 45, 59, 65, 68, 71, 80, 94, 115, 121, 127, 128, 130, 132,
-    134, 135, 136, 142, 143, 149, 154, 157, 160, 168, 181, 184, 186, 196, 197, 199, 205, 208, 211,
-    212, 214, 227, 229, 248, 254, 257, 260, 279, 282, 302, 303, 306, 308, 310, 319, 323, 324, 334,
-    350, 351, 354, 358, 359, 362, 376, 389, 392, 395, 398, 405, 407, 409, 411, 428, 442, 445, 448,
-    450, 454, 460, 461, 464, 470, 471, 472, 473, 475, 478, 479, 497, 500, 503, 505, 510, 512, 514,
-    516, 518, 530, 531, 534, 545, 547, 553, 560, 563, 569, 571, 579, 584, 587, 604, 609, 614, 618,
-    623, 635, 637, 652, 655, 658, 660, 663, 666, 668, 670, 671, 675, 676, 678, 681, 683, 685, 687, 
-    689, 691, 693, 695, 697, 699, 700, 701, 702, 706, 707, 709, 711, 713, 715, 724, 727, 730, 733, 
-    740, 745, 748, 750, 752, 758, 763, 765, 766, 778, 780, 784, 823, 841, 842, 844, 855, 858, 861, 
-    866, 867, 869, 870, 877, 887, 899, 900, 902, 903, 904, 908, 911, 914, 925, 934, 936, 937, 939,
-    952, 956, 959, 964, 968, 970, 972, 979, 981, 983, 1000, 1013, 1018, 1019, 40, 53, 83, 122, 317,
-    373, 673, 768, 812, 815, 818, 828, 849, 853, 863, 865, 871, 876, 930, 931, 943, 998]
-# fmt: on
 
 
 class SimplePokemonForm(BaseModel):
@@ -219,137 +189,6 @@ class PokemonForm(SimplePokemonForm):
             return self.sprite_name[:-8] + "qm"
 
         return formatted
-
-    def pokemon_db_sprite_url(
-        self, is_shiny: bool, source: SpriteSource, is_female=False
-    ) -> str:
-        form_name: str = self.pokemon_db_format()
-        female_stats = ["indeedee-f", "meowstic-f", "oinkologne-f", "basculegion-f"]
-        if (
-            source == SpriteSource.HOME
-            or source == SpriteSource.SCARLET_VIOLET
-            and form_name in female_stats
-        ):
-            form_name += "emale"
-        elif source == SpriteSource.BANK and form_name.endswith("-core"):
-            form_name = form_name[:-5]
-        elif form_name == "pikachu-partner-cap":
-            form_name = "pikachu-johto-cap"
-        elif source == SpriteSource.BLACK_WHITE and (
-            "therian" in form_name or "kyurem-" in form_name or "resolute" in form_name
-        ):
-            source = SpriteSource.BLACK_WHITE_2
-        elif source == SpriteSource.RED_BLUE:
-            form_name += "-color"
-        elif source == SpriteSource.BLACK_WHITE and "darmanitan" in form_name:
-            form_name += "-mode"
-        if (
-            self.national_dex == NationalDex.OGERPON
-            and source == SpriteSource.SCARLET_VIOLET
-        ):
-            form_name = form_name.removesuffix("-mask")
-        if form_name.endswith("-four") and source == SpriteSource.SCARLET_VIOLET:
-            form_name = form_name.replace("-four", "-family4")
-        if "-core-" in form_name and source == SpriteSource.SCARLET_VIOLET:
-            form_name = form_name.replace("core-", "") + "-core"
-        shininess = "normal" if not is_shiny or not source.has_shinies() else "shiny"
-        female_tag = (
-            "-female"
-            if is_female and form_name in female_stats
-            else ("-f" if is_female else "")
-        )
-        return f"https://img.pokemondb.net/sprites/{source.pokemondb_dir()}/{shininess}/{form_name}{female_tag}{source.file_extension()}"
-
-    def bulbagarden_sprite_url(self, group: PokemonSpriteGroup) -> str | None:
-        # if self.introduced_gen != 9 or not self.is_mega:
-        #     return None
-        segments = self.name.split("-")
-        forme_name = "-" + "_".join(segments[1:]).replace("%", "_Percent").replace(
-            "keball", "ké_Ball"
-        ).replace("Paldea_Fire", "Paldea_Blaze").replace(
-            "Paldea_Water", "Paldea_Aqua"
-        ).replace(
-            "_Striped", ""
-        ).replace(
-            " ", "_"
-        )
-        if "Totem" in forme_name:
-            return ""
-        if forme_name in ["-Meadow", "-Four"]:
-            forme_name = ""
-        elif "Pikachu-" in self.name:
-            forme_name = forme_name[1:2]
-        elif forme_name == "-La Reine":
-            forme_name = "-La_Reine"
-        elif (
-            "_Cream" in forme_name
-            or "Caramel_Swirl" in forme_name
-            or "Rainbow_Swirl" in forme_name
-        ) and group.sprite_source != SpriteSource.CHAMPIONS:
-            forme_name = forme_name[:-6]
-        elif self.name == "Tauros-Paldea":
-            forme_name = "-Paldea_Combat"
-        elif forme_name == "-Galar_Zen":
-            forme_name = "GZ"
-        elif forme_name == "-Original":
-            forme_name = "-Original_Color"
-        elif forme_name == "-Male_Mega" or forme_name == "-Female_Mega":
-            forme_name = "-Mega"
-        elif "-Mega_" in forme_name:
-            forme_name = forme_name.replace("-Mega_", "M")
-        elif "-Eternal" in forme_name:
-            forme_name = "E"
-        elif group.is_female:
-            forme_name = "_f"
-
-        if group.sprite_source == SpriteSource.CHAMPIONS:
-            if forme_name == "-Super":
-                forme_name = "-Jumbo"
-            elif forme_name == "-Masterpiece" or "-Busted" in forme_name:
-                forme_name = ""
-
-        shiny_suffix = "_s" if group.is_shiny else ""
-
-        if group.sprite_source == SpriteSource.HOME and "Vivillon" in self.name:
-            forme_name = forme_name[1:4]
-            shiny_suffix = "_s" if group.is_shiny else ""
-
-        form_suffix = (
-            ""
-            if self.form_index == 0
-            and not (
-                self.national_dex == 666 or self.national_dex == 671 or group.is_female
-            )
-            else forme_name
-        )
-
-        bulbaFilePage = f"https://archives.bulbagarden.net/wiki/File:{group.sprite_source.prefix()}{str(self.national_dex).zfill(4)}{form_suffix}{shiny_suffix}.png"
-
-        return self.bulbagarden_image_url_from_page(bulbaFilePage)
-
-    @staticmethod
-    def bulbagarden_image_url_from_page(url: str) -> str | None:
-        # Send an HTTP request to the URL and get the page content
-        response = requests.get(url)
-        page_content = response.text
-
-        # Create a BeautifulSoup object to parse the page content
-        soup = BeautifulSoup(page_content, "html.parser")
-
-        # Find the first image whose alt attribute starts with "File:"
-        target_img = None
-
-        for img in soup.find_all("img"):
-            alt_text = img.get("alt")
-            if alt_text and str(alt_text).startswith("File:"):
-                target_img = img
-                break
-
-        # If a matching image is found, download it
-        if target_img:
-            return str(target_img.get("src"))
-
-        logger.error(f"no image found for {url}")
 
     def gen3_form(self) -> str | None:
         if self.form_index > 0 or self.national_dex == 201:
