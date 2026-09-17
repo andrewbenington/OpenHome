@@ -1,3 +1,5 @@
+import { NationalDex } from '@pkm-rs/pkg'
+
 export * from './interfaces'
 export * from './pkmInterface'
 export * from './ribbonLogic'
@@ -13,4 +15,18 @@ const GENDER_DIFFERENCE_NATIONAL_DEX = [
 
 export function nationalDexHasGenderDifference(nationalDex: number): boolean {
   return GENDER_DIFFERENCE_NATIONAL_DEX.includes(nationalDex)
+}
+
+const GENDER_FORM_DIFFERENCE_NATIONAL_DEX = [
+  NationalDex.Frillish,
+  NationalDex.Jellicent,
+  NationalDex.Pyroar,
+  NationalDex.Meowstic,
+  NationalDex.Indeedee,
+  NationalDex.Basculegion,
+  NationalDex.Oinkologne,
+]
+
+export function nationalDexHasGenderFormDifference(nationalDex: number): boolean {
+  return GENDER_FORM_DIFFERENCE_NATIONAL_DEX.includes(nationalDex)
 }

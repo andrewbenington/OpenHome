@@ -1,4 +1,4 @@
-import { nationalDexHasGenderDifference } from '@openhome-core/pkm/util/index'
+import { nationalDexHasGenderFormDifference } from '@openhome-core/pkm/util/index'
 import { ETERNAL_FLOWER, LGE_STARTER, SPIKY_EAR } from '@openhome-core/resources//consts/Forms'
 import { NationalDex } from '@openhome-core/resources//consts/NationalDex'
 import { CHAMPS_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
@@ -52,7 +52,7 @@ export function boxIconImagePath(mon: MonSpriteData): Result<string, string> {
   ) {
     const female =
       mon.isFemale &&
-      nationalDexHasGenderDifference(mon.nationalDex) &&
+      nationalDexHasGenderFormDifference(mon.nationalDex) &&
       mon.formIndex === 0 &&
       !mon.extraFormIndex
         ? '-f'
@@ -61,10 +61,12 @@ export function boxIconImagePath(mon: MonSpriteData): Result<string, string> {
     return R.Ok(`sprites/box-champions/${shinyFolder}${sprite}${female}.webp`)
   }
 
+  const monWithoutGender = { ...mon, isFemale: false }
+
   const boxIconOverride = FormsUsingImages.get(mon.nationalDex)?.includes(mon.formIndex)
   if (boxIconOverride) {
-    return R.Ok(`icons/box/${getSpriteName(mon)}.webp`)
+    return R.Ok(`icons/box/${getSpriteName(monWithoutGender)}.webp`)
   }
 
-  return R.Ok(getPokemonSpritePathInner(mon, 'box-home', 'webp'))
+  return R.Ok(getPokemonSpritePathInner(monWithoutGender, 'box-home', 'webp'))
 }

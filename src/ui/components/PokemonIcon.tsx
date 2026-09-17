@@ -94,7 +94,7 @@ interface PokemonIconImageProps {
 
 const DEFAULT_BOX_ICON = `/items/index/0000.png`
 
-function getHomeImage(props: PokemonIconImageProps) {
+function getBoxIconImage(props: PokemonIconImageProps) {
   return $R(
     boxIconImagePath({
       nationalDex: props.nationalDex,
@@ -116,7 +116,7 @@ function PokemonIconImage(props: PokemonIconImageProps) {
   const isDarkMode = useIsDarkMode()
 
   if (spritePath === DEFAULT_BOX_ICON && !imageLoadFailed) {
-    getHomeImage(props).match(
+    getBoxIconImage(props).match(
       (path: string) => {
         setSpritePath(getPublicImageURL(path))
       },

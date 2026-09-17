@@ -156,7 +156,7 @@ function PokedexDetails({
       >
         <Flex direction="column" height="100%" width="100%" align="center" justify="center" gap="2">
           <div className="pokedex-image-frame">
-            {(selectedFormStatus === 'ShinyCaught' || true) && (
+            {selectedFormStatus === 'ShinyCaught' && (
               <button
                 className="pokedex-toggle pokedex-shiny-toggle"
                 style={{
