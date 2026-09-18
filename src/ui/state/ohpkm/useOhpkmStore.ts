@@ -16,6 +16,7 @@ import { $R, Option, PromisedResultBox, R, Result } from '@openhome-core/util/fu
 import { LRUCache } from '@openhome-core/util/lruCache'
 import { isThenable, NowOrLater } from '@openhome-core/util/promise'
 import { FourMoves } from '@openhome-core/util/types'
+import useDisplayError from '@openhome-ui/hooks/displayError'
 import { Lookup, MarkingsSixShapesColors, ModernRibbon, OriginGames } from '@pkm-rs/pkg/pkm_rs'
 import dayjs from 'dayjs'
 import { useCallback } from 'react'
@@ -72,6 +73,7 @@ export function useOhpkmStore() {
   const { lookups, updateLookups } = useLookups()
   const { gen12: gen12Lookup, gen345: gen345Lookup } = lookups
   const backend = useBackend()
+  const displayError = useDisplayError()
 
   const updateStore = backend.addToOhpkmStore
 
@@ -190,10 +192,17 @@ export function useOhpkmStore() {
     }
   }
 
-  async function updateAndConvertForSave<P extends PKMInterface>(ohpkm: OHPKM, save: SAV<P>) {
-    await handleLookupsUpdate(ohpkm, save)
-    await insertOrUpdate(ohpkm)
-    await handleLookupsUpdate(ohpkm, save)
+  // the async tasks are left to run here because otherwise the box UI lags to wait for them
+  function updateAndConvertForSave<P extends PKMInterface>(ohpkm: OHPKM, save: SAV<P>) {
+    handleLookupsUpdate(ohpkm, save)
+      .then(() => insertOrUpdate(ohpkm))
+      .then(() => handleLookupsUpdate(ohpkm, save))
+      .catch((error) =>
+        displayError('Error Updating OHPKM for Save', [
+          `When updating the tracking data for the OHPKM ${ohpkm.openhomeId} (${ohpkm.nickname}), an error was encountered:`,
+          String(error),
+        ])
+      )
 
     return save.convertOhpkm(ohpkm, defaultConvertStrategy)
   }
@@ -387,11 +396,11 @@ export function useOhpkmStore() {
     mon: PKMInterface,
     save?: SAV
   ): PromisedResultBox<OHPKM, IdentifierNotPresentError> {
-    return R.after(tryLoadFromId(ohpkmId)).andThen(async (trackedData) => {
+    return R.after(tryLoadFromId(ohpkmId)).awaitMap(async (trackedData) => {
       const updates = trackedData.syncWithGameData(mon, save)
 
       if (updates.length > 0) {
-        await backend.log('DEBUG', `synced ${mon.nickname} with game data`, {
+        void backend.log('DEBUG', `synced ${mon.nickname} with game data`, {
           ohpkm_id: trackedData.openhomeId,
           event: 'game_data_sync',
           updates,
