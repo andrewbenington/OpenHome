@@ -173,7 +173,7 @@ android-init:
 
 .PHONY: android-run
 android-run:
-	@npx pnpm tauri android dev
+	@pnpm tauri android dev
 
 .PHONY: stream-android-logs
 stream-android-logs:
