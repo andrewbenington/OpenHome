@@ -47,8 +47,8 @@ const MarkingsDisplay = <M extends Markings>(props: MarkingsProps<M>) => {
       {markingShapes.map((shape) => (
         <Marking
           key={shape}
-          marking={shape}
-          markings={modifiedMarkings}
+          shape={shape}
+          markings={modifiedMarkings as AnyMarkings}
           onClick={cycleMarkingValue}
         />
       ))}
@@ -56,23 +56,27 @@ const MarkingsDisplay = <M extends Markings>(props: MarkingsProps<M>) => {
   )
 }
 
+type AnyMarkings = {
+  [K in MarkingShape]: MarkingValue
+}
+
 type MarkingProps = {
-  marking: MarkingShape
-  markings: Markings
+  shape: MarkingShape
+  markings: AnyMarkings
   onClick?: (shape: MarkingShape) => void
 }
 
-function Marking({ marking, markings, onClick: toggleMarking }: MarkingProps) {
+function Marking({ shape, markings, onClick: toggleMarking }: MarkingProps) {
   return (
     <span
       className="marking-shape"
-      onClick={() => toggleMarking?.(marking)}
+      onClick={() => toggleMarking?.(shape)}
       style={{
         cursor: toggleMarking ? 'pointer' : 'default',
-        color: getMarkingColorByNumber(markings[marking]),
+        color: getMarkingColorByNumber(markings[shape]),
       }}
     >
-      {markingDisplay(marking)}
+      {markingDisplay(shape)}
     </span>
   )
 }
