@@ -383,10 +383,10 @@ export function markingsFourShapesFromOther(other?: Markings): MarkingsFourShape
   }
 
   return {
-    circle: !!other.circle,
-    triangle: !!other.triangle,
-    square: !!other.square,
-    heart: !!other.heart,
+    circle: other.circle === "blue",
+    triangle: other.triangle === "blue",
+    square: other.square === "blue",
+    heart: other.heart === "blue",
   }
 }
 
@@ -403,12 +403,12 @@ export function markingsSixShapesNoColorFromOther(other?: Markings): MarkingsSix
   }
 
   return {
-    circle: !!other.circle,
-    triangle: !!other.triangle,
-    square: !!other.square,
-    heart: !!other.heart,
-    star: 'star' in other && !!other.star,
-    diamond: 'diamond' in other && !!other.diamond,
+    circle: other.circle === "blue",
+    triangle: other.triangle === "blue",
+    square: other.square === "blue",
+    heart: other.heart === "blue",
+    star: 'star' in other && other.star === "blue",
+    diamond: 'diamond' in other && other.diamond === "blue",
   }
 }
 

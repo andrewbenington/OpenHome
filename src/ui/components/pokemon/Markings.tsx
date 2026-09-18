@@ -63,22 +63,13 @@ type MarkingProps = {
 }
 
 function Marking({ marking, markings, onClick: toggleMarking }: MarkingProps) {
-  let value: MarkingValue
-
-  if (marking === 'star' || marking === 'diamond') {
-    if (!markingsHaveColor(markings)) return <></>
-    value = markings[marking]
-  } else {
-    value = markings[marking]
-  }
-
   return (
     <span
       className="marking-shape"
       onClick={() => toggleMarking?.(marking)}
       style={{
         cursor: toggleMarking ? 'pointer' : 'default',
-        color: getMarkingColorByNumber(value),
+        color: getMarkingColorByNumber(markings[marking]),
       }}
     >
       {markingDisplay(marking)}
