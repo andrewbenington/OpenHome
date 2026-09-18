@@ -37,27 +37,23 @@ const MarkingsDisplay = <M extends Markings>(props: MarkingsProps<M>) => {
         }
       : undefined
 
-  if ("star" in modifiedMarkings && "diamond" in modifiedMarkings) {
-    return (
-      <div className="markings-container">
-        <Marking marking="circle" markings={modifiedMarkings} onClick={cycleMarkingValue} />
-        <Marking marking="triangle" markings={modifiedMarkings} onClick={cycleMarkingValue} />
-        <Marking marking="square" markings={modifiedMarkings} onClick={cycleMarkingValue} />
-        <Marking marking="heart" markings={modifiedMarkings} onClick={cycleMarkingValue} />
-        <Marking marking="star" markings={modifiedMarkings} onClick={cycleMarkingValue} />
-        <Marking marking="diamond" markings={modifiedMarkings} onClick={cycleMarkingValue} />
-      </div>
-    )
-  } else {  // must be PK3
-    return (
-      <div className="markings-container">
-        <Marking marking="circle" markings={modifiedMarkings} onClick={cycleMarkingValue} />
-        <Marking marking="square" markings={modifiedMarkings} onClick={cycleMarkingValue} />
-        <Marking marking="triangle" markings={modifiedMarkings} onClick={cycleMarkingValue} />
-        <Marking marking="heart" markings={modifiedMarkings} onClick={cycleMarkingValue} />
-      </div>
-    )
-  }
+  const markingShapes: MarkingShape[] =
+    'star' in modifiedMarkings && 'diamond' in modifiedMarkings
+      ? ["circle", "triangle", "square", "heart", "star", "diamond"]
+      : ["circle", "square", "triangle", "heart"]
+  
+  return (
+    <div className="markings-container">
+      {markingShapes.map((shape) => (
+        <Marking
+          key={shape}
+          marking={shape}
+          markings={modifiedMarkings}
+          onClick={cycleMarkingValue}
+        />
+      ))}
+    </div>
+  )
 }
 
 type MarkingProps = {
