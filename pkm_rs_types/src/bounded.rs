@@ -13,6 +13,7 @@ impl Display for BoundViolated {
         f.write_str("value exceeds maximum valid")
     }
 }
+
 macro_rules! bounded_impl {
     ($ty:ty) => {
         paste! {

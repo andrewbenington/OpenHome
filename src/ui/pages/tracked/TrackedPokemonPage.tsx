@@ -1,7 +1,8 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { SAV } from '@openhome-core/save/interfaces'
-import { R } from '@openhome-core/util/functional'
+import { $R, R } from '@openhome-core/util/functional'
+import { isThenable } from '@openhome-core/util/promise'
 import { numericSorter } from '@openhome-core/util/sort'
 import Badge from '@openhome-ui/components/badge/Badge'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
@@ -9,9 +10,10 @@ import MessageRibbon from '@openhome-ui/components/MessageRibbon'
 import SideTabNavigation from '@openhome-ui/components/side-tabs/SideTabNavigation'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/PokemonDetailsModal'
+import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { SaveError, saveErrorMessage, saveErrorTitle, useSaves } from '@openhome-ui/state/saves'
 import { Button, DropdownMenu, Flex } from '@radix-ui/themes'
-import { PropsWithChildren, ReactNode, useState } from 'react'
+import { PropsWithChildren, ReactNode, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { boxNameOrDefault, useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import AllTrackedPokemon from './AllTrackedPokemon'
@@ -29,6 +31,38 @@ export default function TrackedPokemonPage() {
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const { findSaveForMon, findingSaveState, findSavesForAllMons, clearFindingState } =
     useManageTracked()
+  const { tryLoadFromId } = useOhpkmStore()
+  const displayError = useDisplayError()
+
+  const onSelectMon = useCallback(
+    async (openhomeId: OhpkmIdentifier) => {
+      const loadResult = tryLoadFromId(openhomeId)
+      if (!isThenable(loadResult)) {
+        $R(loadResult).match(
+          (mon) => setSelectedMon(mon),
+          (error) =>
+            displayError(
+              'Failed to find Pokémon data',
+              `Pokémon with identifier ${error.identifier} could not be found`
+            )
+        )
+
+        return
+      }
+
+      loadResult.then(
+        R.match(
+          (mon) => setSelectedMon(mon),
+          (error) =>
+            displayError(
+              'Failed to find Pokémon data',
+              `Pokémon with identifier ${error.identifier} could not be found`
+            )
+        )
+      )
+    },
+    [displayError, tryLoadFromId]
+  )
 
   return (
     <SideTabNavigation
@@ -40,7 +74,7 @@ export default function TrackedPokemonPage() {
           display: 'All Pokémon',
           component: (
             <AllTrackedPokemon
-              onSelectMon={setSelectedMon}
+              onSelectMon={onSelectMon}
               findSaveForMon={findSaveForMon}
               findSavesForAllMons={findSavesForAllMons}
             />

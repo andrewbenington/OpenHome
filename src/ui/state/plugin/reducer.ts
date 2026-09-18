@@ -1,4 +1,3 @@
-import { ImageResponse } from '@openhome-core/backend/backendInterface'
 import { PkmOrOhpkmFormat } from '@openhome-core/pkm/util'
 import { Option } from '@openhome-core/util/functional'
 import { ExtraFormIndex } from '@pkm-rs/pkg'
@@ -23,8 +22,7 @@ export interface OpenHomePlugin {
   api_version: number
   icon: string
   assets: Record<string, string>
-  icon_image: ImageResponse | null
-  getMonSpritePath?: (params: MonSpriteData) => string | null
+  getMonSpritePath?: (params: MonSpriteData & { dexNum: number; formNum: number }) => string | null
 }
 
 export type PluginStateInternal = { plugins: OpenHomePlugin[]; loaded: boolean }

@@ -1,4 +1,3 @@
-import { ImageResponse } from '@openhome-core/backend/backendInterface'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { OpenHomePlugin } from '@openhome-ui/state/plugin/reducer'
 import { MetadataSummaryLookup, SpeciesLookup } from '@pkm-rs/pkg'
@@ -31,19 +30,4 @@ export function loadPlugin(pluginCode: string): OpenHomePlugin {
 
   const { plugin } = buildPlugin(MetadataSummaryLookup, SpeciesLookup, NationalDex)
   return plugin
-}
-
-export interface PluginMetadata {
-  id: string
-  name: string
-  version: string
-  api_version: number
-}
-
-export interface PluginMetadataWithIcon {
-  id: string
-  name: string
-  version: string
-  api_version: number
-  icon_image: ImageResponse | null
 }

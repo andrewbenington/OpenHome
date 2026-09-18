@@ -10,7 +10,10 @@ export type MonDisplayState = {
   showNotesIndicator: boolean
   showTags: boolean
   showBackgroundColor: boolean
+  boxIconSprites: BoxIconSpriteType
 }
+
+export type BoxIconSpriteType = 'home' | 'default'
 
 export function useMonDisplay() {
   const [{ settings }, dispatchAppInfo] = useContext(AppInfoContext)
@@ -86,6 +89,11 @@ export const TopRightIndicatorTypes = [
   'Alpha',
   'Gigantamax',
   'Pokérus',
+  'TR Count (Sword/Shield)',
+  'Tutor Moves Count (Legends Arceus)',
+  'TM Count (Scarlet/Violet)',
+  'TM Count (Legends Z-A)',
+  'Plus Moves Known',
 ] as const
 
 export type TopRightBadgeType = (typeof TopRightIndicatorTypes)[number]

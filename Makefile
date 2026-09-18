@@ -1,4 +1,4 @@
-VERSION=1.16.0
+VERSION=1.18.0-rc.2
 
 .PHONY: help
 help: # Display this help.
@@ -173,7 +173,7 @@ android-init:
 
 .PHONY: android-run
 android-run:
-	@npx pnpm tauri android dev
+	@pnpm tauri android dev
 
 .PHONY: stream-android-logs
 stream-android-logs:

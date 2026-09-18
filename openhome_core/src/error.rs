@@ -8,6 +8,9 @@ type SourceError = Box<dyn std::error::Error + 'static>;
 
 #[derive(Debug)]
 pub enum Error {
+    PkmRs {
+        source: pkm_rs::result::Error,
+    },
     DataFolderAccess {
         source: SourceError,
     },
@@ -140,6 +143,7 @@ impl Error {
 impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let message = match self {
+            Self::PkmRs { source } => source.to_string(),
             Self::DataFolderAccess { source } => {
                 format!("Could not access app data directory: {source}")
             }
@@ -235,6 +239,12 @@ impl<T> From<std::sync::PoisonError<T>> for Error {
 impl From<Error> for String {
     fn from(value: Error) -> Self {
         value.to_string()
+    }
+}
+
+impl From<pkm_rs::result::Error> for Error {
+    fn from(value: pkm_rs::result::Error) -> Self {
+        Self::PkmRs { source: value }
     }
 }
 

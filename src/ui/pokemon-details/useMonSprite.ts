@@ -19,10 +19,18 @@ export function findPluginSprite(
   enabledPlugins: OpenHomePlugin[]
 ): Option<PluginSpriteResult> {
   for (const plugin of enabledPlugins) {
-    const spritePath = plugin.getMonSpritePath?.(mon)
+    try {
+      const spritePath = plugin.getMonSpritePath?.({
+        dexNum: mon.nationalDex,
+        formNum: mon.formIndex,
+        ...mon,
+      })
 
-    if (spritePath) {
-      return { plugin, spritePath }
+      if (spritePath) {
+        return { plugin, spritePath }
+      }
+    } catch (error) {
+      console.error(`error looking up ${plugin.name} sprite for mon:`, mon, error)
     }
   }
 }
@@ -94,39 +102,12 @@ export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
       case 'default':
         setSpriteResult({
           loading: false,
-          path: getPublicImageURL(getPokemonSpritePath(mon)),
+          path: result.path,
         })
         return
       case 'plugin':
         const { plugin, spritePath } = result
-        backend
-          .getPluginPath(plugin.id)
-          .then(
-            R.asyncFlatMap((pluginPath: string) =>
-              backend.getImageData(`${pluginPath}/${spritePath}`)
-            )
-          )
-          .then(
-            R.match(
-              (imageData) =>
-                setSpriteResult({
-                  loading: false,
-                  path: `data:image/${imageData.extension};base64,${imageData.base64}`,
-                }),
-              (err) => {
-                console.warn(
-                  'Plugin Sprite Error',
-                  `Plugin '${plugin.id}' failed to load a sprite`,
-                  err
-                )
-                setSpriteResult({
-                  loading: false,
-                  errorMessage: 'Failed to load plugin sprite: ' + err,
-                  severity: 'error',
-                })
-              }
-            )
-          )
+        getPluginSprite(plugin, spritePath, backend).then(setSpriteResult)
     }
   }, [
     mon.format,
@@ -150,21 +131,18 @@ export async function getPluginSprite(
   return backend
     .getPluginPath(plugin.id)
     .then(
-      R.asyncFlatMap((pluginPath: string) => backend.getImageData(`${pluginPath}/${spritePath}`))
+      R.map((pluginPath: string) => backend.convertLocalImagePath(`${pluginPath}/${spritePath}`))
     )
     .then(
       R.match(
-        (imageData) =>
-          ({
-            loading: false,
-            path: `data:image/${imageData.extension};base64,${imageData.base64}`,
-          }) as MonSpriteResult,
+        (imageData) => ({ loading: false, path: imageData }),
         (err) => {
           console.warn('Plugin Sprite Error', `Plugin '${plugin.id}' failed to load a sprite`, err)
           return {
             loading: false,
             errorMessage: 'Failed to load plugin sprite: ' + err,
             severity: 'error',
+            path: spritePath,
           }
         }
       )

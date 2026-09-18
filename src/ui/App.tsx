@@ -6,28 +6,23 @@ import { R } from '@openhome-core/util/functional'
 import '@openhome-ui/App.css'
 import AppTabs from '@openhome-ui/AppTabs'
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
-import useDebounce from '@openhome-ui/hooks/debounce'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { TransactionStateProvider } from '@openhome-ui/state/app-state'
-import {
-  AppInfoContext,
-  appInfoInitialState,
-  appInfoReducer,
-  Settings,
-} from '@openhome-ui/state/appInfo'
+import { AppInfoContext, appInfoInitialState, appInfoReducer } from '@openhome-ui/state/appInfo'
 import { DragMonContext, DragMonState, emptyDragState } from '@openhome-ui/state/drag-and-drop'
 import PokemonDndContext from '@openhome-ui/state/drag-and-drop/PokemonDndContext'
 import { ErrorContext, errorReducer } from '@openhome-ui/state/error'
 import { ItemBagContext, itemBagReducer } from '@openhome-ui/state/items'
 import { LookupsProvider } from '@openhome-ui/state/lookups'
 import { MouseContext, mouseReducer } from '@openhome-ui/state/mouse'
-import { OhpkmStoreProvider } from '@openhome-ui/state/ohpkm'
 import { SavesProvider } from '@openhome-ui/state/saves'
 import ErrorMessageModal from '@openhome-ui/top-level/ErrorMessageModal'
 import UpdateMessageModal from '@openhome-ui/top-level/UpdateMessageModal'
 import { Flex, Text, Theme } from '@radix-ui/themes'
-import { useCallback, useEffect, useReducer, useState } from 'react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { useCallback, useEffect, useEffectEvent, useReducer, useState } from 'react'
 import BanksAndBoxesProvider from './state-zustand/banks-and-boxes/Provider'
+import { useBanksAndBoxes } from './state-zustand/banks-and-boxes/store'
 import ConvertStrategiesProvider from './state/convert-strategies/ConvertStrategiesProvider'
 import PluginsProvider from './state/plugin/PluginProvider'
 
@@ -36,6 +31,8 @@ const ZOOM_MIN_PCT = 50
 const ZOOM_MAX_PCT = 160
 
 const REDIRECT_WEB_CONSOLE = false
+
+const queryClient = new QueryClient()
 
 export default function App() {
   const isDarkMode = useIsDarkMode()
@@ -52,7 +49,11 @@ export default function App() {
       <div id="app-container" className="root">
         <BackendContext value={TauriBackend}>
           <ErrorContext value={[errorState, errorDispatch]}>
-            <AppWithBackend />
+            <QueryClientProvider client={queryClient}>
+              <BanksAndBoxesProvider>
+                <AppWithBackend />
+              </BanksAndBoxesProvider>
+            </QueryClientProvider>
           </ErrorContext>
         </BackendContext>
       </div>
@@ -65,6 +66,7 @@ function AppWithBackend() {
   const [dragState, setDragState] = useState<DragMonState>(emptyDragState())
   const [appInfoState, appInfoDispatch] = useReducer(appInfoReducer, appInfoInitialState)
   const [settingsLoading, setSettingsLoading] = useState(false)
+  const { saveChanges } = useBanksAndBoxes()
   const [bagState, bagDispatch] = useReducer(itemBagReducer, {
     itemCounts: {},
     modified: false,
@@ -74,29 +76,44 @@ function AppWithBackend() {
   const backend = useBackend()
   const displayError = useDisplayError()
 
-  const debouncedUpdateSettings = useDebounce((backend: BackendInterface, settings: Settings) => {
-    backend.updateSettings(settings).catch(console.error)
-  }, 500)
+  const reloadSettings = useEffectEvent(backend.getSettings)
+  const getPlatform = useEffectEvent(backend.getPlatform)
+  const displayErrorEvent = useEffectEvent(displayError)
+
+  // The save listener works if these are separated into effect events, but not
+  // if the whole effect function is (including the returned callback). Check
+  // that saving still persists movements after any updates to this.
+  const onMenuEvent = useEffectEvent(backend.onMenuEvent)
+  const saveChangesEvent = useEffectEvent(saveChanges)
+
+  useEffect(() => {
+    const stopListening = onMenuEvent('save', saveChangesEvent)
+
+    // the "stop listening" function should be called when the effect returns,
+    // otherwise duplicate listeners will exist
+    return () => {
+      stopListening()
+    }
+  }, [])
 
   // only on app start
   useEffect(() => {
     if (appInfoState.error) {
       return
     }
-    backend
-      .getSettings()
+    reloadSettings()
       .then(
         R.match(
           async (settings) => appInfoDispatch({ type: 'load_settings', payload: settings }),
-          async (err) => displayError('Error loading settings', err)
+          async (err) => displayErrorEvent('Error loading settings', err)
         )
       )
       .finally(() => setSettingsLoading(false))
-  }, [appInfoState.error, backend, displayError])
+  }, [appInfoState.error])
 
   // only on app start
   useEffect(() => {
-    if (backend.getPlatform() !== 'windows') return
+    if (getPlatform() !== 'windows') return
     const handler = buildKeyboardHandler(backend)
 
     window.addEventListener('keydown', handler)
@@ -105,14 +122,16 @@ function AppWithBackend() {
     }
   }, [backend])
 
-  useEffect(() => {
-    if (!appInfoState.settingsLoaded) return
-    debouncedUpdateSettings(backend, appInfoState.settings)
-  }, [backend, appInfoState.settings, appInfoState.settingsLoaded, debouncedUpdateSettings])
+  // useEffect(() => {
+  //   if (!appInfoState.settingsLoaded) return
+  //   debouncedUpdateSettings(backend, appInfoState.settings)
+  // }, [backend, appInfoState.settings, appInfoState.settingsLoaded])
+
+  const listenToMenuEvents = useEffectEvent(backend.onMenuEvents)
 
   useEffect(() => {
     // returns a function to stop listening
-    const stopListening = backend.onMenuEvents({
+    const stopListening = listenToMenuEvents({
       zoom_in: () => {
         appInfoDispatch({
           type: 'set_zoom_level',
@@ -132,7 +151,7 @@ function AppWithBackend() {
     return () => {
       stopListening()
     }
-  }, [appInfoState.settings.zoomLevel, backend])
+  }, [appInfoState.settings.zoomLevel])
 
   const getEnabledSaveTypes = useCallback(() => {
     return appInfoState.officialSaveTypes
@@ -145,41 +164,37 @@ function AppWithBackend() {
   }, [backend])
 
   return (
-    <BanksAndBoxesProvider>
-      <AppInfoContext value={[appInfoState, appInfoDispatch, getEnabledSaveTypes]}>
-        <PluginsProvider>
-          <TransactionStateProvider>
-            <MouseContext value={[mouseState, mouseDispatch]}>
-              <LookupsProvider>
-                <ConvertStrategiesProvider>
-                  <OhpkmStoreProvider>
-                    <ItemBagContext value={[bagState, bagDispatch]}>
-                      <SavesProvider>
-                        <DragMonContext value={[dragState, setDragState]}>
-                          <PokemonDndContext>
-                            {settingsLoading ? (
-                              <Flex width="100%" height="100vh" align="center" justify="center">
-                                <Text size="9" weight="bold">
-                                  OpenHome
-                                </Text>
-                              </Flex>
-                            ) : (
-                              <AppTabs />
-                            )}
-                            <ErrorMessageModal />
-                            <UpdateMessageModal />
-                          </PokemonDndContext>
-                        </DragMonContext>
-                      </SavesProvider>
-                    </ItemBagContext>
-                  </OhpkmStoreProvider>
-                </ConvertStrategiesProvider>
-              </LookupsProvider>
-            </MouseContext>
-          </TransactionStateProvider>
-        </PluginsProvider>
-      </AppInfoContext>
-    </BanksAndBoxesProvider>
+    <AppInfoContext value={[appInfoState, appInfoDispatch, getEnabledSaveTypes]}>
+      <PluginsProvider>
+        <TransactionStateProvider>
+          <MouseContext value={[mouseState, mouseDispatch]}>
+            <LookupsProvider>
+              <ConvertStrategiesProvider>
+                <ItemBagContext value={[bagState, bagDispatch]}>
+                  <SavesProvider>
+                    <DragMonContext value={[dragState, setDragState]}>
+                      <PokemonDndContext>
+                        {settingsLoading ? (
+                          <Flex width="100%" height="100vh" align="center" justify="center">
+                            <Text size="9" weight="bold">
+                              OpenHome
+                            </Text>
+                          </Flex>
+                        ) : (
+                          <AppTabs />
+                        )}
+                        <ErrorMessageModal />
+                        <UpdateMessageModal />
+                      </PokemonDndContext>
+                    </DragMonContext>
+                  </SavesProvider>
+                </ItemBagContext>
+              </ConvertStrategiesProvider>
+            </LookupsProvider>
+          </MouseContext>
+        </TransactionStateProvider>
+      </PluginsProvider>
+    </AppInfoContext>
   )
 }
 

@@ -1,4 +1,5 @@
 use crate::ohpkm::extra_form::ExtraFormIndex;
+use crate::ohpkm::id::OpenHomeId;
 use crate::ohpkm::issues::OhpkmIssue;
 use crate::ohpkm::v2::OhpkmSectionTag;
 use crate::result::{Error, Result};
@@ -43,6 +44,7 @@ const MOVE_DATA_OFFSETS: MoveDataOffsets = MoveDataOffsets {
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
 pub struct MainDataV2 {
+    pub openhome_id: OpenHomeId,
     pub personality_value: u32,
     pub encryption_constant: u32,
     pub species_and_form: SpeciesForm,
@@ -127,17 +129,32 @@ impl MainDataV2 {
     pub fn new(national_dex: u16, form_index: u16) -> Result<Self> {
         let species_and_form = SpeciesForm::new(national_dex, form_index)?;
         let national_dex = species_and_form.get_ndex();
-        Ok(Self {
+        let mut main_data = Self {
             species_and_form,
             language: Language::English,
             nickname: lookup::species_name(national_dex, Language::English).into(),
             ..Default::default()
-        })
+        };
+
+        main_data.openhome_id = OpenHomeId::new(
+            national_dex,
+            main_data.trainer_id,
+            main_data.secret_id,
+            main_data.personality_value,
+        );
+
+        Ok(main_data)
     }
 
     pub fn from_v1(old: crate::ohpkm::v1::OhpkmV1) -> Self {
         let home_tracker_raw = u64::from_le_bytes(old.home_tracker);
         MainDataV2 {
+            openhome_id: OpenHomeId::new(
+                old.species_and_form.get_ndex(),
+                old.trainer_id,
+                old.secret_id,
+                old.personality_value,
+            ),
             encryption_constant: old.encryption_constant,
             species_and_form: old.species_and_form,
             held_item_index: old.held_item_index,
@@ -220,18 +237,6 @@ impl MainDataV2 {
 
     pub const fn national_dex(&self) -> NationalDex {
         self.species_and_form.get_ndex()
-    }
-
-    pub fn openhome_id(&self) -> String {
-        let base_mon = self.species_and_form.get_base_evolution();
-        format!(
-            "{:04}-{:04x}{:04x}-{:08x}-{:02x}",
-            base_mon.get_ndex(),
-            self.trainer_id,
-            self.secret_id,
-            self.personality_value,
-            self.game_of_origin as u8
-        )
     }
 
     pub const fn with_timestamp_if_missing(
@@ -435,17 +440,22 @@ impl DataSection for MainDataV2 {
 
         let home_tracker_raw = u64::from_le_bytes(bytes[172..180].try_into().unwrap());
 
+        let personality_value = u32::from_le_bytes(bytes[0..4].try_into().unwrap());
+        let trainer_id = u16::from_le_bytes(bytes[12..14].try_into().unwrap());
+        let secret_id = u16::from_le_bytes(bytes[14..16].try_into().unwrap());
+        let national_dex = NationalDex::from_le_bytes(bytes[8..10].try_into().unwrap())?;
+
         // try_into() will always succeed if the buffer range size is correct.
         // if incorrect, it is a fatal coding flaw and will always panic.
         let data = Self {
-            personality_value: u32::from_le_bytes(bytes[0..4].try_into().unwrap()),
+            personality_value,
             encryption_constant: u32::from_le_bytes(bytes[4..8].try_into().unwrap()),
-            species_and_form: SpeciesForm::new(
-                u16::from_le_bytes(bytes[8..10].try_into().unwrap()),
+            species_and_form: SpeciesForm::new_valid_ndex(
+                national_dex,
                 u16::from_le_bytes(bytes[10..12].try_into().unwrap()),
             )?,
-            trainer_id: u16::from_le_bytes(bytes[12..14].try_into().unwrap()),
-            secret_id: u16::from_le_bytes(bytes[14..16].try_into().unwrap()),
+            trainer_id,
+            secret_id,
             exp: u32::from_le_bytes(bytes[16..20].try_into().unwrap()),
             ability_index: AbilityIndexBounded::try_from(u16::from_le_bytes(
                 bytes[20..22].try_into().unwrap(),
@@ -548,7 +558,11 @@ impl DataSection for MainDataV2 {
             language: Language::try_from(bytes[242])?,
             form_argument: u32::from_le_bytes(bytes[244..248].try_into().unwrap()),
             affixed_ribbon: ModernRibbon::from_affixed_byte(bytes[248]),
-            // gap: 249-263
+            // gap: 249
+            openhome_id: OpenHomeId::try_from_bytes(bytes[250..260].try_into().unwrap()).unwrap_or(
+                OpenHomeId::new(national_dex, trainer_id, secret_id, personality_value),
+            ),
+            // gap: 260-263
 
             // TODO: handle invalid values
             extra_form: u64::from_le_bytes(bytes[264..272].try_into().unwrap())
@@ -675,7 +689,10 @@ impl DataSection for MainDataV2 {
 
         bytes[244..248].copy_from_slice(&self.form_argument.to_le_bytes());
         bytes[248] = ModernRibbon::to_affixed_byte(self.affixed_ribbon);
-        // gap: 249-263
+        // gap: 249
+        bytes[250..260].copy_from_slice(&self.openhome_id.to_bytes());
+        // gap: 260-263
+
         bytes[264..272].copy_from_slice(&self.extra_form.map_or(0, |f| f as u64).to_le_bytes());
         bytes[272..298].copy_from_slice(&self.trainer_name);
         bytes[298] = self.trainer_friendship;
@@ -710,17 +727,28 @@ fn current_time_unix_seconds() -> NonZeroU64 {
 impl Randomize for MainDataV2 {
     fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
         let species_and_form = SpeciesForm::randomized(rng);
+        let personality_value = u32::randomized(rng);
+        let trainer_id = u16::randomized(rng);
+        let secret_id = u16::randomized(rng);
+
         let ability_num = AbilityNumber::randomized(rng);
         let ability_index = species_and_form
             .get_forme_metadata()
             .get_ability(ability_num);
+
         Self {
-            personality_value: u32::randomized(rng),
+            openhome_id: OpenHomeId::new(
+                species_and_form.get_ndex(),
+                trainer_id,
+                secret_id,
+                personality_value,
+            ),
+            personality_value,
             encryption_constant: u32::randomized(rng),
             species_and_form,
             held_item_index: u16::randomized(rng),
-            trainer_id: u16::randomized(rng),
-            secret_id: u16::randomized(rng),
+            trainer_id,
+            secret_id,
             exp: u32::randomized(rng),
             ability_index,
             ability_num,

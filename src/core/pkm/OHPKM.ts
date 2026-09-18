@@ -67,9 +67,9 @@ import {
   getAbilityFromNumber,
   getPrevos,
   ivsFromDVs,
+  modernStatCalc,
 } from './util'
 import { AllPKMFields } from './util/pkmInterface'
-import { getStandardPKMStats } from './util/statCalc'
 import { convertPokeDate, convertPokeDateOptional } from './wasm/convert'
 
 export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
@@ -169,9 +169,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
           Gender.Genderless
         this.nature = other.nature ?? NatureIndex.newFromModulo(other.exp)
 
-        if (other.personalityValue === undefined) {
-          this.personalityValue = this.generatePk3CompatiblePid()
-        }
+        this.personalityValue = this.generatePk3CompatiblePid()
       } else {
         this.abilityNum = other.abilityNum ?? 0
         this.gender =
@@ -358,6 +356,8 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       }
 
       this.populateLearnedMoves()
+      // because the ohpkm wasm struct is initialized with an empty byte array, this needs to be called to set the stored openhome ID (or it will remain the default 0001-00000000-00000000)
+      this.regenerateOpenhomeId()
     }
   }
 
@@ -564,6 +564,10 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     )
   }
 
+  get tmMovesLza() {
+    return [...this.tmMovesLzaBase, ...this.tmMovesLzaDlc]
+  }
+
   get plusMovesLza() {
     return this.plusMoveFlags?.getMoveIds() ?? []
   }
@@ -578,7 +582,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     return this.tutorFlagsLA ? movesFromLaTutorFlags(this.tutorFlagsLA) : []
   }
 
-  get tmMovesSvBaseGame() {
+  get tmMovesSv() {
     return this.tmFlagsSV ? movesFromSvTmFlags(this.tmFlagsSV) : []
   }
 
@@ -587,7 +591,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   public getStats(): Stats {
-    return getStandardPKMStats(this)
+    return modernStatCalc(this)
   }
 
   public toBytes() {
@@ -685,7 +689,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   public get stats(): Stats {
-    return getStandardPKMStats(this)
+    return modernStatCalc(this)
   }
 
   public get currentHP(): number {

@@ -1,15 +1,21 @@
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { SaveWriter } from '@openhome-core/save/interfaces'
+import { SAV, SaveWriter } from '@openhome-core/save/interfaces'
 import { PathData, PossibleSaves } from '@openhome-core/save/util/path'
 import { SaveFolder, StoredBankData } from '@openhome-core/save/util/storage'
-import { ConvertStrategyEntries } from '@openhome-core/tauri/spectaCommands'
-import { Errorable } from '@openhome-core/util/functional'
+import {
+  ConvertStrategyEntries,
+  Filter,
+  PaginatedPage,
+  PaginationCursor,
+  PluginMetadata,
+} from '@openhome-core/tauri/spectaCommands'
+import { Errorable, Option, Result } from '@openhome-core/util/functional'
 import { LoadSaveResponse, LookupMap, SaveRef } from '@openhome-core/util/types'
 import { LogFilter } from '@openhome-ui/pages/logs'
 import { AppTheme, Settings } from '@openhome-ui/state/appInfo'
 import { ConvertStrategies } from '@openhome-ui/state/convert-strategies/ConvertStrategiesProvider'
-import { PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
+import { OhpkmBatchLookupResults } from '@openhome-ui/state/ohpkm'
 import { Pokedex, PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { Dayjs } from 'dayjs'
 
@@ -64,12 +70,20 @@ export default interface BackendInterface {
   removeDangling: () => Promise<Errorable<null>>
 
   /* ohpkm bytes store by identifier */
-  loadOhpkmStore: () => Promise<Errorable<OhpkmStore>>
+  searchOhpkmStore(
+    cursor: PaginationCursor,
+    filters: Filter[]
+  ): Promise<Errorable<PaginatedPage<OHPKM>>>
+  getOhpkmIdsMatchingUnknownHandler(save: SAV): Promise<Errorable<OhpkmIdentifier[]>>
+  lookupOhpkmById: (id: OhpkmIdentifier) => Promise<Errorable<Option<OHPKM>>>
+  lookupOhpkmBatch: (ids: OhpkmIdentifier[]) => Promise<Result<OhpkmBatchLookupResults>>
   addToOhpkmStore: (updates: OhpkmStore) => Promise<Errorable<null>>
   deleteHomeMons: (identifiers: string[]) => Promise<Errorable<null>>
 
-  /* prompt user to select new data directory location */
+  /* prompt user to select new data directory location, then restart using that location */
   promptChangeDataDir: () => Promise<Errorable<null>>
+  /* prompt user to select new data directory location, copy all data there, and restart using that location */
+  promptMoveDataDir: () => Promise<Errorable<null>>
   /* get the current data directory path */
   getDataDirPath: () => Promise<Errorable<string>>
 
@@ -113,6 +127,7 @@ export default interface BackendInterface {
   getResourcesPath: () => Promise<string>
   openDirectory: (directory: string) => Promise<Errorable<null>>
   openFileLocation: (filePath: string) => Promise<Errorable<null>>
+  convertLocalImagePath: (absolutePath: string) => string
   getPlatform: () => string
   registerListeners: (listeners: Partial<BackendListeners>) => () => void
   onMenuEvent: (event: MenuEvent, listener: () => void) => () => void
@@ -133,8 +148,7 @@ export default interface BackendInterface {
   onNewLog: (callback: (notification: NewLogNotification) => void) => () => void
 
   /* plugins */
-  getImageData: (absolutePath: string) => Promise<Errorable<ImageResponse>>
-  listInstalledPlugins: () => Promise<Errorable<PluginMetadataWithIcon[]>>
+  listInstalledPlugins: () => Promise<Errorable<PluginMetadata[]>>
   getPluginPath: (pluginId: string) => Promise<Errorable<string>>
   downloadPlugin(remoteUrl: string): Promise<Errorable<string>>
   loadPluginCode(pluginId: string): Promise<Errorable<string>>

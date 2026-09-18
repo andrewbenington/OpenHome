@@ -8,7 +8,7 @@ use pkm_rs_resources;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ribbons::ModernRibbon;
 use pkm_rs_resources::species::SpeciesForm;
-use pkm_rs_resources::species::form_metadata::source_has_form_metadata;
+use pkm_rs_resources::species::metadata_table::source_has_form_metadata;
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;

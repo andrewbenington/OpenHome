@@ -99,12 +99,12 @@ export function booleanSorter<T>(func: (val: T) => boolean | undefined) {
   }
 }
 
-export function dayjsSorter<T>(func: (val: T) => Dayjs | undefined) {
+export function dayjsSorter<T>(func: (val: T) => Dayjs | undefined, recentFirst: boolean = false) {
   return (a: T, b: T) => {
     const dateA = func(a) ?? dayjs.unix(0)
     const dateB = func(b) ?? dayjs.unix(0)
 
-    return dateA.diff(dateB)
+    return recentFirst ? dateB.diff(dateA) : dateA.diff(dateB)
   }
 }
 

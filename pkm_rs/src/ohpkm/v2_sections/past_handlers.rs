@@ -8,6 +8,7 @@ use crate::result::{Error, Result};
 use crate::sectioned_data::DataSection;
 use crate::traits::{OhpkmByte, OhpkmBytes};
 
+use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{BinaryGender, Gender, Language, OriginGame, TrainerData, TrainerMemory};
 use serde::Serialize;
@@ -250,5 +251,34 @@ impl DataSection for PastHandlerDataV2 {
 
     fn is_empty(&self) -> bool {
         self.name.is_empty()
+    }
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct UnknownHandlerSave {
+    name: String,
+    gender: BinaryGender,
+    metadata_source: MetadataSource,
+}
+
+impl UnknownHandlerSave {
+    pub const fn new(name: String, gender: BinaryGender, metadata_source: MetadataSource) -> Self {
+        Self {
+            name,
+            gender,
+            metadata_source,
+        }
+    }
+
+    pub fn get_name(&self) -> String {
+        self.name.clone()
+    }
+
+    pub const fn get_gender(&self) -> BinaryGender {
+        self.gender
+    }
+
+    pub const fn get_metadata_source(&self) -> MetadataSource {
+        self.metadata_source
     }
 }

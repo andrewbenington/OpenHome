@@ -24,9 +24,9 @@ import * as types from '../util/types'
 import { generatePersonalityValuePreservingAttributes, MoveFilter } from '../util/util'
 import { PkmConverter } from './conversion/converter'
 import { PkmConstructorOptions } from './PKM'
+import { modernStatCalc } from './util'
 import * as encryption from './util/encryption'
 import { filterRibbons } from './util/ribbonLogic'
-import { getStats } from './util/statCalc'
 
 export default class PK5 {
   static getFormat() {
@@ -330,7 +330,7 @@ export default class PK5 {
   }
 
   public getStats() {
-    return getStats(this)
+    return modernStatCalc(this)
   }
 
   public get heldItemName() {

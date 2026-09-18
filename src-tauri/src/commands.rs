@@ -1,11 +1,10 @@
 use crate::data_controller::ToDataController;
-use crate::plugin::{self, PluginMetadata, PluginMetadataWithIcon, list_downloaded_plugins};
+use crate::plugin;
 use crate::state::{AppState, AppStateInner};
-use crate::util::ImageResponse;
 use crate::{menu, util};
 use openhome_core::data_controller::{DataController, DataDir};
 use openhome_core::error::{Error, Result};
-use openhome_core::pkm_storage::StoredBankData;
+use openhome_core::pkm_storage::StoredBankDataWasm;
 use openhome_core::saves::{self, SaveFileSearch};
 use serde_json::Value;
 use std::fs;
@@ -129,12 +128,6 @@ pub fn validate_recent_saves(
 
 #[tauri::command]
 #[specta::specta]
-pub fn get_image_data(absolute_path: String) -> CommandResult<ImageResponse> {
-    Ok(util::get_image_data(&PathBuf::from(absolute_path))?)
-}
-
-#[tauri::command]
-#[specta::specta]
 pub fn open_directory(absolute_path: String) -> CommandResult<()> {
     Ok(util::open_directory(&PathBuf::from(absolute_path))?)
 }
@@ -156,7 +149,7 @@ pub async fn download_plugin(
 ) -> CommandResult<String> {
     let metadata_url = format!("{remote_url}/plugin.json");
 
-    let plugin_metadata: PluginMetadata = util::download_json_file(&metadata_url).await?;
+    let plugin_metadata: plugin::PluginMetadata = util::download_json_file(&metadata_url).await?;
 
     Ok(plugin::download_async(app_handle, remote_url, plugin_metadata).await?)
 }
@@ -165,8 +158,8 @@ pub async fn download_plugin(
 #[specta::specta]
 pub fn list_installed_plugins(
     app_handle: tauri::AppHandle,
-) -> CommandResult<Vec<PluginMetadataWithIcon>> {
-    Ok(list_downloaded_plugins(&app_handle.controller())?)
+) -> CommandResult<Vec<plugin::PluginMetadata>> {
+    Ok(plugin::list_downloaded_plugins(&app_handle.controller())?)
 }
 
 #[tauri::command]
@@ -250,17 +243,18 @@ pub async fn find_suggested_saves(
 
 #[tauri::command]
 #[specta::specta]
-pub fn load_banks(app_handle: tauri::AppHandle) -> CommandResult<StoredBankData> {
-    Ok(openhome_core::pkm_storage::load_banks(
-        &app_handle.controller(),
-    )?)
+pub fn load_banks(app_handle: tauri::AppHandle) -> CommandResult<StoredBankDataWasm> {
+    Ok(openhome_core::pkm_storage::load_banks(&app_handle.controller())?.into())
 }
 
 #[tauri::command]
 #[specta::specta]
-pub fn write_banks(app_handle: tauri::AppHandle, bank_data: StoredBankData) -> CommandResult<()> {
+pub fn write_banks(
+    app_handle: tauri::AppHandle,
+    bank_data: StoredBankDataWasm,
+) -> CommandResult<()> {
     Ok(openhome_core::pkm_storage::write_banks(
         &app_handle.controller(),
-        bank_data,
+        bank_data.into(),
     )?)
 }

@@ -107,6 +107,7 @@ pub enum Error {
         length: SectionLength,
         buffer_size: usize,
     },
+    BadMagicNumber,
 }
 
 impl Display for Error {
@@ -129,6 +130,7 @@ impl Display for Error {
                 f,
                 "section {section_name} out of bounds at offset {offset}/length {length}/buffer_size {buffer_size}"
             ),
+            Error::BadMagicNumber => f.write_str("data has incorrect magic number"),
         }
     }
 }
@@ -203,7 +205,7 @@ impl<Tag: SectionTag> SectionedData<Tag> {
         self
     }
 
-    pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
+    pub fn from_bytes(bytes: &[u8], expected_magic_number: u32) -> Result<Self> {
         if bytes.len() <= HEADER_SIZE {
             return Err(Error::BufferTooShort {
                 field: String::from("Data Header"),
@@ -213,6 +215,10 @@ impl<Tag: SectionTag> SectionedData<Tag> {
         }
 
         let magic_number = u32::from_le_bytes(bytes[0..4].try_into().expect(EMERGENCY_BUFFER_MSG));
+        if expected_magic_number != magic_number {
+            return Err(Error::BadMagicNumber);
+        }
+
         let version = u16::from_le_bytes(bytes[4..6].try_into().expect(EMERGENCY_BUFFER_MSG));
         let section_count = u16::from_le_bytes(bytes[6..8].try_into().expect(EMERGENCY_BUFFER_MSG));
 

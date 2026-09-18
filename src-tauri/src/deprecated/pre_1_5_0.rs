@@ -1,4 +1,5 @@
 use openhome_core::pkm_storage;
+use pkm_rs::ohpkm::OpenHomeId;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use uuid::Uuid;
@@ -15,14 +16,13 @@ pub struct BoxPreV1_5_0 {
 
 impl BoxPreV1_5_0 {
     pub fn upgrade(self) -> pkm_storage::Box {
-        let mut identifiers: HashMap<u8, String> = HashMap::new();
+        let mut identifiers: HashMap<u8, OpenHomeId> = HashMap::new();
         for (index_str, identifier) in self.mon_identifiers_by_index {
-            match index_str.parse::<u8>() {
-                Ok(index) => {
-                    identifiers.insert(index, identifier);
-                }
-                Err(_) => continue,
-            }
+            if let Ok(index) = index_str.parse::<u8>()
+                && let Ok(openhome_id) = identifier.parse()
+            {
+                identifiers.insert(index, openhome_id);
+            };
         }
 
         pkm_storage::Box {

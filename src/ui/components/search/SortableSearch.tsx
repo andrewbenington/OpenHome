@@ -18,7 +18,7 @@ export default function SortableSearch<T extends SortableValue, SC extends Searc
   props: SortableSearchProps<T, SC>
 ) {
   const { FormComponent, controller, columns, topRightComponent, onSelectedChange } = props
-  const { reset, results, selectedId, setSelectedId } = controller
+  const { reset, loading, results, selectedId, setSelectedId } = controller
 
   const updateSelected = (item: T) => {
     const itemId = controller.getRowId(item)
@@ -44,13 +44,14 @@ export default function SortableSearch<T extends SortableValue, SC extends Searc
       </form>
       <SortableDataGrid
         className="search-results-grid"
-        rows={results}
+        rows={results ?? []}
         columns={columns}
         onCellClick={(props) => updateSelected(props.row)}
         rowKeyGetter={controller.getRowId}
         rowClass={(row) =>
           controller.getRowId(row) === selectedId ? 'search-row-selected' : undefined
         }
+        fetching={loading ? 'next' : undefined}
       />
     </Flex>
   )

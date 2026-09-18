@@ -2,7 +2,9 @@ import { InfoGridData } from '@openhome-ui/components/InfoGrid'
 import { ErrorContext } from '@openhome-ui/state/error'
 import { useCallback, useContext } from 'react'
 
-export default function useDisplayError() {
+export type ErrorDisplayFn = (title: string, messages: string | string[], data?: any) => void
+
+export default function useDisplayError(): ErrorDisplayFn {
   const [, dispatchErrorState] = useContext(ErrorContext)
 
   const displayError = useCallback(

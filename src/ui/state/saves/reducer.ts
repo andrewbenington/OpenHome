@@ -2,8 +2,9 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { SAV, SaveIdentifier, saveToStringIdentifier } from '@openhome-core/save/interfaces'
 import { SAVClass } from '@openhome-core/save/util'
-import { Option } from '@openhome-core/util/functional'
+import { Option, R, Result } from '@openhome-core/util/functional'
 import { createContext, Dispatch, Reducer } from 'react'
+import { SaveError } from '.'
 
 type OpenSave = {
   index: number
@@ -163,6 +164,7 @@ type SavesContextValue = {
   openSavesDispatch: Dispatch<OpenSavesAction>
   allOpenSaves: SAV[]
   promptDisambiguation: (possibleSaveTypes: SAVClass<SAV>[]) => Promise<Option<SAVClass<SAV>>>
+  saveChanges: (saveWarningAccepted: boolean) => Promise<Result<null, SaveError[]>>
 }
 
 const initialState: OpenSavesState = {
@@ -175,4 +177,5 @@ export const SavesContext = createContext<SavesContextValue>({
   openSavesDispatch: () => {},
   allOpenSaves: [],
   promptDisambiguation: async () => undefined,
+  saveChanges: async () => R.Ok(null),
 })

@@ -1,16 +1,19 @@
 import { Option } from '@openhome-core/util/functional'
+import { NowOrLater } from '@openhome-core/util/promise'
 import { useState } from 'react'
 
 export type SearchController<T> = {
   clearFields: () => void
   fieldsEmpty: boolean
 
-  results: T[]
+  loading: boolean
+  results: Option<T[]>
+  getResults: () => Promise<T[]>
 
   getRowId: (item: T) => string
   selectedId: Option<string>
   setSelectedId: (id: Option<string>) => void
-  selectedItem: Option<T>
+  getSelectedItem: () => NowOrLater<Option<T>>
 
   reset: () => void
 }

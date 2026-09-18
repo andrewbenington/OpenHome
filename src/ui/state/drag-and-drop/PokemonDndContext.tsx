@@ -11,6 +11,7 @@ import {
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
 import { monSupportedBySave } from '@openhome-core/save/util'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
+import useDisplayError from '@openhome-ui/hooks/displayError'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
 import { isMonLocation, MonLocation, useSaves } from '@openhome-ui/state/saves'
@@ -43,6 +44,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
   const { homeLocationIsEmpty, getCurrentBank } = useBanksAndBoxes()
   const { dragState, startDragging, endDragging, clearSelections } = useDragAndDrop()
   const [dragOverId, setDragOverId] = useState<UniqueIdentifier | null>(null)
+  const displayError = useDisplayError()
 
   const sensors = useSensors(
     useSensor(MouseSensor, {
@@ -79,7 +81,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
 
   return (
     <DndContext
-      onDragEnd={(e) => {
+      onDragEnd={async (e) => {
         setDragOverId(null)
 
         const dest = e.over?.data.current
@@ -115,20 +117,20 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
 
         if (dropElementId === 'to_release') {
           if (dragState.multiSelectEnabled && isSourceSelected) {
-            selectedLocations.forEach((loc) => {
-              const m = savesAndBanks.getMonAtLocation(loc)
-              if (m) savesAndBanks.releaseMonAtLocation(loc)
-            })
+            for (const location of selectedLocations) {
+              const mon = await savesAndBanks.getMonAtLocation(location)
+              if (mon) savesAndBanks.releaseMonAtLocation(location)
+            }
             clearSelections()
           } else {
             savesAndBanks.releaseMonAtLocation(firstMonWithLocation)
           }
         } else if (dropElementId === 'item-bag') {
           if (dragState.multiSelectEnabled && isSourceSelected) {
-            selectedLocations.forEach((loc) => {
-              const m = savesAndBanks.getMonAtLocation(loc)
-              if (m) savesAndBanks.moveMonItemToBag(loc)
-            })
+            for (const location of selectedLocations) {
+              const mon = await savesAndBanks.getMonAtLocation(location)
+              if (mon) savesAndBanks.moveMonItemToBag(location)
+            }
             clearSelections()
           } else {
             savesAndBanks.moveMonItemToBag(firstMonWithLocation)
@@ -195,7 +197,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
             for (const sourceLoc of selectedLocations) {
               if (!nextDestination) break
 
-              const currMon = savesAndBanks.getMonAtLocation(sourceLoc)
+              const currMon = await savesAndBanks.getMonAtLocation(sourceLoc)
               if (!currMon) continue
 
               if (
@@ -215,7 +217,9 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
                 savesAndBanks.moveMonItemToBag(sourceLoc)
               }
 
-              savesAndBanks.moveMon({ ...sourceLoc, mon: currMon }, nextDestination)
+              await savesAndBanks
+                .moveMon({ ...sourceLoc, mon: currMon }, nextDestination)
+                .catch((error) => displayError('Error moving Pokémon', error))
 
               nextDestination = nextDestination.isHome
                 ? nextHomeDestination(nextDestination.box, nextDestination.boxSlot + 1)
@@ -233,7 +237,9 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
               savesAndBanks.moveMonItemToBag(source)
             }
 
-            savesAndBanks.moveMon(source, dest)
+            savesAndBanks
+              .moveMon(source, dest)
+              .catch((error) => displayError('Could not move Pokémon', error))
           }
         }
 
@@ -248,7 +254,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
       onDragCancel={endDragging}
       sensors={sensors}
     >
-      <DragOverlay style={{ cursor: 'grabbing' }}>
+      <DragOverlay style={{ cursor: 'grabbing' }} dropAnimation={{ duration: 0 }}>
         {dragState.payload?.kind === 'item' ? (
           <img
             className="draggable-item"

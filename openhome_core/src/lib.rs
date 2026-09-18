@@ -5,6 +5,7 @@ pub mod lookup;
 pub mod ohpkm_store;
 pub mod pkm_storage;
 pub mod saves;
+pub mod search;
 pub mod startup_config;
 mod util;
 

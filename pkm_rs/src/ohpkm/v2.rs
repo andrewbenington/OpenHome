@@ -10,8 +10,10 @@ use crate::ohpkm::OhpkmConvert;
 #[allow(deprecated)]
 use crate::ohpkm::deprecated::PastHandlerDataV1;
 use crate::ohpkm::extra_form::ExtraFormIndex;
+use crate::ohpkm::id::OpenHomeId;
 use crate::ohpkm::issues::OhpkmIssue;
 use crate::ohpkm::v1::OhpkmV1;
+use crate::ohpkm::v2_sections::UnknownHandlerSave;
 use crate::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, StoredPkmBytes, UnconvertedPkm};
 use crate::result::{Error, Result};
 use crate::sectioned_data::{DataSection, SectionTag, SectionedData};
@@ -26,10 +28,11 @@ use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_resources::species::SpeciesMetadata;
+use pkm_rs_types::Dvs;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, FlagSet, Gender, Geolocations, HyperTraining, Ivs,
-    Language, MarkingsSixShapesColors, OriginGame, PokeDate, Pokerus, ShinyLeaves, Stats8,
+    Language, MarkingsSixShapesColors, OriginGame, PkmType, PokeDate, Pokerus, ShinyLeaves, Stats8,
     Stats16Le, StatsPreSplit, TeraType, TrainerData, TrainerMemory,
 };
 use serde::Serialize;
@@ -240,13 +243,18 @@ type DataUpdated = bool;
 
 impl OhpkmV2 {
     pub fn convert_without_backup<PKM: OhpkmConvert>(other: &PKM) -> Self {
-        Self {
+        let mut ohpkm = Self {
             main_data: other.to_main_data(),
             gen67_data: other.to_gen_67_data(),
             swsh_data: other.to_swsh_data(),
             sv_data: other.to_sv_data(),
             ..Default::default()
-        }
+        };
+
+        ohpkm.regenerate_openhome_id();
+        ohpkm.sync_learned_moves();
+
+        ohpkm
     }
 
     pub fn convert_with_backup<PKM: OhpkmConvert>(
@@ -260,8 +268,17 @@ impl OhpkmV2 {
         Ok(ohpkm)
     }
 
-    pub fn openhome_id(&self) -> String {
-        self.main_data.openhome_id()
+    pub const fn openhome_id(&self) -> OpenHomeId {
+        self.main_data.openhome_id
+    }
+
+    pub fn regenerate_openhome_id(&mut self) {
+        self.main_data.openhome_id = OpenHomeId::new(
+            self.species_and_form().get_ndex(),
+            self.trainer_id(),
+            self.secret_id(),
+            self.personality_value(),
+        );
     }
 
     pub fn gen_345_id(&self) -> String {
@@ -806,6 +823,16 @@ impl OhpkmV2 {
             .for_each(|r| self.main_data.ribbons.add_ribbon(r));
     }
 
+    // Species/Form metadata
+
+    pub fn type1(&self) -> PkmType {
+        self.get_forme_metadata().type_1()
+    }
+
+    pub fn type2(&self) -> Option<PkmType> {
+        self.get_forme_metadata().type_2()
+    }
+
     // Plugins
 
     pub fn plugin_origin(&self) -> Option<String> {
@@ -823,7 +850,7 @@ impl OhpkmV2 {
 
     // Game Boy
 
-    pub fn dvs(&self) -> StatsPreSplit {
+    pub fn dvs(&self) -> Dvs {
         match self.gameboy_data {
             Some(data) => data.dvs,
             None => GameboyData::from_main_data(&self.main_data).dvs,
@@ -846,7 +873,7 @@ impl OhpkmV2 {
 
     pub const fn set_gameboy_data(
         &mut self,
-        dvs: StatsPreSplit,
+        dvs: Dvs,
         met_time_of_day: u8,
         evs_g12: StatsPreSplit,
     ) {
@@ -1436,15 +1463,11 @@ impl OhpkmV2 {
         self.handler_data.clone()
     }
 
-    pub fn matching_unknown_handler(
-        &mut self,
-        name: String,
-        gender: BinaryGender,
-    ) -> Option<PastHandlerDataV2> {
-        let sized_string = SizedUtf16String::<26>::from(name);
+    pub fn matching_unknown_handler(&self, save: &UnknownHandlerSave) -> Option<PastHandlerDataV2> {
+        let sized_string = SizedUtf16String::<26>::from(save.get_name());
         self.handler_data
             .iter()
-            .find(|h| h.unknown_trainer_data_matches(&sized_string, gender))
+            .find(|h| h.unknown_trainer_data_matches(&sized_string, save.get_gender()))
             .cloned()
     }
 
@@ -1600,11 +1623,9 @@ impl OhpkmV2 {
     }
 
     pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        let sectioned_data = SectionedData::<OhpkmSectionTag>::from_bytes(bytes)?;
+        let sectioned_data = SectionedData::<OhpkmSectionTag>::from_bytes(bytes, MAGIC_NUMBER)?;
 
-        if sectioned_data.magic_number != MAGIC_NUMBER {
-            return Err(Error::other("Bad magic number"));
-        } else if sectioned_data.version != 2 {
+        if sectioned_data.version != 2 {
             return Err(Error::other("Bad version number"));
         }
 
@@ -1643,11 +1664,9 @@ impl OhpkmV2 {
     }
 
     pub fn from_bytes_fixing_errors(bytes: &[u8]) -> Result<Self> {
-        let sectioned_data = SectionedData::<OhpkmSectionTag>::from_bytes(bytes)?;
+        let sectioned_data = SectionedData::<OhpkmSectionTag>::from_bytes(bytes, MAGIC_NUMBER)?;
 
-        if sectioned_data.magic_number != MAGIC_NUMBER {
-            return Err(Error::other("Bad magic number"));
-        } else if sectioned_data.version != 2 {
+        if sectioned_data.version != 2 {
             return Err(Error::other("Bad version number"));
         }
 
@@ -2035,7 +2054,12 @@ impl OhpkmV2 {
 
     #[wasm_bindgen(getter = openhomeId)]
     pub fn openhome_id_js(&self) -> String {
-        self.openhome_id()
+        self.openhome_id().to_string()
+    }
+
+    #[wasm_bindgen(js_name = regenerateOpenhomeId)]
+    pub fn regenerate_openhome_id_js(&mut self) {
+        self.regenerate_openhome_id();
     }
 
     #[wasm_bindgen(getter = gen345Identifier)]
@@ -2736,6 +2760,7 @@ impl OhpkmV2 {
             Some(data) => data.dvs,
             None => GameboyData::from_main_data(&self.main_data).dvs,
         }
+        .into()
     }
 
     #[wasm_bindgen(getter = metTimeOfDay)]
@@ -2763,7 +2788,7 @@ impl OhpkmV2 {
         evs_g12: StatsPreSplit,
     ) {
         self.gameboy_data = Some(GameboyData {
-            dvs,
+            dvs: dvs.into(),
             met_time_of_day,
             evs_g12,
         })
@@ -3470,7 +3495,6 @@ impl OhpkmV2 {
         match value {
             Some(flags) => {
                 let mut new_bytes = [0u8; LZA_DLC_TM_BYTES];
-                dbg!(new_bytes, LZA_DLC_TM_BYTES);
                 new_bytes.copy_from_slice(&flags);
                 self.lza_data.get_or_insert_default().tm_flags_dlc =
                     FlagSet::<LZA_DLC_TM_BYTES>::from_bytes(new_bytes);
@@ -3571,6 +3595,18 @@ impl OhpkmV2 {
         plugin: Option<String>,
     ) -> DataUpdated {
         self.register_handler(handler, plugin)
+    }
+
+    // Species/Form metadata
+
+    #[wasm_bindgen(getter = type1Index)]
+    pub fn type1_index_wasm(&self) -> u8 {
+        self.get_forme_metadata().type_1_index()
+    }
+
+    #[wasm_bindgen(getter = type2Index)]
+    pub fn type2_index_wasm(&self) -> Option<u8> {
+        self.get_forme_metadata().type_2_index()
     }
 
     // Notes

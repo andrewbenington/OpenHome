@@ -51,9 +51,8 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
 
   const trMovesSwSh = mon.trMovesSwSh
   const tutorMovesLa = mon.tutorMovesLa
-  const tmMovesSvBase = mon.tmMovesSV
-  const tmMovesLzaBase = mon.tmMovesLzaBase
-  const tmMovesLzaDlc = mon.tmMovesLzaDlc
+  const tmMovesSvBase = mon.tmMovesSv
+  const tmMovesLza = mon.tmMovesLza
   const plusMovesLza = Array.from(mon.plusMoveFlags?.getMoveIds() ?? []).map((id) => Moves[id])
 
   return (
@@ -77,6 +76,9 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             <code>{u32Display(mon.encryptionConstant)}</code>
           </AttributeRow>
         )}
+        <AttributeRow label="OpenHome ID">
+          <code>{getMonFileIdentifier(mon)}</code>
+        </AttributeRow>
         <AttributeRow label="Origin Game" value={OriginGames.gameNameFull(mon.gameOfOrigin)} />
         <AttributeRow
           label="Met Location"
@@ -123,25 +125,33 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             <AttributeRow label="Affection" value={mon.trainerAffection.toString()} indent={10} />
           )}
         </AttributeRowExpand>
-        <AttributeRowExpand
-          summary="Last Handler"
-          value={
-            <Flex gap="1">
-              {mon.handlerName ?? '(empty)'}
-              <GenderIcon gender={mon.handlerGender} />
-            </Flex>
-          }
-        >
-          <AttributeRow label="Handler ID" indent={10}>
-            <code>{`${u16Display(mon.handlerID ?? 0)}`}</code>
-          </AttributeRow>
-          {!!mon.handlerFriendship && (
-            <AttributeRow label="Friendship" value={mon.handlerFriendship.toString()} indent={10} />
-          )}
-          {!!mon.handlerAffection && (
-            <AttributeRow label="Affection" value={mon.handlerAffection.toString()} indent={10} />
-          )}
-        </AttributeRowExpand>
+        {(!!mon.handlerFriendship || !!mon.handlerAffection || !!mon.handlerID) && (
+          <AttributeRowExpand
+            summary="Last Handler"
+            value={
+              <Flex gap="1">
+                {mon.handlerName ?? '(empty)'}
+                <GenderIcon gender={mon.handlerGender} />
+              </Flex>
+            }
+          >
+            {!!mon.handlerID && (
+              <AttributeRow label="Handler ID" indent={10}>
+                <code>{`${u16Display(mon.handlerID ?? 0)}`}</code>
+              </AttributeRow>
+            )}
+            {!!mon.handlerFriendship && (
+              <AttributeRow
+                label="Friendship"
+                value={mon.handlerFriendship.toString()}
+                indent={10}
+              />
+            )}
+            {!!mon.handlerAffection && (
+              <AttributeRow label="Affection" value={mon.handlerAffection.toString()} indent={10} />
+            )}
+          </AttributeRowExpand>
+        )}
         {pokerus.status() === 'Uninfected' ? (
           <AttributeRow label="Pokérus" value={pokerus.status()} />
         ) : (
@@ -284,57 +294,19 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             ))}
           </AttributeRowExpand>
         )}
-        {/* {!isRestricted(
-          LA_TRANSFER_RESTRICTIONS,
-          mon.nationalDex,
-          mon.formIndex,
-          mon.extraFormIndex
-        ) &&
-          mon.tutorFlagsLA &&
-          getFlagsInArrayRange(mon.tutorFlagsLA, 0, 8).length > 0 && (
-            <AttributeRowExpand
-              summary="LA Tutor Moves"
-              value={`${getFlagsInArrayRange(mon.tutorFlagsLA, 0, 8).length} Tutor Moves`}
-            >
-              {getFlagsInArrayRange(mon.tutorFlagsLA, 0, 8).map((i) => (
-                <AttributeRow key={`la_tutor_${i + 1}`} label={`Tutor ${i + 1}`} indent={10}>
-                  {Moves[LATutorMoveIndexes[i]].name}
-                </AttributeRow>
-              ))}
-            </AttributeRowExpand>
-          )} */}
-        {/* {!isRestricted(
-          SV_TRANSFER_RESTRICTIONS_ID,
-          mon.nationalDex,
-          mon.formIndex,
-          mon.extraFormIndex
-        ) &&
-          mon.tmFlagsSV &&
-          getFlagsInArrayRange(mon.tmFlagsSV, 0, 22).length > 0 && (
-            <AttributeRowExpand
-              summary="SV TMs"
-              value={`${getFlagsInArrayRange(mon.tmFlagsSV, 0, 22).length} TMs`}
-            >
-              {getFlagsInArrayRange(mon.tmFlagsSV, 0, 22).map((i) => (
-                <AttributeRow key={`sv_tm_${i}`} label={`TM ${i}`} indent={10}>
-                  {Moves[SVTMMoveIndexes[i]].name}
-                </AttributeRow>
-              ))}
-            </AttributeRowExpand>
-          )} */}
-        {tmMovesLzaBase && (
-          <AttributeRowExpand summary="Legends Z-A Base TMs" value={tmMovesLzaBase.length}>
-            {tmMovesLzaBase.map((move) => (
-              <AttributeRow key={`lza_base_tm_${move.name}`} label={move.name} indent={10}>
+        {tmMovesSvBase && tmMovesSvBase.length > 0 && (
+          <AttributeRowExpand summary="S/V Base TMs" value={tmMovesSvBase.length}>
+            {tmMovesSvBase.map((move) => (
+              <AttributeRow key={`sv_base_tm_${move.name}`} label={move.name} indent={10}>
                 {move.name}
               </AttributeRow>
             ))}
           </AttributeRowExpand>
         )}
-        {tmMovesLzaDlc && (
-          <AttributeRowExpand summary="Legends Z-A DLC TMs" value={tmMovesLzaDlc.length}>
-            {tmMovesLzaDlc.map((move) => (
-              <AttributeRow key={`lza_dlc_tm_${move.name}`} label={move.name} indent={10}>
+        {tmMovesLza && (
+          <AttributeRowExpand summary="Legends Z-A TMs" value={tmMovesLza.length}>
+            {tmMovesLza.map((move) => (
+              <AttributeRow key={`lza_tm_${move.name}`} label={move.name} indent={10}>
                 {move.name}
               </AttributeRow>
             ))}
@@ -489,9 +461,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             )}
           </>
         )}
-        {mon instanceof OHPKM && (
-          <AttributeRow label="OpenHome ID" value={getMonFileIdentifier(mon)} />
-        )}
+        {mon instanceof OHPKM && <AttributeRow label="OpenHome ID" value={mon.openhomeId} />}
         {mon.relearnMoves && (
           <>
             {mon.relearnMoves[0] > 0 && (

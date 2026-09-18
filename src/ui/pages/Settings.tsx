@@ -1,9 +1,12 @@
 import useBackend from '@openhome-core/backend/useBackend'
 import { R } from '@openhome-core/util/functional'
+import { $O } from '@openhome-core/util/option'
 import { stringSorter } from '@openhome-core/util/sort'
 import ContentCard from '@openhome-ui/components/ContentCard'
 import SideTabNavigation from '@openhome-ui/components/side-tabs/SideTabNavigation'
-import { AppInfoContext, AppTheme } from '@openhome-ui/state/appInfo'
+import { BoxIconSpriteType } from '@openhome-ui/hooks/monDisplay'
+import useSettings from '@openhome-ui/hooks/settings'
+import { AppTheme } from '@openhome-ui/state/appInfo'
 import {
   BoolOption,
   ConvertStrategies,
@@ -15,13 +18,13 @@ import {
   StringOption,
 } from '@pkm-rs/pkg'
 import { Flex, RadioGroup, Select, Separator } from '@radix-ui/themes'
-import { ReactNode, useContext, useEffect, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import PromptDialog from '../components/dialog/PromptDialog'
 import useDisplayError from '../hooks/displayError'
 import { ConvertStrategyKey, useConvertStrategies } from '../state/convert-strategies'
 import './Settings.css'
 
-export default function Settings() {
+export default function SettingsPage() {
   return (
     <SideTabNavigation
       defaultTab="general"
@@ -43,7 +46,7 @@ export default function Settings() {
 }
 
 function GeneralSettings() {
-  const [appInfoState, dispatchAppInfoState] = useContext(AppInfoContext)
+  const { settings, extraSaveTypes, updateSettings, updateMonDisplayState } = useSettings()
   const backend = useBackend()
   const [dataDirPath, setDataDirPath] = useState<string>()
   const displayError = useDisplayError()
@@ -52,27 +55,25 @@ function GeneralSettings() {
     backend.getDataDirPath().then(R.match((value) => setDataDirPath(value), console.error))
   }, [backend, displayError])
 
-  useEffect(() => {
-    backend.updateSettings(appInfoState.settings).catch(console.error)
-  }, [appInfoState.settings, backend])
-
   return (
     <ContentCard>
       <div className="settings-content-inner">
         <div>
           <GroupHeader name="Enabled ROM Hack Formats" />
           <div style={{ margin: 8 }}>
-            {appInfoState.extraSaveTypes.map((saveType) => (
+            {extraSaveTypes.map((saveType) => (
               <label className="flex-row" key={saveType.saveTypeName}>
                 <input
                   type="checkbox"
-                  onChange={(e) =>
-                    dispatchAppInfoState({
-                      type: 'set_savetype_enabled',
-                      payload: { saveType, enabled: e.target.checked },
+                  onChange={async (e) => {
+                    await updateSettings({
+                      enabledSaveTypes: {
+                        ...settings.enabledSaveTypes,
+                        [saveType.saveTypeID]: e.target.checked,
+                      },
                     })
-                  }
-                  checked={appInfoState.settings.enabledSaveTypes[saveType.saveTypeID]}
+                  }}
+                  checked={settings.enabledSaveTypes[saveType.saveTypeID]}
                 />
                 {saveType.saveTypeName}
               </label>
@@ -82,17 +83,33 @@ function GeneralSettings() {
         <div>
           <GroupHeader name="App Theme" />
           <RadioGroup.Root
-            onValueChange={(newValue: AppTheme) => {
+            onValueChange={async (newValue: AppTheme) => {
               if (!newValue) return
-              backend.setTheme(newValue)
-              dispatchAppInfoState({ type: 'set_app_theme', payload: newValue })
+              await backend.setTheme(newValue)
+              await updateSettings({ appTheme: newValue })
             }}
-            value={appInfoState.settings.appTheme}
+            value={settings.appTheme}
             style={{ margin: 8 }}
           >
             <RadioGroup.Item value="system">System</RadioGroup.Item>
             <RadioGroup.Item value="light">Light</RadioGroup.Item>
             <RadioGroup.Item value="dark">Dark</RadioGroup.Item>
+          </RadioGroup.Root>
+        </div>
+        <div>
+          <GroupHeader name="Box Icon Sprites" />
+          <RadioGroup.Root
+            onValueChange={async (newValue: string) => {
+              if (!newValue) return
+              await updateMonDisplayState({
+                boxIconSprites: newValue as BoxIconSpriteType,
+              })
+            }}
+            value={$O(settings.monDisplayState.boxIconSprites).orElse('default')}
+            style={{ margin: 8 }}
+          >
+            <RadioGroup.Item value="default">Home Icons (default)</RadioGroup.Item>
+            <RadioGroup.Item value="home">Full Home Sprites</RadioGroup.Item>
           </RadioGroup.Root>
         </div>
         <div>
@@ -106,17 +123,35 @@ function GeneralSettings() {
               <b>Current Data Directory:</b>
               <div>{dataDirPath}</div>
               <PromptDialog
+                title="Switch Data Directory"
+                description="Switch data directory? The app will restart using the specified directory as its datastore. No data will be copied or moved. THis is useful when you'd like to treat different directories as multiple 'profiles'. Note that Pokémon tracking data is independent per-directory."
+                triggerButton="Switch Profile"
+                actions={[
+                  { uniqueLabel: 'Cancel', action: () => {}, type: 'cancel' },
+                  {
+                    uniqueLabel: 'Select Directory...',
+                    action: () => {
+                      backend
+                        .promptChangeDataDir()
+                        .then(
+                          R.mapErr((err) => displayError('Error switching data directory', err))
+                        )
+                    },
+                  },
+                ]}
+              />
+              <PromptDialog
                 title="Move Data Directory?"
                 description="Are you sure you want to move the data directory? All files will be copied to the new location, and the app will restart. After they are copied to the new directory successfully, your storage and plugins will be removed from the old directory."
-                triggerButton="Change"
+                triggerButton="Move Data"
                 actions={[
                   { uniqueLabel: 'Cancel', action: () => {}, type: 'cancel' },
                   {
                     uniqueLabel: 'Select New Directory...',
                     action: () => {
                       backend
-                        .promptChangeDataDir()
-                        .then(R.mapErr((err) => displayError('Error changing data directory', err)))
+                        .promptMoveDataDir()
+                        .then(R.mapErr((err) => displayError('Error moving data', err)))
                     },
                     type: 'destructive',
                   },

@@ -21,8 +21,8 @@ import { FourMoves } from '../util/types'
 import { getHeightCalculated, getWeightCalculated, MoveFilter } from '../util/util'
 import { PkmConverter } from './conversion/converter'
 import { PkmConstructorOptions } from './PKM'
+import { modernStatCalc } from './util'
 import * as encryption from './util/encryption'
-import { getStats } from './util/statCalc'
 
 export default class PB7 {
   static getFormat() {
@@ -388,7 +388,7 @@ export default class PB7 {
   }
 
   public getStats() {
-    return getStats(this)
+    return modernStatCalc(this)
   }
 
   public get heldItemName() {

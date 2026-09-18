@@ -22,12 +22,12 @@ import {
   TrainerMemory,
 } from '@pkm-rs/pkg'
 import { PkmConstructorOptions } from './PKM'
+import { modernStatCalc } from './util'
 import {
   decryptByteArrayGen67,
   get16BitChecksumLittleEndian,
   shuffleBlocksGen67,
 } from './util/encryption'
-import { getStats } from './util/statCalc'
 import { convertPokeDate, convertPokeDateOptional } from './wasm/convert'
 
 export default class PK7 {
@@ -545,7 +545,7 @@ export default class PK7 {
   }
 
   public getStats() {
-    return getStats(this)
+    return modernStatCalc(this)
   }
 
   public recalculateStats() {

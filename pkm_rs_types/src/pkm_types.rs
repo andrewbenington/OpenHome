@@ -15,10 +15,13 @@ use wasm_bindgen::prelude::*;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
-#[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
+#[cfg_attr(feature = "wasm", derive(Tsify))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
-#[derive(Debug, Default, EnumString, Display, Serialize, PartialEq, Eq, Clone, Copy)]
+#[derive(
+    Debug, Default, EnumString, Display, Serialize, Deserialize, PartialEq, Eq, Clone, Copy,
+)]
 #[repr(u8)]
 pub enum PkmType {
     #[default]
@@ -96,7 +99,8 @@ impl PkmType {
             // 6: Unused bird type
             7 => Some(Self::Bug),
             8 => Some(Self::Ghost),
-            // 9-19: Dummy 'normal' types
+            9 => Some(Self::Steel),
+            // 10-19: Dummy 'normal' types
             20 => Some(Self::Fire),
             21 => Some(Self::Water),
             22 => Some(Self::Grass),
@@ -104,6 +108,7 @@ impl PkmType {
             24 => Some(Self::Psychic),
             25 => Some(Self::Ice),
             26 => Some(Self::Dragon),
+            27 => Some(Self::Dark),
             _ => None,
         }
     }
@@ -138,6 +143,33 @@ impl PkmTypes {
             "dark" => Some(PkmType::Dark),
             "fairy" => Some(PkmType::Fairy),
             _ => None,
+        }
+    }
+
+    #[wasm_bindgen(js_name = "toGameboyIndex")]
+    #[allow(clippy::missing_const_for_fn)]
+    pub fn to_gameboy_index(t: &PkmType) -> u8 {
+        match t {
+            PkmType::Normal => 0,
+            PkmType::Fighting => 1,
+            PkmType::Flying => 2,
+            PkmType::Poison => 3,
+            PkmType::Ground => 4,
+            PkmType::Rock => 5,
+            // 6: Unused bird type
+            PkmType::Bug => 7,
+            PkmType::Ghost => 8,
+            PkmType::Steel => 9,
+            // 10-19: Dummy 'normal' types
+            PkmType::Fire => 20,
+            PkmType::Water => 21,
+            PkmType::Grass => 22,
+            PkmType::Electric => 23,
+            PkmType::Psychic => 24,
+            PkmType::Ice => 25,
+            PkmType::Dragon => 26,
+            PkmType::Dark => 27,
+            _ => 0,
         }
     }
 
