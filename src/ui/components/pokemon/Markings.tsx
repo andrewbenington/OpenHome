@@ -39,9 +39,9 @@ const MarkingsDisplay = <M extends Markings>(props: MarkingsProps<M>) => {
 
   const markingShapes: MarkingShape[] =
     'star' in modifiedMarkings && 'diamond' in modifiedMarkings
-      ? ["circle", "triangle", "square", "heart", "star", "diamond"]
-      : ["circle", "square", "triangle", "heart"]
-  
+      ? ['circle', 'triangle', 'square', 'heart', 'star', 'diamond']
+      : ['circle', 'square', 'triangle', 'heart']
+
   return (
     <div className="markings-container">
       {markingShapes.map((shape) => (
