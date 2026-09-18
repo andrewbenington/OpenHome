@@ -1,3 +1,5 @@
+import { isThenable } from './promise'
+
 type PartitionedResults<A, E> = { successes: A[]; failures: E[] }
 
 export function partitionResults<A, E>(results: Result<A, E>[]) {
@@ -183,7 +185,10 @@ export class PromisedResultBox<T, E = string> {
     return R.after(Promise.resolve(this.v).then(map<T, E, U>(onOk)))
   }
 
-  andThen<U>(onOk: (v: T) => Promise<U>): PromisedResultBox<U, E> {
+  awaitMap<U>(onOk: (v: T) => Promise<U>): PromisedResultBox<U, E> {
+    if (!isThenable(this.v)) {
+      return $R(this.v).awaitMap(onOk)
+    }
     return R.after(
       Promise.resolve(this.v).then(
         R.match(
@@ -198,7 +203,7 @@ export class PromisedResultBox<T, E = string> {
     return R.after(Promise.resolve(this.v).then(mapErr<T, E, U>(onErr)))
   }
 
-  andThenFlat<U>(onOk: OnOk<T, Promise<Result<U, E>>>): PromisedResultBox<U, E> {
+  awaitFlatMap<U>(onOk: OnOk<T, Promise<Result<U, E>>>): PromisedResultBox<U, E> {
     return R.after(
       Promise.resolve(this.v).then((result) =>
         isErr(result) ? Promise.resolve(result) : onOk(result.data)
@@ -206,7 +211,7 @@ export class PromisedResultBox<T, E = string> {
     )
   }
 
-  thenFlatMap<U>(onOk: OnOk<T, Promise<Result<U, E>>>): PromisedResultBox<U, E> {
+  map<U>(onOk: OnOk<T, Result<U, E>>): PromisedResultBox<U, E> {
     return R.after(
       Promise.resolve(this.v).then((result) =>
         isErr(result) ? Promise.resolve(result) : onOk(result.data)
@@ -301,6 +306,11 @@ export class ResultBox<T, E> {
   // without unwrapping to a raw Result first.
   update<U>(onOk: OnOk<T, ResultBox<U, E>>): ResultBox<U, E> {
     return isOk(this.r) ? onOk(this.r.data) : (this as unknown as ResultBox<U, E>)
+  }
+
+  // Chains an async operation off the ok channel, short-circuiting on error.
+  awaitMap<U>(onOk: OnOk<T, Promise<U>>): PromisedResultBox<U, E> {
+    return R.after(isErr(this.r) ? Promise.resolve(this.r) : onOk(this.r.data).then(R.Ok))
   }
 
   // Chains an async operation off the ok channel, short-circuiting on error.
