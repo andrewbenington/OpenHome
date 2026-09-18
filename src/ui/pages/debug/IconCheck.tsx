@@ -1,8 +1,14 @@
+import { nationalDexHasGenderDifference } from '@openhome-core/pkm/util/index'
 import { range } from '@openhome-core/util/functional'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import SideTabNavigation from '@openhome-ui/components/side-tabs/SideTabNavigation'
 import { useSpeciesData } from '@openhome-ui/hooks/pkm_rs'
-import { extraFormDisplayName, extraFormsByNationalDex, extraFormSpriteName } from '@pkm-rs/pkg'
+import {
+  extraFormDisplayName,
+  extraFormsByNationalDex,
+  extraFormSpriteName,
+  Gender,
+} from '@pkm-rs/pkg'
 import { Generation } from '@pkm-rs/pkg/pkm_rs'
 import { Flex, ScrollArea, Separator, Switch, Tooltip } from '@radix-ui/themes'
 import { useState } from 'react'
@@ -40,12 +46,23 @@ function GenerationIcons(props: { gen: Generation; shiny?: boolean }) {
             <Flex align="center" gap="0.25rem">
               <div className="species-display">
                 {s.forms[0].formeName}
-                <PokemonIcon
-                  nationalDex={s.nationalDex}
-                  formIndex={0}
-                  isShiny={props.shiny}
-                  style={{ width: '2rem', height: '2rem' }}
-                />
+                <Flex direction="column">
+                  <PokemonIcon
+                    nationalDex={s.nationalDex}
+                    formIndex={0}
+                    isShiny={props.shiny}
+                    style={{ width: '2rem', height: '2rem' }}
+                  />
+                  {nationalDexHasGenderDifference(s.nationalDex) && (
+                    <PokemonIcon
+                      nationalDex={s.nationalDex}
+                      formIndex={0}
+                      gender={Gender.Female}
+                      isShiny={props.shiny}
+                      style={{ width: '2rem', height: '2rem' }}
+                    />
+                  )}
+                </Flex>
               </div>
               <div className="form-flex-outer">
                 <div className="form-flex">

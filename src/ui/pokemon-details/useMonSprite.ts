@@ -102,7 +102,7 @@ export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
       case 'default':
         setSpriteResult({
           loading: false,
-          path: getPublicImageURL(getPokemonSpritePath(mon)),
+          path: result.path,
         })
         return
       case 'plugin':

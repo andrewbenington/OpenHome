@@ -74,5 +74,6 @@ jobs:
           releaseDraft: false
           prerelease: false
           tauriScript: 'cargo tauri'
-          releaseAssetNamePattern: '[mainBinaryName]_[version]_arch_linux.[ext]'
+          releaseAssetNamePattern: '[mainBinaryName]_[version]_[arch]_arch_linux[ext]'
+          retryAttempts: 3
           args: ${{ matrix.args }} --verbose

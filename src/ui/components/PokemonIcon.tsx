@@ -1,20 +1,12 @@
-import { CHAMPS_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
-import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { Option, R } from '@openhome-core/util/functional'
+import { $R } from '@openhome-core/util/functional'
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
-import BoxIcons from '@openhome-ui/images/BoxIcons.webp'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
-import {
-  ExtraFormIndex,
-  extraFormSpriteName,
-  FormMetadata,
-  Generation,
-  MetadataSummaryLookup,
-} from '@pkm-rs/pkg'
+import { getPokemonSpritePathInner } from '@openhome-ui/images/pokemon'
+import { ExtraFormIndex, Gender, NationalDex } from '@pkm-rs/pkg'
 import { HTMLAttributes, memo, MouseEventHandler, ReactNode, useState } from 'react'
-import { MonDisplayState, useMonDisplay } from '../hooks/monDisplay'
-import { boxIconImagePath, FormsUsingImages } from '../pokemon-details/useBoxIconImage'
+import { BoxIconSpriteType, MonDisplayState, useMonDisplay } from '../hooks/monDisplay'
+import { boxIconImagePath } from '../pokemon-details/useBoxIconImage'
 import { classNames, grayscaleIf } from '../util/style'
 import { MonTag } from '../util/tags'
 import { TagIcon } from './TagIcon'
@@ -24,6 +16,7 @@ export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
   nationalDex: number
   formIndex?: number
   isShiny?: boolean
+  gender?: Gender
   isEgg?: boolean
   heldItemIndex?: number
   onlyItem?: boolean
@@ -36,82 +29,26 @@ export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
   monDisplayState?: MonDisplayState
 }
 
-function getBackgroundPosition(formeMetadata?: FormMetadata, isEgg?: boolean) {
-  const [x, y] =
-    isEgg ||
-    !formeMetadata ||
-    (formeMetadata.isMega && formeMetadata.introducedGen === Generation.G9)
-      ? [0, 0]
-      : formeMetadata.spriteCoords
-
-  return `${(x / 35) * 100}% ${(y / 36) * 100}%`
-}
-
-type IconType = 'spritesheet' | 'image'
-
-const FORCE_ICON_FROM_IMAGE = false
-
-function iconType(
-  nationalDex: number,
-  formIndex: number,
-  extraFormIndex: Option<ExtraFormIndex>
-): IconType {
-  const formeMetadata = MetadataSummaryLookup(nationalDex, formIndex ?? 0)
-  const inChampions = !isRestricted(CHAMPS_TRANSFER_RESTRICTIONS, nationalDex, formIndex)
-  const isGen9Mega = formeMetadata?.isMega && formeMetadata.introducedGen === Generation.G9
-  const extraFormWithSprite = Boolean(extraFormIndex && extraFormSpriteName(extraFormIndex))
-
-  const shouldUseImage =
-    FORCE_ICON_FROM_IMAGE ||
-    inChampions ||
-    isGen9Mega ||
-    extraFormWithSprite ||
-    FormsUsingImages.get(nationalDex)?.includes(formIndex ?? 0)
-
-  return shouldUseImage ? 'image' : 'spritesheet'
-}
-
 const PokemonIcon = memo((props: PokemonIconProps) => {
-  const { nationalDex, formIndex, isShiny, heldItemIndex, onlyItem, silhouette, isEgg } = props
-  const { grayedOut, topRightIndicator, tags, hasNotes, style, onClick, extraFormIndex } = props
-  const { showNotesIndicator, showTags } = useMonDisplay()
-
-  let monImage = null
-
-  switch (iconType(nationalDex, formIndex ?? 0, extraFormIndex)) {
-    case 'image': {
-      monImage = (
-        <PokemonIconUsingImage
-          nationalDex={nationalDex}
-          formeNumber={formIndex}
-          extraFormIndex={extraFormIndex}
-          silhouette={silhouette}
-          onClick={onClick}
-          isShiny={isShiny}
-        />
-      )
-      break
-    }
-    case 'spritesheet':
-      const formeMetadata = MetadataSummaryLookup(nationalDex, formIndex ?? 0)
-      monImage = formeMetadata ? (
-        <PokemonIconUsingSheet
-          formeMetadata={formeMetadata}
-          isEgg={isEgg}
-          silhouette={silhouette}
-          onClick={onClick}
-        />
-      ) : null
-      break
-  }
+  const {
+    heldItemIndex,
+    onlyItem,
+    grayedOut,
+    topRightIndicator,
+    tags,
+    hasNotes,
+    style,
+    ...iconProps
+  } = props
+  const { showNotesIndicator, showTags, boxIconSprites } = useMonDisplay()
 
   return (
     <div
       className={classNames('pokemon-icon-container', grayscaleIf(grayedOut), 'flex-centered')}
       style={style}
     >
-      {!onlyItem && monImage}
-      {isShiny && (
+      {!onlyItem && <PokemonIconImage {...iconProps} spriteType={boxIconSprites} />}
+      {props.isShiny && (
         <img
           alt="shiny icon"
           className="shiny-icon"
@@ -144,70 +81,54 @@ const PokemonIcon = memo((props: PokemonIconProps) => {
   )
 })
 
-interface PokemonIconUsingSheetProps {
-  formeMetadata: FormMetadata
-  isEgg?: boolean
-  silhouette?: boolean
-  onClick?: MouseEventHandler
-}
-
-function PokemonIconUsingSheet(props: PokemonIconUsingSheetProps) {
-  const { formeMetadata, isEgg, silhouette, onClick } = props
-
-  const isDarkMode = useIsDarkMode()
-
-  return (
-    <div
-      draggable={false}
-      className="pokemon-spritesheet-icon"
-      style={{
-        backgroundImage: `url(${BoxIcons})`,
-        backgroundPosition: getBackgroundPosition(formeMetadata, isEgg),
-        filter: silhouette
-          ? isDarkMode
-            ? 'contrast(0%) brightness(85%)'
-            : 'contrast(0%) brightness(25%)'
-          : undefined,
-      }}
-      onClick={onClick}
-    />
-  )
-}
-
-interface PokemonIconUsingImageProps {
+interface PokemonIconImageProps {
   nationalDex: number
-  formeNumber?: number
+  formIndex?: number
   extraFormIndex?: number
   silhouette?: boolean
+  isEgg?: boolean
   isShiny?: boolean
+  gender?: Gender
   onClick?: MouseEventHandler
+  spriteType: BoxIconSpriteType
 }
 
 const DEFAULT_BOX_ICON = `/items/index/0000.png`
 
-function PokemonIconUsingImage(props: PokemonIconUsingImageProps) {
-  const { nationalDex, formeNumber, extraFormIndex, silhouette, onClick } = props
-  const [spritePath, setSpritePath] = useState(DEFAULT_BOX_ICON)
-  const [imageLoadFailed, setImageLoadFailed] = useState(false)
+function getBoxIconImage(props: PokemonIconImageProps) {
+  return $R(
+    boxIconImagePath(
+      {
+        nationalDex: props.nationalDex,
+        formIndex: props.formIndex ?? 0,
+        format: 'OHPKM',
+        extraFormIndex: props.extraFormIndex,
+        isShiny: props.isShiny,
+        isFemale: props.gender === Gender.Female,
+      },
+      props.spriteType
+    )
+  )
+}
 
+function PokemonIconImage(props: PokemonIconImageProps) {
+  const { silhouette, onClick, isEgg } = props
+  const [spritePath, setSpritePath] = useState(
+    isEgg ? getPublicImageURL('sprites/box-home/egg.webp') : DEFAULT_BOX_ICON
+  )
+  const [imageLoadFailed, setImageLoadFailed] = useState(false)
   const isDarkMode = useIsDarkMode()
 
   if (spritePath === DEFAULT_BOX_ICON && !imageLoadFailed) {
-    const spriteResult = boxIconImagePath({
-      nationalDex: nationalDex,
-      formIndex: formeNumber ?? 0,
-      format: 'OHPKM',
-      extraFormIndex,
-      isShiny: props.isShiny,
-    })
-    R.match(
+    getBoxIconImage(props).match(
       (path: string) => {
         setSpritePath(getPublicImageURL(path))
       },
       (err: string) => {
+        setImageLoadFailed(true)
         console.error(err)
       }
-    )(spriteResult)
+    )
   }
 
   return (
@@ -217,7 +138,6 @@ function PokemonIconUsingImage(props: PokemonIconUsingImageProps) {
       draggable={false}
       src={spritePath}
       style={{
-        imageRendering: 'pixelated',
         filter: silhouette
           ? isDarkMode
             ? 'contrast(0%) brightness(85%)'
@@ -230,8 +150,25 @@ function PokemonIconUsingImage(props: PokemonIconUsingImageProps) {
           event: 'box-sprite-image-error',
           url: spritePath,
         })
-        setImageLoadFailed(true)
-        setSpritePath(DEFAULT_BOX_ICON)
+
+        const homePath = getPokemonSpritePathInner(
+          {
+            ...props,
+            formIndex: props.formIndex ?? 0,
+            format: 'OHPKM',
+            extraFormIndex: props.extraFormIndex,
+          },
+          'box-home',
+          'webp'
+        )
+
+        if (spritePath !== getPublicImageURL(homePath)) {
+          setSpritePath(getPublicImageURL(homePath))
+        } else {
+          console.assert(props.nationalDex !== NationalDex.Farfetchd, getPublicImageURL(homePath))
+          setImageLoadFailed(true)
+          setSpritePath(DEFAULT_BOX_ICON)
+        }
       }}
     />
   )
