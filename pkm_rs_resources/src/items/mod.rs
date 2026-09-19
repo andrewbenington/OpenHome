@@ -6,6 +6,7 @@ mod radical_red;
 mod types;
 pub mod types_extra;
 mod unbound;
+pub mod emerald_rogue;
 
 pub use modern::ITEM_MAX;
 pub use types::*;

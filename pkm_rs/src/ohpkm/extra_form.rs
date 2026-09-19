@@ -244,6 +244,10 @@ impl ExtraFormIndex {
         )
     }
 
+    pub const fn in_emerald_rogue(&self) -> bool {
+        self.is_cosplay_pikachu_form() || self.is_gmax()
+    }
+
     pub const fn in_unbound(&self) -> bool {
         self.is_cosplay_pikachu_form()
             || matches!(
