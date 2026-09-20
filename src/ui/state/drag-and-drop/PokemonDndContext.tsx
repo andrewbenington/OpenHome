@@ -243,6 +243,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
       onDragStart={(e) => {
         const payload = e.active.data?.current
         if (!isDragPayload(payload)) return
+        console.log('starting to drag', payload)
         startDragging(payload)
       }}
       onDragOver={onDragOver}

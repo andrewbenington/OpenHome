@@ -30,6 +30,10 @@ import {
   SavesContext,
 } from './reducer'
 
+const logUpdate = (mon: Option<PKMInterface>, location: SaveMonLocation) =>
+  console.log(
+    `set ${mon?.nickname} at location ${location.saveIdentifier} ${location.box}/${location.boxSlot}`
+  )
 export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'homeData'>> & {
   allOpenSaves: readonly SAV[]
 
@@ -158,6 +162,7 @@ export function useSaves(): SavesAndBanksManager {
       return await convertedSourceMon.then((convertedMon) => {
         const displacedMon = destSave.getMonAt(dest.box, dest.boxSlot)
         destSave.setMonAt(dest.box, dest.boxSlot, convertedMon)
+        logUpdate(convertedMon, dest)
         destSave.updatedBoxSlots.push({ box: dest.box, boxSlot: dest.boxSlot })
         return displacedMon
       })

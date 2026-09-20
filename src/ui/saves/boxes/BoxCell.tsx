@@ -218,6 +218,7 @@ function BoxCell(props: BoxCellProps) {
           style={{
             backgroundColor: cellBackgroundColor,
             borderColor: isSelected ? '#4ade80' : borderColor,
+            borderStyle: 'solid',
             ...props.style,
           }}
           onDrop={(e) => {
