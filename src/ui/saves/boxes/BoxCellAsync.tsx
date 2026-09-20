@@ -1,5 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Option } from '@openhome-core/util/functional'
 import { NowOrLater } from '@openhome-core/util/promise'
 import { CtxMenuElementBuilder } from '@openhome-ui/components/context-menu'
@@ -11,6 +12,7 @@ import BoxCell from './BoxCell'
 interface BoxCellAsyncProps {
   title?: string
   onClick: () => void
+  monPlaceholder?: Option<PKMInterface>
   monPromise?: Promise<Option<PKMInterface>> | Option<PKMInterface>
   onDrop: (_: PKMInterface[]) => NowOrLater<unknown>
   isDisabled?: (mon: PKMInterface) => boolean
@@ -29,19 +31,39 @@ function BoxCellAsync(props: BoxCellAsyncProps) {
   return props.monPromise ? (
     <Suspense
       fallback={
-        <img
-          src="/items/index/0000.png"
-          alt=""
-          aria-hidden
-          draggable={false}
-          style={{ width: '2.75rem', padding: '0.5rem', backgroundColor: '#6662' }}
-        />
+        props.monPlaceholder ? (
+          <BoxCell
+            {...props}
+            mon={props.monPlaceholder}
+            disabled={props.isDisabled?.(props.monPlaceholder)}
+            borderColor="yellow"
+          />
+        ) : (
+          <div
+            className="box-cell box-cell-loading"
+            style={{
+              backgroundColor: '#6662',
+            }}
+          >
+            <img
+              src="/items/index/0000.png"
+              alt=""
+              aria-hidden
+              draggable={false}
+              style={{
+                width: 'calc(0.7 * var(--box-cell-size))',
+                aspectRatio: 1,
+                padding: '0.25rem',
+              }}
+            />
+          </div>
+        )
       }
     >
       <BoxCellAsyncInner {...props} monPromise={props.monPromise} />
     </Suspense>
   ) : (
-    <BoxCell {...props} mon={props.monPromise} />
+    <BoxCell {...props} mon={props.monPromise} borderColor="grey" />
   )
 }
 
@@ -51,7 +73,14 @@ function BoxCellAsyncInner(
   const { monPromise, isDisabled, ...boxCellProps } = props
   const mon = isThenable(monPromise) ? use(monPromise) : monPromise
 
-  return <BoxCell {...boxCellProps} mon={mon} disabled={mon && isDisabled?.(mon)} />
+  return (
+    <BoxCell
+      {...boxCellProps}
+      mon={mon}
+      disabled={mon && isDisabled?.(mon)}
+      borderColor={mon instanceof OHPKM ? 'teal' : 'purple'}
+    />
+  )
 }
 
 export default BoxCellAsync

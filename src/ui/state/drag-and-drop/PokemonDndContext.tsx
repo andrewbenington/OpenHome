@@ -235,7 +235,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
       draggingMon.formIndex
     )?.megaEvolutions.find((mega) => mega.requiredItemId === draggingMon.heldItemIndex)
 
-    if (megaForStone) formeNumber = megaForStone.megaForme.formIndex
+    if (megaForStone) formeNumber = megaForStone.megaForm.formIndex
   } else if (draggingMon && isBattleFormeItem(draggingMon.nationalDex, draggingMon.heldItemIndex)) {
     formeNumber = displayIndexAdder(draggingMon.heldItemIndex)(draggingMon.formIndex)
   }

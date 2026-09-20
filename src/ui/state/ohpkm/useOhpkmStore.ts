@@ -97,7 +97,7 @@ export function useOhpkmStore() {
 
   function tryLoadFromId(id: string): NowOrLater<OhpkmLookupResult> {
     const cached = ohpkmCache.get(id)
-    if (cached) return Promise.resolve(R.Ok(cached))
+    if (cached) return R.Ok(cached)
 
     return backend
       .lookupOhpkmById(id)
@@ -298,7 +298,7 @@ export function useOhpkmStore() {
     return R.Ok(mon)
   }
 
-  async function startTrackingNewMon<P extends PKMInterface>(
+  function startTrackingNewMon<P extends PKMInterface>(
     mon: P,
     sourceSave: Option<SAV<P>>,
     destSave: Option<SAV>
@@ -306,10 +306,15 @@ export function useOhpkmStore() {
     const ohpkm = sourceSave ? OHPKM.fromMonInSave(mon, sourceSave) : OHPKM.fromMonUnknownSave(mon)
     ohpkm.startedTrackingTimestamp = dayjs()
     if (destSave) {
-      await handleLookupsUpdate(ohpkm, destSave)
+      handleLookupsUpdate(ohpkm, destSave)
+        .then(() => insertOrUpdate(ohpkm))
+        .catch((error) =>
+          displayError('Error Updating Lookup File for Save', [
+            `When updating the lookup entry for the OHPKM ${ohpkm.openhomeId} (${ohpkm.nickname}), an error was encountered:`,
+            String(error),
+          ])
+        )
     }
-
-    await insertOrUpdate(ohpkm)
 
     return ohpkm
   }

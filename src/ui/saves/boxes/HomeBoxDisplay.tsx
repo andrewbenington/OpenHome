@@ -257,7 +257,6 @@ type SlotData = {
   monPromise: NowOrLater<Option<OHPKM>>
   location: HomeMonLocation
   identifier: Option<OhpkmIdentifier>
-  // loading: boolean
 }
 
 function SingleBoxMonDisplay() {
