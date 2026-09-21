@@ -1,7 +1,7 @@
 use pkm_rs_resources::species::SpeciesForm;
 use serde::Serialize;
 
-use crate::result::{Error, NdexConvertSource, Result};
+use crate::result::{Error, Result};
 use crate::rom_hacks::cfru::{CfruSpeciesIndex, Pk3Cfru};
 
 #[cfg(feature = "randomize")]
