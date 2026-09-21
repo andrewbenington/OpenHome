@@ -1,4 +1,4 @@
-use emerald_expansion;
+mod emerald_expansion;
 
 // include/constants/pokeball.h - enum PokeBall
 pub const EMERALD_EX_BALLS: [Ball; 28] = [
