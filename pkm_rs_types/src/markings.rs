@@ -166,7 +166,7 @@ impl MarkingValue {
     }
 
     pub const fn to_uncolored(self) -> bool {
-        matches!(self, MarkingValue::Blue)
+        matches!(self, MarkingValue::Blue | MarkingValue::Red)
     }
 
     pub fn from_string_optional(val: Option<String>) -> MarkingValue {
