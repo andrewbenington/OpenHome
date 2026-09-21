@@ -174,7 +174,7 @@ export class PromisedResultBox<T, E = string> {
     return new PromisedResultBox(Promise.resolve(R.Ok(value)))
   }
 
-  then<U>(onOk: OnOk<T, U>): PromisedResultBox<U, E> {
+  map<U>(onOk: OnOk<T, U>): PromisedResultBox<U, E> {
     return R.after(Promise.resolve(this.v).then(map<T, E, U>(onOk)))
   }
 
@@ -204,7 +204,7 @@ export class PromisedResultBox<T, E = string> {
     )
   }
 
-  map<U>(onOk: OnOk<T, Result<U, E>>): PromisedResultBox<U, E> {
+  flatMap<U>(onOk: OnOk<T, Result<U, E>>): PromisedResultBox<U, E> {
     return R.after(
       Promise.resolve(this.v).then((result) =>
         isErr(result) ? Promise.resolve(result) : onOk(result.data)

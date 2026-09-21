@@ -61,7 +61,7 @@ export function useSyncedState<State, Action = State, RustState = State>(
   }, [backend, convertRustState, identifier])
 
   const loadAndCacheState = useCallback(async () => {
-    stateGetter()
+    await stateGetter()
       .then(
         R.match(
           (data) => {

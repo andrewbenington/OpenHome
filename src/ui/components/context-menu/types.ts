@@ -63,7 +63,7 @@ export class Item implements CtxMenuElementBuilder {
     return {
       content: this.content,
       action: this.#action,
-      disabled: this.#action === undefined,
+      disabled: this.#action === undefined || this.#disabled,
       __cm_type_tag: 'item',
     }
   }

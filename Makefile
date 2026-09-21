@@ -36,6 +36,14 @@ check: wasm-compile
 	@pnpm run lint
 	@pnpm run format
 
+.PHONY: oxlint
+oxlint:
+	@oxlint src
+
+.PHONY: eslint
+eslint:
+	@pnpm eslint src --max-warnings 0 --report-unused-disable-directives -c eslint.config.mjs
+
 .PHONY: test
 test: ensure-dependencies
 	@pnpm run test

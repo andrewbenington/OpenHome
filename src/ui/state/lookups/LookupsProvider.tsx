@@ -19,8 +19,9 @@ export default function LookupsProvider({ children }: PropsWithChildren) {
       useStateManager={useLookupsTauri}
       StateContext={LookupsContext}
       stateDescription="lookups"
-      children={children}
-    />
+    >
+      {children}
+    </RustStateProvider>
   )
 }
 

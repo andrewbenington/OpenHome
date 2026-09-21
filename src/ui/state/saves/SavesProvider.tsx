@@ -181,9 +181,9 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     // returns a function to stop listening
     const stopListening = backend.onMenuEvents({
       save: () => saveChanges(false),
-      reset: () => {
+      reset: async () => {
         openSavesDispatch({ type: 'clear_mons_to_release' })
-        reloadBankStore()
+        await reloadBankStore()
         openSavesDispatch({ type: 'close_all_saves' })
       },
     })
@@ -238,10 +238,10 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       <SaveDisambiguationDialog
         open={Boolean(disambiguationSaveTypes)}
         saveTypes={disambiguationSaveTypes}
-        onSelect={(selected) => {
+        onSelect={async (selected) => {
           setDisambiguationSaveTypes(undefined)
           disambiguationResolver.current?.(selected)
-          navigate('/home')
+          await navigate('/home')
         }}
       />
       <PromptDialog

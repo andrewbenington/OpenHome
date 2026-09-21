@@ -82,7 +82,7 @@ const allGenders = [Gender.Male, Gender.Female, Gender.Genderless].map((gender) 
 export default function FilterPanel() {
   const { filter, setFilter, clearFilter } = useMonDisplay()
 
-  const ALL_SPECIES_DATA = useMemo(all_species_data, [])
+  const ALL_SPECIES_DATA = useMemo(() => all_species_data(), [])
 
   const ALL_ABILITIES: SelectOption[] = getAllAbilities()
     .sort(stringSorter((a) => a.name))

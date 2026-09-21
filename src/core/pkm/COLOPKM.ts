@@ -35,7 +35,7 @@ export default class COLOPKM {
   static getFormat() {
     return 'COLOPKM' as const
   }
-  format: 'COLOPKM' = 'COLOPKM'
+  format = 'COLOPKM' as const
   static getBoxSize() {
     return 312
   }

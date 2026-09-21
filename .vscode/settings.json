@@ -8,7 +8,7 @@
     }
   },
   "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "alphatr.oxc-vscode-enhance"
   },
   "[typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
@@ -24,7 +24,7 @@
     "editor.formatOnSave": true
   },
   "[json]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "alphatr.oxc-vscode-enhance"
   },
   "[rust]": {
     "editor.defaultFormatter": "rust-lang.rust-analyzer",

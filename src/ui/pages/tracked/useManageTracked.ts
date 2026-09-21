@@ -50,7 +50,7 @@ export function useManageTracked() {
   const displayError = useDisplayError()
   const [findingSaveState, setFindingSaveState] = useState<FindingSavesState>()
 
-  const enabledSaveTypes = useMemo(getEnabledSaveTypes, [getEnabledSaveTypes])
+  const enabledSaveTypes = useMemo(() => getEnabledSaveTypes(), [getEnabledSaveTypes])
 
   const findSaveForMon = useCallback(
     async (identifier: OhpkmIdentifier) => {
@@ -138,7 +138,7 @@ export function useManageTracked() {
           setState({ type: 'found', id: identifier, save: saveFile.data, location })
 
           mon.syncWithGameData(match, saveFile.data)
-          ohpkmStore.insertOrUpdate(mon)
+          await ohpkmStore.insertOrUpdate(mon)
           return saveFile.data
         }
       }
@@ -242,7 +242,7 @@ export function useManageTracked() {
       }
     }
 
-    ohpkmStore.insertOrUpdateAll(toUpdate)
+    await ohpkmStore.insertOrUpdateAll(toUpdate)
 
     const allMissingIdsNotInBoxes = Array.from(notFoundIds.difference(foundMonIds))
 

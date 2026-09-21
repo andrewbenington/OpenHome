@@ -50,7 +50,7 @@ export default function TrackedPokemonPage() {
         return
       }
 
-      loadResult.then(
+      await loadResult.then(
         R.match(
           (mon) => setSelectedMon(mon),
           (error) =>
@@ -232,8 +232,8 @@ function ForOneStateBody(props: ForOneStateBodyProps) {
   const { getCurrentBank } = useBanksAndBoxes()
   const displayError = useDisplayError()
 
-  function openSaveAndNavToHome(save: SAV) {
-    saves.addSave(save).then(
+  async function openSaveAndNavToHome(save: SAV) {
+    await saves.addSave(save).then(
       R.match(
         () => navigate('/home'),
         (error: SaveError) => displayError(saveErrorTitle(error.type), saveErrorMessage(error))
@@ -244,12 +244,12 @@ function ForOneStateBody(props: ForOneStateBodyProps) {
   function recoverToBox(boxIndex: number) {
     // Radix UI is bugged when you have a dropdown and a dialog open at the same time.
     // This is necessary to restore clickability for the whole app
-    document.body.style.pointerEvents = 'auto'
+    // document.body.style.pointerEvents = 'auto'
 
     setLoading(true)
     saves.recoverMonToBox(state.id, boxIndex)
     switchBoxCurrentBank(boxIndex)
-    navigate('/home')
+    void navigate('/home')
   }
 
   switch (state.type) {
@@ -336,13 +336,13 @@ function ForAllStateBody(props: ForAllStateBodyProps) {
   const { addBoxesWithIds, switchBoxCurrentBank } = useBanksAndBoxes()
   const navigate = useNavigate()
 
-  function recoverMons(ids: OhpkmIdentifier[]) {
+  async function recoverMons(ids: OhpkmIdentifier[]) {
     setLoading(true)
     const firstNewBoxIndex = addBoxesWithIds(ids, 'Recovered Pokémon')
     if (firstNewBoxIndex !== undefined) {
       switchBoxCurrentBank(firstNewBoxIndex)
     }
-    navigate('/home')?.then(() => setLoading(false))
+    await navigate('/home')?.then(() => setLoading(false))
   }
 
   switch (state.type) {

@@ -29,7 +29,7 @@ import {
 export default class PB8LUMI extends PB8 implements PluginPKMInterface {
   // Core plugin metadata
   // @ts-expect-error PB8 declares format as literal 'PB8'; plugin subclass intentionally widens to 'PB8LUMI'
-  public format: 'PB8LUMI' = 'PB8LUMI'
+  public format = 'PB8LUMI' as const
   public pluginOrigin?: PluginIdentifier
   public pluginIdentifier: PluginIdentifier = 'luminescent_platinum'
   public get selectColor() {

@@ -174,5 +174,5 @@ export const SavesContext = createContext<SavesContextValue>({
   openSavesState: initialState,
   openSavesDispatch: () => {},
   allOpenSaves: [],
-  promptDisambiguation: async () => undefined,
+  promptDisambiguation: () => Promise.resolve(undefined),
 })

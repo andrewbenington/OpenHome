@@ -86,18 +86,20 @@ export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
   useEffect(() => {
     if (spriteResult.errorMessage || spriteResult.path) return
 
+    const modifiedMon = { ...mon }
+
     if (isMegaStone(mon.heldItemIndex)) {
       const megaForStone = MetadataSummaryLookup(
-        mon.nationalDex,
-        mon.formIndex
-      )?.megaEvolutions.find((mega) => mega.requiredItemId === mon.heldItemIndex)
+        modifiedMon.nationalDex,
+        modifiedMon.formIndex
+      )?.megaEvolutions.find((mega) => mega.requiredItemId === modifiedMon.heldItemIndex)
 
-      if (megaForStone) mon.formIndex = megaForStone.megaForme.formIndex
-    } else if (isBattleFormeItem(mon.nationalDex, mon.heldItemIndex)) {
-      mon.formIndex = displayIndexAdder(mon.heldItemIndex)(mon.formIndex)
+      if (megaForStone) modifiedMon.formIndex = megaForStone.megaForme.formIndex
+    } else if (isBattleFormeItem(modifiedMon.nationalDex, modifiedMon.heldItemIndex)) {
+      modifiedMon.formIndex = displayIndexAdder(modifiedMon.heldItemIndex)(modifiedMon.formIndex)
     }
 
-    const result = getMonSprite(mon, enabledPlugins)
+    const result = getMonSprite(modifiedMon, enabledPlugins)
     switch (result.type) {
       case 'default':
         setSpriteResult({
@@ -107,7 +109,7 @@ export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
         return
       case 'plugin':
         const { plugin, spritePath } = result
-        getPluginSprite(plugin, spritePath, backend).then(setSpriteResult)
+        getPluginSprite(plugin, spritePath, backend).then(setSpriteResult).catch(console.error)
     }
   }, [
     mon.format,

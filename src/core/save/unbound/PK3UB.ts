@@ -16,7 +16,7 @@ const FAKEMON_INDEXES: number[] = []
 const VALID_MOVE_INDICES_UB = Object.values(CFRUToNationalMap).filter((index) => index > 0)
 
 export default class PK3UB extends PK3CFRU implements PluginPKMInterface {
-  format: 'PK3UB' = 'PK3UB'
+  format = 'PK3UB' as const
   pluginIdentifier: PluginIdentifier = 'unbound'
 
   selectColor: string = '#c127fe'

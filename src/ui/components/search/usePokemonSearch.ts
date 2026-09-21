@@ -123,7 +123,7 @@ export function usePokemonSearch(...prefilter: Filter[]): PokemonSearchControlle
     if (!lookupResult) return undefined
 
     return isThenable(lookupResult)
-      ? O.after(lookupResult).then(preloadRowData).get()
+      ? O.after(lookupResult).map(preloadRowData).get()
       : preloadRowData(lookupResult)
   }
 

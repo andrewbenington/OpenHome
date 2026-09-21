@@ -1157,8 +1157,6 @@ export function originalDataTagToMonFormat(tag: Tag): PkmFormat {
       return 'PK3RR'
     case Tag.Pk3Ub:
       return 'PK3UB'
-    case Tag.Pk3Ub:
-      return 'PK3UB'
     case Tag.Pk9Compass:
       return 'PK9Compass'
     default:

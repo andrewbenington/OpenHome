@@ -13,8 +13,8 @@ test('all box icons are present', () => {
 
   const missingSprites: string[] = []
 
-  for (let species of allFormData) {
-    for (let form of species.forms) {
+  for (const species of allFormData) {
+    for (const form of species.forms) {
       const spriteResult = boxIconImagePath(
         {
           nationalDex: species.nationalDex,
@@ -48,8 +48,8 @@ describe('all home sprites are present', () => {
 
     const missingSprites: string[] = []
 
-    for (let species of allFormData) {
-      for (let form of species.forms) {
+    for (const species of allFormData) {
+      for (const form of species.forms) {
         const spritePath = getPokemonSpritePath({
           nationalDex: species.nationalDex,
           formIndex: form.formIndex,
@@ -74,7 +74,7 @@ describe('all home sprites are present', () => {
 
     const species = allFormData[NationalDex.Alcremie]
 
-    for (let form of species.forms) {
+    for (const form of species.forms) {
       for (const sweet of Object.values(SWEETS).filter((s) => typeof s !== 'string')) {
         const spritePath = getPokemonSpritePath({
           nationalDex: species.nationalDex,

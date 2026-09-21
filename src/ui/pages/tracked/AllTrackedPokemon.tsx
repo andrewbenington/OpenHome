@@ -70,14 +70,9 @@ export default function AllTrackedPokemon({
           rowKeyGetter={(row) => row.openhomeId}
           tableRef={tableContainerRef}
           style={{ borderLeft: 'none' }}
-          onCellContextMenu={(props, e) => {
+          onCellContextMenu={(props) => {
             setCtxMenuMonId(props.row.openhomeId)
             setContextMenuBuilders(buildContextElements(props.row))
-            // ooh i hate this, radix please expose your context menu api
-            const menu = document.querySelector('[data-radix-popper-content-wrapper]')
-            if (menu) {
-              ;(menu as HTMLElement).style.transform = `translate(${e.clientX}px, ${e.clientY}px)`
-            }
           }}
           rowClass={(row) =>
             trackedMonsToRelease.includes(row.openhomeId)

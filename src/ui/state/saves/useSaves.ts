@@ -146,7 +146,7 @@ export function useSaves(): SavesAndBanksManager {
         )
       : PromisedResultBox.ok(undefined)
 
-    return await convertedSourceMon.then((convertedMon) => {
+    return await convertedSourceMon.flatMap((convertedMon) => {
       const displacedMon = destSave.getMonAt(dest.box, dest.boxSlot)
       destSave.setMonAt(dest.box, dest.boxSlot, convertedMon)
       destSave.updatedBoxSlots.push({ box: dest.box, boxSlot: dest.boxSlot })
@@ -169,8 +169,8 @@ export function useSaves(): SavesAndBanksManager {
 
     return R.after(ohpkmStore.tryLoadFromId(identifier))
       .catch(({ identifier }) => `Could not move Pokémon with id ${identifier}: OHPKM data missing`)
-      .map((ohpkm) => ohpkmStore.updateAndConvertForSave(ohpkm, save))
-      .then((convertedForSave) => {
+      .flatMap((ohpkm) => ohpkmStore.updateAndConvertForSave(ohpkm, save))
+      .flatMap((convertedForSave) => {
         // remember the mon that was present before we update that slot
         const displacedMon = save.getMonAt(dest.box, dest.boxSlot)
 
@@ -251,6 +251,7 @@ export function useSaves(): SavesAndBanksManager {
   ): Promise<OpenSavesState> => {
     const addedMons: OHPKM[] = []
     const dest = startingAt
+    let newState = { ...openSavesState }
 
     if (dest.isHome) {
       let nextSlot = dest
@@ -287,7 +288,7 @@ export function useSaves(): SavesAndBanksManager {
         if (nextIndex < tempSave.boxRows * tempSave.boxColumns) {
           const homeMon = mon instanceof OHPKM ? mon : OHPKM.fromMonInSave(mon, tempSave)
 
-          const converted = await ohpkmStore.updateAndConvertForSave(homeMon, tempSave)
+          const converted = ohpkmStore.updateAndConvertForSave(homeMon, tempSave)
           if (R.isErr(converted)) {
             console.error(converted.error)
             continue
@@ -299,10 +300,10 @@ export function useSaves(): SavesAndBanksManager {
         }
       }
 
-      openSavesState.openSaves[dest.saveIdentifier].save = tempSave
+      newState.openSaves[dest.saveIdentifier].save = tempSave
     }
 
-    return { ...openSavesState, openSaves: { ...openSavesState.openSaves } }
+    return newState
   }
 
   const saveBoxNavigateLeft = (save: SAV) => {

@@ -428,7 +428,7 @@ export function useOhpkmStore() {
   }
 
   async function scanFullStoreAndFixHandlers(save: SAV) {
-    return R.after(backend.getOhpkmIdsMatchingUnknownHandler(save)).then(async (ohpkmIds) => {
+    return R.after(backend.getOhpkmIdsMatchingUnknownHandler(save)).flatMap(async (ohpkmIds) => {
       for (const result of (await tryLoadBatch(ohpkmIds)).values()) {
         await $R(result).match(
           async (mon) => fixMissingHandlerIfPresent(save, mon),
