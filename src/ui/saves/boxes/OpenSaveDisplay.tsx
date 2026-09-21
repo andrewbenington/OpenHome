@@ -159,13 +159,16 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
         saveIdentifier: save.identifier,
       }
       const mon = save.getMonAt(location.box, location.boxSlot)
-      const monOrOhpkm = $O(save.getMonAt(location.box, location.boxSlot))
-        .flatMap(ohpkmStore.getPotentialOhpkmId)
+      const openhomeId = $O(save.getMonAt(location.box, location.boxSlot)).flatMap(
+        ohpkmStore.getPotentialOhpkmId
+      )
+
+      const monOrOhpkm = openhomeId
         .flatMap((openhomeId) => saveOhpkms?.get(openhomeId))
         .map(R.dropError) // we expect many "id lookups" to fail, because not all mons are necessarily tracked
         .get()
 
-      return { save, mon: monOrOhpkm ?? mon }
+      return { save, mon: monOrOhpkm ?? mon, openhomeId: openhomeId.get() }
     })
 
   return save && save.currentPCBox !== undefined ? (
@@ -196,7 +199,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
             />
           </div>
           <Grid className="box-grid" columns={save.boxColumns.toString()}>
-            {slots.map(({ save, mon }, index) => {
+            {slots.map(({ save, mon, openhomeId }, index) => {
               const location: MonLocation = {
                 isHome: false,
                 box: save.currentPCBox,
@@ -204,9 +207,11 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                 saveIdentifier: save.identifier,
               }
 
-              const uniqueKey = mon
-                ? `${save.currentPCBox}-${index}-${mon.encryptionConstant ?? mon.personalityValue ?? JSON.stringify(mon.dvs)}-${mon.nickname}`
-                : `${save.currentPCBox}-${index}`
+              const uniqueKey =
+                openhomeId ??
+                (mon
+                  ? `${save.currentPCBox}-${index}-${mon.encryptionConstant ?? mon.personalityValue ?? JSON.stringify(mon.dvs)}-${mon.nickname}`
+                  : `${save.currentPCBox}-${index}`)
 
               const slotMetadata = save.getSlotMetadata?.(save.currentPCBox, index)
 
