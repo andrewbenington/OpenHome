@@ -1,165 +1,95 @@
+use super::EmeraldExpnPokemonIndex;
+use crate::checksum::{Checksum, RefreshChecksum};
 use crate::result::{Error, Result};
-use crate::rom_hacks::cfru::{from_gen3_cfru_move_index, to_gen3_cfru_move_index};
 use crate::strings::Gen3String;
 use crate::traits::{IsShiny, PkmBytes};
 use crate::util;
 
+use pkm_rs_derive::IsShiny8192;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::MoveIndex;
+use pkm_rs_resources::ribbons::Gen3RibbonSet;
 use pkm_rs_resources::species::SpeciesForm;
-use pkm_rs_types::{Gender, Pokerus};
-use pkm_rs_types::{MarkingsFourShapes, OriginGame, Stats8};
+use pkm_rs_types::{
+    BinaryGender, ContestStats, Ivs, MarkingsFourShapes, OriginGame, Pokerus, SimpleAbilityNumber,
+    Stats8,
+};
+use pkm_rs_types::Gender;
 use pkm_rs_types::{read_u16_le, read_u32_le};
 use serde::Serialize;
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 
-pub const CFRU_BALLS: [Ball; 27] = [
-    Ball::Master,
-    Ball::Ultra,
-    Ball::Great,
-    Ball::Poke,
-    Ball::Safari,
-    Ball::Net,
-    Ball::Dive,
-    Ball::Nest,
-    Ball::Repeat,
-    Ball::Timer,
-    Ball::Luxury,
-    Ball::Premier,
-    Ball::Dusk,
-    Ball::Heal,
-    Ball::Quick,
-    Ball::Cherish,
-    Ball::None, // INVALID in TS, mapped to None here
-    Ball::Fast,
-    Ball::Level,
-    Ball::Lure,
-    Ball::Heavy,
-    Ball::Love,
-    Ball::Friend,
-    Ball::Moon,
-    Ball::PokeLegendsArceus, // PokeHisui in TS
-    Ball::Beast,
-    Ball::Dream,
-];
+mod emerald_expn;
 
-#[inline]
-fn cfru_ball_from_index(idx: u8) -> Ball {
-    CFRU_BALLS.get(idx as usize).copied().unwrap_or(Ball::Poke)
-}
-
-#[inline]
-fn cfru_ball_index(ball: Ball) -> u8 {
-    if let Some(i) = CFRU_BALLS.iter().position(|&b| b == ball) {
-        i as u8
-    } else if (Ball::PokeLegendsArceus as u8) <= (ball as u8)
-        && (ball as u8) <= (Ball::Origin as u8)
-    {
-        // Hisui/LA balls to PokeLegendsArceus for CFRU writes
-        CFRU_BALLS
-            .iter()
-            .position(|&b| b == Ball::PokeLegendsArceus)
-            .unwrap() as u8
-    } else {
-        // Fallback to Poke on unknown.
-        CFRU_BALLS.iter().position(|&b| b == Ball::Poke).unwrap() as u8
-    }
-}
-
-#[cfg(not(feature = "randomize"))]
-pub trait CfruSpeciesIndex: From<u16> + Into<u16> + Serialize + Copy {
-    fn try_to_species_and_form(self) -> Result<SpeciesForm>;
-
-
-    fn is_fakemon(&self) -> bool;
-    fn plugin_identifier() -> &'static str;
-}
-
-#[cfg(feature = "randomize")]
-pub trait CfruSpeciesIndex: From<u16> + Into<u16> + Serialize + Copy + Randomize {
-    fn try_to_species_and_form(self) -> Result<SpeciesForm>;
-    fn try_from_species_and_form(species: &SpeciesForm) -> Result<Self>;
-
-    fn is_fakemon(&self) -> bool;
-    fn plugin_identifier() -> &'static str;
-}
-
-/// PK3CFRU (58 bytes)
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = Pk3ExpnWasm))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
-#[derive(Debug, Default, Serialize, Clone)]
-pub struct Pk3Cfru<I: CfruSpeciesIndex> {
-    // Personality 0:4
-    pub personality_value: u32,
-
-    // OTID 4:8
-    pub trainer_id: u16, // 0..6
-    pub secret_id: u16,  // 6..8
-
-    // Nickname 8:18
-    pub nickname: Gen3String<10>,
-
-    // Language 18
-    pub language_index: u8,
-
-    // Sanity 19
-    // pub sanity: u8,
-
-    // OT Name 20:27
-    pub trainer_name: Gen3String<7>,
-
-    // Markings 27
-    pub markings: MarkingsFourShapes,
-
-    // Species 28:30
-    pub cfru_species_index: I, // raw CFRU game index
-
-    // Held Item 30:32
-    pub held_item_index: u16,
-
-    // Exp 32:36
-    pub exp: u32,
-
-    // Move PP Up 36 (2 bits each)
-    pub move_pp_ups: [u8; 4],
-
-    // Friendship 37
+#[derive(Debug, Default, Serialize, Clone, Copy, IsShiny8192)]
+pub struct Pk3EmeraldExpn {
+    // BoxPokemon
+    /*0x00*/ pub personality_value: u32,
+    /*0x04*/ pub trainer_id: u16,
+    /*0x06*/ pub secret_id: u16,
+    /*0x08*/ pub nickname: Gen3String<10>,  // characters 11 and 12 are stored in PokemonSubstruct0
+    /*0x12*/ pub language: u8,  // u3
+             pub mint_nature: u8,  // u5
+    /*0x13*/ pub is_bad_egg: bool,
+             pub has_species_data: bool,
+             pub is_egg: bool,
+//           pub block_box_rs: bool,
+//           pub days_since_form_change: u8,  // u3
+//           pub unused_13: bool,
+    /*0x14*/ pub trainer_name: Gen3String<7>,
+    /*0x1B*/ pub markings: MarkingsFourShapes,
+//           pub current_status: u8,  // u4
+    /*0x1C*/ pub checksum: u16,
+//  /*0x1E*/ pub hp_lost: u16,  // u14, zeroed out when put in box
+//           pub shiny_toggle: bool,
+//           pub unused_1E: bool,
+    
+    // PokemonSubstruct0
+    pub pokemon_index: EmeraldExpnPokemonIndex, // u11
+    pub tera_type: TeraType,  // u5
+    pub held_item_index: u16,  // u10
+    // pub unused_02: u16,  // u6
+    pub experience: u32,  // u21
+    pub nickname_char_11: Gen3String<1>,
+    // pub unused_04: u32,  // u3
+    pub move_pp_ups: u8,
     pub trainer_friendship: u8,
+    pub ball: Ball,  // u6
+    pub nickname_char_12: Gen3String<1>,
+    // pub unused_0A: u16,  // u2
 
-    // Pokeball 38
-    pub ball: Ball,
+    // PokemonSubstruct1
+    pub moves: [MoveIndex; 4],  // each move is a u11
+    // evolution trackers, cleared on box entry; two u5s
+    pub move_pp: [u8; 4],  // each pp is a u7
+    pub hyper_training: HyperTraining,  // each stat is a u1/bool
 
-    // Moves 38:43 (5 bytes total for 4 moves with 10 bits each)
-    pub moves: [MoveIndex; 4],
-    pub move_pp: [u8; 4], // computed; not stored in CFRU bytes
-
-    // EVs 43:49
+    // PokemonSubstruct2
     pub evs: Stats8,
+    pub contest: ContestStats,
 
-    // 49
+    // PokemonSubstruct3
     pub pokerus: Pokerus,
-
-    // 50
     pub met_location_index: u8,
-
-    // 51:53
-    pub met_level: u8,              // 0x34 bits 0..6
-    pub game_of_origin: OriginGame, // 0x34 bits 7..10
-    pub can_gigantamax: bool,       // 0x34 bit 11
-    pub trainer_gender: Gender,     // 0x34 bit 15
-
-    // 53:57
-    pub ivs: Stats8,              // 0x36..0x39 (30 bits)
-    pub is_egg: bool,             // 0x36 bit 30
-    pub has_hidden_ability: bool, // 0x36 bit 31
-
-    // Values not stored in CFRU bytes
-    pub is_nicknamed: bool,
-    pub current_hp: u16,
+    pub met_level: u8,  // u7
+    pub game_of_origin: OriginGame,  // u4
+    pub dynamax_level: u8,  // u4
+    pub trainer_gender: BinaryGender,  // u1/bool
+    pub ivs: Ivs,
+    //pub is_egg: bool,
+    pub can_gigantamax: bool,
+    pub ribbons: Gen3RibbonSet,
+    pub is_shadow: bool,
+    // pub unused_0B: bool,
+    pub ability_num: SimpleAbilityNumber,
+    pub is_fateful_encounter: bool,
 }
 
-impl<I: CfruSpeciesIndex> Pk3Cfru<I> {
+impl<I: EmeraldExpnSpeciesIndex> Pk3EmeraldExpn<I> {
     pub const BOX_SIZE: usize = 58;
     pub const PARTY_SIZE: usize = 100;
 
@@ -199,7 +129,7 @@ impl<I: CfruSpeciesIndex> Pk3Cfru<I> {
         let mut v: u64 = 0;
         for (i, move_slot) in moves.iter().enumerate() {
             let cfru_index = if move_slot.is_empty() {
-                // if the slot is empty, force CFRU index 0
+                // if the slot is empty, force EM index 0
                 0
             } else {
                 let nat_id = u16::from(*move_slot) as usize;
@@ -217,7 +147,7 @@ impl<I: CfruSpeciesIndex> Pk3Cfru<I> {
     }
 }
 
-impl<I: CfruSpeciesIndex> PkmBytes for Pk3Cfru<I> {
+impl<I: EmeraldExpnSpeciesIndex> PkmBytes for Pk3EmeraldExpn<I> {
     const BOX_SIZE: usize = Pk3Cfru::<I>::BOX_SIZE;
     const PARTY_SIZE: usize = Pk3Cfru::<I>::PARTY_SIZE;
 
@@ -404,58 +334,13 @@ impl<I: CfruSpeciesIndex> IsShiny for Pk3Cfru<I> {
         let xor = tid ^ sid ^ (pid & 0xFFFF) ^ ((pid >> 16) & 0xFFFF);
         xor == 0
     }
+
 }
+impl PkmBytes for Pk3EmeraldExpn {
+    const BOX_SIZE: usize = 80;
+    const PARTY_SIZE: usize = 100;
 
-// pub struct Pk3CfruNonFakemon<I: CfruSpeciesIndex>(pub(super) Pk3Cfru<I>);
-
-// impl<I: CfruSpeciesIndex> IsShiny for Pk3CfruNonFakemon<I> {
-//     fn is_shiny(&self) -> bool {
-//         self.0.is_shiny()
-//     }
-
-//     fn is_square_shiny(&self) -> bool {
-//         self.0.is_square_shiny()
-//     }
-// }
-
-// impl<I: CfruSpeciesIndex> Serialize for Pk3CfruNonFakemon<I> {
-//     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-//     where
-//         S: serde::Serializer,
-//     {
-//         self.0.serialize(serializer)
-//     }
-// }
-
-// impl<I: CfruSpeciesIndex> PkmBytes for Pk3CfruNonFakemon<I> {
-//     const BOX_SIZE: usize = Pk3Cfru::BOX_SIZE;
-//     const PARTY_SIZE: usize = Pk3Cfru::PARTY_SIZE;
-
-//     fn from_bytes(bytes: &[u8]) -> Result<Self> {
-//         Pk3Cfru::<I>::from_bytes(bytes).map(Self)
-//     }
-
-//     fn write_box_bytes(&self, bytes: &mut [u8]) {
-//         self.0.write_box_bytes(bytes);
-//     }
-
-//     fn write_party_bytes(&self, bytes: &mut [u8]) {
-//         self.0.write_party_bytes(bytes);
-//     }
-// }
-
-// impl<I: CfruSpeciesIndex> HasSpeciesAndForm for Pk3CfruNonFakemon<I> {
-//     fn get_species_metadata(&self) -> &'static SpeciesMetadata {
-//         self.try_get_species_and_form().get_species_metadata()
-//     }
-
-//     fn get_forme_metadata(&self) -> &'static FormMetadata {
-//         self.species_and_form.get_forme_metadata()
-//     }
-
-//     fn calculate_level(&self) -> u8 {
-//         self.get_species_metadata()
-//             .level_up_type
-//             .calculate_level(self.exp)
-//     }
-// }
+    fn from_bytes(bytes: &[u8]) -> Rresullt<Self> {
+        Self::try_from_bytes(bytes)
+    }
+}

@@ -63,6 +63,10 @@ pub enum Error {
     StringDecode {
         source: StringErrorSource,
     },
+    MoveError {
+        value : u16,
+        source: MoveErrorSource
+    },
     Other(String),
 }
 
@@ -112,6 +116,7 @@ impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let message = match self {
             Self::PkmRsResources(err) => err.to_string(),
+            Self::MoveError { value, source} => format!("Invalid move index: {value}, {source}"),
             Self::PkmRsTypes(err) => err.to_string(),
             Self::SectionedData(err) => err.to_string(),
             Self::BoxIndex(index) => format!("Invalid box index: {index}"),

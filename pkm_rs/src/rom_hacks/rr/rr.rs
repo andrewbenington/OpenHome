@@ -1,11 +1,11 @@
 use pkm_rs_resources::species::SpeciesForm;
 use serde::Serialize;
 
-use crate::result::{Error, NdexConvertSource, Result};
-use crate::rom_hacks::cfru::{CfruSpeciesIndex, Pk3Cfru};
+use crate::result::{Error, PokemonIndexType, Result};
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
+use crate::rom_hacks::cfru::{CfruSpeciesIndex, Pk3Cfru};
 
 const FAKEMON_INDEXES: [u16; 22] = [
     1186, 1200, 1274, 1275, 1276, 1277, 1278, 1279, 1282, 1283, 1284, 1285, 1286, 1287, 1288, 1289,
@@ -19,22 +19,11 @@ impl CfruSpeciesIndex for RadicalRedSpeciesIndex {
     fn try_to_species_and_form(self) -> Result<SpeciesForm> {
         super::RR_TO_NATIONAL_DEX_MAP
             .get(&self.0)
-            .ok_or(Error::GameDex {
+            .ok_or(Error::PokemonGameIndex {
                 value: self.0,
-                game: NdexConvertSource::Gen3RR,
+                source: PokemonIndexType::Gen3RR,
             })
             .copied()
-    }
-
-    fn try_from_species_and_form(saf: &SpeciesForm) -> Result<Self> {
-        super::NATIONAL_DEX_TO_RR_MAP
-            .get(&saf.to_tuple())
-            .ok_or(Error::GenDex {
-                saf: *saf,
-                generation: NdexConvertSource::Gen3RR,
-            })
-            .copied()
-            .map(RadicalRedSpeciesIndex)
     }
 
     fn is_fakemon(&self) -> bool {
