@@ -3,6 +3,7 @@ import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAVClass } from '@openhome-core/save/util'
 import { $R, Option, R, range, Result } from '@openhome-core/util/functional'
+import { NowOrLater } from '@openhome-core/util/promise'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import PromptDialog from '@openhome-ui/components/dialog/PromptDialog'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
@@ -20,7 +21,7 @@ export type SavesProviderProps = {
   children: ReactNode
 }
 
-type SaveTypeCallback = (saveType?: SAVClass | PromiseLike<SAVClass>) => void
+type SaveTypeCallback = (saveType?: NowOrLater<SAVClass>) => unknown
 
 export default function SavesProvider({ children }: SavesProviderProps) {
   const backend = useBackend()
@@ -121,7 +122,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
       if (errors.length) {
         displayError('Error Saving', errors)
-        backend.rollbackTransaction()
+        await backend.rollbackTransaction()
         setSaving(false)
         return R.Err(errors.map(BackendSaveError))
       }
@@ -164,16 +165,21 @@ export default function SavesProvider({ children }: SavesProviderProps) {
   // load bag
   useEffect(() => {
     if (!itemBagState.loaded && !itemBagState.error) {
-      backend.loadItemBag().then(
-        R.match(
-          (bagObj) => {
-            bagDispatch({ type: 'load_item_bag', payload: bagObj })
-          },
-          (err) => {
-            bagDispatch({ type: 'set_error', payload: err })
-          }
+      backend
+        .loadItemBag()
+        .then(
+          R.match(
+            (bagObj) => {
+              bagDispatch({ type: 'load_item_bag', payload: bagObj })
+            },
+            (err) => {
+              bagDispatch({ type: 'set_error', payload: err })
+            }
+          )
         )
-      )
+        .catch((err) => {
+          bagDispatch({ type: 'set_error', payload: err })
+        })
     }
   }, [backend, itemBagState.loaded, itemBagState.error, bagDispatch])
 

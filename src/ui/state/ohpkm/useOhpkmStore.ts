@@ -396,7 +396,7 @@ export function useOhpkmStore() {
     mon: PKMInterface,
     save?: SAV
   ): PromisedResultBox<OHPKM, IdentifierNotPresentError> {
-    return R.after(tryLoadFromId(ohpkmId)).awaitMap(async (trackedData) => {
+    return R.after(tryLoadFromId(ohpkmId)).map((trackedData) => {
       const updates = trackedData.syncWithGameData(mon, save)
 
       if (updates.length > 0) {
@@ -428,23 +428,25 @@ export function useOhpkmStore() {
   }
 
   async function scanFullStoreAndFixHandlers(save: SAV) {
-    return R.after(backend.getOhpkmIdsMatchingUnknownHandler(save)).flatMap(async (ohpkmIds) => {
-      for (const result of (await tryLoadBatch(ohpkmIds)).values()) {
-        await $R(result).match(
-          async (mon) => fixMissingHandlerIfPresent(save, mon),
-          async ({ identifier }) => {
-            return await backend.log(
-              'ERROR',
-              `Could not find OHPKM with identifier ${identifier}`,
-              {
-                ohpkm_id: identifier,
-                event: 'fix_unknown_handler_scan',
-              }
-            )
-          }
-        )
-      }
-    })
+    return R.after(backend.getOhpkmIdsMatchingUnknownHandler(save))
+      .awaitMap(async (ohpkmIds) => {
+        for (const result of (await tryLoadBatch(ohpkmIds)).values()) {
+          await $R(result).match(
+            async (mon) => fixMissingHandlerIfPresent(save, mon),
+            async ({ identifier }) => {
+              return await backend.log(
+                'ERROR',
+                `Could not find OHPKM with identifier ${identifier}`,
+                {
+                  ohpkm_id: identifier,
+                  event: 'fix_unknown_handler_scan',
+                }
+              )
+            }
+          )
+        }
+      })
+      .await()
   }
 
   return {

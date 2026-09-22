@@ -1,3 +1,4 @@
+import { O, PromisedOptionBox } from './option'
 import { isThenable } from './promise'
 
 type PartitionedResults<A, E> = { successes: A[]; failures: E[] }
@@ -212,12 +213,20 @@ export class PromisedResultBox<T, E = string> {
     )
   }
 
-  async get(): Promise<Result<T, E>> {
+  async await(): Promise<Result<T, E>> {
     return this.v
   }
 
   async getBoxed(): Promise<ResultBox<T, E>> {
     return Promise.resolve(this.v).then($R)
+  }
+
+  async ok(): Promise<Option<T>> {
+    return this.await().then((v) => (R.isErr(v) ? undefined : v.data))
+  }
+
+  okBoxed(): PromisedOptionBox<T> {
+    return O.after(this.await().then((v) => (R.isErr(v) ? undefined : v.data)))
   }
 }
 

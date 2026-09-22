@@ -7,6 +7,7 @@ import { numericSorter } from '@openhome-core/util/sort'
 import Badge from '@openhome-ui/components/badge/Badge'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import MessageRibbon from '@openhome-ui/components/MessageRibbon'
+import OhoButton from '@openhome-ui/components/OhoButton'
 import SideTabNavigation from '@openhome-ui/components/side-tabs/SideTabNavigation'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/PokemonDetailsModal'
@@ -106,10 +107,11 @@ function ManageDialog(props: { onClose: () => void }) {
   const { findSavesForAllMons, findingSaveState, clearFindingState } = useManageTracked()
   const [loading, setLoading] = useState(false)
 
-  async function runDetectRecover() {
+  function runDetectRecover() {
     setLoading(true)
-    await findSavesForAllMons()
-    setLoading(false)
+    findSavesForAllMons()
+      .catch(console.error)
+      .finally(() => setLoading(false))
   }
 
   return (
@@ -284,7 +286,15 @@ function ForOneStateBody(props: ForOneStateBodyProps) {
             {state.save.filePath.raw}
           </Flex>
           <ButtonStack>
-            <Button size="1" onClick={() => openSaveAndNavToHome(state.save)}>
+            <Button
+              size="1"
+              onClick={() => {
+                setLoading(true)
+                openSaveAndNavToHome(state.save)
+                  .catch(console.error)
+                  .finally(() => setLoading(false))
+              }}
+            >
               Open Save
             </Button>
             <Button size="1" color="gray" onClick={onClose}>
@@ -380,9 +390,18 @@ function ForAllStateBody(props: ForAllStateBodyProps) {
           )}
           <ButtonStack>
             {state.missingMonIds.length > 0 && (
-              <Button size="1" onClick={() => recoverMons(state.missingMonIds)} loading={loading}>
+              <OhoButton
+                size="1"
+                onClick={() => {
+                  setLoading(true)
+                  recoverMons(state.missingMonIds)
+                    .catch(console.error)
+                    .finally(() => setLoading(false))
+                }}
+                loading={loading}
+              >
                 Recover All to New Boxes
-              </Button>
+              </OhoButton>
             )}
             <Button size="1" color="gray" onClick={onClose}>
               Cancel

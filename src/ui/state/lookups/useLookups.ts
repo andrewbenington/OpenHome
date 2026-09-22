@@ -10,4 +10,4 @@ export function useLookups() {
 
 export const LookupsContext = createContext<
   [StoredLookups, (updated: StoredLookups) => Promise<Errorable<null>>]
->([{ gen12: {}, gen345: {} }, async () => R.Err('Uninitialized')])
+>([{ gen12: {}, gen345: {} }, () => Promise.resolve(R.Err('Uninitialized'))])

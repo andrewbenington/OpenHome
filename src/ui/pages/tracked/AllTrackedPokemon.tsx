@@ -19,7 +19,7 @@ import { useNavigate } from 'react-router'
 import './style.css'
 
 export type AllTrackedPokemonProps = {
-  onSelectMon: (openhomeId: OhpkmIdentifier) => void
+  onSelectMon: (openhomeId: OhpkmIdentifier) => Promise<void>
   findSaveForMon: (identifier: string) => Promise<SAV | undefined>
   findSavesForAllMons: () => Promise<void>
 }
@@ -135,9 +135,9 @@ function useContextMenu(
       const actions: CtxMenuElementBuilder[] = [
         Label.mon(mon),
         homeLocation
-          ? Item.label('Jump to Box').action(() => {
+          ? Item.label('Jump to Box').action(async () => {
               switchBoxCurrentBank(homeLocation.box)
-              navigate('/home')
+              await navigate('/home')
             })
           : Item.label('Find Containing Save').action(() => findSaveForMon(mon.openhomeId)),
         Item.label(`Move To Release Area`).action(() => {

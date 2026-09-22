@@ -1,5 +1,6 @@
 import {
   DndContext,
+  DragEndEvent,
   DragOverEvent,
   DragOverlay,
   PointerSensor,
@@ -17,43 +18,215 @@ import { isMonLocation, MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { MetadataSummaryLookup } from '@pkm-rs/pkg'
 import { Badge } from '@radix-ui/themes'
 import { ReactNode, useCallback, useState } from 'react'
-import { DragPayload, locationKey } from '.'
+import { locationKey } from '.'
 import { OPENHOME_BOX_SLOTS, useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import useDragAndDrop from './useDragAndDrop'
 
-function isDragPayload(value: unknown): value is DragPayload {
-  if (!value || typeof value !== 'object') return false
+function usePokemonDragAndDrop() {
+  const { dragState, startDragging, endDragging: stopDragging, clearSelections } = useDragAndDrop()
+  const savesAndBanks = useSaves()
+  const { homeLocationIsEmpty, getCurrentBank } = useBanksAndBoxes()
+  const [dragOverId, setDragOverId] = useState<UniqueIdentifier | null>(null)
+  const displayError = useDisplayError()
 
-  if (!('kind' in value)) return false
+  async function onDragEnd(controller: DragController, e: DragEndEvent) {
+    const {
+      currentlyDragging,
+      stopDragging: endDragging,
+      clearSelections,
+      setDragOverId,
+    } = controller
+    setDragOverId(null)
 
-  if (value.kind === 'item') {
-    return 'item' in value
+    const dest = e.over?.data.current
+
+    const dropElementId = e.over?.id
+
+    if (!currentlyDragging) return
+
+    if (currentlyDragging.kind === 'item') {
+      if (isMonLocation(dest)) {
+        await savesAndBanks.giveItemToMon(dest, currentlyDragging.item)
+      }
+      endDragging()
+      return
+    }
+
+    const allMonsWithLocations =
+      currentlyDragging.kind === 'mon' ? [currentlyDragging.monData] : currentlyDragging.monData
+    if (allMonsWithLocations.length === 0) return
+    const firstMonWithLocation = allMonsWithLocations[0]
+
+    const selectedLocationKeys = new Set(dragState.selectedLocations.map(locationKey))
+    const sourceLocationKey = locationKey(firstMonWithLocation)
+    const isSourceSelected = selectedLocationKeys.has(sourceLocationKey)
+    const selectedLocations = isSourceSelected
+      ? [
+          firstMonWithLocation,
+          ...dragState.selectedLocations.filter((l) => locationKey(l) !== sourceLocationKey),
+        ]
+      : [firstMonWithLocation]
+
+    const { mon } = firstMonWithLocation
+
+    if (dropElementId === 'to_release') {
+      if (dragState.multiSelectEnabled && isSourceSelected) {
+        for (const location of selectedLocations) {
+          const mon = await savesAndBanks.getMonAtLocation(location)
+          if (mon) savesAndBanks.releaseMonAtLocation(location)
+        }
+        clearSelections()
+      } else {
+        savesAndBanks.releaseMonAtLocation(firstMonWithLocation)
+      }
+    } else if (dropElementId === 'item-bag') {
+      if (dragState.multiSelectEnabled && isSourceSelected) {
+        for (const location of selectedLocations) {
+          const mon = await savesAndBanks.getMonAtLocation(location)
+          if (mon) await savesAndBanks.moveMonItemToBag(location)
+        }
+        clearSelections()
+      } else {
+        await savesAndBanks.moveMonItemToBag(firstMonWithLocation)
+      }
+    } else if (
+      isMonLocation(dest) &&
+      (dest.isHome ||
+        monSupportedBySave(savesAndBanks.saveFromIdentifier(dest.saveIdentifier), mon))
+    ) {
+      if (dragState.multiSelectEnabled && isSourceSelected) {
+        const targetSave = dest.isHome
+          ? undefined
+          : savesAndBanks.saveFromIdentifier(dest.saveIdentifier)
+
+        const nextSaveDestination = (startBox: number, startSlot: number): MonLocation | null => {
+          if (!targetSave) return null
+
+          for (let box = startBox; box < targetSave.getBoxCount(); box++) {
+            const slotStart = box === startBox ? startSlot : 0
+
+            for (let boxSlot = slotStart; boxSlot < targetSave.boxSlotCount; boxSlot++) {
+              if (!targetSave.getMonAt(box, boxSlot)) {
+                return {
+                  isHome: false,
+                  saveIdentifier: targetSave.identifier,
+                  box,
+                  boxSlot,
+                }
+              }
+            }
+          }
+
+          return null
+        }
+
+        const nextHomeDestination = (startBox: number, startSlot: number): MonLocation | null => {
+          if (!dest.isHome) return null
+
+          const currentBank = getCurrentBank()
+          const bank = dest.bank
+
+          for (let box = startBox; box < currentBank.boxes.size; box++) {
+            const slotStart = box === startBox ? startSlot : 0
+
+            for (let boxSlot = slotStart; boxSlot < OPENHOME_BOX_SLOTS; boxSlot++) {
+              const location = { bank, box, boxSlot }
+              if (homeLocationIsEmpty(location)) return { isHome: true, ...location }
+            }
+          }
+
+          return null
+        }
+
+        let nextDestination: MonLocation | null = dest.isHome
+          ? nextHomeDestination(dest.box, dest.boxSlot)
+          : nextSaveDestination(dest.box, dest.boxSlot)
+
+        for (const sourceLoc of selectedLocations) {
+          if (!nextDestination) break
+
+          const currMon = await savesAndBanks.getMonAtLocation(sourceLoc)
+          if (!currMon) continue
+
+          if (
+            !dest.isHome &&
+            targetSave &&
+            !targetSave.supportsMon(currMon.nationalDex, currMon.formIndex)
+          ) {
+            continue
+          }
+
+          if (
+            currMon.heldItemIndex &&
+            !dest.isHome &&
+            targetSave &&
+            !targetSave.supportsItem(currMon.heldItemIndex)
+          ) {
+            await savesAndBanks.moveMonItemToBag(sourceLoc)
+          }
+
+          await savesAndBanks
+            .moveMon({ ...sourceLoc, mon: currMon }, nextDestination)
+            .catch((error) => displayError('Error moving Pokémon', error))
+
+          nextDestination = nextDestination.isHome
+            ? nextHomeDestination(nextDestination.box, nextDestination.boxSlot + 1)
+            : nextSaveDestination(nextDestination.box, nextDestination.boxSlot + 1)
+        }
+        clearSelections()
+      } else {
+        const source = firstMonWithLocation
+
+        if (
+          mon.heldItemIndex &&
+          !dest.isHome &&
+          !savesAndBanks.saveFromIdentifier(dest.saveIdentifier).supportsItem(mon.heldItemIndex)
+        ) {
+          await savesAndBanks.moveMonItemToBag(source)
+        }
+
+        savesAndBanks
+          .moveMon(source, dest)
+          .catch((error) => displayError('Could not move Pokémon', error))
+      }
+    }
+
+    endDragging()
   }
 
-  if (value.kind === 'mon') {
-    return 'monData' in value
+  return {
+    currentlyDragging: dragState.payload,
+    multiSelectEnabled: dragState.multiSelectEnabled,
+    draggingCount: dragState.selectedLocations.length,
+    startDragging,
+    stopDragging,
+    onDragEnd,
+    clearSelections,
+    dragOverId,
+    setDragOverId,
   }
-
-  return false
 }
 
 export default function PokemonDndContext(props: { children?: ReactNode }) {
   const { children } = props
-  const savesAndBanks = useSaves()
-  const { homeLocationIsEmpty, getCurrentBank } = useBanksAndBoxes()
-  const { dragState, startDragging, endDragging, clearSelections } = useDragAndDrop()
+
+  const dragController = usePokemonDragAndDrop()
+  const {
+    currentlyDragging,
+    multiSelectEnabled,
+    draggingCount,
+    stopDragging: endDragging,
+    onDragEnd,
+  } = dragController
   const [dragOverId, setDragOverId] = useState<UniqueIdentifier | null>(null)
-  const displayError = useDisplayError()
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      activationConstraint: dragState.multiSelectEnabled
-        ? { delay: 100, tolerance: 8 }
-        : { distance: 10 },
+      activationConstraint: multiSelectEnabled ? { delay: 100, tolerance: 8 } : { distance: 10 },
     })
   )
 
-  const draggingMon = dragState.payload?.kind === 'mon' ? dragState.payload.monData.mon : undefined
+  const draggingMon = currentlyDragging?.kind === 'mon' ? currentlyDragging.monData.mon : undefined
   let formeNumber = draggingMon?.formIndex ?? 0
 
   if (draggingMon && isMegaStone(draggingMon.heldItemIndex)) {
@@ -76,204 +249,36 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
 
   return (
     <DndContext
-      onDragEnd={async (e) => {
-        setDragOverId(null)
-
-        const dest = e.over?.data.current
-        const payload = dragState.payload
-
-        const dropElementId = e.over?.id
-
-        if (!payload) return
-
-        if (payload.kind === 'item') {
-          if (isMonLocation(dest)) {
-            savesAndBanks.giveItemToMon(dest, payload.item)
-          }
-          endDragging()
-          return
-        }
-
-        const allMonsWithLocations = payload.kind === 'mon' ? [payload.monData] : payload.monData
-        if (allMonsWithLocations.length === 0) return
-        const firstMonWithLocation = allMonsWithLocations[0]
-
-        const selectedLocationKeys = new Set(dragState.selectedLocations.map(locationKey))
-        const sourceLocationKey = locationKey(firstMonWithLocation)
-        const isSourceSelected = selectedLocationKeys.has(sourceLocationKey)
-        const selectedLocations = isSourceSelected
-          ? [
-              firstMonWithLocation,
-              ...dragState.selectedLocations.filter((l) => locationKey(l) !== sourceLocationKey),
-            ]
-          : [firstMonWithLocation]
-
-        const { mon } = firstMonWithLocation
-
-        if (dropElementId === 'to_release') {
-          if (dragState.multiSelectEnabled && isSourceSelected) {
-            for (const location of selectedLocations) {
-              const mon = await savesAndBanks.getMonAtLocation(location)
-              if (mon) savesAndBanks.releaseMonAtLocation(location)
-            }
-            clearSelections()
-          } else {
-            savesAndBanks.releaseMonAtLocation(firstMonWithLocation)
-          }
-        } else if (dropElementId === 'item-bag') {
-          if (dragState.multiSelectEnabled && isSourceSelected) {
-            for (const location of selectedLocations) {
-              const mon = await savesAndBanks.getMonAtLocation(location)
-              if (mon) savesAndBanks.moveMonItemToBag(location)
-            }
-            clearSelections()
-          } else {
-            savesAndBanks.moveMonItemToBag(firstMonWithLocation)
-          }
-        } else if (
-          isMonLocation(dest) &&
-          (dest.isHome ||
-            monSupportedBySave(savesAndBanks.saveFromIdentifier(dest.saveIdentifier), mon))
-        ) {
-          if (dragState.multiSelectEnabled && isSourceSelected) {
-            const targetSave = dest.isHome
-              ? undefined
-              : savesAndBanks.saveFromIdentifier(dest.saveIdentifier)
-
-            const nextSaveDestination = (
-              startBox: number,
-              startSlot: number
-            ): MonLocation | null => {
-              if (!targetSave) return null
-
-              for (let box = startBox; box < targetSave.getBoxCount(); box++) {
-                const slotStart = box === startBox ? startSlot : 0
-
-                for (let boxSlot = slotStart; boxSlot < targetSave.boxSlotCount; boxSlot++) {
-                  if (!targetSave.getMonAt(box, boxSlot)) {
-                    return {
-                      isHome: false,
-                      saveIdentifier: targetSave.identifier,
-                      box,
-                      boxSlot,
-                    }
-                  }
-                }
-              }
-
-              return null
-            }
-
-            const nextHomeDestination = (
-              startBox: number,
-              startSlot: number
-            ): MonLocation | null => {
-              if (!dest.isHome) return null
-
-              const currentBank = getCurrentBank()
-              const bank = dest.bank
-
-              for (let box = startBox; box < currentBank.boxes.size; box++) {
-                const slotStart = box === startBox ? startSlot : 0
-
-                for (let boxSlot = slotStart; boxSlot < OPENHOME_BOX_SLOTS; boxSlot++) {
-                  const location = { bank, box, boxSlot }
-                  if (homeLocationIsEmpty(location)) return { isHome: true, ...location }
-                }
-              }
-
-              return null
-            }
-
-            let nextDestination: MonLocation | null = dest.isHome
-              ? nextHomeDestination(dest.box, dest.boxSlot)
-              : nextSaveDestination(dest.box, dest.boxSlot)
-
-            for (const sourceLoc of selectedLocations) {
-              if (!nextDestination) break
-
-              const currMon = await savesAndBanks.getMonAtLocation(sourceLoc)
-              if (!currMon) continue
-
-              if (
-                !dest.isHome &&
-                targetSave &&
-                !targetSave.supportsMon(currMon.nationalDex, currMon.formIndex)
-              ) {
-                continue
-              }
-
-              if (
-                currMon.heldItemIndex &&
-                !dest.isHome &&
-                targetSave &&
-                !targetSave.supportsItem(currMon.heldItemIndex)
-              ) {
-                savesAndBanks.moveMonItemToBag(sourceLoc)
-              }
-
-              await savesAndBanks
-                .moveMon({ ...sourceLoc, mon: currMon }, nextDestination)
-                .catch((error) => displayError('Error moving Pokémon', error))
-
-              nextDestination = nextDestination.isHome
-                ? nextHomeDestination(nextDestination.box, nextDestination.boxSlot + 1)
-                : nextSaveDestination(nextDestination.box, nextDestination.boxSlot + 1)
-            }
-            clearSelections()
-          } else {
-            const source = firstMonWithLocation
-
-            if (
-              mon.heldItemIndex &&
-              !dest.isHome &&
-              !savesAndBanks.saveFromIdentifier(dest.saveIdentifier).supportsItem(mon.heldItemIndex)
-            ) {
-              savesAndBanks.moveMonItemToBag(source)
-            }
-
-            savesAndBanks
-              .moveMon(source, dest)
-              .catch((error) => displayError('Could not move Pokémon', error))
-          }
-        }
-
-        endDragging()
-      }}
-      onDragStart={(e) => {
-        const payload = e.active.data?.current
-        if (!isDragPayload(payload)) return
-        startDragging(payload)
-      }}
+      onDragEnd={(e) => void onDragEnd(dragController, e)}
       onDragOver={onDragOver}
       onDragCancel={endDragging}
       sensors={sensors}
     >
       <DragOverlay style={{ cursor: 'grabbing' }} dropAnimation={{ duration: 0 }}>
-        {dragState.payload?.kind === 'item' ? (
+        {currentlyDragging?.kind === 'item' ? (
           <img
             className="draggable-item"
-            src={getPublicImageURL(getItemIconPath(dragState.payload.item.index))}
-            alt={dragState.payload.item.name}
+            src={getPublicImageURL(getItemIconPath(currentlyDragging.item.index))}
+            alt={currentlyDragging.item.name}
             draggable={false}
           />
         ) : (
-          dragState.payload?.kind === 'mon' && (
+          currentlyDragging?.kind === 'mon' && (
             <div style={{ width: '100%', height: '100%', position: 'relative' }}>
               <PokemonIcon
-                nationalDex={dragState.payload?.monData.mon.nationalDex ?? 0}
+                nationalDex={currentlyDragging?.monData.mon.nationalDex ?? 0}
                 formIndex={formeNumber}
-                isShiny={dragState.payload?.monData.mon.isShiny()}
-                heldItemIndex={dragState.payload?.monData.mon.heldItemIndex}
+                isShiny={currentlyDragging?.monData.mon.isShiny()}
+                heldItemIndex={currentlyDragging?.monData.mon.heldItemIndex}
                 onlyItem={
-                  dragOverId === 'item-bag' && Boolean(dragState.payload?.monData.mon.heldItemIndex)
+                  dragOverId === 'item-bag' && Boolean(currentlyDragging?.monData.mon.heldItemIndex)
                 }
-                extraFormIndex={dragState.payload?.monData.mon.extraFormIndex}
+                extraFormIndex={currentlyDragging?.monData.mon.extraFormIndex}
                 style={{ width: '100%', height: '100%' }}
               />
-              {dragState.selectedLocations.length > 1 && (
+              {draggingCount > 1 && (
                 <Badge variant="solid" style={{ position: 'absolute', top: 0, left: 0 }}>
-                  {dragState.selectedLocations.length}
+                  {draggingCount}
                 </Badge>
               )}
             </div>
@@ -284,3 +289,5 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
     </DndContext>
   )
 }
+
+type DragController = ReturnType<typeof usePokemonDragAndDrop>

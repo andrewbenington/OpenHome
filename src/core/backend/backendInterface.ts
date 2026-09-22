@@ -11,6 +11,7 @@ import {
   PluginMetadata,
 } from '@openhome-core/tauri/spectaCommands'
 import { Errorable, Option, Result } from '@openhome-core/util/functional'
+import { NowOrLater } from '@openhome-core/util/promise'
 import { LoadSaveResponse, LookupMap, SaveRef } from '@openhome-core/util/types'
 import { LogFilter } from '@openhome-ui/pages/logs'
 import { AppTheme, Settings } from '@openhome-ui/state/appInfo'
@@ -131,7 +132,9 @@ export default interface BackendInterface {
   getPlatform: () => string
   registerListeners: (listeners: Partial<BackendListeners>) => () => void
   onMenuEvent: (event: MenuEvent, listener: () => void) => () => void
-  onMenuEvents: (eventsAndCallbacks: Partial<Record<MenuEvent, () => void>>) => () => void
+  onMenuEvents: (
+    eventsAndCallbacks: Partial<Record<MenuEvent, () => NowOrLater<unknown>>>
+  ) => () => void
   getState: () => Promise<Errorable<AppState>>
   getSettings: () => Promise<Errorable<Settings>>
   updateSettings: (settings: Settings) => Promise<Errorable<null>>

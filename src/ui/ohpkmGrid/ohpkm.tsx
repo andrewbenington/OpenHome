@@ -22,14 +22,16 @@ import {
 } from '@openhome-ui/state-zustand/banks-and-boxes/store'
 import { useSaves } from '@openhome-ui/state/saves'
 import { Language, Lookup } from '@pkm-rs/pkg'
-import { useRef } from 'react'
+import { Spinner } from '@radix-ui/themes'
+import { useRef, useState } from 'react'
 import { SelectColumn } from 'react-data-grid'
 import { OhpkmRowData } from '.'
 
 export default function useOhpkmColumns(
-  onSelectMon?: (id: OhpkmIdentifier) => void
+  onSelectMon?: (id: OhpkmIdentifier) => Promise<void>
 ): SortableColumn<OhpkmRowData>[] {
   const { getBankName, getBoxName, findHomeLocation } = useBanksAndBoxes()
+  const [loading, setLoading] = useState(false)
   const { trackedMonsToRelease } = useSaves()
 
   // this is necessary because the renderer functions do not update correctly when dependencies change
@@ -47,14 +49,26 @@ export default function useOhpkmColumns(
       frozen: true,
       renderValue: (value) => (
         <div className="flex-row-centered">
-          <button onClick={() => onSelectMon?.(value.openhomeId)} className="mon-icon-button">
-            <PokemonIcon
-              nationalDex={value.nationalDex}
-              formIndex={value.formIndex}
-              style={{ height: '1.75rem', width: '1.75rem' }}
-            />
-            {value.nationalDex}
-          </button>
+          {loading ? (
+            <Spinner />
+          ) : (
+            <button
+              onClick={() => {
+                setLoading(true)
+                onSelectMon?.(value.openhomeId)
+                  .catch(console.error)
+                  .finally(() => setLoading(false))
+              }}
+              className="mon-icon-button"
+            >
+              <PokemonIcon
+                nationalDex={value.nationalDex}
+                formIndex={value.formIndex}
+                style={{ height: '1.75rem', width: '1.75rem' }}
+              />
+              {value.nationalDex}
+            </button>
+          )}
         </div>
       ),
       cellClass: 'centered-cell',

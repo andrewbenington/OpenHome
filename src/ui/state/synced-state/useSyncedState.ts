@@ -83,9 +83,9 @@ export function useSyncedState<State, Action = State, RustState = State>(
   useEffect(() => {
     if (!stateCache && !loading) {
       setLoading(true)
-      loadAndCacheState().finally(() => {
-        setLoading(false)
-      })
+      loadAndCacheState()
+        .catch(console.error)
+        .finally(() => setLoading(false))
     }
   }, [loadAndCacheState, loading, stateCache, identifier])
 

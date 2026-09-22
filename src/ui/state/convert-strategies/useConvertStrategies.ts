@@ -55,7 +55,7 @@ export const ConversionSettingsContext = createContext<
     strategies_by_id: {},
     default_strategy_id: ZERO_UUID,
   },
-  async () => R.Err('Uninitialized'),
+  async () => Promise.resolve(R.Err('Uninitialized')),
 ])
 
 export type ConvertStrategyKey = keyof ConvertStrategy

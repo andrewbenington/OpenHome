@@ -14,4 +14,4 @@ addMissingFunctions()
 const wasmPath = path.resolve(__dirname, '../pkm_rs/pkg/pkm_rs_bg.wasm')
 const wasmBytes = fs.readFileSync(wasmPath)
 
-init({ module_or_path: wasmBytes })
+await init({ module_or_path: wasmBytes })

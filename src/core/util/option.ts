@@ -25,7 +25,7 @@ function nullToUndefined<T>(v: NullableOption<T>): Option<T> {
 type NullableOptionNowOrLater<T> = NullableOption<Promise<NullableOption<T>>>
 
 // Wrapper class for a Promise<Option> utility
-class PromisedOptionBox<T> {
+export class PromisedOptionBox<T> {
   constructor(private readonly v: NullableOptionNowOrLater<T>) {}
 
   map<R>(onSome: OnSome<T, R>): PromisedOptionBox<R> {

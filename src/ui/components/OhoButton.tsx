@@ -14,7 +14,6 @@ export type OhoButtonProps = Omit<ButtonProps, 'type'> & {
 
 export default function OhoButton(props: OhoButtonProps) {
   const {
-    type: ohoButtonType,
     disabledMessage,
     style,
     children,
@@ -25,35 +24,12 @@ export default function OhoButton(props: OhoButtonProps) {
     ...buttonProps
   } = props
 
-  const color: RadixColor | undefined = useMemo(() => {
-    switch (ohoButtonType) {
-      case 'reset':
-      case 'clear':
-        return 'gray'
-      case 'delete':
-      case 'destructive':
-        return 'tomato'
-      case 'submit':
-        return 'green'
-      default:
-        return 'gray'
-    }
-  }, [ohoButtonType])
+  const color = buttonColor(props.type)
 
-  const radixType: ButtonProps['type'] = useMemo(() => {
-    switch (ohoButtonType) {
-      case 'add':
-      case 'destructive':
-        return 'submit'
-      case 'clear':
-        return 'reset'
-      default:
-        return undefined
-    }
-  }, [ohoButtonType])
+  const radixType = buttonType(props.type)
 
   const defaultText = useMemo(() => {
-    switch (ohoButtonType) {
+    switch (props.type) {
       case 'add':
         return 'Add'
       case 'delete':
@@ -65,10 +41,10 @@ export default function OhoButton(props: OhoButtonProps) {
       default:
         return undefined
     }
-  }, [ohoButtonType])
+  }, [props.type])
 
   const icon = useMemo(() => {
-    switch (ohoButtonType) {
+    switch (props.type) {
       case 'add':
         return <AddIcon />
       case 'delete':
@@ -76,11 +52,11 @@ export default function OhoButton(props: OhoButtonProps) {
       default:
         return undefined
     }
-  }, [ohoButtonType])
+  }, [props.type])
 
   const variant = useMemo(() => {
     if (variantProp) return variantProp
-    switch (ohoButtonType) {
+    switch (props.type) {
       case 'add':
       case 'submit':
       case 'delete':
@@ -91,7 +67,7 @@ export default function OhoButton(props: OhoButtonProps) {
       default:
         return 'surface'
     }
-  }, [ohoButtonType, variantProp])
+  }, [props.type, variantProp])
 
   const disabled = loading || disabledProp || Boolean(disabledMessage)
 
@@ -99,7 +75,7 @@ export default function OhoButton(props: OhoButtonProps) {
     <Button
       size="1"
       color={color}
-      type={radixType}
+      type={buttonType(radixType)}
       variant={variant}
       loading={loading}
       disabled={disabled}
@@ -119,4 +95,31 @@ export default function OhoButton(props: OhoButtonProps) {
   )
 
   return disabledMessage ? <Tooltip content={disabledMessage}>{button}</Tooltip> : button
+}
+
+function buttonColor(buttonType: OhoButtonType): RadixColor {
+  switch (buttonType) {
+    case 'reset':
+    case 'clear':
+      return 'gray'
+    case 'delete':
+    case 'destructive':
+      return 'tomato'
+    case 'submit':
+      return 'green'
+    default:
+      return 'gray'
+  }
+}
+
+function buttonType(buttonType: OhoButtonType): 'submit' | 'reset' | 'button' | undefined {
+  switch (buttonType) {
+    case 'add':
+    case 'destructive':
+      return 'submit'
+    case 'clear':
+      return 'reset'
+    default:
+      return undefined
+  }
 }

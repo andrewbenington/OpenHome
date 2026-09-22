@@ -1,6 +1,7 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { Option } from '@openhome-core/util/functional'
+import { NowOrLater } from '@openhome-core/util/promise'
 import { CtxMenuElementBuilder } from '@openhome-ui/components/context-menu'
 import { MonLocation } from '@openhome-ui/state/saves'
 import { Suspense, use } from 'react'
@@ -11,7 +12,7 @@ interface BoxCellAsyncProps {
   title?: string
   onClick: () => void
   monPromise?: Promise<Option<PKMInterface>> | Option<PKMInterface>
-  onDrop: (_: PKMInterface[]) => void
+  onDrop: (_: PKMInterface[]) => NowOrLater<unknown>
   isDisabled?: (mon: PKMInterface) => boolean
   disabledReason?: string
   openhomeId?: OhpkmIdentifier

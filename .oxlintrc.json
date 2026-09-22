@@ -1,6 +1,11 @@
 {
   "$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",
-  "plugins": ["typescript", "react", "react-perf", "unicorn"],
+  "plugins": [
+    "typescript",
+    "react",
+    "react-perf",
+    "unicorn"
+  ],
   "categories": {
     "correctness": "error"
   },
@@ -8,34 +13,50 @@
     "browser": true,
     "es2022": true
   },
-  "ignorePatterns": ["dist", "node_modules"],
+  "ignorePatterns": [
+    "dist",
+    "node_modules"
+  ],
   "rules": {
     "eqeqeq": "error",
-    "no-console": ["warn", { "allow": ["debug", "info", "warn", "error", "assert"] }],
-
+    "no-console": [
+      "warn",
+      {
+        "allow": [
+          "debug",
+          "info",
+          "warn",
+          "error",
+          "assert"
+        ]
+      }
+    ],
     "typescript/no-non-null-assertion": "error",
     "typescript/no-unused-vars": [
       "warn",
-      { "vars": "all", "varsIgnorePattern": "^_", "args": "after-used", "argsIgnorePattern": "^_" }
+      {
+        "vars": "all",
+        "varsIgnorePattern": "^_",
+        "args": "after-used",
+        "argsIgnorePattern": "^_"
+      }
     ],
-
     "react/jsx-key": "error",
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "error",
-
     "typescript/no-unsafe-argument": "off",
     "typescript/no-unsafe-assignment": "off",
     "typescript/unbound-method": "off",
     "typescript/no-unsafe-enum-comparison": "off",
     "typescript/no-implied-eval": "off",
 
-    "@typescript-eslint/restrict-template-expressions": "allow",
+    "typescript/no-floating-promises": "error",
+    "typescript/no-misused-promises": "error",
 
     // revisit these in the future:
     "unicorn/no-new-array": "off",
     "react/set-state-in-effect": "off",
     "react/refs": "off",
     "typescript/prefer-as-const": "off"
-
   }
 }

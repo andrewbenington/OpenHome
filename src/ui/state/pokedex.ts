@@ -33,7 +33,9 @@ export function usePokedex(): PokedexManager {
   useEffect(() => {
     if (!pokedexCache && !loading) {
       setLoading(true)
-      loadAndCachePokedex().finally(() => setLoading(false))
+      loadAndCachePokedex()
+        .catch(console.error)
+        .finally(() => setLoading(false))
     }
   }, [loadAndCachePokedex, loading, pokedexCache])
 

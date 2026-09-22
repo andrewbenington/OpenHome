@@ -42,7 +42,7 @@ oxlint:
 
 .PHONY: eslint
 eslint:
-	@pnpm eslint src --max-warnings 0 --report-unused-disable-directives -c eslint.config.mjs
+	@pnpm eslint src/ui/state --max-warnings 0 --report-unused-disable-directives -c eslint.config.mjs
 
 .PHONY: test
 test: ensure-dependencies

@@ -1,5 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { Option } from '@openhome-core/util/functional'
+import { NowOrLater } from '@openhome-core/util/promise'
 import { OhpkmRowData } from '@openhome-ui/ohpkmGrid'
 import React, { ReactNode } from 'react'
 import PokemonIcon from '../PokemonIcon'
@@ -27,14 +28,14 @@ type NoTag<T> = Omit<T, '__cm_type_tag'>
 
 type ItemData = {
   content: ElementContent
-  action?: () => void
+  action?: () => NowOrLater<unknown>
   disabled: boolean
   __cm_type_tag: 'item'
 }
 
 export class Item implements CtxMenuElementBuilder {
   content: ElementContent
-  #action?: () => void
+  #action?: () => NowOrLater<unknown>
   #disabled: boolean = true
 
   private constructor(content: ElementContent) {
@@ -49,7 +50,7 @@ export class Item implements CtxMenuElementBuilder {
     return new Item({ component })
   }
 
-  action(action?: () => void): Item {
+  action(action?: () => NowOrLater<unknown>): Item {
     this.#action = action
     return this
   }
@@ -68,6 +69,57 @@ export class Item implements CtxMenuElementBuilder {
     }
   }
 }
+
+// //* LOADING ITEM *//
+
+// type LoadingItemData = {
+//   content: ElementContent
+//   action?: () => void
+//   disabled: boolean
+//   __cm_type_tag: 'item'
+// }
+
+// export class LoadingItem implements CtxMenuElementBuilder {
+//   content: ElementContent
+//   #action?: () => void
+//   #disabled: boolean = true
+
+//   private constructor(content: ElementContent) {
+//     this.content = content
+//   }
+
+//   static label(label: string): LoadingItem {
+//     return new LoadingItem({ label })
+//   }
+
+//   static component(component: ReactNode): LoadingItem {
+//     return new LoadingItem({ component })
+//   }
+
+//   action(action?: () => void): LoadingItem {
+//     this.#action = action
+//     return this
+//   }
+
+//   loadingAction(action?: () => Promise<void>): LoadingItem {
+//     this.#action = action
+//     return this
+//   }
+
+//   disabled(disabled: boolean): LoadingItem {
+//     this.#disabled = disabled
+//     return this
+//   }
+
+//   build(): LoadingItemData {
+//     return {
+//       content: this.content,
+//       action: this.#action,
+//       disabled: this.#action === undefined || this.#disabled,
+//       __cm_type_tag: 'loading_item',
+//     }
+//   }
+// }
 
 function contentIsLabel(content: ElementContent): content is { label: string } {
   return 'label' in content
