@@ -53,24 +53,24 @@ impl From<Offset> for usize {
 }
 
 // ---------------------------------------------------------------------------
-// Pk3ExBuffer<S> — generic over the byte storage so that a single impl block
+// Pk3ExpnBuffer<S> — generic over the byte storage so that a single impl block
 // covers all getters, and a second (narrower) block covers setters.
 //
-//   Pk3ExBufferRef<'a>  = Pk3ExBuffer<&'a [u8]>       — read-only
-//   Pk3ExBufferMut<'a>  = Pk3ExBuffer<&'a mut [u8]>   — read + write
+//   Pk3ExpnBufferRef<'a>  = Pk3ExpnBuffer<&'a [u8]>       — read-only
+//   Pk3ExpnBufferMut<'a>  = Pk3ExpnBuffer<&'a mut [u8]>   — read + write
 // ---------------------------------------------------------------------------
 
-pub type Pk3ExBufferRef<'a> = Pk3ExBuffer<&'a [u8]>;
-pub type Pk3ExBufferMut<'a> = Pk3ExBuffer<&'a mut [u8]>;
+pub type Pk3ExpnBufferRef<'a> = Pk3ExpnBuffer<&'a [u8]>;
+pub type Pk3ExpnBufferMut<'a> = Pk3ExpnBuffer<&'a mut [u8]>;
 
 #[derive(Default, Clone, Copy)]
-pub struct Pk3ExBuffer<S: AsRef<[u8]>>(S);
+pub struct Pk3ExpnBuffer<S: AsRef<[u8]>>(S);
 
 // ------------------------------------------------------------------
 // Constructors — immutable
 // ------------------------------------------------------------------
 
-impl<'a> Pk3ExBuffer<&'a [u8]> {
+impl<'a> Pk3ExpnBuffer<&'a [u8]> {
     pub fn box_span(span: &'a [u8]) -> Self {
         assert_eq!(span.len(), super::BOX_SIZE);
         Self(span)
@@ -91,7 +91,7 @@ impl<'a> Pk3ExBuffer<&'a [u8]> {
 // Methods — mutable
 // ------------------------------------------------------------------
 
-impl<'a> Pk3ExBuffer<&'a mut [u8]> {
+impl<'a> Pk3ExpnBuffer<&'a mut [u8]> {
     pub fn box_span_mut(span: &'a mut [u8]) -> Self {
         assert_eq!(span.len(), super::BOX_SIZE);
         Self(span)
@@ -112,7 +112,7 @@ impl<'a> Pk3ExBuffer<&'a mut [u8]> {
 // Accessors
 // ------------------------------------------------------------------
 
-impl<S: AsRef<[u8]>> Pk3ExBuffer<S> {
+impl<S: AsRef<[u8]>> Pk3ExpnBuffer<S> {
     fn get_u8(&self, offset: Offset) -> u8 {
         let offset = offset as usize;
         self.bytes()[offset]
@@ -138,7 +138,7 @@ impl<S: AsRef<[u8]>> Pk3ExBuffer<S> {
     }
 }
 
-impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk3ExBuffer<S> {
+impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk3ExpnBuffer<S> {
     fn set_u8(&mut self, offset: Offset, v: u8) {
         let offset = offset as usize;
         self.bytes_mut()[offset] = v;
@@ -169,7 +169,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk3ExBuffer<S> {
 // Shared methods
 // ------------------------------------------------------------------
 
-impl<S: AsRef<[u8]>> Pk3Buffer<S> {
+impl<S: AsRef<[u8]>> Pk3ExpnBuffer<S> {
     fn bytes(&self) -> &[u8] {
         self.0.as_ref()
     }
