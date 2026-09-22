@@ -1,4 +1,4 @@
-mod emerald_expansion;
+mod emerald_expn;
 
 enum EmeraldExpnAbilities {
     None = 0,
