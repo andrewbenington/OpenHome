@@ -1,4 +1,4 @@
-use super::EmeraldExPokemonIndex;
+use super::EmeraldExpnPokemonIndex;
 use crate::checksum::{Checksum, RefreshChecksum};
 use crate::result::{Error, Result};
 use crate::strings::Gen3String;
@@ -24,7 +24,7 @@ use pkm_rs_types::randomize::Randomize;
 mod emerald_expansion;
 
 #[cfg(not(feature = "randomize"))]
-pub trait EmeraldExSpeciesIndex: From<u16> + Into<u16> + Serialize + Copy {
+pub trait EmeraldExpnSpeciesIndex: From<u16> + Into<u16> + Serialize + Copy {
     fn try_to_species_and_form(self) -> Result<SpeciesForm>;
     fn try_from_species_and_form(species: &SpeciesForm) -> Result<Self>;
 
@@ -33,7 +33,7 @@ pub trait EmeraldExSpeciesIndex: From<u16> + Into<u16> + Serialize + Copy {
 }
 
 #[cfg(feature = "randomize")]
-pub trait EmeraldExSpeciesIndex: From<u16> + Into<u16> + Serialize + Copy + Randomize {
+pub trait EmeraldExpnSpeciesIndex: From<u16> + Into<u16> + Serialize + Copy + Randomize {
     fn try_to_species_and_form(self) -> Result<SpeciesForm>;
     fn try_from_species_and_form(species: &SpeciesForm) -> Result<Self>;
 
@@ -41,7 +41,7 @@ pub trait EmeraldExSpeciesIndex: From<u16> + Into<u16> + Serialize + Copy + Rand
     fn plugin_identifier() -> &'static str;
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = Pk3ExWasm))]
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = Pk3ExpnWasm))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny8192)]
 pub struct Pk3Ex {
@@ -67,7 +67,7 @@ pub struct Pk3Ex {
 //           pub unused_1E: bool,
     
     // PokemonSubstruct0
-    pub pokemon_index: EmeraldExPokemonIndex,  // u11
+    pub pokemon_index: EmeraldExpnPokemonIndex, // u11
     pub tera_type: TeraType,  // u5
     pub held_item_index: u16,  // u10
     // pub unused_02: u16,  // u6
