@@ -14,7 +14,7 @@ impl CfruSpeciesIndex for UnboundSpeciesIndex {
     fn try_to_species_and_form(self) -> Result<SpeciesForm> {
         super::UB_TO_NATIONAL_DEX_MAP
             .get(&self.0)
-            .ok_or(Error::GameDex {
+            .ok_or(Error::NationalDex {
                 value: self.0,
                 game: NdexConvertSource::Gen3UB,
             })
