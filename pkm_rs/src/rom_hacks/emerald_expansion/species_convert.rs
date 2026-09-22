@@ -4,7 +4,7 @@ use pkm_rs_resources::species::SpeciesForm;
 
 // TODO We will need to fix the form indices the way we did for National Dex to Emerald Ex
 
-pub static EMERALD_EX_TO_NATIONAL_DEX_MAP: phf::Map<u16, SpeciesForm> = phf_map! {
+pub static EMERALD_EXPN_TO_NATIONAL_DEX_MAP: phf::Map<u16, SpeciesForm> = phf_map! {
     // #define SPECIES_NONE 0
     1 => unsafe { SpeciesForm::new_unchecked(1, 0) },  // SPECIES_BULBASAUR
     2 => unsafe { SpeciesForm::new_unchecked(2, 0) },  // SPECIES_IVYSAUR
@@ -1651,7 +1651,7 @@ pub static EMERALD_EX_TO_NATIONAL_DEX_MAP: phf::Map<u16, SpeciesForm> = phf_map!
 
 type NdexAndForme = (u16, u16);
 
-pub static NATIONAL_DEX_TO_EMERALD_EX_MAP: phf::Map<NdexAndForme, u16> = phf_map! {
+pub static NATIONAL_DEX_TO_EMERALD_EXPN_MAP: phf::Map<NdexAndForme, u16> = phf_map! {
     // (0, 0) => None,
     (1, 0) => 1,  // SPECIES_BULBASAUR
     (2, 0) => 2,  // SPECIES_IVYSAUR

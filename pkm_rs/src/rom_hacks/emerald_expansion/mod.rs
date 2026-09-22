@@ -1,6 +1,6 @@
 mod species_convert;
 
 pub mod emerald_expansion;
-mod pk3emex;
+mod pk3emexpn;
 
-use species_convert::{NATIONAL_DEX_TO_EMERALD_EX_MAP, EMERALD_EX_TO_NATIONAL_DEX_MAP};
+use species_convert::{EMERALD_EXPN_TO_NATIONAL_DEX_MAP, NATIONAL_DEX_TO_EMERALD_EXPN_MAP};

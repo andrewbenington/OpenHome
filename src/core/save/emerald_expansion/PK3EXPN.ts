@@ -1,8 +1,8 @@
 import { PluginPKMInterface, RomHackFormat } from '@openhome-core/pkm/interfaces'
-import { FourMoves, Stats } from '@openhome-core/util/types'
-import { PkmConstructorOptions } from '@openhome-core/pkm/PKM'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { PkmConstructorOptions } from '@openhome-core/pkm/PKM'
 import { Errorable, Option, R } from '@openhome-core/util/functional'
+import { Stats } from '@openhome-core/util/types'
 import {
   Ball,
   BinaryGender,
@@ -13,14 +13,14 @@ import {
   MarkingsFourShapes,
   MetadataSummaryLookup,
   OriginGame,
-  Pk3ExWasm,
+  Pk3ExpnWasm,
   PkmFormat,
   Pokerus,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import { PluginIdentifier } from '../interfaces'
 
-export default abstract class PK3EX implements PluginPKMInterface {
+export default abstract class PK3EXPN implements PluginPKMInterface {
   abstract format: RomHackFormat
 
   abstract pluginIdentifier: PluginIdentifier
@@ -34,32 +34,32 @@ export default abstract class PK3EX implements PluginPKMInterface {
   abstract selectColor: string
 
   abstract getMonFormat(): PkmFormat
-  inner: Pk3ExWasm
+  inner: Pk3ExpnWasm
 
-  constructor(arg: Pk3ExWasm | OHPKM, options: PkmConstructorOptions) {
-    if (arg instanceof Pk3ExWasm) {
+  constructor(arg: Pk3ExpnWasm | OHPKM, options: PkmConstructorOptions) {
+    if (arg instanceof Pk3ExpnWasm) {
       this.inner = arg
     } else {
       const ohpkmBytes = new Uint8Array(arg.toBytes())
 
-      this.inner = Pk3ExWasm.fromOhpkmBytes(
+      this.inner = Pk3ExpnWasm.fromOhpkmBytes(
         ohpkmBytes,
         options.strategy || ConvertStrategies.getDefault()
       )
     }
   }
 
-  static fromBytes<T extends PK3EX>(
+  static fromBytes<T extends PK3EXPN>(
     this: new (buffer: ArrayBuffer, options: PkmConstructorOptions) => T,
     buffer: ArrayBuffer,
     encrypted?: boolean
   ): T {
     const bytes = new Uint8Array(buffer)
-    const pk3ExWasm = encrypted ? Pk3ExWasm.fromEncryptedBytes(bytes) : Pk3ExWasm.fromBytes(bytes)
-    return this.fromWasm(pk3ExWasm)
+    const pk3ExpnWasm = encrypted ? Pk3ExpnWasm.fromEncryptedBytes(bytes) : Pk3ExpnWasm.fromBytes(bytes)
+    return this.fromWasm(pk3ExpnWasm)
   }
 
-  static fromOhpkm<T extends PK3EX>(
+  static fromOhpkm<T extends PK3EXPN>(
     this: new (ohpkm: OHPKM, options: PkmConstructorOptions) => T,
     ohpkm: OHPKM,
     strategy: ConvertStrategy
@@ -67,9 +67,9 @@ export default abstract class PK3EX implements PluginPKMInterface {
     return R.tryFrom(() => new this(ohpkm, { strategy }))
   }
 
-  static fromWasm<T extends PK3EX>(
-    this: new (pk3ex: Pk3ExWasm, options: PkmConstructorOptions) => T,
-    pk3ex: Pk3ExWasm
+  static fromWasm<T extends PK3EXPN>(
+    this: new (pk3ex: Pk3ExpnWasm, options: PkmConstructorOptions) => T,
+    pk3ex: Pk3ExpnWasm
   ): T {
     return new this(pk3ex, {})
   }
@@ -95,7 +95,7 @@ export default abstract class PK3EX implements PluginPKMInterface {
     try {
       this.inner.nationalDex = value
     } catch (e) {
-      console.error(`invalid dex number ${value} for PK3EX: ${e}`)
+      console.error(`invalid dex number ${value} for PK3EXPN: ${e}`)
     }
   }
 

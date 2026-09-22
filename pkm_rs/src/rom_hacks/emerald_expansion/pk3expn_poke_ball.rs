@@ -1,7 +1,7 @@
 mod emerald_expansion;
 
 // include/constants/pokeball.h - enum PokeBall
-pub const EMERALD_EX_BALLS: [Ball; 28] = [
+pub const EMERALD_EXPN_BALLS: [Ball; 28] = [
     Ball::Strange,
     Ball::Poke,
     Ball::Great,
@@ -33,16 +33,22 @@ pub const EMERALD_EX_BALLS: [Ball; 28] = [
 ];
 
 #[inline]
-fn emerald_ex_ball_from_index(idx: u8) -> Ball {
-    EMERALD_EX_BALLS.get(idx as usize).copied().unwrap_or(Ball::Strange)
+fn emerald_expn_ball_from_index(idx: u8) -> Ball {
+    EMERALD_EXPN_BALLS
+        .get(idx as usize)
+        .copied()
+        .unwrap_or(Ball::Strange)
 }
 
 #[inline]
-fn emerald_ex_ball_index(ball: Ball) -> u8 {
-    if let Some(i) = EMERALD_EX_BALLS.iter().position(|&b| b == ball) {
+fn emerald_expn_ball_index(ball: Ball) -> u8 {
+    if let Some(i) = EMERALD_EXPN_BALLS.iter().position(|&b| b == ball) {
         i as u8
     } else {
         // fallback to Strange on unknown
-        EMERALD_EX_BALLS.iter().position(|&b| b == Ball::Strange).unwrap() as u8
+        EMERALD_EXPN_BALLS
+            .iter()
+            .position(|&b| b == Ball::Strange)
+            .unwrap() as u8
     }
 }
