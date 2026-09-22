@@ -1,6 +1,6 @@
 mod emerald_expansion;
 
-enum EmeraldExAbilities {
+enum EmeraldExpnAbilities {
     None = 0,
     Stench = 1,
     Drizzle = 2,

@@ -1,17 +1,17 @@
-import { G3Sector } from '../G3SAV'
-import { Box, BoxAndSlot, PluginSAV } from '../interfaces'
 import { PluginPKMInterface } from '@openhome-core/pkm/interfaces'
-import { LookupType } from '../util'
-import { BinaryGender, Gen3Strings, Language, OriginGame } from '@pkm-rs/pkg'
 import { PluginIdentifier } from '@openhome-core/tauri/spectaCommands'
-import { PathData } from '../util/path'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   runningInTest,
 } from '@openhome-core/util'
+import { BinaryGender, Gen3Strings, Language, OriginGame } from '@pkm-rs/pkg'
+import { G3Sector } from '../G3SAV'
+import { Box, BoxAndSlot, PluginSAV } from '../interfaces'
+import { LookupType } from '../util'
+import { PathData } from '../util/path'
 
-class G3EXSaveBackup<T extends PluginPKMInterface> {
+class G3EXPNSaveBackup<T extends PluginPKMInterface> {
   origin = OriginGame.Emerald
   bytes: Uint8Array
   saveIndex: number = 0
@@ -94,14 +94,14 @@ class G3EXSaveBackup<T extends PluginPKMInterface> {
   }
 }
 
-export abstract class G3EXSAV<T extends PluginPKMInterface> extends PluginSAV<T> {
+export abstract class G3EXPNSAV<T extends PluginPKMInterface> extends PluginSAV<T> {
   static pkmType: any
   pkmTypeClass: any
 
   static lookupType: LookupType = 'gen345'
 
-  primarySave: G3EXSaveBackup<T>
-  backupSave: G3EXSaveBackup<T>
+  primarySave: G3EXPNSaveBackup<T>
+  backupSave: G3EXPNSaveBackup<T>
   primarySaveOffset: number
 
   origin = OriginGame.FireRed
@@ -137,8 +137,8 @@ export abstract class G3EXSAV<T extends PluginPKMInterface> extends PluginSAV<T>
     this.bytes = bytes
     this.filePath = path
 
-    const saveOne = new G3EXSaveBackup<T>(bytes.slice(0, 0xe000), pkmType, this.getBoxCount())
-    const saveTwo = new G3EXSaveBackup<T>(bytes.slice(0xe000, 0x1c000), pkmType, this.getBoxCount())
+    const saveOne = new G3EXPNSaveBackup<T>(bytes.slice(0, 0xe000), pkmType, this.getBoxCount())
+    const saveTwo = new G3EXPNSaveBackup<T>(bytes.slice(0xe000, 0x1c000), pkmType, this.getBoxCount())
 
     if (saveOne.saveIndex > saveTwo.saveIndex) {
       this.primarySave = saveOne
@@ -188,7 +188,7 @@ export abstract class G3EXSAV<T extends PluginPKMInterface> extends PluginSAV<T>
             pcBytes.set(new Uint8Array(mon.toPCBytes()), 0)
           }
         } catch (e) {
-          console.error(`G3EXSAV: ${e}`)
+          console.error(`G3EXPNSAV: ${e}`)
         }
       }
       this.primarySave.pcDataContiguous.set(pcBytes, 4 + monOffset * 80) // TODO: see if pkm sizes need to be updated here
