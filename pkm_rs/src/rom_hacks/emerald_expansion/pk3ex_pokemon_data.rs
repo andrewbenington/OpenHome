@@ -41,7 +41,7 @@ pub trait EmeraldExSpeciesIndex: From<u16> + Into<u16> + Serialize + Copy + Rand
     fn plugin_identifier() -> &'static str;
 }
 
-
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = Pk3ExWasm))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny8192)]
 pub struct Pk3Ex {
