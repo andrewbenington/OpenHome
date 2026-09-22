@@ -2,7 +2,7 @@
 // pub mod rr;
 // pub mod ub;
 
-mod emerald_expansion;
+mod emerald_expn;
 mod rr;
 
 #[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize, specta::Type)]
