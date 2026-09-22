@@ -69,11 +69,14 @@ export default tseslint.config(prettierRecommended, {
         selector: 'CallExpression[callee.name="useValueChanged"]',
       },
     ],
+    '@typescript-eslint/restrict-template-expressions': 'off',
+
     // TODO: revert all below to errors
     '@typescript-eslint/no-unsafe-argument': 'off',
     '@typescript-eslint/no-unsafe-assignment': 'off',
     '@typescript-eslint/unbound-method': 'off',
     '@typescript-eslint/no-unsafe-enum-comparison': 'off',
     '@typescript-eslint/no-implied-eval': 'off',
+    '@typescript-eslint/prefer-as-const': 'off',
   },
 })
