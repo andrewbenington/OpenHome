@@ -16,7 +16,7 @@ use pkm_rs_types::{
 use pkm_rs_types::{Language, Stats16Le};
 use pkm_rs_types::{read_u16_le, read_u32_le};
 
-mod emerald_expansion;
+mod emerald_expn;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(super) enum Offset {
