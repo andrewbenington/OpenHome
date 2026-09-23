@@ -37,44 +37,46 @@ const MarkingsDisplay = <M extends Markings>(props: MarkingsProps<M>) => {
         }
       : undefined
 
+  const markingShapes: MarkingShape[] =
+    'star' in modifiedMarkings && 'diamond' in modifiedMarkings
+      ? ['circle', 'triangle', 'square', 'heart', 'star', 'diamond']
+      : ['circle', 'square', 'triangle', 'heart']
+
   return (
     <div className="markings-container">
-      <Marking marking="circle" markings={modifiedMarkings} onClick={cycleMarkingValue} />
-      <Marking marking="square" markings={modifiedMarkings} onClick={cycleMarkingValue} />
-      <Marking marking="triangle" markings={modifiedMarkings} onClick={cycleMarkingValue} />
-      <Marking marking="heart" markings={modifiedMarkings} onClick={cycleMarkingValue} />
-      <Marking marking="star" markings={modifiedMarkings} onClick={cycleMarkingValue} />
-      <Marking marking="diamond" markings={modifiedMarkings} onClick={cycleMarkingValue} />
+      {markingShapes.map((shape) => (
+        <Marking
+          key={shape}
+          shape={shape}
+          markings={modifiedMarkings as AnyMarkings}
+          onClick={cycleMarkingValue}
+        />
+      ))}
     </div>
   )
 }
 
+type AnyMarkings = {
+  [K in MarkingShape]: MarkingValue
+}
+
 type MarkingProps = {
-  marking: MarkingShape
-  markings: Markings
+  shape: MarkingShape
+  markings: AnyMarkings
   onClick?: (shape: MarkingShape) => void
 }
 
-function Marking({ marking, markings, onClick: toggleMarking }: MarkingProps) {
-  let value: MarkingValue
-
-  if (marking === 'star' || marking === 'diamond') {
-    if (!markingsHaveColor(markings)) return <></>
-    value = markings[marking]
-  } else {
-    value = markings[marking]
-  }
-
+function Marking({ shape, markings, onClick: toggleMarking }: MarkingProps) {
   return (
     <span
       className="marking-shape"
-      onClick={() => toggleMarking?.(marking)}
+      onClick={() => toggleMarking?.(shape)}
       style={{
         cursor: toggleMarking ? 'pointer' : 'default',
-        color: getMarkingColorByNumber(value),
+        color: getMarkingColorByNumber(markings[shape]),
       }}
     >
-      {markingDisplay(marking)}
+      {markingDisplay(shape)}
     </span>
   )
 }
