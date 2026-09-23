@@ -5,7 +5,7 @@ use crate::result::{Error, PokemonIndexType, Result};
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
-use crate::result::Error::NationalDex;
+use crate::rom_hacks::cfru::{CfruSpeciesIndex, Pk3Cfru};
 
 const FAKEMON_INDEXES: [u16; 22] = [
     1186, 1200, 1274, 1275, 1276, 1277, 1278, 1279, 1282, 1283, 1284, 1285, 1286, 1287, 1288, 1289,
@@ -24,17 +24,6 @@ impl CfruSpeciesIndex for RadicalRedSpeciesIndex {
                 source: PokemonIndexType::Gen3RR,
             })
             .copied()
-    }
-
-    fn try_from_species_and_form(saf: &SpeciesForm) -> Result<Self> {
-        super::NATIONAL_DEX_TO_RR_MAP
-            .get(&saf.to_tuple())
-            .ok_or(Error::Game {
-                saf: *saf,
-                generation: PokemonIndexType::Gen3RR,
-            })
-            .copied()
-            .map(RadicalRedSpeciesIndex)
     }
 
     fn is_fakemon(&self) -> bool {
@@ -74,4 +63,4 @@ impl Randomize for RadicalRedSpeciesIndex {
     }
 }
 
-pub type Pk3rr = PK3CFRU<RadicalRedSpeciesIndex>;
+pub type Pk3rr = Pk3Cfru<RadicalRedSpeciesIndex>;
