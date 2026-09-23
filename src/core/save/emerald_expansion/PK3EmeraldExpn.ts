@@ -13,7 +13,6 @@ import {
   MarkingsFourShapes,
   MetadataSummaryLookup,
   OriginGame,
-  Pk3EmeraldExpn,
   PkmFormat,
   Pokerus,
   SpeciesLookup,
@@ -34,15 +33,15 @@ export default abstract class PK3EmeraldExpn implements PluginPKMInterface {
   abstract selectColor: string
 
   abstract getMonFormat(): PkmFormat
-  inner: Pk3ExpnWasm
+  inner: Pk3EmeraldExpnWasm
 
-  constructor(arg: Pk3ExpnWasm | OHPKM, options: PkmConstructorOptions) {
-    if (arg instanceof Pk3ExpnWasm) {
+  constructor(arg: Pk3EmeraldExpnWasm | OHPKM, options: PkmConstructorOptions) {
+    if (arg instanceof Pk3EmeraldExpnWasm) {
       this.inner = arg
     } else {
       const ohpkmBytes = new Uint8Array(arg.toBytes())
 
-      this.inner = Pk3ExpnWasm.fromOhpkmBytes(
+      this.inner = Pk3EmeraldExpnWasm.fromOhpkmBytes(
         ohpkmBytes,
         options.strategy || ConvertStrategies.getDefault()
       )
@@ -55,7 +54,9 @@ export default abstract class PK3EmeraldExpn implements PluginPKMInterface {
     encrypted?: boolean
   ): T {
     const bytes = new Uint8Array(buffer)
-    const pk3ExpnWasm = encrypted ? Pk3ExpnWasm.fromEncryptedBytes(bytes) : Pk3ExpnWasm.fromBytes(bytes)
+    const pk3ExpnWasm = encrypted
+      ? Pk3ExpnWasm.fromEncryptedBytes(bytes)
+      : Pk3EmeraldExpnWasm.fromBytes(bytes)
     return this.fromWasm(pk3ExpnWasm)
   }
 
@@ -68,8 +69,8 @@ export default abstract class PK3EmeraldExpn implements PluginPKMInterface {
   }
 
   static fromWasm<T extends PK3EmeraldExpn>(
-    this: new (pk3ex: Pk3ExpnWasm, options: PkmConstructorOptions) => T,
-    pk3ex: Pk3ExpnWasm
+    this: new (pk3ex: Pk3EmeraldExpnWasm, options: PkmConstructorOptions) => T,
+    pk3ex: Pk3EmeraldExpnWasm
   ): T {
     return new this(pk3ex, {})
   }
