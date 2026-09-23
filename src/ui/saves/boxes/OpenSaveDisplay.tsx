@@ -207,11 +207,9 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                 saveIdentifier: save.identifier,
               }
 
-              const uniqueKey =
-                openhomeId ??
-                (mon
-                  ? `${save.currentPCBox}-${index}-${mon.encryptionConstant ?? mon.personalityValue ?? JSON.stringify(mon.dvs)}-${mon.nickname}`
-                  : `${save.currentPCBox}-${index}`)
+              const uniqueKey = mon
+                ? `${save.currentPCBox}-${index}-${openhomeId ?? mon.encryptionConstant ?? mon.personalityValue ?? JSON.stringify(mon.dvs)}-${mon.nickname}`
+                : `${save.currentPCBox}-${index}`
 
               const slotMetadata = save.getSlotMetadata?.(save.currentPCBox, index)
 
