@@ -67,7 +67,8 @@ function initialMonDisplayState(): MonDisplayState {
 
 export const defaultSettings: Settings = {
   enabledSaveTypes: Object.fromEntries(
-    [...OFFICIAL_SAVE_TYPES, ...EXTRA_SAVE_TYPES].map((savetype) => [savetype.saveTypeID, true])
+    [...OFFICIAL_SAVE_TYPES, ...EXTRA_SAVE_TYPES].map(
+      (savetype) => [savetype.saveTypeID, true])
   ),
   enabledPlugins: {},
   saveCardSize: 180,
