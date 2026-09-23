@@ -13,14 +13,14 @@ import {
   MarkingsFourShapes,
   MetadataSummaryLookup,
   OriginGame,
-  Pk3ExpnWasm,
+  Pk3EmeraldExpn,
   PkmFormat,
   Pokerus,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import { PluginIdentifier } from '../interfaces'
 
-export default abstract class PK3EXPN implements PluginPKMInterface {
+export default abstract class PK3EmeraldExpn implements PluginPKMInterface {
   abstract format: RomHackFormat
 
   abstract pluginIdentifier: PluginIdentifier
@@ -49,7 +49,7 @@ export default abstract class PK3EXPN implements PluginPKMInterface {
     }
   }
 
-  static fromBytes<T extends PK3EXPN>(
+  static fromBytes<T extends PK3EmeraldExpn>(
     this: new (buffer: ArrayBuffer, options: PkmConstructorOptions) => T,
     buffer: ArrayBuffer,
     encrypted?: boolean
@@ -59,7 +59,7 @@ export default abstract class PK3EXPN implements PluginPKMInterface {
     return this.fromWasm(pk3ExpnWasm)
   }
 
-  static fromOhpkm<T extends PK3EXPN>(
+  static fromOhpkm<T extends PK3EmeraldExpn>(
     this: new (ohpkm: OHPKM, options: PkmConstructorOptions) => T,
     ohpkm: OHPKM,
     strategy: ConvertStrategy
@@ -67,7 +67,7 @@ export default abstract class PK3EXPN implements PluginPKMInterface {
     return R.tryFrom(() => new this(ohpkm, { strategy }))
   }
 
-  static fromWasm<T extends PK3EXPN>(
+  static fromWasm<T extends PK3EmeraldExpn>(
     this: new (pk3ex: Pk3ExpnWasm, options: PkmConstructorOptions) => T,
     pk3ex: Pk3ExpnWasm
   ): T {

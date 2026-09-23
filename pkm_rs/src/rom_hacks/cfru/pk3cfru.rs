@@ -7,7 +7,7 @@ use crate::util;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::MoveIndex;
 use pkm_rs_resources::species::SpeciesForm;
-use pkm_rs_types::Gender;
+use pkm_rs_types::{Gender, Pokerus};
 use pkm_rs_types::{MarkingsFourShapes, OriginGame, Stats8};
 use pkm_rs_types::{read_u16_le, read_u32_le};
 use serde::Serialize;
@@ -71,7 +71,7 @@ fn cfru_ball_index(ball: Ball) -> u8 {
 #[cfg(not(feature = "randomize"))]
 pub trait CfruSpeciesIndex: From<u16> + Into<u16> + Serialize + Copy {
     fn try_to_species_and_form(self) -> Result<SpeciesForm>;
-    fn try_from_species_and_form(species: &SpeciesForm) -> Result<Self>;
+
 
     fn is_fakemon(&self) -> bool;
     fn plugin_identifier() -> &'static str;
