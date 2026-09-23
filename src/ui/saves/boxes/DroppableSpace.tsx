@@ -1,6 +1,8 @@
 import { useDroppable } from '@dnd-kit/core'
 import { MonLocation } from '@openhome-ui/state/saves'
+import { cssClass } from '@openhome-ui/util/style'
 import { CSSProperties, ReactNode, useEffect, useEffectEvent } from 'react'
+import './DroppableSpace.css'
 
 const getBackgroundDetails = (disabled?: boolean): CSSProperties => {
   if (disabled) {
@@ -53,18 +55,10 @@ const DroppableSpace = ({
 
   return (
     <div
-      className={className}
+      className={cssClass('droppable-space').with(className).build()}
       style={{
         ...getBackgroundDetails(disabled),
-        outlineStyle: 'solid',
-        outlineWidth: 2,
         outlineColor: isOver ? 'var(--accent-8)' : 'transparent',
-        borderRadius: 'var(--border-radius-lg',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100%',
-        height: '100%',
         ...style,
       }}
       ref={setNodeRef}
