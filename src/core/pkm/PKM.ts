@@ -38,7 +38,6 @@ export type PKM =
   | PB8
   | PK9
   | PA9
-  | PK7
 
 const WasmPkmFormats = [PK3, PK7, PK8, PK9, PK9Compass]
 export type WasmPkmFormat = InstanceType<(typeof WasmPkmFormats)[number]>

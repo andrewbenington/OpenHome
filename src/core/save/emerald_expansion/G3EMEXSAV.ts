@@ -1,3 +1,5 @@
+// noinspection DuplicatedCode
+
 import { PluginPKMInterface } from '@openhome-core/pkm/interfaces'
 import { PluginIdentifier } from '@openhome-core/tauri/spectaCommands'
 import {
@@ -94,7 +96,7 @@ class G3EXPNSaveBackup<T extends PluginPKMInterface> {
   }
 }
 
-export abstract class G3EXPNSAV<T extends PluginPKMInterface> extends PluginSAV<T> {
+export abstract class G3EMEXSAV<T extends PluginPKMInterface> extends PluginSAV<T> {
   static pkmType: any
   pkmTypeClass: any
 
@@ -131,7 +133,7 @@ export abstract class G3EXPNSAV<T extends PluginPKMInterface> extends PluginSAV<
   tooEarlyToOpen: boolean = false
   updatedBoxSlots: BoxAndSlot[] = []
 
-  constructor(path: PathData, bytes: Uint8Array, pkmType: any) {
+  protected constructor(path: PathData, bytes: Uint8Array, pkmType: any) {
     super()
     this.pkmTypeClass = pkmType
     this.bytes = bytes
