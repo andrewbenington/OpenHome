@@ -34,6 +34,7 @@ const logUpdate = (mon: Option<PKMInterface>, location: SaveMonLocation) =>
   console.log(
     `set ${mon?.nickname} at location ${location.saveIdentifier} ${location.box}/${location.boxSlot}`
   )
+
 export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'homeData'>> & {
   allOpenSaves: readonly SAV[]
 

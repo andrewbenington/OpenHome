@@ -305,6 +305,9 @@ export function useOhpkmStore() {
   ) {
     const ohpkm = sourceSave ? OHPKM.fromMonInSave(mon, sourceSave) : OHPKM.fromMonUnknownSave(mon)
     ohpkm.startedTrackingTimestamp = dayjs()
+
+    backend.log('INFO', `Starting to track ${mon.nickname} (${ohpkm.openhomeId})`)
+
     if (destSave) {
       handleLookupsUpdate(ohpkm, destSave)
         .then(() => insertOrUpdate(ohpkm))

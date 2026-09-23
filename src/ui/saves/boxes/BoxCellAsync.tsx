@@ -63,7 +63,7 @@ function BoxCellAsync(props: BoxCellAsyncProps) {
       <BoxCellAsyncInner {...props} monPromise={props.monPromise} />
     </Suspense>
   ) : (
-    <BoxCell {...props} mon={props.monPromise} borderColor="grey" />
+    <BoxCell {...props} mon={props.monPromise} />
   )
 }
 
@@ -78,7 +78,7 @@ function BoxCellAsyncInner(
       {...boxCellProps}
       mon={mon}
       disabled={mon && isDisabled?.(mon)}
-      borderColor={mon instanceof OHPKM ? 'teal' : 'purple'}
+      borderColor={mon instanceof OHPKM ? 'var(--ohpkm-cell-border-color)' : undefined}
     />
   )
 }
