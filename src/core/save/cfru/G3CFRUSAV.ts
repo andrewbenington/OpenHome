@@ -144,6 +144,7 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
   }
 }
 
+// noinspection PointlessArithmeticExpressionJS
 export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<T> {
   static pkmType: any
   pkmTypeClass: any
