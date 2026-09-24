@@ -63,6 +63,7 @@ function createOhpkmStore(capacity: number) {
       globalListeners.add(cb)
       return () => globalListeners.delete(cb)
     },
+    reset: () => cache.reset(),
   }
 }
 
@@ -456,6 +457,10 @@ export function useOhpkmStore() {
     })
   }
 
+  function clearCache() {
+    ohpkmCache.reset()
+  }
+
   return {
     getById,
     tryLoadFromId,
@@ -485,6 +490,7 @@ export function useOhpkmStore() {
     syncOhpkmIfTracked,
 
     scanFullStoreAndFixHandlers,
+    clearCache,
   }
 }
 
