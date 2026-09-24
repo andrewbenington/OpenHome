@@ -3,7 +3,7 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
 import { monSupportedBySave } from '@openhome-core/save/util'
-import { $R, R, range } from '@openhome-core/util/functional'
+import { $R, Option, R, range } from '@openhome-core/util/functional'
 import { $O } from '@openhome-core/util/option'
 import { filterUndefined } from '@openhome-core/util/sort'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
@@ -18,7 +18,7 @@ import { ErrorContext } from '@openhome-ui/state/error'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import useOhpkmBatchIdLookup from '@openhome-ui/state/ohpkm/useOhpkmIdBatchLookup'
 import useTrackedDataRecovery from '@openhome-ui/state/ohpkm/useTrackedDataRecovery'
-import { MonLocation, useSaves } from '@openhome-ui/state/saves'
+import { EMPTY_SLOT, MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { colorIsDark } from '@openhome-ui/util/color'
 import { MetadataSummaryLookup } from '@pkm-rs/pkg'
 import { Button, Dialog, Flex, Grid, Separator } from '@radix-ui/themes'
@@ -158,24 +158,27 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
         boxSlot: index,
         saveIdentifier: save.identifier,
       }
-      const mon = save.getMonAt(location.box, location.boxSlot)
+      let mon: Option<OHPKM | PKMInterface> = save.getMonAt(location.box, location.boxSlot)
       const openhomeId = $O(save.getMonAt(location.box, location.boxSlot)).flatMap(
         ohpkmStore.getPotentialOhpkmId
       )
 
-      // when a pokemon is in the process of being registered (i.e. was just dragged from a different save into
-      // this one), use the pending value to avoid visual snaps back and forth
-      const pendingMon = savesManager.getPendingMon(location)
-      if (pendingMon) console.info('PENDING MON:', pendingMon)
-
-      const monOrOhpkm =
-        pendingMon ??
+      mon =
         openhomeId
           .flatMap((openhomeId) => saveOhpkms?.get(openhomeId))
           .map(R.dropError) // we expect many "id lookups" to fail, because not all mons are necessarily tracked
-          .get()
+          .get() ?? mon
 
-      return { save, mon: monOrOhpkm ?? mon, openhomeId: openhomeId.get() }
+      // when a pokemon is in the process of being registered (i.e. was just dragged from a different save into
+      // this one), use the pending value to avoid visual snaps back and forth
+      const pendingMon = savesManager.getPendingMon(location)
+      if (pendingMon === EMPTY_SLOT) {
+        mon = undefined
+      } else if (pendingMon && ohpkmStore.getPotentialOhpkmId(pendingMon)) {
+        mon = pendingMon
+      }
+
+      return { save, mon, openhomeId: openhomeId.get() }
     })
 
   return save && save.currentPCBox !== undefined ? (

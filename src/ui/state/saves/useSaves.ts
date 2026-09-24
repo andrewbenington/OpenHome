@@ -22,6 +22,8 @@ import { PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { Item } from '@pkm-rs/pkg'
 import { useContext, useRef } from 'react'
 import {
+  EMPTY_SLOT,
+  EmptySlot,
   HomeMonLocation,
   MonLocation,
   MonWithLocation,
@@ -44,7 +46,7 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'home
   saveFromIdentifier: (identifier: SaveIdentifier) => SAV
 
   getMonAtLocation(location: MonLocation): Promise<Option<PKMInterface>>
-  getPendingMon(location: SaveMonLocation): Option<PKMInterface>
+  getPendingMon(location: SaveMonLocation): Option<PKMInterface | EmptySlot>
   overwriteMonAtLocation(location: MonLocation, mon: Option<OhpkmIdentifier>): Promise<void>
   setMonHeldItem(item: Item | undefined, location: MonLocation): Promise<Errorable<null>>
   moveMon(source: MonWithLocation, dest: MonLocation): Promise<Result<null>>
@@ -75,8 +77,6 @@ function MissingOhpkmData(identifier: string) {
 export type OhpkmSaveImportResult = Result<Option<PKMInterface>, IdentifierNotPresentError>
 export type DisplacedMonOpenHomeId = Option<OhpkmIdentifier>
 type MovedPokemonCount = number
-
-export type PendingMonLocation = SaveMonLocation & { mon?: PKMInterface }
 
 export function useSaves(): SavesAndBanksManager {
   const ohpkmStore = useOhpkmStore()
@@ -135,8 +135,9 @@ export function useSaves(): SavesAndBanksManager {
     }
   }
 
-  function getPendingMon(location: SaveMonLocation): Option<PKMInterface> {
+  function getPendingMon(location: SaveMonLocation): Option<PKMInterface | EmptySlot> {
     if (openSavesState.pendingMonLocations.length === 0) return undefined
+
     return openSavesState.pendingMonLocations.find((pending) => saveLocationsEq(location, pending))
       ?.mon
   }
@@ -540,7 +541,7 @@ export function useSaves(): SavesAndBanksManager {
         openSavesDispatch({
           type: 'add_pending_mon_locations',
           payload: [
-            { ...source, mon: swappedMon },
+            { ...source, mon: swappedMon ?? EMPTY_SLOT },
             { ...dest, mon: sourceMon },
           ],
         })
@@ -554,7 +555,7 @@ export function useSaves(): SavesAndBanksManager {
         openSavesDispatch({
           type: 'remove_pending_mon_locations',
           payload: [
-            { ...source, mon: swappedMon },
+            { ...source, mon: swappedMon ?? EMPTY_SLOT },
             { ...dest, mon: sourceMon },
           ],
         })

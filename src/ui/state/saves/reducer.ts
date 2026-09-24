@@ -4,7 +4,6 @@ import { SAV, SaveIdentifier, saveToStringIdentifier } from '@openhome-core/save
 import { SAVClass } from '@openhome-core/save/util'
 import { Option } from '@openhome-core/util/functional'
 import { createContext, Dispatch, Reducer } from 'react'
-import { PendingMonLocation } from './useSaves'
 
 type OpenSave = {
   index: number
@@ -25,6 +24,7 @@ export type HomeMonLocation = {
   bank: number
   save?: undefined
 }
+
 export type SaveMonLocation = {
   box: number
   boxSlot: number
@@ -34,6 +34,15 @@ export type SaveMonLocation = {
 }
 
 export type MonLocation = SaveMonLocation | HomeMonLocation
+
+export const EMPTY_SLOT = Symbol('EmptySlot')
+export type EmptySlot = typeof EMPTY_SLOT
+
+export function isNotEmpty<T>(v: symbol | T): v is Exclude<T, symbol> {
+  return v !== EMPTY_SLOT
+}
+
+export type PendingMonLocation = SaveMonLocation & { mon: PKMInterface | EmptySlot }
 
 export function isMonLocation(obj: object | undefined): obj is MonLocation {
   return obj !== undefined && 'box' in obj && 'boxSlot' in obj
