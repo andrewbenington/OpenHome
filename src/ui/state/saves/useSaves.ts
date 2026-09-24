@@ -25,11 +25,11 @@ import {
   EMPTY_SLOT,
   EmptySlot,
   HomeMonLocation,
+  locationsEq,
   MonLocation,
   MonWithLocation,
   OpenSavesState,
   PendingMonLocation,
-  saveLocationsEq,
   SaveMonLocation,
   SavesContext,
 } from './reducer'
@@ -47,7 +47,7 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'home
   saveFromIdentifier: (identifier: SaveIdentifier) => SAV
 
   getMonAtLocation(location: MonLocation): Promise<Option<PKMInterface>>
-  getPendingMon(location: SaveMonLocation): Option<PKMInterface | EmptySlot>
+  getPendingMon(location: SaveMonLocation): Option<PKMInterface | OhpkmIdentifier | EmptySlot>
   overwriteMonAtLocation(location: MonLocation, mon: Option<OhpkmIdentifier>): Promise<void>
   setMonHeldItem(item: Item | undefined, location: MonLocation): Promise<Errorable<null>>
   moveMon(source: MonWithLocation, dest: MonLocation): Promise<Result<null>>
@@ -136,11 +136,12 @@ export function useSaves(): SavesAndBanksManager {
     }
   }
 
-  function getPendingMon(location: SaveMonLocation): Option<PKMInterface | EmptySlot> {
+  function getPendingMon(
+    location: SaveMonLocation
+  ): Option<PKMInterface | OhpkmIdentifier | EmptySlot> {
     if (openSavesState.pendingMonLocations.length === 0) return undefined
 
-    return openSavesState.pendingMonLocations.find((pending) => saveLocationsEq(location, pending))
-      ?.mon
+    return openSavesState.pendingMonLocations.find((pending) => locationsEq(location, pending))?.mon
   }
 
   const moveMonBetweenSaves = async (

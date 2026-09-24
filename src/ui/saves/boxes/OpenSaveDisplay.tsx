@@ -174,8 +174,12 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
       const pendingMon = savesManager.getPendingMon(location)
       if (pendingMon === EMPTY_SLOT) {
         mon = undefined
-      } else if (pendingMon && ohpkmStore.getPotentialOhpkmId(pendingMon)) {
-        mon = pendingMon
+      } else if (pendingMon) {
+        if (typeof pendingMon === 'string') {
+          mon = undefined
+        } else {
+          mon = pendingMon
+        }
       }
 
       return { save, mon, openhomeId: openhomeId.get(), pendingMon }

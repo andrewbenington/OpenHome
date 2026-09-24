@@ -42,7 +42,9 @@ export function isNotEmpty<T>(v: symbol | T): v is Exclude<T, symbol> {
   return v !== EMPTY_SLOT
 }
 
-export type PendingMonLocation = SaveMonLocation & { mon: PKMInterface | EmptySlot }
+export type PendingSaveMonLocation = SaveMonLocation & { mon: PKMInterface | EmptySlot }
+export type PendingHomeMonLocation = HomeMonLocation & { mon: OhpkmIdentifier | EmptySlot }
+export type PendingMonLocation = PendingSaveMonLocation | PendingHomeMonLocation
 
 export function isMonLocation(obj: object | undefined): obj is MonLocation {
   return obj !== undefined && 'box' in obj && 'boxSlot' in obj
