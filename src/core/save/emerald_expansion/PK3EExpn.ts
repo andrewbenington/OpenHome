@@ -2,37 +2,22 @@ import { PluginPKMInterface, RomHackFormat } from '@openhome-core/pkm/interfaces
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PkmConstructorOptions } from '@openhome-core/pkm/PKM'
 import { Errorable, Option, R } from '@openhome-core/util/functional'
-import { FourMoves, PKMDate, Stats, ToBytesOptions } from '@openhome-core/util/types'
+import { Stats } from '@openhome-core/util/types'
 import {
-  AbilityIndex,
   Ball,
   BinaryGender,
   ContestStats,
   ConvertStrategies,
   ConvertStrategy,
   ExtraFormIndex,
-  Geolocations,
-  HyperTraining,
   MarkingsFourShapes,
   MetadataSummaryLookup,
-  NatureIndex,
   OriginGame,
   PkmFormat,
-  PlusMoveFlags,
   Pokerus,
-  ShinyLeaves,
   SpeciesLookup,
-  Stats16Le,
-  StatsPreSplit,
-  TeraType,
-  TrainerMemory,
 } from '@pkm-rs/pkg'
 import { PluginIdentifier } from '../interfaces'
-import { Move } from '@openhome-core/resources'
-import { MonTag } from '@openhome-ui/util/tags'
-import {
-  Pk3EExpnWasm
-} from '@pkm-rs/pkg/pkm_rs_emerald_expn'
 
 export default abstract class PK3EExpn implements PluginPKMInterface {
   abstract format: RomHackFormat
@@ -62,107 +47,6 @@ export default abstract class PK3EExpn implements PluginPKMInterface {
       )
     }
   }
-  ability?: AbilityIndex | undefined
-  affixedRibbon?: number | undefined
-  alphaMove?: number | undefined
-  avs?: Stats16Le | undefined
-  battleMemoryCount?: number | undefined
-  canGigantamax?: boolean | undefined
-  consoleRegion?: number | undefined
-  contestMemoryCount?: number | undefined
-  country?: number | undefined
-  dvs?: StatsPreSplit | undefined
-  dynamaxLevel?: number | undefined
-  eggDate?: PKMDate | undefined
-  eggLocationIndex?: number | undefined
-  encounterType?: number | undefined
-  encryptionConstant?: number | undefined
-  enjoyment?: number | undefined
-  evsG12?: StatsPreSplit | undefined
-  favorite?: boolean | undefined
-  flag2LA?: boolean | undefined
-  formArgument?: number | undefined
-  fullness?: number | undefined
-  gameOfOriginBattle?: number | undefined
-  geolocations?: Geolocations | undefined
-  gvs?: Stats16Le | undefined
-  handlerAffection?: number | undefined
-  handlerFriendship?: number | undefined
-  handlerGender?: BinaryGender | undefined
-  handlerID?: number | undefined
-  handlerLanguage?: number | undefined
-  handlerMemory?: TrainerMemory | undefined
-  handlerName?: string | undefined
-  heightScalar?: number | undefined
-  homeTracker?: bigint | undefined
-  hyperTraining?: HyperTraining | undefined
-  isAlpha?: boolean | undefined
-  isCurrentHandler?: boolean | undefined
-  isMega?: number | undefined
-  isNoble?: boolean | undefined
-  isNsPokemon?: boolean | undefined
-  isShadow?: boolean | undefined
-  level?: number | undefined
-  masterFlagsLA?: Uint8Array<ArrayBufferLike> | undefined
-  megaForme?: number | undefined
-  metDate?: PKMDate | undefined
-  metLocationIndex?: number | undefined
-  metTimeOfDay?: number | undefined
-  moveFlagsLA?: Uint8Array<ArrayBufferLike> | undefined
-  movePP: FourMoves
-  movePPUps: FourMoves
-  moves: FourMoves
-  obedienceLevel?: number | undefined
-  palma?: number | undefined
-  performance?: number | undefined
-  pokeStarFame?: number | undefined
-  region?: number | undefined
-  relearnMoves?: FourMoves | undefined
-  resortEventStatus?: number | undefined
-  scale?: number | undefined
-  secretSuperTrainingComplete?: boolean | undefined
-  secretSuperTrainingUnlocked?: boolean | undefined
-  shadowID?: number | undefined
-  shinyLeaves?: ShinyLeaves | undefined
-  sociability?: number | undefined
-  statLevel?: number | undefined
-  statNature?: NatureIndex | undefined
-  stats?: Stats16Le | undefined
-  superTrainingDistFlags?: number | undefined
-  superTrainingFlags?: number | undefined
-  tags?: MonTag[] | undefined
-  teraTypeOriginal?: TeraType | undefined
-  teraTypeOverride?: TeraType | undefined
-  tmFlagsLzaBase?: Uint8Array<ArrayBufferLike> | undefined
-  tmFlagsLzaDlc?: Uint8Array<ArrayBufferLike> | undefined
-  tmMovesLza?: Move[] | undefined
-  plusMoveFlags?: PlusMoveFlags | undefined
-  tmFlagsSV?: Uint8Array<ArrayBufferLike> | undefined
-  tmMovesSv?: Move[] | undefined
-  tmFlagsSVDLC?: Uint8Array<ArrayBufferLike> | undefined
-  tmMovesSVDLC?: Move[] | undefined
-  trFlagsSwSh?: Uint8Array<ArrayBufferLike> | undefined
-  trMovesSwSh?: Move[] | undefined
-  trainerAffection?: number | undefined
-  trainerMemory?: TrainerMemory | undefined
-  trainingBag?: number | undefined
-  trainingBagHits?: number | undefined
-  tutorFlagsLA?: Uint8Array<ArrayBufferLike> | undefined
-  tutorMovesLa?: Move[] | undefined
-  type1?: number | undefined
-  type2?: number | undefined
-  unknownA0?: number | undefined
-  unknownF3?: number | undefined
-  weightScalar?: number | undefined
-  heightAbsolute?: number | undefined
-  heightDeviation?: number | undefined
-  weightAbsolute?: number | undefined
-  weightDeviation?: number | undefined
-  calculateChecksum?: (() => number) | undefined
-  originalBytes?: ArrayBuffer | undefined
-  toBytes: ((_options?: ToBytesOptions) => ArrayBuffer) | (() => ArrayBuffer)
-  isFakemon?: boolean | undefined
-  displayColor?: string | undefined
 
   static fromBytes<T extends PK3EExpn>(
     this: new (buffer: ArrayBuffer, options: PkmConstructorOptions) => T,
@@ -170,11 +54,8 @@ export default abstract class PK3EExpn implements PluginPKMInterface {
     encrypted?: boolean
   ): T {
     const bytes = new Uint8Array(buffer)
-    const pk3ExpnWasm = encrypted
-      ? Pk3EExpnWasm.fromEncryptedBytes(bytes)
-      : Pk3EExpnWasm.fromBytes(bytes)
-    let pk3EExpn: PK3EExpn = PK3EExpn.fromWasm(pk3ExpnWasm)
-    return pk3EExpn as T
+    const pk3ExpnWasm = encrypted ? Pk3EExpnWasm.fromEncryptedBytes(bytes) : Pk3EExpnWasm.fromBytes(bytes)
+    return PK3EExpn.fromWasm(pk3ExpnWasm)
   }
 
   static fromOhpkm<T extends PK3EExpn>(
