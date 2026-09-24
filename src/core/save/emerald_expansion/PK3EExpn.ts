@@ -19,7 +19,7 @@ import {
 } from '@pkm-rs/pkg'
 import { PluginIdentifier } from '../interfaces'
 
-export default abstract class PK3EmeraldExpn implements PluginPKMInterface {
+export default abstract class PK3EExpn implements PluginPKMInterface {
   abstract format: RomHackFormat
 
   abstract pluginIdentifier: PluginIdentifier
@@ -33,34 +33,32 @@ export default abstract class PK3EmeraldExpn implements PluginPKMInterface {
   abstract selectColor: string
 
   abstract getMonFormat(): PkmFormat
-  inner: Pk3EmeraldExpnWasm
+  inner: Pk3EExpnWasm
 
-  constructor(arg: Pk3EmeraldExpnWasm | OHPKM, options: PkmConstructorOptions) {
-    if (arg instanceof Pk3EmeraldExpnWasm) {
+  protected constructor(arg: Pk3EExpnWasm | OHPKM, options: PkmConstructorOptions) {
+    if (arg instanceof Pk3EExpnWasm) {
       this.inner = arg
     } else {
       const ohpkmBytes = new Uint8Array(arg.toBytes())
 
-      this.inner = Pk3EmeraldExpnWasm.fromOhpkmBytes(
+      this.inner = Pk3EExpnWasm.fromOhpkmBytes(
         ohpkmBytes,
         options.strategy || ConvertStrategies.getDefault()
       )
     }
   }
 
-  static fromBytes<T extends PK3EmeraldExpn>(
+  static fromBytes<T extends PK3EExpn>(
     this: new (buffer: ArrayBuffer, options: PkmConstructorOptions) => T,
     buffer: ArrayBuffer,
     encrypted?: boolean
   ): T {
     const bytes = new Uint8Array(buffer)
-    const pk3ExpnWasm = encrypted
-      ? Pk3ExpnWasm.fromEncryptedBytes(bytes)
-      : Pk3EmeraldExpnWasm.fromBytes(bytes)
-    return this.fromWasm(pk3ExpnWasm)
+    const pk3ExpnWasm = encrypted ? Pk3EExpnWasm.fromEncryptedBytes(bytes) : Pk3EExpnWasm.fromBytes(bytes)
+    return PK3EExpn.fromWasm(pk3ExpnWasm)
   }
 
-  static fromOhpkm<T extends PK3EmeraldExpn>(
+  static fromOhpkm<T extends PK3EExpn>(
     this: new (ohpkm: OHPKM, options: PkmConstructorOptions) => T,
     ohpkm: OHPKM,
     strategy: ConvertStrategy
@@ -68,9 +66,9 @@ export default abstract class PK3EmeraldExpn implements PluginPKMInterface {
     return R.tryFrom(() => new this(ohpkm, { strategy }))
   }
 
-  static fromWasm<T extends PK3EmeraldExpn>(
-    this: new (pk3ex: Pk3EmeraldExpnWasm, options: PkmConstructorOptions) => T,
-    pk3ex: Pk3EmeraldExpnWasm
+  static fromWasm<T extends PK3EExpn>(
+    this: new (pk3ex: Pk3EExpnWasm, options: PkmConstructorOptions) => T,
+    pk3ex: Pk3EExpnWasm
   ): T {
     return new this(pk3ex, {})
   }
