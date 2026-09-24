@@ -298,7 +298,7 @@ export function useOhpkmStore() {
     return R.Ok(mon)
   }
 
-  function startTrackingNewMon<P extends PKMInterface>(
+  async function startTrackingNewMon<P extends PKMInterface>(
     mon: P,
     sourceSave: Option<SAV<P>>,
     destSave: Option<SAV>
@@ -309,15 +309,16 @@ export function useOhpkmStore() {
     backend.log('INFO', `Starting to track ${mon.nickname} (${ohpkm.openhomeId})`)
 
     if (destSave) {
-      handleLookupsUpdate(ohpkm, destSave)
-        .then(() => insertOrUpdate(ohpkm))
-        .catch((error) =>
-          displayError('Error Updating Lookup File for Save', [
-            `When updating the lookup entry for the OHPKM ${ohpkm.openhomeId} (${ohpkm.nickname}), an error was encountered:`,
-            String(error),
-          ])
-        )
+      await handleLookupsUpdate(ohpkm, destSave)
     }
+
+    await insertOrUpdate(ohpkm).catch((error) => {
+      console.error(error)
+      displayError('Error Updating Lookup File for Save', [
+        `When updating the lookup entry for the OHPKM ${ohpkm.openhomeId} (${ohpkm.nickname}), an error was encountered:`,
+        String(error),
+      ])
+    })
 
     return ohpkm
   }
