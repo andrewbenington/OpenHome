@@ -660,7 +660,7 @@ mod tests {
         // ensure a default file is created and loaded successfully
         let without_file = TestDataController::default();
         super::update_convert_strat_json_dot_keys(&without_file)?;
-        ConvertStrategies::load_from_storage(&without_file)?;
+        ConvertStrategies::load(&without_file)?;
 
         // a file from an older version of OpenHome with dots in the
         // keys should be fixed and loaded successfully
@@ -672,7 +672,7 @@ mod tests {
             WITH_DOTS,
         )?;
         super::update_convert_strat_json_dot_keys(&with_dot_format_file)?;
-        let strategies = ConvertStrategies::load_from_storage(&with_dot_format_file)?;
+        let strategies = ConvertStrategies::load(&with_dot_format_file)?;
         let default = strategies
             .get(&Uuid::nil())
             .expect("Default strategy is missing after converting old conv. strategy format");

@@ -108,7 +108,7 @@ pub fn run() {
 
             let controller = app.handle().controller();
 
-            let ohpkm_store = match OhpkmBytesStore::load_from_mons_v2(&controller) {
+            let ohpkm_store = match OhpkmBytesStore::load(&controller) {
                 Ok(state) => state,
                 Err(err) => {
                     util::show_error_dialog(app, err, launch_error_msg("OHPKM Load"));
@@ -118,7 +118,7 @@ pub fn run() {
                 }
             };
 
-            let mut lookup_state = match LookupState::load_from_storage(&controller) {
+            let mut lookup_state = match LookupState::load(&controller) {
                 Ok(lookup) => lookup,
                 Err(err) => {
                     util::show_error_dialog(app, err, launch_error_msg("Lookup File"));
@@ -134,7 +134,7 @@ pub fn run() {
                     .filter_map(|(_, bytes)| OhpkmV2::from_bytes(bytes).ok()),
             );
 
-            let conversion_settings = match ConvertStrategies::load_from_storage(&controller) {
+            let conversion_settings = match ConvertStrategies::load(&controller) {
                 Ok(settings) => settings,
                 Err(err) => {
                     util::show_error_dialog(app, err, launch_error_msg("Conversion Settings"));
