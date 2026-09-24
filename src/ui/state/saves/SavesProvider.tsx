@@ -32,6 +32,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
   const [openSavesState, openSavesDispatch] = useReducer(openSavesReducer, {
     monsToRelease: [],
     openSaves: {},
+    pendingMonLocations: [],
   })
   const { defaultConvertStrategy } = useConvertStrategies()
   const disambiguationResolver = useRef<Option<SaveTypeCallback>>(undefined)

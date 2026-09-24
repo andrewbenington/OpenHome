@@ -4,6 +4,7 @@ import { SAV, SaveIdentifier, saveToStringIdentifier } from '@openhome-core/save
 import { SAVClass } from '@openhome-core/save/util'
 import { Option } from '@openhome-core/util/functional'
 import { createContext, Dispatch, Reducer } from 'react'
+import { PendingMonLocation } from './useSaves'
 
 type OpenSave = {
   index: number
@@ -13,6 +14,7 @@ type OpenSave = {
 export type OpenSavesState = {
   monsToRelease: (OhpkmIdentifier | PKMInterface)[]
   openSaves: Record<SaveIdentifier, OpenSave>
+  pendingMonLocations: PendingMonLocation[]
   error?: string
 }
 
@@ -35,6 +37,27 @@ export type MonLocation = SaveMonLocation | HomeMonLocation
 
 export function isMonLocation(obj: object | undefined): obj is MonLocation {
   return obj !== undefined && 'box' in obj && 'boxSlot' in obj
+}
+
+export function locationsEq(first: MonLocation, second: MonLocation): boolean {
+  if (first.isHome) {
+    if (second.isHome) return homeLocationsEq(first, second)
+  } else if (!second.isHome) {
+    return saveLocationsEq(first, second)
+  }
+  return false
+}
+
+export function homeLocationsEq(first: HomeMonLocation, second: HomeMonLocation): boolean {
+  return first.bank === second.bank && first.box === second.box && first.boxSlot === second.boxSlot
+}
+
+export function saveLocationsEq(first: SaveMonLocation, second: SaveMonLocation): boolean {
+  return (
+    first.saveIdentifier === second.saveIdentifier &&
+    first.box === second.box &&
+    first.boxSlot === second.boxSlot
+  )
 }
 
 export type MonWithLocation = MonLocation & {
@@ -60,6 +83,14 @@ export type OpenSavesAction =
   | {
       type: 'close_all_saves'
       payload?: undefined
+    }
+  | {
+      type: 'add_pending_mon_locations'
+      payload: PendingMonLocation[]
+    }
+  | {
+      type: 'remove_pending_mon_locations'
+      payload: PendingMonLocation[]
     }
   /*
    *  POKEMON
@@ -155,6 +186,25 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
     case 'close_all_saves': {
       return { ...state, openSaves: {} }
     }
+    case 'add_pending_mon_locations': {
+      return {
+        ...state,
+        pendingMonLocations: [
+          ...state.pendingMonLocations.filter(
+            (pending) => !action.payload.some((loc) => locationsEq(loc, pending))
+          ),
+          ...action.payload,
+        ],
+      }
+    }
+    case 'remove_pending_mon_locations': {
+      return {
+        ...state,
+        pendingMonLocations: state.pendingMonLocations.filter(
+          (pending) => !action.payload.some((loc) => locationsEq(loc, pending))
+        ),
+      }
+    }
   }
 }
 
@@ -168,6 +218,7 @@ type SavesContextValue = {
 const initialState: OpenSavesState = {
   monsToRelease: [],
   openSaves: {},
+  pendingMonLocations: [],
 }
 
 export const SavesContext = createContext<SavesContextValue>({

@@ -163,10 +163,17 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
         ohpkmStore.getPotentialOhpkmId
       )
 
-      const monOrOhpkm = openhomeId
-        .flatMap((openhomeId) => saveOhpkms?.get(openhomeId))
-        .map(R.dropError) // we expect many "id lookups" to fail, because not all mons are necessarily tracked
-        .get()
+      // when a pokemon is in the process of being registered (i.e. was just dragged from a different save into
+      // this one), use the pending value to avoid visual snaps back and forth
+      const pendingMon = savesManager.getPendingMon(location)
+      if (pendingMon) console.info('PENDING MON:', pendingMon)
+
+      const monOrOhpkm =
+        pendingMon ??
+        openhomeId
+          .flatMap((openhomeId) => saveOhpkms?.get(openhomeId))
+          .map(R.dropError) // we expect many "id lookups" to fail, because not all mons are necessarily tracked
+          .get()
 
       return { save, mon: monOrOhpkm ?? mon, openhomeId: openhomeId.get() }
     })
