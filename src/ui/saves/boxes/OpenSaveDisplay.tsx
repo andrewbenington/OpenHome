@@ -178,7 +178,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
         mon = pendingMon
       }
 
-      return { save, mon, openhomeId: openhomeId.get() }
+      return { save, mon, openhomeId: openhomeId.get(), pendingMon }
     })
 
   return save && save.currentPCBox !== undefined ? (
@@ -209,7 +209,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
             />
           </div>
           <Grid className="box-grid" columns={save.boxColumns.toString()}>
-            {slots.map(({ save, mon, openhomeId }, index) => {
+            {slots.map(({ save, mon, openhomeId, pendingMon }, index) => {
               const location: MonLocation = {
                 isHome: false,
                 box: save.currentPCBox,
@@ -255,6 +255,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                         ]
                       : []
                   }
+                  borderColor={pendingMon ? 'fuchsia' : undefined}
                 />
               )
             })}

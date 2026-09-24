@@ -28,6 +28,7 @@ import {
   MonLocation,
   MonWithLocation,
   OpenSavesState,
+  PendingMonLocation,
   saveLocationsEq,
   SaveMonLocation,
   SavesContext,
@@ -505,65 +506,93 @@ export function useSaves(): SavesAndBanksManager {
     return R.Ok(null)
   }
 
+  function addPendingMonLocations(...locations: PendingMonLocation[]) {
+    openSavesDispatch({ type: 'add_pending_mon_locations', payload: locations })
+  }
+
+  function removePendingMonLocations(...locations: SaveMonLocation[]) {
+    openSavesDispatch({ type: 'remove_pending_mon_locations', payload: locations })
+  }
+
   async function moveMon(source: MonLocation, dest: MonLocation): Promise<Result<null>> {
     if (source.isHome) {
-      const sourceMonId = getMonAtHomeLocation(source)
-      if (!sourceMonId) return R.Ok(null)
-
-      if (dest.isHome) {
-        const displacedMonId = moveOhpkmToHome(sourceMonId, dest)
-        moveOhpkmToHome(displacedMonId, source)
-      } else {
-        return moveOhpkmToSave(sourceMonId, dest)
-          .awaitMap((displacedMon) =>
-            moveMonToHome(dest.saveIdentifier, displacedMon, source).then(() => null)
-          )
-          .get()
-      }
-    } else if (!dest.isHome && source.saveIdentifier === dest.saveIdentifier) {
-      moveMonWithinSave(saveFromIdentifier(source.saveIdentifier), source, dest)
+      return dest.isHome ? moveHomeMonToHome(source, dest) : moveHomeMonToSave(source, dest)
     } else {
-      const sourceMon = getMonAtSaveLocation(source)
-      if (!sourceMon) return R.Ok(null)
+      return dest.isHome ? moveSaveMonToHome(source, dest) : moveSaveMonToSave(source, dest)
+    }
+  }
 
-      if (dest.isHome) {
-        const displacedMonId = getMonAtHomeLocation(dest)
-        return moveOhpkmToSave(displacedMonId, source)
-          .awaitMap(async () => {
-            await moveMonToHome(source.saveIdentifier, sourceMon, dest)
-            return null
-          })
-          .get()
-      } else {
-        const destSave = openSavesState.openSaves[dest.saveIdentifier].save
-        const swappedMon = destSave.getMonAt(dest.box, dest.boxSlot)
-
-        openSavesDispatch({
-          type: 'add_pending_mon_locations',
-          payload: [
-            { ...source, mon: swappedMon ?? EMPTY_SLOT },
-            { ...dest, mon: sourceMon },
-          ],
-        })
-
-        await Promise.all([
-          moveMonBetweenSaves(source.saveIdentifier, sourceMon, dest),
-          moveMonBetweenSaves(dest.saveIdentifier, swappedMon, source),
-        ])
-        // removePendingMonLocations(source, dest)
-
-        openSavesDispatch({
-          type: 'remove_pending_mon_locations',
-          payload: [
-            { ...source, mon: swappedMon ?? EMPTY_SLOT },
-            { ...dest, mon: sourceMon },
-          ],
-        })
-        return R.Ok(null)
-      }
+  async function moveHomeMonToHome(
+    source: HomeMonLocation,
+    dest: HomeMonLocation
+  ): Promise<Result<null>> {
+    const sourceMonId = getMonAtHomeLocation(source)
+    if (sourceMonId) {
+      const displacedMonId = moveOhpkmToHome(sourceMonId, dest)
+      moveOhpkmToHome(displacedMonId, source)
     }
 
     return R.Ok(null)
+  }
+
+  async function moveSaveMonToSave(
+    source: SaveMonLocation,
+    dest: SaveMonLocation
+  ): Promise<Result<null>> {
+    if (source.saveIdentifier === dest.saveIdentifier) {
+      moveMonWithinSave(saveFromIdentifier(source.saveIdentifier), source, dest)
+      return R.Ok(null)
+    }
+
+    const sourceMon = getMonAtSaveLocation(source)
+    if (sourceMon) {
+      const destSave = openSavesState.openSaves[dest.saveIdentifier].save
+      const swappedMon = destSave.getMonAt(dest.box, dest.boxSlot)
+
+      addPendingMonLocations(
+        { ...source, mon: swappedMon ?? EMPTY_SLOT },
+        { ...dest, mon: sourceMon }
+      )
+
+      await Promise.all([
+        moveMonBetweenSaves(source.saveIdentifier, sourceMon, dest),
+        moveMonBetweenSaves(dest.saveIdentifier, swappedMon, source),
+      ])
+
+      removePendingMonLocations(source, dest)
+    }
+
+    return R.Ok(null)
+  }
+
+  async function moveHomeMonToSave(
+    source: HomeMonLocation,
+    dest: SaveMonLocation
+  ): Promise<Result<null>> {
+    const sourceMonId = getMonAtHomeLocation(source)
+    if (!sourceMonId) return R.Ok(null)
+
+    return moveOhpkmToSave(sourceMonId, dest)
+      .awaitMap((displacedMon) =>
+        moveMonToHome(dest.saveIdentifier, displacedMon, source).then(() => null)
+      )
+      .get()
+  }
+
+  async function moveSaveMonToHome(
+    source: SaveMonLocation,
+    dest: HomeMonLocation
+  ): Promise<Result<null>> {
+    const sourceMon = getMonAtSaveLocation(source)
+    if (!sourceMon) return R.Ok(null)
+
+    const displacedMonId = getMonAtHomeLocation(dest)
+    return moveOhpkmToSave(displacedMonId, source)
+      .awaitMap(async () => {
+        await moveMonToHome(source.saveIdentifier, sourceMon, dest)
+        return null
+      })
+      .get()
   }
 
   const releaseMonById = (id: OhpkmIdentifier) => {

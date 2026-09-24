@@ -99,7 +99,7 @@ export type OpenSavesAction =
     }
   | {
       type: 'remove_pending_mon_locations'
-      payload: PendingMonLocation[]
+      payload: SaveMonLocation[]
     }
   /*
    *  POKEMON

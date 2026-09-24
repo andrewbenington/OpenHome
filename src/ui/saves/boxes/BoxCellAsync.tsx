@@ -4,7 +4,7 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Option } from '@openhome-core/util/functional'
 import { CtxMenuElementBuilder } from '@openhome-ui/components/context-menu'
 import { MonLocation } from '@openhome-ui/state/saves'
-import { Suspense, use } from 'react'
+import { CSSProperties, Suspense, use } from 'react'
 import '../style.css'
 import BoxCell from './BoxCell'
 
@@ -17,7 +17,7 @@ interface BoxCellAsyncProps {
   isDisabled?: (mon: PKMInterface) => boolean
   disabledReason?: string
   openhomeId?: OhpkmIdentifier
-  borderColor?: string
+  borderColor?: CSSProperties['color']
   dragID: string
   location: MonLocation
   contextMenu?: CtxMenuElementBuilder[]
@@ -77,7 +77,9 @@ function BoxCellAsyncInner(
       {...boxCellProps}
       mon={mon}
       disabled={mon && isDisabled?.(mon)}
-      borderColor={mon instanceof OHPKM ? 'var(--ohpkm-cell-border-color)' : undefined}
+      borderColor={
+        props.borderColor ?? (mon instanceof OHPKM ? 'var(--ohpkm-cell-border-color)' : undefined)
+      }
     />
   )
 }
