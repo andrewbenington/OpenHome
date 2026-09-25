@@ -1,6 +1,5 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Option } from '@openhome-core/util/functional'
 import { CtxMenuElementBuilder } from '@openhome-ui/components/context-menu'
 import { MonLocation } from '@openhome-ui/state/saves'
@@ -35,7 +34,6 @@ function BoxCellAsync(props: BoxCellAsyncProps) {
             {...props}
             mon={props.monPlaceholder}
             disabled={props.isDisabled?.(props.monPlaceholder)}
-            borderColor="yellow"
           />
         ) : (
           <div
@@ -77,9 +75,7 @@ function BoxCellAsyncInner(
       {...boxCellProps}
       mon={mon}
       disabled={mon && isDisabled?.(mon)}
-      borderColor={
-        props.borderColor ?? (mon instanceof OHPKM ? 'var(--ohpkm-cell-border-color)' : undefined)
-      }
+      borderColor={props.borderColor}
     />
   )
 }

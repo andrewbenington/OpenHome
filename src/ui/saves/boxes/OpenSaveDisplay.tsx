@@ -220,7 +220,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
             />
           </div>
           <Grid className="box-grid" columns={save.boxColumns.toString()}>
-            {slots.map(({ save, mon, openhomeId, pendingMon }, index) => {
+            {slots.map(({ save, mon, openhomeId }, index) => {
               const location: MonLocation = {
                 isHome: false,
                 box: save.currentPCBox,
@@ -268,7 +268,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                         ]
                       : []
                   }
-                  borderColor={pendingMon ? 'fuchsia' : undefined}
+                  borderColor={mon instanceof OHPKM ? 'var(--ohpkm-cell-border-color)' : undefined}
                 />
               )
             })}
