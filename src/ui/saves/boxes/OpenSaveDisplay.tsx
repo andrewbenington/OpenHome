@@ -229,7 +229,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
               }
 
               const uniqueKey = isThenable(mon)
-                ? `${openhomeId}`
+                ? `${save.currentPCBox}-${index}-${openhomeId}`
                 : mon
                   ? `${save.currentPCBox}-${index}-${openhomeId ?? mon.encryptionConstant ?? mon.personalityValue ?? JSON.stringify(mon.dvs)}-${mon.nickname}`
                   : `${save.currentPCBox}-${index}`
