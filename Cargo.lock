@@ -210,6 +210,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ac07cdecf99051d9a5238b80f35af32cdeba5b336e55d957b318b50137e18da5"
 
 [[package]]
+name = "bimap"
+version = "0.6.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "230c5f1ca6a325a32553f8640d31ac9b49f2411e901e427570154868b46da4f7"
+
+[[package]]
 name = "bit-set"
 version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2392,6 +2398,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "nbt"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e8fdda7897c3987bd1d2058225c4e7a6bc45e82b821bf0247a8a6a9671244407"
+dependencies = [
+ "flate2",
+]
+
+[[package]]
 name = "ndk"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2973,10 +2988,12 @@ dependencies = [
  "arbitrary-int",
  "arrayref",
  "assert-json-diff",
+ "bimap",
  "console_error_panic_hook",
  "getrandom 0.4.3",
  "hex",
  "js-sys",
+ "nbt",
  "num",
  "phf",
  "pkm_rs_derive",
@@ -3013,6 +3030,7 @@ name = "pkm_rs_resources"
 version = "1.18.0-rc.3"
 dependencies = [
  "arbitrary-int",
+ "bimap",
  "getrandom 0.4.3",
  "js-sys",
  "num",
@@ -4717,7 +4735,7 @@ dependencies = [
  "serde_with",
  "swift-rs",
  "thiserror 2.0.20",
- "toml 0.9.12+spec-1.1.0",
+ "toml 1.1.6+spec-1.1.0",
  "url",
  "urlpattern",
  "uuid",
