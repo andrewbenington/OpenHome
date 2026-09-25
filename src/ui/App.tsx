@@ -84,6 +84,7 @@ function AppWithBackend() {
   // if the whole effect function is (including the returned callback). Check
   // that saving still persists movements after any updates to this.
   const onMenuEvent = useEffectEvent(backend.onMenuEvent)
+
   const saveChangesEvent = useEffectEvent(saveChanges)
 
   useEffect(() => {

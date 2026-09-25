@@ -63,6 +63,7 @@ function createOhpkmStore(capacity: number) {
       globalListeners.add(cb)
       return () => globalListeners.delete(cb)
     },
+    reset: () => cache.reset(),
   }
 }
 
@@ -97,7 +98,7 @@ export function useOhpkmStore() {
 
   function tryLoadFromId(id: string): NowOrLater<OhpkmLookupResult> {
     const cached = ohpkmCache.get(id)
-    if (cached) return Promise.resolve(R.Ok(cached))
+    if (cached) return R.Ok(cached)
 
     return backend
       .lookupOhpkmById(id)
@@ -305,11 +306,20 @@ export function useOhpkmStore() {
   ) {
     const ohpkm = sourceSave ? OHPKM.fromMonInSave(mon, sourceSave) : OHPKM.fromMonUnknownSave(mon)
     ohpkm.startedTrackingTimestamp = dayjs()
+
+    backend.log('INFO', `Starting to track ${mon.nickname} (${ohpkm.openhomeId})`)
+
     if (destSave) {
       await handleLookupsUpdate(ohpkm, destSave)
     }
 
-    await insertOrUpdate(ohpkm)
+    await insertOrUpdate(ohpkm).catch((error) => {
+      console.error(error)
+      displayError('Error Updating Lookup File for Save', [
+        `When updating the lookup entry for the OHPKM ${ohpkm.openhomeId} (${ohpkm.nickname}), an error was encountered:`,
+        String(error),
+      ])
+    })
 
     return ohpkm
   }
@@ -447,6 +457,10 @@ export function useOhpkmStore() {
     })
   }
 
+  function clearCache() {
+    ohpkmCache.reset()
+  }
+
   return {
     getById,
     tryLoadFromId,
@@ -476,6 +490,7 @@ export function useOhpkmStore() {
     syncOhpkmIfTracked,
 
     scanFullStoreAndFixHandlers,
+    clearCache,
   }
 }
 

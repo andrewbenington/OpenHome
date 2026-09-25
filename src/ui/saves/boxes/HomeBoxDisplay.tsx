@@ -5,7 +5,7 @@ import { SortTypes } from '@openhome-core/pkm/sort'
 import { monSupportedBySave } from '@openhome-core/save/util'
 import { mapToObject } from '@openhome-core/util'
 import { $R, Option, R, range } from '@openhome-core/util/functional'
-import { NowOrLater } from '@openhome-core/util/promise'
+import { isThenable, NowOrLater } from '@openhome-core/util/promise'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import { Item, Separator, Submenu } from '@openhome-ui/components/context-menu/types'
 import { DebugDataDisplay } from '@openhome-ui/components/DebugDataDisplay'
@@ -27,7 +27,7 @@ import useDisplayError from '@openhome-ui/hooks/displayError'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/PokemonDetailsModal'
 import { OhpkmLookupResult, useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import useTrackedDataRecovery from '@openhome-ui/state/ohpkm/useTrackedDataRecovery'
-import { HomeMonLocation, MonWithLocation, useSaves } from '@openhome-ui/state/saves'
+import { EMPTY_SLOT, HomeMonLocation, MonWithLocation, useSaves } from '@openhome-ui/state/saves'
 import { cssClass } from '@openhome-ui/util/style'
 import { Language, Lookup } from '@pkm-rs/pkg'
 import { Button, Card, DropdownMenu, Flex, Heading, TextField, Tooltip } from '@radix-ui/themes'
@@ -254,16 +254,15 @@ type MissingIdData = {
 
 type SlotData = {
   monResult?: OhpkmLookupResult
-  monPromise: NowOrLater<Option<OHPKM>>
+  monPromise: NowOrLater<Option<OHPKM>> | PKMInterface
   location: HomeMonLocation
   identifier: Option<OhpkmIdentifier>
-  // loading: boolean
 }
 
 function SingleBoxMonDisplay() {
   const ohpkmStore = useOhpkmStore()
   const displayError = useDisplayError()
-  const { importMonsToLocation, saveFromIdentifier } = useSaves()
+  const { importMonsToLocation, saveFromIdentifier, getPendingMon } = useSaves()
   const { getCurrentBox, getCurrentBank, clearAtHomeLocation, removeAllHomeDupes } =
     useBanksAndBoxes()
   const [missingIdData, setMissingIdData] = useState<MissingIdData>()
@@ -349,7 +348,7 @@ function SingleBoxMonDisplay() {
     () =>
       range(OPENHOME_BOX_SLOTS)
         .map((index: number) => currentBox.identifiers.get(index))
-        .map((identifier, index) => {
+        .map((storedId, index) => {
           const location: HomeMonLocation = {
             bank: currentBankIndex,
             box: currentBoxIndex,
@@ -357,13 +356,31 @@ function SingleBoxMonDisplay() {
             isHome: true,
           }
 
-          return {
-            monPromise: identifier ? lookupOhpkmById(identifier) : undefined,
-            location,
-            identifier,
+          let identifier = storedId
+          let monPromise: NowOrLater<Option<OHPKM>> | PKMInterface = undefined
+
+          // pendingMon means this slot is in the process of being updated, but needs to wait
+          // for the OHPKM data to be registered. In the meantime the pendingMon should be displayed
+          // for immediate visual feedback
+          const pendingMon = getPendingMon(location)
+          if (pendingMon === EMPTY_SLOT) {
+            identifier = undefined
+          } else if (pendingMon) {
+            if (typeof pendingMon === 'string') {
+              identifier = pendingMon
+            } else {
+              identifier = undefined
+              monPromise = pendingMon
+            }
           }
+
+          if (identifier) {
+            monPromise ??= lookupOhpkmById(identifier)
+          }
+
+          return { monPromise, location, identifier }
         }),
-    [currentBankIndex, currentBox.identifiers, currentBoxIndex, lookupOhpkmById]
+    [currentBankIndex, currentBox.identifiers, currentBoxIndex, getPendingMon, lookupOhpkmById]
   )
 
   return (
@@ -392,6 +409,7 @@ function SingleBoxMonDisplay() {
             return (
               <BoxCellAsync
                 key={uniqueKey}
+                monPlaceholder={!isThenable(monPromise) ? monPromise : undefined}
                 monPromise={monPromise}
                 onClick={() => setSelectedIndex(index)}
                 dragID={`home_${currentBoxIndex}_${index}`}
@@ -404,7 +422,10 @@ function SingleBoxMonDisplay() {
                 }}
                 // don't allow a swap with a pokémon not supported by the source save
                 isDisabled={(mon) =>
-                  dragData !== undefined && !dragData.isHome && !sourceSupportsMon(mon)
+                  dragData !== undefined &&
+                  !dragData.isHome &&
+                  mon !== undefined &&
+                  !sourceSupportsMon(mon)
                 }
                 contextMenu={[
                   Item.label('Merge/Recover Tracking Data').action(async () =>
