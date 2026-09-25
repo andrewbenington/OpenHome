@@ -16,6 +16,7 @@ import { SwordShieldSave } from '@openhome-core/save/Gen89/SwordShieldSave'
 import { HGSSSAV } from '@openhome-core/save/HGSSSAV'
 import { OfficialSAV } from '@openhome-core/save/interfaces'
 import { LGPESAV } from '@openhome-core/save/LGPESAV'
+import { Gen3G1RSave, Gen1G1RSave, Gen2G1RSave } from '@openhome-core/save/g1r/G1RSave'
 import { G8LumiSAV } from '@openhome-core/save/luminescentplatinum/G8LUMISAV'
 import { ORASSAV } from '@openhome-core/save/ORASSAV'
 import { PtSAV } from '@openhome-core/save/PtSAV'
@@ -29,6 +30,9 @@ import { updateStyleForUiScale } from '@openhome-ui/util/style'
 import { Dispatch, Reducer, createContext } from 'react'
 
 export const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
+  Gen1G1RSave,
+  Gen2G1RSave,
+  Gen3G1RSave,
   G1SAV,
   G1SAVJP,
   G2SAV,
