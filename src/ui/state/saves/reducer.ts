@@ -42,8 +42,12 @@ export function isNotEmpty<T>(v: symbol | T): v is Exclude<T, symbol> {
   return v !== EMPTY_SLOT
 }
 
-export type PendingSaveMonLocation = SaveMonLocation & { mon: PKMInterface | EmptySlot }
-export type PendingHomeMonLocation = HomeMonLocation & { mon: OhpkmIdentifier | EmptySlot }
+export type PendingSaveMonLocation = SaveMonLocation & {
+  mon: OhpkmIdentifier | PKMInterface | EmptySlot
+}
+export type PendingHomeMonLocation = HomeMonLocation & {
+  mon: OhpkmIdentifier | PKMInterface | EmptySlot
+}
 export type PendingMonLocation = PendingSaveMonLocation | PendingHomeMonLocation
 
 export function isMonLocation(obj: object | undefined): obj is MonLocation {
@@ -101,7 +105,7 @@ export type OpenSavesAction =
     }
   | {
       type: 'remove_pending_mon_locations'
-      payload: SaveMonLocation[]
+      payload: MonLocation[]
     }
   /*
    *  POKEMON

@@ -232,6 +232,8 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     setChangesSavedDisplayed(false)
   }
 
+  console.dir(openSavesState.pendingMonLocations)
+
   return (
     <>
       <SavesContext

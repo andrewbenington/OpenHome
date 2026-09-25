@@ -5,6 +5,7 @@ import { SAV } from '@openhome-core/save/interfaces'
 import { monSupportedBySave } from '@openhome-core/save/util'
 import { $R, Option, R, range } from '@openhome-core/util/functional'
 import { $O } from '@openhome-core/util/option'
+import { isThenable, NowOrLater } from '@openhome-core/util/promise'
 import { filterUndefined } from '@openhome-core/util/sort'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import { Item, OpenHomeCtxMenu, Submenu } from '@openhome-ui/components/context-menu'
@@ -158,13 +159,18 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
         boxSlot: index,
         saveIdentifier: save.identifier,
       }
-      let mon: Option<OHPKM | PKMInterface> = save.getMonAt(location.box, location.boxSlot)
-      const openhomeId = $O(save.getMonAt(location.box, location.boxSlot)).flatMap(
+      let mon: Option<OHPKM | PKMInterface> | NowOrLater<Option<OHPKM>> = save.getMonAt(
+        location.box,
+        location.boxSlot
+      )
+      const openhomeIdBoxed = $O(save.getMonAt(location.box, location.boxSlot)).flatMap(
         ohpkmStore.getPotentialOhpkmId
       )
 
+      let openhomeId = openhomeIdBoxed.get()
+
       mon =
-        openhomeId
+        openhomeIdBoxed
           .flatMap((openhomeId) => saveOhpkms?.get(openhomeId))
           .map(R.dropError) // we expect many "id lookups" to fail, because not all mons are necessarily tracked
           .get() ?? mon
@@ -176,13 +182,14 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
         mon = undefined
       } else if (pendingMon) {
         if (typeof pendingMon === 'string') {
-          mon = undefined
+          openhomeId = pendingMon
+          mon = ohpkmStore.getById(openhomeId)
         } else {
           mon = pendingMon
         }
       }
 
-      return { save, mon, openhomeId: openhomeId.get(), pendingMon }
+      return { save, mon, openhomeId, pendingMon }
     })
 
   return save && save.currentPCBox !== undefined ? (
@@ -221,9 +228,11 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                 saveIdentifier: save.identifier,
               }
 
-              const uniqueKey = mon
-                ? `${save.currentPCBox}-${index}-${openhomeId ?? mon.encryptionConstant ?? mon.personalityValue ?? JSON.stringify(mon.dvs)}-${mon.nickname}`
-                : `${save.currentPCBox}-${index}`
+              const uniqueKey = isThenable(mon)
+                ? `${openhomeId}`
+                : mon
+                  ? `${save.currentPCBox}-${index}-${openhomeId ?? mon.encryptionConstant ?? mon.personalityValue ?? JSON.stringify(mon.dvs)}-${mon.nickname}`
+                  : `${save.currentPCBox}-${index}`
 
               const slotMetadata = save.getSlotMetadata?.(save.currentPCBox, index)
 

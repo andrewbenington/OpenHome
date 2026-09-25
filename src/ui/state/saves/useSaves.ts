@@ -43,7 +43,7 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'home
   saveFromIdentifier: (identifier: SaveIdentifier) => SAV
 
   getMonAtLocation(location: MonLocation): Promise<Option<PKMInterface>>
-  getPendingMon(location: SaveMonLocation): Option<PKMInterface | OhpkmIdentifier | EmptySlot>
+  getPendingMon(location: MonLocation): Option<PKMInterface | OhpkmIdentifier | EmptySlot>
   overwriteOhpkmAtLocation(location: MonLocation, mon: Option<OhpkmIdentifier>): Promise<void>
   setMonHeldItem(item: Item | undefined, location: MonLocation): Promise<Errorable<null>>
   moveMon(source: MonWithLocation, dest: MonLocation): Promise<Result<null>>

@@ -54,7 +54,7 @@ export function useMonLocationsInternal() {
     openSavesDispatch({ type: 'add_pending_mon_locations', payload: locations })
   }
 
-  function removePendingMonLocations(...locations: SaveMonLocation[]) {
+  function removePendingMonLocations(...locations: MonLocation[]) {
     openSavesDispatch({ type: 'remove_pending_mon_locations', payload: locations })
   }
 
@@ -108,10 +108,21 @@ export function useMonLocationsInternal() {
     const sourceMonId = getMonAtHomeLocation(source)
     if (!sourceMonId) return R.Ok(null)
 
+    const destSave = openSavesState.openSaves[dest.saveIdentifier].save
+    const swappedMon = destSave.getMonAt(dest.box, dest.boxSlot)
+
+    addPendingMonLocations(
+      { ...source, mon: swappedMon ?? EMPTY_SLOT },
+      { ...dest, mon: sourceMonId ?? EMPTY_SLOT }
+    )
+
     return moveOhpkmToSave(sourceMonId, dest)
-      .awaitMap((displacedMon) =>
-        overwriteMonAtHomeLocation(dest.saveIdentifier, displacedMon, source).then(() => null)
-      )
+      .awaitMap(async (displacedMon) => {
+        await overwriteMonAtHomeLocation(dest.saveIdentifier, displacedMon, source).then(() => null)
+        removePendingMonLocations(source, dest)
+
+        return null
+      })
       .get()
   }
 
@@ -123,9 +134,17 @@ export function useMonLocationsInternal() {
     if (!sourceMon) return R.Ok(null)
 
     const displacedMonId = getMonAtHomeLocation(dest)
+
+    addPendingMonLocations(
+      { ...source, mon: displacedMonId ?? EMPTY_SLOT },
+      { ...dest, mon: sourceMon ?? EMPTY_SLOT }
+    )
+
     return moveOhpkmToSave(displacedMonId, source)
       .awaitMap(async () => {
         await overwriteMonAtHomeLocation(source.saveIdentifier, sourceMon, dest)
+        removePendingMonLocations(source, dest)
+
         return null
       })
       .get()
@@ -153,7 +172,7 @@ export function useMonLocationsInternal() {
   }
 
   function getPendingMon(
-    location: SaveMonLocation
+    location: MonLocation
   ): Option<PKMInterface | OhpkmIdentifier | EmptySlot> {
     if (openSavesState.pendingMonLocations.length === 0) return undefined
 
