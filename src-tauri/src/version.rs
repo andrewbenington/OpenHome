@@ -222,7 +222,7 @@ impl SignificantUpdate {
             Self::V1_16_0 => Version::parse("1.16.0"),
             Self::V1_17_0 => Version::parse("1.17.0"),
             Self::V1_17_1 => Version::parse("1.17.1"),
-            Self::V1_18_0 => Version::parse("1.18.0-rc.4"),
+            Self::V1_18_0 => Version::parse("1.18.0-rc.5-movement-smoothing"),
         }
         .expect("all versions are valid semver")
     }

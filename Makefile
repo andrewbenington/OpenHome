@@ -1,4 +1,4 @@
-VERSION=1.18.0-rc.4
+VERSION=1.18.0-rc.5-movement-smoothing
 
 .PHONY: help
 help: # Display this help.
