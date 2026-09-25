@@ -145,7 +145,7 @@ export default class PK4 {
       this.ballDPPt = dataView.getUint8(0x83)
       this.ballHGSS = dataView.getUint8(0x86)
       this.ball = Math.max(this.ballDPPt, this.ballHGSS)
-      this.metLevel = dataView.getUint8(0x84)
+      this.metLevel = dataView.getUint8(0x84) & 0b01111111
       this.encounterType = dataView.getUint8(0x85)
       this.performance = dataView.getUint8(0x87)
       if (dataView.byteLength >= 236) {
