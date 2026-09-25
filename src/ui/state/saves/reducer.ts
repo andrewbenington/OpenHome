@@ -13,7 +13,7 @@ type OpenSave = {
 export type OpenSavesState = {
   monsToRelease: (OhpkmIdentifier | PKMInterface)[]
   openSaves: Record<SaveIdentifier, OpenSave>
-  pendingMonLocations: PendingMonLocation[]
+  pendingMonLocations: PendingMonLocation[] // when moving a mon outside of its original save for the first time, there is a delay before the OHPKM data is created and added to the store. in the meantime, these locations have temporary pokemon data stored in pendingMonLocations so the boxes can immediately show the changes.
   error?: string
 }
 

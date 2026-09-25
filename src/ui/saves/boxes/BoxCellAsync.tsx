@@ -13,7 +13,7 @@ interface BoxCellAsyncProps {
   monPlaceholder?: Option<PKMInterface>
   monPromise?: Promise<Option<PKMInterface>> | Option<PKMInterface>
   onDrop: (_: PKMInterface[]) => void
-  isDisabled?: (mon: PKMInterface) => boolean
+  isDisabled?: (mon: Option<PKMInterface>) => boolean
   disabledReason?: string
   openhomeId?: OhpkmIdentifier
   borderColor?: CSSProperties['color']
@@ -60,7 +60,7 @@ function BoxCellAsync(props: BoxCellAsyncProps) {
       <BoxCellAsyncInner {...props} monPromise={props.monPromise} />
     </Suspense>
   ) : (
-    <BoxCell {...props} mon={props.monPromise} />
+    <BoxCell {...props} mon={props.monPromise} disabled={props.isDisabled?.(undefined)} />
   )
 }
 

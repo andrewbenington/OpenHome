@@ -359,13 +359,15 @@ function SingleBoxMonDisplay() {
           let identifier = storedId
           let monPromise: NowOrLater<Option<OHPKM>> | PKMInterface = undefined
 
+          // pendingMon means this slot is in the process of being updated, but needs to wait
+          // for the OHPKM data to be registered. In the meantime the pendingMon should be displayed
+          // for immediate visual feedback
           const pendingMon = getPendingMon(location)
           if (pendingMon === EMPTY_SLOT) {
             identifier = undefined
           } else if (pendingMon) {
             if (typeof pendingMon === 'string') {
               identifier = pendingMon
-              // mon = ohpkmStore.getById(openhomeId)
             } else {
               identifier = undefined
               monPromise = pendingMon
@@ -420,7 +422,10 @@ function SingleBoxMonDisplay() {
                 }}
                 // don't allow a swap with a pokémon not supported by the source save
                 isDisabled={(mon) =>
-                  dragData !== undefined && !dragData.isHome && !sourceSupportsMon(mon)
+                  dragData !== undefined &&
+                  !dragData.isHome &&
+                  mon !== undefined &&
+                  !sourceSupportsMon(mon)
                 }
                 contextMenu={[
                   Item.label('Merge/Recover Tracking Data').action(async () =>
