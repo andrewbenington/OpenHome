@@ -20,6 +20,8 @@ export interface SavePkmClass {
 export type AnyPkmClass = SavePkmClass | typeof OHPKM
 
 export interface SAVClass<S extends SAV = SAV> {
+  // Prefer a positively identified schema over binary formats detected only by size.
+  detectionPriority?: number
   new (path: PathData, bytes: Uint8Array): S
   pkmType: SavePkmClass
   fileIsSave: (bytes: Uint8Array) => boolean

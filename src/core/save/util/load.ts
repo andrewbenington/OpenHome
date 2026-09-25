@@ -8,7 +8,9 @@ export const getPossibleSaveTypes = (
   bytes: Uint8Array,
   supportedSaveTypes: SAVClass[]
 ): SAVClass[] => {
-  return supportedSaveTypes.filter((saveType) => saveType.fileIsSave(bytes))
+  const matches = supportedSaveTypes.filter((saveType) => saveType.fileIsSave(bytes))
+  const priority = Math.max(0, ...matches.map((saveType) => saveType.detectionPriority ?? 0))
+  return matches.filter((saveType) => (saveType.detectionPriority ?? 0) === priority)
 }
 
 export const buildUnknownSaveFile = (
