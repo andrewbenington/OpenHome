@@ -5,7 +5,7 @@ import {
   isMegaStone,
   PkmOrOhpkmFormat,
 } from '@openhome-core/pkm/util'
-import { hasGenderDifference } from '@openhome-core/pkm/util/index'
+import { hasGenderDifferenceFrontVisible } from '@openhome-core/pkm/util/index'
 import { BLOOD_MOON, SWEETS } from '@openhome-core/resources/consts/Forms'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { getLumiFormIndexByExtraFormIndex } from '@openhome-core/save/luminescentplatinum/conversion/LuminescentPlatinumFormMap'
@@ -138,7 +138,12 @@ export const getPokemonSpritePathInner = (
     return `sprites/extra/${extraFormSprite}.webp`
   }
   let spriteName = getSpriteName(mon, monFormat)
-  if (!spriteSource.notGendered && hasGenderDifference(mon.nationalDex) && mon.isFemale) {
+  if (
+    !spriteSource.notGendered &&
+    mon.formIndex === 0 &&
+    hasGenderDifferenceFrontVisible(mon.nationalDex) &&
+    mon.isFemale
+  ) {
     spriteName += '-f'
   }
 
