@@ -12,6 +12,7 @@ import { LookupType } from '../util'
 import { PathData } from '../util/path'
 
 export const SAVE_SIZES_BYTES = [0x20000, 0x20010]
+const PKM_SIZE = 58
 
 class G3CFRUSector {
   data: Uint8Array
@@ -73,6 +74,7 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
   boxes: Box<T>[]
   boxNames: string[]
   firstSectorIndex: number = 0
+  boxOffsets: number[] = []
 
   constructor(bytes: Uint8Array, PkmClass: new (bytes: ArrayBuffer) => T, boxCount: number) {
     this.bytes = bytes
@@ -91,7 +93,7 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
     this.sid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0c)
     this.trainerGender = this.sectors[0].data[0x08] ? BinaryGender.Female : BinaryGender.Male
 
-    const nBytes: number = boxCount * 58 * 30
+    const nBytes: number = boxCount * PKM_SIZE * 30
     const nMons: number = boxCount * 30
     const fullSectionsUsed: number = Math.floor(nBytes / 4080)
     const leftoverBytes: number = nBytes % 4080
@@ -117,7 +119,9 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
     }
     for (let i = 0; i < nMons; i++) {
       try {
-        const mon = new PkmClass(this.pcDataContiguous.slice(4 + i * 58, 4 + (i + 1) * 58).buffer)
+        const mon = new PkmClass(
+          this.pcDataContiguous.slice(4 + i * PKM_SIZE, 4 + (i + 1) * PKM_SIZE).buffer
+        )
 
         if (mon.nationalDex !== 0 && mon.trainerID !== 0) {
           const box = this.boxes[Math.floor(i / 30)]
@@ -226,7 +230,7 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
   prepareForSaving() {
     this.updatedBoxSlots.forEach(({ box, boxSlot: index }) => {
       const monOffset = 30 * box + index
-      const pcBytes = new Uint8Array(58) // Per pokemon bytes
+      const pcBytes = new Uint8Array(PKM_SIZE) // Per pokemon bytes
 
       // Current Mon in loop
       const mon = this.boxes[box].boxSlots[index]
@@ -246,15 +250,19 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
           console.error(e)
         }
       }
-      this.primarySave.pcDataContiguous.set(pcBytes, 4 + monOffset * 58)
+      this.primarySave.pcDataContiguous.set(pcBytes, 4 + monOffset * PKM_SIZE)
     })
+
+    const boxCount = this.getBoxCount()
+    const nBytes: number = boxCount * PKM_SIZE * 30
+    const fullSectionsUsed: number = Math.floor(nBytes / 4080)
 
     // Slice pcData into Section Datas.
     // The first 14 boxes of data are stored in the first 6 section of PC data.
     // I am unsure where the rest of the data is stashed (ie: boxes 15-25)
     // So its just easier to only look at the first 6 sections of PC Data.
     // Each section of PC data is 4080 bytes.
-    this.primarySave.sectors.slice(5, 11).forEach((sector, i) => {
+    this.primarySave.sectors.slice(5, 5 + fullSectionsUsed + 1).forEach((sector, i) => {
       const pcData = this.primarySave.pcDataContiguous.slice(
         // 4080 times sector offset
         i * 0xff0,
