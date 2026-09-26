@@ -17,6 +17,15 @@ export function hasGenderDifference(nationalDex: number): boolean {
   return GENDER_DIFFERENCE_NATIONAL_DEX.includes(nationalDex)
 }
 
+const GENDER_DIFFERENCE_BACK_ONLY = [NationalDex.Torchic, NationalDex.Buizel]
+
+export function hasGenderDifferenceFrontVisible(nationalDex: number): boolean {
+  return (
+    GENDER_DIFFERENCE_NATIONAL_DEX.includes(nationalDex) &&
+    !GENDER_DIFFERENCE_BACK_ONLY.includes(nationalDex)
+  )
+}
+
 const GENDER_FORM_DIFFERENCE_NATIONAL_DEX = [
   NationalDex.Frillish,
   NationalDex.Jellicent,
