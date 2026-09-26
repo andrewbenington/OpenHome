@@ -7,6 +7,7 @@ import { isRomHackFormat } from '@openhome-core/pkm/PKM'
 import { FileSchemas } from '@openhome-core/pkm/schema'
 import { $R, isResult, Option, R, Result } from '@openhome-core/util/functional'
 import Badge from '@openhome-ui/components/badge/Badge'
+import DebugOnly from '@openhome-ui/components/DebugOnly'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import Fallback from '@openhome-ui/components/Fallback'
 import FileTypeSelect from '@openhome-ui/components/FileTypeSelect'
@@ -23,6 +24,7 @@ import PokemonIcon from '../components/PokemonIcon'
 import LogsPage from '../pages/logs/LogsPage'
 import { useConvertStrategies } from '../state/convert-strategies'
 import './style.css'
+import DebugTab from './tabs/DebugTab'
 import DisplayTab from './tabs/DisplayTab'
 import MetDataTab from './tabs/MetDataTab'
 import MovesTab from './tabs/MovesTab'
@@ -205,6 +207,9 @@ function ModalContents(props: ModalContentsProps) {
         <SideTabs.Tab value="stats">Stats</SideTabs.Tab>
         <SideTabs.Tab value="ribbons">Ribbons</SideTabs.Tab>
         <SideTabs.Tab value="other">Other</SideTabs.Tab>
+        <DebugOnly>
+          <SideTabs.Tab value="debug">Debug</SideTabs.Tab>
+        </DebugOnly>
         {displayMonOrFallback instanceof OHPKM && (
           <>
             <SideTabs.Tab value="trainers">Trainers</SideTabs.Tab>
@@ -249,6 +254,11 @@ function ModalContents(props: ModalContentsProps) {
             <SideTabs.Panel value="other">
               <OtherDisplay mon={mon} />
             </SideTabs.Panel>
+            <DebugOnly>
+              <SideTabs.Panel value="debug">
+                <DebugTab mon={mon} />
+              </SideTabs.Panel>
+            </DebugOnly>
             {mon instanceof OHPKM && (
               <>
                 <SideTabs.Panel value="trainers">

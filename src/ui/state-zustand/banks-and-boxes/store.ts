@@ -168,6 +168,12 @@ export const createBanksAndBoxesStore = (
         },
         setAtLocation: (location: BankBoxCoordinates, identifier: OhpkmIdentifier) =>
           set((state) => {
+            const existingLocation = state.reverseLookup.get(identifier)
+            // if this mon is already in a home box, first clear that slot to ensure no duplicates
+            if (existingLocation) {
+              requireBox(state, existingLocation).identifiers.delete(existingLocation.boxSlot)
+            }
+
             requireBox(state, location).identifiers.set(location.boxSlot, identifier)
             state.reverseLookup.set(identifier, location)
             state.updatedBoxSlots.push(location)

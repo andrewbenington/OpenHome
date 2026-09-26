@@ -53,6 +53,7 @@ const DraggableMon = (props: DraggableMonProps) => {
     showItem,
     showShiny,
     monDisplayState,
+    style,
   } = props
   const { attributes, listeners, setNodeRef, isDragging, active } = useDraggable({
     id: (dragID ?? '') + mon.personalityValue?.toString(),
@@ -108,6 +109,7 @@ const DraggableMon = (props: DraggableMonProps) => {
           showItem && (!isDragging || dragState.mode !== 'item') ? mon.heldItemIndex : undefined
         }
         style={{
+          ...style,
           visibility: shouldHide && dragState.mode === 'mon' ? 'hidden' : undefined,
         }}
         grayedOut={disabled}

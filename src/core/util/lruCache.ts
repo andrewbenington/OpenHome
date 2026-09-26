@@ -45,4 +45,8 @@ export class LRUCache<K, V> {
   keys() {
     return this.map.keys() // oldest -> newest
   }
+
+  reset() {
+    this.map = new Map()
+  }
 }

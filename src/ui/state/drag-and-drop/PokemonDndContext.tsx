@@ -9,6 +9,7 @@ import {
 } from '@dnd-kit/core'
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
 import { monSupportedBySave } from '@openhome-core/save/util'
+import { R } from '@openhome-core/util/functional'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { getPublicImageURL } from '@openhome-ui/images/images'
@@ -214,7 +215,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
 
               await savesAndBanks
                 .moveMon({ ...sourceLoc, mon: currMon }, nextDestination)
-                .catch((error) => displayError('Error moving Pokémon', error))
+                .then(R.mapErr((error) => displayError('Could not move Pokémon', error)))
 
               nextDestination = nextDestination.isHome
                 ? nextHomeDestination(nextDestination.box, nextDestination.boxSlot + 1)
@@ -232,9 +233,9 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
               savesAndBanks.moveMonItemToBag(source)
             }
 
-            savesAndBanks
+            await savesAndBanks
               .moveMon(source, dest)
-              .catch((error) => displayError('Could not move Pokémon', error))
+              .then(R.mapErr((error) => displayError('Could not move Pokémon', error)))
           }
         }
 
