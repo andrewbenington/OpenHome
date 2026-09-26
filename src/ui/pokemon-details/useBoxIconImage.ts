@@ -6,10 +6,10 @@ import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { R, Result } from '@openhome-core/util/functional'
 import { BoxIconSpriteType } from '@openhome-ui/hooks/monDisplay'
 import {
-  getPokemonSpritePath,
-  getPokemonSpritePathInner,
+  getPokemonSpritePathFromSource,
   getSpriteName,
   HomeBoxSprites,
+  HomeSprites,
 } from '@openhome-ui/images/pokemon'
 import { MonSpriteData } from '@openhome-ui/state/plugin/reducer'
 import { ExtraFormIndex, extraFormSpriteName, MetadataSummaryLookup } from '@pkm-rs/pkg'
@@ -43,7 +43,7 @@ export function boxIconImagePath(
 ): Result<string, string> {
   const shinyFolder = mon.isShiny ? 'shiny/' : ''
   if (spriteType === 'home') {
-    return R.Ok(getPokemonSpritePath(mon, 'OHPKM'))
+    return R.Ok(getPokemonSpritePathFromSource(mon, HomeSprites))
   }
 
   if (mon.extraFormIndex && ExtraFormsUsingImages.has(mon.extraFormIndex)) {
@@ -80,5 +80,5 @@ export function boxIconImagePath(
     return R.Ok(`icons/box/${getSpriteName(monWithoutGender)}.webp`)
   }
 
-  return R.Ok(getPokemonSpritePathInner(monWithoutGender, HomeBoxSprites))
+  return R.Ok(getPokemonSpritePathFromSource(monWithoutGender, HomeBoxSprites))
 }
