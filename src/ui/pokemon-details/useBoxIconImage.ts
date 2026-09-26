@@ -9,13 +9,15 @@ import {
   getPokemonSpritePath,
   getPokemonSpritePathInner,
   getSpriteName,
+  HomeBoxSprites,
 } from '@openhome-ui/images/pokemon'
 import { MonSpriteData } from '@openhome-ui/state/plugin/reducer'
 import { ExtraFormIndex, extraFormSpriteName, MetadataSummaryLookup } from '@pkm-rs/pkg'
 
 export const FormsUsingImages: Map<number, number[]> = new Map([
-  [NationalDex.Eevee, [LGE_STARTER]], // Starter Eevee
-  [NationalDex.Pichu, [SPIKY_EAR]], // Spiky-eared Pichu
+  [NationalDex.Eevee, [LGE_STARTER]],
+  [NationalDex.Pichu, [SPIKY_EAR]],
+
   // Megas not in Champions
   [NationalDex.Heatran, [1]],
   [NationalDex.Darkrai, [1]],
@@ -78,5 +80,5 @@ export function boxIconImagePath(
     return R.Ok(`icons/box/${getSpriteName(monWithoutGender)}.webp`)
   }
 
-  return R.Ok(getPokemonSpritePathInner(monWithoutGender, 'box-home', 'webp'))
+  return R.Ok(getPokemonSpritePathInner(monWithoutGender, HomeBoxSprites))
 }
