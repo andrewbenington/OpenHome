@@ -110,24 +110,37 @@ export function useOhpkmStore() {
   function tryLoadBatch(ids: OhpkmIdentifier[]): NowOrLater<OhpkmBatchLookupResults> {
     const batchResults: OhpkmBatchLookupResults = new Map()
 
-    const pendingMons: Promise<[string, OhpkmLookupResult]>[] = []
+    const cacheMisses: OhpkmIdentifier[] = []
+    backend.lookupOhpkmBatch(ids)
     for (const identifier of ids) {
-      const resultOrPromise = tryLoadFromId(identifier)
-      if (!isThenable(resultOrPromise)) {
-        batchResults.set(identifier, resultOrPromise)
+      const cached = ohpkmCache.get(identifier)
+      if (cached) {
+        batchResults.set(identifier, R.Ok(cached))
       } else {
-        pendingMons.push(resultOrPromise.then((ohpkm) => [identifier, ohpkm]))
+        cacheMisses.push(identifier)
       }
     }
 
-    if (pendingMons.length === 0) {
+    if (cacheMisses.length === 0) {
       return batchResults
     }
 
-    return Promise.all(pendingMons).then((results) => {
-      results.forEach(([id, ohpkm]) => batchResults.set(id, ohpkm))
-      return batchResults
-    })
+    return backend
+      .lookupOhpkmBatch(cacheMisses)
+      .then(
+        R.match(
+          (lookupResult) => {
+            lookupResult.forEach((monResult, id) => batchResults.set(id, monResult))
+          },
+          (error) => {
+            console.error(error)
+            cacheMisses.forEach((id) => batchResults.set(id, R.Err({ identifier: id })))
+          }
+        )
+      )
+      .then(() => {
+        return batchResults
+      })
   }
 
   async function monIsStored(id: string): Promise<boolean> {
