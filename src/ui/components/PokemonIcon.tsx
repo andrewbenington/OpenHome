@@ -2,7 +2,7 @@ import { $R } from '@openhome-core/util/functional'
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
-import { getPokemonSpritePathInner, HomeBoxSprites } from '@openhome-ui/images/pokemon'
+import { getPokemonSpritePathFromSource, HomeBoxSprites } from '@openhome-ui/images/pokemon'
 import { ExtraFormIndex, Gender, NationalDex } from '@pkm-rs/pkg'
 import { HTMLAttributes, memo, MouseEventHandler, ReactNode, useState } from 'react'
 import { BoxIconSpriteType, MonDisplayState, useMonDisplay } from '../hooks/monDisplay'
@@ -151,7 +151,7 @@ function PokemonIconImage(props: PokemonIconImageProps) {
           url: spritePath,
         })
 
-        const homePath = getPokemonSpritePathInner(
+        const homePath = getPokemonSpritePathFromSource(
           {
             ...props,
             formIndex: props.formIndex ?? 0,

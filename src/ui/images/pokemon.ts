@@ -1,7 +1,7 @@
 import { isRomHackFormat } from '@openhome-core/pkm/interfaces'
 import {
   displayIndexAdder,
-  isBattleFormeItem,
+  isBattleFormeItem as isBattleFormItem,
   isMegaStone,
   PkmOrOhpkmFormat,
 } from '@openhome-core/pkm/util'
@@ -57,14 +57,14 @@ function WebpSource(
   return ImageSource(directory, 'webp', { notGendered: false, noShiny: false, ...options })
 }
 
-const Gen1Sprites = PngSource('gen1', { notGendered: true, noShiny: true })
-const Gen2Sprites = PngSource('gen2', { notGendered: true })
-const Gen3Sprites = PngSource('gen3', { notGendered: true })
-const XdAnimatedSprites = GifSource('gen3gc', { notGendered: true })
-const Gen4Sprites = PngSource('gen4')
-const Gen9Sprites = PngSource('gen9', { noShiny: true })
-const RadicalRedSprites = PngSource('rr', { notGendered: true })
-const HomeSprites = WebpSource('home')
+export const Gen1Sprites = PngSource('gen1', { notGendered: true, noShiny: true })
+export const Gen2Sprites = PngSource('gen2', { notGendered: true })
+export const Gen3Sprites = PngSource('gen3', { notGendered: true })
+export const XdAnimatedSprites = GifSource('gen3gc', { notGendered: true })
+export const Gen4Sprites = PngSource('gen4')
+export const Gen9Sprites = PngSource('gen9', { noShiny: true })
+export const RadicalRedSprites = PngSource('rr', { notGendered: true })
+export const HomeSprites = WebpSource('home')
 export const HomeBoxSprites = WebpSource('box-home', { noShiny: true })
 export const ChampionsBoxSprites = WebpSource('box-champions')
 
@@ -101,12 +101,12 @@ function getImageSource(format: PkmOrOhpkmFormat): PokemonImageSource {
   }
 }
 
-export const getPokemonSpritePath = (mon: MonSpriteData, format?: PkmOrOhpkmFormat) => {
-  const monFormat: PkmOrOhpkmFormat = format ?? mon.format
-  return getPokemonSpritePathInner(mon, getImageSource(monFormat), monFormat)
+export const getPokemonSpritePath = (mon: MonSpriteData, formatOverride?: PkmOrOhpkmFormat) => {
+  const monFormat: PkmOrOhpkmFormat = formatOverride ?? mon.format
+  return getPokemonSpritePathFromSource(mon, getImageSource(monFormat), monFormat)
 }
 
-export const getPokemonSpritePathInner = (
+export const getPokemonSpritePathFromSource = (
   mon: MonSpriteData,
   spriteSource: PokemonImageSource,
   monFormat?: string
@@ -117,7 +117,7 @@ export const getPokemonSpritePathInner = (
     )
 
     if (megaForStone) mon.formIndex = megaForStone.megaForme.formIndex
-  } else if (isBattleFormeItem(mon.nationalDex, mon.heldItemIndex)) {
+  } else if (isBattleFormItem(mon.nationalDex, mon.heldItemIndex)) {
     mon.formIndex = displayIndexAdder(mon.heldItemIndex)(mon.formIndex)
   }
 
