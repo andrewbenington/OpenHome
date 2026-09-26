@@ -31,8 +31,13 @@ export function useMonLocationsInternal() {
   const { openSavesState, openSavesDispatch } = useContext(SavesContext)
   const banksAndBoxes = useBanksAndBoxes()
 
-  const { getMonAtHomeLocation, clearAtHomeLocation, setAtHomeLocation, findHomeLocation } =
-    banksAndBoxes
+  const {
+    getMonAtHomeLocation,
+    clearAtHomeLocation,
+    setAtHomeLocation,
+    findHomeLocation,
+    swapHomeLocations,
+  } = banksAndBoxes
 
   const saveFromIdentifier = (identifier: SaveIdentifier) =>
     openSavesState.openSaves[identifier].save
@@ -62,12 +67,7 @@ export function useMonLocationsInternal() {
     source: HomeMonLocation,
     dest: HomeMonLocation
   ): Promise<Result<null>> {
-    const sourceMonId = getMonAtHomeLocation(source)
-    if (sourceMonId) {
-      const displacedMonId = moveOhpkmToHome(sourceMonId, dest)
-      moveOhpkmToHome(displacedMonId, source)
-    }
-
+    swapHomeLocations(source, dest)
     return R.Ok(null)
   }
 

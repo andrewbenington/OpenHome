@@ -54,6 +54,7 @@ export interface BanksAndBoxesState {
   getAtLocation: (location: BankBoxCoordinates) => Option<OhpkmIdentifier>
   locationIsEmpty: (location: BankBoxCoordinates) => boolean
   setAtLocation: (location: BankBoxCoordinates, contents: OhpkmIdentifier) => void
+  swapLocations: (location1: BankBoxCoordinates, location2: BankBoxCoordinates) => void
   clearAtLocation: (location: BankBoxCoordinates) => void
   setBoxNameCurrentBank: (boxIndex: number, boxName: Option<string>) => void
   deleteBoxCurrentBank: (boxId: string) => void
@@ -166,6 +167,29 @@ export const createBanksAndBoxesStore = (
         locationIsEmpty: (location: BankBoxCoordinates): boolean => {
           return readonlyState().getAtLocation(location) === undefined
         },
+        swapLocations: (location1: BankBoxCoordinates, location2: BankBoxCoordinates) =>
+          set((state) => {
+            const box1 = requireBox(state, location1)
+            const slot1Contents = box1.identifiers.get(location1.boxSlot)
+            const box2 = requireBox(state, location2)
+            const slot2Contents = box2.identifiers.get(location2.boxSlot)
+
+            if (slot2Contents) {
+              box1.identifiers.set(location1.boxSlot, slot2Contents)
+              state.reverseLookup.set(slot2Contents, location1)
+            } else {
+              box1.identifiers.delete(location1.boxSlot)
+            }
+
+            if (slot1Contents) {
+              box2.identifiers.set(location2.boxSlot, slot1Contents)
+              state.reverseLookup.set(slot1Contents, location2)
+            } else {
+              box2.identifiers.delete(location2.boxSlot)
+            }
+
+            state.updatedBoxSlots.push(location1, location2)
+          }),
         setAtLocation: (location: BankBoxCoordinates, identifier: OhpkmIdentifier) =>
           set((state) => {
             const existingLocation = state.reverseLookup.get(identifier)
@@ -487,6 +511,7 @@ export function useBanksAndBoxes() {
   const homeLocationIsEmpty = withSelectors.use.locationIsEmpty()
   const clearAtHomeLocation = withSelectors.use.clearAtLocation()
   const setAtHomeLocation = withSelectors.use.setAtLocation()
+  const swapHomeLocations = withSelectors.use.swapLocations()
   const findHomeLocation = withSelectors.use.findHomeLocation()
   const hasHomeLocation = withSelectors.use.hasHomeLocation()
 
@@ -635,6 +660,7 @@ export function useBanksAndBoxes() {
     homeLocationIsEmpty,
     clearAtHomeLocation,
     setAtHomeLocation,
+    swapHomeLocations,
     findHomeLocation,
     hasHomeLocation,
 
