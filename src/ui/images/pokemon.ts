@@ -1,11 +1,11 @@
-import { isRomHackFormat, MonFormat } from '@openhome-core/pkm/interfaces'
+import { isRomHackFormat } from '@openhome-core/pkm/interfaces'
 import {
   displayIndexAdder,
   isBattleFormeItem,
   isMegaStone,
   PkmOrOhpkmFormat,
 } from '@openhome-core/pkm/util'
-import { nationalDexHasGenderDifference } from '@openhome-core/pkm/util/index'
+import { hasGenderDifference } from '@openhome-core/pkm/util/index'
 import { BLOOD_MOON, SWEETS } from '@openhome-core/resources/consts/Forms'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { getLumiFormIndexByExtraFormIndex } from '@openhome-core/save/luminescentplatinum/conversion/LuminescentPlatinumFormMap'
@@ -21,54 +21,94 @@ import {
   MetadataSummaryLookup,
 } from '@pkm-rs/pkg'
 
-const fileToSpriteFolder: Record<PkmOrOhpkmFormat, string> = {
-  PK1: 'gen1',
-  PK2: 'gen2',
-  PK3: 'gen3',
-  COLOPKM: 'gen3gc',
-  XDPKM: 'gen3gc',
-  PK3RR: 'rr',
-  PK3UB: 'rr',
-  PK4: 'gen4',
-  PK5: 'home',
-  PK6: 'home',
-  PK7: 'home',
-  PB7: 'home',
-  PK8: 'home',
-  PA8: 'home',
-  PB8: 'home',
-  PB8LUMI: 'home',
-  PK9: 'gen9',
-  PK9Compass: 'gen9',
-  PA9: 'home',
-  OHPKM: 'home',
+export type PokemonImageSource = {
+  directory: string
+  extension: string
+  notGendered: boolean
+  noShiny: boolean
 }
 
-export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {
-  const monFormat = format ?? mon.format
+function ImageSource(
+  directory: string,
+  extension: string,
+  options: { notGendered: boolean; noShiny: boolean }
+): PokemonImageSource {
+  return { directory, extension, ...options }
+}
 
-  const extraFormSprite = mon.extraFormIndex ? extraFormSpriteName(mon.extraFormIndex) : undefined
+function PngSource(
+  directory: string,
+  options?: { notGendered?: boolean; noShiny?: boolean }
+): PokemonImageSource {
+  return ImageSource(directory, 'png', { notGendered: false, noShiny: false, ...options })
+}
 
-  let spriteFolder = extraFormSprite ? 'extra' : fileToSpriteFolder[monFormat as MonFormat]
+function GifSource(
+  directory: string,
+  options?: { notGendered?: boolean; noShiny?: boolean }
+): PokemonImageSource {
+  return ImageSource(directory, 'gif', { notGendered: false, noShiny: false, ...options })
+}
 
-  const extension =
-    spriteFolder === 'gen3gc'
-      ? 'gif'
-      : spriteFolder === 'home' || spriteFolder === 'extra'
-        ? 'webp'
-        : 'png'
+function WebpSource(
+  directory: string,
+  options?: { notGendered?: boolean; noShiny?: boolean }
+): PokemonImageSource {
+  return ImageSource(directory, 'webp', { notGendered: false, noShiny: false, ...options })
+}
 
-  if (mon.isShiny && spriteFolder !== 'gen1' && spriteFolder !== 'gen9') {
-    spriteFolder += '/shiny'
+const Gen1Sprites = PngSource('gen1', { notGendered: true, noShiny: true })
+const Gen2Sprites = PngSource('gen2', { notGendered: true })
+const Gen3Sprites = PngSource('gen3', { notGendered: true })
+const XdAnimatedSprites = GifSource('gen3gc', { notGendered: true })
+const Gen4Sprites = PngSource('gen4')
+const Gen9Sprites = PngSource('gen9', { noShiny: true })
+const RadicalRedSprites = PngSource('rr', { notGendered: true })
+const HomeSprites = WebpSource('home')
+export const HomeBoxSprites = WebpSource('box-home', { noShiny: true })
+export const ChampionsBoxSprites = WebpSource('box-champions')
+
+function getImageSource(format: PkmOrOhpkmFormat): PokemonImageSource {
+  switch (format) {
+    case 'PK1':
+      return Gen1Sprites
+    case 'PK2':
+      return Gen2Sprites
+    case 'PK3':
+      return Gen3Sprites
+    case 'COLOPKM':
+    case 'XDPKM':
+      return XdAnimatedSprites
+    case 'PK3RR':
+    case 'PK3UB':
+      return RadicalRedSprites
+    case 'PK4':
+      return Gen4Sprites
+    case 'PK9':
+    case 'PK9Compass':
+      return Gen9Sprites
+    case 'PK5':
+    case 'PK6':
+    case 'PK7':
+    case 'PB7':
+    case 'PK8':
+    case 'PA8':
+    case 'PB8':
+    case 'PB8LUMI':
+    case 'PA9':
+    case 'OHPKM':
+      return HomeSprites
   }
+}
 
-  return getPokemonSpritePathInner(mon, spriteFolder, extension, monFormat)
+export const getPokemonSpritePath = (mon: MonSpriteData, format?: PkmOrOhpkmFormat) => {
+  const monFormat: PkmOrOhpkmFormat = format ?? mon.format
+  return getPokemonSpritePathInner(mon, getImageSource(monFormat), monFormat)
 }
 
 export const getPokemonSpritePathInner = (
   mon: MonSpriteData,
-  spriteFolder: string,
-  extension: string,
+  spriteSource: PokemonImageSource,
   monFormat?: string
 ) => {
   if (isMegaStone(mon.heldItemIndex)) {
@@ -94,18 +134,24 @@ export const getPokemonSpritePathInner = (
   if (alwaysUsedSprite) return alwaysUsedSprite
 
   const extraFormSprite = mon.extraFormIndex ? extraFormSpriteName(mon.extraFormIndex) : undefined
-
-  let spriteName = extraFormSprite ?? getSpriteName(mon, monFormat)
-
-  if (nationalDexHasGenderDifference(mon.nationalDex) && mon.isFemale) {
+  if (extraFormSprite) {
+    return `sprites/extra/${extraFormSprite}.webp`
+  }
+  let spriteName = getSpriteName(mon, monFormat)
+  if (!spriteSource.notGendered && hasGenderDifference(mon.nationalDex) && mon.isFemale) {
     spriteName += '-f'
   }
 
-  if (extraFormSprite) {
-    spriteFolder = 'extra'
+  const spriteDirectory =
+    mon.isShiny && !spriteSource.noShiny
+      ? `${spriteSource.directory}/shiny`
+      : spriteSource.directory
+
+  if (!spriteDirectory) {
+    throw Error(`MISSING: ${spriteSource}`)
   }
 
-  return `sprites/${spriteFolder}/${spriteName}.${extension}`
+  return `sprites/${spriteDirectory}/${spriteName}.${spriteSource.extension}`
 }
 
 export function getSpriteName(mon: MonSpriteData, format?: string): string {
@@ -123,7 +169,7 @@ export function getSpriteName(mon: MonSpriteData, format?: string): string {
 function getRomHackSpritePath(mon: MonSpriteData) {
   const spriteName = getSpriteName(mon, mon.format)
   const monFormat = mon.format
-  let spriteFolder = fileToSpriteFolder[monFormat as MonFormat]
+  let spriteFolder = getImageSource(mon.format).directory
 
   if (monFormat === 'PK3RR') {
     if (mon.nationalDex === NationalDex.Ursaluna && mon.formIndex === BLOOD_MOON) {

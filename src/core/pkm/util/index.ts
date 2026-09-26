@@ -13,7 +13,7 @@ const GENDER_DIFFERENCE_NATIONAL_DEX = [
   902,
 ]
 
-export function nationalDexHasGenderDifference(nationalDex: number): boolean {
+export function hasGenderDifference(nationalDex: number): boolean {
   return GENDER_DIFFERENCE_NATIONAL_DEX.includes(nationalDex)
 }
 
