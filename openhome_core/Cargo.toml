@@ -1,6 +1,6 @@
 [package]
 name = "openhome_core"
-version = "1.18.0-rc.5-movement-smoothing"
+version = "1.18.0-rc.async-ohpkm-store"
 edition = "2024"
 
 [dependencies]

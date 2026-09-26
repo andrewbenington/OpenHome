@@ -1,4 +1,4 @@
-import { nationalDexHasGenderDifference } from '@openhome-core/pkm/util/index'
+import { hasGenderDifference } from '@openhome-core/pkm/util/index'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import useMonSprite from '@openhome-ui/pokemon-details/useMonSprite'
@@ -125,7 +125,7 @@ function PokedexDetails({
     MOST_CURRENT_SOURCE
   )
 
-  const isFemale = showFemale && nationalDexHasGenderDifference(species.nationalDex)
+  const isFemale = showFemale && hasGenderDifference(species.nationalDex)
 
   const selectedFormStatus = getFormeStatus(pokedex, species.nationalDex, selectedForm.formIndex)
   const spriteResult = useMonSprite({
@@ -172,7 +172,7 @@ function PokedexDetails({
                 />
               </button>
             )}
-            {nationalDexHasGenderDifference(species.nationalDex) && (
+            {hasGenderDifference(species.nationalDex) && (
               <button
                 className="pokedex-toggle pokedex-gender-toggle"
                 style={{
