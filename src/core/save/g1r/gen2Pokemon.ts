@@ -4,7 +4,7 @@ import { PkmConstructorOptions } from '@openhome-core/pkm/PKM'
 import { R } from '@openhome-core/util/functional'
 import { ConvertStrategy, Language, OriginGame } from '@pkm-rs/pkg'
 import ids from './gen2Identifiers.json'
-import { integer, luaArray, luaString, LuaTable, optionalTable, text } from './serializer'
+import { luaInteger, luaArray, luaString, LuaTable, luaOptionalTable, luaText } from './serializer'
 
 // PK2 stores Egg status in the surrounding save's species list. G1R stores it on the mon.
 export class Gen2G1RMon extends PK2 {
@@ -31,101 +31,101 @@ function index(list: string[], name: string): number {
   return found
 }
 
-export function gen2FromLua(m: LuaTable, origin: OriginGame): Gen2G1RMon {
-  const dex = index(ids.species, text(m.get('species')))
+export function gen2FromLua(pokemonData: LuaTable, origin: OriginGame): Gen2G1RMon {
+  const dex = index(ids.species, luaText(pokemonData.get('species')))
   const bytes = new Uint8Array(35)
   bytes.set([1, dex, 255])
-  const v = new DataView(bytes.buffer, 3)
-  const n = (key: string, max: number, fallback = 0) => integer(m.get(key), max, fallback)
-  v.setUint8(0, dex)
-  const item = text(m.get('item'))
-  v.setUint8(1, item ? index(ids.items, item) : 0)
-  const moves = optionalTable(m.get('moves'))
+  const dataView = new DataView(bytes.buffer, 3)
+  const luaNumberField = (key: string, max: number, fallback = 0) => luaInteger(pokemonData.get(key), max, fallback)
+  dataView.setUint8(0, dex)
+  const item = luaText(pokemonData.get('item'))
+  dataView.setUint8(1, item ? index(ids.items, item) : 0)
+  const moves = luaOptionalTable(pokemonData.get('moves'))
   for (const [key] of moves)
     if (typeof key !== 'number' || key < 1 || key > 4) throw new Error('Invalid move slot')
   for (let i = 0; i < 4; i++) {
     const entry = moves.get(i + 1)
     const move = entry instanceof Map ? entry : new Map()
-    const name = typeof entry === 'string' ? text(entry) : text(move.get('id'))
-    v.setUint8(2 + i, name ? index(ids.moves, name) : 0)
-    const pp = move.get('pp') ?? optionalTable(m.get('pp')).get(i + 1)
-    v.setUint8(23 + i, integer(pp, 63) | (integer(move.get('ppUps'), 3) << 6))
+    const name = typeof entry === 'string' ? luaText(entry) : luaText(move.get('id'))
+    dataView.setUint8(2 + i, name ? index(ids.moves, name) : 0)
+    const pp = move.get('pp') ?? luaOptionalTable(pokemonData.get('pp')).get(i + 1)
+    dataView.setUint8(23 + i, luaInteger(pp, 63) | (luaInteger(move.get('ppUps'), 3) << 6))
   }
-  v.setUint16(6, n('otId', 65535))
-  const exp = n('experience', 0xffffff)
-  v.setUint8(8, exp >>> 16)
-  v.setUint16(9, exp & 65535)
-  const se = optionalTable(m.get('statExp')),
-    dvs = optionalTable(m.get('dvs'))
-  fields.forEach((key, i) => v.setUint16(11 + i * 2, integer(se.get(key), 65535)))
-  v.setUint8(21, (integer(dvs.get('attack'), 15) << 4) | integer(dvs.get('defense'), 15))
-  v.setUint8(22, (integer(dvs.get('speed'), 15) << 4) | integer(dvs.get('special'), 15))
-  v.setUint8(27, m.get('isEgg') === true ? n('eggSteps', 255) : n('happiness', 255, 70))
-  v.setUint8(28, n('pokerus', 255))
+  dataView.setUint16(6, luaNumberField('otId', 65535))
+  const exp = luaNumberField('experience', 0xffffff)
+  dataView.setUint8(8, exp >>> 16)
+  dataView.setUint16(9, exp & 65535)
+  const se = luaOptionalTable(pokemonData.get('statExp')),
+    dvs = luaOptionalTable(pokemonData.get('dvs'))
+  fields.forEach((key, i) => dataView.setUint16(11 + i * 2, luaInteger(se.get(key), 65535)))
+  dataView.setUint8(21, (luaInteger(dvs.get('attack'), 15) << 4) | luaInteger(dvs.get('defense'), 15))
+  dataView.setUint8(22, (luaInteger(dvs.get('speed'), 15) << 4) | luaInteger(dvs.get('special'), 15))
+  dataView.setUint8(27, pokemonData.get('isEgg') === true ? luaNumberField('eggSteps', 255) : luaNumberField('happiness', 255, 70))
+  dataView.setUint8(28, luaNumberField('pokerus', 255))
   // The engine's unpacked caught fields take precedence over an older imported packed word.
-  let caught = n('caughtData', 65535)
-  if (m.has('caughtTime') || m.has('caughtLocation')) {
-    const gender = text(m.get('caughtByGender'), 'boy')
+  let caught = luaNumberField('caughtData', 65535)
+  if (pokemonData.has('caughtTime') || pokemonData.has('caughtLocation')) {
+    const gender = luaText(pokemonData.get('caughtByGender'), 'boy')
     caught =
-      (((n('caughtTime', 3) << 6) | (n('caughtLevel', 100) & 63)) << 8) |
+      (((luaNumberField('caughtTime', 3) << 6) | (luaNumberField('caughtLevel', 100) & 63)) << 8) |
       (gender === 'girl' || gender === 'female' ? 128 : 0) |
-      n('caughtLocation', 127)
+      luaNumberField('caughtLocation', 127)
   }
-  v.setUint16(29, caught)
-  v.setUint8(31, n('level', 100, 1))
+  dataView.setUint16(29, caught)
+  dataView.setUint8(31, luaNumberField('level', 100, 1))
   const mon = Gen2G1RMon.fromBytes(bytes.buffer)
   mon.gameOfOrigin = origin
   mon.language = Language.English
-  mon.nickname = text(m.get('nickname')) || text(m.get('name')) || text(m.get('species'))
-  mon.trainerName = text(m.get('ot'), 'TRAINER')
-  mon.isEgg = m.get('isEgg') === true
-  mon.currentHP = n('hp', 65535, mon.isEgg ? 0 : mon.getStats().hp)
-  mon.statusCondition = statuses[text(m.get('status'))] ?? 0
-  if (mon.statusCondition === 7) mon.statusCondition = n('statusTurns', 7, 7)
+  mon.nickname = luaText(pokemonData.get('nickname')) || luaText(pokemonData.get('name')) || luaText(pokemonData.get('species'))
+  mon.trainerName = luaText(pokemonData.get('ot'), 'TRAINER')
+  mon.isEgg = pokemonData.get('isEgg') === true
+  mon.currentHP = luaNumberField('hp', 65535, mon.isEgg ? 0 : mon.getStats().hp)
+  mon.statusCondition = statuses[luaText(pokemonData.get('status'))] ?? 0
+  if (mon.statusCondition === 7) mon.statusCondition = luaNumberField('statusTurns', 7, 7)
   return mon
 }
 
 export function gen2ToLua(mon: PK2, original?: LuaTable): LuaTable {
-  const m: LuaTable = original ? structuredClone(original) : new Map()
+  const pokemonData: LuaTable = original ? structuredClone(original) : new Map()
   const species = ids.species[mon.nationalDex - 1]
   if (!species) throw new Error('Unsupported Gen 2 species')
-  m.set('species', species)
-  m.set('name', species)
-  m.set('nickname', luaString(mon.nickname))
-  m.set('ot', luaString(mon.trainerName))
-  m.set('otId', mon.trainerID)
-  m.set('experience', mon.exp)
-  m.set('level', mon.getLevel())
-  m.set('types', luaArray(ids.types[mon.nationalDex - 1]))
+  pokemonData.set('species', species)
+  pokemonData.set('name', species)
+  pokemonData.set('nickname', luaString(mon.nickname))
+  pokemonData.set('ot', luaString(mon.trainerName))
+  pokemonData.set('otId', mon.trainerID)
+  pokemonData.set('experience', mon.exp)
+  pokemonData.set('level', mon.getLevel())
+  pokemonData.set('types', luaArray(ids.types[mon.nationalDex - 1]))
   const isEgg = mon instanceof Gen2G1RMon && mon.isEgg
-  m.set('isEgg', isEgg)
-  m.set('happiness', isEgg ? integer(original?.get('happiness'), 255, 120) : mon.trainerFriendship)
-  if (isEgg) m.set('eggSteps', mon.trainerFriendship)
-  else m.delete('eggSteps')
+  pokemonData.set('isEgg', isEgg)
+  pokemonData.set('happiness', isEgg ? luaInteger(original?.get('happiness'), 255, 120) : mon.trainerFriendship)
+  if (isEgg) pokemonData.set('eggSteps', mon.trainerFriendship)
+  else pokemonData.delete('eggSteps')
   const itemIndex = mon.heldItemIndexGen2?.index ?? 0
   if (itemIndex) {
     const item = ids.items[itemIndex - 1]
     if (!item) throw new Error('Unsupported Gen 2 item')
-    m.set('item', item)
-  } else m.delete('item')
-  m.set('pokerus', mon.pokerusByte)
+    pokemonData.set('item', item)
+  } else pokemonData.delete('item')
+  pokemonData.set('pokerus', mon.pokerusByte)
   const raw = new DataView(mon.toBytes())
-  m.set('caughtData', raw.getUint16(29))
-  m.set('caughtTime', mon.metTimeOfDay)
-  m.set('caughtLevel', Math.min(63, mon.metLevel))
-  m.set('caughtLocation', mon.metLocationIndex)
-  m.set('caughtByGender', mon.trainerGender ? 'girl' : 'boy')
+  pokemonData.set('caughtData', raw.getUint16(29))
+  pokemonData.set('caughtTime', mon.metTimeOfDay)
+  pokemonData.set('caughtLevel', Math.min(63, mon.metLevel))
+  pokemonData.set('caughtLocation', mon.metLocationIndex)
+  pokemonData.set('caughtByGender', mon.trainerGender ? 'girl' : 'boy')
   const dvs = new Map<string, number>(),
     statExp = new Map<string, number>()
   fields.forEach((key, i) => {
     dvs.set(key, mon.dvs[statsKeys[i]])
     statExp.set(key, mon.evsG12[statsKeys[i]])
   })
-  m.set('dvs', dvs)
-  m.set('statExp', statExp)
+  pokemonData.set('dvs', dvs)
+  pokemonData.set('statExp', statExp)
   mon.level = mon.getLevel()
   const stats = mon.getStats()
-  m.set(
+  pokemonData.set(
     'stats',
     new Map(
       Object.entries({
@@ -138,12 +138,12 @@ export function gen2ToLua(mon: PK2, original?: LuaTable): LuaTable {
       })
     )
   )
-  m.set('maxHp', stats.hp)
-  m.set('hp', isEgg ? 0 : Math.min(mon.currentHP, stats.hp))
-  m.set('shiny', mon.isShiny())
-  m.set('gender', mon.gender === 0 ? 'male' : mon.gender === 1 ? 'female' : 'unknown')
-  if (mon.nationalDex === 201) m.set('unownLetter', mon.formIndex + 1)
-  else m.delete('unownLetter')
+  pokemonData.set('maxHp', stats.hp)
+  pokemonData.set('hp', isEgg ? 0 : Math.min(mon.currentHP, stats.hp))
+  pokemonData.set('shiny', mon.isShiny())
+  pokemonData.set('gender', mon.gender === 0 ? 'male' : mon.gender === 1 ? 'female' : 'unknown')
+  if (mon.nationalDex === 201) pokemonData.set('unownLetter', mon.formIndex + 1)
+  else pokemonData.delete('unownLetter')
   const moves: LuaTable = new Map()
   mon.moves.forEach((id, i) => {
     if (!id) return
@@ -160,20 +160,20 @@ export function gen2ToLua(mon: PK2, original?: LuaTable): LuaTable {
       ])
     )
   })
-  m.set('moves', moves)
-  m.delete('pp')
-  m.delete('ppRaw')
-  m.delete('status')
-  m.delete('statusTurns')
+  pokemonData.set('moves', moves)
+  pokemonData.delete('pp')
+  pokemonData.delete('ppRaw')
+  pokemonData.delete('status')
+  pokemonData.delete('statusTurns')
   if (mon.statusCondition & 7) {
-    m.set('status', 'SLP')
-    m.set('statusTurns', mon.statusCondition & 7)
+    pokemonData.set('status', 'SLP')
+    pokemonData.set('statusTurns', mon.statusCondition & 7)
   } else
     for (const [name, mask] of Object.entries(statuses).slice(1)) {
       if (mon.statusCondition & mask) {
-        m.set('status', name)
+        pokemonData.set('status', name)
         break
       }
     }
-  return m
+  return pokemonData
 }

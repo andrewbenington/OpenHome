@@ -19,15 +19,15 @@ import { LookupType } from '../util'
 import { PathData } from '../util/path'
 import { gen3FromLua, gen3ToLua, gen1Species, gen1FromLua, gen1ToLua } from './pokemon'
 import {
-  byteString,
-  encodeLua,
-  integer,
+  luaByteString,
+  encodeLuaSave,
+  luaInteger,
   LuaTable,
-  numericEntries,
-  optionalTable,
-  parseLua,
-  table,
-  text,
+  luaNumericEntries,
+  luaOptionalTable,
+  parseLuaSave,
+  luaTable,
+  luaText,
 } from './serializer'
 
 type LuaKind = 'gen1' | 'gen2' | 'gen3'
@@ -36,10 +36,43 @@ type SourceMon = { kind: LuaKind; value: LuaTable; fingerprint: string }
 const sources = new WeakMap<LuaMon, SourceMon>()
 const parsed = new WeakMap<Uint8Array, LuaTable>()
 
+function pokemonTypeMatches(kind: LuaKind, mon: LuaMon): boolean {
+  if (kind === 'gen1') return mon instanceof PK1
+  if (kind === 'gen2') return mon instanceof PK2
+  return mon instanceof PK3
+}
+
+function serializePokemon(mon: LuaMon, original?: LuaTable): LuaTable {
+  if (mon instanceof PK1) return gen1ToLua(mon, original)
+  if (mon instanceof PK2) return gen2ToLua(mon, original)
+  return gen3ToLua(mon, original)
+}
+
+function speciesIdentifier(kind: LuaKind, mon: LuaMon, value: LuaTable): string | number {
+  if (kind === 'gen1') return gen1Species[mon.nationalDex - 1]
+  if (kind === 'gen2') return gen2Ids.species[mon.nationalDex - 1]
+  return luaInteger(value.get('species'), 411)
+}
+
+function dexFlagNames(kind: LuaKind): string[] {
+  if (kind === 'gen1') return ['seen', 'owned']
+  if (kind === 'gen2') return ['seen', 'caught']
+  return ['seen', 'owned', 'caught']
+}
+
+function trainerGender(owner: LuaTable, kind: LuaKind): BinaryGender {
+  if (kind === 'gen2') {
+    return luaText(owner.get('gender'), 'male') === 'female'
+      ? BinaryGender.Female
+      : BinaryGender.Male
+  }
+  return luaInteger(owner.get('gender'), 1) ? BinaryGender.Female : BinaryGender.Male
+}
+
 function read(bytes: Uint8Array): LuaTable {
   const cached = parsed.get(bytes)
   if (cached) return cached
-  const root = parseLua(bytes)
+  const root = parseLuaSave(bytes)
   parsed.set(bytes, root)
   return root
 }
@@ -56,7 +89,7 @@ const versions = {
 } as const
 
 function versionOf(root: LuaTable) {
-  const version = text(root.get('version') ?? optionalTable(root.get('meta')).get('version'))
+  const version = luaText(root.get('version') ?? luaOptionalTable(root.get('meta')).get('version'))
   if (!Object.hasOwn(versions, version)) throw new Error('Unsupported G1R game version')
   return versions[version as keyof typeof versions]
 }
@@ -65,13 +98,13 @@ function recognized(root: LuaTable, kind: LuaKind): boolean {
   if (versionOf(root).kind !== kind || !(root.get('party') instanceof Map)) return false
   if (kind === 'gen1') {
     return (
-      optionalTable(root.get('meta')).get('format') === 4 &&
+      luaOptionalTable(root.get('meta')).get('format') === 4 &&
       root.get('boxes') instanceof Map &&
       root.get('player') instanceof Map
     )
   }
   if (kind === 'gen2') {
-    const format = integer(root.get('format'), 8)
+    const format = luaInteger(root.get('format'), 8)
     return (
       format >= 1 &&
       root.get('generation') === 2 &&
@@ -82,14 +115,14 @@ function recognized(root: LuaTable, kind: LuaKind): boolean {
   return (
     root.get('schemaVersion') === 1 &&
     root.get('storage') instanceof Map &&
-    optionalTable(root.get('storage')).get('boxes') instanceof Map &&
+    luaOptionalTable(root.get('storage')).get('boxes') instanceof Map &&
     typeof root.get('trainerId') === 'number' &&
     typeof root.get('name') === 'string'
   )
 }
 
 function detects(bytes: Uint8Array, kind: LuaKind): boolean {
-  if (!/^\s*return\s*\{/.test(byteString(bytes.subarray(0, 128)))) return false
+  if (!/^\s*return\s*\{/.test(luaByteString(bytes.subarray(0, 128)))) return false
   try {
     return recognized(read(bytes), kind)
   } catch {
@@ -99,7 +132,7 @@ function detects(bytes: Uint8Array, kind: LuaKind): boolean {
 
 function fingerprint(mon: LuaMon): string {
   return (
-    byteString(new Uint8Array(mon.toBytes({ includeExtraFields: true }))) +
+    luaByteString(new Uint8Array(mon.toBytes({ includeExtraFields: true }))) +
     '\u0000' +
     mon.nickname +
     '\u0000' +
@@ -118,7 +151,7 @@ function identity(mon: LuaMon): string {
     : `1:${mon.nationalDex}:${[mon.dvs.hp, mon.dvs.atk, mon.dvs.def, mon.dvs.spe, mon.dvs.spc].join(',')}:${mon.exp}:${mon.nickname}:${mon.trainerName}`
 }
 
-abstract class G1RSave<P extends LuaMon> extends OfficialSAV<P> {
+abstract class G1RecompSave<P extends LuaMon> extends OfficialSAV<P> {
   static detectionPriority = 1
   abstract convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<P>
   abstract supportsItem(index: number): boolean
@@ -154,44 +187,37 @@ abstract class G1RSave<P extends LuaMon> extends OfficialSAV<P> {
     this.origin = versionOf(this.root).origin
     this.boxRows = kind === 'gen3' ? 5 : 4
     this.boxColumns = kind === 'gen3' ? 6 : 5
-    const owner = kind === 'gen3' ? this.root : table(this.root.get('player'))
-    this.name = text(owner.get('name'))
-    this.tid = integer(owner.get(kind === 'gen3' ? 'trainerId' : 'id'), 65535)
-    this.sid = kind === 'gen3' ? integer(owner.get('secretId'), 65535) : 0
-    this.money = integer((kind === 'gen2' ? owner : this.root).get('money'), 0xffffffff)
-    this.trainerGender =
-      kind === 'gen2'
-        ? text(owner.get('gender'), 'male') === 'female'
-          ? BinaryGender.Female
-          : BinaryGender.Male
-        : integer(owner.get('gender'), 1)
-          ? BinaryGender.Female
-          : BinaryGender.Male
+    const owner = kind === 'gen3' ? this.root : luaTable(this.root.get('player'))
+    this.name = luaText(owner.get('name'))
+    this.tid = luaInteger(owner.get(kind === 'gen3' ? 'trainerId' : 'id'), 65535)
+    this.sid = kind === 'gen3' ? luaInteger(owner.get('secretId'), 65535) : 0
+    this.money = luaInteger((kind === 'gen2' ? owner : this.root).get('money'), 0xffffffff)
+    this.trainerGender = trainerGender(owner, kind)
     this.displayID = this.tid.toString().padStart(5, '0')
-    const storage = kind === 'gen3' ? table(this.root.get('storage')) : this.root
+    const storage = kind === 'gen3' ? luaTable(this.root.get('storage')) : this.root
     const boxCount = kind === 'gen1' ? 12 : 14
-    const current = integer(storage.get('currentBox'), boxCount, 1)
+    const current = luaInteger(storage.get('currentBox'), boxCount, 1)
     if (!current) throw new Error('Lua currentBox must be one based')
     this.currentPCBox = current - 1
-    const data = table(storage.get('boxes'))
-    numericEntries(data, boxCount)
+    const data = luaTable(storage.get('boxes'))
+    luaNumericEntries(data, boxCount)
     this.boxes = Array.from({ length: boxCount }, (_, b) => {
-      const boxData = optionalTable(data.get(b + 1))
-      const mons = kind === 'gen3' ? optionalTable(boxData.get('mons')) : boxData
+      const boxData = luaOptionalTable(data.get(b + 1))
+      const mons = kind === 'gen3' ? luaOptionalTable(boxData.get('mons')) : boxData
       const box = new Box<P>(
         kind === 'gen3'
-          ? text(boxData.get('name'), `BOX ${b + 1}`)
+          ? luaText(boxData.get('name'), `BOX ${b + 1}`)
           : kind === 'gen2'
-            ? text(optionalTable(this.root.get('boxNames')).get(b + 1), `Box ${b + 1}`)
+            ? luaText(luaOptionalTable(this.root.get('boxNames')).get(b + 1), `Box ${b + 1}`)
             : `Box ${b + 1}`,
         this.boxSlotCount
       )
-      const entries = numericEntries(mons, this.boxSlotCount)
+      const entries = luaNumericEntries(mons, this.boxSlotCount)
       entries.forEach(([slot, value], i) => {
         if (kind !== 'gen3' && slot !== i + 1)
           throw new Error('Gen 1 and Gen 2 boxes must be contiguous')
         try {
-          const record = table(value, 'Pokémon')
+          const record = luaTable(value, 'Pokémon')
           const mon = (
             kind === 'gen1'
               ? gen1FromLua(record, this.origin)
@@ -265,8 +291,8 @@ abstract class G1RSave<P extends LuaMon> extends OfficialSAV<P> {
     )
     if (!changed.some(Boolean)) return
     const next = structuredClone(this.root)
-    const storage = this.kind === 'gen3' ? table(next.get('storage')) : next
-    const data = table(storage.get('boxes'))
+    const storage = this.kind === 'gen3' ? luaTable(next.get('storage')) : next
+    const data = luaTable(storage.get('boxes'))
     const savedSources: [P, SourceMon][] = []
     const compacted = this.boxes.map((box) => [...box.boxSlots])
     this.boxes.forEach((box, b) => {
@@ -275,11 +301,7 @@ abstract class G1RSave<P extends LuaMon> extends OfficialSAV<P> {
       box.boxSlots.forEach((mon, slot) => {
         if (!mon) return
         if (
-          !(this.kind === 'gen1'
-            ? mon instanceof PK1
-            : this.kind === 'gen2'
-              ? mon instanceof PK2
-              : mon instanceof PK3) ||
+          !pokemonTypeMatches(this.kind, mon) ||
           !this.supportsMon(mon.nationalDex, mon.formIndex)
         )
           throw new Error('Unsupported Pokémon format')
@@ -289,28 +311,15 @@ abstract class G1RSave<P extends LuaMon> extends OfficialSAV<P> {
         const value =
           original && source?.fingerprint === fp
             ? structuredClone(original)
-            : mon instanceof PK1
-              ? gen1ToLua(mon, original)
-              : mon instanceof PK2
-                ? gen2ToLua(mon, original)
-                : gen3ToLua(mon, original)
+            : serializePokemon(mon, original)
         mons.set(this.kind === 'gen3' ? slot + 1 : mons.size + 1, value)
         savedSources.push([mon, { kind: this.kind, value, fingerprint: fp }])
         if (fp !== this.snapshots[b][slot] && !('isEgg' in mon && mon.isEgg)) {
           const dexName = this.kind === 'gen3' ? 'dex' : 'pokedex'
-          const dex = optionalTable(next.get(dexName))
-          const species =
-            this.kind === 'gen1'
-              ? gen1Species[mon.nationalDex - 1]
-              : this.kind === 'gen2'
-                ? gen2Ids.species[mon.nationalDex - 1]
-                : integer(value.get('species'), 411)
-          for (const key of this.kind === 'gen1'
-            ? ['seen', 'owned']
-            : this.kind === 'gen2'
-              ? ['seen', 'caught']
-              : ['seen', 'owned', 'caught']) {
-            const flags = optionalTable(dex.get(key))
+          const dex = luaOptionalTable(next.get(dexName))
+          const species = speciesIdentifier(this.kind, mon, value)
+          for (const key of dexFlagNames(this.kind)) {
+            const flags = luaOptionalTable(dex.get(key))
             flags.set(species as string | number, true)
             dex.set(key, flags)
           }
@@ -322,12 +331,12 @@ abstract class G1RSave<P extends LuaMon> extends OfficialSAV<P> {
         compacted[b] = box.boxSlots.filter((m): m is P => m !== undefined)
         compacted[b].length = this.boxSlotCount
       } else {
-        const boxData = optionalTable(data.get(b + 1))
+        const boxData = luaOptionalTable(data.get(b + 1))
         boxData.set('mons', mons)
         data.set(b + 1, boxData)
       }
     })
-    const output = encodeLua(next)
+    const output = encodeLuaSave(next)
     // Publish the prepared state only after every conversion and serialization succeeds.
     this.root = next
     this.bytes = output
@@ -342,7 +351,7 @@ abstract class G1RSave<P extends LuaMon> extends OfficialSAV<P> {
   }
 }
 
-export class Gen1G1RSave extends G1RSave<PK1> {
+export class Gen1G1RSave extends G1RecompSave<PK1> {
   static pkmType = PK1
   static lookupType: LookupType = 'gen12'
   static saveTypeName = 'Pokémon Gen 1 G1R save'
@@ -366,7 +375,7 @@ export class Gen1G1RSave extends G1RSave<PK1> {
   }
 }
 
-export class Gen3G1RSave extends G1RSave<PK3> {
+export class Gen3G1RSave extends G1RecompSave<PK3> {
   static pkmType = PK3
   static lookupType: LookupType = 'gen345'
   static saveTypeName = 'Pokémon Gen 3 G1R save'
@@ -389,7 +398,7 @@ export class Gen3G1RSave extends G1RSave<PK3> {
   }
 }
 
-export class Gen2G1RSave extends G1RSave<Gen2G1RMon> {
+export class Gen2G1RSave extends G1RecompSave<Gen2G1RMon> {
   static pkmType = Gen2G1RMon
   static lookupType: LookupType = 'gen12'
   static saveTypeName = 'Pokémon Gen 2 G1R save'

@@ -7,38 +7,39 @@ const MAX_BYTES = 32 * 1024 * 1024
 const MAX_NODES = 1000000
 const MAX_DEPTH = 128
 
-export function table(value: LuaValue | undefined, name = 'value'): LuaTable {
+export function luaTable(value: LuaValue | undefined, name = 'value'): LuaTable {
   if (!(value instanceof Map)) throw new Error(`${name} must be a Lua table`)
   return value
 }
 
-export function optionalTable(value: LuaValue | undefined): LuaTable {
-  return value === undefined ? new Map() : table(value)
+export function luaOptionalTable(value: LuaValue | undefined): LuaTable {
+  return value === undefined ? new Map() : luaTable(value)
 }
 
 export function luaString(value: string): string {
-  return byteString(new TextEncoder().encode(value))
+  return luaByteString(new TextEncoder().encode(value))
 }
 
-export function text(value: LuaValue | undefined, fallback = ''): string {
+export function luaText(value: LuaValue | undefined, fallback = ''): string {
   if (value === undefined) return fallback
   if (typeof value !== 'string') throw new Error('Expected a Lua string')
   return new TextDecoder('utf-8', { fatal: true }).decode(bytesOf(value))
 }
 
-export function number(value: LuaValue | undefined, fallback = 0): number {
+export function luaNumber(value: LuaValue | undefined, fallback = 0): number {
   if (value === undefined) return fallback
   if (typeof value !== 'number' || !Number.isFinite(value)) throw new Error('Expected a number')
   return value
 }
 
-export function integer(value: LuaValue | undefined, max: number, fallback = 0): number {
-  const n = number(value, fallback)
-  if (!Number.isInteger(n) || n < 0 || n > max) throw new Error(`Number outside 0..${max}`)
-  return n
+export function luaInteger(value: LuaValue | undefined, max: number, fallback = 0): number {
+  const numericValue = luaNumber(value, fallback)
+  if (!Number.isInteger(numericValue) || numericValue < 0 || numericValue > max)
+    throw new Error(`Number outside 0..${max}`)
+  return numericValue
 }
 
-export function byteString(bytes: Uint8Array): string {
+export function luaByteString(bytes: Uint8Array): string {
   const chunks: string[] = []
   for (let i = 0; i < bytes.length; i += 8192) {
     chunks.push(String.fromCharCode(...bytes.subarray(i, i + 8192)))
@@ -50,9 +51,9 @@ function bytesOf(s: string): Uint8Array<ArrayBuffer> {
   return Uint8Array.from(s, (c) => c.charCodeAt(0))
 }
 
-export function parseLua(bytes: Uint8Array): LuaTable {
+export function parseLuaSave(bytes: Uint8Array): LuaTable {
   if (bytes.length > MAX_BYTES) throw new Error('Lua save exceeds 32 MiB')
-  const src = byteString(bytes)
+  const src = luaByteString(bytes)
   let pos = 0
   let nodes = 0
   const fail = (why: string): never => {
@@ -151,13 +152,13 @@ export function parseLua(bytes: Uint8Array): LuaTable {
   }
   skip()
   if (ident() !== 'return') fail('expected return')
-  const result = table(value(0), 'save')
+  const result = luaTable(value(0), 'save')
   skip()
   if (pos !== src.length) fail('trailing content')
   return result
 }
 
-export function encodeLua(root: LuaTable): Uint8Array<ArrayBuffer> {
+export function encodeLuaSave(root: LuaTable): Uint8Array<ArrayBuffer> {
   let nodes = 0
   function encode(v: LuaValue, depth: number): string {
     if (++nodes > MAX_NODES || depth > MAX_DEPTH) throw new Error('Lua save exceeds limits')
@@ -201,8 +202,8 @@ export function encodeLua(root: LuaTable): Uint8Array<ArrayBuffer> {
   return bytesOf(output)
 }
 
-export function numericEntries(t: LuaTable, max: number): [number, LuaValue][] {
-  return [...t]
+export function luaNumericEntries(luaTableValue: LuaTable, max: number): [number, LuaValue][] {
+  return [...luaTableValue]
     .map(([k, v]): [number, LuaValue] => {
       if (typeof k !== 'number' || !Number.isInteger(k) || k < 1 || k > max) {
         throw new Error(`Invalid slot index ${String(k)}`)

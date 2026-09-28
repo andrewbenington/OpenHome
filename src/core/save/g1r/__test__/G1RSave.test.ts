@@ -8,7 +8,7 @@ import { G1SAV } from '../../G1SAV'
 import { buildUnknownSaveFile } from '../../util/load'
 import { Gen3G1RSave, Gen1G1RSave, Gen2G1RSave } from '../G1RSave'
 import { gen3FromLua } from '../pokemon'
-import { encodeLua, luaArray, LuaTable, LuaValue, parseLua, table } from '../serializer'
+import { encodeLuaSave, luaArray, LuaTable, LuaValue, parseLuaSave, luaTable } from '../serializer'
 
 function object(values: Record<string, LuaValue>): LuaTable {
   return new Map(Object.entries(values))
@@ -136,7 +136,7 @@ for (const version of [
     const gen3 = ['firered', 'leafgreen'].includes(version)
     const root = gen2 ? gen2Fixture(version) : fixture(gen3 ? 'firered' : 'red')
     root.set('version', version)
-    const bytes = encodeLua(root)
+    const bytes = encodeLuaSave(root)
     const Save = gen2 ? Gen2G1RSave : gen3 ? Gen3G1RSave : Gen1G1RSave
     const loaded = R.assert(
       buildUnknownSaveFile(emptyPathData, bytes, [Gen1G1RSave, Gen2G1RSave, Gen3G1RSave])
@@ -148,13 +148,13 @@ for (const version of [
     const box = gen2 || gen3 ? 13 : 0,
       slot = gen3 ? 29 : 0
     loaded.setMonAt(box, slot, undefined)
-    expect(parseLua(loaded.prepareWriter().bytes).get('version')).toBe(version)
+    expect(parseLuaSave(loaded.prepareWriter().bytes).get('version')).toBe(version)
   })
 }
 
 test('Gen 2 preserves names, caught data, items, Pokerus, stats and unknown fields', () => {
   const root = gen2Fixture()
-  const bytes = encodeLua(root)
+  const bytes = encodeLuaSave(root)
   const save = new Gen2G1RSave(emptyPathData, bytes)
   expect(save.prepareWriter().bytes).toEqual(bytes)
   expect(save.money).toBe(789)
@@ -174,16 +174,16 @@ test('Gen 2 preserves names, caught data, items, Pokerus, stats and unknown fiel
   converted.nickname = 'EDITED'
   save.setMonAt(13, 0, undefined)
   save.setMonAt(0, 0, converted)
-  const after = parseLua(save.prepareWriter().bytes)
+  const after = parseLuaSave(save.prepareWriter().bytes)
   expect(after.get('party')).toEqual(root.get('party'))
   expect(after.get('modData')).toEqual(root.get('modData'))
   expect(after.get('boxNames')).toEqual(root.get('boxNames'))
-  const record = table(table(table(after.get('boxes')).get(1)).get(1))
+  const record = luaTable(luaTable(luaTable(after.get('boxes')).get(1)).get(1))
   expect(record.get('customMonData')).toEqual(redMon().get('customMonData'))
   expect(record.get('item')).toBe('LEFTOVERS')
   expect(record.get('caughtByGender')).toBe('girl')
   expect(record.get('experience')).toBe(1250000)
-  expect(table(table(after.get('pokedex')).get('caught')).get('TYRANITAR')).toBe(true)
+  expect(luaTable(luaTable(after.get('pokedex')).get('caught')).get('TYRANITAR')).toBe(true)
   const reopened = new Gen2G1RSave(emptyPathData, save.bytes)
   expect(reopened.getMonAt(0, 0)?.nickname).toBe('EDITED')
   expect(reopened.getMonAt(0, 0)?.dvs).toEqual(mon.dvs)
@@ -191,11 +191,11 @@ test('Gen 2 preserves names, caught data, items, Pokerus, stats and unknown fiel
 
 test('Gen 2 eggs retain hatch cycles through OpenHome and do not become caught Pokémon', () => {
   const root = gen2Fixture('gold')
-  const record = table(table(table(root.get('boxes')).get(14)).get(1))
+  const record = luaTable(luaTable(luaTable(root.get('boxes')).get(14)).get(1))
   record.set('isEgg', true)
   record.set('eggSteps', 23)
   record.set('happiness', 120)
-  const save = new Gen2G1RSave(emptyPathData, encodeLua(root))
+  const save = new Gen2G1RSave(emptyPathData, encodeLuaSave(root))
   const egg = save.getMonAt(13, 0)
   if (!egg) throw new Error('missing egg')
   expect(egg.isEgg).toBe(true)
@@ -206,13 +206,13 @@ test('Gen 2 eggs retain hatch cycles through OpenHome and do not become caught P
   converted.nickname = 'EGG'
   save.setMonAt(13, 0, undefined)
   save.setMonAt(0, 0, converted)
-  const after = parseLua(save.prepareWriter().bytes)
-  const output = table(table(table(after.get('boxes')).get(1)).get(1))
+  const after = parseLuaSave(save.prepareWriter().bytes)
+  const output = luaTable(luaTable(luaTable(after.get('boxes')).get(1)).get(1))
   expect(output.get('isEgg')).toBe(true)
   expect(output.get('eggSteps')).toBe(23)
   expect(output.get('happiness')).toBe(120)
   expect(after.has('pokedex')).toBe(false)
-  const red = new Gen1G1RSave(emptyPathData, encodeLua(fixture('red')))
+  const red = new Gen1G1RSave(emptyPathData, encodeLuaSave(fixture('red')))
   expect(R.isErr(red.convertOhpkm(oh, ConvertStrategies.getDefault()))).toBe(true)
 })
 
@@ -221,7 +221,7 @@ for (const [kind, Save, count] of [
   ['firered', Gen3G1RSave, 1],
 ] as const) {
   test(`${kind} schema detection, no-op identity and storage dimensions`, () => {
-    const bytes = encodeLua(fixture(kind))
+    const bytes = encodeLuaSave(fixture(kind))
     expect(Save.fileIsSave(bytes)).toBe(true)
     const save = R.assert(buildUnknownSaveFile(emptyPathData, bytes, [Gen1G1RSave, Gen3G1RSave]))
     expect(save.getAllMons()).toHaveLength(count)
@@ -232,7 +232,7 @@ for (const [kind, Save, count] of [
 
   test(`${kind} remove and reinsert preserves unrelated data and repeated saves`, () => {
     const root = fixture(kind)
-    const bytes = encodeLua(root)
+    const bytes = encodeLuaSave(root)
     const save = new Save(emptyPathData, bytes)
     const b = kind === 'red' ? 0 : 13,
       s = kind === 'red' ? 0 : 29
@@ -240,7 +240,7 @@ for (const [kind, Save, count] of [
     expect(mon).toBeDefined()
     save.setMonAt(b, s, undefined)
     const output = save.prepareWriter().bytes
-    const after = parseLua(output)
+    const after = parseLuaSave(output)
     for (const key of ['party', 'modData', 'story', 'meta'])
       expect(after.get(key)).toEqual(root.get(key))
     expect(new Save(emptyPathData, output).getAllMons()).toHaveLength(count - 1)
@@ -258,23 +258,23 @@ for (const [kind, Save, count] of [
       kind === 'red' ? 'meta' : 'schemaVersion',
       kind === 'red' ? object({ format: 999 }) : 999
     )
-    expect(Save.fileIsSave(encodeLua(root))).toBe(false)
-    expect(() => new Save(emptyPathData, encodeLua(root))).toThrow()
+    expect(Save.fileIsSave(encodeLuaSave(root))).toBe(false)
+    expect(() => new Save(emptyPathData, encodeLuaSave(root))).toThrow()
     const good = fixture(kind)
-    const storage = kind === 'red' ? good : table(good.get('storage'))
-    table(storage.get('boxes')).set(99, new Map())
-    expect(() => new Save(emptyPathData, encodeLua(good))).toThrow(/slot/)
+    const storage = kind === 'red' ? good : luaTable(good.get('storage'))
+    luaTable(storage.get('boxes')).set(99, new Map())
+    expect(() => new Save(emptyPathData, encodeLuaSave(good))).toThrow(/slot/)
   })
 }
 
 test('Red HP 255 survives native G1R loading', () => {
-  const save = new Gen1G1RSave(emptyPathData, encodeLua(fixture('red')))
+  const save = new Gen1G1RSave(emptyPathData, encodeLuaSave(fixture('red')))
   expect(save.getMonAt(0, 0)?.currentHP).toBe(255)
   expect(save.getMonAt(0, 0)?.nationalDex).toBe(24)
 })
 
 test('G1R schema takes precedence when text happens to have cartridge save length', () => {
-  const source = encodeLua(fixture('red'))
+  const source = encodeLuaSave(fixture('red'))
   const bytes = new Uint8Array(32768).fill(32)
   bytes.set(source)
   expect(G1SAV.fileIsSave(bytes)).toBe(true)
@@ -284,7 +284,7 @@ test('G1R schema takes precedence when text happens to have cartridge save lengt
 
 test('FireRed sparse box creation, Pokémon conversion, metadata and dex updates', () => {
   const root = fixture('firered')
-  const save = new Gen3G1RSave(emptyPathData, encodeLua(root))
+  const save = new Gen3G1RSave(emptyPathData, encodeLuaSave(root))
   const source = save.getMonAt(13, 29)
   if (!source) throw new Error('fixture missing')
   const oh = OHPKM.fromMonInSave(source, save)
@@ -292,15 +292,15 @@ test('FireRed sparse box creation, Pokémon conversion, metadata and dex updates
   mon.nickname = 'NEW NAME'
   save.setMonAt(13, 29, undefined)
   save.setMonAt(0, 4, mon)
-  const result = parseLua(save.prepareWriter().bytes)
-  const storage = table(result.get('storage'))
-  expect(storage.get('items')).toEqual(table(root.get('storage')).get('items'))
+  const result = parseLuaSave(save.prepareWriter().bytes)
+  const storage = luaTable(result.get('storage'))
+  expect(storage.get('items')).toEqual(luaTable(root.get('storage')).get('items'))
   expect(storage.get('currentBox')).toBe(14)
-  const record = table(table(table(table(storage.get('boxes')).get(1)).get('mons')).get(5))
+  const record = luaTable(luaTable(luaTable(luaTable(storage.get('boxes')).get(1)).get('mons')).get(5))
   expect(record.get('customMonData')).toEqual(fireMon().get('customMonData'))
-  expect(table(record.get('cartExtra')).get('custom')).toBe('nested extra')
+  expect(luaTable(record.get('cartExtra')).get('custom')).toBe('nested extra')
   expect(record.get('cartImport')).toBe(true)
-  expect(table(table(result.get('dex')).get('caught')).get(1)).toBe(true)
+  expect(luaTable(luaTable(result.get('dex')).get('caught')).get(1)).toBe(true)
   const reopened = new Gen3G1RSave(emptyPathData, save.bytes)
   expect(reopened.getMonAt(0, 4)?.nickname).toBe('NEW NAME')
   expect(reopened.getMonAt(0, 4)?.ivs).toEqual(source.ivs)
@@ -317,9 +317,9 @@ test('FireRed national numbering and eggs preserve personality and do not mark d
   const mon = gen3FromLua(m, { tid: 123, sid: 456, name: 'TEST' })
   expect(mon.nationalDex).toBe(252)
   expect(mon.isEgg).toBe(true)
-  const save = new Gen3G1RSave(emptyPathData, encodeLua(root))
+  const save = new Gen3G1RSave(emptyPathData, encodeLuaSave(root))
   save.setMonAt(0, 0, mon)
-  const after = parseLua(save.prepareWriter().bytes)
+  const after = parseLuaSave(save.prepareWriter().bytes)
   expect(after.has('dex')).toBe(false)
   const reopened = new Gen3G1RSave(emptyPathData, save.bytes)
   expect(reopened.getMonAt(0, 0)?.isEgg).toBe(true)
@@ -327,8 +327,8 @@ test('FireRed national numbering and eggs preserve personality and do not mark d
 })
 
 test('cross-generation transfer converts through OpenHome and writes native G1R', () => {
-  const red = new Gen1G1RSave(emptyPathData, encodeLua(fixture('red')))
-  const fire = new Gen3G1RSave(emptyPathData, encodeLua(fixture('firered')))
+  const red = new Gen1G1RSave(emptyPathData, encodeLuaSave(fixture('red')))
+  const fire = new Gen3G1RSave(emptyPathData, encodeLuaSave(fixture('firered')))
   const redMon = red.getMonAt(0, 0),
     fireMon = fire.getMonAt(13, 29)
   if (!redMon || !fireMon) throw new Error('fixture missing')
