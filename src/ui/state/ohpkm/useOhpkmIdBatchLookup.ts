@@ -23,7 +23,6 @@ export default function useOhpkmIdBatchLookup(
     // if this effect is cleaned up before the results return, the ignore flag tells the callback that it is outdated and should set the results
     let ignore = false
     setLoading(true)
-    setBatchResults(undefined)
 
     const batchResult = loadBatch()
     if (isThenable(batchResult)) {

@@ -58,7 +58,7 @@ pub const DATA_DIR: DataDir = DataDir::Storage;
 pub const JSON_FILENAME: &str = "convert_strategies.json";
 
 impl ConvertStrategies {
-    pub fn load_from_storage(data_controller: &impl DataController) -> Result<Self> {
+    pub fn load(data_controller: &impl DataController) -> Result<Self> {
         data_controller.read_or_create_default_json_file(DATA_DIR, JSON_FILENAME)
     }
 

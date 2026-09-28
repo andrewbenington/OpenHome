@@ -1,11 +1,16 @@
 use std::process::Command;
 
-use tauri::{App, AppHandle, Emitter, Wry, image::Image, include_image, menu::*};
+use tauri::{App, AppHandle, Emitter, Manager, Wry, image::Image, include_image, menu::*};
 use tracing::{error, info};
 
-use openhome_core::data_controller::DataController;
+use openhome_core::{
+    convert_strategies::ConvertStrategies, data_controller::DataController, lookup::LookupState,
+    ohpkm_store::OhpkmBytesStore,
+};
 
 use crate::data_controller::ToDataController;
+use crate::synced_state;
+
 const APP_ICON: Image<'_> = include_image!("icons/128x128.png");
 
 const OPEN_CMD: &str = cfg_select! {
@@ -15,7 +20,9 @@ const OPEN_CMD: &str = cfg_select! {
     _ => panic!("unsupported target"),
 };
 
-pub fn create_menu(app: &App) -> core::result::Result<Menu<Wry>, Box<dyn std::error::Error>> {
+type BoxedError = Box<dyn std::error::Error>;
+
+pub fn create_menu(app: &App) -> Result<Menu<Wry>, BoxedError> {
     let handle = app.handle();
     let menu = Menu::new(handle)?;
 
@@ -159,7 +166,9 @@ pub fn handle_menu_event_id(app_handle: &AppHandle, event_id: &str) {
             Err(error) => error!("Error saving: {error}"),
         },
         "reset" => {
-            let _ = app_handle.emit("reset", ());
+            if let Err(err) = handle_reset(app_handle) {
+                error!("Error resetting: {err}");
+            }
         }
         "open-appdata" => match app_handle.controller().get_data_folder() {
             Err(err) => {
@@ -192,4 +201,22 @@ pub fn handle_menu_event_id(app_handle: &AppHandle, event_id: &str) {
 
         _ => (),
     }
+}
+
+fn handle_reset(app_handle: &AppHandle) -> Result<(), BoxedError> {
+    app_handle.emit("reset", ())?;
+
+    let state = app_handle.state::<synced_state::AllSyncedState>();
+    let mut synced_state = state
+        .lock()
+        .map_err(|e| format!("failed to lock synced_state: {e}"))?;
+
+    let lookups = LookupState::load(&app_handle.controller())?;
+    let ohpkm_store = OhpkmBytesStore::load(&app_handle.controller())?;
+    let convert_strategies = ConvertStrategies::load(&app_handle.controller())?;
+
+    *synced_state =
+        synced_state::AllSyncedStateInner::from_states(lookups, ohpkm_store, convert_strategies);
+
+    Ok(())
 }
