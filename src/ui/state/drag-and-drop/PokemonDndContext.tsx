@@ -15,42 +15,16 @@ import { DragMonState, DragPayload, locationKey } from '.'
 import { OPENHOME_BOX_SLOTS, useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import useDragAndDrop from './useDragAndDrop'
 
-function isDragPayload(value: unknown): value is DragPayload {
-  if (!value || typeof value !== 'object') return false
-
-  if (!('kind' in value)) return false
-
-  if (value.kind === 'item') {
-    return 'item' in value
-  }
-
-  if (value.kind === 'mon') {
-    return 'monData' in value
-  }
-
-  return false
-}
-
 export default function PokemonDndContext(props: { children?: ReactNode }) {
   const { children } = props
   const savesAndBanks = useSaves()
   const { homeLocationIsEmpty, getCurrentBank } = useBanksAndBoxes()
-  const { dragState, startDragging, endDragging, clearSelections } = useDragAndDrop()
+  const { dragState, clearSelections } = useDragAndDrop()
   const displayError = useDisplayError()
-
-  // const sensors = useSensors(
-  //   useSensor(PointerSensor, {
-  //     activationConstraint: dragState.multiSelectEnabled
-  //       ? { delay: 100, tolerance: 8 }
-  //       : { distance: 10 },
-  //   })
-  // )
 
   return (
     <DragDropProvider<DragPayload>
       onDragEnd={async (e) => {
-        console.log(e.operation.source?.data, e.operation.target?.id, e.operation.target?.data)
-
         const dest = e.operation.target?.data
         let payload: Option<DragPayload> = e.operation.source?.data
 
@@ -62,7 +36,6 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
           if (isMonLocation(dest)) {
             savesAndBanks.giveItemToMon(dest, payload.item)
           }
-          endDragging()
           return
         }
 
@@ -209,16 +182,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
               .then(R.mapErr((error) => displayError('Could not move Pokémon', error)))
           }
         }
-
-        endDragging()
       }}
-      onDragStart={(e) => {
-        const payload = e.operation.source?.data
-        if (!isDragPayload(payload)) return
-        startDragging(payload)
-      }}
-
-      // onDragCancel={endDragging}
       sensors={(defaults) => [
         ...defaults.filter((sensor) => sensor !== PointerSensor),
         PointerSensor.configure({

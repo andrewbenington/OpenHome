@@ -1,54 +1,13 @@
-import { useDragOperation } from '@dnd-kit/react'
-import { Option } from '@openhome-core/util/functional'
-import { filterUndefined } from '@openhome-core/util/sort'
 import { useCallback, useContext, useMemo } from 'react'
-import { DragMode, DragMonContext, DragPayload, locationKey } from '.'
-import { MonLocation, MonWithLocation, useSaves } from '../saves'
+import { DragMode, DragMonContext, locationKey } from '.'
+import { MonLocation } from '../saves'
 
 export default function useDragAndDrop() {
-  const savesAndBanks = useSaves()
   const [dragState, setDragState] = useContext(DragMonContext)
   const selectedLocationKeys = useMemo(
     () => new Set(dragState.selectedLocations.map(locationKey)),
     [dragState.selectedLocations]
   )
-  const { source } = useDragOperation<DragPayload>()
-
-  const startDragging = async (payload: DragPayload) => {
-    if (
-      source?.data.kind === 'mon' &&
-      dragState.multiSelectEnabled &&
-      dragState.selectedLocations.length > 0
-    ) {
-      // If we start dragging a mon and multi-select is enabled, we want to switch to dragging multiple mons
-      const monsWithLocation: MonWithLocation[] = (
-        await Promise.all(
-          dragState.selectedLocations.map(async (location) => {
-            const mon = await savesAndBanks.getMonAtLocation(location)
-            const monWithLocation: Option<MonWithLocation> = mon ? { ...location, mon } : undefined
-            return monWithLocation
-          })
-        )
-      ).filter(filterUndefined)
-
-      setDragState((prev) => {
-        return {
-          ...prev,
-          payload: { kind: 'multi-mon', monData: monsWithLocation },
-        }
-      })
-    } else {
-      setDragState((prev) => {
-        return { ...prev, payload }
-      })
-    }
-  }
-
-  const endDragging = useCallback(() => {
-    setDragState((prev) => {
-      return { ...prev, payload: undefined }
-    })
-  }, [setDragState])
 
   const setMode = useCallback(
     (mode: DragMode) => {
@@ -142,8 +101,6 @@ export default function useDragAndDrop() {
 
   return {
     dragState,
-    startDragging,
-    endDragging,
     setMode,
     // Multi-select functions
     toggleMultiSelect,
