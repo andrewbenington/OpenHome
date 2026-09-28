@@ -1,6 +1,6 @@
 import { SWEETS } from '@openhome-core/resources/consts/Forms'
 import { $R } from '@openhome-core/util/functional'
-import { boxIconImagePath } from '@openhome-ui/pokemon-details/useBoxIconImage'
+import { boxIconImagePath } from '@openhome-ui/pokemon/useBoxIconImage'
 import { MonSpriteData } from '@openhome-ui/state/plugin/reducer'
 import { all_species_data, NationalDex, SpeciesLookup } from '@pkm-rs/pkg/pkm_rs'
 import { existsSync } from 'fs'

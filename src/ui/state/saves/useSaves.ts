@@ -7,7 +7,7 @@ import { getSaveRef, SAV, SaveIdentifier } from '@openhome-core/save/interfaces'
 import { SAVClass } from '@openhome-core/save/util'
 import { buildSaveFile, getPossibleSaveTypes } from '@openhome-core/save/util/load'
 import { PathData } from '@openhome-core/save/util/path'
-import { Errorable, Option, R, Result } from '@openhome-core/util/functional'
+import { $R, Errorable, Option, R, Result } from '@openhome-core/util/functional'
 import {
   OPENHOME_BOX_SLOTS,
   useBanksAndBoxes,
@@ -395,7 +395,14 @@ export function useSaves(): SavesAndBanksManager {
       })
     } else {
       const releasedMon = clearMonAtSaveLocation(location)
-      if (!releasedMon) return
+      $R(releasedMon).do((mon) => {
+        if (mon) {
+          openSavesDispatch({
+            type: 'release_mon_by_id',
+            payload: mon,
+          })
+        }
+      })
     }
   }
 

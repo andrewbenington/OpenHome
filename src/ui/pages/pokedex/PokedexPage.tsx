@@ -1,7 +1,7 @@
 import { hasGenderDifference } from '@openhome-core/pkm/util/index'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { getPublicImageURL } from '@openhome-ui/images/images'
-import useMonSprite from '@openhome-ui/pokemon-details/useMonSprite'
+import useMonSprite from '@openhome-ui/pokemon/useMonSprite'
 import { usePokedex } from '@openhome-ui/state/pokedex'
 import { Pokedex } from '@openhome-ui/util/pokedex'
 import { cssClass } from '@openhome-ui/util/style'

@@ -1,10 +1,9 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SortTypes } from '@openhome-core/pkm/sort'
 import { monSupportedBySave } from '@openhome-core/save/util'
 import { mapToObject } from '@openhome-core/util'
-import { $R, Option, R, range } from '@openhome-core/util/functional'
+import { $R, isResult, Option, R, range } from '@openhome-core/util/functional'
 import { isThenable, NowOrLater } from '@openhome-core/util/promise'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import { Item, Separator, Submenu } from '@openhome-ui/components/context-menu/types'
@@ -24,19 +23,18 @@ import SearchFields from '@openhome-ui/components/search/SearchFields'
 import PokemonSearchModal from '@openhome-ui/components/search/SearchModal'
 import ToggleButton from '@openhome-ui/components/ToggleButton'
 import useDisplayError from '@openhome-ui/hooks/displayError'
-import PokemonDetailsModal from '@openhome-ui/pokemon-details/PokemonDetailsModal'
+import MissingOhpkmIdPrompt from '@openhome-ui/pokemon/MissingOhpkmId'
+import PokemonDetailsModal from '@openhome-ui/pokemon/PokemonDetailsModal'
 import { OhpkmLookupResult, useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import useTrackedDataRecovery from '@openhome-ui/state/ohpkm/useTrackedDataRecovery'
 import { EMPTY_SLOT, HomeMonLocation, MonWithLocation, useSaves } from '@openhome-ui/state/saves'
 import { cssClass } from '@openhome-ui/util/style'
-import { Language, Lookup } from '@pkm-rs/pkg'
 import { Button, Card, DropdownMenu, Flex, Heading, TextField, Tooltip } from '@radix-ui/themes'
 import { ToggleGroup } from 'radix-ui'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { BsFillGrid3X3GapFill } from 'react-icons/bs'
 import { FaSquare } from 'react-icons/fa'
 import {
-  BankBoxCoordinates,
   OPENHOME_BOX_COLUMNS,
   OPENHOME_BOX_ROWS,
   OPENHOME_BOX_SLOTS,
@@ -247,14 +245,8 @@ export default function HomeBoxDisplay() {
   )
 }
 
-type MissingIdData = {
-  id: OhpkmIdentifier
-  location: BankBoxCoordinates
-}
-
 type SlotData = {
-  monResult?: OhpkmLookupResult
-  monPromise: NowOrLater<Option<OHPKM>> | PKMInterface
+  monPromise: NowOrLater<OhpkmLookupResult> | PKMInterface | undefined
   location: HomeMonLocation
   identifier: Option<OhpkmIdentifier>
 }
@@ -263,9 +255,7 @@ function SingleBoxMonDisplay() {
   const ohpkmStore = useOhpkmStore()
   const displayError = useDisplayError()
   const { importMonsToLocation, saveFromIdentifier, getPendingMon } = useSaves()
-  const { getCurrentBox, getCurrentBank, clearAtHomeLocation, removeAllHomeDupes } =
-    useBanksAndBoxes()
-  const [missingIdData, setMissingIdData] = useState<MissingIdData>()
+  const { getCurrentBox, getCurrentBank, removeAllHomeDupes } = useBanksAndBoxes()
   const { dragState, isSelected, toggleSelection } = useDragAndDrop()
   const { sortHomeBox, sortAllHomeBoxes } = useBanksAndBoxes()
   const {
@@ -277,7 +267,7 @@ function SingleBoxMonDisplay() {
   } = useOpenHomeBoxNavigator()
 
   const currentBox = getCurrentBox()
-  const getById = ohpkmStore.getById
+  const getById = ohpkmStore.tryLoadFromId
   const lookupOhpkmById = useCallback(
     (identifier: OhpkmIdentifier) => getById(identifier),
     [getById]
@@ -328,19 +318,6 @@ function SingleBoxMonDisplay() {
 
   const removeDupesItem = Item.label('Remove duplicates from this box').action(removeAllHomeDupes)
 
-  function dismissMissingIdDialog() {
-    setMissingIdData(undefined)
-  }
-
-  const missingIdEvoFamily = missingIdData
-    ? Lookup.speciesName(parseInt(missingIdData.id.split('-')[0]), Language.English)
-    : undefined
-
-  function clearMissingIdSlot() {
-    if (missingIdData) clearAtHomeLocation(missingIdData.location)
-    dismissMissingIdDialog()
-  }
-
   const currentBankIndex = getCurrentBank().index
   const currentBoxIndex = getCurrentBox().index
 
@@ -357,7 +334,7 @@ function SingleBoxMonDisplay() {
           }
 
           let identifier = storedId
-          let monPromise: NowOrLater<Option<OHPKM>> | PKMInterface = undefined
+          let monPromise: NowOrLater<OhpkmLookupResult> | PKMInterface | undefined = undefined
 
           // pendingMon means this slot is in the process of being updated, but needs to wait
           // for the OHPKM data to be registered. In the meantime the pendingMon should be displayed
@@ -375,6 +352,10 @@ function SingleBoxMonDisplay() {
           }
 
           if (identifier) {
+            // const lookupResult = lookupOhpkmById(identifier)
+            // if (isThenable(lookupResult)) {
+            //   monPromise = lookupResult
+            // }
             monPromise ??= lookupOhpkmById(identifier)
           }
 
@@ -387,29 +368,32 @@ function SingleBoxMonDisplay() {
     <>
       <OpenHomeCtxMenu sections={[contextElements, [removeDupesItem]]}>
         <div className="home-box-grid">
-          {slots.map(({ monResult, monPromise, location, identifier }, index) => {
+          {slots.map(({ monPromise, location, identifier }, index) => {
             // if underlying data changes but this key doesn't, the box cell will be stale and may not display the correct species
             let uniqueKey = identifier ?? `${currentBoxIndex}-${index}`
 
-            if (monResult && R.isErr(monResult)) {
-              return (
-                <Tooltip key={uniqueKey} content={identifier}>
-                  <Button
-                    className="box-slot-missing-id"
-                    radius="full"
-                    size="1"
-                    onClick={() => identifier && setMissingIdData({ id: identifier, location })}
-                  >
-                    !
-                  </Button>
-                </Tooltip>
-              )
+            let monNowOrLater: Option<PKMInterface> = undefined
+
+            if (monPromise && !isThenable(monPromise) && isResult(monPromise)) {
+              if (R.isOk(monPromise)) {
+                monNowOrLater = monPromise.data
+              } else {
+                const { identifier } = monPromise.error
+                console.error(identifier)
+                return (
+                  <MissingOhpkmIdPrompt
+                    key={uniqueKey}
+                    openhomeId={identifier}
+                    location={location}
+                  />
+                )
+              }
             }
 
             return (
               <BoxCellAsync
                 key={uniqueKey}
-                monPlaceholder={!isThenable(monPromise) ? monPromise : undefined}
+                monPlaceholder={!isThenable(monNowOrLater) ? monNowOrLater : undefined}
                 monPromise={monPromise}
                 onClick={() => setSelectedIndex(index)}
                 dragID={`home_${currentBoxIndex}_${index}`}
@@ -462,16 +446,6 @@ function SingleBoxMonDisplay() {
               }
             : undefined
         }
-      />
-      <PromptDialog
-        title="Tracking Data Missing"
-        open={missingIdData !== undefined}
-        onClose={dismissMissingIdDialog}
-        description={`There is a Pokémon in this box slot, but its tracking data cannot be found. This Pokémon's OpenHome ID was ${missingIdData?.id}, and is was from the ${missingIdEvoFamily} evolution family.`}
-        actions={[
-          { uniqueLabel: 'Cancel', action: dismissMissingIdDialog, type: 'cancel' },
-          { uniqueLabel: 'Clear this slot', action: clearMissingIdSlot, type: 'destructive' },
-        ]}
       />
       <PokemonSearchModal
         typeName="Pokémon"
