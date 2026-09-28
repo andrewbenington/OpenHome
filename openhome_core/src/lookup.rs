@@ -20,7 +20,7 @@ pub struct LookupState {
 }
 
 impl LookupState {
-    pub fn load_from_storage(data_controller: &impl DataController) -> Result<Self> {
+    pub fn load(data_controller: &impl DataController) -> Result<Self> {
         Ok(Self {
             gen_12: data_controller
                 .read_or_create_default_json_file(DataDir::Storage, GEN12_FILENAME)?,

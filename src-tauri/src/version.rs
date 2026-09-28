@@ -222,7 +222,7 @@ impl SignificantUpdate {
             Self::V1_16_0 => Version::parse("1.16.0"),
             Self::V1_17_0 => Version::parse("1.17.0"),
             Self::V1_17_1 => Version::parse("1.17.1"),
-            Self::V1_18_0 => Version::parse("1.18.0-rc.2"),
+            Self::V1_18_0 => Version::parse("1.18.0-rc.async-ohpkm-store"),
         }
         .expect("all versions are valid semver")
     }
@@ -390,13 +390,14 @@ impl SignificantUpdate {
                 "A affecting Dark- and Steel- type Pokémon in the Gen 2 format has bene fixed.",
             ]),
             Self::V1_18_0 => Some(vec![
+                "OHPKM storage has been made asynchronous and dynamically loaded. This should make the app perform better for users with thousands of tracked mons.",
                 "Shiny box icons have been added for the newest additions to Pokémon Champions.",
                 "Gender differences are now shown in the box icons (when gendered icons exist).",
                 "Gender differences can be viewed in the Pokédex via a new toggle.",
                 "Box icons can now show Home sprites instead of Home box icons via Settings > General.",
                 "Various missing box icons and Home sprites have been fixed.",
+                "A bug with gen 4 met levels has been fixed.",
                 "Bugs with Gen 1/2 stat and level calculation have been fixed.",
-                "OHPKM storage has been made asynchronous and dynamically loaded. This should make the app perform better on less powerful hardware, or for users with thousands of tracked mons.",
             ]),
             _ => None,
         }
@@ -660,7 +661,7 @@ mod tests {
         // ensure a default file is created and loaded successfully
         let without_file = TestDataController::default();
         super::update_convert_strat_json_dot_keys(&without_file)?;
-        ConvertStrategies::load_from_storage(&without_file)?;
+        ConvertStrategies::load(&without_file)?;
 
         // a file from an older version of OpenHome with dots in the
         // keys should be fixed and loaded successfully
@@ -672,7 +673,7 @@ mod tests {
             WITH_DOTS,
         )?;
         super::update_convert_strat_json_dot_keys(&with_dot_format_file)?;
-        let strategies = ConvertStrategies::load_from_storage(&with_dot_format_file)?;
+        let strategies = ConvertStrategies::load(&with_dot_format_file)?;
         let default = strategies
             .get(&Uuid::nil())
             .expect("Default strategy is missing after converting old conv. strategy format");

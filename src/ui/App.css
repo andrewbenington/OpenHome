@@ -141,6 +141,8 @@
     var(--primitive-teal-400) 85%
   );
 
+  --ohpkm-cell-border-color: var(--primitive-teal-450);
+
   .radix-themes {
     --color-panel: var(--primitive-teal-100);
     --color-bar: var(--color-panel);
@@ -179,6 +181,8 @@
       var(--primitive-navy-800) 0%,
       var(--primitive-teal-800) 85%
     );
+
+    --ohpkm-cell-border-color: var(--primitive-teal-700);
 
     --hyper-train-color: #fccb59;
 
