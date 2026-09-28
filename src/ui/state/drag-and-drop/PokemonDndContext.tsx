@@ -13,13 +13,13 @@ import { Badge } from '@radix-ui/themes'
 import { ReactNode } from 'react'
 import { DragPayload, locationKey } from '.'
 import { OPENHOME_BOX_SLOTS, useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
-import useMultiSelect, { DragMonState } from './useMultiSelect'
+import useMultiSelect, { MultiSelectState } from './useMultiSelect'
 
 export default function PokemonDndContext(props: { children?: ReactNode }) {
   const { children } = props
   const savesAndBanks = useSaves()
   const { homeLocationIsEmpty, getCurrentBank } = useBanksAndBoxes()
-  const { dragState, clearSelections } = useMultiSelect()
+  const { multiSelectState, clearSelections } = useMultiSelect()
   const displayError = useDisplayError()
 
   return (
@@ -43,20 +43,22 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
         if (allMonsWithLocations.length === 0) return
         const firstMonWithLocation = allMonsWithLocations[0]
 
-        const selectedLocationKeys = new Set(dragState.selectedLocations.map(locationKey))
+        const selectedLocationKeys = new Set(multiSelectState.selectedLocations.map(locationKey))
         const sourceLocationKey = locationKey(firstMonWithLocation)
         const isSourceSelected = selectedLocationKeys.has(sourceLocationKey)
         const selectedLocations = isSourceSelected
           ? [
               firstMonWithLocation,
-              ...dragState.selectedLocations.filter((l) => locationKey(l) !== sourceLocationKey),
+              ...multiSelectState.selectedLocations.filter(
+                (l) => locationKey(l) !== sourceLocationKey
+              ),
             ]
           : [firstMonWithLocation]
 
         const { mon } = firstMonWithLocation
 
         if (dropElementId === 'to_release') {
-          if (dragState.multiSelectEnabled && isSourceSelected) {
+          if (multiSelectState.multiSelectEnabled && isSourceSelected) {
             for (const location of selectedLocations) {
               const mon = await savesAndBanks.getMonAtLocation(location)
               if (mon) savesAndBanks.releaseMonAtLocation(location)
@@ -66,7 +68,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
             savesAndBanks.releaseMonAtLocation(firstMonWithLocation)
           }
         } else if (dropElementId === 'item-bag') {
-          if (dragState.multiSelectEnabled && isSourceSelected) {
+          if (multiSelectState.multiSelectEnabled && isSourceSelected) {
             for (const location of selectedLocations) {
               const mon = await savesAndBanks.getMonAtLocation(location)
               if (mon) savesAndBanks.moveMonItemToBag(location)
@@ -80,7 +82,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
           (dest.isHome ||
             monSupportedBySave(savesAndBanks.saveFromIdentifier(dest.saveIdentifier), mon))
         ) {
-          if (dragState.multiSelectEnabled && isSourceSelected) {
+          if (multiSelectState.multiSelectEnabled && isSourceSelected) {
             const targetSave = dest.isHome
               ? undefined
               : savesAndBanks.saveFromIdentifier(dest.saveIdentifier)
@@ -187,19 +189,19 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
         ...defaults.filter((sensor) => sensor !== PointerSensor),
         PointerSensor.configure({
           activationConstraints: [
-            dragState.multiSelectEnabled
+            multiSelectState.multiSelectEnabled
               ? new PointerActivationConstraints.Delay({ value: 100, tolerance: 8 })
               : new PointerActivationConstraints.Distance({ value: 10 }),
           ],
         }),
       ]}
     >
-      <PokemonDndOverlay dragState={dragState}>{children}</PokemonDndOverlay>
+      <PokemonDndOverlay multiSelectState={multiSelectState}>{children}</PokemonDndOverlay>
     </DragDropProvider>
   )
 }
 
-function PokemonDndOverlay(props: { dragState: DragMonState; children: ReactNode }) {
+function PokemonDndOverlay(props: { multiSelectState: MultiSelectState; children: ReactNode }) {
   const { source, target } = useDragOperation<DragPayload>()
 
   const draggingMon = source?.data?.kind === 'mon' ? source?.data.monData.mon : undefined
@@ -216,7 +218,7 @@ function PokemonDndOverlay(props: { dragState: DragMonState; children: ReactNode
     formeNumber = displayIndexAdder(draggingMon.heldItemIndex)(draggingMon.formIndex)
   }
 
-  const { dragState } = props
+  const { multiSelectState } = props
 
   return (
     <>
@@ -241,9 +243,9 @@ function PokemonDndOverlay(props: { dragState: DragMonState; children: ReactNode
                 }
                 extraFormIndex={source.data.monData.mon.extraFormIndex}
               />
-              {dragState.selectedLocations.length > 1 && (
+              {multiSelectState.selectedLocations.length > 1 && (
                 <Badge variant="solid" style={{ position: 'absolute', top: 0, left: 0 }}>
-                  {dragState.selectedLocations.length}
+                  {multiSelectState.selectedLocations.length}
                 </Badge>
               )}
             </div>

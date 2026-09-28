@@ -45,7 +45,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const [, dispatchError] = useContext(ErrorContext)
   const [detailsModal, setDetailsModal] = useState(false)
   const { saveIndex } = props
-  const { dragState, toggleSelection, isSelected } = useMultiSelect()
+  const { multiSelectState, toggleSelection, isSelected } = useMultiSelect()
   const { source } = useDragOperation<DragPayload>()
 
   const save = useMemo(() => allOpenSaves[saveIndex], [allOpenSaves, saveIndex])
@@ -253,7 +253,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                       attemptImportMons(importedMons, location)
                     }
                   }}
-                  multiSelectEnabled={dragState.multiSelectEnabled}
+                  multiSelectEnabled={multiSelectState.multiSelectEnabled}
                   isSelected={isSelected(location)}
                   onToggleSelect={() => toggleSelection(location)}
                   contextMenu={

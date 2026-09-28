@@ -59,7 +59,7 @@ export default function HomeBoxDisplay() {
   const [viewMode, setViewMode] = useState<BoxViewMode>('one')
   const [editingBoxName, setEditingBoxName] = useState('')
   const [debugMode, setDebugMode] = useState(false)
-  const { dragState, toggleMultiSelect } = useMultiSelect()
+  const { multiSelectState, toggleMultiSelect } = useMultiSelect()
   const {
     addBoxCurrentBank,
     getCurrentBox,
@@ -147,13 +147,13 @@ export default function HomeBoxDisplay() {
                   onUnset={() => setBoxNameCurrentBank(currentBox.index, editingBoxName)}
                   icon={EditIcon}
                   hint="Change box name"
-                  disabled={dragState.multiSelectEnabled}
+                  disabled={multiSelectState.multiSelectEnabled}
                 />
                 <ToggleButton
-                  state={dragState.multiSelectEnabled}
+                  state={multiSelectState.multiSelectEnabled}
                   setState={toggleMultiSelect}
                   icon={SelectIcon}
-                  hint={`Multi-select${dragState.selectedLocations.length > 0 ? ` (${dragState.selectedLocations.length})` : ''}`}
+                  hint={`Multi-select${multiSelectState.selectedLocations.length > 0 ? ` (${multiSelectState.selectedLocations.length})` : ''}`}
                   disabled={editing}
                 />
               </>
@@ -258,7 +258,7 @@ function SingleBoxMonDisplay() {
   const displayError = useDisplayError()
   const { importMonsToLocation, saveFromIdentifier, getPendingMon } = useSaves()
   const { getCurrentBox, getCurrentBank, removeAllHomeDupes } = useBanksAndBoxes()
-  const { dragState, isSelected, toggleSelection } = useMultiSelect()
+  const { multiSelectState: dragState, isSelected, toggleSelection } = useMultiSelect()
   const { sortHomeBox, sortAllHomeBoxes } = useBanksAndBoxes()
   const {
     currentIndex: selectedIndex,

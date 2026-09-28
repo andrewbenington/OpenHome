@@ -3,25 +3,25 @@ import { locationKey } from '.'
 import { MonLocation } from '../saves'
 
 export default function useMultiSelect() {
-  const [dragState, setDragState] = useContext(DragMonContext)
+  const [multiSelectState, setMultiSelectState] = useContext(MultiSelectContext)
   const selectedLocationKeys = useMemo(
-    () => new Set(dragState.selectedLocations.map(locationKey)),
-    [dragState.selectedLocations]
+    () => new Set(multiSelectState.selectedLocations.map(locationKey)),
+    [multiSelectState.selectedLocations]
   )
 
   const toggleMultiSelect = useCallback(() => {
-    setDragState((prev) => {
+    setMultiSelectState((prev) => {
       return {
         ...prev,
         multiSelectEnabled: !prev.multiSelectEnabled,
         selectedLocations: [],
       }
     })
-  }, [setDragState])
+  }, [setMultiSelectState])
 
   const setMultiSelectEnabled = useCallback(
     (enabled: boolean) => {
-      setDragState((prev) => {
+      setMultiSelectState((prev) => {
         return {
           ...prev,
           multiSelectEnabled: enabled,
@@ -29,12 +29,12 @@ export default function useMultiSelect() {
         }
       })
     },
-    [setDragState]
+    [setMultiSelectState]
   )
 
   const toggleSelection = useCallback(
     (location: MonLocation) => {
-      setDragState((prev) => {
+      setMultiSelectState((prev) => {
         const key = locationKey(location)
         const isSelected = prev.selectedLocations.some((loc) => locationKey(loc) === key)
 
@@ -51,12 +51,12 @@ export default function useMultiSelect() {
         }
       })
     },
-    [setDragState]
+    [setMultiSelectState]
   )
 
   const setSelection = useCallback(
     (location: MonLocation, select: boolean) => {
-      setDragState((prev) => {
+      setMultiSelectState((prev) => {
         const key = locationKey(location)
         const isSelected = prev.selectedLocations.some((loc) => locationKey(loc) === key)
         if (isSelected === select) return prev
@@ -74,14 +74,14 @@ export default function useMultiSelect() {
         }
       })
     },
-    [setDragState]
+    [setMultiSelectState]
   )
 
   const clearSelections = useCallback(() => {
-    setDragState((prev) => {
+    setMultiSelectState((prev) => {
       return { ...prev, selectedLocations: [] }
     })
-  }, [setDragState])
+  }, [setMultiSelectState])
 
   const isSelected = useCallback(
     (location: MonLocation) => {
@@ -91,8 +91,7 @@ export default function useMultiSelect() {
   )
 
   return {
-    dragState,
-    // Multi-select functions
+    multiSelectState,
     toggleMultiSelect,
     setMultiSelectEnabled,
     toggleSelection,
@@ -102,18 +101,18 @@ export default function useMultiSelect() {
   }
 }
 
-export type DragMonState = {
+export type MultiSelectState = {
   multiSelectEnabled: boolean
   selectedLocations: MonLocation[]
 }
 
-export function emptyDragState(): DragMonState {
+export function defaultMultiSelectState(): MultiSelectState {
   return {
     multiSelectEnabled: false,
     selectedLocations: [],
   }
 }
 
-export const DragMonContext = createContext<[DragMonState, Dispatch<SetStateAction<DragMonState>>]>(
-  [emptyDragState(), () => null]
-)
+export const MultiSelectContext = createContext<
+  [MultiSelectState, Dispatch<SetStateAction<MultiSelectState>>]
+>([defaultMultiSelectState(), () => null])

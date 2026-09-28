@@ -23,7 +23,11 @@ import { useCallback, useEffect, useEffectEvent, useReducer, useState } from 're
 import BanksAndBoxesProvider from './state-zustand/banks-and-boxes/Provider'
 import { useBanksAndBoxes } from './state-zustand/banks-and-boxes/store'
 import ConvertStrategiesProvider from './state/convert-strategies/ConvertStrategiesProvider'
-import { DragMonContext, DragMonState, emptyDragState } from './state/drag-and-drop/useMultiSelect'
+import {
+  defaultMultiSelectState,
+  MultiSelectContext,
+  MultiSelectState,
+} from './state/drag-and-drop/useMultiSelect'
 import PluginsProvider from './state/plugin/PluginProvider'
 
 const ZOOM_CHANGE_PCT = 5
@@ -63,7 +67,8 @@ export default function App() {
 
 function AppWithBackend() {
   const [mouseState, mouseDispatch] = useReducer(mouseReducer, { shift: false })
-  const [dragState, setDragState] = useState<DragMonState>(emptyDragState())
+  const [multiSelectState, setMultiSelectState] =
+    useState<MultiSelectState>(defaultMultiSelectState())
   const [appInfoState, appInfoDispatch] = useReducer(appInfoReducer, appInfoInitialState)
   const [settingsLoading, setSettingsLoading] = useState(false)
   const { saveChanges } = useBanksAndBoxes()
@@ -173,7 +178,7 @@ function AppWithBackend() {
               <ConvertStrategiesProvider>
                 <ItemBagContext value={[bagState, bagDispatch]}>
                   <SavesProvider>
-                    <DragMonContext value={[dragState, setDragState]}>
+                    <MultiSelectContext value={[multiSelectState, setMultiSelectState]}>
                       <PokemonDndContext>
                         {settingsLoading ? (
                           <Flex width="100%" height="100vh" align="center" justify="center">
@@ -187,7 +192,7 @@ function AppWithBackend() {
                         <ErrorMessageModal />
                         <UpdateMessageModal />
                       </PokemonDndContext>
-                    </DragMonContext>
+                    </MultiSelectContext>
                   </SavesProvider>
                 </ItemBagContext>
               </ConvertStrategiesProvider>
