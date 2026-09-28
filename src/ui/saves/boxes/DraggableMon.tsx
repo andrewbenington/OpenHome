@@ -1,4 +1,4 @@
-import { useDraggable } from '@dnd-kit/core'
+import { useDraggable } from '@dnd-kit/react'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
 import { TopRightBadge } from '@openhome-ui/components/badge/TopRightBadge'
@@ -55,7 +55,7 @@ const DraggableMon = (props: DraggableMonProps) => {
     monDisplayState,
     style,
   } = props
-  const { attributes, listeners, setNodeRef, isDragging, active } = useDraggable({
+  const { ref, isDragging } = useDraggable({
     id: (dragID ?? '') + mon.personalityValue?.toString(),
     data: dragData ? { kind: 'mon', monData: dragData } : undefined,
     disabled: disabled || !dragID,
@@ -85,14 +85,12 @@ const DraggableMon = (props: DraggableMonProps) => {
     [mon, topRightIndicator]
   )
 
-  const shouldHide = isDragging || (active && isSelected)
+  const shouldHide = isDragging || (dragState.payload && isSelected)
 
   return (
     <div
       className="fill-parent flex-centered"
-      ref={setNodeRef}
-      {...listeners}
-      {...attributes}
+      ref={ref}
       style={{
         ...getBackgroundDetails(),
         cursor: 'pointer',

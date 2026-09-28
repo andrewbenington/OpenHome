@@ -1,4 +1,4 @@
-import { useDraggable } from '@dnd-kit/core'
+import { useDraggable, useDragOperation } from '@dnd-kit/react'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
 import { Item } from '@pkm-rs/pkg'
@@ -12,10 +12,11 @@ type DraggableItemProps = {
 }
 
 function DraggableItem({ item, count }: DraggableItemProps) {
-  const { attributes, listeners, setNodeRef, isDragging, active } = useDraggable({
+  const { ref, isDragging } = useDraggable({
     id: `item-${item.index}`,
     data: { kind: 'item', item: item },
   })
+  const { source } = useDragOperation()
   const [imageError, setImageError] = useState(false)
 
   const image = !imageError ? (
@@ -37,9 +38,9 @@ function DraggableItem({ item, count }: DraggableItemProps) {
   )
 
   return (
-    <div className="draggable-item" ref={setNodeRef} {...listeners} {...attributes}>
+    <div className="draggable-item" ref={ref}>
       {/* tooltip causes performance issues when dragging; only show when not */}
-      {active ? image : <Tooltip content={item.name}>{image}</Tooltip>}
+      {source ? image : <Tooltip content={item.name}>{image}</Tooltip>}
       <Text
         size="1"
         weight="bold"
