@@ -42,7 +42,7 @@ import {
   OPENHOME_BOX_SLOTS,
   useBanksAndBoxes,
 } from '../../state-zustand/banks-and-boxes/store'
-import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
+import useMultiSelect from '../../state/drag-and-drop/useMultiSelect'
 import { useOpenHomeBoxNavigator } from '../util'
 import AllHomeBoxes from './AllHomeBoxes'
 import ArrowButton from './ArrowButton'
@@ -59,7 +59,7 @@ export default function HomeBoxDisplay() {
   const [viewMode, setViewMode] = useState<BoxViewMode>('one')
   const [editingBoxName, setEditingBoxName] = useState('')
   const [debugMode, setDebugMode] = useState(false)
-  const { dragState, toggleMultiSelect } = useDragAndDrop()
+  const { dragState, toggleMultiSelect } = useMultiSelect()
   const {
     addBoxCurrentBank,
     getCurrentBox,
@@ -258,7 +258,7 @@ function SingleBoxMonDisplay() {
   const displayError = useDisplayError()
   const { importMonsToLocation, saveFromIdentifier, getPendingMon } = useSaves()
   const { getCurrentBox, getCurrentBank, removeAllHomeDupes } = useBanksAndBoxes()
-  const { dragState, isSelected, toggleSelection } = useDragAndDrop()
+  const { dragState, isSelected, toggleSelection } = useMultiSelect()
   const { sortHomeBox, sortAllHomeBoxes } = useBanksAndBoxes()
   const {
     currentIndex: selectedIndex,

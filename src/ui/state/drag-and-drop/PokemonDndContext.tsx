@@ -11,15 +11,15 @@ import { isMonLocation, MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { MetadataSummaryLookup } from '@pkm-rs/pkg'
 import { Badge } from '@radix-ui/themes'
 import { ReactNode } from 'react'
-import { DragMonState, DragPayload, locationKey } from '.'
+import { DragPayload, locationKey } from '.'
 import { OPENHOME_BOX_SLOTS, useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
-import useDragAndDrop from './useDragAndDrop'
+import useMultiSelect, { DragMonState } from './useMultiSelect'
 
 export default function PokemonDndContext(props: { children?: ReactNode }) {
   const { children } = props
   const savesAndBanks = useSaves()
   const { homeLocationIsEmpty, getCurrentBank } = useBanksAndBoxes()
-  const { dragState, clearSelections } = useDragAndDrop()
+  const { dragState, clearSelections } = useMultiSelect()
   const displayError = useDisplayError()
 
   return (

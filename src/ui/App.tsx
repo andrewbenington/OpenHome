@@ -9,7 +9,6 @@ import useIsDarkMode from '@openhome-ui/hooks/darkMode'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { TransactionStateProvider } from '@openhome-ui/state/app-state'
 import { AppInfoContext, appInfoInitialState, appInfoReducer } from '@openhome-ui/state/appInfo'
-import { DragMonContext, DragMonState, emptyDragState } from '@openhome-ui/state/drag-and-drop'
 import PokemonDndContext from '@openhome-ui/state/drag-and-drop/PokemonDndContext'
 import { ErrorContext, errorReducer } from '@openhome-ui/state/error'
 import { ItemBagContext, itemBagReducer } from '@openhome-ui/state/items'
@@ -24,6 +23,7 @@ import { useCallback, useEffect, useEffectEvent, useReducer, useState } from 're
 import BanksAndBoxesProvider from './state-zustand/banks-and-boxes/Provider'
 import { useBanksAndBoxes } from './state-zustand/banks-and-boxes/store'
 import ConvertStrategiesProvider from './state/convert-strategies/ConvertStrategiesProvider'
+import { DragMonContext, DragMonState, emptyDragState } from './state/drag-and-drop/useMultiSelect'
 import PluginsProvider from './state/plugin/PluginProvider'
 
 const ZOOM_CHANGE_PCT = 5

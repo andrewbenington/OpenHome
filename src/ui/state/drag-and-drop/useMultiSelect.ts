@@ -1,21 +1,12 @@
-import { useCallback, useContext, useMemo } from 'react'
-import { DragMode, DragMonContext, locationKey } from '.'
+import { createContext, Dispatch, SetStateAction, useCallback, useContext, useMemo } from 'react'
+import { locationKey } from '.'
 import { MonLocation } from '../saves'
 
-export default function useDragAndDrop() {
+export default function useMultiSelect() {
   const [dragState, setDragState] = useContext(DragMonContext)
   const selectedLocationKeys = useMemo(
     () => new Set(dragState.selectedLocations.map(locationKey)),
     [dragState.selectedLocations]
-  )
-
-  const setMode = useCallback(
-    (mode: DragMode) => {
-      setDragState((prev) => {
-        return { ...prev, mode }
-      })
-    },
-    [setDragState]
   )
 
   const toggleMultiSelect = useCallback(() => {
@@ -101,7 +92,6 @@ export default function useDragAndDrop() {
 
   return {
     dragState,
-    setMode,
     // Multi-select functions
     toggleMultiSelect,
     setMultiSelectEnabled,
@@ -111,3 +101,19 @@ export default function useDragAndDrop() {
     isSelected,
   }
 }
+
+export type DragMonState = {
+  multiSelectEnabled: boolean
+  selectedLocations: MonLocation[]
+}
+
+export function emptyDragState(): DragMonState {
+  return {
+    multiSelectEnabled: false,
+    selectedLocations: [],
+  }
+}
+
+export const DragMonContext = createContext<[DragMonState, Dispatch<SetStateAction<DragMonState>>]>(
+  [emptyDragState(), () => null]
+)
