@@ -491,7 +491,7 @@ type ViewToggleProps = {
   disabled?: boolean
 }
 
-const DRAG_OVER_COOLDOWN_MS = 500
+const DRAG_OVER_COOLDOWN_MS = 1000
 
 // necessary for incompatibility between Node and web api
 type TimeoutType = ReturnType<typeof setTimeout>
