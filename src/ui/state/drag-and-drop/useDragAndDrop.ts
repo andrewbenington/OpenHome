@@ -1,3 +1,4 @@
+import { useDragOperation } from '@dnd-kit/react'
 import { Option } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
 import { useCallback, useContext, useMemo } from 'react'
@@ -11,10 +12,11 @@ export default function useDragAndDrop() {
     () => new Set(dragState.selectedLocations.map(locationKey)),
     [dragState.selectedLocations]
   )
+  const { source } = useDragOperation<DragPayload>()
 
   const startDragging = async (payload: DragPayload) => {
     if (
-      dragState.payload?.kind === 'mon' &&
+      source?.data.kind === 'mon' &&
       dragState.multiSelectEnabled &&
       dragState.selectedLocations.length > 0
     ) {

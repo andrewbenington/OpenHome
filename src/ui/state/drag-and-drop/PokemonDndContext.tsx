@@ -256,7 +256,6 @@ function PokemonDndOverlay(props: { dragState: DragMonState; children: ReactNode
 
   return (
     <>
-      {source?.data.kind ?? 'NONE'}
       <DragOverlay style={{ cursor: 'grabbing' }} dropAnimation={{ duration: 0 }}>
         {source?.data?.kind === 'item' ? (
           <img

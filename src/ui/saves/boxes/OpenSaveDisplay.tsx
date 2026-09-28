@@ -1,3 +1,4 @@
+import { useDragOperation } from '@dnd-kit/react'
 import useBackend from '@openhome-core/backend/useBackend'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
@@ -15,6 +16,7 @@ import SearchFields from '@openhome-ui/components/search/SearchFields'
 import PokemonSearchModal from '@openhome-ui/components/search/SearchModal'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import PokemonDetailsModal from '@openhome-ui/pokemon/PokemonDetailsModal'
+import { DragPayload } from '@openhome-ui/state/drag-and-drop'
 import { ErrorContext } from '@openhome-ui/state/error'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import useOhpkmBatchIdLookup from '@openhome-ui/state/ohpkm/useOhpkmIdBatchLookup'
@@ -44,6 +46,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const [detailsModal, setDetailsModal] = useState(false)
   const { saveIndex } = props
   const { dragState, toggleSelection, isSelected } = useDragAndDrop()
+  const { source } = useDragOperation<DragPayload>()
 
   const save = useMemo(() => allOpenSaves[saveIndex], [allOpenSaves, saveIndex])
   const displayError = useDisplayError()
@@ -112,7 +115,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
 
   const isDisabled = useCallback(
     (mon?: PKMInterface) => {
-      const dragPayload = dragState?.payload
+      const dragPayload = source?.data
 
       if (!dragPayload) return false
 
@@ -141,7 +144,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
 
       return false
     },
-    [dragState?.payload, saveFromIdentifier, save]
+    [source?.data, save, saveFromIdentifier]
   )
 
   const displayData = useMemo(() => save.getDisplayData?.() ?? {}, [save])

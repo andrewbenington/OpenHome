@@ -1,3 +1,4 @@
+import { useDragOperation } from '@dnd-kit/react'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { SortTypes } from '@openhome-core/pkm/sort'
@@ -25,9 +26,10 @@ import ToggleButton from '@openhome-ui/components/ToggleButton'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import MissingOhpkmIdPrompt from '@openhome-ui/pokemon/MissingOhpkmId'
 import PokemonDetailsModal from '@openhome-ui/pokemon/PokemonDetailsModal'
+import { DragPayload } from '@openhome-ui/state/drag-and-drop'
 import { OhpkmLookupResult, useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import useTrackedDataRecovery from '@openhome-ui/state/ohpkm/useTrackedDataRecovery'
-import { EMPTY_SLOT, HomeMonLocation, MonWithLocation, useSaves } from '@openhome-ui/state/saves'
+import { EMPTY_SLOT, HomeMonLocation, useSaves } from '@openhome-ui/state/saves'
 import { cssClass } from '@openhome-ui/util/style'
 import { Button, Card, DropdownMenu, Flex, Heading, TextField, Tooltip } from '@radix-ui/themes'
 import { ToggleGroup } from 'radix-ui'
@@ -265,6 +267,7 @@ function SingleBoxMonDisplay() {
     navigatePrev: navigateLeft,
     selectedMon,
   } = useOpenHomeBoxNavigator()
+  const { source } = useDragOperation<DragPayload>()
 
   const currentBox = getCurrentBox()
   const getById = ohpkmStore.tryLoadFromId
@@ -283,21 +286,22 @@ function SingleBoxMonDisplay() {
     },
   }
 
-  const dragData: MonWithLocation | undefined = useMemo(() => {
-    const payload = dragState.payload
-
-    if (payload?.kind === 'mon') {
-      return payload.monData
-    }
-    return undefined
-  }, [dragState.payload])
-
   const sourceSupportsMon = useCallback(
-    (mon: PKMInterface) =>
-      !dragData || dragData?.isHome
-        ? true
-        : monSupportedBySave(saveFromIdentifier(dragData.saveIdentifier), mon),
-    [dragData, saveFromIdentifier]
+    (mon: PKMInterface) => {
+      if (!source || source.data.kind === 'item') return true
+      if (source.data.kind === 'mon') {
+        return source.data.monData.isHome
+          ? true
+          : monSupportedBySave(saveFromIdentifier(source.data.monData.saveIdentifier), mon)
+      }
+
+      return source.data.monData.every(
+        (monWithLocation) =>
+          monWithLocation.isHome ||
+          monSupportedBySave(saveFromIdentifier(monWithLocation.saveIdentifier), mon)
+      )
+    },
+    [saveFromIdentifier, source]
   )
 
   const contextElements = useMemo(
@@ -406,8 +410,8 @@ function SingleBoxMonDisplay() {
                 }}
                 // don't allow a swap with a pokémon not supported by the source save
                 isDisabled={(mon) =>
-                  dragData !== undefined &&
-                  !dragData.isHome &&
+                  source?.data.kind !== 'item' &&
+                  source?.data !== undefined &&
                   mon !== undefined &&
                   !sourceSupportsMon(mon)
                 }
@@ -494,7 +498,7 @@ type TimeoutType = ReturnType<typeof setTimeout>
 
 function ViewToggle(props: ViewToggleProps) {
   const { viewMode, setViewMode, disabled } = props
-  const { dragState } = useDragAndDrop()
+  const { source } = useDragOperation()
   const [timer, setTimer] = useState<TimeoutType>()
   const setViewModeRef = useRef(setViewMode)
 
@@ -528,11 +532,7 @@ function ViewToggle(props: ViewToggleProps) {
       onValueChange={(newVal: BoxViewMode) => setViewMode(newVal)}
       disabled={disabled}
     >
-      <ToggleGroup.Item
-        value="one"
-        className="ToggleGroupItem"
-        disabled={Boolean(dragState.payload)}
-      >
+      <ToggleGroup.Item value="one" className="ToggleGroupItem" disabled={Boolean(source?.data)}>
         <FaSquare />
       </ToggleGroup.Item>
       <ToggleGroup.Item value="all" className="ToggleGroupItem">

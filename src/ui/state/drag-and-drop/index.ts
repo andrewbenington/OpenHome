@@ -4,8 +4,6 @@ import { createContext, Dispatch, SetStateAction } from 'react'
 import { MonLocation, MonWithLocation } from '../saves'
 
 export type DragMonState = {
-  payload?: DragPayload
-  mode: DragMode
   onEnterListeners: ListenerMap
   onExitListeners: ListenerMap
   overId: UniqueIdentifier | null
@@ -15,7 +13,6 @@ export type DragMonState = {
 
 export function emptyDragState(): DragMonState {
   return {
-    mode: 'mon',
     onEnterListeners: new Map(),
     onExitListeners: new Map(),
     overId: null,

@@ -1,13 +1,13 @@
-import { useDraggable } from '@dnd-kit/react'
+import { useDraggable, useDragOperation } from '@dnd-kit/react'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
 import { TopRightBadge } from '@openhome-ui/components/badge/TopRightBadge'
+import { DragPayload } from '@openhome-ui/state/drag-and-drop'
 import { MonWithLocation } from '@openhome-ui/state/saves'
 import { MetadataSummaryLookup } from '@pkm-rs/pkg'
 import { CSSProperties, useMemo } from 'react'
 import PokemonIcon from '../../components/PokemonIcon'
 import { MonDisplayState, TopRightBadgeType } from '../../hooks/monDisplay'
-import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
 import { MonTag } from '../../util/tags'
 
 const getBackgroundDetails = (disabled?: boolean) => {
@@ -60,7 +60,7 @@ const DraggableMon = (props: DraggableMonProps) => {
     data: dragData ? { kind: 'mon', monData: dragData } : undefined,
     disabled: disabled || !dragID,
   })
-  const { dragState } = useDragAndDrop()
+  const { source } = useDragOperation<DragPayload>()
   const monWithManagement = mon as MonWithManagementData
 
   const formeNumber = useMemo(() => {
@@ -85,7 +85,7 @@ const DraggableMon = (props: DraggableMonProps) => {
     [mon, topRightIndicator]
   )
 
-  const shouldHide = isDragging || (dragState.payload && isSelected)
+  const shouldHide = isDragging || (source && isSelected)
 
   return (
     <div
@@ -104,11 +104,14 @@ const DraggableMon = (props: DraggableMonProps) => {
         gender={mon.gender}
         isEgg={mon.isEgg}
         heldItemIndex={
-          showItem && (!isDragging || dragState.mode !== 'item') ? mon.heldItemIndex : undefined
+          showItem && (!isDragging || source?.data.kind !== 'item') ? mon.heldItemIndex : undefined
         }
         style={{
           ...style,
-          visibility: shouldHide && dragState.mode === 'mon' ? 'hidden' : undefined,
+          visibility:
+            shouldHide && (source?.data.kind === 'mon' || source?.data.kind === 'multi-mon')
+              ? 'hidden'
+              : undefined,
         }}
         grayedOut={disabled}
         topRightIndicator={topRightIndicatorComponent}
