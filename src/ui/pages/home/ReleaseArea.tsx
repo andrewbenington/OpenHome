@@ -2,7 +2,6 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { $R, isResult } from '@openhome-core/util/functional'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import MissingOhpkmIdPrompt from '@openhome-ui/pokemon/MissingOhpkmId'
-import { useMissingOhpkmId } from '@openhome-ui/pokemon/useMissingOhpkmId'
 import DroppableSpace from '@openhome-ui/saves/boxes/DroppableSpace'
 import useOhpkmIdBatchLookup from '@openhome-ui/state/ohpkm/useOhpkmIdBatchLookup'
 import { useSaves } from '@openhome-ui/state/saves'
@@ -31,7 +30,6 @@ function useMonsToRelease(): MonsToReleaseState {
 
 export default function ReleaseArea() {
   const { loading, loadedMons } = useMonsToRelease()
-  const missingIdController = useMissingOhpkmId()
 
   return (
     <Flex className="drop-area" direction="column">
@@ -57,13 +55,7 @@ export default function ReleaseArea() {
                       style={{ height: '2rem', width: '2rem' }}
                     />
                   ),
-                  ({ identifier }) => (
-                    <MissingOhpkmIdPrompt
-                      controller={missingIdController}
-                      context={null}
-                      openhomeId={identifier}
-                    />
-                  )
+                  ({ identifier }) => <MissingOhpkmIdPrompt openhomeId={identifier} />
                 )
               )
             )
