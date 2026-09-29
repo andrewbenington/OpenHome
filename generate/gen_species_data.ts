@@ -98,17 +98,6 @@ type SpeciesForm = {
   readonly formIndex: number
 }
 
-function statsToRust(stats: {
-  readonly hp: number
-  readonly atk: number
-  readonly def: number
-  readonly spa: number
-  readonly spd: number
-  readonly spe: number
-}): string {
-  return `Stats16Le::new(${stats.hp}, ${stats.atk}, ${stats.def}, ${stats.spa}, ${stats.spd}, ${stats.spe})`
-}
-
 function SpeciesAndFormToRust(ref: SpeciesForm): string {
   const species = allSpecies[ref.nationalDex - 1]
   return ref.formIndex === 0
@@ -120,16 +109,12 @@ function evolutionsToRust(evos?: readonly SpeciesForm[]): string {
   return `&[${(evos ?? []).map(SpeciesAndFormToRust).join(',')}]`
 }
 
-function optionalToRust<T, S>(value: T | null | undefined, tranformer?: (T) => S): string {
+function optionalToRust<T, S>(value: T | null | undefined, tranformer?: (v: T) => S): string {
   if (value !== undefined && value !== null) {
-    return `Some(${tranformer ? tranformer(value) : value})`
+    return `Some(${tranformer?.(value) ?? value})`
   } else {
     return 'None'
   }
-}
-
-function pkmTypeToRust(pt: string): string {
-  return `PkmType::${pt}`
 }
 
 function eggGroupToRust(eg: string): string {
@@ -290,12 +275,11 @@ async function getAllSpeciesAndForms() {
           prevoFormIndex: formeRow.formIndex,
         })
       )
-      const preEvolution = camelcaseKeys(
-        await evolutionsGetByEvo(db, {
-          evoNationalDex: formeRow.nationalDex,
-          evoFormIndex: formeRow.formIndex,
-        })
-      )
+      const preEvoResult = await evolutionsGetByEvo(db, {
+        evoNationalDex: formeRow.nationalDex,
+        evoFormIndex: formeRow.formIndex,
+      })
+      const preEvolution = preEvoResult ? camelcaseKeys(preEvoResult) : null
       const megas = camelcaseKeys(
         await megaEvolutionGetByBaseForm(db, {
           nationalDex: formeRow.nationalDex,

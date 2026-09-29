@@ -1,4 +1,4 @@
-import Database from 'better-sqlite3'
+import Database, { type Database as DatabaseType } from 'better-sqlite3'
 
 export const abilityGetAllQuery = `-- name: AbilityGetAll :many
 SELECT
@@ -18,6 +18,6 @@ export function abilityGetAll(): AbilityGetAllRow[] {
   return result as AbilityGetAllRow[]
 }
 
-export function openDatabase() {
+export function openDatabase(): DatabaseType {
   return new Database('generate/pkm.db')
 }
