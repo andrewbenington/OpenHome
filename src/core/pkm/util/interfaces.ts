@@ -1,9 +1,10 @@
-import { NatureIndex, StatsPreSplit } from '@pkm-rs/pkg'
+import { HyperTraining, NatureIndex, StatsPreSplit } from '@pkm-rs/pkg'
 import { Stats } from '../../util/types'
 
 export interface AllPKMs extends SpeciesData {
   exp: number
   format: string
+  getLevel(): number
 }
 
 export interface SpeciesData {
@@ -13,6 +14,7 @@ export interface SpeciesData {
 
 export interface PKMWithModernIVs {
   ivs: Stats
+  hyperTraining?: HyperTraining
 }
 
 export interface PKMWithDVs {

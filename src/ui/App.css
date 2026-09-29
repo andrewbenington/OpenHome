@@ -141,6 +141,8 @@
     var(--primitive-teal-400) 85%
   );
 
+  --ohpkm-cell-border-color: var(--primitive-teal-450);
+
   .radix-themes {
     --color-panel: var(--primitive-teal-100);
     --color-bar: var(--color-panel);
@@ -180,6 +182,8 @@
       var(--primitive-teal-800) 85%
     );
 
+    --ohpkm-cell-border-color: var(--primitive-teal-700);
+
     --hyper-train-color: #fccb59;
 
     .radix-themes {
@@ -218,11 +222,6 @@ img {
   }
 }
 
-div {
-  user-select: none;
-  -webkit-user-select: none !important;
-}
-
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
@@ -231,8 +230,6 @@ html,
 body,
 #root {
   height: 100%;
-  user-select: none;
-  -webkit-user-select: none !important;
   -webkit-user-drag: none !important;
   overflow: hidden;
 }

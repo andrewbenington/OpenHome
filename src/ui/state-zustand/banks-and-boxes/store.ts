@@ -10,7 +10,7 @@ import {
 import { Option, partitionResults, R, range, Result } from '@openhome-core/util/functional'
 import { numericSorter } from '@openhome-core/util/sort'
 import { IdentifierNotPresentError, useOhpkmStore } from '@openhome-ui/state/ohpkm'
-import { createContext, useCallback, useContext, useEffect } from 'react'
+import { createContext, useCallback, useContext } from 'react'
 import { v4 as UuidV4 } from 'uuid'
 import { create, StateCreator, StoreApi, UseBoundStore } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
@@ -54,6 +54,7 @@ export interface BanksAndBoxesState {
   getAtLocation: (location: BankBoxCoordinates) => Option<OhpkmIdentifier>
   locationIsEmpty: (location: BankBoxCoordinates) => boolean
   setAtLocation: (location: BankBoxCoordinates, contents: OhpkmIdentifier) => void
+  swapLocations: (location1: BankBoxCoordinates, location2: BankBoxCoordinates) => void
   clearAtLocation: (location: BankBoxCoordinates) => void
   setBoxNameCurrentBank: (boxIndex: number, boxName: Option<string>) => void
   deleteBoxCurrentBank: (boxId: string) => void
@@ -69,6 +70,7 @@ export interface BanksAndBoxesState {
   allMonsCurrentBank: () => LocationsByIdentifier
   allMonsInBoxCurrentBank: (boxIndex: number) => OhpkmIdentifier[]
   findHomeLocation: (identifier: OhpkmIdentifier) => Option<BankBoxCoordinates>
+  hasHomeLocation: (identifier: OhpkmIdentifier) => boolean
   indexOfBoxId: (id: string) => Option<number>
 }
 
@@ -131,7 +133,7 @@ export const createBanksAndBoxesStore = (
             for (const box of requireBank(state, state.currentBankIndex).boxes.values()) {
               // if an identifiers map is present for this box, overwrite the current with that.
               // otherwise clear the box
-              box.identifiers = boxSlotsByBoxIndex.get(box.index) ?? new Map()
+              box.identifiers = boxSlotsByBoxIndex.get(box.index) ?? new Map<number, string>()
             }
           }),
         getBankName: (bankIndex: number): string => {
@@ -165,8 +167,37 @@ export const createBanksAndBoxesStore = (
         locationIsEmpty: (location: BankBoxCoordinates): boolean => {
           return readonlyState().getAtLocation(location) === undefined
         },
+        swapLocations: (location1: BankBoxCoordinates, location2: BankBoxCoordinates) =>
+          set((state) => {
+            const box1 = requireBox(state, location1)
+            const slot1Contents = box1.identifiers.get(location1.boxSlot)
+            const box2 = requireBox(state, location2)
+            const slot2Contents = box2.identifiers.get(location2.boxSlot)
+
+            if (slot2Contents) {
+              box1.identifiers.set(location1.boxSlot, slot2Contents)
+              state.reverseLookup.set(slot2Contents, location1)
+            } else {
+              box1.identifiers.delete(location1.boxSlot)
+            }
+
+            if (slot1Contents) {
+              box2.identifiers.set(location2.boxSlot, slot1Contents)
+              state.reverseLookup.set(slot1Contents, location2)
+            } else {
+              box2.identifiers.delete(location2.boxSlot)
+            }
+
+            state.updatedBoxSlots.push(location1, location2)
+          }),
         setAtLocation: (location: BankBoxCoordinates, identifier: OhpkmIdentifier) =>
           set((state) => {
+            const existingLocation = state.reverseLookup.get(identifier)
+            // if this mon is already in a home box, first clear that slot to ensure no duplicates
+            if (existingLocation) {
+              requireBox(state, existingLocation).identifiers.delete(existingLocation.boxSlot)
+            }
+
             requireBox(state, location).identifiers.set(location.boxSlot, identifier)
             state.reverseLookup.set(identifier, location)
             state.updatedBoxSlots.push(location)
@@ -203,7 +234,7 @@ export const createBanksAndBoxesStore = (
         ) =>
           set((state) => {
             const currentBank = currentBankMutable(state)
-            let newBox = buildNewBox(currentBank, boxName, identifiers)
+            const newBox = buildNewBox(currentBank, boxName, identifiers)
             currentBank.boxes = rebuildMapWithNewBox(currentBank.boxes, newBox, location)
           }),
         reorderBoxesCurrentBank: (idsInNewOrder: string[]) =>
@@ -263,6 +294,9 @@ export const createBanksAndBoxesStore = (
         },
         findHomeLocation: (identifier: OhpkmIdentifier): Option<BankBoxCoordinates> => {
           return readonlyState().reverseLookup.get(identifier)
+        },
+        hasHomeLocation: (identifier: OhpkmIdentifier): boolean => {
+          return readonlyState().reverseLookup.get(identifier) !== undefined
         },
         indexOfBoxId: (id: string): Option<number> => {
           return Array.from(readonlyState().getCurrentBank().boxes).find(
@@ -342,7 +376,7 @@ function buildNewBox(
     id: UuidV4(),
     name: boxName ?? null,
     index: bank.boxes.size,
-    identifiers: identifiers ?? new Map(),
+    identifiers: identifiers ?? new Map<number, string>(),
   }
 }
 
@@ -432,7 +466,7 @@ const createSelectors = <S extends UseBoundStore<StoreApi<object>>>(_store: S) =
   const store = _store as WithSelectors<typeof _store>
   store.use = {}
   for (const k of Object.keys(store.getState())) {
-    ;(store.use as any)[k] = () => store((s) => s[k as keyof typeof s])
+    ;(store.use as Record<string, unknown>)[k] = () => store((s) => s[k as keyof typeof s])
   }
 
   return store
@@ -477,7 +511,9 @@ export function useBanksAndBoxes() {
   const homeLocationIsEmpty = withSelectors.use.locationIsEmpty()
   const clearAtHomeLocation = withSelectors.use.clearAtLocation()
   const setAtHomeLocation = withSelectors.use.setAtLocation()
+  const swapHomeLocations = withSelectors.use.swapLocations()
   const findHomeLocation = withSelectors.use.findHomeLocation()
+  const hasHomeLocation = withSelectors.use.hasHomeLocation()
 
   const allMonsInCurrentBankWithLocations = withSelectors.use.allMonsCurrentBank()
   const allMonsInCurrentBank = () => Object.keys(allMonsInCurrentBankWithLocations())
@@ -496,12 +532,14 @@ export function useBanksAndBoxes() {
     switchBoxCurrentBank((getCurrentBank().current_box + 1) % currentBankBoxCount)
   }
 
-  function sortHomeBox(
+  async function sortHomeBox(
     boxIndex: number,
     sortType: string
-  ): Result<null, IdentifierNotPresentError[]> {
-    const loadResults = ohpkmStore.tryLoadFromIds(allMonsInHomeBoxCurrentBank(boxIndex))
-    const { successes: mons, failures } = partitionResults(loadResults)
+  ): Promise<Result<null, IdentifierNotPresentError[]>> {
+    const loadResults = await ohpkmStore.tryLoadBatch(allMonsInHomeBoxCurrentBank(boxIndex))
+
+    const { successes: mons, failures } = partitionResults(Array.from(loadResults.values()))
+
     if (failures.length) {
       return R.Err(failures)
     }
@@ -525,10 +563,13 @@ export function useBanksAndBoxes() {
     return R.Ok(null)
   }
 
-  function sortAllHomeBoxes(sortType: string): Result<null, IdentifierNotPresentError[]> {
+  async function sortAllHomeBoxes(
+    sortType: string
+  ): Promise<Result<null, IdentifierNotPresentError[]>> {
     const currentBankMons = allMonsInCurrentBankWithLocations()
-    const loadResults = ohpkmStore.tryLoadFromIds(Object.keys(currentBankMons))
-    const { successes: allMons, failures } = partitionResults(loadResults)
+    const loadResults = await ohpkmStore.tryLoadBatch(Object.keys(currentBankMons))
+    const { successes: allMons, failures } = partitionResults(Array.from(loadResults.values()))
+
     if (failures.length) {
       failures.forEach((failure) => {
         const location = currentBankMons[failure.identifier]
@@ -587,17 +628,6 @@ export function useBanksAndBoxes() {
     await reloadBankStore()
   }, [backend, banks, getCurrentBank, reloadBankStore])
 
-  useEffect(() => {
-    // returns a function to stop listening
-    const stopListening = backend.onMenuEvent('save', saveChanges)
-
-    // the "stop listening" function should be called when the effect returns,
-    // otherwise duplicate listeners will exist
-    return () => {
-      stopListening()
-    }
-  }, [backend, saveChanges, reloadBankStore])
-
   return {
     saveChanges,
     reloadBankStore,
@@ -630,7 +660,9 @@ export function useBanksAndBoxes() {
     homeLocationIsEmpty,
     clearAtHomeLocation,
     setAtHomeLocation,
+    swapHomeLocations,
     findHomeLocation,
+    hasHomeLocation,
 
     allMonsInCurrentBank,
     allMonsInHomeBoxCurrentBank,

@@ -3,16 +3,16 @@ import { FormMetadata, MetadataSummaryLookup } from '@pkm-rs/pkg'
 import { assert, beforeAll, describe, expect, test } from 'vitest'
 import { initializeWasm } from './init'
 
-var MimeJr: FormMetadata
-var MrMimeKanto: FormMetadata
-var MrMimeGalar: FormMetadata
-var MrRime: FormMetadata
+let MimeJr: FormMetadata
+let MrMimeKanto: FormMetadata
+let MrMimeGalar: FormMetadata
+let MrRime: FormMetadata
 
-var Vaporeon: FormMetadata
-var Sylveon: FormMetadata
+let Vaporeon: FormMetadata
+let Sylveon: FormMetadata
 
-var Applin: FormMetadata
-var Hydrapple: FormMetadata
+let Applin: FormMetadata
+let Hydrapple: FormMetadata
 
 beforeAll(initializeWasm)
 beforeAll(() => {

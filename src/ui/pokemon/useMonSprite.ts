@@ -1,0 +1,150 @@
+import BackendInterface from '@openhome-core/backend/backendInterface'
+import useBackend from '@openhome-core/backend/useBackend'
+import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
+import { Option, R } from '@openhome-core/util/functional'
+import useDisplayError from '@openhome-ui/hooks/displayError'
+import { getPublicImageURL } from '@openhome-ui/images/images'
+import { getPokemonSpritePath } from '@openhome-ui/images/pokemon'
+import { MonSpriteData, OpenHomePlugin, PluginContext } from '@openhome-ui/state/plugin/reducer'
+import { MetadataSummaryLookup } from '@pkm-rs/pkg'
+import { useContext, useEffect, useState } from 'react'
+
+type PluginSpriteResult = {
+  plugin: OpenHomePlugin
+  spritePath: string
+}
+
+export function findPluginSprite(
+  mon: MonSpriteData,
+  enabledPlugins: OpenHomePlugin[]
+): Option<PluginSpriteResult> {
+  for (const plugin of enabledPlugins) {
+    try {
+      const spritePath = plugin.getMonSpritePath?.({
+        dexNum: mon.nationalDex,
+        formNum: mon.formIndex,
+        ...mon,
+      })
+
+      if (spritePath) {
+        return { plugin, spritePath }
+      }
+    } catch (error) {
+      console.error(`error looking up ${plugin.name} sprite for mon:`, mon, error)
+    }
+  }
+}
+
+export type GetMonSpriteResult =
+  { type: 'default'; path: string } | ({ type: 'plugin' } & PluginSpriteResult)
+
+export function getMonSprite(
+  mon: MonSpriteData,
+  enabledPlugins: OpenHomePlugin[]
+): GetMonSpriteResult {
+  if (isMegaStone(mon.heldItemIndex)) {
+    const megaForStone = MetadataSummaryLookup(mon.nationalDex, mon.formIndex)?.megaEvolutions.find(
+      (mega) => mega.requiredItemId === mon.heldItemIndex
+    )
+
+    if (megaForStone) mon.formIndex = megaForStone.megaForme.formIndex
+  } else if (isBattleFormeItem(mon.nationalDex, mon.heldItemIndex)) {
+    mon.formIndex = displayIndexAdder(mon.heldItemIndex)(mon.formIndex)
+  }
+
+  const pluginResult = findPluginSprite(mon, enabledPlugins)
+  if (pluginResult) {
+    return { type: 'plugin', ...pluginResult }
+  } else {
+    return { type: 'default', path: getPublicImageURL(getPokemonSpritePath(mon)) }
+  }
+}
+
+type MonSpriteResult =
+  | { loading: true; path?: undefined; errorMessage?: undefined; severity?: undefined }
+  | { loading: false; path?: undefined; errorMessage: string; severity: 'error' | 'warning' }
+  | { loading: false; path: string; errorMessage?: string; severity?: 'error' | 'warning' }
+
+export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
+  const { enabledPlugins } = useContext(PluginContext)
+  const backend = useBackend()
+  const [spriteResult, setSpriteResult] = useState<MonSpriteResult>({ loading: true })
+  const displayError = useDisplayError()
+
+  useEffect(() => {
+    setSpriteResult({ loading: true })
+  }, [
+    mon.format,
+    mon.nationalDex,
+    mon.formIndex,
+    mon.formArgument,
+    mon.isFemale,
+    mon.isShiny,
+    mon.extraFormIndex,
+  ])
+
+  useEffect(() => {
+    if (spriteResult.errorMessage || spriteResult.path) return
+
+    if (isMegaStone(mon.heldItemIndex)) {
+      const megaForStone = MetadataSummaryLookup(
+        mon.nationalDex,
+        mon.formIndex
+      )?.megaEvolutions.find((mega) => mega.requiredItemId === mon.heldItemIndex)
+
+      if (megaForStone) mon.formIndex = megaForStone.megaForme.formIndex
+    } else if (isBattleFormeItem(mon.nationalDex, mon.heldItemIndex)) {
+      mon.formIndex = displayIndexAdder(mon.heldItemIndex)(mon.formIndex)
+    }
+
+    const result = getMonSprite(mon, enabledPlugins)
+    switch (result.type) {
+      case 'default':
+        setSpriteResult({
+          loading: false,
+          path: result.path,
+        })
+        return
+      case 'plugin':
+        const { plugin, spritePath } = result
+        getPluginSprite(plugin, spritePath, backend).then(setSpriteResult)
+    }
+  }, [
+    mon.format,
+    enabledPlugins,
+    backend,
+    displayError,
+    spriteResult.path,
+    spriteResult.errorMessage,
+    spriteResult,
+    mon,
+  ])
+
+  return spriteResult
+}
+
+export async function getPluginSprite(
+  plugin: OpenHomePlugin,
+  spritePath: string,
+  backend: BackendInterface
+): Promise<MonSpriteResult> {
+  return backend
+    .getPluginPath(plugin.id)
+    .then(
+      R.map((pluginPath: string) => backend.convertLocalImagePath(`${pluginPath}/${spritePath}`))
+    )
+    .then(
+      R.match(
+        (imageData) => ({ loading: false, path: imageData }),
+        (err) => {
+          console.warn('Plugin Sprite Error', `Plugin '${plugin.id}' failed to load a sprite`, err)
+          return {
+            loading: false,
+            errorMessage: 'Failed to load plugin sprite: ' + err,
+            severity: 'error',
+            path: spritePath,
+          }
+        }
+      )
+    )
+}

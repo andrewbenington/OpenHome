@@ -1,6 +1,9 @@
+use std::collections::HashMap;
 use std::ops::Deref;
 use std::sync::Mutex;
 
+use openhome_core::search;
+use pkm_rs::ohpkm::{OhpkmV2, OpenHomeId, UnknownHandlerSave};
 use serde::Serialize;
 use tauri::Emitter;
 
@@ -60,9 +63,23 @@ impl<State: SyncedState> SyncedStateWrapper<State> {
 }
 
 pub struct AllSyncedStateInner {
-    pub lookups: SyncedStateWrapper<LookupState>,
-    pub ohpkm_store: SyncedStateWrapper<OhpkmBytesStore>,
-    pub convert_strategies: SyncedStateWrapper<ConvertStrategies>,
+    lookups: SyncedStateWrapper<LookupState>,
+    ohpkm_store: SyncedStateWrapper<OhpkmBytesStore>,
+    convert_strategies: SyncedStateWrapper<ConvertStrategies>,
+}
+
+impl AllSyncedStateInner {
+    pub fn from_states(
+        lookups: LookupState,
+        ohpkm_store: OhpkmBytesStore,
+        convert_strategies: ConvertStrategies,
+    ) -> Self {
+        Self {
+            lookups: SyncedStateWrapper(lookups),
+            ohpkm_store: SyncedStateWrapper(ohpkm_store),
+            convert_strategies: SyncedStateWrapper(convert_strategies),
+        }
+    }
 }
 
 pub struct AllSyncedState(pub Mutex<AllSyncedStateInner>);
@@ -73,19 +90,50 @@ impl AllSyncedState {
         ohpkm_store: OhpkmBytesStore,
         convert_strategies: ConvertStrategies,
     ) -> Self {
-        Self(Mutex::new(AllSyncedStateInner {
-            lookups: SyncedStateWrapper(lookups),
-            ohpkm_store: SyncedStateWrapper(ohpkm_store),
-            convert_strategies: SyncedStateWrapper(convert_strategies),
-        }))
+        Self(Mutex::new(AllSyncedStateInner::from_states(
+            lookups,
+            ohpkm_store,
+            convert_strategies,
+        )))
     }
 
     pub fn clone_lookups(&self) -> Result<LookupState> {
         Ok(self.lock()?.lookups.0.clone())
     }
 
-    pub fn ohpkm_store_b64(&self) -> Result<Vec<(String, String)>> {
-        Ok(self.lock()?.ohpkm_store.0.to_b64_entries())
+    pub fn search_ohpkm_store(
+        &self,
+        cursor: search::PaginationCursor,
+        filters: Vec<search::Filter>,
+    ) -> Result<search::PaginatedPage<String>> {
+        Ok(self
+            .lock()?
+            .ohpkm_store
+            .0
+            .get_b64_bytes_page(cursor, filters))
+    }
+
+    pub fn search_ohpkms_matching_unknown_handler(
+        &self,
+        save: &UnknownHandlerSave,
+    ) -> Result<Vec<OhpkmV2>> {
+        Ok(self
+            .lock()?
+            .ohpkm_store
+            .0
+            .get_all_with_unknown_handler(save)
+            .collect())
+    }
+
+    pub fn ohpkm_lookup(&self, id: OpenHomeId) -> Result<Option<OhpkmV2>> {
+        self.lock()?.ohpkm_store.0.lookup(&id)
+    }
+
+    pub fn ohpkm_lookup_batch(
+        &self,
+        ids: &[OpenHomeId],
+    ) -> Result<HashMap<OpenHomeId, Result<OhpkmV2>>> {
+        Ok(self.lock()?.ohpkm_store.0.lookup_batch(ids))
     }
 
     pub fn get_convert_strategies(&self) -> Result<ConvertStrategies> {

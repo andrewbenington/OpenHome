@@ -12,7 +12,7 @@ use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesForm;
 
 use pkm_rs_types::strings::SizedUtf16String;
-use pkm_rs_types::{ContestStats, Ivs, Language, Pokerus, Stats8, Stats16Le, StatsPreSplit};
+use pkm_rs_types::{ContestStats, Dvs, Ivs, Language, Pokerus, Stats8, Stats16Le, StatsPreSplit};
 use pkm_rs_types::{Gender, OriginGame, PokeDate, ShinyLeaves, TrainerMemory};
 use pkm_rs_types::{Geolocations, HyperTraining, MarkingsSixShapesColors};
 
@@ -67,7 +67,7 @@ pub struct OhpkmV1 {
     pub tera_type_override: u8,
     pub unknown_a0: u32,
     pub gvs: Stats8,
-    pub dvs: StatsPreSplit,
+    pub dvs: Dvs,
     pub handler_name: SizedUtf16String<26>,
     pub handler_language: u8,
     pub is_current_handler: bool,
@@ -210,7 +210,9 @@ impl OhpkmV1 {
             tera_type_override: bytes[154],
             unknown_a0: u32::from_le_bytes(bytes[160..164].try_into().unwrap()),
             gvs: Stats8::from_bytes(bytes[164..170].try_into().unwrap()),
-            dvs: StatsPreSplit::from_dv_bytes(bytes[170..172].try_into().unwrap()),
+            dvs: Dvs::from(StatsPreSplit::from_dv_bytes(
+                bytes[170..172].try_into().unwrap(),
+            )),
             handler_name: SizedUtf16String::<26>::from_bytes(bytes[184..210].try_into().unwrap()),
             handler_language: bytes[211],
             is_current_handler: util::get_flag(bytes, 212, 0),
@@ -396,7 +398,7 @@ impl PkmBytes for OhpkmV1 {
         bytes[154] = self.tera_type_override;
         bytes[160..164].copy_from_slice(&self.unknown_a0.to_le_bytes());
         bytes[164..170].copy_from_slice(&self.gvs.to_bytes());
-        bytes[170..172].copy_from_slice(&self.dvs.to_dv_bytes());
+        bytes[170..172].copy_from_slice(&self.dvs.to_bytes());
 
         // height_absolute and weight_absolute are now calculated on the fly, so thes bytes are skipped
 

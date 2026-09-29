@@ -1,10 +1,9 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { getMonFileIdentifier, OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { SortTypes } from '@openhome-core/pkm/sort'
-import { monSupportedBySave } from '@openhome-core/save/util'
 import { mapToObject } from '@openhome-core/util'
-import { $R, R, range } from '@openhome-core/util/functional'
+import { $R, isResult, Option, R, range } from '@openhome-core/util/functional'
+import { isThenable, NowOrLater } from '@openhome-core/util/promise'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import { Item, Separator, Submenu } from '@openhome-ui/components/context-menu/types'
 import { DebugDataDisplay } from '@openhome-ui/components/DebugDataDisplay'
@@ -23,36 +22,36 @@ import SearchFields from '@openhome-ui/components/search/SearchFields'
 import PokemonSearchModal from '@openhome-ui/components/search/SearchModal'
 import ToggleButton from '@openhome-ui/components/ToggleButton'
 import useDisplayError from '@openhome-ui/hooks/displayError'
-import PokemonDetailsModal from '@openhome-ui/pokemon-details/PokemonDetailsModal'
-import { ErrorContext } from '@openhome-ui/state/error'
-import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
+import MissingOhpkmIdPrompt from '@openhome-ui/pokemon/MissingOhpkmId'
+import PokemonDetailsModal from '@openhome-ui/pokemon/PokemonDetailsModal'
+import {
+  useDragSourceSupportsMon,
+  useIsDraggingActive,
+} from '@openhome-ui/state-zustand/drag-and-drop/dragStore'
+import { OhpkmLookupResult, useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import useTrackedDataRecovery from '@openhome-ui/state/ohpkm/useTrackedDataRecovery'
-import { HomeMonLocation, MonLocation, MonWithLocation, useSaves } from '@openhome-ui/state/saves'
+import { EMPTY_SLOT, HomeMonLocation, useSaves } from '@openhome-ui/state/saves'
 import { cssClass } from '@openhome-ui/util/style'
-import { Language, Lookup } from '@pkm-rs/pkg'
 import { Button, Card, DropdownMenu, Flex, Heading, TextField, Tooltip } from '@radix-ui/themes'
 import { ToggleGroup } from 'radix-ui'
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { BsFillGrid3X3GapFill } from 'react-icons/bs'
 import { FaSquare } from 'react-icons/fa'
 import {
-  BankBoxCoordinates,
   OPENHOME_BOX_COLUMNS,
   OPENHOME_BOX_ROWS,
   OPENHOME_BOX_SLOTS,
   useBanksAndBoxes,
 } from '../../state-zustand/banks-and-boxes/store'
-import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
+import useMultiSelect from '../../state/drag-and-drop/useMultiSelect'
 import { useOpenHomeBoxNavigator } from '../util'
 import AllHomeBoxes from './AllHomeBoxes'
 import ArrowButton from './ArrowButton'
-import BoxCell from './BoxCell'
+import BoxCellAsync from './BoxCellAsync'
 import DroppableSpace from './DroppableSpace'
 import './style.css'
 
 export type BoxViewMode = 'one' | 'all'
-
-const ALLOW_DUPE_IMPORT = true
 
 export default function HomeBoxDisplay() {
   const [editing, setEditing] = useState(false)
@@ -61,7 +60,7 @@ export default function HomeBoxDisplay() {
   const [viewMode, setViewMode] = useState<BoxViewMode>('one')
   const [editingBoxName, setEditingBoxName] = useState('')
   const [debugMode, setDebugMode] = useState(false)
-  const { dragState, toggleMultiSelect } = useDragAndDrop()
+  const { multiSelectState, toggleMultiSelect } = useMultiSelect()
   const {
     addBoxCurrentBank,
     getCurrentBox,
@@ -149,13 +148,13 @@ export default function HomeBoxDisplay() {
                   onUnset={() => setBoxNameCurrentBank(currentBox.index, editingBoxName)}
                   icon={EditIcon}
                   hint="Change box name"
-                  disabled={dragState.multiSelectEnabled}
+                  disabled={multiSelectState.multiSelectEnabled}
                 />
                 <ToggleButton
-                  state={dragState.multiSelectEnabled}
+                  state={multiSelectState.multiSelectEnabled}
                   setState={toggleMultiSelect}
                   icon={SelectIcon}
-                  hint={`Multi-select${dragState.selectedLocations.length > 0 ? ` (${dragState.selectedLocations.length})` : ''}`}
+                  hint={`Multi-select${multiSelectState.selectedLocations.length > 0 ? ` (${multiSelectState.selectedLocations.length})` : ''}`}
                   disabled={editing}
                 />
               </>
@@ -233,41 +232,49 @@ export default function HomeBoxDisplay() {
       {viewMode === 'one' ? (
         <SingleBoxMonDisplay />
       ) : (
-        <AllHomeBoxes
-          onBoxSelect={(boxIndex) => {
-            switchBoxCurrentBank(boxIndex)
-            setViewMode('one')
-          }}
-          moving={moving}
-          deleting={deleting}
-          debugMode={debugMode}
-        />
+        viewMode === 'all' && (
+          <AllHomeBoxes
+            onBoxSelect={(boxIndex) => {
+              switchBoxCurrentBank(boxIndex)
+              setViewMode('one')
+            }}
+            moving={moving}
+            deleting={deleting}
+            debugMode={debugMode}
+          />
+        )
       )}
     </Card>
   )
 }
 
-type MissingIdData = {
-  id: OhpkmIdentifier
-  location: BankBoxCoordinates
+type SlotData = {
+  monPromise: NowOrLater<OhpkmLookupResult> | PKMInterface | undefined
+  location: HomeMonLocation
+  identifier: Option<OhpkmIdentifier>
 }
 
 function SingleBoxMonDisplay() {
   const ohpkmStore = useOhpkmStore()
   const displayError = useDisplayError()
-  const { importMonsToLocation, saveFromIdentifier } = useSaves()
-  const { getCurrentBox, getCurrentBank, clearAtHomeLocation, removeAllHomeDupes } =
-    useBanksAndBoxes()
-  const [missingIdData, setMissingIdData] = useState<MissingIdData>()
-  const [, dispatchError] = useContext(ErrorContext)
-  const { dragState, isSelected, toggleSelection } = useDragAndDrop()
+  const { importMonsToLocation, getPendingMon } = useSaves()
+  const { getCurrentBox, getCurrentBank, removeAllHomeDupes } = useBanksAndBoxes()
+  const { multiSelectState: dragState, isSelected, toggleSelection } = useMultiSelect()
   const { sortHomeBox, sortAllHomeBoxes } = useBanksAndBoxes()
   const {
     currentIndex: selectedIndex,
     setCurrentIndex: setSelectedIndex,
     navigateNext: navigateRight,
     navigatePrev: navigateLeft,
+    selectedMon,
   } = useOpenHomeBoxNavigator()
+
+  const currentBox = getCurrentBox()
+  const getById = ohpkmStore.tryLoadFromId
+  const lookupOhpkmById = useCallback(
+    (identifier: OhpkmIdentifier) => getById(identifier),
+    [getById]
+  )
 
   const TrackedDataRecovery = useTrackedDataRecovery()
   const dataRecoverySearchModal = {
@@ -279,72 +286,13 @@ function SingleBoxMonDisplay() {
     },
   }
 
-  const attemptImportMons = useCallback(
-    (mons: PKMInterface[], location: MonLocation) => {
-      for (const mon of mons) {
-        try {
-          const identifier = getMonFileIdentifier(OHPKM.fromMonUnknownSave(mon))
-
-          if (!identifier) continue
-
-          if (!ALLOW_DUPE_IMPORT && ohpkmStore.monIsStored(identifier)) {
-            const message =
-              mons.length === 1
-                ? 'This Pokémon has been moved into OpenHome before.'
-                : 'One or more of these Pokémon has been moved into OpenHome before.'
-
-            dispatchError({
-              type: 'set_message',
-              payload: { title: 'Import Failed', messages: [message] },
-            })
-            return
-          }
-        } catch (e) {
-          dispatchError({
-            type: 'set_message',
-            payload: { title: 'Import Failed', messages: [`${e}`] },
-          })
-        }
-      }
-      importMonsToLocation(mons, location)
-    },
-    [dispatchError, importMonsToLocation, ohpkmStore]
-  )
-
-  const dragData: MonWithLocation | undefined = useMemo(() => {
-    const payload = dragState.payload
-
-    if (payload?.kind === 'mon') {
-      return payload.monData
-    }
-    return undefined
-  }, [dragState.payload])
-
-  const sourceSupportsMon = useCallback(
-    (mon: PKMInterface) =>
-      !dragData || dragData?.isHome
-        ? true
-        : monSupportedBySave(saveFromIdentifier(dragData.saveIdentifier), mon),
-    [dragData, saveFromIdentifier]
-  )
-
-  const currentBox = getCurrentBox()
-
-  const selectedMon = useMemo(() => {
-    if (!currentBox || selectedIndex === undefined || selectedIndex >= OPENHOME_BOX_SLOTS) {
-      return undefined
-    }
-    const selectedMonIdentifier = currentBox.identifiers.get(selectedIndex)
-    if (!selectedMonIdentifier) return undefined
-
-    return ohpkmStore.getById(selectedMonIdentifier)
-  }, [currentBox, ohpkmStore, selectedIndex])
+  const sourceSupportsMon = useDragSourceSupportsMon()
 
   const contextElements = useMemo(
     () => [
       Submenu.label('Sort this box...').with(
         ...SortTypes.map((sortType) =>
-          Item.label(`By ${sortType}`).action(() => sortHomeBox(getCurrentBox().index, sortType))
+          Item.label(`By ${sortType}`).action(() => sortHomeBox(currentBox.index, sortType))
         )
       ),
       Submenu.label('Sort all boxes...').with(
@@ -353,95 +301,114 @@ function SingleBoxMonDisplay() {
         )
       ),
     ],
-    [getCurrentBox, sortAllHomeBoxes, sortHomeBox]
+    [currentBox, sortAllHomeBoxes, sortHomeBox]
   )
 
   const removeDupesItem = Item.label('Remove duplicates from this box').action(removeAllHomeDupes)
 
-  function dismissMissingIdDialog() {
-    setMissingIdData(undefined)
-  }
+  const currentBankIndex = getCurrentBank().index
+  const currentBoxIndex = getCurrentBox().index
 
-  const missingIdEvoFamily = missingIdData
-    ? Lookup.speciesName(parseInt(missingIdData.id.split('-')[0]), Language.English)
-    : undefined
+  const slots: SlotData[] = useMemo(
+    () =>
+      range(OPENHOME_BOX_SLOTS)
+        .map((index: number) => currentBox.identifiers.get(index))
+        .map((storedId, index) => {
+          const location: HomeMonLocation = {
+            bank: currentBankIndex,
+            box: currentBoxIndex,
+            boxSlot: index,
+            isHome: true,
+          }
 
-  function clearMissingIdSlot() {
-    if (missingIdData) clearAtHomeLocation(missingIdData.location)
-    dismissMissingIdDialog()
-  }
+          let identifier = storedId
+          let monPromise: NowOrLater<OhpkmLookupResult> | PKMInterface | undefined = undefined
+
+          // pendingMon means this slot is in the process of being updated, but needs to wait
+          // for the OHPKM data to be registered. In the meantime the pendingMon should be displayed
+          // for immediate visual feedback
+          const pendingMon = getPendingMon(location)
+          if (pendingMon === EMPTY_SLOT) {
+            identifier = undefined
+          } else if (pendingMon) {
+            if (typeof pendingMon === 'string') {
+              identifier = pendingMon
+            } else {
+              identifier = undefined
+              monPromise = pendingMon
+            }
+          }
+
+          if (identifier) {
+            // const lookupResult = lookupOhpkmById(identifier)
+            // if (isThenable(lookupResult)) {
+            //   monPromise = lookupResult
+            // }
+            monPromise ??= lookupOhpkmById(identifier)
+          }
+
+          return { monPromise, location, identifier }
+        }),
+    [currentBankIndex, currentBox.identifiers, currentBoxIndex, getPendingMon, lookupOhpkmById]
+  )
 
   return (
     <>
       <OpenHomeCtxMenu sections={[contextElements, [removeDupesItem]]}>
         <div className="home-box-grid">
-          {range(OPENHOME_BOX_SLOTS)
-            .map((index: number) => currentBox.identifiers.get(index))
-            .map((identifier, index) => {
-              const currentBankIndex = getCurrentBank().index
-              const currentBoxIndex = getCurrentBox().index
+          {slots.map(({ monPromise, location, identifier }, index) => {
+            // if underlying data changes but this key doesn't, the box cell will be stale and may not display the correct species
+            let uniqueKey = identifier ?? `${currentBoxIndex}-${index}`
 
-              const thisLocation: HomeMonLocation = {
-                bank: currentBankIndex,
-                box: currentBoxIndex,
-                boxSlot: index,
-                isHome: true,
-              }
+            let monNowOrLater: Option<PKMInterface> = undefined
 
-              // if underlying data changes but this key doesn't, the box cell will be stale and may not display the correct species
-              let uniqueKey = `${currentBoxIndex}-${index}-${identifier}`
-
-              const result = identifier ? ohpkmStore.tryLoadFromId(identifier) : undefined
-              if (result && R.isErr(result)) {
+            if (monPromise && !isThenable(monPromise) && isResult(monPromise)) {
+              if (R.isOk(monPromise)) {
+                monNowOrLater = monPromise.data
+              } else {
+                const { identifier } = monPromise.error
+                console.error(identifier)
                 return (
-                  <Tooltip key={uniqueKey} content={identifier}>
-                    <Button
-                      className="box-slot-missing-id"
-                      radius="full"
-                      size="1"
-                      onClick={() =>
-                        identifier && setMissingIdData({ id: identifier, location: thisLocation })
-                      }
-                    >
-                      !
-                    </Button>
-                  </Tooltip>
+                  <MissingOhpkmIdPrompt
+                    key={uniqueKey}
+                    openhomeId={identifier}
+                    location={location}
+                  />
                 )
               }
+            }
 
-              const mon = result?.data
-
-              return (
-                <BoxCell
-                  key={uniqueKey}
-                  onClick={() => setSelectedIndex(index)}
-                  dragID={`home_${currentBoxIndex}_${index}`}
-                  location={thisLocation}
-                  mon={mon}
-                  onDrop={(importedMons) => {
-                    if (importedMons) {
-                      attemptImportMons(importedMons, thisLocation)
-                    }
-                  }}
-                  disabled={
-                    // don't allow a swap with a pokémon not supported by the source save
-                    mon && dragData && !dragData.isHome && !sourceSupportsMon(mon)
+            return (
+              <BoxCellAsync
+                key={uniqueKey}
+                monPlaceholder={!isThenable(monNowOrLater) ? monNowOrLater : undefined}
+                monPromise={monPromise}
+                onClick={() => setSelectedIndex(index)}
+                dragID={`home_${currentBoxIndex}_${index}`}
+                location={location}
+                openhomeId={identifier}
+                onDrop={(importedMons) => {
+                  if (importedMons) {
+                    importMonsToLocation(importedMons, location)
                   }
-                  contextMenu={[
-                    Item.label('Merge/Recover Tracking Data').action(() =>
-                      $R(TrackedDataRecovery.startRecovery(thisLocation)).mapErr((err) =>
-                        displayError('Error starting recovery process', err.message, err.data)
-                      )
-                    ),
-                    Separator,
-                    ...contextElements,
-                  ]}
-                  multiSelectEnabled={dragState.multiSelectEnabled}
-                  isSelected={isSelected(thisLocation)}
-                  onToggleSelect={() => toggleSelection(thisLocation)}
-                />
-              )
-            })}
+                }}
+                // don't allow a swap with a pokémon not supported by the source save
+                isDisabled={(mon) => mon !== undefined && !sourceSupportsMon(mon)}
+                contextMenu={[
+                  Item.label('Merge/Recover Tracking Data').action(async () =>
+                    $R(await TrackedDataRecovery.startRecovery(location)).mapErr((err) =>
+                      displayError('Error starting recovery process', err.message, err.data)
+                    )
+                  ),
+                  Separator,
+                  ...contextElements,
+                ]}
+                multiSelectEnabled={dragState.multiSelectEnabled}
+                isSelected={isSelected(location)}
+                onToggleSelect={() => toggleSelection(location)}
+              />
+            )
+          })}
         </div>
       </OpenHomeCtxMenu>
       <PokemonDetailsModal
@@ -463,16 +430,6 @@ function SingleBoxMonDisplay() {
             : undefined
         }
       />
-      <PromptDialog
-        title="Tracking Data Missing"
-        open={missingIdData !== undefined}
-        onClose={dismissMissingIdDialog}
-        description={`There is a Pokémon in this box slot, but its tracking data cannot be found. This Pokémon's OpenHome ID was ${missingIdData?.id}, and is was from the ${missingIdEvoFamily} evolution family.`}
-        actions={[
-          { uniqueLabel: 'Cancel', action: dismissMissingIdDialog, type: 'cancel' },
-          { uniqueLabel: 'Clear this slot', action: clearMissingIdSlot, type: 'destructive' },
-        ]}
-      />
       <PokemonSearchModal
         typeName="Pokémon"
         title={TrackedDataRecovery.selectDataPrompt}
@@ -492,8 +449,8 @@ function SingleBoxMonDisplay() {
           },
           {
             uniqueLabel: 'Confirm',
-            action: () => {
-              $R(TrackedDataRecovery.confirmRecovery()).mapErr((err) => {
+            action: async () => {
+              $R(await TrackedDataRecovery.confirmRecovery()).mapErr((err) => {
                 TrackedDataRecovery.goBack()
                 displayError('Error recovering Pokémon data', err.message, err.data)
               })
@@ -513,14 +470,14 @@ type ViewToggleProps = {
   disabled?: boolean
 }
 
-const DRAG_OVER_COOLDOWN_MS = 500
+const DRAG_OVER_COOLDOWN_MS = 1000
 
 // necessary for incompatibility between Node and web api
 type TimeoutType = ReturnType<typeof setTimeout>
 
 function ViewToggle(props: ViewToggleProps) {
   const { viewMode, setViewMode, disabled } = props
-  const { dragState } = useDragAndDrop()
+  const draggingActive = useIsDraggingActive()
   const [timer, setTimer] = useState<TimeoutType>()
   const setViewModeRef = useRef(setViewMode)
 
@@ -554,11 +511,7 @@ function ViewToggle(props: ViewToggleProps) {
       onValueChange={(newVal: BoxViewMode) => setViewMode(newVal)}
       disabled={disabled}
     >
-      <ToggleGroup.Item
-        value="one"
-        className="ToggleGroupItem"
-        disabled={Boolean(dragState.payload)}
-      >
+      <ToggleGroup.Item value="one" className="ToggleGroupItem" disabled={draggingActive}>
         <FaSquare />
       </ToggleGroup.Item>
       <ToggleGroup.Item value="all" className="ToggleGroupItem">

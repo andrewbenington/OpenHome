@@ -128,12 +128,11 @@ export interface AllPKMFields {
   teraTypeOriginal?: TeraType
   teraTypeOverride?: TeraType
   tmFlagsLzaBase?: Uint8Array
-  tmMovesLzaBase?: Move[]
   tmFlagsLzaDlc?: Uint8Array
-  tmMovesLzaDlc?: Move[]
+  tmMovesLza?: Move[]
   plusMoveFlags?: PlusMoveFlags
   tmFlagsSV?: Uint8Array
-  tmMovesSV?: Move[]
+  tmMovesSv?: Move[]
   tmFlagsSVDLC?: Uint8Array
   tmMovesSVDLC?: Move[]
   trFlagsSwSh?: Uint8Array

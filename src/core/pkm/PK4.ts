@@ -24,9 +24,9 @@ import * as types from '../util/types'
 import { generatePersonalityValuePreservingAttributes, MoveFilter } from '../util/util'
 import { PkmConverter } from './conversion/converter'
 import { PkmConstructorOptions } from './PKM'
+import { modernStatCalc } from './util'
 import * as encryption from './util/encryption'
 import { filterRibbons } from './util/ribbonLogic'
-import { getStats } from './util/statCalc'
 
 const DP_FARAWAY_PLACE = 0xbba
 
@@ -145,7 +145,7 @@ export default class PK4 {
       this.ballDPPt = dataView.getUint8(0x83)
       this.ballHGSS = dataView.getUint8(0x86)
       this.ball = Math.max(this.ballDPPt, this.ballHGSS)
-      this.metLevel = dataView.getUint8(0x84)
+      this.metLevel = dataView.getUint8(0x84) & 0b01111111
       this.encounterType = dataView.getUint8(0x85)
       this.performance = dataView.getUint8(0x87)
       if (dataView.byteLength >= 236) {
@@ -404,7 +404,7 @@ export default class PK4 {
   }
 
   public getStats() {
-    return getStats(this)
+    return modernStatCalc(this)
   }
 
   public get heldItemName() {

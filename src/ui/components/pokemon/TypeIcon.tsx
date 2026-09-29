@@ -1,6 +1,7 @@
 import { teraTypeStringFromIndex } from '@openhome-core/resources'
 import { getPublicImageURL, getTypeIconPath } from '@openhome-ui/images/images'
 import { PkmType, TeraType } from '@pkm-rs/pkg'
+import { memo } from 'react'
 import './style.css'
 
 type TypeIconProps = {
@@ -24,7 +25,7 @@ type TypeIconProps = {
     }
 )
 
-const TypeIcon = (props: TypeIconProps) => {
+const TypeIcon = memo((props: TypeIconProps) => {
   let type: string
 
   if (props.teraType) {
@@ -45,6 +46,6 @@ const TypeIcon = (props: TypeIconProps) => {
       src={getPublicImageURL(getTypeIconPath(type))}
     />
   )
-}
+})
 
 export default TypeIcon

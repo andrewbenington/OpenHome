@@ -3,8 +3,8 @@ import { type CSSProperties } from 'react'
 
 import './style.css'
 
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SortableValue } from '@openhome-core/util/sort'
+import { OhpkmRowData } from '@openhome-ui/ohpkmGrid'
 import { Dialog } from '../dialog/Dialog'
 import OhoButton, { OhoButtonType } from '../OhoButton'
 import { ModalController, type SearchController } from './controllers'
@@ -40,15 +40,20 @@ function SearchModal<T extends SortableValue, SC extends SearchController<T>>(
     SearchComponent,
   } = props
   const { modalOpen, setModalOpen } = props.modalController
-  const { selectedItem, reset } = searchController
+  const { selectedId, getSelectedItem, reset, loading } = searchController
 
   function closeAndClear() {
     reset()
     setModalOpen(false)
   }
 
-  function confirmSelected() {
-    if (selectedItem) onSelect(selectedItem)
+  async function confirmSelected() {
+    if (!selectedId) return
+
+    const selectedItem = await getSelectedItem()
+    if (selectedItem) {
+      onSelect(selectedItem)
+    }
   }
 
   return (
@@ -75,7 +80,7 @@ function SearchModal<T extends SortableValue, SC extends SearchController<T>>(
             <OhoButton type="reset" onClick={closeAndClear}>
               Cancel
             </OhoButton>
-            <OhoButton disabled={!selectedItem} type="submit" onClick={confirmSelected}>
+            <OhoButton disabled={loading || !selectedId} type="submit" onClick={confirmSelected}>
               Select
             </OhoButton>
           </Flex>
@@ -85,7 +90,7 @@ function SearchModal<T extends SortableValue, SC extends SearchController<T>>(
   )
 }
 
-type PokemonSearchModalProps = SearchModalProps<OHPKM, PokemonSearchController>
+type PokemonSearchModalProps = SearchModalProps<OhpkmRowData, PokemonSearchController>
 
 function PokemonSearchModal(props: PokemonSearchModalProps) {
   return <SearchModal {...props} typeName="Pokémon" SearchComponent={Search.Pokemon} />

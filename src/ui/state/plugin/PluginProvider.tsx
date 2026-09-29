@@ -67,9 +67,9 @@ function usePlugins() {
     appInfoState.settings.enabledPlugins,
   ])
 
-  useEffect(() => {
-    backend.updateSettings(appInfoState.settings).catch(console.error)
-  }, [appInfoState.settings, backend])
+  // useEffect(() => {
+  //   backend.updateSettings(appInfoState.settings).catch(console.error)
+  // }, [appInfoState.settings, backend])
 
   useEffect(() => {
     setLoading(true)

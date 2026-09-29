@@ -1,5 +1,3 @@
-use base64::Engine;
-use base64::engine::general_purpose;
 use std::fs;
 use std::io::Cursor;
 use std::path::Path;
@@ -10,12 +8,6 @@ use openhome_core::{Error, Result};
 
 #[cfg(not(target_os = "linux"))]
 use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
-
-#[derive(serde::Serialize, serde::Deserialize, Debug, specta::Type)]
-pub struct ImageResponse {
-    pub base64: String,
-    pub extension: String,
-}
 
 pub fn write_file_contents<P, C>(path: P, contents: C) -> Result<()>
 where
@@ -107,37 +99,6 @@ where
         serde_json::from_str(&body_text).map_err(|err| Error::file_malformed(&url, err))?;
 
     Ok(body)
-}
-
-pub fn get_image_data(absolute_path: &Path) -> Result<ImageResponse> {
-    if !absolute_path.exists() {
-        return Err(Error::file_missing(absolute_path));
-    }
-
-    let bytes = read_file_bytes(absolute_path)?;
-
-    let extension = absolute_path
-        .extension()
-        .ok_or(Error::other("Image format not supported (no extension)"))?;
-
-    let extension_lower = extension.to_string_lossy().to_lowercase();
-
-    if extension_lower != "png"
-        && extension_lower != "gif"
-        && extension_lower != "jpg"
-        && extension_lower != "jpeg"
-    {
-        return Err(Error::other(&format!(
-            "Image format not supported: {extension_lower}"
-        )));
-    }
-
-    let response = ImageResponse {
-        base64: general_purpose::STANDARD.encode(bytes),
-        extension: extension_lower,
-    };
-
-    Ok(response)
 }
 
 pub fn delete_directory(directory_path: &Path) -> Result<()> {

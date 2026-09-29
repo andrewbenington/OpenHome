@@ -1,6 +1,6 @@
 import { PKM, RomHackPKM } from '@openhome-core/pkm/PKM'
 import { Stats } from '@openhome-core/util/types'
-import { FormMetadata, SpeciesMetadata } from '@pkm-rs/pkg'
+import { FormMetadata, SpeciesMetadata, StatsPreSplit } from '@pkm-rs/pkg'
 import { PluginIdentifier } from '../save/interfaces'
 import { AllPKMFields } from './util/pkmInterface'
 
@@ -15,7 +15,7 @@ export interface PluginPKMInterface extends PKMInterface {
 }
 
 export type PKMInterface = AllPKMFields & {
-  getStats(): Stats
+  getStats(): Stats | StatsPreSplit
   // Corresponding save's plugin_identifier
   pluginIdentifier?: PluginIdentifier
   // If met in a plugin save, this will be the save's plugin_identifier. otherwise this is empty

@@ -1,14 +1,23 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PluginIdentifier } from '@openhome-core/save/interfaces'
-import { gameOrPluginSorter, SortableColumn, stringSorter } from '@openhome-core/util/sort'
+import { isOk } from '@openhome-core/util/functional'
+import {
+  filterUndefined,
+  gameOrPluginSorter,
+  multiSorter,
+  numericSorter,
+  SortableColumn,
+  stringSorter,
+} from '@openhome-core/util/sort'
 import Badge from '@openhome-ui/components/badge/Badge'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
 import { useLookups } from '@openhome-ui/state/lookups/useLookups'
-import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
-import { OriginGames } from '@pkm-rs/pkg'
+import useOhpkmIdBatchLookup from '@openhome-ui/state/ohpkm/useOhpkmIdBatchLookup'
+import { Language, Lookup, OriginGames } from '@pkm-rs/pkg'
+import { Spinner } from '@radix-ui/themes'
 
-type G12LookupRow = {
+export type G12LookupRow = {
   gen12ID: string
   homeID: string
   homeMon?: OHPKM
@@ -19,8 +28,8 @@ type Gen12LookupProps = {
 }
 
 export default function Gen12Lookup({ onSelectMon }: Gen12LookupProps) {
-  const ohpkmStore = useOhpkmStore()
   const { lookups } = useLookups()
+  const { loading, batchResults } = useOhpkmIdBatchLookup(Object.values(lookups.gen12))
 
   const columns: SortableColumn<G12LookupRow>[] = [
     {
@@ -40,6 +49,12 @@ export default function Gen12Lookup({ onSelectMon }: Gen12LookupProps) {
             />
           </button>
         ),
+      sortFunction: multiSorter(
+        numericSorter((row) => row.homeMon?.nationalDex),
+        numericSorter((row) => row.homeMon?.formIndex)
+      ),
+      getFilterValue: (value) =>
+        value.homeMon ? Lookup.speciesName(value.homeMon.nationalDex, Language.English) : undefined,
       cellClass: 'centered-cell',
     },
     {
@@ -77,15 +92,27 @@ export default function Gen12Lookup({ onSelectMon }: Gen12LookupProps) {
     },
   ]
 
-  return (
+  const rowsWithLoadedOhpkms: G12LookupRow[] = Object.entries(lookups.gen12)
+    .map(([gen12ID, homeID]) => ({
+      gen12ID,
+      homeID,
+      ohpkmResult: batchResults?.get(homeID),
+    }))
+    .map(({ gen12ID, homeID, ohpkmResult }) =>
+      ohpkmResult !== undefined && isOk(ohpkmResult)
+        ? { gen12ID, homeID, homeMon: ohpkmResult.data }
+        : undefined
+    )
+    .filter(filterUndefined)
+
+  return loading ? (
+    <Spinner />
+  ) : (
     <SortableDataGrid
-      rows={Object.entries(lookups.gen12).map(([gen12ID, homeID]) => ({
-        gen12ID,
-        homeID,
-        homeMon: ohpkmStore.getById(homeID),
-      }))}
+      rows={rowsWithLoadedOhpkms}
       columns={columns}
-      enableVirtualization={Object.entries(lookups.gen12).length > 2000} // maybe this should be user-togglable
+      enableVirtualization={rowsWithLoadedOhpkms.length > 2000} // maybe this should be user-togglable
+      defaultSort="Pokémon"
     />
   )
 }

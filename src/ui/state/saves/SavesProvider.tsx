@@ -1,6 +1,4 @@
 import useBackend from '@openhome-core/backend/useBackend'
-import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAVClass } from '@openhome-core/save/util'
 import { $R, Option, R, range, Result } from '@openhome-core/util/functional'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
@@ -8,13 +6,30 @@ import PromptDialog from '@openhome-ui/components/dialog/PromptDialog'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { Button, Callout, Flex } from '@radix-ui/themes'
-import { ReactNode, useCallback, useContext, useEffect, useReducer, useRef, useState } from 'react'
+import {
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useEffectEvent,
+  useReducer,
+  useRef,
+  useState,
+} from 'react'
 import { useNavigate } from 'react-router'
 import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import { useConvertStrategies } from '../convert-strategies'
 import { ItemBagContext } from '../items/reducer'
 import { useOhpkmStore } from '../ohpkm'
 import { openSavesReducer, SavesContext } from './reducer'
+import {
+  BackendSaveError,
+  PkmConversion,
+  SaveError,
+  SaveItemBagData,
+  TransactionCommit,
+  TransactionStart,
+} from './useSaves'
 
 export type SavesProviderProps = {
   children: ReactNode
@@ -32,6 +47,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
   const [openSavesState, openSavesDispatch] = useReducer(openSavesReducer, {
     monsToRelease: [],
     openSaves: {},
+    pendingMonLocations: [],
   })
   const { defaultConvertStrategy } = useConvertStrategies()
   const disambiguationResolver = useRef<Option<SaveTypeCallback>>(undefined)
@@ -78,7 +94,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
             const data = save.getMonAt(boxNum, boxSlot)
             if (!data) continue
 
-            const trackedData = ohpkmStore.loadIfTracked(data)
+            const trackedData = await ohpkmStore.loadIfTracked(data)
             if (!trackedData) continue
 
             trackedData.tradeToSave(save)
@@ -177,6 +193,8 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     }
   }, [backend, itemBagState.loaded, itemBagState.error, bagDispatch])
 
+  const clearOhpkmCache = useEffectEvent(ohpkmStore.clearCache)
+
   useEffect(() => {
     // returns a function to stop listening
     const stopListening = backend.onMenuEvents({
@@ -184,6 +202,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       reset: () => {
         openSavesDispatch({ type: 'clear_mons_to_release' })
         reloadBankStore()
+        clearOhpkmCache()
         openSavesDispatch({ type: 'close_all_saves' })
       },
     })
@@ -230,6 +249,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
             .sort((a, b) => a.index - b.index)
             .map((data) => data.save),
           promptDisambiguation,
+          saveChanges,
         }}
       >
         <div />
@@ -271,42 +291,6 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     </>
   )
 }
-
-type SaveError =
-  | { _SaveErrorType: 'TransactionStart'; message: string }
-  | { _SaveErrorType: 'TransactionCommit'; message: string }
-  | { _SaveErrorType: 'IdentifierNotTracked'; identifier: OhpkmIdentifier }
-  | { _SaveErrorType: 'PkmConversion'; message: string }
-  | { _SaveErrorType: 'GenG12Identifier'; mon: OHPKM }
-  | { _SaveErrorType: 'GenG345Identifier'; mon: OHPKM }
-  | { _SaveErrorType: 'SaveItemBagData'; message: string }
-  | { _SaveErrorType: 'BackendSaveError'; message: string }
-  | { _SaveErrorType: 'ReloadLookup'; message: string }
-
-const TransactionStart: (message: string) => SaveError = (message: string) => ({
-  _SaveErrorType: 'TransactionStart',
-  message,
-})
-
-const TransactionCommit: (message: string) => SaveError = (message: string) => ({
-  _SaveErrorType: 'TransactionCommit',
-  message,
-})
-
-const SaveItemBagData: (message: string) => SaveError = (message: string) => ({
-  _SaveErrorType: 'SaveItemBagData',
-  message,
-})
-
-const BackendSaveError: (message: string) => SaveError = (message: string) => ({
-  _SaveErrorType: 'BackendSaveError',
-  message,
-})
-
-const PkmConversion: (message: string) => SaveError = (message: string) => ({
-  _SaveErrorType: 'PkmConversion',
-  message,
-})
 
 interface SaveDisambiguationDialogProps {
   open: boolean

@@ -11,12 +11,12 @@ use crate::traits::{HasSpeciesAndForm, PkmBytes};
 use pkm_rs_derive::IsShiny4096;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::helpers;
 use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_resources::moves::{MoveIndex, MoveSlots};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
 use pkm_rs_resources::species::{FormMetadata, SpeciesForm, SpeciesMetadata};
+use pkm_rs_resources::stats;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, FlagSet, HyperTraining, Ivs, Language,
@@ -141,13 +141,13 @@ impl Pk9 {
         let level = species_and_form
             .get_species_metadata()
             .calculate_level(buf.exp());
-        let mint_nature = buf.mint_nature()?;
-        let stats = helpers::calculate_stats_modern(
+        let mint_nature: NatureIndex = buf.mint_nature()?;
+        let stats = stats::calculate_all_modern_for_source(
             MetadataSource::ScarletViolet,
             species_and_form,
             &buf.ivs(),
             &buf.evs(),
-            level,
+            level as u16,
             mint_nature.get_metadata(),
             Some(buf.hyper_training()),
         )
@@ -348,12 +348,12 @@ impl Pk9 {
     }
 
     pub fn calculate_stats(&self) -> Stats16Le {
-        helpers::calculate_stats_modern(
+        stats::calculate_all_modern_for_source(
             MetadataSource::ScarletViolet,
             self.species_and_form.0,
             &self.ivs,
             &self.evs,
-            self.calculate_level(),
+            self.calculate_level() as u16,
             self.mint_nature.get_metadata(),
             Some(self.hyper_training),
         )

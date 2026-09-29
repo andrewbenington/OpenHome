@@ -3,17 +3,18 @@ import { SaveRef } from '@openhome-core/util/types'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import useDisplayError from '@openhome-ui/hooks/displayError'
-import { OriginGames } from '@pkm-rs/pkg'
-import { Badge, Flex } from '@radix-ui/themes'
+import { OriginGame, OriginGames } from '@pkm-rs/pkg'
+import { Badge, Flex, Spinner } from '@radix-ui/themes'
 import { useMemo, useState } from 'react'
 import { classNames, grayscaleIf } from '../util/style'
+import './SaveCard.css'
 import './style.css'
 import { buildRecentSaveContextElements, formatTimeSince, logoFromSaveRef } from './util'
 
 export type SaveCardProps = {
   save: SaveRef
   size?: number
-  onOpen: () => void
+  onOpen: () => Promise<void>
   onRemove?: () => void
 }
 
@@ -25,8 +26,9 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
   const [expanded, setExpanded] = useState(false)
   const displayError = useDisplayError()
   const backend = useBackend()
+  const [loading, setLoading] = useState(false)
 
-  const isGameBoy = save.game && OriginGames.isGameboy(save.game)
+  const isBoxartGame = save.game === OriginGame.BlueGreen || save.game === OriginGame.BlueJpn
 
   const backgroundColor = useMemo(() => {
     return save.pluginIdentifier
@@ -40,18 +42,27 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
   return (
     <OpenHomeCtxMenu elements={buildRecentSaveContextElements(save, backend, onRemove)}>
       <div style={{ position: 'relative' }}>
-        <div
+        <button
           className={classNames('save-card', grayscaleIf(!save.valid))}
           style={{
             width: size,
             height: size,
             backgroundImage,
-            backgroundSize: isGameBoy ? size : size * 0.9,
+            backgroundSize: isBoxartGame ? size : size * 0.9,
             backgroundColor,
           }}
-          onClick={onOpen}
+          onClick={async () => {
+            setLoading(true)
+            onOpen()
+          }}
+          disabled={!save.valid || loading}
         >
           <Flex direction="row" width="100%" justify="start" gap="2">
+            {loading && (
+              <div className="centered-spinner">
+                <Spinner style={{ color: 'white', margin: 'auto' }} />
+              </div>
+            )}
             {size >= standardViewMinSize && (
               <Badge variant="solid" size="3">
                 <b>{save.trainerName}</b>
@@ -88,7 +99,7 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
           ) : (
             <div />
           )}
-        </div>
+        </button>
         {!save.valid && (
           <div className="save-grid-error-button-container">
             <button

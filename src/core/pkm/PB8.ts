@@ -24,9 +24,9 @@ import * as types from '../util/types'
 import { MoveFilter } from '../util/util'
 import { PkmConverter } from './conversion/converter'
 import { PkmConstructorOptions } from './PKM'
+import { modernStatCalc } from './util'
 import * as encryption from './util/encryption'
 import { filterRibbons } from './util/ribbonLogic'
-import { getStats } from './util/statCalc'
 
 export default class PB8 {
   static getFormat() {
@@ -415,7 +415,7 @@ export default class PB8 {
   }
 
   public getStats() {
-    return getStats(this)
+    return modernStatCalc(this)
   }
 
   public recalculateStats() {

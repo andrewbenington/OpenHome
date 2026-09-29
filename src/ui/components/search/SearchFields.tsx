@@ -1,5 +1,6 @@
+import { booleanSorter, multiSorter, numericSorter } from '@openhome-core/util/sort'
 import { getOriginIconPath } from '@openhome-ui/images/game'
-import { OriginGames, OriginGameWithData } from '@pkm-rs/pkg'
+import { Generation, OriginGames, OriginGameWithData } from '@pkm-rs/pkg'
 import LabelledInput from '../input/LabelledInput'
 import JvrFlex from '../OhoFlex'
 import { PokemonSearchController } from './usePokemonSearch'
@@ -18,8 +19,14 @@ export function PokemonSearchFields({ controller }: PokemonSearchFieldsProps) {
         uniqueFieldId="origin_game"
         label="Origin Game"
         placeholder="Origin Game"
-        options={OriginGames.allMetadata()}
-        getOptionString={(option) => option?.name}
+        options={OriginGames.allMetadata().toSorted(
+          multiSorter(
+            booleanSorter((option) => option.generation === Generation.None),
+            numericSorter((option) => option.generation),
+            numericSorter((option) => option.game)
+          )
+        )}
+        getOptionString={(option) => option.name}
         getOptionUniqueID={(opt) => opt.game.toString()}
         value={originGame ? OriginGames.getMetadata(originGame) : undefined}
         onChange={(option) => setOriginGame(option?.game || null)}

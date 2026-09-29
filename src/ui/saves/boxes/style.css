@@ -64,6 +64,16 @@
   box-sizing: border-box;
 }
 
+.box-cell-loading {
+  aspect-ratio: 1;
+  border-radius: 3px;
+  border-width: 1px;
+  box-sizing: border-box;
+  display: grid;
+  align-items: center;
+  justify-content: center;
+}
+
 .box-grid {
   box-sizing: border-box;
   padding: var(--padding-radius-sm-lg);
@@ -79,9 +89,8 @@
   display: grid;
   gap: 0.2rem;
   width: 100%;
-  min-width: fit-content;
   grid-template-columns: repeat(12, minmax(var(--box-cell-size), 1fr));
-  min-height: fit-content;
+  min-height: calc(10 * var(--box-cell-size));
 }
 
 .sort-mon-cell .pokemon-icon-container {
@@ -132,6 +141,7 @@
 .home-box-header {
   padding: var(--padding-radius-sm-lg);
   width: 100%;
+  min-width: 40rem;
   height: fit-content;
   overflow: auto;
   display: flex;

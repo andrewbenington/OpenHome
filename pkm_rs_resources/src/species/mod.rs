@@ -1,5 +1,5 @@
-pub mod form_metadata;
 mod metadata;
+pub mod metadata_table;
 mod types;
 
 pub use metadata::*;

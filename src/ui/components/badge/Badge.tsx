@@ -4,6 +4,7 @@ import { Nullable, Option } from '@openhome-core/util/functional'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getDetailsOfficialSave, getDetailsPluginSave } from '@openhome-ui/saves/util'
 import { Pokerus } from '@pkm-rs/pkg'
+import { memo } from 'react'
 import { HyperTrainIcon } from '../Icons'
 import { BaseBadge } from './BaseBadge'
 import { ImageBadge } from './ImageBadge'
@@ -30,7 +31,7 @@ function colorByPercent(percent: number) {
   return 'hsl(204, 99%, 65%)'
 }
 
-function NumericalBadge({ value, percent, max: maxProp }: TopRightNumericalBadgeProps) {
+function NumericBadge({ value, percent, max: maxProp }: TopRightNumericalBadgeProps) {
   if (value === undefined) return null
 
   const color = colorByPercent(percent ? value : Math.min((value / maxProp) * 100, 100))
@@ -165,13 +166,13 @@ function PokerusBadge(props: BadgeProps & { pokerusByte: Option<number> }) {
 }
 
 const Badge = {
-  Alpha: AlphaBadge,
-  Game: GameBadge,
-  Gigantamax: GigantamaxBadge,
-  HyperTrain: HyperTrainBadge,
-  Image: ImageBadge,
-  Numerical: NumericalBadge,
-  Pokerus: PokerusBadge,
+  Alpha: memo(AlphaBadge),
+  Game: memo(GameBadge),
+  Gigantamax: memo(GigantamaxBadge),
+  HyperTrain: memo(HyperTrainBadge),
+  Image: memo(ImageBadge),
+  Numeric: memo(NumericBadge),
+  Pokerus: memo(PokerusBadge),
 }
 
 export default Badge

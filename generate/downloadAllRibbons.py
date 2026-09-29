@@ -10,10 +10,13 @@ os.makedirs("ribbons", exist_ok=True)
 
 
 def split_camel_case_string(s):
-    return re.findall(r'[A-Z](?:[a-z]+|[A-Z]*(?=[a-z]|$))', s)
+    return re.findall(r"[A-Z](?:[a-z]+|[A-Z]*(?=[a-z]|$))", s)
+
 
 def getPokeSpriteMap():
-    response = requests.get("https://raw.githubusercontent.com/msikma/pokesprite/master/data/misc.json")
+    response = requests.get(
+        "https://raw.githubusercontent.com/msikma/pokesprite/master/data/misc.json"
+    )
 
     if response.status_code == 200:
         # If the request was successful, parse the JSON data into a dictionary
@@ -24,6 +27,7 @@ def getPokeSpriteMap():
     # print(f"{filename} from {url}")
     # return False, False
 
+
 def download_png(url, directory, filename):
     # Check if the file already exists in the directory
     if os.path.isfile(os.path.join(directory, filename)):
@@ -33,7 +37,7 @@ def download_png(url, directory, filename):
     print(f"Downloading {filename} from {url}...")
     try:
         opener = urllib.request.build_opener()
-        opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+        opener.addheaders = [("User-agent", "Mozilla/5.0")]
         urllib.request.install_opener(opener)
         urllib.request.urlretrieve(url, os.path.join(directory, filename))
         print(f"\tDownloaded to {directory}")
@@ -43,6 +47,7 @@ def download_png(url, directory, filename):
         return True, "404" not in str(e)
     # print(f"{filename} from {url}")
     # return False, False
+
 
 def download_all_sprites():
     MiscDict = getPokeSpriteMap()
@@ -66,8 +71,6 @@ def download_all_sprites():
         url = f"https://raw.githubusercontent.com/msikma/pokesprite/master/misc/{path}"
         thread = threading.Thread(target=download_png, args=(url, directory, filename))
         thread.start()
-            
-
 
 
 # scrape_bulbapedia_gen_9()

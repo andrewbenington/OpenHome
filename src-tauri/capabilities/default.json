@@ -13,7 +13,19 @@
     "fs:read-all",
     "fs:read-files",
     "fs:allow-read",
+    {
+      "identifier": "fs:allow-write",
+      "allow": [
+        { "path": "$DOWNLOAD/**" },
+        { "path": "$DOCUMENT/**" },
+        { "path": "$APPDATA/**" },
+        { "path": "**" }
+      ]
+    },
     "process:default",
-    "process:allow-restart"
+    "process:allow-restart",
+    "fs:allow-appdata-write",
+    "fs:scope-download-recursive",
+    "fs:scope-document-recursive"
   ]
 }

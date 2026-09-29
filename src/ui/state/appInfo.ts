@@ -51,7 +51,7 @@ export const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
 ]
 const EXTRA_SAVE_TYPES = [G3RRSAV, G3UBSAV, G8LumiSAV, CompassSave]
 
-function initialMonDisplayState() {
+function initialMonDisplayState(): MonDisplayState {
   return {
     filter: {},
     topRightIndicator: null,
@@ -60,6 +60,7 @@ function initialMonDisplayState() {
     showNotesIndicator: true,
     showTags: true,
     showBackgroundColor: true,
+    boxIconSprites: 'default',
   }
 }
 
@@ -72,10 +73,13 @@ export const defaultSettings: Settings = {
   saveViewMode: 'card',
   monDisplayState: initialMonDisplayState(),
   appTheme: 'system',
+  tableType: 'rdg',
   zoomLevel: 100,
 }
 
 export type AppTheme = 'light' | 'dark' | 'system'
+
+export type TableType = 'rdg' | 'tanstack'
 
 export type Settings = {
   enabledSaveTypes: Record<string, boolean>
@@ -84,6 +88,7 @@ export type Settings = {
   saveViewMode: SaveViewMode
   monDisplayState: MonDisplayState
   appTheme: AppTheme
+  tableType: TableType
   zoomLevel: number
 }
 
@@ -125,6 +130,10 @@ export type AppInfoAction =
   | {
       type: 'set_app_theme'
       payload: AppTheme
+    }
+  | {
+      type: 'set_table_type'
+      payload: TableType
     }
   | { type: 'set_mon_display_state'; payload: MonDisplayState }
   | {
@@ -201,6 +210,9 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
     }
     case 'set_app_theme': {
       return { ...state, settings: { ...state.settings, appTheme: payload } }
+    }
+    case 'set_table_type': {
+      return { ...state, settings: { ...state.settings, tableType: payload } }
     }
     case 'set_mon_display_state': {
       return { ...state, settings: { ...state.settings, monDisplayState: payload } }

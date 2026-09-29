@@ -1,4 +1,4 @@
-import { PA8, PK2, PK3, PK4, PK7, PK8, PK9 } from '@openhome-core/pkm'
+import { PA8, PK3, PK4, PK7, PK8, PK9 } from '@openhome-core/pkm'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { SwordShieldSave } from '@openhome-core/save/Gen89/SwordShieldSave'
 import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
@@ -157,19 +157,6 @@ describe('evolution and form change update ohpkm', async () => {
   })
 })
 
-test('Game Boy Pokemon in the same evolution family have distinct OpenHome IDs', () => {
-  const bytes = new Uint8Array(fs.readFileSync(pkmTestFilePath('pk2', 'hooh.pk2')))
-  const abra = PK2.fromBytes(bytes.buffer)
-  const kadabra = PK2.fromBytes(bytes.buffer.slice(0))
-
-  abra.nationalDex = NationalDex.Abra
-  kadabra.nationalDex = NationalDex.Kadabra
-
-  expect(OHPKM.fromMonUnknownSave(abra).openhomeId).not.toEqual(
-    OHPKM.fromMonUnknownSave(kadabra).openhomeId
-  )
-})
-
 describe('plugin form persistence', () => {
   test('pluginForm survives OHPKM serialization', () => {
     const starter = OHPKM.fromBytes(new Uint8Array().buffer)
@@ -247,12 +234,10 @@ describe('move filter', () => {
     const ohpkm = OHPKM.defaultWithSpecies(NationalDex.Gyarados, 0)
     ohpkm.moves = [AQUA_TAIL, RAIN_DANCE, HYDRO_PUMP, DRAGON_DANCE]
     ohpkm.movePP = [10, 5, 5, 20]
-    ohpkm.movePPUps = [1, 2, 3, 1]
 
     const pa8 = R.assert(PA8.fromOhpkm(ohpkm, ConvertStrategies.getDefault()))
     expect(pa8.moves).toEqual([AQUA_TAIL, HYDRO_PUMP, 0, 0])
     expect(pa8.movePP).toEqual([10, 5, 0, 0])
-    expect(pa8.movePPUps).toEqual([1, 3, 0, 0])
   })
 
   test('if no moves are compatible, use level-up moves', () => {

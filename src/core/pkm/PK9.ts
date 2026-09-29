@@ -1,5 +1,6 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { ModernRibbons } from '@openhome-core/resources'
+import { movesFromSvTmFlags } from '@openhome-core/resources/moves/flags'
 import { Errorable, Option, R } from '@openhome-core/util/functional'
 import { FourMoves, PKMDate, Stats } from '@openhome-core/util/types'
 import {
@@ -514,12 +515,16 @@ export default class PK9 {
     this.inner.trainer_gender = value
   }
 
-  get tmFlagsBaseGame() {
+  get tmFlagsSvBase() {
     return this.inner.tmFlagsBaseGame
   }
 
-  get tmFlagsDlc() {
+  get tmFlagsSvDlc() {
     return this.inner.tmFlagsDlc
+  }
+
+  get tmMovesSv() {
+    return this.tmFlagsSvBase ? movesFromSvTmFlags(this.tmFlagsSvBase) : []
   }
 
   get homeTracker() {

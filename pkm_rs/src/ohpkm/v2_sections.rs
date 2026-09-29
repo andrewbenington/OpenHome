@@ -29,6 +29,7 @@ pub(crate) use gen67_data::Gen67Data;
 pub(crate) use learned_moves::LearnedMoves;
 pub(crate) use main_data::MainDataV2;
 pub(crate) use past_handlers::PastHandlerDataV2;
+pub use past_handlers::UnknownHandlerSave;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;

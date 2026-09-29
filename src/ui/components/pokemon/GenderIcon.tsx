@@ -1,5 +1,6 @@
 import { displayGender } from '@openhome-core/util/types'
 import { BinaryGender, Gender } from '@pkm-rs/pkg'
+import { memo } from 'react'
 import './style.css'
 
 interface GenderIconProps {
@@ -7,7 +8,7 @@ interface GenderIconProps {
   size?: number
 }
 
-export default function GenderIcon({ gender, size }: GenderIconProps) {
+const GenderIcon = memo(({ gender, size }: GenderIconProps) => {
   return (
     gender !== undefined &&
     gender < Gender.Genderless && (
@@ -24,7 +25,9 @@ export default function GenderIcon({ gender, size }: GenderIconProps) {
       </div>
     )
   )
-}
+})
+
+export default GenderIcon
 
 function genderSymbol(gender: Gender | BinaryGender): string {
   switch (gender) {

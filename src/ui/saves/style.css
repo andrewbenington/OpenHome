@@ -26,9 +26,11 @@
   position: relative;
   border-radius: var(--border-radius-lg);
   box-sizing: border-box;
+  border-width: 0;
+  contain: paint;
 }
 
-.save-card:hover::after {
+.save-card:hover:not(:disabled)::after {
   content: '';
   width: inherit;
   height: inherit;
