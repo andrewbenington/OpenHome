@@ -6,7 +6,7 @@ import { getPokemonSpritePathFromSource, HomeBoxSprites } from '@openhome-ui/ima
 import { ExtraFormIndex, Gender, NationalDex } from '@pkm-rs/pkg'
 import { HTMLAttributes, memo, MouseEventHandler, ReactNode, useState } from 'react'
 import { BoxIconSpriteType, MonDisplayState, useMonDisplay } from '../hooks/monDisplay'
-import { boxIconImagePath } from '../pokemon-details/useBoxIconImage'
+import { boxIconImagePath } from '../pokemon/useBoxIconImage'
 import { classNames, grayscaleIf } from '../util/style'
 import { MonTag } from '../util/tags'
 import { TagIcon } from './TagIcon'
