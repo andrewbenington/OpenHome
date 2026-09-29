@@ -51,6 +51,5 @@
     "src/types/pkm-resources-types.d.ts",
     "scripts",
     "__mocks__",
-    "generate/"
   ],
 }
