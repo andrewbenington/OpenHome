@@ -15,6 +15,7 @@ import SearchFields from '@openhome-ui/components/search/SearchFields'
 import PokemonSearchModal from '@openhome-ui/components/search/SearchModal'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import PokemonDetailsModal from '@openhome-ui/pokemon/PokemonDetailsModal'
+import { useCanSwapWithDragging } from '@openhome-ui/state-zustand/drag-and-drop/dragStore'
 import { ErrorContext } from '@openhome-ui/state/error'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import useOhpkmBatchIdLookup from '@openhome-ui/state/ohpkm/useOhpkmIdBatchLookup'
@@ -23,9 +24,9 @@ import { EMPTY_SLOT, MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { colorIsDark } from '@openhome-ui/util/color'
 import { MetadataSummaryLookup } from '@pkm-rs/pkg'
 import { Button, Dialog, Flex, Grid, Separator } from '@radix-ui/themes'
-import { useCallback, useContext, useMemo, useState } from 'react'
+import { useContext, useMemo, useState } from 'react'
 import { MdClose } from 'react-icons/md'
-import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
+import useMultiSelect from '../../state/drag-and-drop/useMultiSelect'
 import { cssClass } from '../../util/style'
 import { useBoxNavigator } from '../util'
 import ArrowButton from './ArrowButton'
@@ -37,13 +38,13 @@ interface OpenSaveDisplayProps {
 
 const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const savesManager = useSaves()
-  const { allOpenSaves, saveFromIdentifier, importMonsToLocation } = savesManager
+  const { allOpenSaves, importMonsToLocation } = savesManager
 
   const ohpkmStore = useOhpkmStore()
   const [, dispatchError] = useContext(ErrorContext)
   const [detailsModal, setDetailsModal] = useState(false)
   const { saveIndex } = props
-  const { dragState, toggleSelection, isSelected } = useDragAndDrop()
+  const { multiSelectState, toggleSelection, isSelected } = useMultiSelect()
 
   const save = useMemo(() => allOpenSaves[saveIndex], [allOpenSaves, saveIndex])
   const displayError = useDisplayError()
@@ -110,45 +111,13 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
     importMonsToLocation(mons, location)
   }
 
-  const isDisabled = useCallback(
-    (mon?: PKMInterface) => {
-      const dragPayload = dragState?.payload
-
-      if (!dragPayload) return false
-
-      if (dragPayload.kind === 'item') {
-        return !save.supportsItem(dragPayload.item.index)
-      }
-
-      const draggingMons = Array.isArray(dragPayload.monData)
-        ? dragPayload.monData
-        : [dragPayload.monData]
-
-      for (const monWithLocation of draggingMons) {
-        if (!monWithLocation || Object.entries(monWithLocation).length === 0) return false // Handles a glitch that occurs when navigating between boxes and the payload becomes an empty object
-
-        const sourceSave = monWithLocation.isHome
-          ? undefined
-          : saveFromIdentifier(monWithLocation.saveIdentifier)
-
-        const sourceIsOpenHome = !sourceSave
-        const monIsIncompatible =
-          !monSupportedBySave(save, monWithLocation.mon) ||
-          (mon && !sourceIsOpenHome && !monSupportedBySave(sourceSave, mon))
-
-        if (monIsIncompatible) return true
-      }
-
-      return false
-    },
-    [dragState?.payload, saveFromIdentifier, save]
-  )
+  const canSwapWithDragging = useCanSwapWithDragging(save)
 
   const displayData = useMemo(() => save.getDisplayData?.() ?? {}, [save])
 
   const allCellsDisabled = range(save.boxColumns * save.boxRows)
     .map((index: number) => save.getMonAt(save.currentPCBox, index))
-    .every(isDisabled)
+    .every(canSwapWithDragging)
 
   const slots = range(save.boxColumns * save.boxRows)
     .map((index: number) => save.getMonAt(save.currentPCBox, index))
@@ -242,7 +211,9 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                   onClick={() => setSelectedIndex(index)}
                   dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${index}`}
                   location={location}
-                  isDisabled={(mon) => isDisabled(mon) || slotMetadata?.isDisabled === true}
+                  isDisabled={(mon) =>
+                    !canSwapWithDragging(mon) || slotMetadata?.isDisabled === true
+                  }
                   disabledReason={slotMetadata?.disabledReason}
                   monPromise={mon}
                   onDrop={(importedMons) => {
@@ -250,7 +221,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                       attemptImportMons(importedMons, location)
                     }
                   }}
-                  multiSelectEnabled={dragState.multiSelectEnabled}
+                  multiSelectEnabled={multiSelectState.multiSelectEnabled}
                   isSelected={isSelected(location)}
                   onToggleSelect={() => toggleSelection(location)}
                   contextMenu={

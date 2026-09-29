@@ -1,13 +1,13 @@
-import { useDraggable } from '@dnd-kit/core'
+import { useDraggable } from '@dnd-kit/react'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
 import { TopRightBadge } from '@openhome-ui/components/badge/TopRightBadge'
+import { useDraggingActive } from '@openhome-ui/state-zustand/drag-and-drop/dragStore'
 import { MonWithLocation } from '@openhome-ui/state/saves'
 import { MetadataSummaryLookup } from '@pkm-rs/pkg'
 import { CSSProperties, useMemo } from 'react'
 import PokemonIcon from '../../components/PokemonIcon'
 import { MonDisplayState, TopRightBadgeType } from '../../hooks/monDisplay'
-import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
 import { MonTag } from '../../util/tags'
 
 const getBackgroundDetails = (disabled?: boolean) => {
@@ -55,12 +55,12 @@ const DraggableMon = (props: DraggableMonProps) => {
     monDisplayState,
     style,
   } = props
-  const { attributes, listeners, setNodeRef, isDragging, active } = useDraggable({
+  const { ref, isDragging } = useDraggable({
     id: (dragID ?? '') + mon.personalityValue?.toString(),
     data: dragData ? { kind: 'mon', monData: dragData } : undefined,
     disabled: disabled || !dragID,
   })
-  const { dragState } = useDragAndDrop()
+  const draggingActive = useDraggingActive()
   const monWithManagement = mon as MonWithManagementData
 
   const formeNumber = useMemo(() => {
@@ -85,14 +85,12 @@ const DraggableMon = (props: DraggableMonProps) => {
     [mon, topRightIndicator]
   )
 
-  const shouldHide = isDragging || (active && isSelected)
+  const shouldHide = isDragging || (draggingActive && isSelected)
 
   return (
     <div
       className="fill-parent flex-centered"
-      ref={setNodeRef}
-      {...listeners}
-      {...attributes}
+      ref={ref}
       style={{
         ...getBackgroundDetails(),
         cursor: 'pointer',
@@ -105,12 +103,10 @@ const DraggableMon = (props: DraggableMonProps) => {
         isShiny={showShiny && mon.isShiny()}
         gender={mon.gender}
         isEgg={mon.isEgg}
-        heldItemIndex={
-          showItem && (!isDragging || dragState.mode !== 'item') ? mon.heldItemIndex : undefined
-        }
+        heldItemIndex={showItem ? mon.heldItemIndex : undefined}
         style={{
           ...style,
-          visibility: shouldHide && dragState.mode === 'mon' ? 'hidden' : undefined,
+          visibility: shouldHide ? 'hidden' : undefined,
         }}
         grayedOut={disabled}
         topRightIndicator={topRightIndicatorComponent}
