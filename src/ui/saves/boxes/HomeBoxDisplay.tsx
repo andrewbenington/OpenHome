@@ -1,8 +1,6 @@
-import { useDragOperation } from '@dnd-kit/react'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { SortTypes } from '@openhome-core/pkm/sort'
-import { monSupportedBySave } from '@openhome-core/save/util'
 import { mapToObject } from '@openhome-core/util'
 import { $R, isResult, Option, R, range } from '@openhome-core/util/functional'
 import { isThenable, NowOrLater } from '@openhome-core/util/promise'
@@ -26,7 +24,10 @@ import ToggleButton from '@openhome-ui/components/ToggleButton'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import MissingOhpkmIdPrompt from '@openhome-ui/pokemon/MissingOhpkmId'
 import PokemonDetailsModal from '@openhome-ui/pokemon/PokemonDetailsModal'
-import { DragPayload } from '@openhome-ui/state/drag-and-drop'
+import {
+  useDragSourceSupportsMon,
+  useIsDraggingActive,
+} from '@openhome-ui/state-zustand/drag-and-drop/dragStore'
 import { OhpkmLookupResult, useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import useTrackedDataRecovery from '@openhome-ui/state/ohpkm/useTrackedDataRecovery'
 import { EMPTY_SLOT, HomeMonLocation, useSaves } from '@openhome-ui/state/saves'
@@ -256,7 +257,7 @@ type SlotData = {
 function SingleBoxMonDisplay() {
   const ohpkmStore = useOhpkmStore()
   const displayError = useDisplayError()
-  const { importMonsToLocation, saveFromIdentifier, getPendingMon } = useSaves()
+  const { importMonsToLocation, getPendingMon } = useSaves()
   const { getCurrentBox, getCurrentBank, removeAllHomeDupes } = useBanksAndBoxes()
   const { multiSelectState: dragState, isSelected, toggleSelection } = useMultiSelect()
   const { sortHomeBox, sortAllHomeBoxes } = useBanksAndBoxes()
@@ -267,7 +268,6 @@ function SingleBoxMonDisplay() {
     navigatePrev: navigateLeft,
     selectedMon,
   } = useOpenHomeBoxNavigator()
-  const { source } = useDragOperation<DragPayload>()
 
   const currentBox = getCurrentBox()
   const getById = ohpkmStore.tryLoadFromId
@@ -286,23 +286,7 @@ function SingleBoxMonDisplay() {
     },
   }
 
-  const sourceSupportsMon = useCallback(
-    (mon: PKMInterface) => {
-      if (!source || source.data.kind === 'item') return true
-      if (source.data.kind === 'mon') {
-        return source.data.monData.isHome
-          ? true
-          : monSupportedBySave(saveFromIdentifier(source.data.monData.saveIdentifier), mon)
-      }
-
-      return source.data.monData.every(
-        (monWithLocation) =>
-          monWithLocation.isHome ||
-          monSupportedBySave(saveFromIdentifier(monWithLocation.saveIdentifier), mon)
-      )
-    },
-    [saveFromIdentifier, source]
-  )
+  const sourceSupportsMon = useDragSourceSupportsMon()
 
   const contextElements = useMemo(
     () => [
@@ -409,12 +393,7 @@ function SingleBoxMonDisplay() {
                   }
                 }}
                 // don't allow a swap with a pokémon not supported by the source save
-                isDisabled={(mon) =>
-                  source?.data.kind !== 'item' &&
-                  source?.data !== undefined &&
-                  mon !== undefined &&
-                  !sourceSupportsMon(mon)
-                }
+                isDisabled={(mon) => mon !== undefined && !sourceSupportsMon(mon)}
                 contextMenu={[
                   Item.label('Merge/Recover Tracking Data').action(async () =>
                     $R(await TrackedDataRecovery.startRecovery(location)).mapErr((err) =>
@@ -498,7 +477,7 @@ type TimeoutType = ReturnType<typeof setTimeout>
 
 function ViewToggle(props: ViewToggleProps) {
   const { viewMode, setViewMode, disabled } = props
-  const { source } = useDragOperation()
+  const draggingActive = useIsDraggingActive()
   const [timer, setTimer] = useState<TimeoutType>()
   const setViewModeRef = useRef(setViewMode)
 
@@ -532,7 +511,7 @@ function ViewToggle(props: ViewToggleProps) {
       onValueChange={(newVal: BoxViewMode) => setViewMode(newVal)}
       disabled={disabled}
     >
-      <ToggleGroup.Item value="one" className="ToggleGroupItem" disabled={Boolean(source?.data)}>
+      <ToggleGroup.Item value="one" className="ToggleGroupItem" disabled={draggingActive}>
         <FaSquare />
       </ToggleGroup.Item>
       <ToggleGroup.Item value="all" className="ToggleGroupItem">

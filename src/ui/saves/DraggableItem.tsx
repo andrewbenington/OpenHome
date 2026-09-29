@@ -1,6 +1,7 @@
-import { useDraggable, useDragOperation } from '@dnd-kit/react'
+import { useDraggable } from '@dnd-kit/react'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
+import { useIsDraggingActive } from '@openhome-ui/state-zustand/drag-and-drop/dragStore'
 import { Item } from '@pkm-rs/pkg'
 import { Text, Tooltip } from '@radix-ui/themes'
 import { useState } from 'react'
@@ -16,7 +17,7 @@ function DraggableItem({ item, count }: DraggableItemProps) {
     id: `item-${item.index}`,
     data: { kind: 'item', item: item },
   })
-  const { source } = useDragOperation()
+  const draggingActive = useIsDraggingActive()
   const [imageError, setImageError] = useState(false)
 
   const image = !imageError ? (
@@ -40,7 +41,7 @@ function DraggableItem({ item, count }: DraggableItemProps) {
   return (
     <div className="draggable-item" ref={ref}>
       {/* tooltip causes performance issues when dragging; only show when not */}
-      {source ? image : <Tooltip content={item.name}>{image}</Tooltip>}
+      {draggingActive ? image : <Tooltip content={item.name}>{image}</Tooltip>}
       <Text
         size="1"
         weight="bold"
