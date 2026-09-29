@@ -1,7 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { SortTypes } from '@openhome-core/pkm/sort'
-import { monSupportedBySave } from '@openhome-core/save/util'
 import { mapToObject } from '@openhome-core/util'
 import { $R, isResult, Option, R, range } from '@openhome-core/util/functional'
 import { isThenable, NowOrLater } from '@openhome-core/util/promise'
@@ -25,9 +24,13 @@ import ToggleButton from '@openhome-ui/components/ToggleButton'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import MissingOhpkmIdPrompt from '@openhome-ui/pokemon/MissingOhpkmId'
 import PokemonDetailsModal from '@openhome-ui/pokemon/PokemonDetailsModal'
+import {
+  useDragSourceSupportsMon,
+  useIsDraggingActive,
+} from '@openhome-ui/state-zustand/drag-and-drop/dragStore'
 import { OhpkmLookupResult, useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import useTrackedDataRecovery from '@openhome-ui/state/ohpkm/useTrackedDataRecovery'
-import { EMPTY_SLOT, HomeMonLocation, MonWithLocation, useSaves } from '@openhome-ui/state/saves'
+import { EMPTY_SLOT, HomeMonLocation, useSaves } from '@openhome-ui/state/saves'
 import { cssClass } from '@openhome-ui/util/style'
 import { Button, Card, DropdownMenu, Flex, Heading, TextField, Tooltip } from '@radix-ui/themes'
 import { ToggleGroup } from 'radix-ui'
@@ -40,7 +43,7 @@ import {
   OPENHOME_BOX_SLOTS,
   useBanksAndBoxes,
 } from '../../state-zustand/banks-and-boxes/store'
-import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
+import useMultiSelect from '../../state/drag-and-drop/useMultiSelect'
 import { useOpenHomeBoxNavigator } from '../util'
 import AllHomeBoxes from './AllHomeBoxes'
 import ArrowButton from './ArrowButton'
@@ -57,7 +60,7 @@ export default function HomeBoxDisplay() {
   const [viewMode, setViewMode] = useState<BoxViewMode>('one')
   const [editingBoxName, setEditingBoxName] = useState('')
   const [debugMode, setDebugMode] = useState(false)
-  const { dragState, toggleMultiSelect } = useDragAndDrop()
+  const { multiSelectState, toggleMultiSelect } = useMultiSelect()
   const {
     addBoxCurrentBank,
     getCurrentBox,
@@ -145,13 +148,13 @@ export default function HomeBoxDisplay() {
                   onUnset={() => setBoxNameCurrentBank(currentBox.index, editingBoxName)}
                   icon={EditIcon}
                   hint="Change box name"
-                  disabled={dragState.multiSelectEnabled}
+                  disabled={multiSelectState.multiSelectEnabled}
                 />
                 <ToggleButton
-                  state={dragState.multiSelectEnabled}
+                  state={multiSelectState.multiSelectEnabled}
                   setState={toggleMultiSelect}
                   icon={SelectIcon}
-                  hint={`Multi-select${dragState.selectedLocations.length > 0 ? ` (${dragState.selectedLocations.length})` : ''}`}
+                  hint={`Multi-select${multiSelectState.selectedLocations.length > 0 ? ` (${multiSelectState.selectedLocations.length})` : ''}`}
                   disabled={editing}
                 />
               </>
@@ -254,9 +257,9 @@ type SlotData = {
 function SingleBoxMonDisplay() {
   const ohpkmStore = useOhpkmStore()
   const displayError = useDisplayError()
-  const { importMonsToLocation, saveFromIdentifier, getPendingMon } = useSaves()
+  const { importMonsToLocation, getPendingMon } = useSaves()
   const { getCurrentBox, getCurrentBank, removeAllHomeDupes } = useBanksAndBoxes()
-  const { dragState, isSelected, toggleSelection } = useDragAndDrop()
+  const { multiSelectState: dragState, isSelected, toggleSelection } = useMultiSelect()
   const { sortHomeBox, sortAllHomeBoxes } = useBanksAndBoxes()
   const {
     currentIndex: selectedIndex,
@@ -283,22 +286,7 @@ function SingleBoxMonDisplay() {
     },
   }
 
-  const dragData: MonWithLocation | undefined = useMemo(() => {
-    const payload = dragState.payload
-
-    if (payload?.kind === 'mon') {
-      return payload.monData
-    }
-    return undefined
-  }, [dragState.payload])
-
-  const sourceSupportsMon = useCallback(
-    (mon: PKMInterface) =>
-      !dragData || dragData?.isHome
-        ? true
-        : monSupportedBySave(saveFromIdentifier(dragData.saveIdentifier), mon),
-    [dragData, saveFromIdentifier]
-  )
+  const sourceSupportsMon = useDragSourceSupportsMon()
 
   const contextElements = useMemo(
     () => [
@@ -405,12 +393,7 @@ function SingleBoxMonDisplay() {
                   }
                 }}
                 // don't allow a swap with a pokémon not supported by the source save
-                isDisabled={(mon) =>
-                  dragData !== undefined &&
-                  !dragData.isHome &&
-                  mon !== undefined &&
-                  !sourceSupportsMon(mon)
-                }
+                isDisabled={(mon) => mon !== undefined && !sourceSupportsMon(mon)}
                 contextMenu={[
                   Item.label('Merge/Recover Tracking Data').action(async () =>
                     $R(await TrackedDataRecovery.startRecovery(location)).mapErr((err) =>
@@ -487,14 +470,14 @@ type ViewToggleProps = {
   disabled?: boolean
 }
 
-const DRAG_OVER_COOLDOWN_MS = 500
+const DRAG_OVER_COOLDOWN_MS = 1000
 
 // necessary for incompatibility between Node and web api
 type TimeoutType = ReturnType<typeof setTimeout>
 
 function ViewToggle(props: ViewToggleProps) {
   const { viewMode, setViewMode, disabled } = props
-  const { dragState } = useDragAndDrop()
+  const draggingActive = useIsDraggingActive()
   const [timer, setTimer] = useState<TimeoutType>()
   const setViewModeRef = useRef(setViewMode)
 
@@ -528,11 +511,7 @@ function ViewToggle(props: ViewToggleProps) {
       onValueChange={(newVal: BoxViewMode) => setViewMode(newVal)}
       disabled={disabled}
     >
-      <ToggleGroup.Item
-        value="one"
-        className="ToggleGroupItem"
-        disabled={Boolean(dragState.payload)}
-      >
+      <ToggleGroup.Item value="one" className="ToggleGroupItem" disabled={draggingActive}>
         <FaSquare />
       </ToggleGroup.Item>
       <ToggleGroup.Item value="all" className="ToggleGroupItem">
