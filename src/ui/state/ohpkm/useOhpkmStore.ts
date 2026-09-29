@@ -24,7 +24,7 @@ import { OhpkmStoreData } from '.'
 import { useConvertStrategies } from '../convert-strategies'
 import { useLookups } from '../lookups'
 
-export const FORCE_MISSED_LOOKUP = true
+export const FORCE_MISSED_LOOKUP = false
 
 export type MoveSlotIndex = 0 | 1 | 2 | 3
 
