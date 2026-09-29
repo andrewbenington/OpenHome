@@ -1,4 +1,5 @@
 import * as fs from 'fs'
+import { abilityGetAll } from './database.ts'
 
 const overrides: Record<number, string> = {
   266: 'AS_ONE_ICE_RIDER',
@@ -9,20 +10,8 @@ const overrides: Record<number, string> = {
   304: 'EMBODY_ASPECT_DEF',
 }
 
-function convertToEnumMember(input: string): string {
-  if (input === '—') {
-    return 'None'
-  }
-  // Remove spaces and split the string into words
-  const words = input.trim().split(/[\s-]+/)
-
-  // Capitalize the first letter of each word and join them
-  const pascalCaseString = words
-    .map((word) => (word.length === 0 ? '' : word[0].toUpperCase() + word.slice(1)))
-    .join('')
-    .replace(/[^A-Za-z0-9]/g, '')
-
-  return pascalCaseString
+function abilitiesFromDb() {
+  return abilityGetAll()
 }
 
 export function rustAbilityConstName(index: number, ability: string): string {
@@ -47,10 +36,7 @@ function convertAbility(index: number, ability: string): string {
 }
 
 function main() {
-  const names: string[] = fs
-    .readFileSync('pkm_rs/text_source/abilities.txt', 'utf-8')
-    .split('\n')
-    .slice(1)
+  const names: string[] = abilitiesFromDb().map((row) => row.name)
 
   let output = `use serde::{Serialize, Serializer};
 use std::fmt::Debug;
@@ -347,7 +333,7 @@ impl AbilityMetadata {
     }
 }
 
-pub const ABILITY_MAX: usize = 318;
+pub const ABILITY_MAX: usize = ${names.length};
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getAllAbilities"))]
 #[allow(clippy::missing_const_for_fn)]

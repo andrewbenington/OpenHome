@@ -16586,8 +16586,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::Equal,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(46) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(46)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(292) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(292)
                 }),
                 hidden_ability: None,
                 base_height: 12,
@@ -20320,8 +20320,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::Equal,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(8) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(8)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(26) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(26)
                 }),
                 hidden_ability: None,
                 base_height: 19,
@@ -20493,8 +20493,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::M7ToF1,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(80) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(80)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(319) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(319)
                 }),
                 hidden_ability: None,
                 base_height: 13,
@@ -37631,8 +37631,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::Equal,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(194) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(194)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(181) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(181)
                 }),
                 hidden_ability: None,
                 base_height: 21,

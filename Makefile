@@ -1,4 +1,4 @@
-VERSION=1.18.0-rc.async-ohpkm-store
+VERSION=1.18.0-rc.performance-fixes
 
 .PHONY: help
 help: # Display this help.

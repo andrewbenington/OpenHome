@@ -46,3 +46,4 @@ if __name__ == "__main__":
     with sqlite3.connect("generate/pkm.db") as conn:
         conn.row_factory = sqlite3.Row
         all_species = get_species(conn)
+
