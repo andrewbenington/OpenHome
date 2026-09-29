@@ -289,7 +289,11 @@ export default abstract class PK3CFRU implements PluginPKMInterface {
         this.internalMetLocationIndex = FIRERED_IN_GAME_TRADE
       }
 
-      this.internalSpeciesIndex = this.monToGameIndex(other.nationalDex, other.formIndex)
+      this.internalSpeciesIndex = this.monToGameIndex(
+        other.nationalDex,
+        other.formIndex,
+        other.extraFormIndex
+      )
 
       if (other.pluginOrigin === this.getPluginIdentifier()) {
         this.pluginOrigin = other.pluginOrigin
@@ -337,7 +341,11 @@ export default abstract class PK3CFRU implements PluginPKMInterface {
   abstract getValidMoveIndices(): number[]
 
   abstract monFromGameIndex(gameIndex: number): CfruSpeciesAndForm
-  abstract monToGameIndex(nationalDexNumber: number, formIndex: number): number
+  abstract monToGameIndex(
+    nationalDexNumber: number,
+    formIndex: number,
+    extraFormIndex: Option<number>
+  ): number
 
   abstract indexIsFakemon(speciesIndex: number): boolean
 
@@ -375,7 +383,11 @@ export default abstract class PK3CFRU implements PluginPKMInterface {
       dataView.setUint16(0x1c, this.pluginForm, true)
     } else {
       const formIndex = this.nationalDex === NationalDex.Unown ? 0 : this.formIndex
-      dataView.setUint16(0x1c, this.monToGameIndex(this.nationalDex, formIndex), true)
+      dataView.setUint16(
+        0x1c,
+        this.monToGameIndex(this.nationalDex, formIndex, this.extraFormIndex),
+        true
+      )
     }
 
     // 30:32 Held Item
