@@ -1,4 +1,4 @@
-VERSION=1.18.0-rc.3
+VERSION=1.18.0-rc.performance-fixes
 
 .PHONY: help
 help: # Display this help.
@@ -35,6 +35,9 @@ check: wasm-compile
 	@pnpm run typecheck
 	@pnpm run lint
 	@pnpm run format
+	@cd generate && pnpm run typecheck
+	@cd generate && pnpm run lint
+	@cd generate && pnpm run format
 
 .PHONY: test
 test: ensure-dependencies

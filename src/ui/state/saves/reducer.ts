@@ -13,6 +13,7 @@ type OpenSave = {
 export type OpenSavesState = {
   monsToRelease: (OhpkmIdentifier | PKMInterface)[]
   openSaves: Record<SaveIdentifier, OpenSave>
+  pendingMonLocations: PendingMonLocation[] // when moving a mon outside of its original save for the first time, there is a delay before the OHPKM data is created and added to the store. in the meantime, these locations have temporary pokemon data stored in pendingMonLocations so the boxes can immediately show the changes.
   error?: string
 }
 
@@ -23,6 +24,7 @@ export type HomeMonLocation = {
   bank: number
   save?: undefined
 }
+
 export type SaveMonLocation = {
   box: number
   boxSlot: number
@@ -33,8 +35,44 @@ export type SaveMonLocation = {
 
 export type MonLocation = SaveMonLocation | HomeMonLocation
 
+export const EMPTY_SLOT = Symbol('EmptySlot')
+export type EmptySlot = typeof EMPTY_SLOT
+
+export function isNotEmpty<T>(v: symbol | T): v is Exclude<T, symbol> {
+  return v !== EMPTY_SLOT
+}
+
+export type PendingSaveMonLocation = SaveMonLocation & {
+  mon: OhpkmIdentifier | PKMInterface | EmptySlot
+}
+export type PendingHomeMonLocation = HomeMonLocation & {
+  mon: OhpkmIdentifier | PKMInterface | EmptySlot
+}
+export type PendingMonLocation = PendingSaveMonLocation | PendingHomeMonLocation
+
 export function isMonLocation(obj: object | undefined): obj is MonLocation {
   return obj !== undefined && 'box' in obj && 'boxSlot' in obj
+}
+
+export function locationsEq(first: MonLocation, second: MonLocation): boolean {
+  if (first.isHome) {
+    if (second.isHome) return homeLocationsEq(first, second)
+  } else if (!second.isHome) {
+    return saveLocationsEq(first, second)
+  }
+  return false
+}
+
+export function homeLocationsEq(first: HomeMonLocation, second: HomeMonLocation): boolean {
+  return first.bank === second.bank && first.box === second.box && first.boxSlot === second.boxSlot
+}
+
+export function saveLocationsEq(first: SaveMonLocation, second: SaveMonLocation): boolean {
+  return (
+    first.saveIdentifier === second.saveIdentifier &&
+    first.box === second.box &&
+    first.boxSlot === second.boxSlot
+  )
 }
 
 export type MonWithLocation = MonLocation & {
@@ -60,6 +98,14 @@ export type OpenSavesAction =
   | {
       type: 'close_all_saves'
       payload?: undefined
+    }
+  | {
+      type: 'add_pending_mon_locations'
+      payload: PendingMonLocation[]
+    }
+  | {
+      type: 'remove_pending_mon_locations'
+      payload: MonLocation[]
     }
   /*
    *  POKEMON
@@ -155,6 +201,25 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
     case 'close_all_saves': {
       return { ...state, openSaves: {} }
     }
+    case 'add_pending_mon_locations': {
+      return {
+        ...state,
+        pendingMonLocations: [
+          ...state.pendingMonLocations.filter(
+            (pending) => !action.payload.some((loc) => locationsEq(loc, pending))
+          ),
+          ...action.payload,
+        ],
+      }
+    }
+    case 'remove_pending_mon_locations': {
+      return {
+        ...state,
+        pendingMonLocations: state.pendingMonLocations.filter(
+          (pending) => !action.payload.some((loc) => locationsEq(loc, pending))
+        ),
+      }
+    }
   }
 }
 
@@ -168,6 +233,7 @@ type SavesContextValue = {
 const initialState: OpenSavesState = {
   monsToRelease: [],
   openSaves: {},
+  pendingMonLocations: [],
 }
 
 export const SavesContext = createContext<SavesContextValue>({

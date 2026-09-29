@@ -2,11 +2,11 @@ import { $R } from '@openhome-core/util/functional'
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
-import { getPokemonSpritePathInner } from '@openhome-ui/images/pokemon'
+import { getPokemonSpritePathFromSource, HomeBoxSprites } from '@openhome-ui/images/pokemon'
 import { ExtraFormIndex, Gender, NationalDex } from '@pkm-rs/pkg'
 import { HTMLAttributes, memo, MouseEventHandler, ReactNode, useState } from 'react'
 import { BoxIconSpriteType, MonDisplayState, useMonDisplay } from '../hooks/monDisplay'
-import { boxIconImagePath } from '../pokemon-details/useBoxIconImage'
+import { boxIconImagePath } from '../pokemon/useBoxIconImage'
 import { classNames, grayscaleIf } from '../util/style'
 import { MonTag } from '../util/tags'
 import { TagIcon } from './TagIcon'
@@ -151,15 +151,14 @@ function PokemonIconImage(props: PokemonIconImageProps) {
           url: spritePath,
         })
 
-        const homePath = getPokemonSpritePathInner(
+        const homePath = getPokemonSpritePathFromSource(
           {
             ...props,
             formIndex: props.formIndex ?? 0,
             format: 'OHPKM',
             extraFormIndex: props.extraFormIndex,
           },
-          'box-home',
-          'webp'
+          HomeBoxSprites
         )
 
         if (spritePath !== getPublicImageURL(homePath)) {

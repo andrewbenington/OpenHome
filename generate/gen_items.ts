@@ -12,7 +12,7 @@ import {
   itemUnboundGetAll,
 } from './queries.ts'
 
-function optionalToRust<T, S>(value: T | null | undefined, tranformer?: (T) => S): string {
+function optionalToRust<T, S>(value: T | null | undefined, tranformer?: (v: T) => S): string {
   if (value !== undefined && value !== null) {
     return `Some(${tranformer ? tranformer(value) : value})`
   } else {
@@ -88,7 +88,7 @@ impl ItemGen1 {
         match modern_index {`
 
   const alreadyProcessed: Set<number> = new Set()
-  for (const item of allItems.toSorted((a, b) => a.modernId - b.modernId)) {
+  for (const item of allItems.toSorted((a, b) => (a.modernId ?? 0) - (b.modernId ?? 0))) {
     if (item.modernId && !alreadyProcessed.has(item.modernId)) {
       output += `
             ${item.modernId} => Self::new(${item.id}),`
@@ -134,7 +134,7 @@ impl ItemGen2 {
         match modern_index {`
 
   const alreadyProcessed: Set<number> = new Set()
-  for (const item of allItems.toSorted((a, b) => a.modernId - b.modernId)) {
+  for (const item of allItems.toSorted((a, b) => (a.modernId ?? 0) - (b.modernId ?? 0))) {
     if (item.modernId && !alreadyProcessed.has(item.modernId)) {
       output += `
             ${item.modernId} => Self::new(${item.id}),`
@@ -185,7 +185,7 @@ impl ItemGen3 {
         match modern_index {`
 
   const alreadyProcessed: Set<number> = new Set()
-  for (const item of allItems.toSorted((a, b) => a.modernId - b.modernId)) {
+  for (const item of allItems.toSorted((a, b) => (a.modernId ?? 0) - (b.modernId ?? 0))) {
     if (item.modernId && !alreadyProcessed.has(item.modernId)) {
       output += `
             ${item.modernId} => Self::new(${item.id}),`
@@ -230,7 +230,7 @@ impl ItemRadicalRed {
         match modern_index {`
 
   const alreadyProcessed: Set<number> = new Set()
-  for (const item of allItems.toSorted((a, b) => a.modernId - b.modernId)) {
+  for (const item of allItems.toSorted((a, b) => (a.modernId ?? 0) - (b.modernId ?? 0))) {
     if (item.modernId && !alreadyProcessed.has(item.modernId)) {
       output += `
             ${item.modernId} => Self::new(${item.id}),`
@@ -267,7 +267,7 @@ impl ItemUnbound {
         match modern_index {`
 
   const alreadyProcessed: Set<number> = new Set()
-  for (const item of allItems.toSorted((a, b) => a.modernId - b.modernId)) {
+  for (const item of allItems.toSorted((a, b) => (a.modernId ?? 0) - (b.modernId ?? 0))) {
     if (item.modernId && !alreadyProcessed.has(item.modernId)) {
       output += `
             ${item.modernId} => Self::new(${item.id}),`

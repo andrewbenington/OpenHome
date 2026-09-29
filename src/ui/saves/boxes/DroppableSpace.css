@@ -1,0 +1,10 @@
+.droppable-space {
+  outline-style: solid;
+  outline-width: 2px;
+  border-radius: var(--border-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}

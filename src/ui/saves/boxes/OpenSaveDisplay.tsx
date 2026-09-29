@@ -3,8 +3,9 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
 import { monSupportedBySave } from '@openhome-core/save/util'
-import { $R, R, range } from '@openhome-core/util/functional'
+import { $R, Option, R, range } from '@openhome-core/util/functional'
 import { $O } from '@openhome-core/util/option'
+import { isThenable, NowOrLater } from '@openhome-core/util/promise'
 import { filterUndefined } from '@openhome-core/util/sort'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import { Item, OpenHomeCtxMenu, Submenu } from '@openhome-ui/components/context-menu'
@@ -13,18 +14,19 @@ import Fallback from '@openhome-ui/components/Fallback'
 import SearchFields from '@openhome-ui/components/search/SearchFields'
 import PokemonSearchModal from '@openhome-ui/components/search/SearchModal'
 import useDisplayError from '@openhome-ui/hooks/displayError'
-import PokemonDetailsModal from '@openhome-ui/pokemon-details/PokemonDetailsModal'
+import PokemonDetailsModal from '@openhome-ui/pokemon/PokemonDetailsModal'
+import { useCanSwapWithDragging } from '@openhome-ui/state-zustand/drag-and-drop/dragStore'
 import { ErrorContext } from '@openhome-ui/state/error'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import useOhpkmBatchIdLookup from '@openhome-ui/state/ohpkm/useOhpkmIdBatchLookup'
 import useTrackedDataRecovery from '@openhome-ui/state/ohpkm/useTrackedDataRecovery'
-import { MonLocation, useSaves } from '@openhome-ui/state/saves'
+import { EMPTY_SLOT, MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { colorIsDark } from '@openhome-ui/util/color'
 import { MetadataSummaryLookup } from '@pkm-rs/pkg'
 import { Button, Dialog, Flex, Grid, Separator } from '@radix-ui/themes'
-import { useCallback, useContext, useMemo, useState } from 'react'
+import { useContext, useMemo, useState } from 'react'
 import { MdClose } from 'react-icons/md'
-import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
+import useMultiSelect from '../../state/drag-and-drop/useMultiSelect'
 import { cssClass } from '../../util/style'
 import { useBoxNavigator } from '../util'
 import ArrowButton from './ArrowButton'
@@ -36,13 +38,13 @@ interface OpenSaveDisplayProps {
 
 const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const savesManager = useSaves()
-  const { allOpenSaves, saveFromIdentifier, importMonsToLocation } = savesManager
+  const { allOpenSaves, importMonsToLocation } = savesManager
 
   const ohpkmStore = useOhpkmStore()
   const [, dispatchError] = useContext(ErrorContext)
   const [detailsModal, setDetailsModal] = useState(false)
   const { saveIndex } = props
-  const { dragState, toggleSelection, isSelected } = useDragAndDrop()
+  const { multiSelectState, toggleSelection, isSelected } = useMultiSelect()
 
   const save = useMemo(() => allOpenSaves[saveIndex], [allOpenSaves, saveIndex])
   const displayError = useDisplayError()
@@ -109,45 +111,13 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
     importMonsToLocation(mons, location)
   }
 
-  const isDisabled = useCallback(
-    (mon?: PKMInterface) => {
-      const dragPayload = dragState?.payload
-
-      if (!dragPayload) return false
-
-      if (dragPayload.kind === 'item') {
-        return !save.supportsItem(dragPayload.item.index)
-      }
-
-      const draggingMons = Array.isArray(dragPayload.monData)
-        ? dragPayload.monData
-        : [dragPayload.monData]
-
-      for (const monWithLocation of draggingMons) {
-        if (!monWithLocation || Object.entries(monWithLocation).length === 0) return false // Handles a glitch that occurs when navigating between boxes and the payload becomes an empty object
-
-        const sourceSave = monWithLocation.isHome
-          ? undefined
-          : saveFromIdentifier(monWithLocation.saveIdentifier)
-
-        const sourceIsOpenHome = !sourceSave
-        const monIsIncompatible =
-          !monSupportedBySave(save, monWithLocation.mon) ||
-          (mon && !sourceIsOpenHome && !monSupportedBySave(sourceSave, mon))
-
-        if (monIsIncompatible) return true
-      }
-
-      return false
-    },
-    [dragState?.payload, saveFromIdentifier, save]
-  )
+  const canSwapWithDragging = useCanSwapWithDragging(save)
 
   const displayData = useMemo(() => save.getDisplayData?.() ?? {}, [save])
 
   const allCellsDisabled = range(save.boxColumns * save.boxRows)
     .map((index: number) => save.getMonAt(save.currentPCBox, index))
-    .every(isDisabled)
+    .every(canSwapWithDragging)
 
   const slots = range(save.boxColumns * save.boxRows)
     .map((index: number) => save.getMonAt(save.currentPCBox, index))
@@ -158,14 +128,37 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
         boxSlot: index,
         saveIdentifier: save.identifier,
       }
-      const mon = save.getMonAt(location.box, location.boxSlot)
-      const monOrOhpkm = $O(save.getMonAt(location.box, location.boxSlot))
-        .flatMap(ohpkmStore.getPotentialOhpkmId)
-        .flatMap((openhomeId) => saveOhpkms?.get(openhomeId))
-        .map(R.dropError) // we expect many "id lookups" to fail, because not all mons are necessarily tracked
-        .get()
+      let mon: Option<OHPKM | PKMInterface> | NowOrLater<Option<OHPKM>> = save.getMonAt(
+        location.box,
+        location.boxSlot
+      )
+      const openhomeIdBoxed = $O(save.getMonAt(location.box, location.boxSlot)).flatMap(
+        ohpkmStore.getPotentialOhpkmId
+      )
 
-      return { save, mon: monOrOhpkm ?? mon }
+      let openhomeId = openhomeIdBoxed.get()
+
+      mon =
+        openhomeIdBoxed
+          .flatMap((openhomeId) => saveOhpkms?.get(openhomeId))
+          .map(R.dropError) // we expect many "id lookups" to fail, because not all mons are necessarily tracked
+          .get() ?? mon
+
+      // when a pokemon is in the process of being registered (i.e. was just dragged from a different save into
+      // this one), use the pending value to avoid visual snaps back and forth
+      const pendingMon = savesManager.getPendingMon(location)
+      if (pendingMon === EMPTY_SLOT) {
+        mon = undefined
+      } else if (pendingMon) {
+        if (typeof pendingMon === 'string') {
+          openhomeId = pendingMon
+          mon = ohpkmStore.getById(openhomeId)
+        } else {
+          mon = pendingMon
+        }
+      }
+
+      return { save, mon, openhomeId, pendingMon }
     })
 
   return save && save.currentPCBox !== undefined ? (
@@ -196,7 +189,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
             />
           </div>
           <Grid className="box-grid" columns={save.boxColumns.toString()}>
-            {slots.map(({ save, mon }, index) => {
+            {slots.map(({ save, mon, openhomeId }, index) => {
               const location: MonLocation = {
                 isHome: false,
                 box: save.currentPCBox,
@@ -204,9 +197,11 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                 saveIdentifier: save.identifier,
               }
 
-              const uniqueKey = mon
-                ? `${save.currentPCBox}-${index}-${mon.encryptionConstant ?? mon.personalityValue ?? JSON.stringify(mon.dvs)}-${mon.nickname}`
-                : `${save.currentPCBox}-${index}`
+              const uniqueKey = isThenable(mon)
+                ? `${save.currentPCBox}-${index}-${openhomeId}`
+                : mon
+                  ? `${save.currentPCBox}-${index}-${openhomeId ?? mon.encryptionConstant ?? mon.personalityValue ?? JSON.stringify(mon.dvs)}-${mon.nickname}`
+                  : `${save.currentPCBox}-${index}`
 
               const slotMetadata = save.getSlotMetadata?.(save.currentPCBox, index)
 
@@ -216,7 +211,9 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                   onClick={() => setSelectedIndex(index)}
                   dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${index}`}
                   location={location}
-                  isDisabled={(mon) => isDisabled(mon) || slotMetadata?.isDisabled === true}
+                  isDisabled={(mon) =>
+                    !canSwapWithDragging(mon) || slotMetadata?.isDisabled === true
+                  }
                   disabledReason={slotMetadata?.disabledReason}
                   monPromise={mon}
                   onDrop={(importedMons) => {
@@ -224,7 +221,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                       attemptImportMons(importedMons, location)
                     }
                   }}
-                  multiSelectEnabled={dragState.multiSelectEnabled}
+                  multiSelectEnabled={multiSelectState.multiSelectEnabled}
                   isSelected={isSelected(location)}
                   onToggleSelect={() => toggleSelection(location)}
                   contextMenu={
@@ -242,6 +239,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                         ]
                       : []
                   }
+                  borderColor={mon instanceof OHPKM ? 'var(--ohpkm-cell-border-color)' : undefined}
                 />
               )
             })}
