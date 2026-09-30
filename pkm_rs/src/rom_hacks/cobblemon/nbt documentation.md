@@ -293,6 +293,12 @@ Required int.
 
 The Pokemon's friendship with the current Trainer. Starts at 50 (150 if in a Friend Ball).
 
+### `Fullness`
+
+Optional int.
+
+How full the Pokemon is from eating various food items. The maximum value is [derived](https://gitlab.com/cable-mc/cobblemon/-/blob/main/common/src/main/kotlin/com/cobblemon/mod/common/pokemon/Pokemon.kt#L1050) from what Grass Knot's base power would be if used on the Pokemon, with an absolute maximum of 7.
+
 ### `Gender`
 
 Required string.
@@ -408,6 +414,14 @@ Required list. 1-4 items.
 Required string.
 
 Set to the [resource identifier](https://gitlab.com/cable-mc/cobblemon/-/blob/main/common/src/main/kotlin/com/cobblemon/mod/common/api/pokemon/Natures.kt#L24) of the Pokemon's original Nature.
+
+### `Nickname`
+
+Optional string.
+
+The Pokemon's nickname.
+
+Can be 1-12 characters long.
 
 ### `PersistentData`
 
