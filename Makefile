@@ -1,4 +1,4 @@
-VERSION=1.18.0-rc.performance-fixes
+VERSION=1.18.0
 
 .PHONY: help
 help: # Display this help.

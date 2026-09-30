@@ -1063,6 +1063,8 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.obedienceLevel = other.obedienceLevel
     }
 
+    this.populateLearnedMoves()
+
     return updates
   }
 
@@ -1155,8 +1157,6 @@ export function originalDataTagToMonFormat(tag: Tag): PkmFormat {
       return 'PB8LUMI'
     case Tag.Pk3Rr:
       return 'PK3RR'
-    case Tag.Pk3Ub:
-      return 'PK3UB'
     case Tag.Pk3Ub:
       return 'PK3UB'
     case Tag.Pk9Compass:
