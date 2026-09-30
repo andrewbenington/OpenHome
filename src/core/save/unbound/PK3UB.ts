@@ -1,11 +1,13 @@
 import { PluginPKMInterface, RomHackFormat } from '@openhome-core/pkm/interfaces'
-import { ItemUnbound, PkmFormat } from '@pkm-rs/pkg'
+import { Option } from '@openhome-core/util/functional'
+import { ExtraFormIndex, ItemUnbound, PkmFormat } from '@pkm-rs/pkg'
 import PK3CFRU from '../cfru/PK3CFRU'
 import { fromGen3CFRUMoveIndex, toGen3CFRUMoveIndex } from '../cfru/conversion/Gen3CFRUMovesIndex'
 import { CFRUToNationalMap } from '../cfru/conversion/Gen3CFRUMovesIndex/CFRUToNationalMap'
-import { CfruSpeciesAndForm, toGen3CRFUPokemonIndex } from '../cfru/conversion/util'
+import { CfruSpeciesAndForm } from '../cfru/conversion/util'
 import { PluginIdentifier } from '../interfaces'
-import { NationalDexToUnboundMap, UnboundToNationalDexMap } from './conversion/UnboundSpeciesMap'
+import { toGen3UBPokemonIndex } from './conversion/Gen3UBPokemonIndex'
+import { UnboundToNationalDexMap } from './conversion/UnboundSpeciesMap'
 
 // const FAKEMON_INDEXES = [
 //   1186, 1200, 1274, 1275, 1276, 1277, 1278, 1279, 1282, 1283, 1284, 1285, 1286, 1287, 1288, 1289,
@@ -61,8 +63,12 @@ export default class PK3UB extends PK3CFRU implements PluginPKMInterface {
     return data
   }
 
-  monToGameIndex(nationalDexNumber: number, formIndex: number): number {
-    return toGen3CRFUPokemonIndex(nationalDexNumber, formIndex, NationalDexToUnboundMap)
+  monToGameIndex(
+    nationalDexNumber: number,
+    formIndex: number,
+    extraFormIndex: Option<ExtraFormIndex>
+  ): number {
+    return toGen3UBPokemonIndex(nationalDexNumber, formIndex, extraFormIndex)
   }
 
   indexIsFakemon(speciesIndex: number): boolean {
