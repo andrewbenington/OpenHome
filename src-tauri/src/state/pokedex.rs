@@ -31,7 +31,7 @@ impl Deref for PokedexState {
 }
 
 pub type DexNumber = u16;
-pub type FormeNumber = u16;
+pub type FormNumber = u16;
 
 #[derive(
     Debug,
@@ -72,7 +72,7 @@ pub struct FormEntry {
     pub shiny_leaves: ShinyLeaves,
 }
 
-type FormEntries = HashMap<FormeNumber, FormEntry>;
+type FormEntries = HashMap<FormNumber, FormEntry>;
 #[derive(Default, Debug, Clone, Serialize, Deserialize, specta::Type)]
 pub struct PokedexEntry {
     // for compatibility with v1.10.* and earlier
@@ -81,12 +81,12 @@ pub struct PokedexEntry {
 }
 
 impl PokedexEntry {
-    fn form_mut(&mut self, form_index: FormeNumber) -> &mut FormEntry {
+    fn form_mut(&mut self, form_index: FormNumber) -> &mut FormEntry {
         self.forms.entry(form_index).or_default()
     }
 
     #[cfg(test)]
-    fn form_dex_level(&self, form_index: FormeNumber) -> Option<PokedexLevel> {
+    fn form_dex_level(&self, form_index: FormNumber) -> Option<PokedexLevel> {
         self.forms.get(&form_index).map(|entry| entry.level)
     }
 }
@@ -111,7 +111,7 @@ impl Pokedex {
     pub fn register(
         &mut self,
         national_dex: DexNumber,
-        form_index: FormeNumber,
+        form_index: FormNumber,
         dex_level: PokedexLevel,
     ) {
         self.by_dex_number
@@ -122,11 +122,7 @@ impl Pokedex {
     }
 
     #[cfg(test)]
-    fn form_status(
-        &self,
-        national_dex: DexNumber,
-        form_index: FormeNumber,
-    ) -> Option<PokedexLevel> {
+    fn form_status(&self, national_dex: DexNumber, form_index: FormNumber) -> Option<PokedexLevel> {
         self.by_dex_number
             .get(&national_dex)?
             .form_dex_level(form_index)
@@ -137,7 +133,7 @@ impl Pokedex {
 #[serde(rename_all = "camelCase")]
 pub struct PokedexUpdate {
     national_dex: DexNumber,
-    form_index: FormeNumber,
+    form_index: FormNumber,
     status: PokedexLevel,
 }
 
@@ -169,7 +165,7 @@ mod storage_format {
     use serde::de::value::MapAccessDeserializer;
     use serde::de::{IntoDeserializer, Visitor};
 
-    type FormEntriesStored = HashMap<FormeNumber, FormEntryStored>;
+    type FormEntriesStored = HashMap<FormNumber, FormEntryStored>;
     #[derive(Debug, Clone, specta::Type)]
     pub enum FormEntryStored {
         LevelOnly(PokedexLevel),
