@@ -1031,6 +1031,8 @@ pub const COBBLEMON_MARK_MAX: usize = CobblemonRibbon::VictoryMark as usize;
 pub type CobblemonRibbonSet<const N: usize, const MAX: usize = COBBLEMON_MARK_MAX> =
     RibbonSet<N, CobblemonRibbon, MAX>;
 
+impl<const COBBLEMON_MARK_COUNT: usize> CobblemonRibbonSet<COBBLEMON_MARK_COUNT> {}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd)]
 pub enum CobblemonRibbon {
     // ObsoleteRibbon
@@ -1782,6 +1784,12 @@ impl From<CobblemonRibbon> for &str {
 impl From<CobblemonRibbon> for usize {
     fn from(ribbon: CobblemonRibbon) -> Self {
         ribbon.get_index()
+    }
+}
+
+impl From<CobblemonRibbon> for OpenHomeRibbon {
+    fn from(ribbon: CobblemonRibbon) -> Self {
+        ribbon.to_openhome().expect("OpenHomeRibbon is valid")
     }
 }
 
