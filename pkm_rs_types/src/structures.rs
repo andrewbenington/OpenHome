@@ -1,5 +1,3 @@
-use std::ops::Add;
-
 use arbitrary_int::{u3, u4};
 use chrono::Datelike;
 use serde::{Deserialize, Serialize, Serializer};
@@ -719,6 +717,14 @@ impl ShinyLeaves {
     pub const fn new_crown() -> Self {
         Self(0b100000)
     }
+
+    pub fn update_from(&mut self, other: &Self) {
+        if !(self.has_crown() || other.has_crown()) {
+            self.0 |= other.0;
+        } else {
+            *self = Self::new_crown();
+        }
+    }
 }
 
 #[cfg(feature = "wasm")]
@@ -762,17 +768,6 @@ impl std::fmt::Display for ShinyLeaves {
             }
             Ok(())
         }
-    }
-}
-
-impl Add for ShinyLeaves {
-    type Output = Self;
-
-    fn add(mut self, rhs: Self) -> Self::Output {
-        if !(self.has_crown() || rhs.has_crown()) {
-            self.0 |= rhs.0
-        }
-        self
     }
 }
 

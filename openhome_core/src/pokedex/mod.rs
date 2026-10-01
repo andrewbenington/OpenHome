@@ -75,6 +75,10 @@ pub struct FormEntry {
 impl FormEntry {
     pub fn update(&mut self, other: Self) {
         self.level = self.level.max(other.level);
+        self.games.extend(other.games);
+        self.extra.extend(other.extra);
+        self.flags.extend(other.flags);
+        self.shiny_leaves.update_from(&other.shiny_leaves);
     }
 
     #[cfg(test)]

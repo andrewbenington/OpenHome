@@ -25,7 +25,7 @@ import { useItemBag } from '@openhome-ui/state/items'
 import { OhpkmStoreData } from '@openhome-ui/state/ohpkm'
 import { IdentifierNotPresentError, useOhpkmStore } from '@openhome-ui/state/ohpkm/useOhpkmStore'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
-import { Gender, Item, OriginGame } from '@pkm-rs/pkg'
+import { Gender, Item, OriginGame, OriginGames } from '@pkm-rs/pkg'
 import { useContext, useRef } from 'react'
 import {
   EmptySlot,
@@ -559,17 +559,18 @@ export function pokedexUpdatesFromSave(saveFile: SAV) {
   const pokedexUpdates: PokedexUpdate[] = []
 
   for (const mon of saveFile.getAllMons()) {
+    const data = pokedexCaughtEntryFromMon(mon, saveFile.pluginIdentifier ?? saveFile.origin)
     pokedexUpdates.push({
       nationalDex: mon.nationalDex,
       formIndex: mon.formIndex,
-      data: pokedexCaughtEntryFromMon(mon, saveFile.origin),
+      data,
     })
 
     if (isBattleFormeItem(mon.nationalDex, mon.heldItemIndex)) {
       pokedexUpdates.push({
         nationalDex: mon.nationalDex,
         formIndex: displayIndexAdder(mon.heldItemIndex)(mon.formIndex),
-        data: pokedexCaughtEntryFromMon(mon, saveFile.origin),
+        data,
       })
     }
   }
@@ -577,13 +578,20 @@ export function pokedexUpdatesFromSave(saveFile: SAV) {
   return pokedexUpdates
 }
 
+function isOriginGameStr(v: string): v is OriginGameStr {
+  return OriginGames.isOriginGameString(v)
+}
+
 function pokedexCaughtEntryFromMon(
   mon: PKMInterface,
   game: OriginGame | PluginIdentifier
 ): FormEntry {
+  const gameString = typeof game === 'number' ? OriginGame[game] : undefined
+  const originGame = gameString && isOriginGameStr(gameString) ? gameString : undefined
+
   return {
     level: mon.isShiny() ? 'ShinyCaught' : 'Caught',
-    games: isPluginGame(game) ? [] : [game.toString() as OriginGameStr],
+    games: originGame ? [originGame] : [],
     extra: isPluginGame(game) ? [game] : [],
     flags: pokedexFlagsFromMon(mon),
     shiny_leaves: mon.shinyLeaves?.toByte() ?? 0,
