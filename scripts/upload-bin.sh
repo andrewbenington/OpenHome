@@ -53,6 +53,8 @@ RELEASE=$(curl -L \
   -H "X-GitHub-Api-Version: 2026-03-10" \
   "https://api.github.com/repos/$GITHUB_REPO/releases/latest")
 
+echo "$RELEASE"
+
 
 RELEASE_ID=$(echo "$RELEASE" | grep -m1 '"id"' | head -1 | grep -o '[0-9]*')
 TAG=$(echo "$RELEASE" | grep '"tag_name"' | head -1 | sed -E 's/.*"tag_name": *"([^"]+)".*/\1/')

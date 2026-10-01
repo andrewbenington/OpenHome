@@ -3,8 +3,9 @@
 # Merge strategies for specific files
 # This helps Git handle conflicts more intelligently
 
-# always regenerate, never merge
-package-lock.json merge=ours
+# always keep, never merge (regenerated lockfiles)
+pnpm-lock.yaml merge=ours
+flake.lock merge=ours
 yarn.lock merge=ours
 Cargo.lock merge=ours
 
@@ -18,12 +19,22 @@ Cargo.lock merge=ours
 *.rs text eol=lf
 
 # Binary files
-*.pk9 binary
-*.pk8 binary
-*.pk7 binary
-*.pk6 binary
-*.pk5 binary
+*.pkm binary
+*.pk1 binary
+*.pk2 binary
+*.pk3 binary
+*.ck3 binary
+*.colopkm binary
+*.xk3 binary
+*.xdpkm binary
 *.pk4 binary
+*.pk5 binary
+*.pk6 binary
+*.pk7 binary
+*.pb7 binary
+*.pk8 binary
+*.pa8 binary
+*.pk9 binary
 *.pa9 binary
 *.ohpkm binary
 *.sav binary
