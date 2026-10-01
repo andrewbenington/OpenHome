@@ -66,6 +66,7 @@ Slot# (Compound)
   ├ HeldItemVisible (Bool)
   ├ IVs (Compound)
   ├ Level (Int)
+  ├ Markings (Int Array)
   ├ Marks (List)
   ├ MintedNature (String)
   ├ MoveSet (List)
@@ -386,6 +387,16 @@ For context: In the official games, Hyper Training is simply a bool that determi
 Required int.
 
 The Pokemon's current level.
+
+### `Markings`
+
+Optional int array.
+
+There are always six ints. Each one corresponds to a marking in the following order: circle, triangle, square, heart, star, diamond.
+
+- 0 means the marking isn't set.
+- 1 means the marking is blue.
+- 2 means the marking is red.
 
 ### `Marks`
 
