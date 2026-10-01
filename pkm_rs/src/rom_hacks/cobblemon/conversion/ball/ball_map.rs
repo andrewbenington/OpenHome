@@ -100,6 +100,7 @@ static COBBLEMON_BALL_TO_OPENHOME_BALL_MAP: LazyLock<BiHashMap<CobblemonBall, Ba
             (CobblemonBall::Ultra, Ball::Ultra),
             (CobblemonBall::Great, Ball::Great),
             (CobblemonBall::Poke, Ball::Poke),
+            (CobblemonBall::Poke, Ball::Strange),
             (CobblemonBall::Slate, Ball::Poke),
             (CobblemonBall::Azure, Ball::Poke),
             (CobblemonBall::Verdant, Ball::Poke),
@@ -290,7 +291,6 @@ pub enum CobblemonBall {
     Sport,
     Dream,
     Beast,
-    //Strange,
     PokeLegendsArceus,
     SlateLegendsArceus,
     AzureLegendsArceus,
@@ -329,6 +329,7 @@ impl From<u8> for CobblemonBall {
         COBBLEMON_BALL_INDEX_MAP
             .get_by_left(&value)
             .copied()
+            .or(Some(CobblemonBall::Poke))
             .expect("CobblemonBall index is valid")
     }
 }
@@ -338,7 +339,8 @@ impl From<Ball> for CobblemonBall {
         COBBLEMON_BALL_TO_OPENHOME_BALL_MAP
             .get_by_right(&ball)
             .copied()
-            .expect("Ball is valid")
+            .or(Some(CobblemonBall::Poke))
+            .expect("CobblemonBall is valid")
     }
 }
 
@@ -347,6 +349,7 @@ impl From<CobblemonBall> for Ball {
         COBBLEMON_BALL_TO_OPENHOME_BALL_MAP
             .get_by_left(&ball)
             .copied()
+            .or(Some(Ball::Poke))
             .expect("Ball is valid")
     }
 }
