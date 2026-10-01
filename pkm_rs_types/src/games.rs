@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use serde::{Deserialize, Serialize};
 use strum_macros::{Display, EnumString};
 #[cfg(feature = "wasm")]
@@ -15,7 +17,20 @@ pub enum ColosseumOrXd {
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[cfg_attr(feature = "specta", derive(specta::Type))]
-#[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, Deserialize)]
+#[cfg_attr(feature = "specta", specta(rename = "OriginGameStr"))]
+#[derive(
+    Debug,
+    Default,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Clone,
+    Copy,
+    Deserialize,
+    strum::EnumString,
+)]
 #[repr(u8)]
 pub enum OriginGame {
     #[default]
@@ -443,6 +458,10 @@ impl OriginGame {
     pub fn is_scarlet_violet(self) -> bool {
         self == Self::Scarlet || self == Self::Violet
     }
+
+    pub fn is_origin_string(v: &str) -> bool {
+        OriginGame::from_str(v).is_ok()
+    }
 }
 
 impl Serialize for OriginGame {
@@ -651,6 +670,11 @@ impl OriginGames {
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "isScarletViolet"))]
     pub fn is_scarlet_violet(value: u8) -> bool {
         OriginGame::from(value).is_scarlet_violet()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "isOriginGameString"))]
+    pub fn is_origin_string(s: &str) -> bool {
+        OriginGame::is_origin_string(s)
     }
 }
 

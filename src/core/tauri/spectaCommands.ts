@@ -384,7 +384,7 @@ export type Filter =
   | { baseEvolution: number }
 export type FormEntry = {
   level: PokedexLevel
-  games: OriginGame[]
+  games: OriginGameStr[]
   extra: PluginIdentifier[]
   flags: PokedexFlag[]
   shiny_leaves: ShinyLeaves
@@ -421,7 +421,7 @@ export type NamedStrategy = { name: string; strategy: ConvertStrategy }
 export type NatureIndex = number
 export type NatureStrategy = 'KeepOriginalNature' | 'KeepMintNature'
 export type NicknameCapitalization = 'GameDefault' | 'Modern'
-export type OriginGame =
+export type OriginGameStr =
   | 'Invalid0'
   | 'Sapphire'
   | 'Ruby'
@@ -509,7 +509,7 @@ export type Pokedex = { byDexNumber: Partial<{ [key in number]: PokedexEntry }> 
 export type PokedexEntry = { forms: Partial<{ [key in number]: FormEntry }> }
 export type PokedexFlag = 'Male' | 'Female' | 'NsPokemon' | 'Gigantamax' | 'Alpha'
 export type PokedexLevel = 'Seen' | 'Caught' | 'ShinyCaught'
-export type PokedexUpdate = { nationalDex: number; formIndex: number; status: PokedexLevel }
+export type PokedexUpdate = { nationalDex: number; formIndex: number; data: FormEntry }
 export type PossibleSaves = { citra: PathData[]; desmume: PathData[]; open_emu: PathData[] }
 export type SaveRef = {
   filePath: PathData

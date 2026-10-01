@@ -300,7 +300,9 @@ export function getSaveRef(save: SAV): SaveRef {
     valid: true,
   }
 }
-export type PluginIdentifier = RustPluginIdentifier | string
+
+export type PluginIdentifier = RustPluginIdentifier
+
 export function pluginGameName(identifier: PluginIdentifier, type = 'full'): string {
   switch (identifier) {
     case 'radical_red':
@@ -314,6 +316,10 @@ export function pluginGameName(identifier: PluginIdentifier, type = 'full'): str
     default:
       return 'Unknown Plugin'
   }
+}
+
+export function isPluginGame(id: OriginGame | PluginIdentifier): id is PluginIdentifier {
+  return typeof id === 'string'
 }
 
 export function pluginOriginMarkPath(identifier: PluginIdentifier): string | undefined {

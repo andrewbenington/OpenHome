@@ -3,10 +3,17 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { displayIndexAdder, isBattleFormeItem } from '@openhome-core/pkm/util'
-import { getSaveRef, SAV, SaveIdentifier } from '@openhome-core/save/interfaces'
+import {
+  getSaveRef,
+  isPluginGame,
+  PluginIdentifier,
+  SAV,
+  SaveIdentifier,
+} from '@openhome-core/save/interfaces'
 import { SAVClass } from '@openhome-core/save/util'
 import { buildSaveFile, getPossibleSaveTypes } from '@openhome-core/save/util/load'
 import { PathData } from '@openhome-core/save/util/path'
+import { FormEntry, OriginGameStr, PokedexFlag } from '@openhome-core/tauri/spectaCommands'
 import { $R, Errorable, Option, R, Result } from '@openhome-core/util/functional'
 import {
   OPENHOME_BOX_SLOTS,
@@ -18,7 +25,7 @@ import { useItemBag } from '@openhome-ui/state/items'
 import { OhpkmStoreData } from '@openhome-ui/state/ohpkm'
 import { IdentifierNotPresentError, useOhpkmStore } from '@openhome-ui/state/ohpkm/useOhpkmStore'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
-import { Item } from '@pkm-rs/pkg'
+import { Gender, Item, OriginGame } from '@pkm-rs/pkg'
 import { useContext, useRef } from 'react'
 import {
   EmptySlot,
@@ -210,7 +217,7 @@ export function useSaves(): SavesAndBanksManager {
   const addSave = async (save: SAV): Promise<Result<SAV, SaveError>> => {
     try {
       await backend.addRecentSave(getSaveRef(save))
-      const result = await backend.registerInPokedex(pokedexSeenFromSave(save))
+      const result = await backend.registerInPokedex(pokedexUpdatesFromSave(save))
       if (R.isErr(result)) {
         console.error('Error registering pokedex entries from save:', result.error)
       }
@@ -548,24 +555,58 @@ export function saveErrorMessage(error: SaveError): string {
   }
 }
 
-export function pokedexSeenFromSave(saveFile: SAV) {
+export function pokedexUpdatesFromSave(saveFile: SAV) {
   const pokedexUpdates: PokedexUpdate[] = []
 
   for (const mon of saveFile.getAllMons()) {
     pokedexUpdates.push({
       nationalDex: mon.nationalDex,
       formIndex: mon.formIndex,
-      status: 'Seen',
+      data: pokedexCaughtEntryFromMon(mon, saveFile.origin),
     })
 
     if (isBattleFormeItem(mon.nationalDex, mon.heldItemIndex)) {
       pokedexUpdates.push({
         nationalDex: mon.nationalDex,
         formIndex: displayIndexAdder(mon.heldItemIndex)(mon.formIndex),
-        status: 'Seen',
+        data: pokedexCaughtEntryFromMon(mon, saveFile.origin),
       })
     }
   }
 
   return pokedexUpdates
+}
+
+function pokedexCaughtEntryFromMon(
+  mon: PKMInterface,
+  game: OriginGame | PluginIdentifier
+): FormEntry {
+  return {
+    level: mon.isShiny() ? 'ShinyCaught' : 'Caught',
+    games: isPluginGame(game) ? [] : [game.toString() as OriginGameStr],
+    extra: isPluginGame(game) ? [game] : [],
+    flags: pokedexFlagsFromMon(mon),
+    shiny_leaves: mon.shinyLeaves?.toByte() ?? 0,
+  }
+}
+
+function pokedexFlagsFromMon(mon: PKMInterface): PokedexFlag[] {
+  const flags: PokedexFlag[] = []
+  if (mon.gender === Gender.Male) {
+    flags.push('Male')
+  } else if (mon.gender === Gender.Female) {
+    flags.push('Female')
+  }
+
+  if (mon.isNsPokemon) {
+    flags.push('NsPokemon')
+  }
+  if (mon.canGigantamax) {
+    flags.push('Gigantamax')
+  }
+  if (mon.isAlpha) {
+    flags.push('Alpha')
+  }
+
+  return flags
 }

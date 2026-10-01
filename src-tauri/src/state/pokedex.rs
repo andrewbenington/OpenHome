@@ -72,6 +72,20 @@ pub struct FormEntry {
     pub shiny_leaves: ShinyLeaves,
 }
 
+impl FormEntry {
+    pub fn update(&mut self, other: Self) {
+        self.level = self.level.max(other.level);
+    }
+
+    #[cfg(test)]
+    pub fn from_level(level: PokedexLevel) -> Self {
+        Self {
+            level,
+            ..Default::default()
+        }
+    }
+}
+
 type FormEntries = HashMap<FormNumber, FormEntry>;
 #[derive(Default, Debug, Clone, Serialize, Deserialize, specta::Type)]
 pub struct PokedexEntry {
@@ -108,17 +122,12 @@ impl Pokedex {
         data_controller.write_file_json(DataDir::Storage, POKEDEX_FILENAME, &self.by_dex_number)
     }
 
-    pub fn register(
-        &mut self,
-        national_dex: DexNumber,
-        form_index: FormNumber,
-        dex_level: PokedexLevel,
-    ) {
+    pub fn update(&mut self, national_dex: DexNumber, form_index: FormNumber, data: FormEntry) {
         self.by_dex_number
             .entry(national_dex)
             .or_default()
             .form_mut(form_index)
-            .level = dex_level;
+            .update(data);
     }
 
     #[cfg(test)]
@@ -134,7 +143,7 @@ impl Pokedex {
 pub struct PokedexUpdate {
     national_dex: DexNumber,
     form_index: FormNumber,
-    status: PokedexLevel,
+    data: FormEntry,
 }
 
 #[tauri::command]
@@ -152,7 +161,7 @@ pub fn update_pokedex(
 ) -> CommandResult<()> {
     let mut pokedex = pokedex_state.lock()?;
     for update in updates {
-        pokedex.register(update.national_dex, update.form_index, update.status);
+        pokedex.update(update.national_dex, update.form_index, update.data);
     }
 
     app_handle
@@ -268,14 +277,14 @@ mod storage_format {
 mod tests {
     use serde_json::json;
 
-    use crate::state::{Pokedex, PokedexEntry, PokedexLevel};
+    use crate::state::{FormEntry, Pokedex, PokedexEntry, PokedexLevel};
     use openhome_core::{Error, Result, data_controller::MockSingleJsonFile};
 
     #[test]
     fn serialize_deserialize() -> Result<()> {
         let mut pokedex = Pokedex::default();
-        pokedex.register(25, 0, PokedexLevel::Caught);
-        pokedex.register(26, 1, PokedexLevel::Seen);
+        pokedex.update(25, 0, FormEntry::from_level(PokedexLevel::Caught));
+        pokedex.update(26, 1, FormEntry::from_level(PokedexLevel::Seen));
 
         let serialized = serde_json::to_string(&pokedex)
             .map_err(|err| Error::other_with_source("serialize Pokedex", err))?;
@@ -299,7 +308,7 @@ mod tests {
     #[test]
     fn serializes_to_forms() -> Result<()> {
         let mut pokedex = Pokedex::default();
-        pokedex.register(25, 0, PokedexLevel::Caught);
+        pokedex.update(25, 0, FormEntry::from_level(PokedexLevel::Caught));
 
         let serialized = serde_json::to_string(&pokedex)
             .map_err(|err| Error::other_with_source("serialize Pokédex", err))?;
