@@ -1,14 +1,12 @@
+use crate::Result;
+use crate::data_controller::{DataController, DataDir, JsonDataReader};
+
 use std::collections::HashSet;
 use std::{collections::HashMap, ops::Deref, sync::Mutex};
 
 use pkm_rs::PluginIdentifier;
 use pkm_rs_types::{OriginGame, ShinyLeaves};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use tauri::Emitter;
-
-use crate::commands::CommandResult;
-use openhome_core::Result;
-use openhome_core::data_controller::{DataController, DataDir, JsonDataReader};
 
 const POKEDEX_FILENAME: &str = "pokedex.json";
 
@@ -141,32 +139,9 @@ impl Pokedex {
 #[derive(Debug, Serialize, Deserialize, Clone, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct PokedexUpdate {
-    national_dex: DexNumber,
-    form_index: FormNumber,
-    data: FormEntry,
-}
-
-#[tauri::command]
-#[specta::specta]
-pub fn get_pokedex(pokedex_state: tauri::State<'_, PokedexState>) -> CommandResult<Pokedex> {
-    Ok(pokedex_state.lock()?.clone())
-}
-
-#[tauri::command]
-#[specta::specta]
-pub fn update_pokedex(
-    app_handle: tauri::AppHandle,
-    pokedex_state: tauri::State<'_, PokedexState>,
-    updates: Vec<PokedexUpdate>,
-) -> CommandResult<()> {
-    let mut pokedex = pokedex_state.lock()?;
-    for update in updates {
-        pokedex.update(update.national_dex, update.form_index, update.data);
-    }
-
-    app_handle
-        .emit("pokedex_update", pokedex.clone())
-        .map_err(|err| format!("Could not emit 'pokedex_update' to frontend: {err}").into())
+    pub national_dex: DexNumber,
+    pub form_index: FormNumber,
+    pub data: FormEntry,
 }
 
 mod storage_format {
@@ -277,8 +252,8 @@ mod storage_format {
 mod tests {
     use serde_json::json;
 
-    use crate::state::{FormEntry, Pokedex, PokedexEntry, PokedexLevel};
-    use openhome_core::{Error, Result, data_controller::MockSingleJsonFile};
+    use super::*;
+    use crate::{Error, Result, data_controller::MockSingleJsonFile};
 
     #[test]
     fn serialize_deserialize() -> Result<()> {

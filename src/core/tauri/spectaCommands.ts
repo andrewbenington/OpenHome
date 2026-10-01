@@ -102,22 +102,6 @@ export const commands = {
       else return { status: 'error', error: e as any }
     }
   },
-  async getDataDirPath(): Promise<Result<string, CommandError>> {
-    try {
-      return { status: 'ok', data: await TAURI_INVOKE('get_data_dir_path') }
-    } catch (e) {
-      if (e instanceof Error) throw e
-      else return { status: 'error', error: e as any }
-    }
-  },
-  async changeDataDir(shouldMove: boolean): Promise<Result<null, CommandError>> {
-    try {
-      return { status: 'ok', data: await TAURI_INVOKE('change_data_dir', { shouldMove }) }
-    } catch (e) {
-      if (e instanceof Error) throw e
-      else return { status: 'error', error: e as any }
-    }
-  },
   async loadBanks(): Promise<Result<StoredBankDataWasm, CommandError>> {
     try {
       return { status: 'ok', data: await TAURI_INVOKE('load_banks') }
@@ -145,6 +129,22 @@ export const commands = {
   async updatePokedex(updates: PokedexUpdate[]): Promise<Result<null, CommandError>> {
     try {
       return { status: 'ok', data: await TAURI_INVOKE('update_pokedex', { updates }) }
+    } catch (e) {
+      if (e instanceof Error) throw e
+      else return { status: 'error', error: e as any }
+    }
+  },
+  async getDataDirPath(): Promise<Result<string, CommandError>> {
+    try {
+      return { status: 'ok', data: await TAURI_INVOKE('get_data_dir_path') }
+    } catch (e) {
+      if (e instanceof Error) throw e
+      else return { status: 'error', error: e as any }
+    }
+  },
+  async changeDataDir(shouldMove: boolean): Promise<Result<null, CommandError>> {
+    try {
+      return { status: 'ok', data: await TAURI_INVOKE('change_data_dir', { shouldMove }) }
     } catch (e) {
       if (e instanceof Error) throw e
       else return { status: 'error', error: e as any }
