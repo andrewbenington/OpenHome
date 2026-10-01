@@ -2,7 +2,9 @@
 // pub mod rr;
 // pub mod ub;
 
-#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize, specta::Type)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize, specta::Type,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum PluginIdentifier {
     RadicalRed,

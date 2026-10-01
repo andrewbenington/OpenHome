@@ -15,7 +15,7 @@ pub enum ColosseumOrXd {
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[cfg_attr(feature = "specta", derive(specta::Type))]
-#[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Deserialize)]
+#[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, Deserialize)]
 #[repr(u8)]
 pub enum OriginGame {
     #[default]

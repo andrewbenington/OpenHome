@@ -114,7 +114,6 @@ fn rgb_to_display_color(rgb: [u8; 3]) -> String {
     format!("#{:02x}{:02x}{:02x}", rgb[0], rgb[1], rgb[2])
 }
 
-#[allow(deprecated)]
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Display)]
 #[repr(u16)]
 pub enum OhpkmSectionTag {
