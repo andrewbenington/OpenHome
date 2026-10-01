@@ -1,8 +1,6 @@
-export type PokedexEntry = { formes: Record<number, PokedexStatus> }
-export type PokedexStatus = 'Seen' | 'Caught' | 'ShinyCaught'
-export type Pokedex = { byDexNumber: Record<number, PokedexEntry> }
-export type PokedexUpdate = {
-  nationalDex: number
-  formIndex: number
-  status: PokedexStatus
-}
+import * as SpectaGenerated from '@openhome-core/tauri/spectaCommands'
+
+export type PokedexEntry = SpectaGenerated.PokedexEntry
+export type PokedexLevel = SpectaGenerated.PokedexLevel
+export type Pokedex = SpectaGenerated.Pokedex
+export type PokedexUpdate = SpectaGenerated.PokedexUpdate

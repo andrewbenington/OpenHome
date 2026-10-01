@@ -382,6 +382,13 @@ export type Filter =
   | { moveTextPrefixEng: string }
   | { nicknamePrefix: string }
   | { baseEvolution: number }
+export type FormEntry = {
+  level: PokedexLevel
+  games: OriginGame[]
+  extra: PluginIdentifier[]
+  flags: PokedexFlag[]
+  shiny_leaves: ShinyLeaves
+}
 export type Gender = 'Male' | 'Female' | 'Genderless' | 'Invalid'
 export type JsonValue =
   null | boolean | number | string | JsonValue[] | Partial<{ [key in string]: JsonValue }>
@@ -414,6 +421,60 @@ export type NamedStrategy = { name: string; strategy: ConvertStrategy }
 export type NatureIndex = number
 export type NatureStrategy = 'KeepOriginalNature' | 'KeepMintNature'
 export type NicknameCapitalization = 'GameDefault' | 'Modern'
+export type OriginGame =
+  | 'Invalid0'
+  | 'Sapphire'
+  | 'Ruby'
+  | 'Emerald'
+  | 'FireRed'
+  | 'LeafGreen'
+  | 'Invalid6'
+  | 'HeartGold'
+  | 'SoulSilver'
+  | 'Invalid9'
+  | 'Diamond'
+  | 'Pearl'
+  | 'Platinum'
+  | 'Invalid13'
+  | 'Invalid14'
+  | 'ColosseumXd'
+  | 'BattleRevolution'
+  | 'Invalid17'
+  | 'Invalid18'
+  | 'Invalid19'
+  | 'White'
+  | 'Black'
+  | 'White2'
+  | 'Black2'
+  | 'X'
+  | 'Y'
+  | 'AlphaSapphire'
+  | 'OmegaRuby'
+  | 'Invalid28'
+  | 'Invalid29'
+  | 'Sun'
+  | 'Moon'
+  | 'UltraSun'
+  | 'UltraMoon'
+  | 'Go'
+  | 'Red'
+  | 'BlueGreen'
+  | 'BlueJpn'
+  | 'Yellow'
+  | 'Gold'
+  | 'Silver'
+  | 'Crystal'
+  | 'LetsGoPikachu'
+  | 'LetsGoEevee'
+  | 'Sword'
+  | 'Shield'
+  | 'Home'
+  | 'LegendsArceus'
+  | 'BrilliantDiamond'
+  | 'ShiningPearl'
+  | 'Scarlet'
+  | 'Violet'
+  | 'LegendsZa'
 export type PaginatedPage<T> = {
   results: T[]
   nextPageExists: boolean
@@ -445,9 +506,10 @@ export type PkmType =
 export type PluginIdentifier = 'radical_red' | 'unbound' | 'luminescent_platinum' | 'compass'
 export type PluginMetadata = { id: string; name: string; version: string; api_version: number }
 export type Pokedex = { byDexNumber: Partial<{ [key in number]: PokedexEntry }> }
-export type PokedexEntry = { formes: Partial<{ [key in number]: PokedexStatus }> }
-export type PokedexStatus = 'Seen' | 'Caught' | 'ShinyCaught'
-export type PokedexUpdate = { nationalDex: number; formIndex: number; status: PokedexStatus }
+export type PokedexEntry = { forms: Partial<{ [key in number]: FormEntry }> }
+export type PokedexFlag = 'Male' | 'Female' | 'NsPokemon' | 'Gigantamax' | 'Alpha'
+export type PokedexLevel = 'Seen' | 'Caught' | 'ShinyCaught'
+export type PokedexUpdate = { nationalDex: number; formIndex: number; status: PokedexLevel }
 export type PossibleSaves = { citra: PathData[]; desmume: PathData[]; open_emu: PathData[] }
 export type SaveRef = {
   filePath: PathData
@@ -459,6 +521,7 @@ export type SaveRef = {
   valid: boolean
   pluginIdentifier: PluginIdentifier | null
 }
+export type ShinyLeaves = number
 export type StoredBankDataWasm = { banks: BankWasm[]; current_bank?: number }
 export type TransactionState = { open_transaction: boolean; temp_files: string[] }
 export type UpdateFeatures = { version: string; feature_messages: string[] }

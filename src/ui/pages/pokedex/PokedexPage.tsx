@@ -1,4 +1,5 @@
 import { hasGenderDifference } from '@openhome-core/pkm/util/index'
+import { filterUndefined } from '@openhome-core/util/sort'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import useMonSprite from '@openhome-ui/pokemon/useMonSprite'
@@ -52,9 +53,11 @@ export default function PokedexPage() {
   }
 
   const pokedex = pokedexState.pokedex
-  const caughtCount = Object.values(pokedex.byDexNumber).filter((entry) =>
-    Object.values(entry.formes).some((status) => status.endsWith('Caught'))
-  ).length
+  const caughtCount = Object.values(pokedex.byDexNumber)
+    .filter(filterUndefined)
+    .filter((entry) =>
+      Object.values(entry.forms).some((status) => status?.level.endsWith('Caught'))
+    ).length
 
   const seenCount = new Set(
     Object.keys(pokedex.byDexNumber).filter((v) => parseInt(v) <= NationalDex.Pecharunt)

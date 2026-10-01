@@ -1,21 +1,21 @@
-import { Pokedex, PokedexStatus } from '@openhome-ui/util/pokedex'
+import { Pokedex, PokedexLevel } from '@openhome-ui/util/pokedex'
 import { ExtraFormMetadata, FormMetadata, Language, Lookup, SpeciesMetadata } from '@pkm-rs/pkg'
 
-export function getHighestFormeStatus(
+export function getHighestFormStatus(
   pokedex: Pokedex,
   species: SpeciesMetadata
-): [number, PokedexStatus | undefined] {
+): [number, PokedexLevel | undefined] {
   if (!(species.nationalDex in pokedex.byDexNumber)) return [0, undefined]
 
   let maxStatusForme = 0
-  let maxStatus: PokedexStatus = 'Seen'
+  let maxStatus: PokedexLevel = 'Seen'
 
-  for (const [formIndex, status] of Object.entries(
-    pokedex.byDexNumber[species.nationalDex].formes
+  for (const [formIndex, dexEntry] of Object.entries(
+    pokedex.byDexNumber[species.nationalDex]?.forms ?? {}
   )) {
-    if (StatusIndices[status] > StatusIndices[maxStatus]) {
+    if (dexEntry && StatusIndices[dexEntry.level] > StatusIndices[maxStatus]) {
       maxStatusForme = parseInt(formIndex)
-      maxStatus = status
+      maxStatus = dexEntry.level
     }
   }
 
@@ -26,12 +26,12 @@ export function getFormeStatus(
   pokedex: Pokedex,
   nationalDex: number,
   formIndex: number
-): PokedexStatus | undefined {
+): PokedexLevel | undefined {
   if (!(nationalDex in pokedex.byDexNumber)) return undefined
-  return pokedex.byDexNumber[nationalDex].formes[formIndex]
+  return pokedex.byDexNumber[nationalDex]?.forms[formIndex]?.level
 }
 
-export const StatusIndices: Record<PokedexStatus, number> = {
+export const StatusIndices: Record<PokedexLevel, number> = {
   Seen: 0,
   Caught: 1,
   ShinyCaught: 2,
