@@ -430,6 +430,7 @@ fn metadata_table_by_source(source: MetadataSource) -> &'static dyn MetadataTabl
         MetadataSource::LegendsArceus => &METADATA_TABLE_LA,
         MetadataSource::ScarletViolet => &METADATA_TABLE_SV,
         MetadataSource::LegendsZa => &METADATA_TABLE_LZA,
+        MetadataSource::Cobblemon => &METADATA_TABLE_SV,
     }
 }
 

@@ -241,6 +241,7 @@ pub enum PokemonIndexType {
     ScarletViolet,
     Gen3RR,
     Gen3UB,
+    Cobblemon,
 }
 
 impl Display for PokemonIndexType {
@@ -257,6 +258,7 @@ impl Display for PokemonIndexType {
             PokemonIndexType::ScarletViolet => "Scarlet/Violet",
             PokemonIndexType::Gen3RR => "Radical Red",
             PokemonIndexType::Gen3UB => "Unbound",
+            PokemonIndexType::Cobblemon => "Cobblemon",
         })
     }
 }

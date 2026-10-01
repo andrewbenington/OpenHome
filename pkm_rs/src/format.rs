@@ -42,6 +42,7 @@ pub enum PkmFormat {
     PK3UB,
     PB8LUMI,
     PK9Compass,
+    PkCblmn,
 }
 
 impl PkmFormat {
@@ -71,6 +72,7 @@ impl PkmFormat {
             Self::PK3RR | Self::PK3UB => OriginGame::FireRed,
             Self::PB8LUMI => OriginGame::BrilliantDiamond,
             Self::PK9Compass => OriginGame::Scarlet,
+            Self::PkCblmn => OriginGame::Home,
         }
     }
 
@@ -91,7 +93,7 @@ impl PkmFormat {
             Self::PK9 => origin.is_scarlet_violet(),
             Self::PA9 => origin == OriginGame::LegendsZa,
 
-            Self::PK3RR | Self::PK3UB | Self::PB8LUMI | Self::PK9Compass => false,
+            Self::PK3RR | Self::PK3UB | Self::PB8LUMI | Self::PK9Compass | Self::PkCblmn => false,
         }
     }
 
@@ -110,6 +112,7 @@ impl PkmFormat {
             Self::PK3RR | Self::PK3UB => Generation::G3,
             Self::PB8LUMI => Generation::G8,
             Self::PK9Compass => Generation::G9,
+            Self::PkCblmn => Generation::G9,
         }
     }
 
@@ -122,7 +125,8 @@ impl PkmFormat {
             | Self::PB8LUMI
             | Self::PK9
             | Self::PK9Compass
-            | Self::PA9 => true,
+            | Self::PA9
+            | Self::PkCblmn => true,
             Self::PK1
             | Self::PK2
             | Self::PK3
@@ -164,12 +168,14 @@ impl PkmFormat {
 
             Self::PK3RR | Self::PK3UB => LinkTradeIndex::PkmGen3 as u16,
             Self::PB8LUMI | Self::PK9Compass => LinkTradeIndex::Pkm3dsSwitch as u16,
+            // Cobblemon has no met locations, so just use something fitting, it won't be used
+            Self::PkCblmn => super::location::FARAWAY_PLACE_SWSH,
         }
     }
 
     pub fn origin_is_legal(&self, origin: OriginGame) -> bool {
         match self {
-            Self::PK1 | Self::PK2 => false,
+            Self::PK1 | Self::PK2 | Self::PkCblmn => false,
             Self::PK3 | Self::ColoPkm | Self::XdPkm => origin.generation() == Generation::G3,
             Self::PK4 => {
                 origin.generation() == Generation::G3 || origin.generation() == Generation::G4
@@ -208,7 +214,7 @@ impl PkmFormat {
         }
 
         match self {
-            Self::PK1 | Self::PK2 => origin, // doesn't matter; these games don't store origin
+            Self::PK1 | Self::PK2 | Self::PkCblmn => origin, // doesn't matter; these games don't store origin
             Self::PK3 | Self::ColoPkm | Self::XdPkm => match origin {
                 Red | Yellow | LetsGoPikachu => FireRed,
                 BlueGreen | BlueJpn | LetsGoEevee => LeafGreen,
@@ -341,7 +347,7 @@ impl PkmFormat {
 
     pub const fn location_index_of(&self, location: Location) -> Option<u16> {
         match self {
-            Self::PK1 => None,
+            Self::PK1 | Self::PkCblmn => None,
             Self::PK2 => location::gen2::index_of(location),
             Self::PK3 => location::gen3_gba::index_of(location),
             Self::ColoPkm | Self::XdPkm => match location {
@@ -926,6 +932,10 @@ impl PkmFormat {
 
                 MetData::new(legalized_origin, location_index)
             }
+            PkmFormat::PkCblmn => {
+                // Cobblemon has no met locations, so just use the source met location, it won't be used
+                MetData::new(source_origin, source_met_location)
+            }
         }
     }
 
@@ -949,6 +959,7 @@ impl PkmFormat {
             Self::PK3RR | Self::PK3UB => MetadataSource::FireRedLeafGreen,
             Self::PB8LUMI => MetadataSource::BrilliantDiamondShiningPearl,
             Self::PK9Compass => MetadataSource::ScarletViolet,
+            Self::PkCblmn => MetadataSource::Cobblemon,
         }
     }
 }

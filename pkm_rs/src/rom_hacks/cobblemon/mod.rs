@@ -1,7 +1,11 @@
-mod conversion;
+#[cfg(feature = "wasm")]
 mod pkcblmn;
+#[cfg(feature = "wasm")]
+pub use pkcblmn::*;
 
-use conversion::ball::ball_map::CobblemonBall;
+pub mod conversion;
+
+//use conversion::ball::ball_map::CobblemonBall;
 
 const BOX_ROWS: u8 = 5;
 const BOX_COLS: u8 = 6;

@@ -10,6 +10,7 @@ use serde::Serialize;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 
+mod cobblemon_data;
 mod gameboy_data;
 mod gen45_data;
 mod gen67_data;
@@ -21,6 +22,7 @@ mod past_handlers;
 
 pub mod pkm_bytes;
 
+pub(crate) use cobblemon_data::CobblemonData;
 pub(crate) use gameboy_data::GameboyData;
 pub(crate) use gen8_data::{LegendsArceusData, SwordShieldData};
 pub(crate) use gen9_data::{LegendsZaData, SV_BASE_TM_BYTES_EXCLUDE_UNUSED, ScarletVioletData};

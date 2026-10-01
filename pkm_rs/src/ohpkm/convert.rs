@@ -6,14 +6,17 @@ mod pk7;
 mod pk8;
 #[cfg(feature = "wasm")]
 mod pk9;
+#[cfg(feature = "wasm")]
+mod pkcblmn;
 
-use crate::ohpkm::v2_sections::SwordShieldData;
+use crate::convert_strategy::ConvertStrategy;
 use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
 use crate::result::Result;
 use crate::traits::Pkm;
-use crate::{convert_strategy::ConvertStrategy, ohpkm::v2_sections::ScarletVioletData};
 
-use super::v2_sections::{Gen67Data, MainDataV2};
+use super::v2_sections::{
+    CobblemonData, Gen67Data, LegendsArceusData, MainDataV2, ScarletVioletData, SwordShieldData,
+};
 
 pub trait OhpkmConvert: Pkm {
     fn to_main_data(&self) -> MainDataV2;
@@ -26,7 +29,15 @@ pub trait OhpkmConvert: Pkm {
         None
     }
 
+    fn to_la_data(&self) -> Option<LegendsArceusData> {
+        None
+    }
+
     fn to_sv_data(&self) -> Option<ScarletVioletData> {
+        None
+    }
+
+    fn to_cobblemon_data(&self) -> Option<CobblemonData> {
         None
     }
 

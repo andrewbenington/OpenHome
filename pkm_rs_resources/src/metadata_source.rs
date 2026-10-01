@@ -38,6 +38,7 @@ pub enum MetadataSource {
     #[default]
     ScarletViolet,
     LegendsZa,
+    Cobblemon,
 }
 
 impl MetadataSource {
@@ -65,6 +66,7 @@ impl MetadataSource {
             Self::LegendsArceus => OriginGame::LegendsArceus,
             Self::ScarletViolet => OriginGame::Scarlet,
             Self::LegendsZa => OriginGame::LegendsZa,
+            Self::Cobblemon => OriginGame::Home,
         }
     }
 
@@ -146,6 +148,7 @@ impl MetadataSource {
             Self::LegendsArceus => vec![OriginGame::LegendsArceus],
             Self::ScarletViolet => vec![OriginGame::Scarlet, OriginGame::Violet],
             Self::LegendsZa => vec![OriginGame::LegendsZa],
+            Self::Cobblemon => vec![OriginGame::Home],
         }
     }
 
@@ -173,6 +176,7 @@ impl MetadataSource {
             Self::LegendsArceus => "Legends: Arceus",
             Self::ScarletViolet => "Scarlet/Violet",
             Self::LegendsZa => "Legends: Z-A",
+            Self::Cobblemon => "Cobblemon",
         }
     }
 

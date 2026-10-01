@@ -60,6 +60,7 @@ const fn slice_for_source(source: MetadataSource) -> Option<&'static [u8]> {
         MetadataSource::LegendsArceus => Some(&MAX_PP_PLA),
         MetadataSource::ScarletViolet => Some(&MAX_PP_SV),
         MetadataSource::LegendsZa => Some(&MAX_PP_PLZA),
+        MetadataSource::Cobblemon => Some(&MAX_PP_SV),
     }
 }
 

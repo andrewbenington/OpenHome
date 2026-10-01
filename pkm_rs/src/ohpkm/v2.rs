@@ -1,9 +1,9 @@
 use std::num::NonZeroU64;
 
 use super::v2_sections::{
-    GameboyData, Gen45Data, Gen67Data, LearnedMoves, LegendsArceusData, LegendsZaData, MainDataV2,
-    MonTags, MostRecentSave, Notes, PastHandlerDataV2, PluginData, SV_BASE_TM_BYTES_EXCLUDE_UNUSED,
-    ScarletVioletData, SwordShieldData,
+    CobblemonData, GameboyData, Gen45Data, Gen67Data, LearnedMoves, LegendsArceusData,
+    LegendsZaData, MainDataV2, MonTags, MostRecentSave, Notes, PastHandlerDataV2, PluginData,
+    SV_BASE_TM_BYTES_EXCLUDE_UNUSED, ScarletVioletData, SwordShieldData,
 };
 use crate::gen9_lza::PlusMoveFlags;
 use crate::ohpkm::OhpkmConvert;
@@ -16,6 +16,7 @@ use crate::ohpkm::v1::OhpkmV1;
 use crate::ohpkm::v2_sections::UnknownHandlerSave;
 use crate::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, StoredPkmBytes, UnconvertedPkm};
 use crate::result::{Error, Result};
+use crate::rom_hacks::cobblemon::conversion::ball::ball_map::CobblemonBall;
 use crate::sectioned_data::{DataSection, SectionTag, SectionedData};
 use crate::traits::{HasSpeciesAndForm, IsShiny, PkmBytes};
 
@@ -25,7 +26,9 @@ use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::{MoveIndex, MoveSlots, la_tutor, lza_tm, sv_tm, swsh_tr};
 use pkm_rs_resources::natures::NatureIndex;
-use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
+use pkm_rs_resources::ribbons::{
+    CobblemonRibbon, CobblemonRibbonSet, ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet,
+};
 use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_resources::species::SpeciesMetadata;
 use pkm_rs_types::Dvs;
@@ -127,6 +130,7 @@ pub enum OhpkmSectionTag {
     LegendsArceus = 0x06,
     ScarletViolet = 0x07,
     LegendsZa = 0x11,
+    Cobblemon = 0x12,
     PluginData = 0x09,
     Notes = 0x0A,
     MostRecentSave = 0x0B,
@@ -152,6 +156,7 @@ impl OhpkmSectionTag {
             0x06 => Some(Self::LegendsArceus),
             0x07 => Some(Self::ScarletViolet),
             0x11 => Some(Self::LegendsZa),
+            0x12 => Some(Self::Cobblemon),
             #[allow(deprecated)]
             0x08 => Some(Self::PastHandlerV1),
             0x09 => Some(Self::PluginData),
@@ -183,6 +188,7 @@ impl OhpkmSectionTag {
             Self::LegendsArceus => 44,
             Self::ScarletViolet => 37,
             Self::LegendsZa => 83,
+            Self::Cobblemon => 0, // TODO: update
             Self::PastHandlerV2 => 40,
             Self::PluginData => 0,
             Self::Notes => 0,
@@ -224,6 +230,7 @@ pub struct OhpkmV2 {
     la_data: Option<LegendsArceusData>,
     sv_data: Option<ScarletVioletData>,
     lza_data: Option<LegendsZaData>,
+    cblmn_data: Option<CobblemonData>,
     handler_data: Vec<PastHandlerDataV2>,
     learned_moves: Option<LearnedMoves>,
     plugin_data: Option<PluginData>,
@@ -247,7 +254,9 @@ impl OhpkmV2 {
             main_data: other.to_main_data(),
             gen67_data: other.to_gen_67_data(),
             swsh_data: other.to_swsh_data(),
+            la_data: other.to_la_data(),
             sv_data: other.to_sv_data(),
+            cblmn_data: other.to_cobblemon_data(),
             ..Default::default()
         };
 
@@ -639,11 +648,11 @@ impl OhpkmV2 {
     }
 
     pub const fn affixed_ribbon(&self) -> Option<ModernRibbon> {
-        self.main_data.affixed_ribbon
+        self.main_data.affixed_ribbon // TODO: handle CobblemonRibbon
     }
 
     pub const fn set_affixed_ribbon(&mut self, v: Option<ModernRibbon>) {
-        self.main_data.affixed_ribbon = v;
+        self.main_data.affixed_ribbon = v; // TODO: handle CobblemonRibbon
     }
 
     pub const fn extra_form_index(&self) -> Option<ExtraFormIndex> {
@@ -820,6 +829,14 @@ impl OhpkmV2 {
             .into_iter()
             .map(DsGen3Ribbon::from_index)
             .map(DsGen3Ribbon::to_openhome)
+            .for_each(|r| self.main_data.ribbons.add_ribbon(r));
+    }
+
+    pub fn add_cobblemon_ribbons(&mut self, ribbon_indices: Vec<usize>) {
+        ribbon_indices
+            .into_iter()
+            .map(CobblemonRibbon::from_index)
+            .map(CobblemonRibbon::to_openhome)
             .for_each(|r| self.main_data.ribbons.add_ribbon(r));
     }
 
@@ -1457,6 +1474,63 @@ impl OhpkmV2 {
         Some(self.lza_data?.plus_moves)
     }
 
+    // Cobblemon
+
+    pub fn cobblemon_ball(&self) -> Option<CobblemonBall> {
+        Some(self.cblmn_data?.cobblemon_ball)
+    }
+
+    pub fn set_cobblemon_ball(&mut self, value: Option<CobblemonBall>) {
+        match value {
+            Some(cobblemon_ball) => {
+                self.cblmn_data.get_or_insert_default().cobblemon_ball = cobblemon_ball
+            }
+            None => {
+                if let Some(cblmn_data) = &mut self.cblmn_data {
+                    cblmn_data.cobblemon_ball = CobblemonBall::from(self.main_data.ball)
+                }
+            }
+        }
+    }
+
+    pub fn cobblemon_is_tradeable(&self) -> bool {
+        self.cblmn_data.map(|d| d.is_tradeable).unwrap_or(true)
+    }
+
+    pub fn set_cobblemon_is_tradeable(&mut self, value: Option<bool>) {
+        match value {
+            Some(is_tradeable) => {
+                self.cblmn_data.get_or_insert_default().is_tradeable = is_tradeable
+            }
+            None => {
+                // toggle the value if not provided
+                if let Some(cblmn_data) = &mut self.cblmn_data {
+                    cblmn_data.is_tradeable = !cblmn_data.is_tradeable
+                }
+            }
+        }
+    }
+
+    pub fn cobblemon_trainer_is_player(&self) -> bool {
+        self.cblmn_data
+            .map(|d| d.trainer_is_player)
+            .unwrap_or(false)
+    }
+
+    pub fn set_cobblemon_trainer_is_player(&mut self, value: Option<bool>) {
+        match value {
+            Some(trainer_is_player) => {
+                self.cblmn_data.get_or_insert_default().trainer_is_player = trainer_is_player
+            }
+            None => {
+                // toggle the value if not provided
+                if let Some(cblmn_data) = &mut self.cblmn_data {
+                    cblmn_data.trainer_is_player = !cblmn_data.trainer_is_player
+                }
+            }
+        }
+    }
+
     // Past Handlers
 
     pub fn handlers(&self) -> Vec<PastHandlerDataV2> {
@@ -1611,6 +1685,7 @@ impl OhpkmV2 {
             la_data: None,
             sv_data: None,
             lza_data: None,
+            cblmn_data: None,
             handler_data: Vec::new(),
             plugin_data: None,
             learned_moves: None,
@@ -1650,6 +1725,7 @@ impl OhpkmV2 {
             la_data: LegendsArceusData::extract_from(&sectioned_data)?,
             sv_data: ScarletVioletData::extract_from(&sectioned_data)?,
             lza_data: LegendsZaData::extract_from(&sectioned_data)?,
+            cblmn_data: CobblemonData::extract_from(&sectioned_data)?,
             handler_data: past_handler_data_v2,
             learned_moves: LearnedMoves::extract_from(&sectioned_data)?,
             plugin_data: PluginData::extract_from(&sectioned_data)?,
@@ -1697,6 +1773,7 @@ impl OhpkmV2 {
                 .ok()
                 .flatten(),
             lza_data: LegendsZaData::extract_from(&sectioned_data).ok().flatten(),
+            cblmn_data: CobblemonData::extract_from(&sectioned_data).ok().flatten(),
             handler_data: past_handler_data_v2,
             learned_moves: LearnedMoves::extract_from(&sectioned_data).ok().flatten(),
             plugin_data: PluginData::extract_from(&sectioned_data).ok().flatten(),
@@ -1727,6 +1804,7 @@ impl OhpkmV2 {
             la_data: LegendsArceusData::from_v1(old),
             sv_data: ScarletVioletData::from_v1(old),
             lza_data: None, // z-a move flags weren't tracked in v1
+            cblmn_data: None,
             handler_data: PastHandlerDataV2::from_ohpkm_v1(old).map_or(Vec::new(), |hd| vec![hd]),
             learned_moves: LearnedMoves::from_v1(old),
             plugin_data: PluginData::from_v1(old),
@@ -1754,6 +1832,7 @@ impl OhpkmV2 {
             la_data,
             sv_data,
             lza_data,
+            cblmn_data,
             handler_data,
             learned_moves,
             plugin_data,
@@ -1773,6 +1852,7 @@ impl OhpkmV2 {
             .add_if_some(la_data)
             .add_if_some(sv_data)
             .add_if_some(lza_data)
+            .add_if_some(cblmn_data)
             .add_all(handler_data)
             .add_if_some(plugin_data)
             .add_if_some(notes)
@@ -2013,6 +2093,7 @@ impl OhpkmV2 {
             la_data,
             sv_data,
             lza_data,
+            cblmn_data,
             handler_data,
             learned_moves,
             plugin_data,
@@ -2036,6 +2117,7 @@ impl OhpkmV2 {
         add_section_bytes_to_js_object(&obj, la_data)?;
         add_section_bytes_to_js_object(&obj, sv_data)?;
         add_section_bytes_to_js_object(&obj, lza_data)?;
+        add_section_bytes_to_js_object(&obj, cblmn_data)?;
 
         for handler in handler_data {
             add_section_bytes_to_js_object(&obj, &Some(handler.clone()))?;
