@@ -159,6 +159,32 @@ function PokerusBadge(props: BadgePropsNoBackground & { pokerusByte: Option<numb
   }
 }
 
+function TitanBadge(props: BadgePropsNoBackground) {
+  const label = labelIf(props.showLabel, 'Titan')
+  return (
+    <ImageBadge
+      tooltip="Titan"
+      src={getPublicImageURL('icons/titan.svg')}
+      backgroundColor="#a0caa0"
+      label={label}
+      {...props}
+    />
+  )
+}
+
+function TotemBadge(props: BadgePropsNoBackground) {
+  const label = labelIf(props.showLabel, 'Totem')
+  return (
+    <ImageBadge
+      tooltip="Totem"
+      src={getPublicImageURL('icons/totem.svg')}
+      backgroundColor="#e4c30a"
+      label={label}
+      {...props}
+    />
+  )
+}
+
 const Badge = {
   Alpha: memo(AlphaBadge),
   Game: memo(GameBadge),
@@ -167,6 +193,8 @@ const Badge = {
   Image: memo(ImageBadge),
   Numeric: memo(NumericBadge),
   Pokerus: memo(PokerusBadge),
+  Titan: memo(TitanBadge),
+  Totem: memo(TotemBadge),
 }
 
 export default Badge

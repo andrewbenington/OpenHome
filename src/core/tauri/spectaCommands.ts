@@ -507,7 +507,8 @@ export type PluginIdentifier = 'radical_red' | 'unbound' | 'luminescent_platinum
 export type PluginMetadata = { id: string; name: string; version: string; api_version: number }
 export type Pokedex = { byDexNumber: Partial<{ [key in number]: PokedexEntry }> }
 export type PokedexEntry = { forms: Partial<{ [key in number]: FormEntry }> }
-export type PokedexFlag = 'Male' | 'Female' | 'NsPokemon' | 'Gigantamax' | 'Alpha'
+export type PokedexFlag =
+  'Male' | 'Female' | 'NsPokemon' | 'Totem' | 'Gigantamax' | 'Alpha' | 'Titan'
 export type PokedexLevel = 'Seen' | 'Caught' | 'ShinyCaught'
 export type PokedexUpdate = { nationalDex: number; formIndex: number; data: FormEntry }
 export type PossibleSaves = { citra: PathData[]; desmume: PathData[]; open_emu: PathData[] }

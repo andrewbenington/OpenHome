@@ -22,8 +22,13 @@
   padding: calc(0.15rem * var(--badge-size));
   border-radius: var(--border-radius-xs);
 
-  img {
+  img,
+  svg {
     width: calc(0.6rem + 0.4rem * var(--badge-size));
+  }
+
+  svg {
+    height: 40px;
   }
 }
 

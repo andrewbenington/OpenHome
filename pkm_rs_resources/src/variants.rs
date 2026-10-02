@@ -87,3 +87,43 @@ pub const fn has_gigantamax_form(species_form: SpeciesForm) -> bool {
 pub fn has_gigantamax_form_wasm(national_dex: NationalDex, form_index: u16) -> bool {
     SpeciesForm::new_valid_ndex(national_dex, form_index).is_ok_and(has_gigantamax_form)
 }
+
+pub const fn totem_form_acquirable(species_form: SpeciesForm) -> bool {
+    match species_form.get_ndex() {
+        NationalDex::Gumshoos
+        | NationalDex::Araquanid
+        | NationalDex::Lurantis
+        | NationalDex::Salazzle
+        | NationalDex::Vikavolt
+        | NationalDex::Togedemaru
+        | NationalDex::Mimikyu
+        | NationalDex::Ribombee
+        | NationalDex::Kommoo => true,
+        NationalDex::Raticate | NationalDex::Marowak => species_form.get_forme_index() == 1,
+        _ => false,
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "totemFormAcquirable"))]
+#[allow(clippy::missing_const_for_fn)]
+pub fn totem_form_acquirable_wasm(national_dex: NationalDex, form_index: u16) -> bool {
+    SpeciesForm::new_valid_ndex(national_dex, form_index).is_ok_and(totem_form_acquirable)
+}
+
+pub const fn species_has_titan(species_form: SpeciesForm) -> bool {
+    matches!(
+        species_form.get_ndex(),
+        NationalDex::Klawf
+            | NationalDex::Bombirdier
+            | NationalDex::Orthworm
+            | NationalDex::GreatTusk
+            | NationalDex::IronTreads
+            | NationalDex::Tatsugiri
+    )
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "speciesHasTitan"))]
+#[allow(clippy::missing_const_for_fn)]
+pub fn species_has_titan_wasm(national_dex: NationalDex, form_index: u16) -> bool {
+    SpeciesForm::new_valid_ndex(national_dex, form_index).is_ok_and(species_has_titan)
+}

@@ -38,19 +38,6 @@
   color: white;
 }
 
-.pokedex-image {
-  height: calc(100% + 1rem);
-  padding: 0.5rem;
-  margin: -1.25rem 0px 0px -1rem;
-  position: absolute;
-}
-
-.pokedex-image-shadow {
-  margin: -0.75rem 0px 0px -0.25rem;
-  filter: brightness(0%) blur(2px);
-  opacity: 0.4;
-}
-
 .pokedex-header {
   height: var(--top-bar-height);
   padding: var(--padding-radius-sm-lg);
@@ -101,20 +88,25 @@
   position: relative;
 }
 
-.pokedex-image-frame {
+.pokedex-summary-pane {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 100%;
+  width: 60%;
+  min-width: 34rem;
+  flex-grow: 1;
+  overflow: auto;
   position: relative;
-  background-color: rgba(255, 255, 255, 0.833);
-  outline: 0.25rem solid var(--color-gray-200);
-  border-radius: var(--border-radius-sm);
-  box-shadow:
-    rgba(50, 50, 93, 0.25) 0px 2rem 3.75rem -0.75rem inset,
-    rgba(0, 0, 0, 0.3) 0px 1rem 2.25rem -1rem inset;
-  contain: content;
-  min-width: 8rem;
-  width: 18rem;
-  max-width: 100%;
-  aspect-ratio: 1;
-  position: relative;
+  box-sizing: border-box;
+  padding: 0;
+  background-color: var(--color-sidebar);
+}
+
+.pokedex-summary-card {
+  width: 100%;
+  flex-shrink: 0;
+  padding: 0.5rem;
 }
 
 .base-stats-container {
@@ -127,40 +119,14 @@
 }
 
 .pokedex-view-select {
-  min-width: 10rem;
-  margin: var(--padding-radius-sm-lg);
-}
-
-.pokedex-toggle {
-  position: absolute;
-  width: 2rem;
-  height: 2rem;
-  z-index: 20;
-  border-radius: 50%;
-  border: none;
-  box-shadow: var(--raised-button-box-shadow);
-}
-
-.pokedex-shiny-toggle {
-  top: var(--padding-radius-sm-lg);
-  right: var(--padding-radius-sm-lg);
-}
-
-.pokedex-gender-toggle {
-  top: var(--padding-radius-sm-lg);
-  left: var(--padding-radius-sm-lg);
-  padding: 0;
-  text-align: center;
-
-  p {
-    font-size: 1.3rem;
-    margin: auto;
-  }
+  width: 10rem;
+  margin: auto var(--padding-radius-xs-sm) auto auto;
 }
 
 .pokedex-tab-row {
   position: absolute;
   z-index: 10;
+  width: 100%;
 }
 
 .pokedex-tab {
@@ -207,5 +173,23 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto 1fr;
-  height: 100vh;
+  margin: -0.5rem;
+  contain: paint;
+}
+
+.bottom-right-grid > * {
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+
+.bottom-right-grid > *:not(:nth-child(2n)) {
+  border-right: 1px solid var(--gray-a6);
+}
+
+.bottom-right-grid > *:not(:nth-last-child(-n + 2)) {
+  border-bottom: 1px solid var(--gray-a6);
+}
+
+.base-stats-and-attributes {
+  width: 50%;
 }

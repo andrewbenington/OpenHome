@@ -82,6 +82,12 @@ function pokedexFlagsFromMon(mon: PKMInterface): SpectaGenerated.PokedexFlag[] {
   if (mon.isAlpha) {
     flags.push('Alpha')
   }
+  if (mon.metadata?.formeName.toLowerCase().includes('totem')) {
+    flags.push('Totem')
+  }
+  if (mon.ribbons?.includes('Titan Mark')) {
+    flags.push('Titan')
+  }
 
   return flags
 }

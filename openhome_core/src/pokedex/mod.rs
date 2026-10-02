@@ -59,8 +59,10 @@ pub enum PokedexFlag {
     Male,
     Female,
     NsPokemon,
+    Totem,
     Gigantamax,
     Alpha,
+    Titan,
 }
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize, specta::Type)]
