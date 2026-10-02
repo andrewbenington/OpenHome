@@ -1,6 +1,8 @@
 import { hasGenderDifference } from '@openhome-core/pkm/util/index'
+import { FormEntry } from '@openhome-core/tauri/spectaCommands'
+import { Option } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
-import Badge from '@openhome-ui/components/badge/Badge'
+import Badge, { BadgePropsNoBackground } from '@openhome-ui/components/badge/Badge'
 import OhoFlex from '@openhome-ui/components/OhoFlex'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { getPublicImageURL } from '@openhome-ui/images/images'
@@ -33,7 +35,7 @@ import {
   Text,
   TextField,
 } from '@radix-ui/themes'
-import { useEffect, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import './pokedex.css'
 import { PokedexGames } from './PokedexGames'
 import PokedexLearnset from './PokedexLearnset'
@@ -154,6 +156,12 @@ function PokedexDetails({
     setImageError(false)
   }, [selectedForm])
 
+  const variantBadges = VARIANTS.filter((variant) =>
+    variant.isPossibleFor(selectedForm.nationalDex, selectedForm.formIndex)
+  )
+    .filter(filterUndefined)
+    .map((variant) => variant.render(selectedForm, selectedFormEntry))
+
   return (
     <Flex direction="row" height="100%" align="center" width="100%" overflow="hidden">
       <Flex
@@ -167,78 +175,81 @@ function PokedexDetails({
         pt="8"
       >
         <Flex direction="column" height="100%" width="100%" align="center" justify="start" gap="2">
-          <div className="pokedex-image-frame">
-            {selectedFormEntry?.level === 'ShinyCaught' && (
-              <button
-                className="pokedex-toggle pokedex-shiny-toggle"
-                style={{
-                  backgroundColor: showShiny ? 'var(--accent-9)' : 'var(--gray-9)',
-                }}
-                onClick={() => setShowShiny(!showShiny)}
-              >
-                <img
-                  alt="shiny icon"
-                  style={{ width: '100%', height: '100%' }}
-                  draggable={false}
-                  src={getPublicImageURL('icons/Shiny.png')}
-                />
-              </button>
-            )}
-            {hasGenderDifference(species.nationalDex) && (
-              <button
-                className="pokedex-toggle pokedex-gender-toggle"
-                style={{
-                  backgroundColor: showFemale ? 'var(--accent-9)' : 'var(--gray-9)',
-                }}
-                onClick={() => setShowFemale(!showFemale)}
-              >
-                <p>♀</p>
-              </button>
-            )}
-            {imageError ? (
-              <PokemonIcon
-                nationalDex={species.nationalDex}
-                formIndex={selectedForm.formIndex}
-                gender={isFemale ? Gender.Female : undefined}
-                style={{ width: '90%', height: 0, paddingBottom: '90%' }}
-                silhouette={!isCaught}
-              />
-            ) : spriteResult.path ? (
-              <>
-                <img
-                  className="pokedex-image pokedex-image-shadow"
-                  draggable={false}
-                  src={spriteResult.path}
-                  onError={() => setImageError(true)}
-                />
-                <img
-                  className="pokedex-image"
-                  draggable={false}
-                  src={spriteResult.path}
-                  onError={() => setImageError(true)}
-                  style={{
-                    filter: !isCaught ? 'saturate(0%)' : undefined,
-                  }}
-                />
-              </>
-            ) : (
-              <Spinner style={{ margin: 'auto', height: '2rem' }} />
-            )}
-          </div>
-          <div className="pokedex-caption">{selectedForm.formeName}</div>
-          <Card style={{ padding: 0 }} mb="4">
-            <OhoFlex.RowCentered align="center" p="2" minHeight="fit-content">
-              <Badge.Gigantamax
-                activeIf={selectedFormEntry?.flags.includes('Gigantamax') === true}
-                showIf={hasGigantamaxForm(selectedForm.nationalDex, selectedForm.formIndex)}
-                size="2"
-              />
-              <Badge.Alpha
-                activeIf={selectedFormEntry?.flags.includes('Alpha') === true}
-                showIf={canBeAlpha(selectedForm.nationalDex, selectedForm.formIndex)}
-                size="2"
-              />
-            </OhoFlex.RowCentered>
+          <Card
+            style={{
+              padding: '1rem',
+              width: 'fit-content',
+              maxWidth: '80%',
+              borderRadius: 'var(--border-radius-lg)',
+            }}
+            mb="2"
+          >
+            <Flex direction="column" height="100%" align="center" justify="start" gap="2">
+              <div className="pokedex-image-frame">
+                {selectedFormEntry?.level === 'ShinyCaught' && (
+                  <button
+                    className="pokedex-toggle pokedex-shiny-toggle"
+                    style={{
+                      backgroundColor: showShiny ? 'var(--accent-9)' : 'var(--gray-9)',
+                    }}
+                    onClick={() => setShowShiny(!showShiny)}
+                  >
+                    <img
+                      alt="shiny icon"
+                      style={{ width: '100%', height: '100%' }}
+                      draggable={false}
+                      src={getPublicImageURL('icons/Shiny.png')}
+                    />
+                  </button>
+                )}
+                {hasGenderDifference(species.nationalDex) && (
+                  <button
+                    className="pokedex-toggle pokedex-gender-toggle"
+                    style={{
+                      backgroundColor: showFemale ? 'var(--accent-9)' : 'var(--gray-9)',
+                    }}
+                    onClick={() => setShowFemale(!showFemale)}
+                  >
+                    <p>♀</p>
+                  </button>
+                )}
+                {imageError ? (
+                  <PokemonIcon
+                    nationalDex={species.nationalDex}
+                    formIndex={selectedForm.formIndex}
+                    gender={isFemale ? Gender.Female : undefined}
+                    style={{ width: '90%', height: 0, paddingBottom: '90%' }}
+                    silhouette={!isCaught}
+                  />
+                ) : spriteResult.path ? (
+                  <>
+                    <img
+                      className="pokedex-image pokedex-image-shadow"
+                      draggable={false}
+                      src={spriteResult.path}
+                      onError={() => setImageError(true)}
+                    />
+                    <img
+                      className="pokedex-image"
+                      draggable={false}
+                      src={spriteResult.path}
+                      onError={() => setImageError(true)}
+                      style={{
+                        filter: !isCaught ? 'saturate(0%)' : undefined,
+                      }}
+                    />
+                  </>
+                ) : (
+                  <Spinner style={{ margin: 'auto', height: '2rem' }} />
+                )}
+              </div>
+              <div className="pokedex-caption">{selectedForm.formeName}</div>
+              {variantBadges.length > 0 && (
+                <OhoFlex.RowCentered align="center" p="2" minHeight="fit-content">
+                  {variantBadges}
+                </OhoFlex.RowCentered>
+              )}
+            </Flex>
           </Card>
           <h3>Standard Forms</h3>
           <Flex justify="center" gap="2" width="100%" wrap="wrap">
@@ -391,3 +402,57 @@ function PokedexDetails({
     </Flex>
   )
 }
+
+type IsPossibleFor = (nationalDex: NationalDex, formIndex: number) => boolean
+type IsRegistered = (formDexEntry: FormEntry) => boolean
+type BadgeType = (props: BadgePropsNoBackground) => ReactNode
+
+class PokedexVariant<B extends BadgeType = BadgeType> {
+  description: string
+  isPossibleFor: IsPossibleFor
+  isRegistered: IsRegistered
+  badge: BadgeType
+
+  private constructor(
+    description: string,
+    isPossibleFor: IsPossibleFor,
+    isRegistered: IsRegistered,
+    badge: B
+  ) {
+    this.description = description
+    this.isPossibleFor = isPossibleFor
+    this.isRegistered = isRegistered
+    this.badge = badge
+  }
+
+  static is<B extends BadgeType>(
+    description: string,
+    isPossibleFor: IsPossibleFor,
+    isRegistered: IsRegistered,
+    badge: B
+  ) {
+    return new PokedexVariant<B>(description, isPossibleFor, isRegistered, badge)
+  }
+
+  render(form: FormMetadata | ExtraFormMetadata, formDexEntry: Option<FormEntry>): ReactNode {
+    const BadgeType = this.badge
+    return (
+      <BadgeType
+        activeIf={formDexEntry && this.isRegistered(formDexEntry)}
+        showIf={this.isPossibleFor(form.nationalDex, form.formIndex)}
+        size="2"
+        tooltip={this.description}
+      />
+    )
+  }
+}
+
+const VARIANTS: PokedexVariant[] = [
+  PokedexVariant.is(
+    'Gigantamax Factor',
+    hasGigantamaxForm,
+    (data) => data.flags.includes('Gigantamax'),
+    Badge.Gigantamax
+  ),
+  PokedexVariant.is('Alpha', canBeAlpha, (data) => data.flags.includes('Alpha'), Badge.Alpha),
+]

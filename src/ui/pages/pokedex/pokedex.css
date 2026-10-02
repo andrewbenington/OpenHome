@@ -101,18 +101,17 @@
 }
 
 .pokedex-image-frame {
-  margin-top: 0.5rem;
   position: relative;
   background-color: rgba(255, 255, 255, 0.833);
   outline: 0.25rem solid var(--color-gray-200);
-  border-radius: var(--border-radius-lg);
+  border-radius: var(--border-radius-sm);
   box-shadow:
     rgba(50, 50, 93, 0.25) 0px 2rem 3.75rem -0.75rem inset,
     rgba(0, 0, 0, 0.3) 0px 1rem 2.25rem -1rem inset;
   contain: content;
   min-width: 8rem;
-  width: 22rem;
-  max-width: 80%;
+  width: 18rem;
+  max-width: 100%;
   aspect-ratio: 1;
   position: relative;
 }

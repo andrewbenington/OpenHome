@@ -22,13 +22,8 @@ export type EvolutionFamilyProps = {
   onClick?: (nationalDex: number, formeNumber: number) => void
 }
 
-export default function EvolutionFamily({
-  nationalDex,
-  formNumber: formIndex,
-  pokedex,
-  height,
-  onClick,
-}: EvolutionFamilyProps) {
+export default function EvolutionFamily(props: EvolutionFamilyProps) {
+  const { nationalDex, formNumber: formIndex, pokedex, height, onClick } = props
   let baseEvolution = getBaseEvolution(nationalDex, formIndex)
 
   if (MONS_WITH_NON_EVOLVABLE_FORMS.includes(nationalDex)) {
