@@ -6,22 +6,22 @@ import { getDetailsOfficialSave, getDetailsPluginSave } from '@openhome-ui/saves
 import { Pokerus } from '@pkm-rs/pkg'
 import { memo } from 'react'
 import { HyperTrainIcon } from '../Icons'
-import { BaseBadge } from './BaseBadge'
+import { BaseBadge, BaseBadgeProps } from './BaseBadge'
 import { ImageBadge } from './ImageBadge'
 
-type TopRightNumericalBadgeProps = {
+type TopRightNumericalBadgeProps = BaseBadgeProps & {
   value?: number
   percent?: boolean
 } & (
-  | {
-      percent?: false
-      max: number
-    }
-  | {
-      percent: true
-      max?: undefined
-    }
-)
+    | {
+        percent?: false
+        max: number
+      }
+    | {
+        percent: true
+        max?: undefined
+      }
+  )
 
 function colorByPercent(percent: number) {
   if (percent < 30) return '#bbb'
@@ -46,21 +46,18 @@ function NumericBadge({ value, percent, max: maxProp }: TopRightNumericalBadgePr
   )
 }
 
-export type BadgeProps = {
-  className?: string
-  tooltip?: string
-  color?: string
-  backgroundColor?: string
-  style?: React.CSSProperties
+export type BadgeProps = BaseBadgeProps & {
   showIf?: Option<boolean>
   showLabel?: boolean
 }
+
+export type BadgePropsNoBackground = Omit<BadgeProps, 'backgroundColor'>
 
 function labelIf(showLabel: Option<boolean>, label: Option<string>): Option<string> {
   return showLabel ? label : undefined
 }
 
-function AlphaBadge(props: BadgeProps) {
+function AlphaBadge(props: Omit<BadgeProps, 'backgroundColor'>) {
   const label = labelIf(props.showLabel, 'Alpha')
   return (
     <ImageBadge
@@ -73,12 +70,10 @@ function AlphaBadge(props: BadgeProps) {
   )
 }
 
-export type GameBadgeProps = {
+export type GameBadgeProps = BadgePropsNoBackground & {
   originGame?: Nullable<number>
   plugin?: Nullable<PluginIdentifier>
   withName?: boolean
-  tooltip?: string
-  style?: React.CSSProperties
 }
 
 export function GameBadge(props: GameBadgeProps) {
@@ -98,12 +93,12 @@ export function GameBadge(props: GameBadgeProps) {
       src={markIconPath}
       backgroundColor={backgroundColor}
       label={props.withName ? shortName : undefined}
-      style={props.style}
+      {...props}
     />
   )
 }
 
-function GigantamaxBadge(props: BadgeProps) {
+function GigantamaxBadge(props: BadgePropsNoBackground) {
   const label = labelIf(props.showLabel, 'Gigantamax')
   return (
     <ImageBadge
@@ -116,7 +111,7 @@ function GigantamaxBadge(props: BadgeProps) {
   )
 }
 
-function HyperTrainBadge(props: BadgeProps) {
+function HyperTrainBadge(props: BadgePropsNoBackground) {
   const label = labelIf(props.showLabel, 'Hyper Trained')
   return (
     <ImageBadge
@@ -130,7 +125,7 @@ function HyperTrainBadge(props: BadgeProps) {
   )
 }
 
-function PokerusBadge(props: BadgeProps & { pokerusByte: Option<number> }) {
+function PokerusBadge(props: BadgePropsNoBackground & { pokerusByte: Option<number> }) {
   const pokerus = Pokerus.fromByte(props.pokerusByte ?? 0)
   switch (pokerus.status()) {
     case 'Uninfected':

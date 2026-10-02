@@ -1,5 +1,7 @@
 import { hasGenderDifference } from '@openhome-core/pkm/util/index'
 import { filterUndefined } from '@openhome-core/util/sort'
+import Badge from '@openhome-ui/components/badge/Badge'
+import OhoFlex from '@openhome-ui/components/OhoFlex'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import useMonSprite from '@openhome-ui/pokemon/useMonSprite'
@@ -8,11 +10,13 @@ import { Pokedex } from '@openhome-ui/util/pokedex'
 import { cssClass } from '@openhome-ui/util/style'
 import {
   allMetadataSources,
+  canBeAlpha,
   extraFormMetadata,
   ExtraFormMetadata,
   extraFormsByNationalDex,
   FormMetadata,
   Gender,
+  hasGigantamaxForm,
   MetadataSource,
   MetadataSources,
   NationalDex,
@@ -20,6 +24,7 @@ import {
 } from '@pkm-rs/pkg'
 import {
   Button,
+  Card,
   Flex,
   Heading,
   Select,
@@ -35,7 +40,7 @@ import PokedexLearnset from './PokedexLearnset'
 import PokedexSidebar from './PokedexSidebar'
 import PokedexSummary from './PokedexSummary'
 import TooltipPokemonIcon from './TooltipPokemonIcon'
-import { getFormeStatus, isExtraFormMetadata } from './util'
+import { getFormPokedexData, isExtraFormMetadata } from './util'
 
 type PokedexView = 'summary' | 'levelup' | 'games'
 
@@ -128,14 +133,19 @@ function PokedexDetails({
     MOST_CURRENT_SOURCE
   )
 
-  const isFemale = showFemale && hasGenderDifference(species.nationalDex)
+  const selectedFormEntry = getFormPokedexData(pokedex, species.nationalDex, selectedForm.formIndex)
+  const isCaught = selectedFormEntry?.level?.includes('Caught')
 
-  const selectedFormStatus = getFormeStatus(pokedex, species.nationalDex, selectedForm.formIndex)
+  const isFemale =
+    showFemale &&
+    hasGenderDifference(species.nationalDex) &&
+    selectedFormEntry?.flags.includes('Female')
+
   const spriteResult = useMonSprite({
     nationalDex: species.nationalDex,
     formIndex: selectedForm.formIndex,
     format: 'OHPKM',
-    isShiny: selectedFormStatus === 'ShinyCaught' && showShiny,
+    isShiny: selectedFormEntry?.level === 'ShinyCaught' && showShiny,
     extraFormIndex: isExtraFormMetadata(selectedForm) ? selectedForm.extraFormIndex : undefined,
     isFemale,
   })
@@ -143,8 +153,6 @@ function PokedexDetails({
   useEffect(() => {
     setImageError(false)
   }, [selectedForm])
-
-  const selectedFormCaught = selectedFormStatus?.includes('Caught')
 
   return (
     <Flex direction="row" height="100%" align="center" width="100%" overflow="hidden">
@@ -156,10 +164,11 @@ function PokedexDetails({
         width="40%"
         maxWidth="30rem"
         gap="2"
+        pt="8"
       >
-        <Flex direction="column" height="100%" width="100%" align="center" justify="center" gap="2">
+        <Flex direction="column" height="100%" width="100%" align="center" justify="start" gap="2">
           <div className="pokedex-image-frame">
-            {selectedFormStatus === 'ShinyCaught' && (
+            {selectedFormEntry?.level === 'ShinyCaught' && (
               <button
                 className="pokedex-toggle pokedex-shiny-toggle"
                 style={{
@@ -192,7 +201,7 @@ function PokedexDetails({
                 formIndex={selectedForm.formIndex}
                 gender={isFemale ? Gender.Female : undefined}
                 style={{ width: '90%', height: 0, paddingBottom: '90%' }}
-                silhouette={!selectedFormCaught}
+                silhouette={!isCaught}
               />
             ) : spriteResult.path ? (
               <>
@@ -208,7 +217,7 @@ function PokedexDetails({
                   src={spriteResult.path}
                   onError={() => setImageError(true)}
                   style={{
-                    filter: !selectedFormCaught ? 'saturate(0%)' : undefined,
+                    filter: !isCaught ? 'saturate(0%)' : undefined,
                   }}
                 />
               </>
@@ -217,6 +226,21 @@ function PokedexDetails({
             )}
           </div>
           <div className="pokedex-caption">{selectedForm.formeName}</div>
+          <Card style={{ padding: 0 }} mb="4">
+            <OhoFlex.RowCentered align="center" p="2" minHeight="fit-content">
+              <Badge.Gigantamax
+                activeIf={selectedFormEntry?.flags.includes('Gigantamax') === true}
+                showIf={hasGigantamaxForm(selectedForm.nationalDex, selectedForm.formIndex)}
+                size="2"
+              />
+              <Badge.Alpha
+                activeIf={selectedFormEntry?.flags.includes('Alpha') === true}
+                showIf={canBeAlpha(selectedForm.nationalDex, selectedForm.formIndex)}
+                size="2"
+              />
+            </OhoFlex.RowCentered>
+          </Card>
+          <h3>Standard Forms</h3>
           <Flex justify="center" gap="2" width="100%" wrap="wrap">
             {species.forms.map((form) => (
               <Button
@@ -236,9 +260,11 @@ function PokedexDetails({
                   formIndex={form.formIndex}
                   style={{ width: '3rem', height: '3rem' }}
                   silhouette={
-                    !getFormeStatus(pokedex, species.nationalDex, form.formIndex)?.includes(
-                      'Caught'
-                    )
+                    !getFormPokedexData(
+                      pokedex,
+                      species.nationalDex,
+                      form.formIndex
+                    )?.level.includes('Caught')
                   }
                 />
               </Button>
@@ -264,7 +290,9 @@ function PokedexDetails({
                   formIndex={0}
                   extraFormIndex={form}
                   style={{ width: '3rem', height: '3rem' }}
-                  silhouette={!getFormeStatus(pokedex, species.nationalDex, 0)?.includes('Caught')}
+                  silhouette={
+                    !getFormPokedexData(pokedex, species.nationalDex, 0)?.level.includes('Caught')
+                  }
                 />
               </Button>
             ))}

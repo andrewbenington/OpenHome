@@ -1,3 +1,5 @@
+import { FormEntry } from '@openhome-core/tauri/spectaCommands'
+import { Option } from '@openhome-core/util/functional'
 import { Pokedex, PokedexLevel } from '@openhome-ui/util/pokedex'
 import { ExtraFormMetadata, FormMetadata, Language, Lookup, SpeciesMetadata } from '@pkm-rs/pkg'
 
@@ -22,13 +24,13 @@ export function getHighestFormStatus(
   return [maxStatusForme, maxStatus]
 }
 
-export function getFormeStatus(
+export function getFormPokedexData(
   pokedex: Pokedex,
   nationalDex: number,
   formIndex: number
-): PokedexLevel | undefined {
+): Option<FormEntry> {
   if (!(nationalDex in pokedex.byDexNumber)) return undefined
-  return pokedex.byDexNumber[nationalDex]?.forms[formIndex]?.level
+  return pokedex.byDexNumber[nationalDex]?.forms[formIndex]
 }
 
 export const StatusIndices: Record<PokedexLevel, number> = {
