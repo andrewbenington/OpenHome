@@ -57,9 +57,13 @@
 }
 
 .badge-disabled {
-  background-color: var(--gray-7) !important;
+  background-color: light-dark(var(--gray-8), var(--gray-7)) !important;
   img {
-    filter: brightness(20%);
+    filter: brightness(55%);
+
+    @media (prefers-color-scheme: dark) {
+      filter: brightness(20%);
+    }
   }
 }
 

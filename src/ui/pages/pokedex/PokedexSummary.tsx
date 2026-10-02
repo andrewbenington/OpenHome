@@ -137,7 +137,7 @@ export default function PokedexSummary(props: PokedexSummaryProps) {
                     />
                   )
                 })}
-              <h2 style={{ width: '100%', textAlign: 'center', margin: '1rem 0' }}>Plugins</h2>
+              <h3 style={{ width: '100%', textAlign: 'center', margin: '1rem 0' }}>Plugins</h3>
               <Flex gap="1" overflowY="auto" wrap="wrap" justify="center" mb="1rem">
                 {extraSaveTypes
                   .filter(

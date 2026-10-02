@@ -22,19 +22,22 @@ pub fn can_be_alpha_la(species_form: SpeciesForm) -> bool {
 }
 
 const FLOETTE_ETERNAL: u16 = 5;
+const GRENINJA_BATTLE_BOND: u16 = 1;
 
 pub fn can_be_alpha_lza(species_form: SpeciesForm) -> bool {
     let form_metadata = species_form.get_forme_metadata();
-    if species_form.get_ndex() == NationalDex::Floette
-        && species_form.get_forme_index() == FLOETTE_ETERNAL
-    {
-        return false;
-    }
 
-    MetadataSource::LegendsZa.supports_form(species_form)
-        && !form_metadata.is_sub_legend
-        && !form_metadata.is_restricted_legend
-        && !form_metadata.is_mythical
+    match (species_form.get_ndex(), species_form.get_forme_index()) {
+        (NationalDex::Floette, FLOETTE_ETERNAL) | (NationalDex::Greninja, GRENINJA_BATTLE_BOND) => {
+            false
+        }
+        _ => {
+            MetadataSource::LegendsZa.supports_form(species_form)
+                && !form_metadata.is_sub_legend
+                && !form_metadata.is_restricted_legend
+                && !form_metadata.is_mythical
+        }
+    }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "canBeAlpha"))]
