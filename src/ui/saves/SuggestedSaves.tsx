@@ -133,7 +133,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
               <Badge.Game
                 originGame={suggestion.save.data.origin}
                 plugin={suggestion.save.data.pluginIdentifier}
-                withName
+                withNameAbbr
                 tooltip={suggestion.filePath.raw}
               />
             ) : null

@@ -4,7 +4,7 @@
     rgba(0, 0, 0, 0.15) 0px -2.25rem 2rem 0px inset, rgba(0, 0, 0, 0.1) 0px -5rem 5rem 0px inset,
     rgba(0, 0, 0, 0.06) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px,
     rgba(0, 0, 0, 0.09) 0px 8px 4px;
-  --top-bar-height: 1.2rem;
+  --top-bar-height: 2.5rem;
   --sidebar-width: 22rem;
 
   height: 100%;
@@ -71,6 +71,7 @@
     width: 22rem;
     background-color: var(--accent-5);
   }
+  box-sizing: border-box;
 }
 
 .pokedex-header-title {
@@ -200,4 +201,11 @@
     margin: auto;
     max-height: 100%;
   }
+}
+
+.bottom-right-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr;
+  height: 100vh;
 }

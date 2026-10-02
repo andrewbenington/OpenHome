@@ -419,7 +419,7 @@ function TransferToSaveButton(props: TransferToSaveButtonProps) {
         <b>{save.name}</b>
         <p>(TID {save.displayID})</p>
         <div style={{ flex: 1 }} />
-        <Badge.Game withName originGame={save.origin} plugin={save.pluginIdentifier} />
+        <Badge.Game withNameAbbr originGame={save.origin} plugin={save.pluginIdentifier} />
       </Flex>
     </Button>
   )

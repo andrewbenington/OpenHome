@@ -211,6 +211,7 @@ export function buildRecentSaveContextElements(
 
 export type GameOrPluginDetails = {
   shortName: string
+  fullName: string
   markIconPath: Option<string>
   backgroundColor: string
 }
@@ -222,6 +223,7 @@ export function getDetailsOfficialSave(originGame: number): GameOrPluginDetails 
 
   return {
     shortName: OriginGames.gameNameShort(originGame),
+    fullName: OriginGames.gameNameFull(originGame),
     markIconPath: markImage,
     backgroundColor,
   }
@@ -230,6 +232,7 @@ export function getDetailsOfficialSave(originGame: number): GameOrPluginDetails 
 export function getDetailsPluginSave(pluginId: PluginIdentifier): GameOrPluginDetails {
   return {
     shortName: pluginGameName(pluginId, 'short'),
+    fullName: pluginGameName(pluginId, 'full'),
     markIconPath: pluginOriginMarkPath(pluginId),
     backgroundColor: OriginGames.pluginColor(pluginId),
   }

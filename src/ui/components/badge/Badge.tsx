@@ -73,26 +73,25 @@ function AlphaBadge(props: Omit<BadgeProps, 'backgroundColor'>) {
 export type GameBadgeProps = BadgePropsNoBackground & {
   originGame?: Nullable<number>
   plugin?: Nullable<PluginIdentifier>
-  withName?: boolean
-}
+} & ({ withName?: boolean; withNameAbbr?: never } | { withName?: never; withNameAbbr?: boolean })
 
 export function GameBadge(props: GameBadgeProps) {
   if (props.originGame === undefined || props.originGame === null) return null
 
-  const { shortName, markIconPath, backgroundColor } = props.plugin
+  const { shortName, fullName, markIconPath, backgroundColor } = props.plugin
     ? getDetailsPluginSave(props.plugin)
     : getDetailsOfficialSave(props.originGame)
 
   if (!markIconPath) return null
 
-  const tooltipText = props.tooltip ?? (props.withName ? undefined : shortName)
+  const tooltipText = props.tooltip ?? (props.withNameAbbr ? undefined : shortName)
 
   return (
     <ImageBadge
       tooltip={tooltipText}
       src={markIconPath}
       backgroundColor={backgroundColor}
-      label={props.withName ? shortName : undefined}
+      label={props.withNameAbbr ? shortName : props.withName ? fullName : undefined}
       {...props}
     />
   )

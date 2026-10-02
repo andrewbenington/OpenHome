@@ -2,7 +2,6 @@ import useBackend from '@openhome-core/backend/useBackend'
 import { bytesToPKM } from '@openhome-core/pkm/FileImport'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { displayIndexAdder, isBattleFormeItem } from '@openhome-core/pkm/util'
 import {
   CtxMenuElementBuilder,
   Item,
@@ -16,7 +15,7 @@ import { useMonDisplay } from '@openhome-ui/hooks/monDisplay'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { filterApplies } from '@openhome-ui/util/filter'
-import { PokedexUpdate } from '@openhome-ui/util/pokedex'
+import { PokedexUpdate, updatesFromMon } from '@openhome-ui/util/pokedex'
 import { DISPLAY_COLOR_PRESETS, TAG_PRESETS } from '@openhome-ui/util/tags'
 import { Lookup } from '@pkm-rs/pkg'
 import { Flex, TextField } from '@radix-ui/themes'
@@ -82,21 +81,8 @@ function BoxCell(props: BoxCellProps) {
 
         try {
           const mon = bytesToPKM(bytes, extension.toUpperCase())
-
           importedMons.push(mon)
-          pokedexUpdates.push({
-            nationalDex: mon.nationalDex,
-            formIndex: mon.formIndex,
-            status: mon.isShiny() ? 'ShinyCaught' : 'Caught',
-          })
-
-          if (isBattleFormeItem(mon.nationalDex, mon.heldItemIndex)) {
-            pokedexUpdates.push({
-              nationalDex: mon.nationalDex,
-              formIndex: displayIndexAdder(mon.heldItemIndex)(mon.formIndex),
-              status: mon.isShiny() ? 'ShinyCaught' : 'Caught',
-            })
-          }
+          pokedexUpdates.push(...updatesFromMon(mon))
         } catch (e) {
           displayError('Error Importing Pokémon', `${e}`)
         }

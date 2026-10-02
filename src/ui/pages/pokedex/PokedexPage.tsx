@@ -21,7 +21,9 @@ import {
   hasGigantamaxForm,
   MetadataSource,
   MetadataSources,
+  MetadataSummaryLookup,
   NationalDex,
+  SpeciesLookup,
   SpeciesMetadata,
 } from '@pkm-rs/pkg'
 import {
@@ -29,6 +31,7 @@ import {
   Card,
   Flex,
   Heading,
+  Inset,
   Select,
   Separator,
   Spinner,
@@ -36,6 +39,7 @@ import {
   TextField,
 } from '@radix-ui/themes'
 import { ReactNode, useEffect, useState } from 'react'
+import EvolutionFamily from './EvolutionFamily'
 import './pokedex.css'
 import { PokedexGames } from './PokedexGames'
 import PokedexLearnset from './PokedexLearnset'
@@ -172,9 +176,9 @@ function PokedexDetails({
         width="40%"
         maxWidth="30rem"
         gap="2"
-        pt="8"
+        pt="4"
       >
-        <Flex direction="column" height="100%" width="100%" align="center" justify="start" gap="2">
+        <Flex direction="column" width="100%" align="center" justify="start" gap="2" mb="auto">
           <Card
             style={{
               padding: '1rem',
@@ -244,11 +248,9 @@ function PokedexDetails({
                 )}
               </div>
               <div className="pokedex-caption">{selectedForm.formeName}</div>
-              {variantBadges.length > 0 && (
-                <OhoFlex.RowCentered align="center" p="2" minHeight="fit-content">
-                  {variantBadges}
-                </OhoFlex.RowCentered>
-              )}
+              <OhoFlex.RowCentered align="center" p="2" minHeight="3rem">
+                {variantBadges}
+              </OhoFlex.RowCentered>
             </Flex>
           </Card>
           <h3>Standard Forms</h3>
@@ -309,6 +311,26 @@ function PokedexDetails({
             ))}
           </Flex>
         </Flex>
+        <Card mb="4" style={{ height: 'fit-content', padding: '0.5rem 0.75rem' }}>
+          <Text weight="bold" size="2">
+            Evolution Family
+          </Text>
+          <Inset side="x" p="0" mx="-2" mt="1">
+            <Separator />
+          </Inset>
+          <div style={{ padding: '1rem 0' }}>
+            <EvolutionFamily
+              height="fit-content"
+              nationalDex={species.nationalDex}
+              formNumber={selectedForm.formIndex}
+              pokedex={pokedex}
+              onClick={(nationalDex, formIndex) => {
+                setSelectedSpecies(SpeciesLookup(nationalDex))
+                setSelectedForm(MetadataSummaryLookup(nationalDex, formIndex))
+              }}
+            />
+          </div>
+        </Card>
       </Flex>
       <Separator orientation="vertical" style={{ height: '100%' }} />
       <Flex direction="column" height="100%" maxHeight="100%" width="60%" overflow="auto">

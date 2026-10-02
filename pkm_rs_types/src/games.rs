@@ -28,6 +28,7 @@ pub enum ColosseumOrXd {
     Hash,
     Clone,
     Copy,
+    Serialize,
     Deserialize,
     strum::EnumString,
 )]
@@ -461,15 +462,6 @@ impl OriginGame {
 
     pub fn is_origin_string(v: &str) -> bool {
         OriginGame::from_str(v).is_ok()
-    }
-}
-
-impl Serialize for OriginGame {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        self.game_name_full().serialize(serializer)
     }
 }
 

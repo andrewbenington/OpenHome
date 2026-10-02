@@ -2,18 +2,10 @@ import useBackend from '@openhome-core/backend/useBackend'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { displayIndexAdder, isBattleFormeItem } from '@openhome-core/pkm/util'
-import {
-  getSaveRef,
-  isPluginGame,
-  PluginIdentifier,
-  SAV,
-  SaveIdentifier,
-} from '@openhome-core/save/interfaces'
+import { getSaveRef, SAV, SaveIdentifier } from '@openhome-core/save/interfaces'
 import { SAVClass } from '@openhome-core/save/util'
 import { buildSaveFile, getPossibleSaveTypes } from '@openhome-core/save/util/load'
 import { PathData } from '@openhome-core/save/util/path'
-import { FormEntry, OriginGameStr, PokedexFlag } from '@openhome-core/tauri/spectaCommands'
 import { $R, Errorable, Option, R, Result } from '@openhome-core/util/functional'
 import {
   OPENHOME_BOX_SLOTS,
@@ -24,8 +16,8 @@ import { useConvertStrategies } from '@openhome-ui/state/convert-strategies'
 import { useItemBag } from '@openhome-ui/state/items'
 import { OhpkmStoreData } from '@openhome-ui/state/ohpkm'
 import { IdentifierNotPresentError, useOhpkmStore } from '@openhome-ui/state/ohpkm/useOhpkmStore'
-import { PokedexUpdate } from '@openhome-ui/util/pokedex'
-import { Gender, Item, OriginGame, OriginGames } from '@pkm-rs/pkg'
+import { pokedexUpdatesFromSave } from '@openhome-ui/util/pokedex'
+import { Item } from '@pkm-rs/pkg'
 import { useContext, useRef } from 'react'
 import {
   EmptySlot,
@@ -553,68 +545,4 @@ export function saveErrorMessage(error: SaveError): string {
     case 'ALREADY_OPEN':
       return 'The selected save file is already open'
   }
-}
-
-export function pokedexUpdatesFromSave(saveFile: SAV) {
-  const pokedexUpdates: PokedexUpdate[] = []
-
-  for (const mon of saveFile.getAllMons()) {
-    const data = pokedexCaughtEntryFromMon(mon, saveFile.pluginIdentifier ?? saveFile.origin)
-    pokedexUpdates.push({
-      nationalDex: mon.nationalDex,
-      formIndex: mon.formIndex,
-      data,
-    })
-
-    if (isBattleFormeItem(mon.nationalDex, mon.heldItemIndex)) {
-      pokedexUpdates.push({
-        nationalDex: mon.nationalDex,
-        formIndex: displayIndexAdder(mon.heldItemIndex)(mon.formIndex),
-        data,
-      })
-    }
-  }
-
-  return pokedexUpdates
-}
-
-function isOriginGameStr(v: string): v is OriginGameStr {
-  return OriginGames.isOriginGameString(v)
-}
-
-function pokedexCaughtEntryFromMon(
-  mon: PKMInterface,
-  game: OriginGame | PluginIdentifier
-): FormEntry {
-  const gameString = typeof game === 'number' ? OriginGame[game] : undefined
-  const originGame = gameString && isOriginGameStr(gameString) ? gameString : undefined
-
-  return {
-    level: mon.isShiny() ? 'ShinyCaught' : 'Caught',
-    games: originGame ? [originGame] : [],
-    extra: isPluginGame(game) ? [game] : [],
-    flags: pokedexFlagsFromMon(mon),
-    shiny_leaves: mon.shinyLeaves?.toByte() ?? 0,
-  }
-}
-
-function pokedexFlagsFromMon(mon: PKMInterface): PokedexFlag[] {
-  const flags: PokedexFlag[] = []
-  if (mon.gender === Gender.Male) {
-    flags.push('Male')
-  } else if (mon.gender === Gender.Female) {
-    flags.push('Female')
-  }
-
-  if (mon.isNsPokemon) {
-    flags.push('NsPokemon')
-  }
-  if (mon.canGigantamax) {
-    flags.push('Gigantamax')
-  }
-  if (mon.isAlpha) {
-    flags.push('Alpha')
-  }
-
-  return flags
 }

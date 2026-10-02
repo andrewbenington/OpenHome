@@ -187,7 +187,7 @@ export default function useOhpkmColumns(
       width: '10rem',
       renderValue: (value) => (
         <div className="flex-row-centered">
-          <Badge.Game originGame={value.gameOfOrigin} plugin={value.pluginOrigin} withName />
+          <Badge.Game originGame={value.gameOfOrigin} plugin={value.pluginOrigin} withNameAbbr />
         </div>
       ),
       getFilterValue: (mon) => mon.originGameName,
