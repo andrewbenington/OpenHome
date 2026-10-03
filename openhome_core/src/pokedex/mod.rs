@@ -68,7 +68,9 @@ pub enum PokedexFlag {
 #[derive(Debug, Default, Clone, Serialize, Deserialize, specta::Type)]
 pub struct FormEntry {
     pub level: PokedexLevel,
-    pub games: HashSet<OriginGame>,
+    // by preserving order, the first game registered for
+    // a form can be reflected in the color of the origin mark
+    pub games: Vec<OriginGame>,
     pub extra: HashSet<PluginIdentifier>,
     pub flags: HashSet<PokedexFlag>,
     pub shiny_leaves: ShinyLeaves,
@@ -77,10 +79,16 @@ pub struct FormEntry {
 impl FormEntry {
     pub fn update(&mut self, other: Self) {
         self.level = self.level.max(other.level);
-        self.games.extend(other.games);
-        self.extra.extend(other.extra);
-        self.flags.extend(other.flags);
+        self.extra.extend(&other.extra);
+        self.flags.extend(&other.flags);
         self.shiny_leaves.update_from(&other.shiny_leaves);
+
+        self.games
+            .extend(other.games_set().difference(&self.games_set()));
+    }
+
+    fn games_set(&self) -> HashSet<OriginGame> {
+        self.games.iter().copied().collect()
     }
 
     #[cfg(test)]
@@ -129,11 +137,23 @@ impl Pokedex {
     }
 
     pub fn update(&mut self, national_dex: DexNumber, form_index: FormNumber, data: FormEntry) {
+        dbg!(
+            self.by_dex_number
+                .entry(national_dex)
+                .or_default()
+                .form_mut(form_index)
+        );
         self.by_dex_number
             .entry(national_dex)
             .or_default()
             .form_mut(form_index)
             .update(data);
+        dbg!(
+            self.by_dex_number
+                .entry(national_dex)
+                .or_default()
+                .form_mut(form_index)
+        );
     }
 
     #[cfg(test)]

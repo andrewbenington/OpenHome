@@ -7,7 +7,10 @@ use pkm_rs_types::{GameSetting, NationalDex};
 use wasm_bindgen::prelude::*;
 
 pub fn can_be_alpha(species_form: SpeciesForm) -> bool {
-    can_be_alpha_lza(species_form) || can_be_alpha_la(species_form)
+    can_be_alpha_lza(species_form)
+        || can_be_alpha_la(species_form)
+        || can_be_alpha_lza(species_form.get_base_evolution())
+        || can_be_alpha_la(species_form.get_base_evolution())
 }
 
 pub fn can_be_alpha_la(species_form: SpeciesForm) -> bool {

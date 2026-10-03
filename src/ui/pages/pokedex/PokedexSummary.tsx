@@ -6,7 +6,7 @@ import Badge from '@openhome-ui/components/badge/Badge'
 import OhoFlex from '@openhome-ui/components/OhoFlex'
 import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
-import { originToStr, Pokedex } from '@openhome-ui/util/pokedex'
+import { parseOriginGame, Pokedex } from '@openhome-ui/util/pokedex'
 import {
   currentMetadataReader,
   ExtraFormMetadata,
@@ -116,19 +116,18 @@ export default function PokedexSummary(props: PokedexSummaryProps) {
           <Text>{getPokedexSummary(species, selectedForm)}</Text>
           <ScrollArea>
             <OhoFlex.Row wrap="wrap">
-              {orderedGameSets.map((games) => {
-                const defaultOriginGame = games[0]
-                const firstRegistered = games.find((game) =>
-                  dexEntry?.games.includes(originToStr(game))
-                )
-                const badgeGame = firstRegistered ?? defaultOriginGame
+              {orderedGameSets.map((gamesForOrigin) => {
+                const caughtOrigins = dexEntry?.games.map(parseOriginGame).filter(filterUndefined)
+                const firstRegistered = caughtOrigins?.find((game) => gamesForOrigin.includes(game))
+                const badgeGame = firstRegistered ?? gamesForOrigin[0]
+
                 return (
                   <Badge.Game
                     key={badgeGame}
                     originGame={badgeGame}
                     size="3"
                     style={{ fontWeight: 'bold' }}
-                    activeIf={dexEntry?.games.includes(originToStr(badgeGame)) === true}
+                    activeIf={Boolean(firstRegistered)}
                   />
                 )
               })}

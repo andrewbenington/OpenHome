@@ -50,7 +50,7 @@
 }
 
 .pokedex-sidebar-button-selected {
-  background-color: var(--accent-10);
+  background-color: var(--accent-10) !important; /* to take priority over the "caught" color */
   color: white;
   font-weight: bold;
 }
