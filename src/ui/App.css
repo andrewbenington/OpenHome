@@ -1,4 +1,9 @@
 :root {
+  --primitive-font-sans:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell',
+    'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  --primitive-font-mono: monospace;
+
   --font-sans: var(--primitive-font-sans);
   --font-mono: var(--primitive-font-mono);
   --font-weight-normal: var(--primitive-font-weight-normal);
@@ -6,7 +11,7 @@
   --base-font-size: 14px;
 
   font-size: var(--base-font-size);
-  font-family: var(--font-sans);
+  font-family: var(--font-sans) !important;
   font-weight: var(--font-weight-normal);
   color-scheme: light dark;
   background-color: var(--color-surface);
@@ -352,6 +357,9 @@ label {
   --font-size-2: var(--font-size-standard);
 
   font-size: var(--base-font-size);
+  font-family: var(--font-sans) !important;
+  --default-font-family: var(--font-sans) !important;
+
   .rt-BaseMenuSeparator {
     margin: 0px 0px;
   }
