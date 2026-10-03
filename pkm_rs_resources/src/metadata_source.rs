@@ -213,6 +213,11 @@ impl MetadataSources {
         source.first_origin_game()
     }
 
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "originMark"))]
+    pub fn origin_mark(source: MetadataSource) -> Option<OriginMark> {
+        source.first_origin_game().mark()
+    }
+
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "originGamesFor"))]
     pub fn all_origin_games(source: MetadataSource) -> Vec<OriginGame> {
         source.all_origin_games()

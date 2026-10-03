@@ -188,10 +188,7 @@ function compatibleGamesPrioritizeCaught(
         )
       }
     }),
-    (source) => {
-      const defaultOrigin = MetadataSources.defaultOriginGame(source)
-      return `${OriginGames.generation(defaultOrigin)}-${OriginGames.gameSettingName(defaultOrigin)}`
-    }
+    (source) => `${MetadataSources.originMark(source)}`
   )
 
   const orderedGameSets: OriginGame[][] = Object.entries(groupedSources)

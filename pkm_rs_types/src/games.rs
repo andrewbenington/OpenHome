@@ -31,6 +31,7 @@ pub enum ColosseumOrXd {
     Serialize,
     Deserialize,
     strum::EnumString,
+    strum::IntoStaticStr,
 )]
 #[repr(u8)]
 pub enum OriginGame {
@@ -261,6 +262,12 @@ impl OriginGame {
         match *self {
             Self::Red | Self::BlueGreen | Self::BlueJpn | Self::Yellow => Some(OriginMark::GameBoy),
             Self::Gold | Self::Silver | Self::Crystal => Some(OriginMark::GameBoy),
+            Self::Ruby | Self::Sapphire | Self::Emerald => Some(OriginMark::GameBoyAdvance),
+            Self::FireRed | Self::LeafGreen => Some(OriginMark::GameBoyAdvance),
+            Self::ColosseumXd => Some(OriginMark::GameCube),
+            Self::Diamond | Self::Pearl | Self::Platinum => Some(OriginMark::NintendoDs),
+            Self::HeartGold | Self::SoulSilver => Some(OriginMark::NintendoDs),
+            Self::Black | Self::White | Self::Black2 | Self::White2 => Some(OriginMark::NintendoDs),
             Self::X | Self::Y => Some(OriginMark::Pentagon),
             Self::OmegaRuby | Self::AlphaSapphire => Some(OriginMark::Pentagon),
             Self::Sun | Self::Moon | Self::UltraSun | Self::UltraMoon => Some(OriginMark::Alola),
@@ -762,9 +769,12 @@ impl OriginGameWithData {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy, strum::EnumString, strum::IntoStaticStr)]
 pub enum OriginMark {
     GameBoy,
+    GameBoyAdvance,
+    GameCube,
+    NintendoDs,
     Pentagon,
     Alola,
     LetsGo,
@@ -778,18 +788,6 @@ pub enum OriginMark {
 
 impl std::fmt::Display for OriginMark {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let s = match self {
-            Self::GameBoy => "GameBoy",
-            Self::Pentagon => "Pentagon",
-            Self::Alola => "Alola",
-            Self::LetsGo => "LetsGo",
-            Self::Galar => "Galar",
-            Self::Hisui => "Hisui",
-            Self::Bdsp => "Bdsp",
-            Self::Tera => "Tera",
-            Self::Mega => "Mega",
-            Self::Go => "GO",
-        };
-        write!(f, "{s}")
+        f.write_str(self.into())
     }
 }

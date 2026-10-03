@@ -329,7 +329,7 @@ export function pluginOriginMarkPath(identifier: PluginIdentifier): string | und
   switch (identifier) {
     case 'radical_red':
     case 'unbound':
-      return '/icons/gba.png'
+      return '/origin_marks/GameBoyAdvance.png'
     case 'luminescent_platinum':
       return '/origin_marks/Bdsp.png'
     case 'compass':
