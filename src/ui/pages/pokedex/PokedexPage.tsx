@@ -3,7 +3,6 @@ import { usePokedex } from '@openhome-ui/state/pokedex'
 import { Pokedex } from '@openhome-ui/util/pokedex'
 import { cssClass } from '@openhome-ui/util/style'
 import {
-  allMetadataSources,
   ExtraFormMetadata,
   FormMetadata,
   MetadataSource,
@@ -159,7 +158,7 @@ function PokedexDetails(props: PokedexDetailsProps) {
             >
               <Select.Trigger variant="classic" className="pokedex-view-select" />
               <Select.Content position="popper">
-                {allMetadataSources().map((source) => (
+                {MetadataSources.all().map((source) => (
                   <Select.Item
                     key={source}
                     value={source.toString()}

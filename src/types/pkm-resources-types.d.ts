@@ -13,6 +13,4 @@ declare module '@pkm-rs/pkg' {
   }
 
   function extraFormsByNationalDex(national_dex: number): ExtraFormIndex[]
-
-  function allMetadataSources(): MetadataSource[]
 }

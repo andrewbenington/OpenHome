@@ -278,7 +278,7 @@ export class CompassSave extends PluginSAV<PK9Compass> {
   }
 
   static getPluginIdentifier() {
-    return 'compass'
+    return 'compass' as const
   }
 
   getMonAt(boxNum: number, boxSlot: number) {

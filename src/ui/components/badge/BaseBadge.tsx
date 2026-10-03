@@ -8,7 +8,7 @@ export type BaseBadgeProps = {
   className?: string
   tooltip?: string
   color?: string
-  backgroundColor: string
+  backgroundColor?: string
   style?: React.CSSProperties
   size?: Option<Responsive<'2' | '1' | '3'>>
   activeIf?: boolean

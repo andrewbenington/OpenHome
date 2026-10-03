@@ -1,4 +1,6 @@
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
+import { $O } from '@openhome-core/util/option'
+import { filterUndefined, multiSorter, numericSorter } from '@openhome-core/util/sort'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import Badge from '@openhome-ui/components/badge/Badge'
 import OhoFlex from '@openhome-ui/components/OhoFlex'
@@ -14,6 +16,7 @@ import {
   MetadataSources,
   orasFormIndexIfSupported,
   OriginGame,
+  OriginGames,
   SpeciesMetadata,
 } from '@pkm-rs/pkg'
 import { Card, Flex, ScrollArea, Text } from '@radix-ui/themes'
@@ -61,6 +64,8 @@ export default function PokedexSummary(props: PokedexSummaryProps) {
   const type1 = isExtraForm ? selectedForm.type1 : reader.type1()
   const type2 = isExtraForm ? selectedForm.type2 : reader.type2()
   const stats = reader.baseStats()
+
+  const orderedGameSets = compatibleGamesPrioritizeCaught(selectedForm)
 
   return (
     <OhoFlex.ColStart p="1" height="100%" overflow="auto">
@@ -111,32 +116,22 @@ export default function PokedexSummary(props: PokedexSummaryProps) {
           <Text>{getPokedexSummary(species, selectedForm)}</Text>
           <ScrollArea>
             <OhoFlex.Row wrap="wrap">
-              {MetadataSources.supportedGameOrigins(
-                selectedForm.nationalDex,
-                selectedForm.formIndex
-              )
-                .filter((origin) => {
-                  if (isExtraFormMetadata(selectedForm)) {
-                    return (
-                      (origin === OriginGame.OmegaRuby || origin === OriginGame.AlphaSapphire) &&
-                      orasFormIndexIfSupported(selectedForm.extraFormIndex) !== undefined
-                    )
-                  } else {
-                    return true
-                  }
-                })
-                .map((origin) => {
-                  const originString = originToStr(origin)
-                  return (
-                    <Badge.Game
-                      key={origin}
-                      originGame={origin}
-                      size="3"
-                      style={{ fontWeight: 'bold' }}
-                      activeIf={(originString && dexEntry?.games.includes(originString)) === true}
-                    />
-                  )
-                })}
+              {orderedGameSets.map((games) => {
+                const defaultOriginGame = games[0]
+                const firstRegistered = games.find((game) =>
+                  dexEntry?.games.includes(originToStr(game))
+                )
+                const badgeGame = firstRegistered ?? defaultOriginGame
+                return (
+                  <Badge.Game
+                    key={badgeGame}
+                    originGame={badgeGame}
+                    size="3"
+                    style={{ fontWeight: 'bold' }}
+                    activeIf={dexEntry?.games.includes(originToStr(badgeGame)) === true}
+                  />
+                )
+              })}
               <h3 style={{ width: '100%', textAlign: 'center', margin: '1rem 0' }}>Plugins</h3>
               <Flex gap="1" overflowY="auto" wrap="wrap" justify="center" mb="1rem">
                 {extraSaveTypes
@@ -171,4 +166,47 @@ export default function PokedexSummary(props: PokedexSummaryProps) {
       </Card>
     </OhoFlex.ColStart>
   )
+}
+
+function compatibleGamesPrioritizeCaught(
+  selectedForm: FormMetadata | ExtraFormMetadata
+): OriginGame[][] {
+  if (!selectedForm) return []
+
+  const groupedSources = Object.groupBy(
+    MetadataSources.all().filter((source) => {
+      if (isExtraFormMetadata(selectedForm)) {
+        return (
+          source === MetadataSource.OmegaRubyAlphaSapphire &&
+          orasFormIndexIfSupported(selectedForm.extraFormIndex) !== undefined
+        )
+      } else {
+        return MetadataSources.supportsForm(
+          source,
+          selectedForm.nationalDex,
+          selectedForm.formIndex
+        )
+      }
+    }),
+    (source) => {
+      const defaultOrigin = MetadataSources.defaultOriginGame(source)
+      return `${OriginGames.generation(defaultOrigin)}-${OriginGames.gameSettingName(defaultOrigin)}`
+    }
+  )
+
+  const orderedGameSets: OriginGame[][] = Object.entries(groupedSources)
+    .toSorted(
+      multiSorter(
+        numericSorter(([, sources]) =>
+          $O(sources?.[0]).map(MetadataSources.defaultOriginGame).map(OriginGames.generation).get()
+        ),
+        numericSorter(([, sources]) =>
+          $O(sources?.[0]).map(MetadataSources.defaultOriginGame).get()
+        )
+      )
+    )
+    .map(([, sources]) => sources?.flatMap(MetadataSources.originGamesFor))
+    .filter(filterUndefined)
+
+  return orderedGameSets
 }

@@ -110,16 +110,16 @@ function GigantamaxBadge(props: BadgePropsNoBackground) {
   )
 }
 
-function HyperTrainBadge(props: BadgePropsNoBackground) {
+function HyperTrainBadge(props: BadgeProps) {
   const label = labelIf(props.showLabel, 'Hyper Trained')
   return (
     <ImageBadge
       tooltip="Hyper Trained"
       src={HyperTrainIcon}
-      backgroundColor="var(--hyper-train-color)"
       color="black"
       label={label}
       {...props}
+      backgroundColor={props.backgroundColor ?? 'var(--hyper-train-color)'}
     />
   )
 }
