@@ -175,72 +175,56 @@ impl OriginGame {
         }
     }
     pub const fn generation(&self) -> Generation {
+        use OriginGame::*;
         match *self {
-            Self::Red | Self::BlueGreen | Self::BlueJpn | Self::Yellow => Generation::G1,
-            Self::Gold | Self::Silver | Self::Crystal => Generation::G2,
-            Self::Ruby
-            | Self::Sapphire
-            | Self::Emerald
-            | Self::FireRed
-            | Self::LeafGreen
-            | Self::ColosseumXd => Generation::G3,
-            Self::Diamond
-            | Self::Pearl
-            | Self::Platinum
-            | Self::HeartGold
-            | Self::SoulSilver
-            | Self::BattleRevolution => Generation::G4,
-            Self::Black | Self::White | Self::Black2 | Self::White2 => Generation::G5,
-            Self::X | Self::Y | Self::OmegaRuby | Self::AlphaSapphire => Generation::G6,
-            Self::Sun
-            | Self::Moon
-            | Self::UltraSun
-            | Self::UltraMoon
-            | Self::LetsGoPikachu
-            | Self::LetsGoEevee => Generation::G7,
-            Self::Sword
-            | Self::Shield
-            | Self::LegendsArceus
-            | Self::BrilliantDiamond
-            | Self::ShiningPearl => Generation::G8,
-            Self::Scarlet | Self::Violet | Self::LegendsZa => Generation::G9,
-            Self::Go | Self::Home => Generation::None,
+            Red | BlueGreen | BlueJpn | Yellow => Generation::G1,
+            Gold | Silver | Crystal => Generation::G2,
+            Ruby | Sapphire | Emerald | FireRed | LeafGreen | ColosseumXd => Generation::G3,
+            Diamond | Pearl | Platinum | HeartGold | SoulSilver | BattleRevolution => {
+                Generation::G4
+            }
+            Black | White | Black2 | White2 => Generation::G5,
+            X | Y | OmegaRuby | AlphaSapphire => Generation::G6,
+            Sun | Moon | UltraSun | UltraMoon | LetsGoPikachu | LetsGoEevee => Generation::G7,
+            Sword | Shield | LegendsArceus | BrilliantDiamond | ShiningPearl => Generation::G8,
+            Scarlet | Violet | LegendsZa => Generation::G9,
+            Go | Home => Generation::None,
 
             _ => Generation::None,
         }
     }
 
     pub const fn game_setting(&self) -> Option<GameSetting> {
+        use OriginGame::*;
         match *self {
-            Self::Red
-            | Self::BlueGreen
-            | Self::BlueJpn
-            | Self::Yellow
-            | Self::FireRed
-            | Self::LeafGreen
-            | Self::LetsGoPikachu
-            | Self::LetsGoEevee => Some(GameSetting::Kanto),
-            Self::Gold | Self::Silver | Self::Crystal | Self::HeartGold | Self::SoulSilver => {
-                Some(GameSetting::Johto)
-            }
-            Self::Ruby | Self::Sapphire | Self::Emerald | Self::OmegaRuby | Self::AlphaSapphire => {
-                Some(GameSetting::Hoenn)
-            }
-            Self::ColosseumXd => Some(GameSetting::Orre),
-            Self::Diamond
-            | Self::Pearl
-            | Self::Platinum
-            | Self::BrilliantDiamond
-            | Self::ShiningPearl => Some(GameSetting::Sinnoh),
-            Self::Black | Self::White | Self::Black2 | Self::White2 => Some(GameSetting::Unova),
-            Self::X | Self::Y => Some(GameSetting::Kalos),
-            Self::Sun | Self::Moon | Self::UltraSun | Self::UltraMoon => Some(GameSetting::Alola),
-            Self::Sword | Self::Shield => Some(GameSetting::Galar),
-            Self::LegendsArceus => Some(GameSetting::Hisui),
-            Self::Scarlet | Self::Violet => Some(GameSetting::Paldea),
-            Self::LegendsZa => Some(GameSetting::Lumiose),
-            Self::Go => Some(GameSetting::PokemonGo),
-            Self::BattleRevolution | Self::Home => None,
+            Red | BlueGreen | BlueJpn | Yellow => Some(GameSetting::Kanto),
+            FireRed | LeafGreen => Some(GameSetting::Kanto),
+            LetsGoPikachu | LetsGoEevee => Some(GameSetting::Kanto),
+
+            Gold | Silver | Crystal => Some(GameSetting::Johto),
+            HeartGold | SoulSilver => Some(GameSetting::Johto),
+
+            Ruby | Sapphire | Emerald => Some(GameSetting::Hoenn),
+            OmegaRuby | AlphaSapphire => Some(GameSetting::Hoenn),
+
+            ColosseumXd => Some(GameSetting::Orre),
+
+            Diamond | Pearl | Platinum => Some(GameSetting::Sinnoh),
+            BrilliantDiamond | ShiningPearl => Some(GameSetting::Sinnoh),
+
+            Black | White | Black2 | White2 => Some(GameSetting::Unova),
+
+            X | Y => Some(GameSetting::Kalos),
+            Sun | Moon | UltraSun | UltraMoon => Some(GameSetting::Alola),
+
+            Sword | Shield => Some(GameSetting::Galar),
+            LegendsArceus => Some(GameSetting::Hisui),
+
+            Scarlet | Violet => Some(GameSetting::Paldea),
+            LegendsZa => Some(GameSetting::Lumiose),
+
+            Go => Some(GameSetting::PokemonGo),
+            BattleRevolution | Home => None,
             _ => None,
         }
     }
@@ -259,25 +243,30 @@ impl OriginGame {
     }
 
     pub const fn mark(&self) -> Option<OriginMark> {
+        use OriginGame::*;
         match *self {
-            Self::Red | Self::BlueGreen | Self::BlueJpn | Self::Yellow => Some(OriginMark::GameBoy),
-            Self::Gold | Self::Silver | Self::Crystal => Some(OriginMark::GameBoy),
-            Self::Ruby | Self::Sapphire | Self::Emerald => Some(OriginMark::GameBoyAdvance),
-            Self::FireRed | Self::LeafGreen => Some(OriginMark::GameBoyAdvance),
-            Self::ColosseumXd => Some(OriginMark::GameCube),
-            Self::Diamond | Self::Pearl | Self::Platinum => Some(OriginMark::NintendoDs),
-            Self::HeartGold | Self::SoulSilver => Some(OriginMark::NintendoDs),
-            Self::Black | Self::White | Self::Black2 | Self::White2 => Some(OriginMark::NintendoDs),
-            Self::X | Self::Y => Some(OriginMark::Pentagon),
-            Self::OmegaRuby | Self::AlphaSapphire => Some(OriginMark::Pentagon),
-            Self::Sun | Self::Moon | Self::UltraSun | Self::UltraMoon => Some(OriginMark::Alola),
-            Self::LetsGoPikachu | Self::LetsGoEevee => Some(OriginMark::LetsGo),
-            Self::Sword | Self::Shield => Some(OriginMark::Galar),
-            Self::LegendsArceus => Some(OriginMark::Hisui),
-            Self::BrilliantDiamond | Self::ShiningPearl => Some(OriginMark::Bdsp),
-            Self::Scarlet | Self::Violet => Some(OriginMark::Tera),
-            Self::LegendsZa => Some(OriginMark::Mega),
-            Self::Go => Some(OriginMark::Go),
+            Red | BlueGreen | BlueJpn | Yellow => Some(OriginMark::GameBoy),
+            Gold | Silver | Crystal => Some(OriginMark::GameBoy),
+
+            Ruby | Sapphire | Emerald | FireRed | LeafGreen => Some(OriginMark::GameBoyAdvance),
+            ColosseumXd => Some(OriginMark::GameCube),
+
+            Diamond | Pearl | Platinum | HeartGold | SoulSilver => Some(OriginMark::NintendoDs),
+            Black | White | Black2 | White2 => Some(OriginMark::NintendoDsi),
+
+            X | Y | OmegaRuby | AlphaSapphire => Some(OriginMark::Pentagon),
+            Sun | Moon | UltraSun | UltraMoon => Some(OriginMark::Alola),
+
+            LetsGoPikachu | LetsGoEevee => Some(OriginMark::LetsGo),
+
+            Sword | Shield => Some(OriginMark::Galar),
+            LegendsArceus => Some(OriginMark::Hisui),
+            BrilliantDiamond | ShiningPearl => Some(OriginMark::Bdsp),
+
+            Scarlet | Violet => Some(OriginMark::Tera),
+            LegendsZa => Some(OriginMark::Mega),
+
+            Go => Some(OriginMark::Go),
             _ => None,
         }
     }
@@ -775,6 +764,7 @@ pub enum OriginMark {
     GameBoyAdvance,
     GameCube,
     NintendoDs,
+    NintendoDsi,
     Pentagon,
     Alola,
     LetsGo,
