@@ -44,12 +44,12 @@ pub fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
         commands::open_directory,
         commands::open_file_location,
         commands::find_suggested_saves,
-        startup_config::get_data_dir_path,
-        startup_config::change_data_dir,
         commands::load_banks,
         commands::write_banks,
-        state::get_pokedex,
-        state::update_pokedex,
+        commands::get_pokedex,
+        commands::update_pokedex,
+        startup_config::get_data_dir_path,
+        startup_config::change_data_dir,
         state::start_transaction,
         state::rollback_transaction,
         state::commit_transaction,
@@ -148,7 +148,7 @@ pub fn run() {
                 AllSyncedState::from_states(lookup_state, ohpkm_store, conversion_settings);
             app.manage(synced_state);
 
-            let pokedex_state = match state::PokedexState::load_from_storage(&controller) {
+            let pokedex_state = match openhome_core::PokedexState::load_from_storage(&controller) {
                 Ok(pokedex) => pokedex,
                 Err(err) => {
                     util::show_error_dialog(app, err, launch_error_msg("Pokedex File"));

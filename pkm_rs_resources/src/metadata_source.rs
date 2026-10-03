@@ -208,6 +208,21 @@ impl MetadataSources {
         species::metadata_table::source_has_form_metadata(source, national_dex, form_index)
     }
 
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "defaultOriginGame"))]
+    pub fn first_origin_game(source: MetadataSource) -> OriginGame {
+        source.first_origin_game()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "originMark"))]
+    pub fn origin_mark(source: MetadataSource) -> Option<OriginMark> {
+        source.first_origin_game().mark()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "originGamesFor"))]
+    pub fn all_origin_games(source: MetadataSource) -> Vec<OriginGame> {
+        source.all_origin_games()
+    }
+
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "supportedGameOrigins"))]
     pub fn supported_game_origins(national_dex: u16, form_index: u16) -> Vec<OriginGame> {
         MetadataSource::iter()
@@ -217,10 +232,9 @@ impl MetadataSources {
             .flat_map(MetadataSource::all_origin_games)
             .collect()
     }
-}
 
-#[cfg(feature = "wasm")]
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "allMetadataSources"))]
-pub fn all_metadata_sources() -> Vec<MetadataSource> {
-    MetadataSource::iter().collect()
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "all"))]
+    pub fn all_metadata_sources() -> Vec<MetadataSource> {
+        MetadataSource::iter().collect()
+    }
 }

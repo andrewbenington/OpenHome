@@ -281,6 +281,27 @@ public static partial class Util
     return strings.balllist.GetValue(pk.Ball).ToString().Replace(" Ball", "").Replace("Poke", "Poké");
   }
 
+  public static object FormatGame(GameVersion version, GameStrings strings) => version switch
+  {
+    GameVersion.GN => "BlueGreen",
+    GameVersion.BU => "BlueJpn",
+    GameVersion.CXD => "ColosseumXd",
+    GameVersion.BATREV => "BattleRevolution",
+    GameVersion.B2 => "Black2",
+    GameVersion.W2 => "White2",
+    GameVersion.OR => "OmegaRuby",
+    GameVersion.AS => "AlphaSapphire",
+    GameVersion.US => "UltraSun",
+    GameVersion.UM => "UltraMoon",
+    GameVersion.GP => "LetsGoPikachu",
+    GameVersion.GE => "LetsGoEevee",
+    GameVersion.PLA => "LegendsArceus",
+    GameVersion.BD => "BrilliantDiamond",
+    GameVersion.SP => "ShiningPearl",
+    GameVersion.ZA => "LegendsZa",
+    GameVersion other => strings.gamelist.GetValue((int)other)
+  };
+
   public static object FormatAffixedRibbon(sbyte ribbon, GameStrings strings)
   {
     if (ribbon == -1) return null;

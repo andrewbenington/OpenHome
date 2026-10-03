@@ -72,7 +72,7 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> {
   }
 
   static getPluginIdentifier() {
-    return 'unbound'
+    return 'unbound' as const
   }
 
   getSlotMetadata = (boxNum: number, boxSlot: number): SlotMetadata => {

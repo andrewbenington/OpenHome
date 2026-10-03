@@ -6,22 +6,22 @@ import { getDetailsOfficialSave, getDetailsPluginSave } from '@openhome-ui/saves
 import { Pokerus } from '@pkm-rs/pkg'
 import { memo } from 'react'
 import { HyperTrainIcon } from '../Icons'
-import { BaseBadge } from './BaseBadge'
+import { BaseBadge, BaseBadgeProps } from './BaseBadge'
 import { ImageBadge } from './ImageBadge'
 
-type TopRightNumericalBadgeProps = {
+type TopRightNumericalBadgeProps = BaseBadgeProps & {
   value?: number
   percent?: boolean
 } & (
-  | {
-      percent?: false
-      max: number
-    }
-  | {
-      percent: true
-      max?: undefined
-    }
-)
+    | {
+        percent?: false
+        max: number
+      }
+    | {
+        percent: true
+        max?: undefined
+      }
+  )
 
 function colorByPercent(percent: number) {
   if (percent < 30) return '#bbb'
@@ -46,21 +46,18 @@ function NumericBadge({ value, percent, max: maxProp }: TopRightNumericalBadgePr
   )
 }
 
-export type BadgeProps = {
-  className?: string
-  tooltip?: string
-  color?: string
-  backgroundColor?: string
-  style?: React.CSSProperties
+export type BadgeProps = BaseBadgeProps & {
   showIf?: Option<boolean>
   showLabel?: boolean
 }
+
+export type BadgePropsNoBackground = Omit<BadgeProps, 'backgroundColor'>
 
 function labelIf(showLabel: Option<boolean>, label: Option<string>): Option<string> {
   return showLabel ? label : undefined
 }
 
-function AlphaBadge(props: BadgeProps) {
+function AlphaBadge(props: Omit<BadgeProps, 'backgroundColor'>) {
   const label = labelIf(props.showLabel, 'Alpha')
   return (
     <ImageBadge
@@ -73,37 +70,37 @@ function AlphaBadge(props: BadgeProps) {
   )
 }
 
-export type GameBadgeProps = {
+export type GameBadgeProps = BadgePropsNoBackground & {
   originGame?: Nullable<number>
   plugin?: Nullable<PluginIdentifier>
-  withName?: boolean
-  tooltip?: string
-  style?: React.CSSProperties
-}
+} & ({ withName?: boolean; withNameAbbr?: never } | { withName?: never; withNameAbbr?: boolean })
 
 export function GameBadge(props: GameBadgeProps) {
-  if (props.originGame === undefined || props.originGame === null) return null
-
-  const { shortName, markIconPath, backgroundColor } = props.plugin
+  const details = props.plugin
     ? getDetailsPluginSave(props.plugin)
-    : getDetailsOfficialSave(props.originGame)
+    : props.originGame
+      ? getDetailsOfficialSave(props.originGame)
+      : null
 
+  if (!details) return null
+
+  const { shortName, fullName, markIconPath, backgroundColor } = details
   if (!markIconPath) return null
 
-  const tooltipText = props.tooltip ?? (props.withName ? undefined : shortName)
+  const tooltipText = props.tooltip ?? (props.withNameAbbr ? undefined : shortName)
 
   return (
     <ImageBadge
       tooltip={tooltipText}
       src={markIconPath}
       backgroundColor={backgroundColor}
-      label={props.withName ? shortName : undefined}
-      style={props.style}
+      label={props.withNameAbbr ? shortName : props.withName ? fullName : undefined}
+      {...props}
     />
   )
 }
 
-function GigantamaxBadge(props: BadgeProps) {
+function GigantamaxBadge(props: BadgePropsNoBackground) {
   const label = labelIf(props.showLabel, 'Gigantamax')
   return (
     <ImageBadge
@@ -122,15 +119,15 @@ function HyperTrainBadge(props: BadgeProps) {
     <ImageBadge
       tooltip="Hyper Trained"
       src={HyperTrainIcon}
-      backgroundColor="var(--hyper-train-color)"
       color="black"
       label={label}
       {...props}
+      backgroundColor={props.backgroundColor ?? 'var(--hyper-train-color)'}
     />
   )
 }
 
-function PokerusBadge(props: BadgeProps & { pokerusByte: Option<number> }) {
+function PokerusBadge(props: BadgePropsNoBackground & { pokerusByte: Option<number> }) {
   const pokerus = Pokerus.fromByte(props.pokerusByte ?? 0)
   switch (pokerus.status()) {
     case 'Uninfected':
@@ -165,6 +162,32 @@ function PokerusBadge(props: BadgeProps & { pokerusByte: Option<number> }) {
   }
 }
 
+function TitanBadge(props: BadgePropsNoBackground) {
+  const label = labelIf(props.showLabel, 'Titan')
+  return (
+    <ImageBadge
+      tooltip="Titan"
+      src={getPublicImageURL('icons/titan.svg')}
+      backgroundColor="#a0caa0"
+      label={label}
+      {...props}
+    />
+  )
+}
+
+function TotemBadge(props: BadgePropsNoBackground) {
+  const label = labelIf(props.showLabel, 'Totem')
+  return (
+    <ImageBadge
+      tooltip="Totem"
+      src={getPublicImageURL('icons/totem.svg')}
+      backgroundColor="#e4c30a"
+      label={label}
+      {...props}
+    />
+  )
+}
+
 const Badge = {
   Alpha: memo(AlphaBadge),
   Game: memo(GameBadge),
@@ -173,6 +196,8 @@ const Badge = {
   Image: memo(ImageBadge),
   Numeric: memo(NumericBadge),
   Pokerus: memo(PokerusBadge),
+  Titan: memo(TitanBadge),
+  Totem: memo(TotemBadge),
 }
 
 export default Badge

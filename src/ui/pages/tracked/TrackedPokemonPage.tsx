@@ -268,7 +268,7 @@ function ForOneStateBody(props: ForOneStateBodyProps) {
             <Badge.Game
               originGame={state.save.origin}
               plugin={state.save.pluginIdentifier}
-              withName
+              withNameAbbr
             />
           </Flex>
           <Flex gap="1" align="center">
@@ -355,7 +355,7 @@ function ForAllStateBody(props: ForAllStateBodyProps) {
             <Badge.Game
               originGame={state.currentSaveRef.game}
               plugin={state.currentSaveRef.pluginIdentifier}
-              withName
+              withNameAbbr
             />
           </Flex>
           <Flex gap="1" align="center">

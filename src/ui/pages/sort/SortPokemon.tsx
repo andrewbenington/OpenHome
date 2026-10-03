@@ -72,7 +72,7 @@ export default function SortPokemon() {
     .map(
       R.match(
         (mon: OHPKM) => ({ mon, color: OPENHOME_COLOR, isHome: true }),
-        (_) => undefined
+        () => undefined
       )
     )
     .filter(filterUndefined)
@@ -419,7 +419,7 @@ function TransferToSaveButton(props: TransferToSaveButtonProps) {
         <b>{save.name}</b>
         <p>(TID {save.displayID})</p>
         <div style={{ flex: 1 }} />
-        <Badge.Game withName originGame={save.origin} plugin={save.pluginIdentifier} />
+        <Badge.Game withNameAbbr originGame={save.origin} plugin={save.pluginIdentifier} />
       </Flex>
     </Button>
   )

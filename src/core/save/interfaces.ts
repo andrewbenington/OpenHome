@@ -300,8 +300,13 @@ export function getSaveRef(save: SAV): SaveRef {
     valid: true,
   }
 }
+
 export type PluginIdentifier = RustPluginIdentifier
-export function pluginGameName(identifier: PluginIdentifier, type = 'full'): string {
+
+export function pluginGameName(
+  identifier: PluginIdentifier,
+  type: 'full' | 'short' = 'full'
+): string {
   switch (identifier) {
     case 'radical_red':
       return 'Radical Red'
@@ -316,11 +321,15 @@ export function pluginGameName(identifier: PluginIdentifier, type = 'full'): str
   }
 }
 
+export function isPluginGame(id: OriginGame | PluginIdentifier): id is PluginIdentifier {
+  return typeof id === 'string'
+}
+
 export function pluginOriginMarkPath(identifier: PluginIdentifier): string | undefined {
   switch (identifier) {
     case 'radical_red':
     case 'unbound':
-      return '/icons/gba.png'
+      return '/origin_marks/GameBoyAdvance.png'
     case 'luminescent_platinum':
       return '/origin_marks/Bdsp.png'
     case 'compass':

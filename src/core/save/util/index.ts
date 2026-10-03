@@ -2,7 +2,7 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Errorable } from '@openhome-core/util/functional'
 import { ConvertStrategy, ExtraFormIndex, OriginGame, PkmFormat } from '@pkm-rs/pkg'
-import { PluginSAV, SAV } from '../interfaces'
+import { PluginIdentifier, PluginSAV, SAV } from '../interfaces'
 import { PathData } from './path'
 import { TransferRestrictions } from './TransferRestrictions'
 
@@ -33,7 +33,7 @@ export interface SAVClass<S extends SAV = SAV> {
 
 export interface PluginSaveClass<S extends PluginSAV = PluginSAV> extends SAVClass<S> {
   transferRestrictions: TransferRestrictions
-  getPluginIdentifier: () => string
+  getPluginIdentifier: () => PluginIdentifier
 }
 
 export function supportsMon(
