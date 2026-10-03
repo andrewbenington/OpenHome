@@ -104,6 +104,7 @@ export function useOhpkmStore() {
       .lookupOhpkmById(id)
       .then(R.mapErr(() => IdentifierNotPresent(id)))
       .then(R.flatMap((ohpkm) => (ohpkm ? R.Ok(ohpkm) : R.Err(IdentifierNotPresent(id)))))
+      .then(R.peek((ohpkm) => ohpkmCache.set(ohpkm.openhomeId, ohpkm)))
   }
 
   function tryLoadBatch(ids: OhpkmIdentifier[]): NowOrLater<OhpkmBatchLookupResults> {

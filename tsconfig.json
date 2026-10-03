@@ -47,12 +47,9 @@
   "include": [
     "src",
     "packages",
-    "generate/_rename.js",
-    "generate/generateMoveMap.ts",
     "src-tauri/pokemon-wasm",
-    "generate/generate-cfru/generateMoveMap.ts",
     "src/types/pkm-resources-types.d.ts",
     "scripts",
-    "__mocks__"
-  ]
+    "__mocks__",
+  ],
 }

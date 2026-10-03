@@ -1,4 +1,4 @@
-VERSION=1.18.0-rc.async-ohpkm-store
+VERSION=1.18.0
 
 .PHONY: help
 help: # Display this help.
@@ -35,6 +35,9 @@ check: wasm-compile
 	@pnpm run typecheck
 	@pnpm run lint
 	@pnpm run format
+	@cd generate && pnpm run typecheck
+	@cd generate && pnpm run lint
+	@cd generate && pnpm run format
 
 .PHONY: test
 test: ensure-dependencies
@@ -96,14 +99,19 @@ build-mac-arm:
 build-mac-intel:
 	@npx tauri build --target x86_64-apple-darwin
 
-
-.PHONY: release-mac-arm
-release-mac-arm: build-mac-arm
+.PHONY: upload-mac-arm
+upload-mac-arm:
 	@source .env && ./scripts/upload-bin.sh $(shell pwd)/target/aarch64-apple-darwin/release/bundle/dmg OpenHome
 
-.PHONY: release-mac-intel
-release-mac-intel: build-mac-intel
+.PHONY: release-mac-arm
+release-mac-arm: build-mac-arm upload-mac-arm
+
+.PHONY: upload-mac-intel
+upload-mac-intel:
 	@source .env && ./scripts/upload-bin.sh $(shell pwd)/target/x86_64-apple-darwin/release/bundle/dmg OpenHome
+
+.PHONY: release-mac-intel
+release-mac-intel: build-mac-intel upload-mac-intel
 
 .PHONY: release-mac
 release-mac: release-mac-arm release-mac-intel

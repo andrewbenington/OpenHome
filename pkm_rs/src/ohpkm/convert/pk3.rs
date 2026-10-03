@@ -1,7 +1,7 @@
 use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_resources::ribbons::Gen3Ribbon;
 use pkm_rs_resources::{items::ItemGen3, lookup};
-use pkm_rs_types::{AbilityNumber, Generation, PokeDate, Stats16Le};
+use pkm_rs_types::{AbilityNumber, Generation, PokeDate, SimpleAbilityNumber, Stats16Le};
 
 use super::OhpkmConvert;
 use crate::convert_strategy::{ConvertStrategy, PidModificationStrategy, PkmConverter};
@@ -127,6 +127,15 @@ impl OhpkmConvert for Pk3 {
             ohpkm.personality_value()
         };
 
+        let form_metadata = ohpkm.get_forme_metadata();
+
+        let ability_index_unchecked = form_metadata.get_ability(ohpkm.ability_num());
+        let ability_num = if ability_index_unchecked.to_u16() <= PK3_MAX_ABILITY {
+            SimpleAbilityNumber::from(ohpkm.ability_num())
+        } else {
+            SimpleAbilityNumber::First
+        };
+
         let mut mon = Self {
             sanity: 0,
             checksum: 0,
@@ -139,7 +148,7 @@ impl OhpkmConvert for Pk3 {
             exp: ohpkm.exp(),
             has_species_data: true,
             is_bad_egg: false,
-            ability_num: ohpkm.ability_num().into(),
+            ability_num,
             markings: ohpkm.markings().into(),
             personality_value,
             is_fateful_encounter: ohpkm.is_fateful_encounter(),

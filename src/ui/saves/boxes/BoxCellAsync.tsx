@@ -1,17 +1,22 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
-import { Option } from '@openhome-core/util/functional'
+import { $R, isResult, Option } from '@openhome-core/util/functional'
+import { NowOrLater } from '@openhome-core/util/promise'
 import { CtxMenuElementBuilder } from '@openhome-ui/components/context-menu'
+import MissingOhpkmIdPrompt from '@openhome-ui/pokemon/MissingOhpkmId'
+import { OhpkmLookupResult } from '@openhome-ui/state/ohpkm'
 import { MonLocation } from '@openhome-ui/state/saves'
 import { CSSProperties, Suspense, use } from 'react'
 import '../style.css'
 import BoxCell from './BoxCell'
 
+export type BoxSlotContents = NowOrLater<Option<PKMInterface | OhpkmLookupResult>>
+
 interface BoxCellAsyncProps {
   title?: string
   onClick: () => void
   monPlaceholder?: Option<PKMInterface>
-  monPromise?: Promise<Option<PKMInterface>> | Option<PKMInterface>
+  monPromise?: BoxSlotContents
   onDrop: (_: PKMInterface[]) => void
   isDisabled?: (mon: Option<PKMInterface>) => boolean
   disabledReason?: string
@@ -64,11 +69,32 @@ function BoxCellAsync(props: BoxCellAsyncProps) {
   )
 }
 
-function BoxCellAsyncInner(
-  props: BoxCellAsyncProps & { monPromise: Promise<Option<PKMInterface>> | Option<PKMInterface> }
-) {
+function BoxCellAsyncInner(props: BoxCellAsyncProps & { monPromise: BoxSlotContents }) {
   const { monPromise, isDisabled, ...boxCellProps } = props
-  const mon = isThenable(monPromise) ? use(monPromise) : monPromise
+  const awaitedContents = isThenable(monPromise) ? use(monPromise) : monPromise
+
+  if (awaitedContents && isResult(awaitedContents)) {
+    return $R(awaitedContents).match(
+      (ohpkm) => (
+        <BoxCell
+          {...boxCellProps}
+          mon={ohpkm}
+          disabled={isDisabled?.(ohpkm)}
+          borderColor={props.borderColor}
+        />
+      ),
+      ({ identifier }) => {
+        return (
+          <MissingOhpkmIdPrompt
+            location={props.location.isHome ? props.location : undefined}
+            openhomeId={identifier}
+          />
+        )
+      }
+    )
+  }
+
+  const mon: Option<PKMInterface> = awaitedContents
 
   return (
     <BoxCell
