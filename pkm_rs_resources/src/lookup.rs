@@ -28,6 +28,6 @@ impl Lookup {
 
     #[wasm_bindgen(js_name = locationName)]
     pub fn location_name(game: OriginGame, language: Language, index: usize) -> Option<String> {
-        pkhex_text::location_name(game, language, index).map(&str::to_owned)
+        pkhex_text::location_name(game, language, index).map(str::to_owned)
     }
 }

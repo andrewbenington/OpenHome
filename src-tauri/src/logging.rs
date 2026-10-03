@@ -131,7 +131,7 @@ impl LogEntry {
     pub fn from_json(mut v: serde_json::Value) -> Option<Self> {
         let timestamp = v["timestamp"].as_str()?.to_owned();
         let level: LogLevel = v["level"].as_str()?.parse().ok()?;
-        let target = v["target"].as_str().map(&str::to_owned);
+        let target = v["target"].as_str().map(str::to_owned);
 
         let fields = &mut v["fields"];
 
