@@ -66,6 +66,15 @@ export default function PokedexSummary(props: PokedexSummaryProps) {
   const stats = reader.baseStats()
 
   const orderedGameSets = compatibleGamesPrioritizeCaught(selectedForm)
+  const extraGames = extraSaveTypes.filter(
+    (saveType) =>
+      !isRestricted(
+        saveType.transferRestrictions,
+        selectedForm.nationalDex,
+        selectedForm.formIndex,
+        isExtraFormMetadata(selectedForm) ? selectedForm.extraFormIndex : undefined
+      )
+  )
 
   return (
     <OhoFlex.ColStart p="1" height="100%" overflow="auto">
@@ -115,7 +124,7 @@ export default function PokedexSummary(props: PokedexSummaryProps) {
           </Text>
           <Text>{getPokedexSummary(species, selectedForm)}</Text>
           <ScrollArea>
-            <OhoFlex.Row wrap="wrap">
+            <OhoFlex.Row wrap="wrap" gap="1" justify="center">
               {orderedGameSets.map((gamesForOrigin) => {
                 const caughtOrigins = dexEntry?.games.map(parseOriginGame).filter(filterUndefined)
                 const firstRegistered = caughtOrigins?.find((game) => gamesForOrigin.includes(game))
@@ -131,34 +140,26 @@ export default function PokedexSummary(props: PokedexSummaryProps) {
                   />
                 )
               })}
-              <h3 style={{ width: '100%', textAlign: 'center', margin: '1rem 0' }}>Plugins</h3>
-              <Flex gap="1" overflowY="auto" wrap="wrap" justify="center" mb="1rem">
-                {extraSaveTypes
-                  .filter(
-                    (saveType) =>
-                      !isRestricted(
-                        saveType.transferRestrictions,
-                        selectedForm.nationalDex,
-                        selectedForm.formIndex,
-                        isExtraFormMetadata(selectedForm) ? selectedForm.extraFormIndex : undefined
-                      )
-                  )
-                  .map((saveType) => {
-                    const pluginIdentifier = saveType.getPluginIdentifier()
-                    return (
-                      <Badge.Game
-                        key={origin}
-                        plugin={pluginIdentifier}
-                        // withName
-                        size="3"
-                        style={{ fontWeight: 'bold' }}
-                        activeIf={
-                          (pluginIdentifier && dexEntry?.extra.includes(pluginIdentifier)) === true
-                        }
-                      />
-                    )
-                  })}
-              </Flex>
+            </OhoFlex.Row>
+            <h3 style={{ width: '100%', textAlign: 'center', margin: '1rem 0 0.5rem' }}>
+              Extra Games
+            </h3>
+            <OhoFlex.Row wrap="wrap" gap="1" justify="center">
+              {extraGames.map((saveType) => {
+                const pluginIdentifier = saveType.getPluginIdentifier()
+                return (
+                  <Badge.Game
+                    key={origin}
+                    plugin={pluginIdentifier}
+                    // withName
+                    size="3"
+                    style={{ fontWeight: 'bold' }}
+                    activeIf={
+                      (pluginIdentifier && dexEntry?.extra.includes(pluginIdentifier)) === true
+                    }
+                  />
+                )
+              })}
             </OhoFlex.Row>
           </ScrollArea>
         </div>

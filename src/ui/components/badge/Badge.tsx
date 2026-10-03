@@ -76,12 +76,15 @@ export type GameBadgeProps = BadgePropsNoBackground & {
 } & ({ withName?: boolean; withNameAbbr?: never } | { withName?: never; withNameAbbr?: boolean })
 
 export function GameBadge(props: GameBadgeProps) {
-  if (props.originGame === undefined || props.originGame === null) return null
-
-  const { shortName, fullName, markIconPath, backgroundColor } = props.plugin
+  const details = props.plugin
     ? getDetailsPluginSave(props.plugin)
-    : getDetailsOfficialSave(props.originGame)
+    : props.originGame
+      ? getDetailsOfficialSave(props.originGame)
+      : null
 
+  if (!details) return null
+
+  const { shortName, fullName, markIconPath, backgroundColor } = details
   if (!markIconPath) return null
 
   const tooltipText = props.tooltip ?? (props.withNameAbbr ? undefined : shortName)

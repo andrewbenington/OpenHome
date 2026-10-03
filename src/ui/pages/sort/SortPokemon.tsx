@@ -72,7 +72,7 @@ export default function SortPokemon() {
     .map(
       R.match(
         (mon: OHPKM) => ({ mon, color: OPENHOME_COLOR, isHome: true }),
-        (_) => undefined
+        () => undefined
       )
     )
     .filter(filterUndefined)
