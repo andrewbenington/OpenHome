@@ -1,3 +1,4 @@
+import useBackend from '@openhome-core/backend/useBackend'
 import { Filter } from '@openhome-ui/util/filter'
 import { useContext } from 'react'
 import { AppInfoContext } from '../state/appInfo'
@@ -17,11 +18,13 @@ export type BoxIconSpriteType = 'home' | 'default'
 
 export function useMonDisplay() {
   const [{ settings }, dispatchAppInfo] = useContext(AppInfoContext)
+  const backend = useBackend()
 
   const monDisplayState = settings.monDisplayState
 
   function updateState(newState: MonDisplayState) {
     dispatchAppInfo({ type: 'set_mon_display_state', payload: newState })
+    backend.updateSettings({ ...settings, monDisplayState: newState }).catch(console.error)
   }
 
   function setFilter(newFilter: Partial<Filter>) {
