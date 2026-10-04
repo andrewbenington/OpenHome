@@ -48,6 +48,7 @@ pub fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
         commands::write_banks,
         commands::get_pokedex,
         commands::update_pokedex,
+        commands::sync_pokedex,
         startup_config::get_data_dir_path,
         startup_config::change_data_dir,
         state::start_transaction,

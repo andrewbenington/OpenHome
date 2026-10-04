@@ -2,11 +2,15 @@ use crate::Result;
 use crate::data_controller::{DataController, DataDir, JsonDataReader};
 
 use std::collections::HashSet;
+use std::str::FromStr;
 use std::{collections::HashMap, ops::Deref, sync::Mutex};
 
 use pkm_rs::PluginIdentifier;
+use pkm_rs::ohpkm::OhpkmV2;
+use pkm_rs::traits::HasSpeciesAndForm;
 use pkm_rs_types::{OriginGame, ShinyLeaves};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use strum::IntoEnumIterator;
 
 mod storage_format;
 
@@ -54,7 +58,9 @@ pub enum PokedexLevel {
     ShinyCaught,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, specta::Type)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, strum::EnumIter, specta::Type,
+)]
 pub enum PokedexFlag {
     Male,
     Female,
@@ -63,6 +69,30 @@ pub enum PokedexFlag {
     Gigantamax,
     Alpha,
     Titan,
+}
+
+fn is_true(v: bool) -> bool {
+    v
+}
+
+impl PokedexFlag {
+    fn ohpkm_matches(self, ohpkm: &OhpkmV2) -> bool {
+        use pkm_rs_resources::ribbons::ModernRibbon;
+
+        match self {
+            PokedexFlag::Male => ohpkm.gender() == pkm_rs_types::Gender::Male,
+            PokedexFlag::Female => ohpkm.gender() == pkm_rs_types::Gender::Female,
+            PokedexFlag::NsPokemon => ohpkm.is_ns_pokemon().is_some_and(is_true),
+            PokedexFlag::Totem => ohpkm.get_forme_metadata().is_totem_form(),
+            PokedexFlag::Gigantamax => ohpkm.can_gigantamax().is_some_and(is_true),
+            PokedexFlag::Alpha => ohpkm.is_alpha().is_some_and(is_true),
+            PokedexFlag::Titan => ohpkm.ribbons().includes(ModernRibbon::TitanMark),
+        }
+    }
+
+    fn all_from_ohpkm(ohpkm: &OhpkmV2) -> impl Iterator<Item = Self> {
+        PokedexFlag::iter().filter(|flag| flag.ohpkm_matches(ohpkm))
+    }
 }
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize, specta::Type)]
@@ -89,6 +119,24 @@ impl FormEntry {
 
     fn games_set(&self) -> HashSet<OriginGame> {
         self.games.iter().copied().collect()
+    }
+
+    pub fn from_ohpkm(ohpkm: &OhpkmV2, level: PokedexLevel) -> Self {
+        let (games, extra) = match ohpkm
+            .plugin_origin()
+            .and_then(|p_str| PluginIdentifier::from_str(&p_str).ok())
+        {
+            Some(extra_origin) => (Vec::new(), HashSet::from([extra_origin])),
+            None => (vec![ohpkm.game_of_origin()], HashSet::new()),
+        };
+
+        Self {
+            level,
+            games,
+            extra,
+            flags: PokedexFlag::all_from_ohpkm(ohpkm).collect(),
+            shiny_leaves: ohpkm.shiny_leaves().unwrap_or_default(),
+        }
     }
 
     #[cfg(test)]
@@ -137,12 +185,6 @@ impl Pokedex {
     }
 
     pub fn update(&mut self, national_dex: DexNumber, form_index: FormNumber, data: FormEntry) {
-        dbg!(
-            self.by_dex_number
-                .entry(national_dex)
-                .or_default()
-                .form_mut(form_index)
-        );
         self.by_dex_number
             .entry(national_dex)
             .or_default()
@@ -153,6 +195,15 @@ impl Pokedex {
                 .entry(national_dex)
                 .or_default()
                 .form_mut(form_index)
+        );
+    }
+
+    pub fn update_from_ohpkm(&mut self, ohpkm: &OhpkmV2, level: PokedexLevel) {
+        let (national_dex, form_index) = ohpkm.species_and_form().split();
+        self.update(
+            national_dex as u16,
+            form_index,
+            FormEntry::from_ohpkm(ohpkm, level),
         );
     }
 

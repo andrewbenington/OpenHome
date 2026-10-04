@@ -12,7 +12,7 @@ use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::lookup;
 use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots, PpUpStorage};
 use pkm_rs_resources::natures::NatureIndex;
-use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
+use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
@@ -387,7 +387,7 @@ impl MainDataV2 {
 
         // Affixed ribbon must be in the mon's possession
         if let Some(affixed_ribbon) = self.affixed_ribbon
-            && !self.ribbons.includes(OpenHomeRibbon::Mod(affixed_ribbon))
+            && !self.ribbons.includes(affixed_ribbon)
         {
             self.affixed_ribbon = None;
             errors_found.push(OhpkmIssue::AffixedRibbonNotPresent)

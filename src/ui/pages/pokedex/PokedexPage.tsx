@@ -1,4 +1,5 @@
 import { filterUndefined } from '@openhome-core/util/sort'
+import OhoButton from '@openhome-ui/components/OhoButton'
 import { usePokedex } from '@openhome-ui/state/pokedex'
 import { Pokedex } from '@openhome-ui/util/pokedex'
 import { cssClass } from '@openhome-ui/util/style'
@@ -59,6 +60,14 @@ export default function PokedexPage() {
     <div className="pokedex-page">
       <div className="pokedex-header">
         <h1 className="pokedex-header-title">National Pokédex</h1>
+        <OhoButton
+          variant="classic"
+          color="mint"
+          style={{ borderRadius: '999px' }}
+          onClick={pokedexState.populatePokedexFromOhpkms}
+        >
+          Sync
+        </OhoButton>
         <div style={{ flex: 1 }} />
         <Text>
           <b>Caught:</b> {caughtCount}

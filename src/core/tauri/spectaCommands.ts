@@ -134,6 +134,14 @@ export const commands = {
       else return { status: 'error', error: e as any }
     }
   },
+  async syncPokedex(): Promise<Result<null, CommandError>> {
+    try {
+      return { status: 'ok', data: await TAURI_INVOKE('sync_pokedex') }
+    } catch (e) {
+      if (e instanceof Error) throw e
+      else return { status: 'error', error: e as any }
+    }
+  },
   async getDataDirPath(): Promise<Result<string, CommandError>> {
     try {
       return { status: 'ok', data: await TAURI_INVOKE('get_data_dir_path') }

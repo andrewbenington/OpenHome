@@ -3,9 +3,10 @@ import { Errorable, R } from '@openhome-core/util/functional'
 import { Pokedex } from '@openhome-ui/util/pokedex'
 import { useCallback, useEffect, useState } from 'react'
 
-export type PokedexManager = { getPokedex: () => Promise<Errorable<Pokedex>> } & (
-  { loaded: true; pokedex: Pokedex } | { loaded: false; pokedex: undefined }
-)
+export type PokedexManager = {
+  getPokedex: () => Promise<Errorable<Pokedex>>
+  populatePokedexFromOhpkms: () => Promise<Errorable<null>>
+} & ({ loaded: true; pokedex: Pokedex } | { loaded: false; pokedex: undefined })
 
 export function usePokedex(): PokedexManager {
   const [pokedexCache, setPokedexCache] = useState<Pokedex>()
@@ -37,10 +38,15 @@ export function usePokedex(): PokedexManager {
     }
   }, [loadAndCachePokedex, loading, pokedexCache])
 
+  const functions = {
+    getPokedex: loadAndCachePokedex,
+    populatePokedexFromOhpkms: backend.syncPokedex,
+  }
+
   if (pokedexCache) {
-    return { getPokedex: loadAndCachePokedex, pokedex: pokedexCache, loaded: true }
+    return { pokedex: pokedexCache, loaded: true, ...functions }
   } else {
-    return { getPokedex: loadAndCachePokedex, pokedex: undefined, loaded: false }
+    return { pokedex: undefined, loaded: false, ...functions }
   }
 }
 

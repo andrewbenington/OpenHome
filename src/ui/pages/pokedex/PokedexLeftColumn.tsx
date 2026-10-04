@@ -267,7 +267,7 @@ class PokedexVariant<B extends BadgeType = BadgeType> {
     const BadgeType = this.badge
     return (
       <BadgeType
-        activeIf={formDexEntry && this.isRegistered(formDexEntry)}
+        inactive={!formDexEntry || !this.isRegistered(formDexEntry)}
         showIf={this.isPossibleFor(form.nationalDex, form.formIndex)}
         size="2"
         tooltip={this.description}

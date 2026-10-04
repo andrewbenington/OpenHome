@@ -11,7 +11,7 @@ export type BaseBadgeProps = {
   backgroundColor?: string
   style?: React.CSSProperties
   size?: Option<Responsive<'2' | '1' | '3'>>
-  activeIf?: boolean
+  inactive?: boolean
 } & PropsWithChildren
 
 export function BaseBadge(props: BaseBadgeProps) {
@@ -22,7 +22,7 @@ export function BaseBadge(props: BaseBadgeProps) {
       className={cssClass(`badge badge-size-${props.size ?? '1'}`)
         .with(className)
         .with('badge-disabled')
-        .if(props.activeIf === false) // only disable if activeIf function is provided and false
+        .if(props.inactive) // only disable if activeIf function is provided and false
         .build()}
       style={{ backgroundColor, color, ...style }}
       variant="solid"

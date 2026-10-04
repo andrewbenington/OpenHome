@@ -136,7 +136,7 @@ export default function PokedexSummary(props: PokedexSummaryProps) {
                     originGame={badgeGame}
                     size="3"
                     style={{ fontWeight: 'bold' }}
-                    activeIf={Boolean(firstRegistered)}
+                    inactive={!firstRegistered}
                   />
                 )
               })}
@@ -154,9 +154,7 @@ export default function PokedexSummary(props: PokedexSummaryProps) {
                     // withName
                     size="3"
                     style={{ fontWeight: 'bold' }}
-                    activeIf={
-                      (pluginIdentifier && dexEntry?.extra.includes(pluginIdentifier)) === true
-                    }
+                    inactive={!pluginIdentifier || !dexEntry?.extra.includes(pluginIdentifier)}
                   />
                 )
               })}

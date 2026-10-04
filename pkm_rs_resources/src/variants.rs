@@ -94,6 +94,23 @@ pub fn has_gigantamax_form_wasm(national_dex: NationalDex, form_index: u16) -> b
     SpeciesForm::new_valid_ndex(national_dex, form_index).is_ok_and(has_gigantamax_form)
 }
 
+pub const fn is_totem_form(species_form: SpeciesForm) -> bool {
+    let (national_dex, form_index) = species_form.split();
+    match national_dex {
+        NationalDex::Gumshoos
+        | NationalDex::Araquanid
+        | NationalDex::Lurantis
+        | NationalDex::Salazzle
+        | NationalDex::Vikavolt
+        | NationalDex::Togedemaru
+        | NationalDex::Mimikyu
+        | NationalDex::Ribombee
+        | NationalDex::Kommoo => form_index == 1,
+        NationalDex::Raticate | NationalDex::Marowak => form_index == 2,
+        _ => false,
+    }
+}
+
 pub const fn totem_form_acquirable(species_form: SpeciesForm) -> bool {
     match species_form.get_ndex() {
         NationalDex::Gumshoos

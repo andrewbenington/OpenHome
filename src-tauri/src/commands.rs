@@ -7,6 +7,7 @@ use openhome_core::error::{Error, Result};
 use openhome_core::pkm_storage::StoredBankDataWasm;
 use openhome_core::pokedex::{Pokedex, PokedexState, PokedexUpdate};
 use openhome_core::saves::{self, SaveFileSearch};
+use pkm_rs::ohpkm::OhpkmV2;
 use serde_json::Value;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -277,6 +278,26 @@ pub fn update_pokedex(
     for update in updates {
         pokedex.update(update.national_dex, update.form_index, update.data);
     }
+
+    app_handle
+        .emit("pokedex_update", pokedex.clone())
+        .map_err(|err| format!("Could not emit 'pokedex_update' to frontend: {err}").into())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn sync_pokedex(
+    app_handle: tauri::AppHandle,
+    pokedex_state: tauri::State<'_, PokedexState>,
+    synced_state: tauri::State<'_, crate::synced_state::AllSyncedState>,
+) -> CommandResult<()> {
+    use openhome_core::pokedex::PokedexLevel;
+
+    let mut pokedex = pokedex_state.lock()?;
+    synced_state.for_each_ohpkm_stored(|id, bytes| match OhpkmV2::from_bytes(bytes) {
+        Ok(ohpkm) => pokedex.update_from_ohpkm(&ohpkm, PokedexLevel::Caught),
+        Err(err) => tracing::error!("error building OHPKM with id {id}: {err}"),
+    })?;
 
     app_handle
         .emit("pokedex_update", pokedex.clone())

@@ -352,6 +352,10 @@ impl FormMetadata {
             .any(|mega| mega.mega_form.form_index == self.form_index)
     }
 
+    pub const fn is_totem_form(&self) -> bool {
+        crate::variants::is_totem_form(self.forme_ref())
+    }
+
     #[cfg(feature = "wasm")]
     fn has_data_for_source(&self, source: MetadataSource) -> bool {
         use crate::species::metadata_table::source_has_form_metadata;
@@ -628,17 +632,17 @@ pub struct SpeciesForm {
 
 impl SpeciesForm {
     pub fn new(national_dex: u16, form_index: u16) -> Result<SpeciesForm> {
-        let valid_ndex = NationalDex::new(national_dex)?;
+        let national_dex = NationalDex::new(national_dex)?;
 
-        if valid_ndex.get_species_metadata().forms.len() <= form_index as usize {
+        if national_dex.get_species_metadata().forms.len() <= form_index as usize {
             return Err(Error::FormIndex {
-                national_dex: valid_ndex,
+                national_dex,
                 form_index,
             });
         }
 
         Ok(SpeciesForm {
-            national_dex: valid_ndex,
+            national_dex,
             form_index,
         })
     }
@@ -708,6 +712,10 @@ impl SpeciesForm {
 
     pub const fn get_forme_index(&self) -> u16 {
         self.form_index
+    }
+
+    pub const fn split(&self) -> (NationalDex, u16) {
+        (self.national_dex, self.form_index)
     }
 
     pub fn get_levelup_learnset(&self, source: Option<MetadataSource>) -> Option<LearnsetReader> {
