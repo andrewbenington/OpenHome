@@ -53,10 +53,21 @@ export const getLocationString = (
   const location = Lookup.locationName(game, language, index)
   if (!location) return `[LOCATION INDEX ${index}]` // todo: i18n
 
-  if (game === OriginGame.LegendsArceus) {
-    return location
-  } else if (egg) {
+  if (egg) {
     return `from ${location}`
+  } else if (
+    (OriginGames.isBdsp(game) || (game >= OriginGame.Sword && index < 30000)) &&
+    language === Language.English
+  ) {
+    // handle english nominatives for relevant locations in all switch games
+    // contributions welcome for non-english!
+    return location
+  } else if (
+    (OriginGames.isSwSh(game) || game === OriginGame.LegendsArceus) &&
+    language !== Language.English &&
+    index < 30000
+  ) {
+    return location // handle supported non-English nominative locations
   } else if (location?.startsWith('Route')) {
     return `on ${location}`
   } else return `in ${location}`
