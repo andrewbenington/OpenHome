@@ -15,28 +15,11 @@ export function getLocationStringOrOrigin(
   language: Language,
   egg = false
 ) {
-  if (format === 'OHPKM' || formatMatchesOrigin(format, game)) {
-    return getLocationString(game, index, format, language, egg)
-  }
-  return `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
-}
-
-export const getLocationString = (
-  game: OriginGame,
-  index: number,
-  format: string,
-  language: Language,
-  egg = false
-) => {
-  if (game <= OriginGame.White && index === 30001) {
-    return 'at the Poké Transfer Lab' // todo: i18n
-  }
-
   if (game === OriginGame.Go) {
     return 'in Pokémon GO' // todo: i18n
-  }
-
-  if (format === 'PB7' && !OriginGames.isLetsGo(game)) {
+  } else if (format === 'OHPKM' || formatMatchesOrigin(format, game)) {
+    return getLocationString(game, index, language, egg)
+  } else if (format === 'PB7' && !OriginGames.isLetsGo(game)) {
     return game <= OriginGame.UltraMoon
       ? `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
       : 'in a faraway place' // todo: i18n
@@ -45,9 +28,31 @@ export const getLocationString = (
       ? `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
       : 'in the Faraway place' // todo: i18n
   } else if (format === 'PB8' && !OriginGames.isBdsp(game)) {
+    if (game === OriginGame.LegendsArceus) {
+      return 'in the Sinnoh region of old' // todo: i18n
+    }
     return game <= OriginGame.Shield
       ? `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
       : 'in a faraway place' // todo: i18n
+  } else if (format === 'PA8' && game !== OriginGame.LegendsArceus) {
+    if (OriginGames.isBdsp(game)) {
+      return 'in the Sinnoh region made new' // todo: i18n
+    }
+    return game <= OriginGame.ShiningPearl
+      ? `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
+      : 'in a faraway place' // todo: i18n
+  }
+  return `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
+}
+
+export const getLocationString = (
+  game: OriginGame,
+  index: number,
+  language: Language,
+  egg = false
+) => {
+  if (game <= OriginGame.White && index === 30001) {
+    return 'at the Poké Transfer Lab' // todo: i18n
   }
 
   const location = Lookup.locationName(game, language, index)
@@ -95,5 +100,5 @@ export const getFormatLocationString = (
   language: Language,
   egg = false
 ) => {
-  return getLocationString(ORIGIN_GAME_BY_FORMAT[format], index, format, language, egg)
+  return getLocationString(ORIGIN_GAME_BY_FORMAT[format], index, language, egg)
 }

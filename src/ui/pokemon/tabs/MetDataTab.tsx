@@ -26,7 +26,7 @@ const MetDataTab = (props: { mon: PKMInterface }) => {
     }
     return `Egg received on ${mon.eggDate.month}/${mon.eggDate.day}/${
       mon.eggDate.year
-    } ${getLocationString(mon.gameOfOrigin, mon.eggLocationIndex, mon.format, Language.English, true)}.` // todo: i18n
+    } ${getLocationString(mon.gameOfOrigin, mon.eggLocationIndex, Language.English, true)}.` // todo: i18n
   }, [mon])
 
   const metMessage = useMemo(() => {
