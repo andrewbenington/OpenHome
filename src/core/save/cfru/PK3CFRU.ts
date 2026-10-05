@@ -450,6 +450,7 @@ export default abstract class PK3CFRU implements PluginPKMInterface {
   }
 
   public get gender() {
+    console.log(this.metadata, this.metadata?.formeName)
     return this.metadata?.genderFromPid(this.personalityValue)
   }
 

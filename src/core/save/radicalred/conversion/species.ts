@@ -4825,8 +4825,8 @@ export const RadicalRedToNationalDexMap: Record<string, CfruSpeciesAndForm | nul
     formIndex: 1,
   },
   '1202': {
-    nationalDex: -1,
-    formIndex: -1,
+    nationalDex: 876,
+    formIndex: 1,
   },
   '1203': {
     nationalDex: 877,
