@@ -2423,7 +2423,7 @@ export const RadicalRedToNationalDexMap: Record<string, CfruSpeciesAndForm | nul
   },
   '603': {
     nationalDex: 550,
-    formIndex: 1,
+    formIndex: 0,
   },
   '604': {
     nationalDex: 551,
@@ -2955,7 +2955,7 @@ export const RadicalRedToNationalDexMap: Record<string, CfruSpeciesAndForm | nul
   },
   '736': {
     nationalDex: 550,
-    formIndex: 0,
+    formIndex: 1,
   },
   '737': {
     nationalDex: 555,
@@ -4013,7 +4013,7 @@ export const RadicalRedToNationalDexMap: Record<string, CfruSpeciesAndForm | nul
     formIndex: 0,
   },
   '1000': {
-    nationalDex: 781,
+    nationalDex: 783,
     formIndex: 0,
   },
   '1001': {
@@ -5096,11 +5096,11 @@ export const RadicalRedToNationalDexMap: Record<string, CfruSpeciesAndForm | nul
   },
   '1264': {
     nationalDex: 898,
-    formIndex: 0,
+    formIndex: 1,
   },
   '1265': {
     nationalDex: 898,
-    formIndex: 0,
+    formIndex: 2,
   },
   '1266': {
     nationalDex: 897,
@@ -5539,7 +5539,7 @@ export const RadicalRedToNationalDexMap: Record<string, CfruSpeciesAndForm | nul
   },
   '1370': {
     nationalDex: 1024,
-    formIndex: 0,
+    formIndex: 1,
   },
   '1371': {
     nationalDex: 1019,
