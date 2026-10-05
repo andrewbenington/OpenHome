@@ -324,6 +324,21 @@ impl PkmFormat {
             return super::location::POKE_TRANSFER_MET_LOCATION_GEN_5;
         }
 
+        if self == Self::PK8 {
+            return if self.matches_origin(original_origin) {
+                met_location_index
+            } else {
+                match original_origin {
+                    OriginGame::Violet => 59996,
+                    OriginGame::Scarlet => 59997,
+                    OriginGame::ShiningPearl => 59998,
+                    OriginGame::BrilliantDiamond => 59999,
+                    OriginGame::LegendsArceus => 60000,
+                    _ => super::location::FARAWAY_PLACE_SWSH,
+                }
+            };
+        }
+
         let origin_was_changed = original_origin != legalized_origin;
         if !origin_was_changed {
             return met_location_index;
