@@ -43,7 +43,7 @@ import {
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
 import { Errorable, Option, R } from '../../util/functional'
-import { PluginIdentifier } from '../interfaces'
+import { pluginGameName, PluginIdentifier } from '../interfaces'
 import { CfruSpeciesAndForm } from './conversion/util'
 
 const INTERNAL_ORIGIN_NON_RR = OriginGame.Invalid6
@@ -170,9 +170,9 @@ export default abstract class PK3CFRU implements PluginPKMInterface {
       this.extraFormIndex = speciesData.extraFormIndex
 
       if (speciesData.nationalDex < 0) {
-        console.error(`BAD INTERNAL SPECIES INDEX: ${this.internalSpeciesIndex}`)
-        this.nationalDex = 0
-        this.formIndex = 0
+        throw Error(
+          `Unknown ${pluginGameName(this.getPluginIdentifier())} species index: ${this.internalSpeciesIndex}`
+        )
       } else if (speciesData.nationalDex === NationalDex.Unown) {
         this.nationalDex = NationalDex.Unown
         this.formIndex = unownFormFromPid(this.personalityValue)

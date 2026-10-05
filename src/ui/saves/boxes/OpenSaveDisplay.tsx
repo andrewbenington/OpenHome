@@ -3,7 +3,7 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
 import { monSupportedBySave } from '@openhome-core/save/util'
-import { $R, Option, R, range } from '@openhome-core/util/functional'
+import { $R, Option, R, range, Result } from '@openhome-core/util/functional'
 import { $O } from '@openhome-core/util/option'
 import { isThenable, NowOrLater } from '@openhome-core/util/promise'
 import { filterUndefined } from '@openhome-core/util/sort'
@@ -38,7 +38,7 @@ interface OpenSaveDisplayProps {
 
 type SlotMetadata = {
   save: SAV
-  mon: NowOrLater<Option<PKMInterface>>
+  mon: NowOrLater<Result<Option<PKMInterface>>>
   openhomeId: Option<string> | undefined
   pendingMon: Option<string | symbol | PKMInterface>
 }
@@ -127,7 +127,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
     .every(canSwapWithDragging)
 
   const slots: SlotMetadata[] = range(save.boxColumns * save.boxRows)
-    .map((index: number) => save.getMonAt(save.currentPCBox, index))
+    .map((index: number) => save.tryGetMonAt(save.currentPCBox, index))
     .map((_, index) => {
       const location: MonLocation = {
         isHome: false,
@@ -135,30 +135,40 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
         boxSlot: index,
         saveIdentifier: save.identifier,
       }
-      let mon: NowOrLater<Option<PKMInterface>> = save.getMonAt(location.box, location.boxSlot)
+
+      let mon: NowOrLater<Result<Option<PKMInterface>>> = save.tryGetMonAt(
+        location.box,
+        location.boxSlot
+      )
+
+      if (R.isErr(mon)) {
+        return { save, mon, openhomeId: undefined, pendingMon: undefined }
+      }
+
       const openhomeIdBoxed = $O(save.getMonAt(location.box, location.boxSlot)).flatMap(
         ohpkmStore.getPotentialOhpkmId
       )
 
       let openhomeId = openhomeIdBoxed.get()
 
-      mon =
-        openhomeIdBoxed
-          .flatMap((openhomeId) => saveOhpkms?.get(openhomeId))
-          .map(R.dropError) // we expect many "id lookups" to fail, because not all mons are necessarily tracked
-          .get() ?? mon
+      const ohpkm = openhomeIdBoxed
+        .flatMap((openhomeId) => saveOhpkms?.get(openhomeId))
+        .map(R.dropError) // we expect many "id lookups" to fail, because not all mons are necessarily tracked
+        .get()
+      mon = ohpkm ? R.Ok(ohpkm) : mon
 
       // when a pokemon is in the process of being registered (i.e. was just dragged from a different save into
       // this one), use the pending value to avoid visual snaps back and forth
       const pendingMon = savesManager.getPendingMon(location)
       if (pendingMon === EMPTY_SLOT) {
-        mon = undefined
+        mon = R.Ok(undefined)
       } else if (pendingMon) {
         if (typeof pendingMon === 'string') {
           openhomeId = pendingMon
-          mon = ohpkmStore.getById(openhomeId)
+          const result = ohpkmStore.getById(openhomeId)
+          mon = isThenable(result) ? result.then(R.Ok) : R.Ok(result)
         } else {
-          mon = pendingMon
+          mon = R.Ok(pendingMon)
         }
       }
 
@@ -203,11 +213,16 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
 
               const uniqueKey = isThenable(mon)
                 ? `${save.currentPCBox}-${index}-${openhomeId}`
-                : mon
-                  ? `${save.currentPCBox}-${index}-${openhomeId ?? mon.encryptionConstant ?? mon.personalityValue ?? JSON.stringify(mon.dvs)}-${mon.nickname}`
+                : R.isOk(mon) && mon.data
+                  ? `${save.currentPCBox}-${index}-${openhomeId ?? mon.data.encryptionConstant ?? mon.data.personalityValue ?? JSON.stringify(mon.data.dvs)}-${mon.data.nickname}`
                   : `${save.currentPCBox}-${index}`
 
               const slotMetadata = save.getSlotMetadata?.(save.currentPCBox, index)
+
+              const borderColor =
+                !isThenable(mon) && R.isOk(mon) && mon.data instanceof OHPKM
+                  ? 'var(--ohpkm-cell-border-color)'
+                  : undefined
 
               return (
                 <BoxCellAsync
@@ -243,7 +258,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                         ]
                       : []
                   }
-                  borderColor={mon instanceof OHPKM ? 'var(--ohpkm-cell-border-color)' : undefined}
+                  borderColor={borderColor}
                 />
               )
             })}

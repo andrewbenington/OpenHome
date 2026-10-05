@@ -159,6 +159,7 @@ export type Ok<T> = {
 }
 
 export type Result<T, E = string> = Ok<T> | Err<E>
+export type ErrorOf<R extends Result<unknown, unknown>> = R extends Err<infer E> ? E : never
 
 export function isResult<T, V>(v: object): v is Result<T, V> {
   return (
