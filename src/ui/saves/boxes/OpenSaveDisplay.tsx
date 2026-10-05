@@ -36,6 +36,13 @@ interface OpenSaveDisplayProps {
   saveIndex: number
 }
 
+type SlotMetadata = {
+  save: SAV
+  mon: NowOrLater<Option<PKMInterface>>
+  openhomeId: Option<string> | undefined
+  pendingMon: Option<string | symbol | PKMInterface>
+}
+
 const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const savesManager = useSaves()
   const { allOpenSaves, importMonsToLocation } = savesManager
@@ -119,7 +126,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
     .map((index: number) => save.getMonAt(save.currentPCBox, index))
     .every(canSwapWithDragging)
 
-  const slots = range(save.boxColumns * save.boxRows)
+  const slots: SlotMetadata[] = range(save.boxColumns * save.boxRows)
     .map((index: number) => save.getMonAt(save.currentPCBox, index))
     .map((_, index) => {
       const location: MonLocation = {
@@ -128,10 +135,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
         boxSlot: index,
         saveIdentifier: save.identifier,
       }
-      let mon: Option<OHPKM | PKMInterface> | NowOrLater<Option<OHPKM>> = save.getMonAt(
-        location.box,
-        location.boxSlot
-      )
+      let mon: NowOrLater<Option<PKMInterface>> = save.getMonAt(location.box, location.boxSlot)
       const openhomeIdBoxed = $O(save.getMonAt(location.box, location.boxSlot)).flatMap(
         ohpkmStore.getPotentialOhpkmId
       )

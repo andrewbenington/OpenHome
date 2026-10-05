@@ -1,6 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { PluginIdentifier as RustPluginIdentifier } from '@openhome-core/tauri/spectaCommands'
-import { Errorable, Option, range } from '@openhome-core/util/functional'
+import { Errorable, Option, R, range, Result } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
 import {
   BinaryGender,
@@ -17,7 +17,7 @@ import { PathData } from './util/path'
 import { TransferRestrictions } from './util/TransferRestrictions'
 
 type SparseArray<T> = (T | undefined)[]
-export class Box<P extends PKMInterface> {
+export class Box<P> {
   name: string | undefined
   boxSlots: SparseArray<P>
 
@@ -70,6 +70,7 @@ interface BaseSAV<P extends PKMInterface = PKMInterface> {
 
   getSlotMetadata?: (boxNum: number, boxSlot: number) => SlotMetadata
   getMonAt(boxNum: number, boxSlot: number): Option<P>
+  tryGetMonAt(boxNum: number, boxSlot: number): Result<Option<P>>
   setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void
   getAllMons(): Readonly<P>[]
 
@@ -96,7 +97,7 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   abstract language?: Language // TODO: add to save files
   abstract displayID: string
   abstract currentPCBox: number
-  abstract boxes: Readonly<Box<P>>[]
+  abstract boxes: Readonly<Box<Result<Option<P>>>>[]
   abstract bytes: Uint8Array<ArrayBufferLike>
   abstract invalid: boolean
   abstract tooEarlyToOpen: boolean
@@ -128,6 +129,7 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   getSlotMetadata?: (boxNum: number, boxSlot: number) => SlotMetadata = undefined
 
   abstract getMonAt(boxNum: number, boxSlot: number): Option<P>
+  abstract tryGetMonAt(boxNum: number, boxSlot: number): Result<Option<P>>
   abstract setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void
 
   getBoxCount(): number {
@@ -135,7 +137,9 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   }
 
   getAllMons(): Readonly<P>[] {
-    return this.boxes.flatMap((box) => box.boxSlots.filter(filterUndefined))
+    return this.boxes.flatMap((box) =>
+      box.boxSlots.map((result) => (result ? R.dropError(result) : result)).filter(filterUndefined)
+    )
   }
 
   get gameNameFull(): string {
@@ -263,6 +267,7 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   }
 
   abstract getMonAt(boxNum: number, boxSlot: number): Option<P>
+  abstract tryGetMonAt(boxNum: number, boxSlot: number): Result<Option<P>>
   abstract setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void
 
   getBoxCount(): number {
@@ -366,7 +371,7 @@ export abstract class WasmOfficialSave<
   WasmSave extends WasmSaveInner<WasmP>,
 > extends OfficialSAV<P> {
   inner: WasmSave
-  boxes: Array<Box<P>> = []
+  boxes: Array<Box<Result<Option<P>>>> = []
 
   constructor(inner: WasmSave) {
     super()
@@ -413,6 +418,11 @@ export abstract class WasmOfficialSave<
   getMonAt(boxNum: number, boxSlot: number): Option<P> {
     const wasmMon = this.inner.getMonAt(boxNum, boxSlot)
     return wasmMon ? this.monFromWasm(wasmMon) : undefined
+  }
+
+  tryGetMonAt(boxNum: number, boxSlot: number): Result<Option<P>> {
+    const wasmMon = this.inner.getMonAt(boxNum, boxSlot)
+    return R.Ok(wasmMon ? this.monFromWasm(wasmMon) : undefined)
   }
 
   getAllMons() {

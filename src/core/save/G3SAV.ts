@@ -1,13 +1,13 @@
 import { PK3 } from '@openhome-core/pkm'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { GEN3_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
-import { runningInTest } from '@openhome-core/util'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
 } from '@openhome-core/util/byteLogic'
+import { $O } from '@openhome-core/util/option'
 import {
   BinaryGender,
   ConvertStrategy,
@@ -18,7 +18,7 @@ import {
   OriginGame,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
-import { Errorable, Option } from '../util/functional'
+import { $R, Errorable, Option, R, range, Result } from '../util/functional'
 import { filterUndefined } from '../util/sort'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { LookupType } from './util'
@@ -31,6 +31,13 @@ export const FRLG_SECURITY_OFFSET = 0x0af8
 export const FRLG_SECURITY_COPY_OFFSET = 0x0f20
 export const GEN3_SIGNATURE_OFFSET = 0x0ff8
 export const GEN3_SIGNATURE = 0x08012025
+
+const BOX_SLOTS = 30
+const BOX_COUNT = 14
+const PK3_SIZE_BYTES = 80
+const PC_OFFSET = 4
+const BOX_NAME_OFFSET = 0x8344
+const SECTION_SIZE = 0x0ff4
 
 const MAX_ADDITIONAL_BYTES = 0x100
 
@@ -80,6 +87,7 @@ export class G3Sector {
     this.checksum = ((checksum & 0xffff) + ((checksum >> 16) & 0xffff)) & 0xffff
   }
 }
+
 export class G3SaveBackup {
   origin: OriginGame
 
@@ -90,8 +98,6 @@ export class G3SaveBackup {
   isFirstSave: boolean = false
 
   gameCode: number = 0
-  securityKey: number = 0
-  securityKeyCopy?: number
   signature: number
 
   money: number = -1
@@ -111,7 +117,7 @@ export class G3SaveBackup {
 
   currentPCBox: number
 
-  boxes = new Array<Box<PK3>>(14)
+  boxes = new Array<Box<Result<Option<PK3>>>>(14)
 
   firstSectorIndex: number = 0
 
@@ -119,7 +125,7 @@ export class G3SaveBackup {
     this.bytes = bytes
     this.saveIndex = bytesToUint32LittleEndian(bytes, 0xffc)
     this.sectors = []
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < BOX_COUNT; i++) {
       this.sectors.push(new G3Sector(bytes, i))
       this.firstSectorIndex = this.sectors[0].sectionID
     }
@@ -136,20 +142,10 @@ export class G3SaveBackup {
         break
       case 1:
         this.origin = OriginGame.FireRed
-        this.securityKey = bytesToUint32LittleEndian(this.sectors[0].data, FRLG_SECURITY_OFFSET)
-        this.securityKeyCopy = bytesToUint32LittleEndian(
-          this.sectors[0].data,
-          FRLG_SECURITY_COPY_OFFSET
-        )
         this.money = bytesToUint32LittleEndian(this.sectors[1].data, 0x290) ^ this.securityKey
         break
       default:
         this.origin = OriginGame.Emerald
-        this.securityKey = bytesToUint32LittleEndian(this.sectors[0].data, EMERALD_SECURITY_OFFSET)
-        this.securityKeyCopy = bytesToUint32LittleEndian(
-          this.sectors[0].data,
-          EMERALD_SECURITY_COPY_OFFSET
-        )
         this.money = bytesToUint32LittleEndian(this.sectors[1].data, 0x490) ^ this.securityKey
         break
     }
@@ -167,25 +163,20 @@ export class G3SaveBackup {
     })
     this.currentPCBox = this.pcDataContiguous[0]
 
-    for (let i = 0; i < 14; i++) {
-      const boxNameStart = 0x8344 + i * 9
+    for (let i = 0; i < BOX_COUNT; i++) {
+      const boxNameStart = BOX_NAME_OFFSET + i * 9
       const boxNameSlice = this.pcDataContiguous.slice(boxNameStart, boxNameStart + 10)
       const boxName = Gen3Strings.decode10Bytes(boxNameSlice, this.isJapanese ? 'Jpn' : 'Int')
       this.boxes[i] = new Box(boxName, 30)
     }
-    for (let i = 0; i < 420; i++) {
-      const box = this.boxes[Math.floor(i / 30)]
-      const slot = i % 30
-      try {
-        const buffer = this.pcDataContiguous.slice(4 + i * 80, 4 + (i + 1) * 80).buffer
-        box.boxSlots[slot] = PK3.fromSlotBytes(buffer)
-      } catch (e) {
-        if (!runningInTest()) {
-          console.error(
-            `File has invalid Pokémon data at box ${Math.floor(i / 30)}/slot ${slot}: ${e}`
-          )
-        }
-      }
+    for (let i = 0; i < BOX_COUNT * BOX_SLOTS; i++) {
+      const box = this.boxes[Math.floor(i / BOX_SLOTS)]
+      const slot = i % BOX_SLOTS
+      const buffer = this.pcDataContiguous.slice(
+        PC_OFFSET + i * PK3_SIZE_BYTES,
+        PC_OFFSET + (i + 1) * PK3_SIZE_BYTES
+      ).buffer
+      box.boxSlots[slot] = R.tryFrom(() => PK3.fromSlotBytes(buffer))
     }
 
     this.tid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0a)
@@ -199,6 +190,28 @@ export class G3SaveBackup {
     }
 
     return new G3SaveBackup(bytes)
+  }
+
+  get securityKey() {
+    switch (this.gameCode) {
+      case 0:
+        return 0
+      case 1:
+        return bytesToUint32LittleEndian(this.sectors[0].data, FRLG_SECURITY_OFFSET)
+      default:
+        return bytesToUint32LittleEndian(this.sectors[0].data, EMERALD_SECURITY_OFFSET)
+    }
+  }
+
+  get securityKeyCopy() {
+    switch (this.gameCode) {
+      case 0:
+        return undefined
+      case 1:
+        return bytesToUint32LittleEndian(this.sectors[0].data, FRLG_SECURITY_COPY_OFFSET)
+      default:
+        return bytesToUint32LittleEndian(this.sectors[0].data, EMERALD_SECURITY_COPY_OFFSET)
+    }
   }
 
   // Per PKHeX:
@@ -216,11 +229,11 @@ export class G3SAV extends OfficialSAV<PK3> {
   static transferRestrictions = GEN3_TRANSFER_RESTRICTIONS
   static lookupType: LookupType = 'gen345'
 
-  static TRAINER_OFFSET = 0x0ff4 * 0
+  static TRAINER_OFFSET = 0
 
-  static TEAM_ITEMS_OFFSET = 0x0ff4 * 1
+  static TEAM_ITEMS_OFFSET = SECTION_SIZE * 1
 
-  static PC_OFFSET = 0x0ff4 * 5
+  static PC_OFFSET = SECTION_SIZE * 5
 
   primarySave: G3SaveBackup
 
@@ -245,7 +258,7 @@ export class G3SAV extends OfficialSAV<PK3> {
   language = Language.None
 
   currentPCBox: number
-  boxes: Array<Box<PK3>>
+  boxes: Array<Box<Result<Option<PK3>>>>
 
   bytes: Uint8Array
 
@@ -284,8 +297,11 @@ export class G3SAV extends OfficialSAV<PK3> {
 
     // hacky way to detect save version
     // TODO: make more robust
-    const trainerMon = this.boxes
-      .flatMap((box) => box.boxSlots)
+    const trainerMon = range(BOX_COUNT)
+      .flatMap((box) => this.boxes.at(box)?.boxSlots)
+      .filter(filterUndefined)
+      .filter(R.isOk)
+      .map(R.assert)
       .filter(filterUndefined)
       .find(
         (mon) =>
@@ -323,25 +339,23 @@ export class G3SAV extends OfficialSAV<PK3> {
   }
 
   prepareForSaving() {
-    this.updatedBoxSlots.forEach(({ box, boxSlot: index }) => {
-      const monOffset = 30 * box + index
-      const pcBytes = new Uint8Array(80)
-      const mon = this.boxes[box].boxSlots[index]
+    this.updatedBoxSlots.forEach(({ box, boxSlot }) => {
+      const monOffset = BOX_SLOTS * box + boxSlot
+      const pcBytes = new Uint8Array(PK3_SIZE_BYTES)
 
       // mon will be undefined if pokemon was moved from this slot
       // and the slot was left empty
-
-      if (mon) {
-        try {
+      $R(this.tryGetMonAt(box, boxSlot)).match(
+        (mon) => {
           if (mon?.gameOfOrigin && mon?.nationalDex) {
             mon.refreshChecksum()
             pcBytes.set(new Uint8Array(mon.toPCBytes()), 0)
           }
-        } catch (e) {
-          console.error(`G3SAV: ${e}`)
-        }
-      }
-      this.primarySave.pcDataContiguous.set(pcBytes, 4 + monOffset * 80)
+        },
+        (error) => `G3SAV: ${error}`
+      )
+
+      this.primarySave.pcDataContiguous.set(pcBytes, PC_OFFSET + monOffset * PK3_SIZE_BYTES)
     })
     this.primarySave.sectors.slice(5).forEach((sector, i) => {
       const pcData = this.primarySave.pcDataContiguous.slice(
@@ -416,15 +430,18 @@ export class G3SAV extends OfficialSAV<PK3> {
     return this.primarySave.trainerGender
   }
 
-  getMonAt(boxNum: number, boxSlot: number) {
-    const box = this.boxes[boxNum]
-    if (!box) return undefined
-    return box.boxSlots[boxSlot]
+  getMonAt(boxIndex: number, boxSlot: number): Option<PK3> {
+    let slotResult = this.boxes.at(boxIndex)?.boxSlots.at(boxSlot)
+    return $O(slotResult).map(R.dropError).get()
   }
 
-  setMonAt(boxNum: number, boxSlot: number, mon: Option<PK3>): void {
-    const box = this.boxes[boxNum]
+  tryGetMonAt(boxIndex: number, boxSlot: number): Result<Option<PK3>> {
+    return this.boxes.at(boxIndex)?.boxSlots.at(boxSlot) ?? R.Ok(undefined)
+  }
+
+  setMonAt(boxIndex: number, boxSlot: number, mon: Option<PK3>): void {
+    const box = this.boxes[boxIndex]
     if (!box) return
-    box.boxSlots[boxSlot] = mon
+    box.boxSlots[boxSlot] = R.Ok(mon)
   }
 }

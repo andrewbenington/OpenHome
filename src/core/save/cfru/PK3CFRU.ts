@@ -170,6 +170,7 @@ export default abstract class PK3CFRU implements PluginPKMInterface {
       this.extraFormIndex = speciesData.extraFormIndex
 
       if (speciesData.nationalDex < 0) {
+        console.error(`BAD INTERNAL SPECIES INDEX: ${this.internalSpeciesIndex}`)
         this.nationalDex = 0
         this.formIndex = 0
       } else if (speciesData.nationalDex === NationalDex.Unown) {
