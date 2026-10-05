@@ -117,7 +117,7 @@ export class G3SaveBackup {
 
   currentPCBox: number
 
-  boxes = new Array<Box<Result<Option<PK3>>>>(14)
+  boxesWithResults = new Array<Box<Result<Option<PK3>>>>(14)
 
   firstSectorIndex: number = 0
 
@@ -167,10 +167,10 @@ export class G3SaveBackup {
       const boxNameStart = BOX_NAME_OFFSET + i * 9
       const boxNameSlice = this.pcDataContiguous.slice(boxNameStart, boxNameStart + 10)
       const boxName = Gen3Strings.decode10Bytes(boxNameSlice, this.isJapanese ? 'Jpn' : 'Int')
-      this.boxes[i] = new Box(boxName, 30)
+      this.boxesWithResults[i] = new Box(boxName, 30)
     }
     for (let i = 0; i < BOX_COUNT * BOX_SLOTS; i++) {
-      const box = this.boxes[Math.floor(i / BOX_SLOTS)]
+      const box = this.boxesWithResults[Math.floor(i / BOX_SLOTS)]
       const slot = i % BOX_SLOTS
       const buffer = this.pcDataContiguous.slice(
         PC_OFFSET + i * PK3_SIZE_BYTES,
@@ -221,6 +221,12 @@ export class G3SaveBackup {
   get isJapanese(): boolean {
     return this.sectors[0].data[0x6] === 0
   }
+
+  get boxes() {
+    return this.boxesWithResults.map((box) =>
+      box.map((mon) => (mon ? R.dropError(mon) : undefined))
+    )
+  }
 }
 
 export class G3SAV extends OfficialSAV<PK3> {
@@ -258,7 +264,7 @@ export class G3SAV extends OfficialSAV<PK3> {
   language = Language.None
 
   currentPCBox: number
-  boxes: Array<Box<Result<Option<PK3>>>>
+  boxesWithResults: Box<Result<Option<PK3>>>[]
 
   bytes: Uint8Array
 
@@ -293,12 +299,12 @@ export class G3SAV extends OfficialSAV<PK3> {
     this.displayID = this.primarySave.tid.toString().padStart(5, '0')
     this.sid = this.primarySave.sid
     this.currentPCBox = this.primarySave.currentPCBox
-    this.boxes = this.primarySave.boxes
+    this.boxesWithResults = this.primarySave.boxesWithResults
 
     // hacky way to detect save version
     // TODO: make more robust
     const trainerMon = range(BOX_COUNT)
-      .flatMap((box) => this.boxes.at(box)?.boxSlots)
+      .flatMap((box) => this.boxesWithResults.at(box)?.boxSlots)
       .filter(filterUndefined)
       .filter(R.isOk)
       .map(R.assert)
@@ -431,17 +437,23 @@ export class G3SAV extends OfficialSAV<PK3> {
   }
 
   getMonAt(boxIndex: number, boxSlot: number): Option<PK3> {
-    let slotResult = this.boxes.at(boxIndex)?.boxSlots.at(boxSlot)
+    let slotResult = this.boxesWithResults.at(boxIndex)?.boxSlots.at(boxSlot)
     return $O(slotResult).map(R.dropError).get()
   }
 
   tryGetMonAt(boxIndex: number, boxSlot: number): Result<Option<PK3>> {
-    return this.boxes.at(boxIndex)?.boxSlots.at(boxSlot) ?? R.Ok(undefined)
+    return this.boxesWithResults.at(boxIndex)?.boxSlots.at(boxSlot) ?? R.Ok(undefined)
   }
 
   setMonAt(boxIndex: number, boxSlot: number, mon: Option<PK3>): void {
-    const box = this.boxes[boxIndex]
+    const box = this.boxesWithResults[boxIndex]
     if (!box) return
     box.boxSlots[boxSlot] = R.Ok(mon)
+  }
+
+  get boxes() {
+    return this.boxesWithResults.map((box) =>
+      box.map((mon) => (mon ? R.dropError(mon) : undefined))
+    )
   }
 }

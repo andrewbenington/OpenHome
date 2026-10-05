@@ -5,14 +5,19 @@ import {
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
 } from '@openhome-core/util/byteLogic'
-import { Option } from '@openhome-core/util/functional'
+import { $R, Option, R, Result } from '@openhome-core/util/functional'
 import { BinaryGender, Gen3Strings, Language, OriginGame } from '@pkm-rs/pkg'
 import { Box, BoxAndSlot, PluginIdentifier, PluginSAV } from '../interfaces'
 import { LookupType } from '../util'
 import { PathData } from '../util/path'
 
 export const SAVE_SIZES_BYTES = [0x20000, 0x20010]
-const PKM_SIZE = 58
+const PK3RR_SIZE = 58
+
+const BOX_SLOTS = 30
+const BOX_COUNT = 14
+const PC_OFFSET = 4
+const SECTION_SIZE = 0x0ff4
 
 class G3CFRUSector {
   data: Uint8Array
@@ -62,7 +67,6 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
   bytes: Uint8Array
   saveIndex: number = 0
   isFirstSave: boolean = false
-  securityKey: number = 0
   money: number = -1
   name: string = ''
   tid: number = 0
@@ -71,15 +75,17 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
   sectors: G3CFRUSector[]
   pcDataContiguous: Uint8Array
   currentPCBox: number
-  boxes: Box<T>[]
+  boxesWithResults: Box<Result<Option<T>>>[]
   boxNames: string[]
   firstSectorIndex: number = 0
   boxOffsets: number[] = []
 
+  PkmClass: new (bytes: ArrayBuffer) => T
+
   constructor(bytes: Uint8Array, PkmClass: new (bytes: ArrayBuffer) => T, boxCount: number) {
+    this.PkmClass = PkmClass
     this.bytes = bytes
     this.saveIndex = bytesToUint32LittleEndian(bytes, 0xffc)
-    this.securityKey = bytesToUint32LittleEndian(bytes, 0xf20)
     this.money = bytesToUint32LittleEndian(bytes, 0x290) ^ this.securityKey
     this.sectors = []
     for (let i = 0; i < 14; i++) {
@@ -93,7 +99,7 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
     this.sid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0c)
     this.trainerGender = this.sectors[0].data[0x08] ? BinaryGender.Female : BinaryGender.Male
 
-    const nBytes: number = boxCount * PKM_SIZE * 30
+    const nBytes: number = boxCount * PK3RR_SIZE * 30
     const nMons: number = boxCount * 30
     const fullSectionsUsed: number = Math.floor(nBytes / 4080)
     const leftoverBytes: number = nBytes % 4080
@@ -112,35 +118,53 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
       this.currentPCBox = 0
     }
     this.boxNames = []
-    this.boxes = new Array<Box<T>>(boxCount)
+    this.boxesWithResults = new Array(boxCount)
     for (let i = 0; i < boxCount; i++) {
       // TODO: More research into where BOX names are located
-      this.boxes[i] = new Box('Box' + (i + 1), 30)
+      this.boxesWithResults[i] = new Box('Box' + (i + 1), BOX_SLOTS)
     }
     for (let i = 0; i < nMons; i++) {
-      try {
-        const mon = new PkmClass(
-          this.pcDataContiguous.slice(4 + i * PKM_SIZE, 4 + (i + 1) * PKM_SIZE).buffer
-        )
+      const box = this.boxesWithResults[Math.floor(i / BOX_SLOTS)]
 
-        if (mon.nationalDex !== 0 && mon.trainerID !== 0) {
-          const box = this.boxes[Math.floor(i / 30)]
-
-          box.boxSlots[i % 30] = mon
+      const result = R.tryFrom(
+        () =>
+          new PkmClass(
+            this.pcDataContiguous.slice(
+              PC_OFFSET + i * PK3RR_SIZE,
+              PC_OFFSET + (i + 1) * PK3RR_SIZE
+            ).buffer
+          )
+      )
+      box.boxSlots[i % BOX_SLOTS] = $R(result)
+        .map((mon) => {
+          if (mon.nationalDex === 0 || mon.trainerID === 0) return undefined
           if (mon.trainerID === this.tid) {
             mon.gameOfOrigin = OriginGame.FireRed
           }
-        }
-      } catch (e) {
-        // :)
-        if (!`${e}`.endsWith('index 0 not found.')) {
-          console.error(e)
-        }
-      }
+
+          return mon
+        })
+        .get()
     }
 
-    this.securityKey = bytesToUint32LittleEndian(this.sectors[0].data, 0xaf8)
     this.money = bytesToUint32LittleEndian(this.sectors[1].data, 0x290) ^ this.securityKey
+  }
+
+  getMonBytes(box: number, boxSlot: number) {
+    const offset = (BOX_SLOTS * box + boxSlot) * PK3RR_SIZE
+    return this.pcDataContiguous.slice(offset, offset + PK3RR_SIZE)
+  }
+
+  getMonAt(boxIndex: number, boxSlot: number) {
+    return new this.PkmClass(this.getMonBytes(boxIndex, boxSlot).buffer)
+  }
+
+  getBoxName(boxNum: number) {
+    return 'Box' + (boxNum + 1)
+  }
+
+  get securityKey() {
+    return bytesToUint32LittleEndian(this.bytes, 0xf20)
   }
 }
 
@@ -150,9 +174,9 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
 
   // static transferRestrictions = RR_TRANSFER_RESTRICTIONS
 
-  static TRAINER_OFFSET = 0x0ff4 * 0
-  static TEAM_ITEMS_OFFSET = 0x0ff4 * 1
-  static PC_OFFSET = 0x0ff4 * 5
+  static TRAINER_OFFSET = 0
+  static TEAM_ITEMS_OFFSET = SECTION_SIZE * 1
+  static PC_OFFSET = SECTION_SIZE * 5
 
   static lookupType: LookupType = 'gen345'
 
@@ -179,7 +203,6 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
   language = Language.None
 
   currentPCBox: number
-  boxes: Array<Box<T>>
   boxNames: string[]
 
   bytes: Uint8Array
@@ -219,7 +242,6 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
     this.sid = this.primarySave.sid
     this.trainerGender = this.primarySave.trainerGender
     this.currentPCBox = this.primarySave.currentPCBox
-    this.boxes = this.primarySave.boxes
     this.boxNames = this.primarySave.boxNames
   }
 
@@ -229,8 +251,8 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
 
   prepareForSaving() {
     this.updatedBoxSlots.forEach(({ box, boxSlot: index }) => {
-      const monOffset = 30 * box + index
-      const pcBytes = new Uint8Array(PKM_SIZE) // Per pokemon bytes
+      const monOffset = BOX_COUNT * box + index
+      const pcBytes = new Uint8Array(PK3RR_SIZE) // Per pokemon bytes
 
       // Current Mon in loop
       const mon = this.boxes[box].boxSlots[index]
@@ -250,11 +272,11 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
           console.error(e)
         }
       }
-      this.primarySave.pcDataContiguous.set(pcBytes, 4 + monOffset * PKM_SIZE)
+      this.primarySave.pcDataContiguous.set(pcBytes, 4 + monOffset * PK3RR_SIZE)
     })
 
     const boxCount = this.getBoxCount()
-    const nBytes: number = boxCount * PKM_SIZE * 30
+    const nBytes: number = boxCount * PK3RR_SIZE * 30
     const fullSectionsUsed: number = Math.floor(nBytes / 4080)
 
     // Slice pcData into Section Datas.
@@ -290,16 +312,24 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
   static saveTypeID = 'G3RRSAV'
 
   getMonAt(boxNum: number, boxSlot: number) {
-    const box = this.boxes[boxNum]
-    if (!box) return undefined
-    return box.boxSlots[boxSlot]
+    return this.boxes.at(boxNum)?.boxSlots.at(boxSlot)
+  }
+
+  tryGetMonAt(boxNum: number, boxSlot: number) {
+    return this.primarySave.boxesWithResults.at(boxNum)?.boxSlots.at(boxSlot) ?? R.Ok(undefined)
   }
 
   setMonAt(boxNum: number, boxSlot: number, mon: Option<T>): void {
-    const box = this.boxes[boxNum]
+    const box = this.primarySave.boxesWithResults[boxNum]
     if (!box) return
-    box.boxSlots[boxSlot] = mon
+    box.boxSlots[boxSlot] = R.Ok(mon)
     this.updatedBoxSlots.push({ box: boxNum, boxSlot: boxSlot })
+  }
+
+  get boxes() {
+    return this.primarySave.boxesWithResults.map((box) =>
+      box.map((mon) => (mon ? $R(mon).peekErr(console.error).dropError() : undefined))
+    )
   }
 }
 

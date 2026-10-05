@@ -25,6 +25,12 @@ export class Box<P> {
     this.name = name
     this.boxSlots = new Array(boxSize)
   }
+
+  map<U>(f: (slotData: Option<P>) => U): Box<U> {
+    const box = new Box<U>(this.name ?? '', this.boxSlots.length)
+    box.boxSlots = this.boxSlots.map(f)
+    return box
+  }
 }
 
 export interface BoxAndSlot {
@@ -97,7 +103,7 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   abstract language?: Language // TODO: add to save files
   abstract displayID: string
   abstract currentPCBox: number
-  abstract boxes: Readonly<Box<Result<Option<P>>>>[]
+  abstract boxes: Readonly<Box<P>>[]
   abstract bytes: Uint8Array<ArrayBufferLike>
   abstract invalid: boolean
   abstract tooEarlyToOpen: boolean
@@ -129,7 +135,10 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   getSlotMetadata?: (boxNum: number, boxSlot: number) => SlotMetadata = undefined
 
   abstract getMonAt(boxNum: number, boxSlot: number): Option<P>
-  abstract tryGetMonAt(boxNum: number, boxSlot: number): Result<Option<P>>
+  tryGetMonAt(boxNum: number, boxSlot: number): Result<Option<P>> {
+    return R.Ok(this.getMonAt(boxNum, boxSlot))
+  }
+
   abstract setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void
 
   getBoxCount(): number {
@@ -137,9 +146,7 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   }
 
   getAllMons(): Readonly<P>[] {
-    return this.boxes.flatMap((box) =>
-      box.boxSlots.map((result) => (result ? R.dropError(result) : result)).filter(filterUndefined)
-    )
+    return this.boxes.flatMap((box) => box.boxSlots.filter(filterUndefined))
   }
 
   get gameNameFull(): string {
@@ -267,7 +274,10 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   }
 
   abstract getMonAt(boxNum: number, boxSlot: number): Option<P>
-  abstract tryGetMonAt(boxNum: number, boxSlot: number): Result<Option<P>>
+  tryGetMonAt(boxNum: number, boxSlot: number): Result<Option<P>> {
+    return R.Ok(this.getMonAt(boxNum, boxSlot))
+  }
+
   abstract setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void
 
   getBoxCount(): number {
@@ -371,7 +381,7 @@ export abstract class WasmOfficialSave<
   WasmSave extends WasmSaveInner<WasmP>,
 > extends OfficialSAV<P> {
   inner: WasmSave
-  boxes: Array<Box<Result<Option<P>>>> = []
+  boxes: Array<Box<P>> = []
 
   constructor(inner: WasmSave) {
     super()

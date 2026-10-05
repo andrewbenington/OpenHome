@@ -323,7 +323,10 @@ export class ResultBox<T, E> {
   }
 
   peekErr(onErr: (error: E) => void) {
-    return peekErr(onErr)(this.r)
+    if (isErr(this.r)) {
+      onErr(this.r.error)
+    }
+    return this
   }
 
   orElse(ifErr: T) {
