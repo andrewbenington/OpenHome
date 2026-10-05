@@ -8,6 +8,8 @@ import {
   PkmFormat,
 } from '@pkm-rs/pkg'
 
+const FARAWAY_PLACE_STRING = 'in a faraway place' // todo: i18n
+
 export function getLocationStringOrOrigin(
   game: OriginGame,
   index: number,
@@ -22,25 +24,25 @@ export function getLocationStringOrOrigin(
   } else if (format === 'PB7' && !OriginGames.isLetsGo(game)) {
     return game <= OriginGame.UltraMoon
       ? `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
-      : 'in a faraway place' // todo: i18n
+      : FARAWAY_PLACE_STRING
   } else if (format === 'PK8' && !OriginGames.isSwSh(game)) {
     return game <= OriginGame.LetsGoEevee
       ? `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
-      : 'in the Faraway place' // todo: i18n
+      : FARAWAY_PLACE_STRING
   } else if (format === 'PB8' && !OriginGames.isBdsp(game)) {
     if (game === OriginGame.LegendsArceus) {
       return 'in the Sinnoh region of old' // todo: i18n
     }
     return game <= OriginGame.Shield
       ? `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
-      : 'in a faraway place' // todo: i18n
+      : FARAWAY_PLACE_STRING
   } else if (format === 'PA8' && game !== OriginGame.LegendsArceus) {
     if (OriginGames.isBdsp(game)) {
       return 'in the Sinnoh region made new' // todo: i18n
     }
     return game <= OriginGame.ShiningPearl
       ? `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
-      : 'in a faraway place' // todo: i18n
+      : FARAWAY_PLACE_STRING
   }
   return `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
 }
