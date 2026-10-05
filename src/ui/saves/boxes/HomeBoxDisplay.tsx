@@ -2,8 +2,8 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { SortTypes } from '@openhome-core/pkm/sort'
 import { mapToObject } from '@openhome-core/util'
-import { $R, isResult, Option, R, range } from '@openhome-core/util/functional'
-import { isThenable, NowOrLater } from '@openhome-core/util/promise'
+import { $R, Option, R, range } from '@openhome-core/util/functional'
+import { isThenable } from '@openhome-core/util/promise'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import { Item, Separator, Submenu } from '@openhome-ui/components/context-menu/types'
 import { DebugDataDisplay } from '@openhome-ui/components/DebugDataDisplay'
@@ -22,13 +22,12 @@ import SearchFields from '@openhome-ui/components/search/SearchFields'
 import PokemonSearchModal from '@openhome-ui/components/search/SearchModal'
 import ToggleButton from '@openhome-ui/components/ToggleButton'
 import useDisplayError from '@openhome-ui/hooks/displayError'
-import MissingOhpkmIdPrompt from '@openhome-ui/pokemon/MissingOhpkmId'
 import PokemonDetailsModal from '@openhome-ui/pokemon/PokemonDetailsModal'
 import {
   useDragSourceSupportsMon,
   useIsDraggingActive,
 } from '@openhome-ui/state-zustand/drag-and-drop/dragStore'
-import { OhpkmLookupResult, useOhpkmStore } from '@openhome-ui/state/ohpkm'
+import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import useTrackedDataRecovery from '@openhome-ui/state/ohpkm/useTrackedDataRecovery'
 import { EMPTY_SLOT, HomeMonLocation, useSaves } from '@openhome-ui/state/saves'
 import { cssClass } from '@openhome-ui/util/style'
@@ -47,7 +46,7 @@ import useMultiSelect from '../../state/drag-and-drop/useMultiSelect'
 import { useOpenHomeBoxNavigator } from '../util'
 import AllHomeBoxes from './AllHomeBoxes'
 import ArrowButton from './ArrowButton'
-import BoxCellAsync from './BoxCellAsync'
+import BoxCellAsync, { BoxSlotContents } from './BoxCellAsync'
 import DroppableSpace from './DroppableSpace'
 import './style.css'
 
@@ -249,7 +248,7 @@ export default function HomeBoxDisplay() {
 }
 
 type SlotData = {
-  monPromise: NowOrLater<OhpkmLookupResult> | PKMInterface | undefined
+  monPromise: BoxSlotContents
   location: HomeMonLocation
   identifier: Option<OhpkmIdentifier>
 }
@@ -322,7 +321,7 @@ function SingleBoxMonDisplay() {
           }
 
           let identifier = storedId
-          let monPromise: NowOrLater<OhpkmLookupResult> | PKMInterface | undefined = undefined
+          let monPromise: BoxSlotContents = R.Ok(undefined) as BoxSlotContents
 
           // pendingMon means this slot is in the process of being updated, but needs to wait
           // for the OHPKM data to be registered. In the meantime the pendingMon should be displayed
@@ -335,16 +334,17 @@ function SingleBoxMonDisplay() {
               identifier = pendingMon
             } else {
               identifier = undefined
-              monPromise = pendingMon
+              monPromise = R.Ok(pendingMon) as BoxSlotContents
             }
           }
 
           if (identifier) {
-            // const lookupResult = lookupOhpkmById(identifier)
-            // if (isThenable(lookupResult)) {
-            //   monPromise = lookupResult
-            // }
-            monPromise ??= lookupOhpkmById(identifier)
+            const lookupResult = lookupOhpkmById(identifier)
+            if (isThenable(lookupResult)) {
+              monPromise = lookupResult
+            } else if (lookupResult) {
+              monPromise = lookupOhpkmById(identifier)
+            }
           }
 
           return { monPromise, location, identifier }
@@ -362,21 +362,21 @@ function SingleBoxMonDisplay() {
 
             let monNowOrLater: Option<PKMInterface> = undefined
 
-            if (monPromise && !isThenable(monPromise) && isResult(monPromise)) {
-              if (R.isOk(monPromise)) {
-                monNowOrLater = monPromise.data
-              } else {
-                const { identifier } = monPromise.error
-                console.error(identifier)
-                return (
-                  <MissingOhpkmIdPrompt
-                    key={uniqueKey}
-                    openhomeId={identifier}
-                    location={location}
-                  />
-                )
-              }
-            }
+            // if (monPromise && !isThenable(monPromise) && isResult(monPromise)) {
+            //   if (R.isOk(monPromise)) {
+            //     monNowOrLater = monPromise.data
+            //   } else {
+            //     const { identifier } = monPromise.error
+            //     console.error(identifier)
+            //     return (
+            //       <MissingOhpkmIdPrompt
+            //         key={uniqueKey}
+            //         openhomeId={identifier}
+            //         location={location}
+            //       />
+            //     )
+            //   }
+            // }
 
             return (
               <BoxCellAsync

@@ -1,6 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { PluginIdentifier as RustPluginIdentifier } from '@openhome-core/tauri/spectaCommands'
-import { Errorable, Option, range } from '@openhome-core/util/functional'
+import { Errorable, Option, R, range, Result } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
 import {
   BinaryGender,
@@ -17,13 +17,19 @@ import { PathData } from './util/path'
 import { TransferRestrictions } from './util/TransferRestrictions'
 
 type SparseArray<T> = (T | undefined)[]
-export class Box<P extends PKMInterface> {
+export class Box<P> {
   name: string | undefined
   boxSlots: SparseArray<P>
 
   constructor(name: string, boxSize: number) {
     this.name = name
     this.boxSlots = new Array(boxSize)
+  }
+
+  map<U>(f: (slotData: Option<P>) => U): Box<U> {
+    const box = new Box<U>(this.name ?? '', this.boxSlots.length)
+    box.boxSlots = this.boxSlots.map(f)
+    return box
   }
 }
 
@@ -70,6 +76,7 @@ interface BaseSAV<P extends PKMInterface = PKMInterface> {
 
   getSlotMetadata?: (boxNum: number, boxSlot: number) => SlotMetadata
   getMonAt(boxNum: number, boxSlot: number): Option<P>
+  tryGetMonAt(boxNum: number, boxSlot: number): Result<Option<P>>
   setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void
   getAllMons(): Readonly<P>[]
 
@@ -128,6 +135,10 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   getSlotMetadata?: (boxNum: number, boxSlot: number) => SlotMetadata = undefined
 
   abstract getMonAt(boxNum: number, boxSlot: number): Option<P>
+  tryGetMonAt(boxNum: number, boxSlot: number): Result<Option<P>> {
+    return R.Ok(this.getMonAt(boxNum, boxSlot))
+  }
+
   abstract setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void
 
   getBoxCount(): number {
@@ -263,6 +274,10 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   }
 
   abstract getMonAt(boxNum: number, boxSlot: number): Option<P>
+  tryGetMonAt(boxNum: number, boxSlot: number): Result<Option<P>> {
+    return R.Ok(this.getMonAt(boxNum, boxSlot))
+  }
+
   abstract setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void
 
   getBoxCount(): number {
@@ -413,6 +428,11 @@ export abstract class WasmOfficialSave<
   getMonAt(boxNum: number, boxSlot: number): Option<P> {
     const wasmMon = this.inner.getMonAt(boxNum, boxSlot)
     return wasmMon ? this.monFromWasm(wasmMon) : undefined
+  }
+
+  tryGetMonAt(boxNum: number, boxSlot: number): Result<Option<P>> {
+    const wasmMon = this.inner.getMonAt(boxNum, boxSlot)
+    return R.Ok(wasmMon ? this.monFromWasm(wasmMon) : undefined)
   }
 
   getAllMons() {
