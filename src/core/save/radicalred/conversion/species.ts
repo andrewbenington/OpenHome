@@ -7,7 +7,7 @@ import {
   toGen3CRFUPokemonIndex,
 } from '../../cfru/conversion/util'
 
-const RadicalRedToNationalDexMap: Record<string, CfruSpeciesAndForm | null> = {
+export const RadicalRedToNationalDexMap: Record<string, CfruSpeciesAndForm | null> = {
   '0': {
     nationalDex: 0,
     formIndex: 0,
@@ -5563,8 +5563,8 @@ const RadicalRedToNationalDexMap: Record<string, CfruSpeciesAndForm | null> = {
   },
 }
 
-const NationalDexToRadicalRedMap = makeNationalDexToGameMap(RadicalRedToNationalDexMap)
-const ExtraFormToRadicalRedMap = makeExtraFormToGameMap(RadicalRedToNationalDexMap)
+export const NationalDexToRadicalRedMap = makeNationalDexToGameMap(RadicalRedToNationalDexMap)
+export const ExtraFormToRadicalRedMap = makeExtraFormToGameMap(RadicalRedToNationalDexMap)
 
 export function toRadicalRedPokemonIndex(
   nationalDexNumber: number,
@@ -5580,6 +5580,6 @@ export function radicalRedIndexLookup(radicalRedIndex: number) {
   return fromGen3CRFUPokemonIndex(
     radicalRedIndex,
     RadicalRedToNationalDexMap,
-    'Pokemon Radical Red'
+    'Pokémon Radical Red'
   )
 }

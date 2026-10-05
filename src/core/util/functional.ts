@@ -159,6 +159,7 @@ export type Ok<T> = {
 }
 
 export type Result<T, E = string> = Ok<T> | Err<E>
+export type ErrorOf<R extends Result<unknown, unknown>> = R extends Err<infer E> ? E : never
 
 export function isResult<T, V>(v: object): v is Result<T, V> {
   return (
@@ -323,7 +324,10 @@ export class ResultBox<T, E> {
   }
 
   peekErr(onErr: (error: E) => void) {
-    return peekErr(onErr)(this.r)
+    if (isErr(this.r)) {
+      onErr(this.r.error)
+    }
+    return this
   }
 
   orElse(ifErr: T) {

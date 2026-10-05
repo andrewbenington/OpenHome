@@ -57,18 +57,16 @@ export function fromGen3CRFUPokemonIndex(
 }
 
 export function toGen3CRFUPokemonIndex(
-  nationalDexNumber: number,
+  nationalDex: number,
   formIndex: number,
   NationalDexToGameMap: Record<string, string>
 ): number {
-  const key = `${nationalDexNumber}_${formIndex}`
-  const gameIndex = globalThis.Number(NationalDexToGameMap[key])
+  const key = `${nationalDex}_${formIndex}`
+  const gameIndex = parseInt(NationalDexToGameMap[key])
 
   if (gameIndex !== undefined) {
     return gameIndex
   } else {
-    throw new Error(
-      `National Dex number ${nationalDexNumber} with form index ${formIndex} not found.`
-    )
+    throw new Error(`National Dex number ${nationalDex} with form index ${formIndex} not found.`)
   }
 }

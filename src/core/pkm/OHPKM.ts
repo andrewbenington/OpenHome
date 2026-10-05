@@ -17,7 +17,6 @@ import {
   getFlag,
   getHeightCalculated,
   getWeightCalculated,
-  runningInTest,
   setFlag,
 } from '@openhome-core/util'
 import { intersection, Option, unique } from '@openhome-core/util/functional'
@@ -644,12 +643,12 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     this.tradeToSaveWasm(save.origin)
 
     const isOriginalSave = this.isFrom(save)
-    if (!runningInTest()) {
-      console.debug(
-        { isOriginalSave, ohpkm_id: this.openhomeId, event: 'trade_to_save' },
-        'Traded Pokémon to save file'
-      )
-    }
+    // if (!runningInTest()) {
+    //   console.debug(
+    //     { isOriginalSave, ohpkm_id: this.openhomeId, event: 'trade_to_save' },
+    //     'Traded Pokémon to save file'
+    //   )
+    // }
 
     this.isCurrentHandler = !isOriginalSave
     if (isOriginalSave) {

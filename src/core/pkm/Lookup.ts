@@ -107,6 +107,7 @@ export const getMonGen345Identifier = (
     } else if (mon.personalityValue !== undefined) {
       pk3CompatiblePID = mon.personalityValue
     } else {
+      console.error(mon)
       return undefined
     }
 
@@ -122,6 +123,7 @@ export const getMonGen345Identifier = (
   } catch (error) {
     console.error(`getMonGen345Identifier: ${error}`)
   }
+  console.error('uhhh', mon)
   return undefined
 }
 
