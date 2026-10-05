@@ -183,12 +183,12 @@ impl PkmFormat {
             Self::PK7 => origin <= OriginGame::Crystal,
             Self::PB7 => origin.is_lets_go() || origin == OriginGame::Go,
             Self::PK8 => origin <= OriginGame::Shield,
-            Self::PA8 | Self::PB8 => origin <= OriginGame::LegendsArceus,
+            Self::PA8 | Self::PB8 => origin <= OriginGame::ShiningPearl,
             Self::PK9 => origin <= OriginGame::Violet,
             Self::PA9 => origin <= OriginGame::LegendsZa,
             Self::PK3RR => origin.generation() == Generation::G3,
             Self::PK3UB => origin.generation() == Generation::G3,
-            Self::PB8LUMI => origin <= OriginGame::LegendsArceus,
+            Self::PB8LUMI => origin <= OriginGame::ShiningPearl,
             Self::PK9Compass => origin <= OriginGame::Violet,
         }
     }
