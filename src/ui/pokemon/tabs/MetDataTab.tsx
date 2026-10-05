@@ -30,8 +30,11 @@ const MetDataTab = (props: { mon: PKMInterface }) => {
   }, [mon])
 
   const metMessage = useMemo(() => {
-    if (!mon.metLocationIndex) {
-      return 'Met location unknown.'
+    if (
+      !mon.metLocationIndex ||
+      (OriginGames.isBdsp(mon.gameOfOrigin) && mon.metLocationIndex === 65535) // BDSP Egg
+    ) {
+      return 'Met location unknown.' // todo: i18n
     }
 
     let message = 'Met'
