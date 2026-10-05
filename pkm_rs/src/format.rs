@@ -325,9 +325,7 @@ impl PkmFormat {
         }
 
         if self == Self::PK8 {
-            return if self.matches_origin(original_origin) {
-                met_location_index
-            } else {
+            return if original_origin >= OriginGame::LegendsArceus {
                 match original_origin {
                     OriginGame::Violet => 59996,
                     OriginGame::Scarlet => 59997,
@@ -336,6 +334,8 @@ impl PkmFormat {
                     OriginGame::LegendsArceus => 60000,
                     _ => super::location::FARAWAY_PLACE_SWSH,
                 }
+            } else {
+                met_location_index
             };
         }
 
