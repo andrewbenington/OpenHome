@@ -11,9 +11,9 @@ import { CSSProperties, Suspense, use } from 'react'
 import '../style.css'
 import BoxCell from './BoxCell'
 
-type BoxSlotResult = Result<Option<PKMInterface>> | OhpkmLookupResult
+export type BoxSlotResult = Result<Option<PKMInterface>> | OhpkmLookupResult
 export type BoxSlotContents = NowOrLater<Option<BoxSlotResult>>
-type BoxSlotError = ErrorOf<BoxSlotResult>
+export type BoxSlotError = ErrorOf<BoxSlotResult>
 
 interface BoxCellAsyncProps {
   title?: string

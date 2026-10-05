@@ -8,6 +8,7 @@ import { $O } from '@openhome-core/util/option'
 import { isThenable, NowOrLater } from '@openhome-core/util/promise'
 import { filterUndefined } from '@openhome-core/util/sort'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
+import AttributeRowExpand from '@openhome-ui/components/AttributeRowExpand'
 import { Item, OpenHomeCtxMenu, Submenu } from '@openhome-ui/components/context-menu'
 import PromptDialog from '@openhome-ui/components/dialog/PromptDialog'
 import Fallback from '@openhome-ui/components/Fallback'
@@ -297,6 +298,13 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                 {value}
               </AttributeRow>
             ))}
+            <AttributeRowExpand summary="Updated Box Slots" value={save.updatedBoxSlots.length}>
+              {save.updatedBoxSlots.map(({ box, boxSlot }, i) => (
+                <AttributeRow label={String(i + 1)} key={`${box}-${boxSlot}`}>
+                  Box {box}, Slot {boxSlot}
+                </AttributeRow>
+              ))}
+            </AttributeRowExpand>
           </Dialog.Content>
         </Dialog.Root>
       </Flex>

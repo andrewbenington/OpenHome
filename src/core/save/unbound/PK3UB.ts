@@ -6,8 +6,7 @@ import { fromGen3CFRUMoveIndex, toGen3CFRUMoveIndex } from '../cfru/conversion/G
 import { CFRUToNationalMap } from '../cfru/conversion/Gen3CFRUMovesIndex/CFRUToNationalMap'
 import { CfruSpeciesAndForm } from '../cfru/conversion/util'
 import { PluginIdentifier } from '../interfaces'
-import { toGen3UBPokemonIndex } from './conversion/Gen3UBPokemonIndex'
-import { UnboundToNationalDexMap } from './conversion/UnboundSpeciesMap'
+import { toUnboundPokemonIndex, unboundIndexLookup } from './conversion/UnboundSpeciesMap'
 
 // const FAKEMON_INDEXES = [
 //   1186, 1200, 1274, 1275, 1276, 1277, 1278, 1279, 1282, 1283, 1284, 1285, 1286, 1287, 1288, 1289,
@@ -56,7 +55,7 @@ export default class PK3UB extends PK3CFRU implements PluginPKMInterface {
   }
 
   monFromGameIndex(gameIndex: number): CfruSpeciesAndForm {
-    const data = UnboundToNationalDexMap[String(gameIndex)]
+    const data = unboundIndexLookup(gameIndex)
     if (!data) {
       throw new Error(`Unbound index ${gameIndex} not found.`)
     }
@@ -68,7 +67,7 @@ export default class PK3UB extends PK3CFRU implements PluginPKMInterface {
     formIndex: number,
     extraFormIndex: Option<ExtraFormIndex>
   ): number {
-    return toGen3UBPokemonIndex(nationalDexNumber, formIndex, extraFormIndex)
+    return toUnboundPokemonIndex(nationalDexNumber, formIndex, extraFormIndex) ?? -1
   }
 
   indexIsFakemon(speciesIndex: number): boolean {

@@ -6,12 +6,17 @@ import {
   PkmOrOhpkmFormat,
 } from '@openhome-core/pkm/util'
 import { hasGenderDifferenceFrontVisible } from '@openhome-core/pkm/util/index'
-import { BLOOD_MOON, SWEETS } from '@openhome-core/resources/consts/Forms'
+import {
+  BLOOD_MOON,
+  SWEETS,
+  UNOWN_EXCLAMATION,
+  UNOWN_QUESTION,
+} from '@openhome-core/resources/consts/Forms'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { getLumiFormIndexByExtraFormIndex } from '@openhome-core/save/luminescentplatinum/conversion/LuminescentPlatinumFormMap'
 import { RRSprites } from '@openhome-core/save/radicalred/conversion/RadicalRedSprites'
 import { toRadicalRedPokemonIndex } from '@openhome-core/save/radicalred/conversion/species'
-import { toGen3UBPokemonIndex } from '@openhome-core/save/unbound/conversion/Gen3UBPokemonIndex'
+import { toUnboundPokemonIndex } from '@openhome-core/save/unbound/conversion/UnboundSpeciesMap'
 import { UBSprites } from '@openhome-core/save/unbound/conversion/UnboundSprites'
 import { MonSpriteData } from '@openhome-ui/state/plugin/reducer'
 import {
@@ -171,6 +176,8 @@ export function getSpriteName(mon: MonSpriteData, format?: string): string {
   return spriteName
 }
 
+const A_ASCII_LOWER = 97
+
 function getRomHackSpritePath(mon: MonSpriteData) {
   const spriteName = getSpriteName(mon, mon.format)
   const monFormat = mon.format
@@ -202,8 +209,9 @@ function getRomHackSpritePath(mon: MonSpriteData) {
     if (mon.nationalDex === NationalDex.Ursaluna && mon.formIndex === BLOOD_MOON) {
       return 'sprites/home/ursaluna-bloodmoon.png'
     }
-    let gen3UBname =
-      UBSprites[toGen3UBPokemonIndex(mon.nationalDex, mon.formIndex, mon.extraFormIndex)]
+
+    const unboundIndex = toUnboundPokemonIndex(mon.nationalDex, mon.formIndex, mon.extraFormIndex)
+    let gen3UBname = unboundIndex !== undefined ? UBSprites[unboundIndex] : undefined
 
     if (!gen3UBname) {
       console.error(`missing Unbound sprite for ${spriteName}`)
@@ -212,6 +220,16 @@ function getRomHackSpritePath(mon: MonSpriteData) {
 
     if (gen3UBname.length === 0) return gen3UBname
     gen3UBname = gen3UBname[0].toUpperCase() + gen3UBname.slice(1).toLowerCase()
+
+    if (mon.nationalDex === NationalDex.Unown) {
+      const letter =
+        mon.formIndex === UNOWN_EXCLAMATION
+          ? 'exclamation'
+          : mon.formIndex === UNOWN_QUESTION
+            ? 'question'
+            : String.fromCharCode(A_ASCII_LOWER + mon.formIndex)
+      gen3UBname = `Unown${letter}.png`
+    }
     return `sprites/${spriteFolder}/${gen3UBname}`
   } else if (monFormat === 'PB8LUMI') {
     if (!mon.extraFormIndex) {

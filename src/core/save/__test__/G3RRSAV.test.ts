@@ -140,18 +140,20 @@ describe('G3RRSAV - Radical Red Save File Write Test', () => {
   })
 
   test('should modify a Pokémon and save changes to a new file', () => {
+    const BOX = 3
+    const SLOT = 4
     // Modify the nickname, held item, or other properties of the first Pokémon in the first box
     const modifiedSave = new G3RRSAV(savePathData, saveBytes)
-    const firstMon = modifiedSave.getMonAt(0, 0)
+    const mon = modifiedSave.getMonAt(BOX, SLOT)
 
-    expect(firstMon).toBeDefined()
-    assert(firstMon !== undefined)
+    expect(mon).toBeDefined()
+    assert(mon !== undefined)
 
-    firstMon.nickname = 'ModTest'
-    modifiedSave.setMonAt(0, 0, firstMon)
+    mon.nickname = 'ModTest'
+    modifiedSave.setMonAt(BOX, SLOT, mon)
     modifiedSave.prepareForSaving()
 
     const rebuiltSave = new G3RRSAV(savePathData, modifiedSave.prepareWriter().bytes)
-    expect(rebuiltSave.getMonAt(0, 0)?.nickname).toBe('ModTest')
+    expect(rebuiltSave.getMonAt(BOX, SLOT)?.nickname).toBe('ModTest')
   })
 })

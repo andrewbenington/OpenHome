@@ -15,9 +15,9 @@ export const SAVE_SIZES_BYTES = [0x20000, 0x20010]
 const PK3RR_SIZE = 58
 
 const BOX_SLOTS = 30
-const BOX_COUNT = 14
+const INITIAL_BOX_COUNT = 14
 const PC_OFFSET = 4
-const SECTION_SIZE = 0x0ff4
+const SECTION_SIZE = 0x0ff0
 
 class G3CFRUSector {
   data: Uint8Array
@@ -251,7 +251,7 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
 
   prepareForSaving() {
     this.updatedBoxSlots.forEach(({ box, boxSlot: index }) => {
-      const monOffset = BOX_COUNT * box + index
+      const monOffset = BOX_SLOTS * box + index
       const pcBytes = new Uint8Array(PK3RR_SIZE) // Per pokemon bytes
 
       // Current Mon in loop
@@ -272,11 +272,11 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
           console.error(e)
         }
       }
-      this.primarySave.pcDataContiguous.set(pcBytes, 4 + monOffset * PK3RR_SIZE)
+      this.primarySave.pcDataContiguous.set(pcBytes, PC_OFFSET + monOffset * PK3RR_SIZE)
     })
 
     const boxCount = this.getBoxCount()
-    const nBytes: number = boxCount * PK3RR_SIZE * 30
+    const nBytes: number = boxCount * PK3RR_SIZE * BOX_SLOTS
     const fullSectionsUsed: number = Math.floor(nBytes / 4080)
 
     // Slice pcData into Section Datas.
@@ -287,9 +287,9 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
     this.primarySave.sectors.slice(5, 5 + fullSectionsUsed + 1).forEach((sector, i) => {
       const pcData = this.primarySave.pcDataContiguous.slice(
         // 4080 times sector offset
-        i * 0xff0,
+        i * SECTION_SIZE,
         // 4080 ahead of that, or 0x450 ahead of that if box 13 zero indexed
-        i * 0xff0 + (i + 5 === 13 ? 3964 : 0xff0)
+        i * SECTION_SIZE + (i + 5 === 13 ? 3964 : 0xff0)
       )
 
       sector.data.set(pcData)
@@ -337,7 +337,7 @@ export const findFirstSectionOffset = (bytes: Uint8Array): number => {
   const SECTION_SIZE = 0x1000
   const SAVE_INDEX_OFFSET = 0xff4
 
-  for (let i = 0; i < 14; i++) {
+  for (let i = 0; i < INITIAL_BOX_COUNT; i++) {
     const sectionStart = i * SECTION_SIZE
     const saveIndex = bytesToUint16LittleEndian(bytes, sectionStart + SAVE_INDEX_OFFSET)
 
