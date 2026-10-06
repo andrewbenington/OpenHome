@@ -353,7 +353,7 @@ impl FormMetadata {
     }
 
     pub const fn is_totem_form(&self) -> bool {
-        crate::variants::is_totem_form(self.forme_ref())
+        crate::variants::is_acquirable_totem_form(self.forme_ref())
     }
 
     #[cfg(feature = "wasm")]

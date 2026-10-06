@@ -94,7 +94,7 @@ pub fn has_gigantamax_form_wasm(national_dex: NationalDex, form_index: u16) -> b
     SpeciesForm::new_valid_ndex(national_dex, form_index).is_ok_and(has_gigantamax_form)
 }
 
-pub const fn is_totem_form(species_form: SpeciesForm) -> bool {
+pub const fn is_acquirable_totem_form(species_form: SpeciesForm) -> bool {
     let (national_dex, form_index) = species_form.split();
     match national_dex {
         NationalDex::Gumshoos
@@ -109,6 +109,12 @@ pub const fn is_totem_form(species_form: SpeciesForm) -> bool {
         NationalDex::Raticate | NationalDex::Marowak => form_index == 2,
         _ => false,
     }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "isAcquirableTotemForm"))]
+#[allow(clippy::missing_const_for_fn)]
+pub fn is_acquirable_totem_form_wasm(national_dex: NationalDex, form_index: u16) -> bool {
+    SpeciesForm::new_valid_ndex(national_dex, form_index).is_ok_and(is_acquirable_totem_form)
 }
 
 pub const fn totem_form_acquirable(species_form: SpeciesForm) -> bool {
@@ -131,6 +137,33 @@ pub const fn totem_form_acquirable(species_form: SpeciesForm) -> bool {
 #[allow(clippy::missing_const_for_fn)]
 pub fn totem_form_acquirable_wasm(national_dex: NationalDex, form_index: u16) -> bool {
     SpeciesForm::new_valid_ndex(national_dex, form_index).is_ok_and(totem_form_acquirable)
+}
+
+const RATICATE_ALOLA: SpeciesForm =
+    unsafe { SpeciesForm::unchecked_form(NationalDex::Raticate, 1) };
+const MAROWAK_ALOLA: SpeciesForm = unsafe { SpeciesForm::unchecked_form(NationalDex::Marowak, 1) };
+
+pub const fn acquirable_totem_base_form(national_dex: NationalDex) -> Option<SpeciesForm> {
+    match national_dex {
+        NationalDex::Gumshoos
+        | NationalDex::Araquanid
+        | NationalDex::Lurantis
+        | NationalDex::Salazzle
+        | NationalDex::Vikavolt
+        | NationalDex::Togedemaru
+        | NationalDex::Mimikyu
+        | NationalDex::Ribombee
+        | NationalDex::Kommoo => Some(SpeciesForm::base_form(national_dex)),
+        NationalDex::Marowak => Some(MAROWAK_ALOLA),
+        NationalDex::Raticate => Some(RATICATE_ALOLA),
+        _ => None,
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "acquirableTotemBaseForm"))]
+#[allow(clippy::missing_const_for_fn)]
+pub fn acquirable_totem_base_form_wasm(national_dex: NationalDex) -> Option<SpeciesForm> {
+    acquirable_totem_base_form(national_dex)
 }
 
 pub const fn species_has_titan(species_form: SpeciesForm) -> bool {

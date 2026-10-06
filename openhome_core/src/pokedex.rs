@@ -8,6 +8,8 @@ use std::{collections::HashMap, ops::Deref, sync::Mutex};
 use pkm_rs::PluginIdentifier;
 use pkm_rs::ohpkm::OhpkmV2;
 use pkm_rs::traits::HasSpeciesAndForm;
+use pkm_rs_resources::species::SpeciesForm;
+use pkm_rs_resources::variants::{acquirable_totem_base_form, is_acquirable_totem_form};
 use pkm_rs_types::{OriginGame, ShinyLeaves};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use strum::IntoEnumIterator;
@@ -185,17 +187,21 @@ impl Pokedex {
     }
 
     pub fn update(&mut self, national_dex: DexNumber, form_index: FormNumber, data: FormEntry) {
-        self.by_dex_number
-            .entry(national_dex)
-            .or_default()
-            .form_mut(form_index)
-            .update(data);
-        dbg!(
-            self.by_dex_number
-                .entry(national_dex)
-                .or_default()
-                .form_mut(form_index)
-        );
+        let species_entry = self.by_dex_number.entry(national_dex).or_default();
+
+        species_entry.form_mut(form_index).update(data);
+
+        // Totem forms have separate indexes, so the totem flag needs to be set for the form the
+        // totem is based on.
+        if let Ok(species_form) = SpeciesForm::new(national_dex, form_index)
+            && is_acquirable_totem_form(species_form)
+            && let Some(base_form) = acquirable_totem_base_form(species_form.get_ndex())
+        {
+            species_entry
+                .form_mut(base_form.get_forme_index())
+                .flags
+                .insert(PokedexFlag::Totem);
+        }
     }
 
     pub fn update_from_ohpkm(&mut self, ohpkm: &OhpkmV2, level: PokedexLevel) {

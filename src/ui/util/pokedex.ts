@@ -1,10 +1,16 @@
 import { displayIndexAdder, isBattleFormeItem } from '@openhome-core/pkm'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { PluginIdentifier, SAV, isPluginGame } from '@openhome-core/save/interfaces'
+import { isPluginGame, PluginIdentifier, SAV } from '@openhome-core/save/interfaces'
 import * as SpectaGenerated from '@openhome-core/tauri/spectaCommands'
 import { OriginGameStr } from '@openhome-core/tauri/spectaCommands'
 import { Option } from '@openhome-core/util/functional'
-import { Gender, OriginGame, OriginGames } from '@pkm-rs/pkg'
+import {
+  acquirableTotemBaseForm,
+  Gender,
+  isAcquirableTotemForm,
+  OriginGame,
+  OriginGames,
+} from '@pkm-rs/pkg'
 
 export type PokedexEntry = SpectaGenerated.PokedexEntry
 export type PokedexLevel = SpectaGenerated.PokedexLevel
@@ -109,6 +115,19 @@ export function updatesFromMon(
       formIndex: displayIndexAdder(mon.heldItemIndex)(mon.formIndex),
       data: pokedexCaughtEntryFromMon(mon, game),
     })
+  }
+
+  // Totem forms have separate indexes, so the totem flag needs to be set for the form the
+  // totem is based on.
+  if (isAcquirableTotemForm(mon.nationalDex, mon.formIndex)) {
+    const totemBaseForm = acquirableTotemBaseForm(mon.nationalDex)
+    if (totemBaseForm) {
+      pokedexUpdates.push({
+        nationalDex: mon.nationalDex,
+        formIndex: totemBaseForm.formIndex,
+        data: { ...pokedexCaughtEntryFromMon(mon, game) },
+      })
+    }
   }
 
   return pokedexUpdates
