@@ -1,5 +1,5 @@
 import { hasGenderDifference } from '@openhome-core/pkm/util/index'
-import { FormEntry } from '@openhome-core/tauri/spectaCommands'
+import { FormEntry, PokedexFlag } from '@openhome-core/tauri/spectaCommands'
 import { Option } from '@openhome-core/util/functional'
 import { $O } from '@openhome-core/util/option'
 import { filterUndefined } from '@openhome-core/util/sort'
@@ -11,6 +11,8 @@ import useMonSprite from '@openhome-ui/pokemon/useMonSprite'
 import { cssClass } from '@openhome-ui/util/style'
 import {
   canBeAlpha,
+  canBeNsPokemon,
+  canBeTitan,
   extraFormMetadata,
   ExtraFormMetadata,
   extraFormsByNationalDex,
@@ -19,7 +21,6 @@ import {
   hasGigantamaxForm,
   MetadataSummaryLookup,
   NationalDex,
-  speciesHasTitan,
   SpeciesLookup,
   totemFormAcquirable,
 } from '@pkm-rs/pkg'
@@ -263,6 +264,16 @@ class PokedexVariant<B extends BadgeType = BadgeType> {
     return new PokedexVariant<B>(description, isPossibleFor, isRegistered, badge)
   }
 
+  static flag<B extends BadgeType>(
+    description: string,
+    isPossibleFor: IsPossibleFor,
+    flag: PokedexFlag,
+    badge: B
+  ) {
+    const isRegistered: IsRegistered = (data) => data.flags.includes(flag)
+    return new PokedexVariant<B>(description, isPossibleFor, isRegistered, badge)
+  }
+
   render(form: FormMetadata | ExtraFormMetadata, formDexEntry: Option<FormEntry>): ReactNode {
     const BadgeType = this.badge
     return (
@@ -277,23 +288,9 @@ class PokedexVariant<B extends BadgeType = BadgeType> {
 }
 
 const VARIANTS: PokedexVariant[] = [
-  PokedexVariant.is('Alpha', canBeAlpha, (data) => data.flags.includes('Alpha'), Badge.Alpha),
-  PokedexVariant.is(
-    'Gigantamax Factor',
-    hasGigantamaxForm,
-    (data) => data.flags.includes('Gigantamax'),
-    Badge.Gigantamax
-  ),
-  PokedexVariant.is(
-    'Totem Obtained',
-    totemFormAcquirable,
-    (data) => data.flags.includes('Totem'),
-    Badge.Totem
-  ),
-  PokedexVariant.is(
-    'Titan Obtained',
-    speciesHasTitan,
-    (data) => data.flags.includes('Titan'),
-    Badge.Titan
-  ),
+  PokedexVariant.flag('Alpha', canBeAlpha, 'Alpha', Badge.Alpha),
+  PokedexVariant.flag('Gigantamax Factor', hasGigantamaxForm, 'Gigantamax', Badge.Gigantamax),
+  PokedexVariant.flag('Totem Obtained', totemFormAcquirable, 'Totem', Badge.Totem),
+  PokedexVariant.flag('Titan Obtained', canBeTitan, 'Titan', Badge.Titan),
+  PokedexVariant.flag("N's Pokémon", canBeNsPokemon, 'NsPokemon', Badge.NsPokemon),
 ]

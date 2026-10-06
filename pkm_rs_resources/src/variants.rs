@@ -1,4 +1,5 @@
 use crate::metadata_source::MetadataSource;
+use crate::species::BaseForm;
 use crate::species::SpeciesForm;
 
 use pkm_rs_types::{GameSetting, NationalDex};
@@ -166,7 +167,7 @@ pub fn acquirable_totem_base_form_wasm(national_dex: NationalDex) -> Option<Spec
     acquirable_totem_base_form(national_dex)
 }
 
-pub const fn species_has_titan(species_form: SpeciesForm) -> bool {
+pub const fn can_be_titan(species_form: SpeciesForm) -> bool {
     matches!(
         species_form.get_ndex(),
         NationalDex::Klawf
@@ -178,8 +179,36 @@ pub const fn species_has_titan(species_form: SpeciesForm) -> bool {
     )
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "speciesHasTitan"))]
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "canBeTitan"))]
 #[allow(clippy::missing_const_for_fn)]
-pub fn species_has_titan_wasm(national_dex: NationalDex, form_index: u16) -> bool {
-    SpeciesForm::new_valid_ndex(national_dex, form_index).is_ok_and(species_has_titan)
+pub fn can_be_titan_wasm(national_dex: NationalDex, form_index: u16) -> bool {
+    SpeciesForm::new_valid_ndex(national_dex, form_index).is_ok_and(can_be_titan)
+}
+
+pub fn can_be_ns_pokemon(species_form: SpeciesForm) -> bool {
+    let (national_dex, form_index) = species_form.get_base_evolution().split();
+    form_index == 0
+        && (species_form.is_or_evolves_from(NationalDex::Boldore.base_form())
+            || matches!(
+                national_dex,
+                NationalDex::Purrloin
+                    | NationalDex::Pidove
+                    | NationalDex::Timburr
+                    | NationalDex::Tympole
+                    | NationalDex::Woobat
+                    | NationalDex::Sandile
+                    | NationalDex::Darumaka
+                    | NationalDex::Scraggy
+                    | NationalDex::Sigilyph
+                    | NationalDex::Zorua
+                    | NationalDex::Joltik
+                    | NationalDex::Ferroseed
+                    | NationalDex::Klink
+            ))
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "canBeNsPokemon"))]
+#[allow(clippy::missing_const_for_fn)]
+pub fn can_be_ns_pokemon_wasm(national_dex: NationalDex, form_index: u16) -> bool {
+    SpeciesForm::new_valid_ndex(national_dex, form_index).is_ok_and(can_be_ns_pokemon)
 }

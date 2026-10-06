@@ -692,18 +692,32 @@ impl SpeciesForm {
     pub fn get_base_evolution(&self) -> SpeciesForm {
         match self.get_forme_metadata().pre_evolution {
             None => *self,
-            Some(forme_ref) => forme_ref.get_base_evolution(),
+            Some(species_form) => species_form.get_base_evolution(),
         }
     }
 
-    pub fn get_prevos(&self) -> Vec<SpeciesForm> {
-        let mut prevos = Vec::new();
-        let mut current = *self;
-        while let Some(forme_ref) = current.get_forme_metadata().pre_evolution {
-            prevos.push(forme_ref);
-            current = forme_ref;
-        }
-        prevos
+    pub fn all_evolutions(&self) -> impl Iterator<Item = SpeciesForm> {
+        Evolutions::not_including(*self)
+    }
+
+    pub fn and_all_evolutions(&self) -> impl Iterator<Item = SpeciesForm> {
+        Evolutions::including(*self)
+    }
+
+    pub fn all_preevolutions(&self) -> impl Iterator<Item = SpeciesForm> {
+        Preevolutions::not_including(*self)
+    }
+
+    pub fn and_all_preevolutions(&self) -> impl Iterator<Item = SpeciesForm> {
+        Preevolutions::including(*self)
+    }
+
+    pub fn is_or_evolves_into(&self, other: SpeciesForm) -> bool {
+        self.and_all_evolutions().any(|v| v == other)
+    }
+
+    pub fn is_or_evolves_from(&self, other: SpeciesForm) -> bool {
+        self.and_all_preevolutions().any(|v| v == other)
     }
 
     pub const fn get_ndex(&self) -> NationalDex {
@@ -751,6 +765,81 @@ impl SpeciesForm {
 
     pub fn get_base_stats_from(&self, source: MetadataSource) -> Option<BaseStats> {
         base_stats_lookup(self.national_dex, self.form_index, source)
+    }
+}
+
+pub trait BaseForm {
+    fn base_form(&self) -> SpeciesForm;
+}
+
+impl BaseForm for NationalDex {
+    fn base_form(&self) -> SpeciesForm {
+        SpeciesForm::base_form(*self)
+    }
+}
+
+#[derive(Debug, Default, PartialEq, Eq, Clone)]
+pub struct Evolutions {
+    queue: Vec<SpeciesForm>,
+}
+
+impl Evolutions {
+    pub fn including(first: SpeciesForm) -> Self {
+        Self { queue: vec![first] }
+    }
+
+    pub fn not_including(first: SpeciesForm) -> Self {
+        Self {
+            queue: first.get_forme_metadata().evolutions(),
+        }
+    }
+}
+
+impl Iterator for Evolutions {
+    type Item = SpeciesForm;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let current = self.queue.pop()?;
+
+        self.queue
+            .append(&mut current.get_forme_metadata().evolutions());
+
+        Some(current)
+    }
+}
+
+#[derive(Debug, Default, PartialEq, Eq, Clone)]
+pub struct Preevolutions {
+    queue: Vec<SpeciesForm>,
+}
+
+impl Preevolutions {
+    pub fn including(first: SpeciesForm) -> Self {
+        Self { queue: vec![first] }
+    }
+
+    pub fn not_including(first: SpeciesForm) -> Self {
+        Self {
+            queue: first
+                .get_forme_metadata()
+                .pre_evolution
+                .into_iter()
+                .collect(),
+        }
+    }
+}
+
+impl Iterator for Preevolutions {
+    type Item = SpeciesForm;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let current = self.queue.pop()?;
+
+        if let Some(prevo) = current.get_forme_metadata().pre_evolution {
+            self.queue.push(prevo);
+        }
+
+        Some(current)
     }
 }
 
@@ -814,5 +903,31 @@ mod tests {
         assert_eq!(LevelUpType::Slow.get_min_exp_for_level(1), 0);
         assert_eq!(LevelUpType::Slow.get_min_exp_for_level(63), 312558);
         assert_eq!(LevelUpType::Slow.calculate_level(317341), 63);
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use pkm_rs_types::NationalDex;
+
+    use crate::species::SpeciesForm;
+
+    const ROGGENROLA: SpeciesForm = SpeciesForm::base_form(NationalDex::Roggenrola);
+    const BOLDORE: SpeciesForm = SpeciesForm::base_form(NationalDex::Boldore);
+    const GIGALITH: SpeciesForm = SpeciesForm::base_form(NationalDex::Gigalith);
+
+    #[test]
+    fn evolution_relationships() {
+        assert!(BOLDORE.is_or_evolves_into(BOLDORE));
+        assert!(ROGGENROLA.is_or_evolves_into(BOLDORE));
+        assert!(!BOLDORE.is_or_evolves_into(ROGGENROLA));
+        assert!(!GIGALITH.is_or_evolves_into(ROGGENROLA));
+        assert!(ROGGENROLA.is_or_evolves_into(GIGALITH));
+
+        assert!(BOLDORE.is_or_evolves_from(BOLDORE));
+        assert!(!ROGGENROLA.is_or_evolves_from(BOLDORE));
+        assert!(BOLDORE.is_or_evolves_from(ROGGENROLA));
+        assert!(GIGALITH.is_or_evolves_from(ROGGENROLA));
+        assert!(!ROGGENROLA.is_or_evolves_from(GIGALITH));
     }
 }

@@ -157,12 +157,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
             color="white"
             showIf={mon.isShadow}
           />
-          <Badge.Image
-            label="N's Pokémon"
-            backgroundColor="green"
-            color="white"
-            showIf={mon.isNsPokemon}
-          />
+          <Badge.NsPokemon showIf={mon.isNsPokemon} showLabel />
         </div>
       </Flex>
       <Flex direction="column" gap="2px" flexGrow="1">

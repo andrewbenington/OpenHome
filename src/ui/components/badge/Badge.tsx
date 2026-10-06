@@ -127,6 +127,19 @@ function HyperTrainBadge(props: BadgeProps) {
   )
 }
 
+function NsPokemonBadge(props: BadgePropsNoBackground) {
+  const label = labelIf(props.showLabel, "N's Pokemon")
+  return (
+    <ImageBadge
+      tooltip="N's Pokemon"
+      src={getPublicImageURL('icons/N.png')}
+      backgroundColor="#7ed67e"
+      label={label}
+      {...props}
+    />
+  )
+}
+
 function PokerusBadge(props: BadgePropsNoBackground & { pokerusByte: Option<number> }) {
   const pokerus = Pokerus.fromByte(props.pokerusByte ?? 0)
   switch (pokerus.status()) {
@@ -195,6 +208,7 @@ const Badge = {
   HyperTrain: memo(HyperTrainBadge),
   Image: memo(ImageBadge),
   Numeric: memo(NumericBadge),
+  NsPokemon: memo(NsPokemonBadge),
   Pokerus: memo(PokerusBadge),
   Titan: memo(TitanBadge),
   Totem: memo(TotemBadge),

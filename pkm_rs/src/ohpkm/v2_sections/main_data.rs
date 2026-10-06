@@ -424,8 +424,7 @@ impl MainDataV2 {
 
 fn is_prevo_species_name(species_and_form: &SpeciesForm, name: &str, language: Language) -> bool {
     species_and_form
-        .get_prevos()
-        .iter()
+        .all_preevolutions()
         .any(|prevo| name.eq_ignore_ascii_case(lookup::species_name(prevo.get_ndex(), language)))
 }
 
