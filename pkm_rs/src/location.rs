@@ -905,9 +905,9 @@ mod tests {
             let ohpkm = ohpkm_with_origin_and_location(OriginGame::Scarlet, 20000);
             let met_data = PkmFormat::PK8.met_data_maximizing_legality(&ohpkm);
 
-            // Future games get an origin of Sword and the faraway place met location
+            // Future games get an origin of Sword and a certain faraway place met location
             assert_eq!(met_data.origin, OriginGame::Sword);
-            assert_eq!(met_data.location_index, FARAWAY_PLACE_SWSH);
+            assert_eq!(met_data.location_index, 59997);
 
             Ok(())
         }

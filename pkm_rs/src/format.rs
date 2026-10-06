@@ -183,12 +183,12 @@ impl PkmFormat {
             Self::PK7 => origin <= OriginGame::Crystal,
             Self::PB7 => origin.is_lets_go() || origin == OriginGame::Go,
             Self::PK8 => origin <= OriginGame::Shield,
-            Self::PA8 | Self::PB8 => origin <= OriginGame::LegendsArceus,
+            Self::PA8 | Self::PB8 => origin <= OriginGame::ShiningPearl,
             Self::PK9 => origin <= OriginGame::Violet,
             Self::PA9 => origin <= OriginGame::LegendsZa,
             Self::PK3RR => origin.generation() == Generation::G3,
             Self::PK3UB => origin.generation() == Generation::G3,
-            Self::PB8LUMI => origin <= OriginGame::LegendsArceus,
+            Self::PB8LUMI => origin <= OriginGame::ShiningPearl,
             Self::PK9Compass => origin <= OriginGame::Violet,
         }
     }
@@ -322,6 +322,21 @@ impl PkmFormat {
         if self.generation() >= Generation::G5 && legalized_origin.generation() <= Generation::G4 {
             // Pokémon brought up through Gen V Poké Transfer use the transfer met index, not the Lab map index
             return super::location::POKE_TRANSFER_MET_LOCATION_GEN_5;
+        }
+
+        if self == Self::PK8 {
+            return if original_origin >= OriginGame::LegendsArceus {
+                match original_origin {
+                    OriginGame::Violet => 59996,
+                    OriginGame::Scarlet => 59997,
+                    OriginGame::ShiningPearl => 59998,
+                    OriginGame::BrilliantDiamond => 59999,
+                    OriginGame::LegendsArceus => 60000,
+                    _ => super::location::FARAWAY_PLACE_SWSH,
+                }
+            } else {
+                met_location_index
+            };
         }
 
         let origin_was_changed = original_origin != legalized_origin;
