@@ -1,5 +1,6 @@
 import { Moves } from '@openhome-core/resources'
 import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
+import useSettings from '@openhome-ui/hooks/settings'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { colorForType, contrastColorForType } from '@openhome-ui/util/color'
 import { cssClass } from '@openhome-ui/util/style'
@@ -32,6 +33,8 @@ const MoveCard = (props: MoveCardProps) => {
     typeOverride,
     ...htmlProps
   } = props
+  const { developerSettings } = useSettings()
+
   const moveData = move ? Moves[move] : undefined
   if (move && !moveData) {
     console.warn(`An unknown move has been detected. The move index is ${move}.`)
@@ -92,6 +95,7 @@ const MoveCard = (props: MoveCardProps) => {
         <div className="move-card-vert">
           <div className="move-name" style={{ color: contrastColorForType(type) }}>
             {moveData.name}
+            {developerSettings.flags.includes('show_move_ids') ? ` [${moveData.id}]` : ''}
           </div>
           {shouldShowPp && (
             <div className="move-pp-display">

@@ -6,8 +6,8 @@ use pkm_rs_types::FlagSet;
 
 pub const LZA_BASE_TM_BYTES: usize = 25;
 pub const LZA_DLC_TM_BYTES: usize = 13;
-pub const LZA_PLUS_MOVES_BLOCK_C_BYTES: usize = 33;
-pub const LZA_PLUS_MOVES_BLOCK_B_BYTES: usize = 12;
+pub const LZA_PLUS_MOVES_0XD6_BYTES: usize = 33;
+pub const LZA_PLUS_MOVES_0X94_BYTES: usize = 12;
 
 #[cfg(feature = "wasm")]
 use arrayref::array_ref;
@@ -21,26 +21,28 @@ use pkm_rs_types::randomize::Randomize;
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Default, serde::Serialize, Clone, Copy, PartialEq, Eq)]
 pub struct PlusMoveFlags {
-    block_c: FlagSet<LZA_PLUS_MOVES_BLOCK_C_BYTES>,
-    block_b: FlagSet<LZA_PLUS_MOVES_BLOCK_B_BYTES>,
+    block_0xd6: FlagSet<LZA_PLUS_MOVES_0XD6_BYTES>,
+    block_0x94: FlagSet<LZA_PLUS_MOVES_0X94_BYTES>,
 }
 
 impl PlusMoveFlags {
     pub const fn from_byte_blocks(
-        block_c: &[u8; LZA_PLUS_MOVES_BLOCK_C_BYTES],
-        block_b: &[u8; LZA_PLUS_MOVES_BLOCK_B_BYTES],
+        block_0xd6: &[u8; LZA_PLUS_MOVES_0XD6_BYTES],
+        block_0x94: &[u8; LZA_PLUS_MOVES_0X94_BYTES],
     ) -> Self {
         Self {
-            block_c: FlagSet::from_bytes(*block_c),
-            block_b: FlagSet::from_bytes(*block_b),
+            block_0xd6: FlagSet::from_bytes(*block_0xd6),
+            block_0x94: FlagSet::from_bytes(*block_0x94),
         }
     }
 
     pub fn add_move_id(&mut self, move_id: u16) {
-        if let Some(block_c_index) = lza_plus::plus_move_index_by_move_id_block_c(move_id) {
-            self.block_c.set_flag(block_c_index, true);
-        } else if let Some(block_b_index) = lza_plus::plus_move_index_by_move_id_block_b(move_id) {
-            self.block_b.set_flag(block_b_index, true);
+        if let Some(block_0xd6_index) = lza_plus::plus_move_index_by_move_id_block_0xd6(move_id) {
+            self.block_0xd6.set_flag(block_0xd6_index, true);
+        } else if let Some(block_0x94_index) =
+            lza_plus::plus_move_index_by_move_id_block_0x94(move_id)
+        {
+            self.block_0x94.set_flag(block_0x94_index, true);
         }
     }
 
@@ -50,9 +52,13 @@ impl PlusMoveFlags {
         }
     }
 
-    pub fn add_all_for_species_at_level(&mut self, species_form: SpeciesForm, level: u8) {
+    pub fn add_all_for_species_at_level(
+        &mut self,
+        species_form: SpeciesForm,
+        level: u8,
+    ) -> &mut Self {
         let Some(plus_move_data) = species_form.get_plus_moves_lza() else {
-            return;
+            return self;
         };
 
         self.add_move_ids(
@@ -67,37 +73,46 @@ impl PlusMoveFlags {
                     }
                 }),
         );
+
+        self
+    }
+
+    pub fn all_for_species_at_level(species_form: SpeciesForm, level: u8) -> Self {
+        *Self::default().add_all_for_species_at_level(species_form, level)
     }
 
     pub fn add_all_from(&mut self, other: &PlusMoveFlags) {
-        self.block_c.add_all_from(&other.block_c);
-        self.block_b.add_all_from(&other.block_b);
+        self.block_0xd6.add_all_from(&other.block_0xd6);
+        self.block_0x94.add_all_from(&other.block_0x94);
     }
 
     pub fn contains_all_from(&mut self, other: &PlusMoveFlags) -> bool {
-        self.block_c.is_superset_of(&other.block_c) && self.block_b.is_superset_of(&other.block_b)
+        self.block_0xd6.is_superset_of(&other.block_0xd6)
+            && self.block_0x94.is_superset_of(&other.block_0x94)
     }
 
     pub fn is_plus_move(&self, move_id: u16) -> bool {
-        if let Some(block_c_index) = lza_plus::plus_move_index_by_move_id_block_c(move_id) {
-            self.block_c.get_flag(block_c_index)
-        } else if let Some(block_b_index) = lza_plus::plus_move_index_by_move_id_block_b(move_id) {
-            self.block_b.get_flag(block_b_index)
+        if let Some(block_0xd6_index) = lza_plus::plus_move_index_by_move_id_block_0xd6(move_id) {
+            self.block_0xd6.get_flag(block_0xd6_index)
+        } else if let Some(block_0x94_index) =
+            lza_plus::plus_move_index_by_move_id_block_0x94(move_id)
+        {
+            self.block_0x94.get_flag(block_0x94_index)
         } else {
             false
         }
     }
 
     pub fn get_move_ids(&self) -> Vec<MoveIndex> {
-        self.block_c
+        self.block_0xd6
             .get_flags()
             .into_iter()
-            .filter_map(lza_plus::move_id_by_lza_plus_move_index_block_c)
+            .filter_map(lza_plus::move_id_by_lza_plus_move_index_block_0xd6)
             .chain(
-                self.block_b
+                self.block_0x94
                     .get_flags()
                     .into_iter()
-                    .filter_map(lza_plus::move_id_by_plus_move_index_block_b),
+                    .filter_map(lza_plus::move_id_by_plus_move_index_block_0x94),
             )
             .collect()
     }
@@ -105,14 +120,14 @@ impl PlusMoveFlags {
     pub const fn to_bytes(
         &self,
     ) -> (
-        [u8; LZA_PLUS_MOVES_BLOCK_C_BYTES],
-        [u8; LZA_PLUS_MOVES_BLOCK_B_BYTES],
+        [u8; LZA_PLUS_MOVES_0XD6_BYTES],
+        [u8; LZA_PLUS_MOVES_0X94_BYTES],
     ) {
-        (self.block_c.to_bytes(), self.block_b.to_bytes())
+        (self.block_0xd6.to_bytes(), self.block_0x94.to_bytes())
     }
 
     pub fn is_empty(&self) -> bool {
-        self.block_c.is_empty() && self.block_b.is_empty()
+        self.block_0xd6.is_empty() && self.block_0x94.is_empty()
     }
 }
 
@@ -121,10 +136,10 @@ impl PlusMoveFlags {
 #[allow(clippy::missing_const_for_fn)]
 impl PlusMoveFlags {
     #[wasm_bindgen(js_name = fromByteBlocks)]
-    pub fn from_byte_blocks_wasm(block_c: Vec<u8>, block_b: Vec<u8>) -> Self {
+    pub fn from_byte_blocks_wasm(block_0xd6: Vec<u8>, block_0x94: Vec<u8>) -> Self {
         Self::from_byte_blocks(
-            array_ref![block_c, 0, LZA_PLUS_MOVES_BLOCK_C_BYTES],
-            array_ref![block_b, 0, LZA_PLUS_MOVES_BLOCK_B_BYTES],
+            array_ref![block_0xd6, 0, LZA_PLUS_MOVES_0XD6_BYTES],
+            array_ref![block_0x94, 0, LZA_PLUS_MOVES_0X94_BYTES],
         )
     }
 
@@ -151,14 +166,24 @@ impl PlusMoveFlags {
         *self
     }
 
-    #[wasm_bindgen(js_name = toBlockCBytes)]
-    pub fn to_block_c_bytes_wasm(&self) -> Vec<u8> {
-        self.block_c.to_bytes().to_vec()
+    #[wasm_bindgen(js_name = toBlock0xD6Bytes)]
+    pub fn to_block_0xd6_bytes_wasm(&self) -> Vec<u8> {
+        self.block_0xd6.to_bytes().to_vec()
     }
 
-    #[wasm_bindgen(js_name = toBlockBBytes)]
-    pub fn to_block_b_bytes_wasm(&self) -> Vec<u8> {
-        self.block_b.to_bytes().to_vec()
+    #[wasm_bindgen(js_name = toBlock0xD6Flags)]
+    pub fn to_block_0xd6_flags_wasm(&self) -> Vec<usize> {
+        self.block_0xd6.get_flags()
+    }
+
+    #[wasm_bindgen(js_name = toBlock0x94Bytes)]
+    pub fn to_block_0x94_bytes_wasm(&self) -> Vec<u8> {
+        self.block_0x94.to_bytes().to_vec()
+    }
+
+    #[wasm_bindgen(js_name = toBlock0x94Flags)]
+    pub fn to_block_0x94_flags_wasm(&self) -> Vec<usize> {
+        self.block_0x94.get_flags().into_iter().collect()
     }
 
     #[wasm_bindgen(js_name = addAllFrom)]
@@ -181,5 +206,32 @@ impl PlusMoveFlags {
     #[wasm_bindgen(js_name = equals)]
     pub fn equals_wasm(&self, other: &PlusMoveFlags) -> bool {
         self == other
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use pkm_rs_resources::species::BaseForm;
+    use pkm_rs_types::NationalDex;
+
+    const GRENINJA_PLUS_MOVES: &[u16] = &[
+        594, 33, 45, 55, 98, 122, 61, 108, 332, 425, 164, 400, 340, 104, 56,
+    ];
+
+    #[test]
+    fn greninja_plus_moves_are_expected() {
+        let plus_moves = NationalDex::Greninja
+            .base_form()
+            .get_plus_moves_lza()
+            .expect("Greninja has LZA plus move data");
+
+        assert_eq!(
+            GRENINJA_PLUS_MOVES,
+            &plus_moves
+                .all_moves()
+                .iter()
+                .map(|m| m.move_id_raw())
+                .collect::<Vec<_>>()
+        );
     }
 }

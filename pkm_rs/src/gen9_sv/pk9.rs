@@ -669,7 +669,7 @@ impl crate::tests::PkhexJson for Pk9 {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::Pk9;
     use crate::checksum::Checksum;
     use crate::convert_strategy::ConvertStrategy;

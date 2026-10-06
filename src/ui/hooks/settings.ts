@@ -1,5 +1,5 @@
 import useBackend from '@openhome-core/backend/useBackend'
-import { AppInfoContext, Settings as SettingsType } from '@openhome-ui/state/appInfo'
+import { AppInfoContext, DeveloperFlag, Settings as SettingsType } from '@openhome-ui/state/appInfo'
 import { useContext } from 'react'
 import { MonDisplayState } from './monDisplay'
 
@@ -19,11 +19,27 @@ export default function useSettings() {
     })
   }
 
+  async function setDeveloperFlag(flag: DeveloperFlag, value: boolean) {
+    const { flags: oldFlags } = appInfoState.settings.developerSettings
+
+    const others = oldFlags.filter((other) => other !== flag)
+    const flags = [...others, ...(value ? [flag] : [])]
+
+    return updateSettings({
+      developerSettings: {
+        ...appInfoState.settings.developerSettings,
+        flags,
+      },
+    })
+  }
+
   return {
     settings: appInfoState.settings,
     updateSettings,
     monDisplayState: appInfoState.settings.monDisplayState,
     updateMonDisplayState,
+    developerSettings: appInfoState.settings.developerSettings,
+    setDeveloperFlag,
     extraSaveTypes: appInfoState.extraSaveTypes,
   }
 }
