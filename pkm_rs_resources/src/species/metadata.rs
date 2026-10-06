@@ -33241,7 +33241,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_gmax: false,
                 is_battle_only: false,
                 is_cosmetic: false,
-                gender_ratio: GenderRatio::Equal,
+                gender_ratio: GenderRatio::AllMale,
                 abilities: (unsafe { AbilityIndexBounded::new_unchecked(51) }, unsafe {
                     AbilityIndexBounded::new_unchecked(151)
                 }),
@@ -33274,7 +33274,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_gmax: false,
                 is_battle_only: false,
                 is_cosmetic: false,
-                gender_ratio: GenderRatio::Equal,
+                gender_ratio: GenderRatio::AllFemale,
                 abilities: (unsafe { AbilityIndexBounded::new_unchecked(51) }, unsafe {
                     AbilityIndexBounded::new_unchecked(151)
                 }),
@@ -33304,7 +33304,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_gmax: false,
                 is_battle_only: true,
                 is_cosmetic: false,
-                gender_ratio: GenderRatio::Equal,
+                gender_ratio: GenderRatio::AllMale,
                 abilities: (unsafe { AbilityIndexBounded::new_unchecked(36) }, unsafe {
                     AbilityIndexBounded::new_unchecked(36)
                 }),
@@ -33334,7 +33334,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_gmax: false,
                 is_battle_only: true,
                 is_cosmetic: false,
-                gender_ratio: GenderRatio::Equal,
+                gender_ratio: GenderRatio::AllFemale,
                 abilities: (unsafe { AbilityIndexBounded::new_unchecked(36) }, unsafe {
                     AbilityIndexBounded::new_unchecked(36)
                 }),
@@ -43102,7 +43102,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_gmax: false,
                 is_battle_only: false,
                 is_cosmetic: false,
-                gender_ratio: GenderRatio::Equal,
+                gender_ratio: GenderRatio::AllMale,
                 abilities: (unsafe { AbilityIndexBounded::new_unchecked(39) }, unsafe {
                     AbilityIndexBounded::new_unchecked(28)
                 }),
@@ -43132,7 +43132,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_gmax: false,
                 is_battle_only: false,
                 is_cosmetic: false,
-                gender_ratio: GenderRatio::Equal,
+                gender_ratio: GenderRatio::AllFemale,
                 abilities: (unsafe { AbilityIndexBounded::new_unchecked(20) }, unsafe {
                     AbilityIndexBounded::new_unchecked(28)
                 }),
@@ -44306,7 +44306,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_gmax: false,
                 is_battle_only: false,
                 is_cosmetic: false,
-                gender_ratio: GenderRatio::Equal,
+                gender_ratio: GenderRatio::AllMale,
                 abilities: (unsafe { AbilityIndexBounded::new_unchecked(33) }, unsafe {
                     AbilityIndexBounded::new_unchecked(91)
                 }),
@@ -44338,7 +44338,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_gmax: false,
                 is_battle_only: false,
                 is_cosmetic: false,
-                gender_ratio: GenderRatio::Equal,
+                gender_ratio: GenderRatio::AllFemale,
                 abilities: (unsafe { AbilityIndexBounded::new_unchecked(33) }, unsafe {
                     AbilityIndexBounded::new_unchecked(91)
                 }),
@@ -44852,7 +44852,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_gmax: false,
                 is_battle_only: false,
                 is_cosmetic: false,
-                gender_ratio: GenderRatio::Equal,
+                gender_ratio: GenderRatio::AllMale,
                 abilities: (unsafe { AbilityIndexBounded::new_unchecked(268) }, unsafe {
                     AbilityIndexBounded::new_unchecked(82)
                 }),
@@ -44882,7 +44882,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_gmax: false,
                 is_battle_only: false,
                 is_cosmetic: false,
-                gender_ratio: GenderRatio::Equal,
+                gender_ratio: GenderRatio::AllFemale,
                 abilities: (unsafe { AbilityIndexBounded::new_unchecked(165) }, unsafe {
                     AbilityIndexBounded::new_unchecked(82)
                 }),
