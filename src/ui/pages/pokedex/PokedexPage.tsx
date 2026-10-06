@@ -1,17 +1,11 @@
-import { hasGenderDifference } from '@openhome-core/pkm/util/index'
-import PokemonIcon from '@openhome-ui/components/PokemonIcon'
-import { getPublicImageURL } from '@openhome-ui/images/images'
-import useMonSprite from '@openhome-ui/pokemon/useMonSprite'
+import { filterUndefined } from '@openhome-core/util/sort'
+import OhoButton from '@openhome-ui/components/OhoButton'
 import { usePokedex } from '@openhome-ui/state/pokedex'
 import { Pokedex } from '@openhome-ui/util/pokedex'
 import { cssClass } from '@openhome-ui/util/style'
 import {
-  allMetadataSources,
-  extraFormMetadata,
   ExtraFormMetadata,
-  extraFormsByNationalDex,
   FormMetadata,
-  Gender,
   MetadataSource,
   MetadataSources,
   NationalDex,
@@ -27,14 +21,14 @@ import {
   Text,
   TextField,
 } from '@radix-ui/themes'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import './pokedex.css'
 import { PokedexGames } from './PokedexGames'
 import PokedexLearnset from './PokedexLearnset'
+import PokedexLeftColumn from './PokedexLeftColumn'
 import PokedexSidebar from './PokedexSidebar'
 import PokedexSummary from './PokedexSummary'
-import TooltipPokemonIcon from './TooltipPokemonIcon'
-import { getFormeStatus, isExtraFormMetadata } from './util'
+import { isExtraFormMetadata } from './util'
 
 type PokedexView = 'summary' | 'levelup' | 'games'
 
@@ -52,9 +46,11 @@ export default function PokedexPage() {
   }
 
   const pokedex = pokedexState.pokedex
-  const caughtCount = Object.values(pokedex.byDexNumber).filter((entry) =>
-    Object.values(entry.formes).some((status) => status.endsWith('Caught'))
-  ).length
+  const caughtCount = Object.values(pokedex.byDexNumber)
+    .filter(filterUndefined)
+    .filter((entry) =>
+      Object.values(entry.forms).some((status) => status?.level.endsWith('Caught'))
+    ).length
 
   const seenCount = new Set(
     Object.keys(pokedex.byDexNumber).filter((v) => parseInt(v) <= NationalDex.Pecharunt)
@@ -64,6 +60,14 @@ export default function PokedexPage() {
     <div className="pokedex-page">
       <div className="pokedex-header">
         <h1 className="pokedex-header-title">National Pokédex</h1>
+        <OhoButton
+          variant="classic"
+          color="mint"
+          style={{ borderRadius: '999px' }}
+          onClick={pokedexState.populatePokedexFromOhpkms}
+        >
+          Sync
+        </OhoButton>
         <div style={{ flex: 1 }} />
         <Text>
           <b>Caught:</b> {caughtCount}
@@ -83,8 +87,8 @@ export default function PokedexPage() {
           {selectedSpecies && selectedForm && (
             <PokedexDetails
               pokedex={pokedex}
-              species={selectedSpecies}
-              selectedForm={selectedForm}
+              speciesMetadata={selectedSpecies}
+              formMetadata={selectedForm}
               setSelectedForm={setSelectedForm}
               setSelectedSpecies={setSelectedSpecies}
             />
@@ -102,174 +106,26 @@ export default function PokedexPage() {
   )
 }
 
-type PokedexDetailsProps = {
+export type PokedexDetailsProps = {
   pokedex: Pokedex
-  species: SpeciesMetadata
-  selectedForm: FormMetadata | ExtraFormMetadata
+  speciesMetadata: SpeciesMetadata
+  formMetadata: FormMetadata | ExtraFormMetadata
   setSelectedForm: (form?: FormMetadata | ExtraFormMetadata) => void
   setSelectedSpecies: (species?: SpeciesMetadata) => void
 }
 
-function PokedexDetails({
-  pokedex,
-  species,
-  selectedForm,
-  setSelectedForm,
-  setSelectedSpecies,
-}: PokedexDetailsProps) {
-  const [imageError, setImageError] = useState(false)
-  const [showShiny, setShowShiny] = useState(false)
-  const [showFemale, setShowFemale] = useState(false)
+function PokedexDetails(props: PokedexDetailsProps) {
+  const { pokedex, speciesMetadata, formMetadata, setSelectedForm, setSelectedSpecies } = props
   const [currentView, setCurrentView] = useState<PokedexView>('summary')
   const [metadataSource, setMetadataSource] = useState<MetadataSource | MostCurrentSource>(
     MOST_CURRENT_SOURCE
   )
 
-  const isFemale = showFemale && hasGenderDifference(species.nationalDex)
-
-  const selectedFormStatus = getFormeStatus(pokedex, species.nationalDex, selectedForm.formIndex)
-  const spriteResult = useMonSprite({
-    nationalDex: species.nationalDex,
-    formIndex: selectedForm.formIndex,
-    format: 'OHPKM',
-    isShiny: selectedFormStatus === 'ShinyCaught' && showShiny,
-    extraFormIndex: isExtraFormMetadata(selectedForm) ? selectedForm.extraFormIndex : undefined,
-    isFemale,
-  })
-
-  useEffect(() => {
-    setImageError(false)
-  }, [selectedForm])
-
-  const selectedFormCaught = selectedFormStatus?.includes('Caught')
-
   return (
     <Flex direction="row" height="100%" align="center" width="100%" overflow="hidden">
-      <Flex
-        direction="column"
-        align="center"
-        justify="center"
-        height="100%"
-        width="40%"
-        maxWidth="30rem"
-        gap="2"
-      >
-        <Flex direction="column" height="100%" width="100%" align="center" justify="center" gap="2">
-          <div className="pokedex-image-frame">
-            {selectedFormStatus === 'ShinyCaught' && (
-              <button
-                className="pokedex-toggle pokedex-shiny-toggle"
-                style={{
-                  backgroundColor: showShiny ? 'var(--accent-9)' : 'var(--gray-9)',
-                }}
-                onClick={() => setShowShiny(!showShiny)}
-              >
-                <img
-                  alt="shiny icon"
-                  style={{ width: '100%', height: '100%' }}
-                  draggable={false}
-                  src={getPublicImageURL('icons/Shiny.png')}
-                />
-              </button>
-            )}
-            {hasGenderDifference(species.nationalDex) && (
-              <button
-                className="pokedex-toggle pokedex-gender-toggle"
-                style={{
-                  backgroundColor: showFemale ? 'var(--accent-9)' : 'var(--gray-9)',
-                }}
-                onClick={() => setShowFemale(!showFemale)}
-              >
-                <p>♀</p>
-              </button>
-            )}
-            {imageError ? (
-              <PokemonIcon
-                nationalDex={species.nationalDex}
-                formIndex={selectedForm.formIndex}
-                gender={isFemale ? Gender.Female : undefined}
-                style={{ width: '90%', height: 0, paddingBottom: '90%' }}
-                silhouette={!selectedFormCaught}
-              />
-            ) : spriteResult.path ? (
-              <>
-                <img
-                  className="pokedex-image pokedex-image-shadow"
-                  draggable={false}
-                  src={spriteResult.path}
-                  onError={() => setImageError(true)}
-                />
-                <img
-                  className="pokedex-image"
-                  draggable={false}
-                  src={spriteResult.path}
-                  onError={() => setImageError(true)}
-                  style={{
-                    filter: !selectedFormCaught ? 'saturate(0%)' : undefined,
-                  }}
-                />
-              </>
-            ) : (
-              <Spinner style={{ margin: 'auto', height: '2rem' }} />
-            )}
-          </div>
-          <div className="pokedex-caption">{selectedForm.formeName}</div>
-          <Flex justify="center" gap="2" width="100%" wrap="wrap">
-            {species.forms.map((form) => (
-              <Button
-                className="pokedex-raised-button"
-                key={`${species.nationalDex}~${form.formIndex}`} // must include both or it won't update when the species changes
-                variant={
-                  form.formIndex === selectedForm.formIndex && !isExtraFormMetadata(selectedForm)
-                    ? 'solid'
-                    : 'soft'
-                }
-                onClick={() => setSelectedForm(form)}
-                size="4"
-                style={{ minWidth: 0, padding: 0, aspectRatio: 1 }}
-              >
-                <TooltipPokemonIcon
-                  nationalDex={species.nationalDex}
-                  formIndex={form.formIndex}
-                  style={{ width: '3rem', height: '3rem' }}
-                  silhouette={
-                    !getFormeStatus(pokedex, species.nationalDex, form.formIndex)?.includes(
-                      'Caught'
-                    )
-                  }
-                />
-              </Button>
-            ))}
-          </Flex>
-          {extraFormsByNationalDex(species.nationalDex).length > 0 && <h3>Extra Forms</h3>}
-          <Flex justify="center" gap="2" width="100%" wrap="wrap">
-            {extraFormsByNationalDex(species.nationalDex).map((form) => (
-              <Button
-                className="pokedex-raised-button"
-                key={form}
-                variant={
-                  isExtraFormMetadata(selectedForm) && selectedForm.extraFormIndex === form
-                    ? 'solid'
-                    : 'soft'
-                }
-                onClick={() => setSelectedForm(extraFormMetadata(form))}
-                size="4"
-                style={{ minWidth: 0, padding: 0, aspectRatio: 1 }}
-              >
-                <TooltipPokemonIcon
-                  nationalDex={species.nationalDex}
-                  formIndex={0}
-                  extraFormIndex={form}
-                  style={{ width: '3rem', height: '3rem' }}
-                  silhouette={!getFormeStatus(pokedex, species.nationalDex, 0)?.includes('Caught')}
-                />
-              </Button>
-            ))}
-          </Flex>
-        </Flex>
-      </Flex>
+      <PokedexLeftColumn {...props} />
       <Separator orientation="vertical" style={{ height: '100%' }} />
-      <Flex direction="column" height="100%" maxHeight="100%" width="60%" overflow="auto">
+      <div className="pokedex-summary-pane">
         <Flex className="pokedex-tab-row">
           <Button
             className={cssClass('pokedex-tab')
@@ -298,7 +154,6 @@ function PokedexDetails({
           >
             Games
           </Button>
-          <div style={{ flex: 1 }} />
           {currentView !== 'games' && (
             <Select.Root
               value={metadataSource.toString()}
@@ -312,15 +167,15 @@ function PokedexDetails({
             >
               <Select.Trigger variant="classic" className="pokedex-view-select" />
               <Select.Content position="popper">
-                {allMetadataSources().map((source) => (
+                {MetadataSources.all().map((source) => (
                   <Select.Item
                     key={source}
                     value={source.toString()}
                     disabled={
                       !MetadataSources.supportsForm(
                         source,
-                        selectedForm.nationalDex,
-                        selectedForm.formIndex
+                        formMetadata.nationalDex,
+                        formMetadata.formIndex
                       )
                     }
                   >
@@ -338,25 +193,25 @@ function PokedexDetails({
           {currentView === 'summary' ? (
             <PokedexSummary
               pokedex={pokedex}
-              species={species}
-              selectedForm={selectedForm}
+              species={speciesMetadata}
+              selectedForm={formMetadata}
               setSelectedForm={setSelectedForm}
               setSelectedSpecies={setSelectedSpecies}
               metadataSource={metadataSource}
             />
           ) : currentView === 'levelup' ? (
-            isExtraFormMetadata(selectedForm) ? (
+            isExtraFormMetadata(formMetadata) ? (
               <Heading size="2" m="3" align="center">
                 Extra form learnsets are not yet supported
               </Heading>
             ) : (
-              <PokedexLearnset selectedForm={selectedForm} metadataSource={metadataSource} />
+              <PokedexLearnset selectedForm={formMetadata} metadataSource={metadataSource} />
             )
           ) : currentView === 'games' ? (
-            <PokedexGames selectedForm={selectedForm} />
+            <PokedexGames selectedForm={formMetadata} />
           ) : null}
         </div>
-      </Flex>
+      </div>
     </Flex>
   )
 }

@@ -197,6 +197,19 @@ impl AllSyncedState {
 
         Ok(())
     }
+
+    pub fn for_each_ohpkm_stored<F: FnMut(&OpenHomeId, &[u8])>(
+        &self,
+        mut callback: F,
+    ) -> Result<()> {
+        self.lock()?
+            .ohpkm_store
+            .0
+            .all_entries()
+            .for_each(|(id, bytes)| callback(id, bytes.as_ref()));
+
+        Ok(())
+    }
 }
 
 impl Deref for AllSyncedState {

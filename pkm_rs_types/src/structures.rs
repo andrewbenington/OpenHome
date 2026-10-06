@@ -694,7 +694,8 @@ impl BitSet for u8 {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Default, Debug, Clone, Copy)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
+#[derive(Default, Debug, Clone, Copy, Hash, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ShinyLeaves(u8);
 
 impl ShinyLeaves {
@@ -716,36 +717,56 @@ impl ShinyLeaves {
     pub const fn new_crown() -> Self {
         Self(0b100000)
     }
+
+    pub fn update_from(&mut self, other: &Self) {
+        if !(self.has_crown() || other.has_crown()) {
+            self.0 |= other.0;
+        } else {
+            *self = Self::new_crown();
+        }
+    }
 }
 
 #[cfg(feature = "wasm")]
-impl Serialize for ShinyLeaves {
-    fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+impl std::fmt::Display for ShinyLeaves {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if self.has_crown() {
-            serializer.serialize_str("Crown")
+            f.write_str("Crown")
         } else if self.0 == 0 {
-            serializer.serialize_str("No Leaves")
+            f.write_str("No Leaves")
         } else {
-            let mut leaves = vec![];
+            let needs_comma = &mut false;
+
+            let mut write_separator = |f: &mut std::fmt::Formatter<'_>| {
+                if *needs_comma {
+                    f.write_str(", ")
+                } else {
+                    *needs_comma = true;
+                    Ok(())
+                }
+            };
+
             if self.has_first() {
-                leaves.push("First");
+                write_separator(f)?;
+                f.write_str("First")?;
             }
             if self.has_second() {
-                leaves.push("Second");
+                write_separator(f)?;
+                f.write_str("Second")?;
             }
             if self.has_third() {
-                leaves.push("Third");
+                write_separator(f)?;
+                f.write_str("Third")?;
             }
             if self.has_fourth() {
-                leaves.push("Fourth");
+                write_separator(f)?;
+                f.write_str("Fourth")?;
             }
             if self.has_fifth() {
-                leaves.push("Fifth");
+                write_separator(f)?;
+                f.write_str("Fifth")?;
             }
-            serializer.serialize_str(&leaves.join(", "))
+            Ok(())
         }
     }
 }
@@ -1108,7 +1129,13 @@ mod tests {
         }
     }
 
-    #[cfg(feature = "wasm")]
+    #[test]
+    fn shiny_leaves_display() {
+        assert_eq!(ShinyLeaves::from_byte(0b0001).to_string(), "First");
+        assert_eq!(ShinyLeaves::from_byte(0b1010).to_string(), "Second, Fourth");
+        assert_eq!(ShinyLeaves::new_crown().to_string(), "Crown");
+    }
+
     #[test]
     fn pokerus_strain() {
         let byte = 0xc4;

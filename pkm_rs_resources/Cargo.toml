@@ -16,7 +16,7 @@ wasm-bindgen = { version = "0.2.128", optional = true }
 js-sys = { version = "0.3.105", optional = true }
 serde-wasm-bindgen = { version = "0.6.5", optional = true }
 static_assertions = "1.1.0"
-strum = "0.28.0"
+strum = { version = "0.28.0", features=["derive"] }
 strum_macros = "0.28.0"
 rand = { version = "0.10.2", optional = true }
 arbitrary-int = "2.2.0"

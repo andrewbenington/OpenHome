@@ -18,11 +18,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: fit-content;
-  padding: 0;
-  min-width: 1.25rem;
-  height: 1.25rem;
+  min-height: 1.25rem;
+  padding: calc(0.15rem * var(--badge-size));
   border-radius: var(--border-radius-xs);
+
+  img,
+  svg {
+    width: calc(0.6rem + 0.4rem * var(--badge-size));
+  }
+
+  svg {
+    height: 40px;
+  }
+}
+
+.badge-icon-only {
+  aspect-ratio: 1;
 }
 
 .numerical-badge {
@@ -33,9 +44,31 @@
   color: black;
 }
 
+.badge-size-1 {
+  --badge-size: 1;
+}
+
+.badge-size-2 {
+  --badge-size: 2;
+}
+
+.badge-size-3 {
+  --badge-size: 3;
+}
+
+.badge-disabled {
+  background-color: light-dark(var(--gray-8), var(--gray-7)) !important;
+  img {
+    filter: brightness(55%);
+
+    @media (prefers-color-scheme: dark) {
+      filter: brightness(20%);
+    }
+  }
+}
+
 .image-badge-with-text {
   padding: 0px var(--padding-radius-sm-lg);
-  display: inline-flex;
   align-items: center;
   gap: 0.25rem;
 }

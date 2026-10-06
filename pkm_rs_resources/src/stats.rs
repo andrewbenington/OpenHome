@@ -1,8 +1,8 @@
 #[cfg(feature = "wasm")]
 use crate::natures::NatureIndex;
 use crate::natures::NatureMetadata;
-use crate::species::SpeciesForm;
 use crate::species::metadata_table::BaseStats;
+use crate::species::{BaseForm, SpeciesForm};
 use crate::{metadata_source::MetadataSource, species::metadata_table::MetadataTableReader};
 
 use pkm_rs_types::{HyperTraining, NationalDex, Stat, Stats, Stats16Le, StatsPreSplit};
@@ -213,8 +213,9 @@ pub fn calculate_stats_gen1(
     evs: &StatsPreSplit,
     level: u16,
 ) -> Option<StatsPreSplit> {
-    let BaseStats::PreSplit(base) =
-        SpeciesForm::base_form(national_dex).get_base_stats_from(MetadataSource::Yellow)?
+    let BaseStats::PreSplit(base) = national_dex
+        .base_form()
+        .get_base_stats_from(MetadataSource::Yellow)?
     else {
         panic!("Pokémon Yellow base stats should have a unified Special stat")
     };

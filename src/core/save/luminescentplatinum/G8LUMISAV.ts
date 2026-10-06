@@ -47,7 +47,7 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
   // Static metadata
   static saveTypeAbbreviation = 'LUMI'
   static saveTypeName = 'Pokémon Luminescent Platinum'
-  static saveTypeID = 'luminescent_platinum'
+  static saveTypeID = 'luminescent_platinum' as const
   static pkmType = PB8LUMI
   static boxSizeBytes = PB8LUMI.getBoxSize() * 30
   static transferRestrictions: TransferRestrictions = LP_TRANSFER_RESTRICTIONS

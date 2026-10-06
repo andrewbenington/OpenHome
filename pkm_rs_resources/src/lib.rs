@@ -17,6 +17,7 @@ pub mod ribbons;
 pub mod species;
 pub mod stats;
 pub mod text_resource;
+pub mod variants;
 
 pub use result::*;
 

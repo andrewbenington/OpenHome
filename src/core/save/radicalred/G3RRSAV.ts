@@ -79,7 +79,7 @@ export class G3RRSAV extends G3CFRUSAV<PK3RR> {
   }
 
   static getPluginIdentifier() {
-    return 'radical_red'
+    return 'radical_red' as const
   }
 
   getSlotMetadata = (boxNum: number, boxSlot: number): SlotMetadata => {
