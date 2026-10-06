@@ -9,7 +9,7 @@ import { beforeAll, describe, expect, test } from 'vitest'
 import { PKMInterface } from '../../pkm/interfaces'
 import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
 import { LegendsArceusSave } from '../Gen89/LegendsArceus'
-import { ScarletVioletSave } from '../Gen89/ScarletVioletSave'
+import { ScarletVioletSaveJs } from '../Gen89/ScarletVioletSave'
 import { SwordShieldSave } from '../Gen89/SwordShieldSave'
 import { emptyPathData, PathData } from '../util/path'
 import { initializeWasm } from './init'
@@ -161,7 +161,7 @@ describe('gen 8 save files', () => {
 
   test("scarlet/violet empty bytes don't crash", () => {
     const violetSaveBytes = new Uint8Array(readFileSync(saveTestFilePath('violet')))
-    const violetSave = new ScarletVioletSave(violetPath, violetSaveBytes)
+    const violetSave = new ScarletVioletSaveJs(violetPath, violetSaveBytes)
     violetSave.emptyBoxSlotBytes()
   })
 

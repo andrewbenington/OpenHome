@@ -33,7 +33,7 @@ const SAVE_SIZE_BYTES_MAX = 0x43c000
 
 export type SV_SAVE_REVISION = 'Base Game' | 'Teal Mask' | 'Indigo Disk'
 
-export class ScarletVioletSave extends Gen8Gen9Save<PK9> {
+export class ScarletVioletSaveJs extends Gen8Gen9Save<PK9> {
   static boxSizeBytes = PK9.getBoxSize() * 30
   static pkmType = PK9
   static saveTypeAbbreviation = 'SV'
@@ -105,7 +105,7 @@ export class ScarletVioletSave extends Gen8Gen9Save<PK9> {
   }
 
   getBoxSizeBytes(): number {
-    return ScarletVioletSave.boxSizeBytes
+    return ScarletVioletSaveJs.boxSizeBytes
   }
 
   getBoxSlotGapBytes(): number {
@@ -170,7 +170,7 @@ export class ScarletVioletSave extends Gen8Gen9Save<PK9> {
     }
     if (!SwishCrypto.getIsHashValid(bytes)) return false
     // ensure this isn't Pokémon Compass
-    return new ScarletVioletSave(emptyPathData, bytes).getBlock('Compass_Levelcap') === undefined
+    return new ScarletVioletSaveJs(emptyPathData, bytes).getBlock('Compass_Levelcap') === undefined
   }
 
   static includesOrigin(origin: OriginGame) {
