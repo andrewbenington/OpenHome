@@ -88,7 +88,6 @@ export const RRExcludedForms = {
   '854': [1], // Antique Sinistea
   '855': [1], // Antique Polteageist
   '869': [1, 2, 3, 4, 5, 6, 7, 8], // Alcremie non-Vanilla
-  '876': [1], // Indeedee-F also shares a Radical Red index with male, so excluded until given special handling
   '893': [1], // Zarude Dada
   '898': [1, 2], // Fused Calyrex
   '902': [1], // Basculegion-F, same as Indeedee/Meowstic
