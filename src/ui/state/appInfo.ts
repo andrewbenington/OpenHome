@@ -74,9 +74,16 @@ export const defaultSettings: Settings = {
   monDisplayState: initialMonDisplayState(),
   appTheme: 'system',
   zoomLevel: 100,
+  developerSettings: { flags: [] },
 }
 
 export type AppTheme = 'light' | 'dark' | 'system'
+
+export type DeveloperFlag = 'show_move_ids'
+
+export type DeveloperSettings = {
+  flags: DeveloperFlag[]
+}
 
 export type Settings = {
   enabledSaveTypes: Record<string, boolean>
@@ -86,6 +93,7 @@ export type Settings = {
   monDisplayState: MonDisplayState
   appTheme: AppTheme
   zoomLevel: number
+  developerSettings: DeveloperSettings
 }
 
 export type AppInfoState = {

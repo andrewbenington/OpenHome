@@ -1,6 +1,6 @@
 use crate::gen9_lza::{
-    LZA_BASE_TM_BYTES, LZA_DLC_TM_BYTES, LZA_PLUS_MOVES_BLOCK_B_BYTES,
-    LZA_PLUS_MOVES_BLOCK_C_BYTES, PlusMoveFlags,
+    LZA_BASE_TM_BYTES, LZA_DLC_TM_BYTES, LZA_PLUS_MOVES_0X94_BYTES, LZA_PLUS_MOVES_0XD6_BYTES,
+    PlusMoveFlags,
 };
 use crate::gen9_sv;
 use crate::ohpkm::issues::OhpkmIssue;
@@ -148,8 +148,8 @@ impl DataSection for LegendsZaData {
             tm_flags_base: FlagSet::from_bytes(*array_ref![bytes, 0, LZA_BASE_TM_BYTES]),
             tm_flags_dlc: FlagSet::from_bytes(*array_ref![bytes, 25, LZA_DLC_TM_BYTES]),
             plus_moves: PlusMoveFlags::from_byte_blocks(
-                array_ref![bytes, 38, LZA_PLUS_MOVES_BLOCK_C_BYTES],
-                array_ref![bytes, 71, LZA_PLUS_MOVES_BLOCK_B_BYTES],
+                array_ref![bytes, 38, LZA_PLUS_MOVES_0XD6_BYTES],
+                array_ref![bytes, 71, LZA_PLUS_MOVES_0X94_BYTES],
             ),
         })
     }
@@ -157,21 +157,21 @@ impl DataSection for LegendsZaData {
     fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = [0u8; OhpkmSectionTag::LegendsZa.min_size()];
 
-        let (tm_base_bytes, tm_dlc_bytes, plus_block_c_bytes, plus_block_b_bytes) = mut_array_refs![
+        let (tm_base_bytes, tm_dlc_bytes, plus_block_0xd6_bytes, plus_block_0x94_bytes) = mut_array_refs![
             &mut bytes,
             LZA_BASE_TM_BYTES,
             LZA_DLC_TM_BYTES,
-            LZA_PLUS_MOVES_BLOCK_C_BYTES,
-            LZA_PLUS_MOVES_BLOCK_B_BYTES
+            LZA_PLUS_MOVES_0XD6_BYTES,
+            LZA_PLUS_MOVES_0X94_BYTES
         ];
 
         tm_base_bytes.copy_from_slice(&self.tm_flags_base.to_bytes());
         tm_dlc_bytes.copy_from_slice(&self.tm_flags_dlc.to_bytes());
 
-        let (block_c, block_b) = self.plus_moves.to_bytes();
+        let (block_0xd6, block_0x94) = self.plus_moves.to_bytes();
 
-        plus_block_c_bytes.copy_from_slice(&block_c);
-        plus_block_b_bytes.copy_from_slice(&block_b);
+        plus_block_0xd6_bytes.copy_from_slice(&block_0xd6);
+        plus_block_0x94_bytes.copy_from_slice(&block_0x94);
 
         bytes.to_vec()
     }
