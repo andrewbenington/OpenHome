@@ -88,7 +88,7 @@ export default function PokedexSummary(props: PokedexSummaryProps) {
             align="end"
             style={{ height: '100%', overflowY: 'auto', width: '50%', gap: 2 }}
           >
-            <AttributeRow label="Level-Up">{species.levelUpType}</AttributeRow>
+            <AttributeRow label="Experience Growth">{species.experienceGrowth}</AttributeRow>
             <AttributeRow label="Type">
               <TypeIcon type={type1} />
               {type2 && <TypeIcon type={type2} />}
@@ -96,12 +96,12 @@ export default function PokedexSummary(props: PokedexSummaryProps) {
             {!isExtraFormMetadata(selectedForm) && (
               <>
                 <AttributeRow label="Ability 1">{selectedForm.abilities[0].name}</AttributeRow>
-                {selectedForm.abilities[1] !== selectedForm.abilities[0] && (
+                {!selectedForm.abilities[1].equals(selectedForm.abilities[0]) && (
                   <AttributeRow label="Ability 2">{selectedForm.abilities[1].name}</AttributeRow>
                 )}
 
                 {selectedForm.hiddenAbility && (
-                  <AttributeRow label="Ability H">
+                  <AttributeRow label="Hidden Ability">
                     <div>{selectedForm.hiddenAbility.name}</div>
                   </AttributeRow>
                 )}
@@ -110,7 +110,7 @@ export default function PokedexSummary(props: PokedexSummaryProps) {
             <AttributeRow label="Egg Groups">
               <div>{selectedForm.eggGroups.join(' • ')}</div>
             </AttributeRow>
-            <AttributeRow label="Gender Ratio">{selectedForm.genderRatio}</AttributeRow>
+            <AttributeRow label="Gender Ratio">{selectedForm.genderRatioDisplay}</AttributeRow>
           </Flex>
         </Flex>
       </Card>

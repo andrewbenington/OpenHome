@@ -39,7 +39,7 @@ export function rustAbilityConstName(index: number, ability: string): string {
   return constName
 }
 
-type LevelUpType = 'Slow' | 'Medium Slow' | 'Medium Fast' | 'Fast' | 'Erratic' | 'Fluctuating'
+type ExperienceGrowth = 'Slow' | 'Medium Slow' | 'Medium Fast' | 'Fast' | 'Erratic' | 'Fluctuating'
 
 type GenderRatio =
   'Genderless' | 'AllMale' | 'AllFemale' | 'Equal' | 'M1ToF7' | 'M1ToF3' | 'M7ToF1' | 'M3ToF1'
@@ -48,7 +48,7 @@ type Species = {
   readonly name: string
   readonly nationalDex: number
   readonly forms: readonly Form[]
-  readonly levelUpType: LevelUpType
+  readonly experienceGrowth: ExperienceGrowth
 }
 
 type Form = {
@@ -123,8 +123,8 @@ function eggGroupToRust(eg: string): string {
   return `EggGroup::${enumName}`
 }
 
-function levelUpTypeToRust(lut: string): string {
-  return `LevelUpType::${lut.split(' ').join('')}`
+function experienceGrowthToRust(lut: string): string {
+  return `ExperienceGrowth::${lut.split(' ').join('')}`
 }
 
 function regionToRust(reg: string): string {
@@ -190,7 +190,7 @@ function convertForm(species: Species, form: Form): string {
 function convertSpecies(species: Species): string {
   return `SpeciesMetadata {
     national_dex: NationalDex::${pascalCase(species.name)},
-    level_up_type: ${levelUpTypeToRust(species.levelUpType)},
+    experience_growth: ${experienceGrowthToRust(species.experienceGrowth)},
     forms: &[${species.forms.map((form) => convertForm(species, form)).join(',')}]
 }`
 }
@@ -199,7 +199,7 @@ function rowToSpecies(row: SpeciesGetAllRow, forms: Form[]): Species {
   return {
     name: row.name,
     nationalDex: row.nationalDex,
-    levelUpType: row.levelUpType,
+    experienceGrowth: row.levelUpType,
     forms: forms,
   }
 }
@@ -299,7 +299,7 @@ async function main() {
   let output = `
 use crate::abilities::AbilityIndexBounded;
 use crate::species::{
-    EggGroup, FormMetadata, GenderRatio, LevelUpType, MegaEvolutionMetadata, SpeciesForm, SpeciesMetadata,
+    EggGroup, FormMetadata, GenderRatio, ExperienceGrowth, MegaEvolutionMetadata, SpeciesForm, SpeciesMetadata,
 };
 use pkm_rs_types::{Generation, GameSetting, NationalDex};
 

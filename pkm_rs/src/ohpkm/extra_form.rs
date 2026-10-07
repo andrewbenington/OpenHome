@@ -874,10 +874,10 @@ impl ExtraFormMetadata {
     }
 
     #[wasm_bindgen(getter = eggGroups)]
-    pub fn egg_groups(&self) -> Vec<String> {
+    pub fn egg_groups(&self) -> Vec<EggGroup> {
         match self.egg_groups.1 {
-            Some(egg_group_1) => vec![self.egg_groups.0.to_string(), egg_group_1.to_string()],
-            None => vec![self.egg_groups.0.to_string()],
+            Some(egg_group_1) => vec![self.egg_groups.0, egg_group_1],
+            None => vec![self.egg_groups.0],
         }
     }
 
@@ -919,6 +919,11 @@ impl ExtraFormMetadata {
     #[wasm_bindgen(js_name = genderFromPid)]
     pub fn gender_from_pid(&self, pid: u32) -> Gender {
         self.gender_ratio.gender_for_pid(pid)
+    }
+
+    #[wasm_bindgen(getter = genderRatioDisplay)]
+    pub fn gender_ratio_display(&self) -> String {
+        self.gender_ratio.to_string()
     }
 
     #[wasm_bindgen(getter = baseStats)]

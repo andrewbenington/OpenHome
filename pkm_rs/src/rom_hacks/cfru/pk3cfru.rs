@@ -455,7 +455,7 @@ impl<I: CfruSpeciesIndex> IsShiny for Pk3Cfru<I> {
 
 //     fn calculate_level(&self) -> u8 {
 //         self.get_species_metadata()
-//             .level_up_type
+//             .experience_growth
 //             .calculate_level(self.exp)
 //     }
 // }
