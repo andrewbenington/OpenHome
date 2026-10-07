@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 
 use super::{BOX_NAME_LENGTH, BOX_SLOTS, BoxName, Pk8};
-use crate::encryption::swish_crypto;
+use crate::encryption::swish_crypto::{self, NumericBlock};
 use crate::gen8_swsh::{BoxIndex, BoxSlot};
 use crate::result::{Error, Result};
 use crate::traits::PkmBytes;
@@ -15,6 +15,7 @@ pub(super) struct SwShBlocks {
     pub(super) my_status: MyStatusBlock,
     pub(super) pokemon_boxes: BoxBlock,
     pub(super) box_layouts: BoxLayout,
+    pub(super) current_box: NumericBlock,
     pub(super) other_blocks: Vec<swish_crypto::Block>,
 }
 
@@ -23,6 +24,7 @@ impl SwShBlocks {
         let mut my_status: Option<MyStatusBlock> = None;
         let mut pokemon_boxes: Option<BoxBlock> = None;
         let mut box_layouts: Option<BoxLayout> = None;
+        let mut current_box: Option<NumericBlock> = None;
         let mut other_blocks: Vec<swish_crypto::Block> = Vec::new();
 
         for block in blocks {
@@ -38,6 +40,10 @@ impl SwShBlocks {
                 Some(BlockKey::BoxLayout) => {
                     let block_data = block.into_array_data()?;
                     box_layouts = Some(BoxLayout(block_data));
+                }
+                Some(BlockKey::CurrentBox) => {
+                    let block_data = block.into_numeric_data()?;
+                    current_box = Some(block_data);
                 }
                 _ => {
                     other_blocks.push(block);
@@ -57,10 +63,15 @@ impl SwShBlocks {
             return Err(Error::build_save("missing BoxLayouts block", None));
         };
 
+        let Some(current_box) = current_box else {
+            return Err(Error::build_save("missing CurrentBox block", None));
+        };
+
         Ok(Self {
             my_status,
             pokemon_boxes,
             box_layouts,
+            current_box,
             other_blocks,
         })
     }
@@ -70,6 +81,7 @@ impl SwShBlocks {
             my_status,
             pokemon_boxes,
             box_layouts,
+            current_box,
             other_blocks,
         } = self;
 
@@ -81,6 +93,10 @@ impl SwShBlocks {
                 my_status.into_block(),
                 pokemon_boxes.into_block(),
                 box_layouts.into_block(),
+                swish_crypto::Block::new(
+                    BlockKey::CurrentBox.to_u32(),
+                    swish_crypto::BlockData::Value(current_box),
+                ),
             ])
             .map(|block| (block.key(), block))
             .collect();

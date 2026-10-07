@@ -7,8 +7,8 @@ import {
   SV_TRANSFER_RESTRICTIONS_TM,
 } from '@openhome-core/resources/consts/TransferRestrictions'
 import {
+  BlockDataFor,
   blockIsType,
-  ObjectBlock,
   SwishCrypto,
 } from '@openhome-core/save/encryption/SwishCrypto/SwishCrypto'
 import { G89BlockName, Gen8Gen9Save } from '@openhome-core/save/Gen89/Gen8Gen9Save'
@@ -24,6 +24,7 @@ import {
   emptyBoxSlotBytesScarletViolet,
   ExtraFormIndex,
   Languages,
+  ObjectBlock,
   OriginGame,
 } from '@pkm-rs/pkg'
 
@@ -46,7 +47,7 @@ export class ScarletVioletSave extends Gen8Gen9Save<PK9> {
   constructor(path: PathData, bytes: Uint8Array) {
     super(path, bytes)
 
-    this.trainerBlock = new MyStatus(this.getBlockMust('MyStatus', 'Object'))
+    this.trainerBlock = new MyStatus(this.getBlockDataMust('MyStatus', 'Object').Object)
     this.name = this.trainerBlock.getName()
 
     this.boxes.forEach((box, i) => {
@@ -83,19 +84,20 @@ export class ScarletVioletSave extends Gen8Gen9Save<PK9> {
     return this.scBlocks.find((b) => b.key === key)
   }
 
-  getBlockMust<T extends Block = Block>(
+  getBlockDataMust<T extends BlockType>(
     blockName: G89BlockName | keyof typeof BlockKeys,
-    type?: BlockType
-  ): T {
+    type: T
+  ): BlockDataFor<T> {
     const block = this.getBlock(blockName)
 
     if (!block) {
       throw Error(`Missing block ${blockName}`)
     }
-    if (type && !blockIsType(block, type)) {
+    if (!blockIsType(block, type)) {
       throw Error(`Block ${blockName} is type ${JSON.stringify(block.data)} (expected ${type})`)
     }
-    return block as T
+
+    return block.data
   }
 
   getMonBoxSizeBytes(): number {
@@ -209,7 +211,7 @@ class MyStatus {
   dataView: DataView<ArrayBuffer>
 
   constructor(scBlock: ObjectBlock) {
-    this.dataView = new DataView(scBlock.data.Object.bytes.buffer)
+    this.dataView = new DataView(scBlock.bytes.buffer)
   }
 
   public getName(): string {

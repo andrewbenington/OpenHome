@@ -10,15 +10,11 @@ import {
   ConvertStrategy,
   ExtraFormIndex,
   Languages,
+  ObjectBlock,
   OriginGame,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
-import {
-  ArrayBlock,
-  blockIsType,
-  ObjectBlock,
-  SwishCrypto,
-} from '../encryption/SwishCrypto/SwishCrypto'
+import { BlockDataFor, blockIsType, SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
 import { PathData } from '../util/path'
 import { BoxNamesBlock } from './BoxNamesBlock'
 import { G89BlockName, Gen8Gen9Save } from './Gen8Gen9Save'
@@ -48,7 +44,7 @@ export class LegendsArceusSave extends Gen8Gen9Save<PA8> {
       }
     })
 
-    this.myStatusBlock = new MyStatusBlock(this.getBlockMust('MyStatus', 'Object'))
+    this.myStatusBlock = new MyStatusBlock(this.getBlockDataMust('MyStatus', 'Object').Object)
     this.name = this.myStatusBlock.getName()
     this.tid = this.myStatusBlock.getTID()
     this.sid = this.myStatusBlock.getSID()
@@ -81,22 +77,22 @@ export class LegendsArceusSave extends Gen8Gen9Save<PA8> {
     return this.scBlocks.find((b) => b.key === key)
   }
 
-  getBlockMust<T extends Block = Block>(
+  getBlockDataMust<T extends BlockType>(
     blockName: G89BlockName | keyof typeof BlockKeys,
-    type?: BlockType
-  ): T {
+    type: T
+  ): BlockDataFor<T> {
     const block = this.getBlock(blockName)
 
     if (!block) {
       throw Error(`Missing block ${blockName}`)
     }
-    if (type && !blockIsType(block, type)) {
+    if (!blockIsType(block, type)) {
       throw Error(`Block ${blockName} has data ${JSON.stringify(block.data)}(expected ${type})`)
     }
-    return block as T
+    return block.data
   }
 
-  getBoxNamesBlock = () => new BoxNamesBlock(this.getBlockMust<ArrayBlock>('BoxLayout', 'Array'))
+  getBoxNamesBlock = () => new BoxNamesBlock(this.getBlockDataMust('BoxLayout', 'Array').Array)
 
   getMonBoxSizeBytes(): number {
     return 360
@@ -114,7 +110,7 @@ export class LegendsArceusSave extends Gen8Gen9Save<PA8> {
     return !isRestricted(LA_TRANSFER_RESTRICTIONS, nationalDex, formeNumber, extraFormIndex)
   }
 
-  supportsItem(_: number) {
+  supportsItem(_itemIndex: number) {
     // max supported item is Legend Plate if future functionality allows for direcly
     // adding to the game's satchel, but for now this will always return false because
     // there are no held Items
@@ -168,7 +164,7 @@ class MyStatusBlock {
   dataView: DataView<ArrayBuffer>
 
   constructor(scBlock: ObjectBlock) {
-    this.dataView = new DataView(scBlock.data.Object.bytes.buffer)
+    this.dataView = new DataView(scBlock.bytes.buffer)
   }
 
   public getName(): string {
