@@ -19,7 +19,9 @@ export function getDisplayID(pokemon: PKM): string {
     !('gameOfOrigin' in pokemon) ||
     OriginGames.generation(pokemon.gameOfOrigin) === Generation.G1 ||
     OriginGames.generation(pokemon.gameOfOrigin) === Generation.G2 ||
-    pokemon.gameOfOrigin < OriginGame.Sun
+    pokemon.gameOfOrigin < OriginGame.Sun ||
+    pokemon.gameOfOrigin === OriginGame.FireRedSwitch ||
+    pokemon.gameOfOrigin === OriginGame.LeafGreenSwitch
   ) {
     return pokemon.trainerID.toString().padStart(5, '0')
   }
