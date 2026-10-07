@@ -9,12 +9,12 @@ import {
   Pk7Wasm,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
-import { Errorable, Option } from '../util/functional'
+import { Errorable } from '../util/functional'
 import { BoxAndSlot, WasmOfficialSave } from './interfaces'
 import { PathData } from './util/path'
 import { isRestricted } from './util/TransferRestrictions'
 
-export class Gen7AlolaSave extends WasmOfficialSave<PK7, Pk7Wasm, Gen7AlolaSaveRust> {
+export class Gen7AlolaSave extends WasmOfficialSave<Pk7Wasm, PK7, Gen7AlolaSaveRust> {
   static pkmType = PK7
   static saveTypeAbbreviation = 'SM/USUM'
   static saveTypeID = 'SM/USUM'
@@ -32,16 +32,9 @@ export class Gen7AlolaSave extends WasmOfficialSave<PK7, Pk7Wasm, Gen7AlolaSaveR
 
   updatedBoxSlots: BoxAndSlot[] = []
 
-  currentPCBox: number
-
   constructor(path: PathData, bytes: Uint8Array) {
     super(Gen7AlolaSaveRust.fromBytes(bytes))
     this.filePath = path
-    this.currentPCBox = this.inner.currentPcBoxIdx
-  }
-
-  get bytes() {
-    return this.inner.prepareBytesForSaving()
   }
 
   static fileIsSave(bytes: Uint8Array): boolean {
@@ -74,15 +67,7 @@ export class Gen7AlolaSave extends WasmOfficialSave<PK7, Pk7Wasm, Gen7AlolaSaveR
     return itemIndex <= Item.FairyMemory
   }
 
-  setMonAt(boxNum: number, boxSlot: number, mon: Option<PK7>): void {
-    this.inner.setMonAt(boxNum, boxSlot, mon ? mon.inner : undefined)
-  }
-
   monFromWasm(wasmMon: Pk7Wasm): PK7 {
     return PK7.fromWasm(wasmMon)
-  }
-
-  getBoxName(boxIndex: number) {
-    return this.inner.getBoxName(boxIndex)
   }
 }

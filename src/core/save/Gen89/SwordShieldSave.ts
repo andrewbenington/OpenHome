@@ -34,7 +34,7 @@ const SAVE_SIZE_BYTES_MAX = 0x187800
 
 export type SWSH_SAVE_REVISION = 'Base Game' | 'Isle Of Armor' | 'Crown Tundra'
 
-export class SwordShieldSave extends WasmOfficialSave<PK8, Pk8Wasm, SwordShieldSaveRust> {
+export class SwordShieldSave extends WasmOfficialSave<Pk8Wasm, PK8, SwordShieldSaveRust> {
   MAX_BOX_COUNT: number = SwordShieldSaveRust.MAX_BOX_COUNT
   SLOTS_PER_BOX: number = SwordShieldSaveRust.SLOTS_PER_BOX
 
@@ -68,20 +68,12 @@ export class SwordShieldSave extends WasmOfficialSave<PK8, Pk8Wasm, SwordShieldS
     )
   }
 
-  get bytes() {
-    return this.inner.prepareBytesForSaving()
-  }
-
   get boxRows() {
     return SwordShieldSaveRust.BOX_ROWS
   }
 
   get boxColumns() {
     return SwordShieldSaveRust.BOX_COLS
-  }
-
-  get currentPCBox() {
-    return this.getCurrentPCBox()
   }
 
   convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK8> {
@@ -131,11 +123,6 @@ export class SwordShieldSave extends WasmOfficialSave<PK8, Pk8Wasm, SwordShieldS
     return block.data
   }
 
-  getMonAt(boxIndex: number, boxSlot: number): PK8 | undefined {
-    let pk8Wasm = this.inner.getMonAt(boxIndex, boxSlot)
-    return pk8Wasm ? PK8.fromWasm(pk8Wasm) : undefined
-  }
-
   setMonAt(boxIndex: number, boxSlot: number, mon: Option<PK8>): void {
     this.inner.setMonAt(boxIndex, boxSlot, mon?.inner)
   }
@@ -154,10 +141,6 @@ export class SwordShieldSave extends WasmOfficialSave<PK8, Pk8Wasm, SwordShieldS
 
   getBoxSlotGapBytes(): number {
     return 0
-  }
-
-  getBoxName(boxIndex: number) {
-    return this.inner.getBoxName(boxIndex)
   }
 
   supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
