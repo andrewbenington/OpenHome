@@ -248,7 +248,7 @@ export class G3SAV extends OfficialSAV<PK3> {
   primarySaveOffset: number
 
   origin: OriginGame
-  isPlugin: false = false
+  isPlugin: boolean = false
 
   boxRows = 5
   boxColumns = 6
@@ -402,15 +402,18 @@ export class G3SAV extends OfficialSAV<PK3> {
     }
     try {
       const save = new G3SAV(emptyPathData, bytes)
-
-      if (save.primarySave.gameCode === 0) {
-        return true
-      }
-      return save.primarySave.securityKey > 0 && save.primarySave.signature === GEN3_SIGNATURE
+      return this.saveFileIsThisFormat(save)
     } catch (e) {
       console.error(e)
       return false
     }
+  }
+
+  public static saveFileIsThisFormat(save: G3SAV) {
+    if (save.primarySave.gameCode === 0) {
+      return true
+    }
+    return save.primarySave.securityKey > 0 && save.primarySave.signature === GEN3_SIGNATURE
   }
 
   static includesOrigin(origin: OriginGame) {

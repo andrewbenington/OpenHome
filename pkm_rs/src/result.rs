@@ -1,5 +1,3 @@
-#[cfg(feature = "wasm")]
-use crate::encryption::swish_crypto::SwishError;
 use crate::sectioned_data;
 
 use pkm_rs_resources::abilities::ABILITY_MAX;
@@ -64,6 +62,10 @@ pub enum Error {
     },
     StringDecode {
         source: StringErrorSource,
+    },
+    MoveError {
+        value : u16,
+        source: MoveErrorSource
     },
     #[cfg(feature = "wasm")]
     SwishCrypto(SwishError),
