@@ -7,10 +7,9 @@ import {
   SWSH_TRANSFER_RESTRICTIONS_IOA,
 } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { Errorable, Option } from '@openhome-core/util/functional'
+import { Errorable } from '@openhome-core/util/functional'
 import { utf16BytesToString } from '@openhome-core/util/stringConversion'
 import {
-  BinaryGender,
   Block,
   BlockType,
   ConvertStrategy,
@@ -35,8 +34,7 @@ const SAVE_SIZE_BYTES_MAX = 0x187800
 export type SWSH_SAVE_REVISION = 'Base Game' | 'Isle Of Armor' | 'Crown Tundra'
 
 export class SwordShieldSave extends WasmOfficialSave<Pk8Wasm, PK8, SwordShieldSaveRust> {
-  MAX_BOX_COUNT: number = SwordShieldSaveRust.MAX_BOX_COUNT
-  SLOTS_PER_BOX: number = SwordShieldSaveRust.SLOTS_PER_BOX
+  WASM_SAVE_CLASS = SwordShieldSaveRust
 
   static boxSizeBytes = PK8.getBoxSize() * 30
   static pkmType = PK8
@@ -68,20 +66,8 @@ export class SwordShieldSave extends WasmOfficialSave<Pk8Wasm, PK8, SwordShieldS
     )
   }
 
-  get boxRows() {
-    return SwordShieldSaveRust.BOX_ROWS
-  }
-
-  get boxColumns() {
-    return SwordShieldSaveRust.BOX_COLS
-  }
-
   convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK8> {
     return PK8.fromOhpkm(ohpkm, strategy)
-  }
-
-  getBoxCount(): number {
-    return 32
   }
 
   monConstructor(buffer: ArrayBuffer, encrypted: boolean): PK8 {
@@ -90,10 +76,6 @@ export class SwordShieldSave extends WasmOfficialSave<Pk8Wasm, PK8, SwordShieldS
 
   isEmptySlot(bytes: ArrayBuffer): boolean {
     return Pk8Wasm.isEmptySlot(new Uint8Array(bytes))
-  }
-
-  emptyBoxSlotBytes() {
-    return SwordShieldSaveRust.emptyBoxSlotBytes()
   }
 
   getBlockKey(blockName: G89BlockName | keyof typeof BlockKeys): number {
@@ -123,24 +105,8 @@ export class SwordShieldSave extends WasmOfficialSave<Pk8Wasm, PK8, SwordShieldS
     return block.data
   }
 
-  setMonAt(boxIndex: number, boxSlot: number, mon: Option<PK8>): void {
-    this.inner.setMonAt(boxIndex, boxSlot, mon?.inner)
-  }
-
   monFromWasm(wasmMon: Pk8Wasm): PK8 {
     return PK8.fromWasm(wasmMon)
-  }
-
-  getMonBoxSizeBytes(): number {
-    return PK8.getBoxSize()
-  }
-
-  getBoxSizeBytes(): number {
-    return SwordShieldSave.boxSizeBytes
-  }
-
-  getBoxSlotGapBytes(): number {
-    return 0
   }
 
   supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
@@ -216,14 +182,6 @@ export class SwordShieldSave extends WasmOfficialSave<Pk8Wasm, PK8, SwordShieldS
 
   static includesOrigin(origin: OriginGame) {
     return origin === OriginGame.Sword || origin === OriginGame.Shield
-  }
-
-  get trainerGender(): BinaryGender {
-    return this.inner.trainerGender
-  }
-
-  get language() {
-    return this.inner.language
   }
 }
 

@@ -15,12 +15,11 @@ import { PathData } from './util/path'
 import { isRestricted } from './util/TransferRestrictions'
 
 export class Gen7AlolaSave extends WasmOfficialSave<Pk7Wasm, PK7, Gen7AlolaSaveRust> {
+  WASM_SAVE_CLASS = Gen7AlolaSaveRust
+
   static pkmType = PK7
   static saveTypeAbbreviation = 'SM/USUM'
   static saveTypeID = 'SM/USUM'
-
-  MAX_BOX_COUNT: number = Gen7AlolaSaveRust.MAX_BOX_COUNT
-  SLOTS_PER_BOX: number = Gen7AlolaSaveRust.SLOTS_PER_BOX
 
   filePath: PathData
   fileCreated?: Date
@@ -45,14 +44,6 @@ export class Gen7AlolaSave extends WasmOfficialSave<Pk7Wasm, PK7, Gen7AlolaSaveR
 
   static includesOrigin(origin: OriginGame) {
     return Gen7AlolaSaveRust.includesOrigin(origin)
-  }
-
-  get boxRows() {
-    return Gen7AlolaSaveRust.BOX_ROWS
-  }
-
-  get boxColumns() {
-    return Gen7AlolaSaveRust.BOX_COLS
   }
 
   convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK7> {

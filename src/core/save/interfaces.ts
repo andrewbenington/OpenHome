@@ -388,6 +388,15 @@ export interface WasmSaveInner<P> {
 
 type WasmPkmInterface<P> = PKMInterface & { inner: P }
 
+type WasmSaveClass<S> = {
+  fromBytes(bytes: Uint8Array): S
+
+  readonly BOX_COLS: number
+  readonly BOX_ROWS: number
+  readonly SLOTS_PER_BOX: number
+  readonly MAX_BOX_COUNT: number
+}
+
 export abstract class WasmOfficialSave<
   WasmP,
   P extends WasmPkmInterface<WasmP>,
@@ -400,6 +409,8 @@ export abstract class WasmOfficialSave<
     super()
     this.inner = inner
   }
+
+  abstract WASM_SAVE_CLASS: WasmSaveClass<WasmSave>
 
   get name() {
     return this.inner.trainerName
@@ -443,8 +454,21 @@ export abstract class WasmOfficialSave<
 
   abstract monFromWasm(wasmMon: WasmP): P
 
-  abstract MAX_BOX_COUNT: number
-  abstract SLOTS_PER_BOX: number
+  get MAX_BOX_COUNT(): number {
+    return this.WASM_SAVE_CLASS.MAX_BOX_COUNT
+  }
+
+  get SLOTS_PER_BOX(): number {
+    return this.WASM_SAVE_CLASS.SLOTS_PER_BOX
+  }
+
+  get boxRows() {
+    return this.WASM_SAVE_CLASS.BOX_ROWS
+  }
+
+  get boxColumns() {
+    return this.WASM_SAVE_CLASS.BOX_COLS
+  }
 
   getMonAt(boxNum: number, boxSlot: number): Option<P> {
     const wasmMon = this.inner.getMonAt(boxNum, boxSlot)
