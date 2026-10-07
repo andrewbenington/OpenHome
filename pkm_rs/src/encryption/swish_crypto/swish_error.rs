@@ -46,7 +46,7 @@ pub struct MissingBlock {
 }
 
 impl MissingBlock {
-    pub fn new(block_key_display: String) -> Self {
+    pub const fn new(block_key_display: String) -> Self {
         Self { block_key_display }
     }
 }
