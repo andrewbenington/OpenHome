@@ -1,3 +1,4 @@
+#[cfg(feature = "wasm")]
 use crate::encryption::swish_crypto::SwishError;
 use crate::sectioned_data;
 
@@ -64,6 +65,7 @@ pub enum Error {
     StringDecode {
         source: StringErrorSource,
     },
+    #[cfg(feature = "wasm")]
     SwishCrypto(SwishError),
     Other(String),
 }
@@ -173,6 +175,7 @@ impl Display for Error {
                 format!("Invalid tag value {value} for tag type {tag_type}")
             }
             Self::StringDecode { source } => format!("String decode error: {source}"),
+            #[cfg(feature = "wasm")]
             Self::SwishCrypto(error) => error.to_string(),
             Self::Other(msg) => msg.clone(),
         };
@@ -317,6 +320,7 @@ impl From<Error> for JsValue {
     }
 }
 
+#[cfg(feature = "wasm")]
 impl From<SwishError> for Error {
     fn from(value: SwishError) -> Self {
         Self::SwishCrypto(value)
