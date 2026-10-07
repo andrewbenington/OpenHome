@@ -382,11 +382,15 @@ export interface WasmSaveInner<P> {
 
   getMonAt(box_num: number, offset: number): Option<P>
   setMonAt(box_num: number, offset: number, mon?: P | null): void
+
+  getBoxName(box_num: number): string
 }
 
+type WasmPkmInterface<P> = PKMInterface & { inner: P }
+
 export abstract class WasmOfficialSave<
-  P extends PKMInterface,
   WasmP,
+  P extends WasmPkmInterface<WasmP>,
   WasmSave extends WasmSaveInner<WasmP>,
 > extends OfficialSAV<P> {
   inner: WasmSave
@@ -421,6 +425,10 @@ export abstract class WasmOfficialSave<
     return this.inner.currentPcBoxIdx
   }
 
+  get currentPCBox() {
+    return this.getCurrentPCBox()
+  }
+
   get origin() {
     return this.inner.gameOfOrigin
   }
@@ -448,6 +456,10 @@ export abstract class WasmOfficialSave<
     return R.Ok(wasmMon ? this.monFromWasm(wasmMon) : undefined)
   }
 
+  setMonAt(boxIndex: number, boxSlot: number, mon: Option<P>): void {
+    this.inner.setMonAt(boxIndex, boxSlot, mon?.inner)
+  }
+
   getAllMons() {
     return range(this.MAX_BOX_COUNT)
       .flatMap((boxIndex) => range(this.SLOTS_PER_BOX).map((boxSlot) => ({ boxIndex, boxSlot })))
@@ -467,5 +479,7 @@ export abstract class WasmOfficialSave<
     return this.SLOTS_PER_BOX
   }
 
-  abstract getBoxName(boxIndex: number): string
+  getBoxName(boxIndex: number): string {
+    return this.inner.getBoxName(boxIndex)
+  }
 }
