@@ -57,21 +57,15 @@ export class SwordShieldSave extends WasmOfficialSave<PK8, Pk8Wasm, SwordShieldS
   scBlocks: Block[]
 
   trainerCardBlock: TrainerCardBlock
-  currentPCBox: number
 
   constructor(path: PathData, bytes: Uint8Array) {
     super(SwordShieldSaveRust.fromBytes(bytes))
     this.scBlocks = SwishCrypto.decrypt(bytes)
     this.filePath = path
 
-    const currentPCBlock = this.getBlockDataMust('CurrentBox', {
-      Scalar: { Numeric: 'UInt8' },
-    })
     this.trainerCardBlock = new TrainerCardBlock(
       this.getBlockDataMust('TrainerCard', 'Object').Object
     )
-
-    this.currentPCBox = currentPCBlock.Value.UInt8
   }
 
   get bytes() {
@@ -84,6 +78,10 @@ export class SwordShieldSave extends WasmOfficialSave<PK8, Pk8Wasm, SwordShieldS
 
   get boxColumns() {
     return SwordShieldSaveRust.BOX_COLS
+  }
+
+  get currentPCBox() {
+    return this.getCurrentPCBox()
   }
 
   convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK8> {

@@ -1,7 +1,7 @@
-use super::save_blocks::{BoxBlock, MyStatusBlock, SwShBlocks};
+use super::save_blocks::{BoxBlock, MyStatusBlock, SwordShieldBlocks};
 use super::{BOX_COLS, BOX_ROWS, BoxName, MAX_BOX_COUNT, Pk8, Pk8Buffer};
 use crate::checksum::RefreshChecksum;
-use crate::encryption::swish_crypto;
+use crate::encryption::swish_crypto::{self, NumericBlock, SwishBlocks};
 use crate::gen8_swsh::{BoxIndex, BoxSlot};
 use crate::result::{Error, Result};
 use crate::traits::PkmBytes;
@@ -11,6 +11,7 @@ use pkm_rs_types::BoundViolated;
 use pkm_rs_types::OriginGame;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{BinaryGender, Language};
+
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -21,7 +22,7 @@ const SAVE_SIZE_BYTES_MAX: usize = 0x187800;
 #[derive(Debug)]
 pub struct SwordShieldSave {
     bytes: Box<[u8]>,
-    blocks: SwShBlocks,
+    blocks: SwordShieldBlocks,
 }
 
 impl SwordShieldSave {
@@ -40,7 +41,10 @@ impl SwordShieldSave {
             ));
         }
 
-        let blocks = SwShBlocks::from_vec(swish_crypto::decrypt_blocks(&bytes)?)?;
+        let blocks = SwordShieldBlocks::from_blocks(
+            SwishBlocks::from_bytes(&bytes)
+                .map_err(|e| Error::other(&format!("SwishBlocks from_bytes: {e}")))?,
+        )?;
 
         Ok(Self { bytes, blocks })
     }
@@ -140,7 +144,15 @@ impl SwordShieldSave {
 
     #[cfg(feature = "wasm")]
     pub fn prepare_bytes_for_saving(&self) -> Vec<u8> {
-        swish_crypto::encrypt_blocks(&self.blocks.clone().into_vec(), self.bytes.len())
+        swish_crypto::encrypt_blocks(
+            &self
+                .blocks
+                .clone()
+                .to_blocks()
+                .into_values()
+                .collect::<Vec<_>>(),
+            self.bytes.len(),
+        )
     }
 
     fn convert_ohpkm(
@@ -164,11 +176,13 @@ impl SwordShieldSave {
         self.my_status().origin_game()
     }
 
-    fn current_pc_box_idx(&self) -> usize {
-        if self.bytes[0] >= MAX_BOX_COUNT {
-            0
+    const fn current_pc_box_idx(&self) -> usize {
+        if let NumericBlock::UInt8(current_box) = self.blocks.current_box
+            && current_box < MAX_BOX_COUNT
+        {
+            current_box as usize
         } else {
-            self.bytes[0].into()
+            0
         }
     }
 
@@ -372,6 +386,17 @@ mod tests {
                 }
             }
         }
+        Ok(())
+    }
+
+    #[test]
+    fn current_box_is_expected() -> Result<()> {
+        let save_path = Path::new("gen8-swsh").join("sword");
+        let save_bytes = tests::save_bytes_from_file(&save_path)?;
+        let save = SwordShieldSave::from_bytes(save_bytes.into_boxed_slice())?;
+
+        assert_eq!(save.current_pc_box_idx(), 15);
+
         Ok(())
     }
 

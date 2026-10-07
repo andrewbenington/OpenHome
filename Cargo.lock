@@ -2978,6 +2978,7 @@ dependencies = [
  "hex",
  "js-sys",
  "num",
+ "num_enum",
  "phf",
  "pkm_rs_derive",
  "pkm_rs_resources",

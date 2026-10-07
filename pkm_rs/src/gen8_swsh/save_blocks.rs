@@ -1,205 +1,129 @@
 use std::collections::BTreeMap;
 
 use super::{BOX_NAME_LENGTH, BOX_SLOTS, BoxName, Pk8};
-use crate::encryption::swish_crypto::{self, NumericBlock};
+use crate::encryption::swish_crypto::{self, NumericBlock, SwishBlocks};
 use crate::gen8_swsh::{BoxIndex, BoxSlot};
-use crate::result::{Error, Result};
+use crate::result::Result;
 use crate::traits::PkmBytes;
 
+use num_enum::{IntoPrimitive, TryFromPrimitive};
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{BinaryGender, Language, read_u16_le};
 use pkm_rs_types::{OriginGame, read_u32_le};
+use strum::{Display, EnumIter, EnumString};
 
 #[derive(Debug, Clone)]
-pub(super) struct SwShBlocks {
+pub(super) struct SwordShieldBlocks {
     pub(super) my_status: MyStatusBlock,
     pub(super) pokemon_boxes: BoxBlock,
     pub(super) box_layouts: BoxLayout,
     pub(super) current_box: NumericBlock,
-    pub(super) other_blocks: Vec<swish_crypto::Block>,
+    pub(super) other_blocks: SwishBlocks,
 }
 
-impl SwShBlocks {
-    pub fn from_vec(blocks: impl IntoIterator<Item = swish_crypto::Block>) -> Result<Self> {
-        let mut my_status: Option<MyStatusBlock> = None;
-        let mut pokemon_boxes: Option<BoxBlock> = None;
-        let mut box_layouts: Option<BoxLayout> = None;
-        let mut current_box: Option<NumericBlock> = None;
-        let mut other_blocks: Vec<swish_crypto::Block> = Vec::new();
-
-        for block in blocks {
-            match BlockKey::try_from(block.key()) {
-                Some(BlockKey::MyStatus) => {
-                    let block_data = block.into_object_data()?;
-                    my_status = Some(MyStatusBlock(block_data));
-                }
-                Some(BlockKey::Box) => {
-                    let block_data = block.into_object_data()?;
-                    pokemon_boxes = Some(BoxBlock(block_data));
-                }
-                Some(BlockKey::BoxLayout) => {
-                    let block_data = block.into_array_data()?;
-                    box_layouts = Some(BoxLayout(block_data));
-                }
-                Some(BlockKey::CurrentBox) => {
-                    let block_data = block.into_numeric_data()?;
-                    current_box = Some(block_data);
-                }
-                _ => {
-                    other_blocks.push(block);
-                }
-            };
-        }
-
-        let Some(my_status) = my_status else {
-            return Err(Error::build_save("missing MyStatus block", None));
-        };
-
-        let Some(pokemon_boxes) = pokemon_boxes else {
-            return Err(Error::build_save("missing Boxes block", None));
-        };
-
-        let Some(box_layouts) = box_layouts else {
-            return Err(Error::build_save("missing BoxLayouts block", None));
-        };
-
-        let Some(current_box) = current_box else {
-            return Err(Error::build_save("missing CurrentBox block", None));
-        };
+impl SwordShieldBlocks {
+    pub fn from_blocks(mut blocks: SwishBlocks) -> Result<Self> {
+        let my_status = MyStatusBlock(
+            blocks
+                .try_pop_block(SwShBlockKey::MyStatus)?
+                .into_object_data()?,
+        );
+        let pokemon_boxes = BoxBlock(
+            blocks
+                .try_pop_block(SwShBlockKey::Box)?
+                .into_object_data()?,
+        );
+        let box_layouts = BoxLayout(
+            blocks
+                .try_pop_block(SwShBlockKey::BoxLayout)?
+                .into_array_data()?,
+        );
+        let current_box = blocks
+            .try_pop_block(SwShBlockKey::CurrentBox)?
+            .into_numeric_data()?;
 
         Ok(Self {
             my_status,
             pokemon_boxes,
             box_layouts,
             current_box,
-            other_blocks,
+            other_blocks: blocks,
         })
     }
 
-    pub fn into_vec(self) -> Vec<swish_crypto::Block> {
+    pub fn to_blocks(&self) -> BTreeMap<u32, swish_crypto::Block> {
         let Self {
             my_status,
             pokemon_boxes,
             box_layouts,
             current_box,
             other_blocks,
-        } = self;
+        } = self.clone();
+
+        let current_box_block = swish_crypto::Block::new(
+            SwShBlockKey::CurrentBox,
+            swish_crypto::BlockData::Value(current_box),
+        );
 
         // the game will read the file fine if the blocks aren't sorted, but PKHeX expects them to be in key order.
         // an iterator from a btree will preserve key order.
-        let blocks_btree: BTreeMap<u32, swish_crypto::Block> = other_blocks
-            .into_iter()
-            .chain([
-                my_status.into_block(),
-                pokemon_boxes.into_block(),
-                box_layouts.into_block(),
-                swish_crypto::Block::new(
-                    BlockKey::CurrentBox.to_u32(),
-                    swish_crypto::BlockData::Value(current_box),
-                ),
-            ])
-            .map(|block| (block.key(), block))
-            .collect();
+        let mut all_blocks = other_blocks.into_inner();
+        for block in [
+            my_status.into_block(),
+            pokemon_boxes.into_block(),
+            box_layouts.into_block(),
+            current_box_block,
+        ] {
+            all_blocks.insert(block.key(), block);
+        }
 
-        blocks_btree.into_values().collect()
+        all_blocks
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
-enum BlockKey {
-    MyStatus,
-    TeamNames,
-    TeamIndexes,
-    BoxLayout,
-    BoxWallpapers,
-    MenuButtons,
+#[derive(
+    Debug,
+    PartialEq,
+    Eq,
+    Clone,
+    Copy,
+    EnumIter,
+    EnumString,
+    Display,
+    TryFromPrimitive,
+    IntoPrimitive,
+)]
+#[repr(u32)]
+pub enum SwShBlockKey {
+    MyStatus = 0xf25c070e,
+    TeamNames = 0x1920c1e4,
+    TeamIndexes = 0x33f39467,
+    BoxLayout = 0x19722c89,
+    BoxWallpapers = 0x2eb1b190,
+    MenuButtons = 0xb1dddca8,
 
-    Box,
-    MysteryGift,
-    Item,
-    Coordinates,
-    Misc,
-    Party,
-    Daycare,
-    Record,
-    Zukan,
-    ZukanR1,
-    ZukanR2,
-    PokedexRecommendation,
-    CurryDex,
-    TrainerCard,
-    PlayTime,
+    Box = 0x0d66012c,
+    MysteryGift = 0x112d5141,
+    Item = 0x1177c2c4,
+    Coordinates = 0x16aaa7fa,
+    Misc = 0x1b882b09,
+    Party = 0x2985fe5d,
+    Daycare = 0x2d6fba6a,
+    Record = 0x37da95a3,
+    Zukan = 0x4716c404,
+    ZukanR1 = 0x3f936ba9,
+    ZukanR2 = 0x3c9366f0,
+    PokedexRecommendation = 0xc3fb9e77,
+    CurryDex = 0x6eb72940,
+    TrainerCard = 0x874da6fa,
+    PlayTime = 0x8cbbfd90,
 
-    CurrentBox,
-    BoxesUnlocked,
-}
-
-impl BlockKey {
-    pub const fn try_from(value: u32) -> Option<Self> {
-        match value {
-            0xf25c070e => Some(Self::MyStatus),
-            0x1920c1e4 => Some(Self::TeamNames),
-            0x33f39467 => Some(Self::TeamIndexes),
-            0x19722c89 => Some(Self::BoxLayout),
-            0x2eb1b190 => Some(Self::BoxWallpapers),
-            0xb1dddca8 => Some(Self::MenuButtons),
-
-            0x0d66012c => Some(Self::Box),
-            0x112d5141 => Some(Self::MysteryGift),
-            0x1177c2c4 => Some(Self::Item),
-            0x16aaa7fa => Some(Self::Coordinates),
-            0x1b882b09 => Some(Self::Misc),
-            0x2985fe5d => Some(Self::Party),
-            0x2d6fba6a => Some(Self::Daycare),
-            0x37da95a3 => Some(Self::Record),
-            0x4716c404 => Some(Self::Zukan),
-            0x3f936ba9 => Some(Self::ZukanR1),
-            0x3c9366f0 => Some(Self::ZukanR2),
-            0xc3fb9e77 => Some(Self::PokedexRecommendation),
-            0x6eb72940 => Some(Self::CurryDex),
-            0x874da6fa => Some(Self::TrainerCard),
-            0x8cbbfd90 => Some(Self::PlayTime),
-
-            0x017c3cbb => Some(Self::CurrentBox),
-            0x71825204 => Some(Self::BoxesUnlocked),
-
-            _ => None,
-        }
-    }
-
-    pub const fn to_u32(self) -> u32 {
-        match self {
-            Self::MyStatus => 0xf25c070e,
-            Self::TeamNames => 0x1920c1e4,
-            Self::TeamIndexes => 0x33f39467,
-            Self::BoxLayout => 0x19722c89,
-            Self::BoxWallpapers => 0x2eb1b190,
-            Self::MenuButtons => 0xb1dddca8,
-
-            Self::Box => 0x0d66012c,
-            Self::MysteryGift => 0x112d5141,
-            Self::Item => 0x1177c2c4,
-            Self::Coordinates => 0x16aaa7fa,
-            Self::Misc => 0x1b882b09,
-            Self::Party => 0x2985fe5d,
-            Self::Daycare => 0x2d6fba6a,
-            Self::Record => 0x37da95a3,
-            Self::Zukan => 0x4716c404,
-            Self::ZukanR1 => 0x3f936ba9,
-            Self::ZukanR2 => 0x3c9366f0,
-            Self::PokedexRecommendation => 0xc3fb9e77,
-            Self::CurryDex => 0x6eb72940,
-            Self::TrainerCard => 0x874da6fa,
-            Self::PlayTime => 0x8cbbfd90,
-
-            Self::CurrentBox => 0x017c3cbb,
-            Self::BoxesUnlocked => 0x71825204,
-        }
-    }
+    CurrentBox = 0x017c3cbb,
+    BoxesUnlocked = 0x71825204,
 }
 
 #[derive(Debug, Clone)]
-pub(super) struct MyStatusBlock(swish_crypto::ObjectBlock);
+pub(super) struct MyStatusBlock(pub(super) swish_crypto::ObjectBlock);
 
 impl MyStatusBlock {
     const NAME_OFFSET: usize = 0xb0;
@@ -250,7 +174,7 @@ impl MyStatusBlock {
 
     pub fn into_block(self) -> swish_crypto::Block {
         swish_crypto::Block::new(
-            BlockKey::MyStatus.to_u32(),
+            SwShBlockKey::MyStatus,
             swish_crypto::BlockData::Object(self.0.clone()),
         )
     }
@@ -282,10 +206,7 @@ impl BoxBlock {
     }
 
     fn into_block(self) -> swish_crypto::Block {
-        swish_crypto::Block::new(
-            BlockKey::Box.to_u32(),
-            swish_crypto::BlockData::Object(self.0),
-        )
+        swish_crypto::Block::new(SwShBlockKey::Box, swish_crypto::BlockData::Object(self.0))
     }
 }
 
@@ -305,7 +226,7 @@ impl BoxLayout {
 
     fn into_block(self) -> swish_crypto::Block {
         swish_crypto::Block::new(
-            BlockKey::BoxLayout.to_u32(),
+            SwShBlockKey::BoxLayout,
             swish_crypto::BlockData::Array(self.0),
         )
     }
