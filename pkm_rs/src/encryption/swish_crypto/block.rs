@@ -383,60 +383,48 @@ impl NumericType {
     }
 
     pub fn block_from_bytes(self, bytes: &[u8]) -> Result<NumericBlock, SwishError> {
-        let byte_length = bytes.len();
         Ok(match self {
-            Self::UInt8 => NumericBlock::UInt8(u8::from_le_bytes(
-                bytes
-                    .try_into()
-                    .map_err(|_| SwishError::need_1_byte(self, byte_length))?,
-            )),
-            Self::UInt16 => NumericBlock::UInt16(u16::from_le_bytes(
-                bytes
-                    .try_into()
-                    .map_err(|_| SwishError::need_2_bytes(self, byte_length))?,
-            )),
-            Self::UInt32 => NumericBlock::UInt32(u32::from_le_bytes(
-                bytes
-                    .try_into()
-                    .map_err(|_| SwishError::need_4_bytes(self, byte_length))?,
-            )),
-            Self::UInt64 => NumericBlock::UInt64(u64::from_le_bytes(
-                bytes
-                    .try_into()
-                    .map_err(|_| SwishError::need_8_bytes(self, byte_length))?,
-            )),
-            Self::Int8 => NumericBlock::Int8(i8::from_le_bytes(
-                bytes
-                    .try_into()
-                    .map_err(|_| SwishError::need_1_byte(self, byte_length))?,
-            )),
-            Self::Int16 => NumericBlock::Int16(i16::from_le_bytes(
-                bytes
-                    .try_into()
-                    .map_err(|_| SwishError::need_2_bytes(self, byte_length))?,
-            )),
-            Self::Int32 => NumericBlock::Int32(i32::from_le_bytes(
-                bytes
-                    .try_into()
-                    .map_err(|_| SwishError::need_4_bytes(self, byte_length))?,
-            )),
-            Self::Int64 => NumericBlock::Int64(i64::from_le_bytes(
-                bytes
-                    .try_into()
-                    .map_err(|_| SwishError::need_8_bytes(self, byte_length))?,
-            )),
-            Self::Float32 => NumericBlock::Float32(f32::from_le_bytes(
-                bytes
-                    .try_into()
-                    .map_err(|_| SwishError::need_4_bytes(self, byte_length))?,
-            )),
-            Self::Float64 => NumericBlock::Float64(f64::from_le_bytes(
-                bytes
-                    .try_into()
-                    .map_err(|_| SwishError::need_8_bytes(self, byte_length))?,
-            )),
+            Self::UInt8 => {
+                NumericBlock::UInt8(u8::from_le_bytes(numtype_try_into_array(self, bytes)?))
+            }
+            Self::UInt16 => {
+                NumericBlock::UInt16(u16::from_le_bytes(numtype_try_into_array(self, bytes)?))
+            }
+            Self::UInt32 => {
+                NumericBlock::UInt32(u32::from_le_bytes(numtype_try_into_array(self, bytes)?))
+            }
+            Self::UInt64 => {
+                NumericBlock::UInt64(u64::from_le_bytes(numtype_try_into_array(self, bytes)?))
+            }
+            Self::Int8 => {
+                NumericBlock::Int8(i8::from_le_bytes(numtype_try_into_array(self, bytes)?))
+            }
+            Self::Int16 => {
+                NumericBlock::Int16(i16::from_le_bytes(numtype_try_into_array(self, bytes)?))
+            }
+            Self::Int32 => {
+                NumericBlock::Int32(i32::from_le_bytes(numtype_try_into_array(self, bytes)?))
+            }
+            Self::Int64 => {
+                NumericBlock::Int64(i64::from_le_bytes(numtype_try_into_array(self, bytes)?))
+            }
+            Self::Float32 => {
+                NumericBlock::Float32(f32::from_le_bytes(numtype_try_into_array(self, bytes)?))
+            }
+            Self::Float64 => {
+                NumericBlock::Float64(f64::from_le_bytes(numtype_try_into_array(self, bytes)?))
+            }
         })
     }
+}
+
+fn numtype_try_into_array<const N: usize>(
+    numtype: NumericType,
+    bytes: &[u8],
+) -> Result<[u8; N], SwishError> {
+    bytes
+        .try_into()
+        .map_err(|_| SwishError::expected_bytes::<N>(numtype, bytes.len()))
 }
 
 #[cfg(feature = "wasm")]
@@ -522,7 +510,7 @@ impl NumericBlock {
         }
     }
 
-    pub const fn numeric_type(&self) -> NumericType {
+    pub const fn inner_type(&self) -> NumericType {
         match self {
             Self::UInt8(_) => NumericType::UInt8,
             Self::UInt16(_) => NumericType::UInt16,
@@ -584,7 +572,7 @@ impl BlockData {
             BlockData::Object(_) => BlockType::Object,
             BlockData::Array(_) => BlockType::Array,
             BlockData::Value(numeric_value) => {
-                BlockType::Scalar(ScalarType::Numeric(numeric_value.numeric_type()))
+                BlockType::Scalar(ScalarType::Numeric(numeric_value.inner_type()))
             }
         }
     }
@@ -782,14 +770,14 @@ impl ScalarType {
     pub const fn id(&self) -> u8 {
         match self {
             Self::Bool(bool_type) => bool_type.id(),
-            Self::Numeric(numeric_type) => numeric_type.id(),
+            Self::Numeric(inner_type) => inner_type.id(),
         }
     }
 
     pub const fn byte_size(&self) -> usize {
         match self {
             Self::Bool(..) => 1,
-            Self::Numeric(numeric_type) => numeric_type.byte_size(),
+            Self::Numeric(inner_type) => inner_type.byte_size(),
         }
     }
 }
@@ -849,37 +837,21 @@ pub enum SwishError {
         expected: ExpectedBlockType,
         actual: BlockType,
     },
-    #[error("expected {expected} bytes for type  block of type {numeric_type}, received {actual}")]
+    #[error("expected {expected} bytes for block of type {inner_type}, received {actual}")]
     ByteLength {
-        numeric_type: NumericType,
+        inner_type: NumericType,
         expected: usize,
         actual: usize,
     },
 }
 
 impl SwishError {
-    const fn need_bytes(numeric_type: NumericType, actual: usize, expected: usize) -> Self {
+    const fn expected_bytes<const EXPECTED: usize>(inner_type: NumericType, actual: usize) -> Self {
         Self::ByteLength {
-            numeric_type,
-            expected,
+            inner_type,
+            expected: EXPECTED,
             actual,
         }
-    }
-
-    pub const fn need_1_byte(numeric_type: NumericType, actual: usize) -> Self {
-        Self::need_bytes(numeric_type, actual, 1)
-    }
-
-    pub const fn need_2_bytes(numeric_type: NumericType, actual: usize) -> Self {
-        Self::need_bytes(numeric_type, actual, 2)
-    }
-
-    pub const fn need_4_bytes(numeric_type: NumericType, actual: usize) -> Self {
-        Self::need_bytes(numeric_type, actual, 4)
-    }
-
-    pub const fn need_8_bytes(numeric_type: NumericType, actual: usize) -> Self {
-        Self::need_bytes(numeric_type, actual, 8)
     }
 }
 
