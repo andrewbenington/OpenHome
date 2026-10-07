@@ -32,3 +32,12 @@ pub use rom_hacks::PluginIdentifier;
 pub use strings::Gen3Strings;
 
 extern crate static_assertions;
+
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(start)]
+pub fn init() {
+    console_error_panic_hook::set_once();
+}

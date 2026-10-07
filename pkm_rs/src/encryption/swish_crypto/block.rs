@@ -84,7 +84,10 @@ pub fn encrypt_blocks_js(blocks: Box<[Block]>, size: usize) -> Vec<u8> {
     feature = "wasm",
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
 )]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
+#[cfg_attr(
+    feature = "wasm",
+    tsify(into_wasm_abi, from_wasm_abi, large_number_types_as_bigints)
+)]
 #[derive(Debug, Clone, Hash)]
 pub struct Block {
     key: u32,
@@ -436,6 +439,13 @@ impl NumericType {
     }
 }
 
+#[cfg(feature = "wasm")]
+#[allow(clippy::missing_const_for_fn)]
+#[wasm_bindgen(js_name = "blockDataType")]
+pub fn block_data_type(data: &BlockData) -> BlockType {
+    data.block_type()
+}
+
 #[derive(
     Debug,
     Clone,
@@ -446,6 +456,7 @@ impl NumericType {
     tsify::Tsify,
     strum::Display,
 )]
+#[cfg_attr(feature = "wasm", tsify(large_number_types_as_bigints))]
 pub enum NumericBlock {
     UInt8(u8),
     UInt16(u16),

@@ -6,11 +6,9 @@ import {
   SV_TRANSFER_RESTRICTIONS_TM,
 } from '@openhome-core/resources/consts/TransferRestrictions'
 import {
-  ArrayBlock,
+  BlockDataFor,
   blockIsType,
-  ObjectBlock,
   SwishCrypto,
-  ValueBlock,
 } from '@openhome-core/save/encryption/SwishCrypto/SwishCrypto'
 import { BoxNamesBlock } from '@openhome-core/save/Gen89/BoxNamesBlock'
 import { G89BlockName } from '@openhome-core/save/Gen89/Gen8Gen9Save'
@@ -28,6 +26,7 @@ import {
   emptyBoxSlotBytesScarletViolet,
   ExtraFormIndex,
   Languages,
+  ObjectBlock,
   OriginGame,
 } from '@pkm-rs/pkg'
 import PK9Compass from './PK9Compass'
@@ -83,15 +82,14 @@ export class CompassSave extends PluginSAV<PK9Compass> {
     this.filePath = path
     this.scBlocks = SwishCrypto.decrypt(bytes)
 
-    const currentPCBlock = this.getBlockMust<ValueBlock>('CurrentBox', {
+    const currentPCBlock = this.getBlockDataMust('CurrentBox', {
       Scalar: { Numeric: 'UInt8' },
     })
+    this.currentPCBox = currentPCBlock.Value.UInt8
 
-    this.currentPCBox = new DataView(currentPCBlock.data.Value.bytes.buffer).getUint8(0)
+    const boxNamesBlock = new BoxNamesBlock(this.getBlockDataMust('BoxLayout', 'Array').Array)
 
-    const boxNamesBlock = new BoxNamesBlock(this.getBlockMust<ArrayBlock>('BoxLayout', 'Array'))
-
-    const boxBlock = this.getBlockMust<ObjectBlock>('Box', 'Object')
+    const boxBlock = this.getBlockDataMust('Box', 'Object').Object
 
     this.boxes = Array(this.getBoxCount())
     for (let box = 0; box < this.getBoxCount(); box++) {
@@ -107,7 +105,7 @@ export class CompassSave extends PluginSAV<PK9Compass> {
             this.getBoxSizeBytes() * box +
             (this.getMonBoxSizeBytes() + this.getBoxSlotGapBytes()) * monIndex
           const endByte = startByte + this.getMonBoxSizeBytes()
-          const monData = boxBlock.data.Object.bytes.buffer.slice(startByte, endByte)
+          const monData = boxBlock.bytes.buffer.slice(startByte, endByte)
 
           if (!this.isEmptySlot(monData)) {
             this.boxes[box].boxSlots[monIndex] = this.monConstructor(monData, true)
@@ -117,7 +115,7 @@ export class CompassSave extends PluginSAV<PK9Compass> {
         }
       }
     }
-    this.trainerBlock = new MyStatus(this.getBlockMust('MyStatus', 'Object'))
+    this.trainerBlock = new MyStatus(this.getBlockDataMust('MyStatus', 'Object').Object)
     this.name = this.trainerBlock.getName()
 
     this.boxes.forEach((box, i) => {
@@ -154,21 +152,21 @@ export class CompassSave extends PluginSAV<PK9Compass> {
     return this.scBlocks.find((b) => b.key === key)
   }
 
-  getBlockMust<T extends Block = Block>(
+  getBlockDataMust<T extends BlockType>(
     blockName: G89BlockName | keyof typeof BlockKeys,
-    type?: BlockType
-  ): T {
+    type: T
+  ): BlockDataFor<T> {
     const block = this.getBlock(blockName)
 
     if (!block) {
       throw Error(`Missing block ${blockName}`)
     }
-    if (type && !blockIsType(block, type)) {
+    if (!blockIsType(block, type)) {
       throw Error(
         `Block ${blockName} has data ${JSON.stringify(block.data)} (expected ${JSON.stringify(type)})`
       )
     }
-    return block as T
+    return block.data
   }
 
   getMonBoxSizeBytes(): number {
@@ -245,7 +243,7 @@ export class CompassSave extends PluginSAV<PK9Compass> {
   }
 
   prepareForSaving() {
-    const boxBlock = this.getBlockMust<ObjectBlock>('Box', 'Object')
+    const boxBlock = this.getBlockDataMust('Box', 'Object').Object
 
     this.updatedBoxSlots.forEach(({ box, boxSlot }) => {
       const mon = this.getMonAt(box, boxSlot)
@@ -253,7 +251,7 @@ export class CompassSave extends PluginSAV<PK9Compass> {
       const writeIndex =
         this.getBoxSizeBytes() * box +
         (this.getMonBoxSizeBytes() + this.getBoxSlotGapBytes()) * boxSlot
-      const blockBuffer = new Uint8Array(boxBlock.data.Object.bytes.buffer)
+      const blockBuffer = new Uint8Array(boxBlock.bytes.buffer)
 
       // mon will be undefined if pokemon was moved from this slot
       // and the slot was left empty
@@ -350,7 +348,7 @@ class MyStatus {
   dataView: DataView<ArrayBuffer>
 
   constructor(scBlock: ObjectBlock) {
-    this.dataView = new DataView(scBlock.data.Object.bytes.buffer)
+    this.dataView = new DataView(scBlock.bytes.buffer)
   }
 
   public getName(): string {

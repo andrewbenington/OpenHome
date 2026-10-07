@@ -49,7 +49,7 @@ use crate::{
     },
 };
 
-pub trait PersonalInfo: Sized {
+pub trait PersonalInfo: Sized + std::panic::RefUnwindSafe + std::panic::UnwindSafe {
     const MAX_NATIONAL_DEX: NationalDex;
 
     fn from_pkl_bytes(bytes: &'static [u8]) -> Self;
@@ -194,7 +194,7 @@ impl<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize> MetadataTable
     }
 }
 
-trait MetadataTable {
+trait MetadataTable: std::panic::RefUnwindSafe + std::panic::UnwindSafe {
     fn get_types(&self, national_dex: u16, form_index: u16) -> Option<(PkmType, Option<PkmType>)>;
 
     fn get_game_index(&self, national_dex: u16, form_index: u16) -> Option<u16>;
@@ -210,7 +210,7 @@ trait MetadataTable {
 
 impl<T, U> MetadataTable for T
 where
-    T: std::ops::Deref<Target = U>,
+    T: std::ops::Deref<Target = U> + std::panic::RefUnwindSafe + std::panic::UnwindSafe,
     U: MetadataTable + ?Sized + 'static,
 {
     fn get_types(&self, national_dex: u16, form_index: u16) -> Option<(PkmType, Option<PkmType>)> {

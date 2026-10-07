@@ -18,17 +18,13 @@ import {
   Language,
   Languages,
   Lookup,
+  ObjectBlock,
   OriginGame,
   Pk8Wasm,
   SwordShieldSaveRust,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
-import {
-  blockIsType,
-  ObjectBlock,
-  SwishCrypto,
-  ValueBlock,
-} from '../encryption/SwishCrypto/SwishCrypto'
+import { BlockDataFor, blockIsType, SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
 import { BoxAndSlot, WasmOfficialSave } from '../interfaces'
 import { PathData } from '../util/path'
 import { G89BlockName } from './Gen8Gen9Save'
@@ -68,12 +64,14 @@ export class SwordShieldSave extends WasmOfficialSave<PK8, Pk8Wasm, SwordShieldS
     this.scBlocks = SwishCrypto.decrypt(bytes)
     this.filePath = path
 
-    const currentPCBlock = this.getBlockMust<ValueBlock>('CurrentBox', {
+    const currentPCBlock = this.getBlockDataMust('CurrentBox', {
       Scalar: { Numeric: 'UInt8' },
     })
-    this.trainerCardBlock = new TrainerCardBlock(this.getBlockMust('TrainerCard', 'Object'))
+    this.trainerCardBlock = new TrainerCardBlock(
+      this.getBlockDataMust('TrainerCard', 'Object').Object
+    )
 
-    this.currentPCBox = new DataView(currentPCBlock.data.Value.bytes.buffer).getUint8(0)
+    this.currentPCBox = currentPCBlock.Value.UInt8
   }
 
   get bytes() {
@@ -118,21 +116,21 @@ export class SwordShieldSave extends WasmOfficialSave<PK8, Pk8Wasm, SwordShieldS
     return this.scBlocks.find((b) => b.key === key)
   }
 
-  getBlockMust<T extends Block = Block>(
+  getBlockDataMust<T extends BlockType>(
     blockName: G89BlockName | keyof typeof BlockKeys,
-    type?: BlockType
-  ): T {
+    type: T
+  ): BlockDataFor<T> {
     const block = this.getBlock(blockName)
 
     if (!block) {
       throw Error(`Missing block ${blockName}`)
     }
-    if (type && !blockIsType(block, type)) {
+    if (!blockIsType(block, type)) {
       throw Error(
         `Block ${blockName} has data ${JSON.stringify(block.data)} (expected ${JSON.stringify(type)})`
       )
     }
-    return block as T
+    return block.data
   }
 
   getMonAt(boxIndex: number, boxSlot: number): PK8 | undefined {
@@ -248,7 +246,7 @@ export class SwordShieldSave extends WasmOfficialSave<PK8, Pk8Wasm, SwordShieldS
   }
 }
 
-const BlockKeys = {
+export const BlockKeys = {
   MyStatus: 0xf25c070e,
   TeamNames: 0x1920c1e4,
   TeamIndexes: 0x33f39467,
@@ -280,7 +278,7 @@ class TrainerCardBlock {
   dataView: DataView<ArrayBuffer>
 
   constructor(scBlock: ObjectBlock) {
-    this.dataView = new DataView(scBlock.data.Object.bytes.buffer)
+    this.dataView = new DataView(scBlock.bytes.buffer)
   }
 
   public getName(): string {
