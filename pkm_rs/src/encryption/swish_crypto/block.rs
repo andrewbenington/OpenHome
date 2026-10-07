@@ -1,11 +1,10 @@
 // PKHeX reference implementation: PKHeX.Core/Saves/Encryption/SwishCrypto/SwishCrypto.cs
 
+use thiserror::Error;
 use wasm_bindgen::prelude::*;
 
-use crate::{
-    bytes::{Reader, Writer},
-    result::Error,
-};
+use crate::bytes::{Reader, Writer};
+use crate::result::Error;
 const PAD_LENGTH: usize = 127;
 
 const STATIC_XOR_PAD: [u8; PAD_LENGTH] = [
@@ -27,7 +26,7 @@ fn crypt_static_xor_pad_bytes(data: &[u8]) -> Vec<u8> {
         .collect()
 }
 
-fn read_blocks(data: &[u8]) -> Result<Vec<Block>, InvalidTypeId> {
+fn read_blocks(data: &[u8]) -> Result<Vec<Block>, SwishError> {
     let mut result = Vec::<Block>::new();
     let mut reader = Reader::new(data);
 
@@ -39,7 +38,7 @@ fn read_blocks(data: &[u8]) -> Result<Vec<Block>, InvalidTypeId> {
 }
 
 #[wasm_bindgen(js_name = decryptBlocks)]
-pub fn decrypt_blocks(data: &[u8]) -> Result<Vec<Block>, InvalidTypeId> {
+pub fn decrypt_blocks(data: &[u8]) -> Result<Vec<Block>, SwishError> {
     let data_before_hash = &data[..data.len() - super::HASH_SIZE];
     let data_after_xor = crypt_static_xor_pad_bytes(data_before_hash);
 
@@ -101,7 +100,7 @@ impl Block {
         self.key
     }
 
-    fn read_encrypted(reader: &mut Reader) -> Result<Self, InvalidTypeId> {
+    fn read_encrypted(reader: &mut Reader) -> Result<Self, SwishError> {
         let key = reader.read_u32();
 
         let mut crypto_state = SwishCrypto::new(key);
@@ -117,10 +116,7 @@ impl Block {
                     *byte ^= crypto_state.next_u8();
                 }
 
-                BlockData::Value {
-                    dataype: numeric_type,
-                    bytes: payload_bytes,
-                }
+                BlockData::Value(numeric_type.block_from_bytes(&payload_bytes)?)
             }
             BlockType::Object => {
                 let byte_count = (reader.read_u32() ^ crypto_state.next_32()) as usize;
@@ -175,7 +171,7 @@ impl Block {
             BlockData::Bool(..) => &Vec::new(),
             BlockData::Object(ObjectBlock { bytes }) => bytes,
             BlockData::Array(ArrayBlock { bytes, .. }) => bytes,
-            BlockData::Value { bytes, .. } => bytes,
+            BlockData::Value(numeric_value) => &numeric_value.to_le_bytes(),
         };
 
         for byte in payload {
@@ -185,30 +181,62 @@ impl Block {
         writer.current_offset()
     }
 
+    pub fn into_numeric_data(self) -> std::result::Result<NumericBlock, WrongBlockType> {
+        let Block { key, data } = self;
+        if let BlockData::Value(numeric_block) = data {
+            Ok(numeric_block)
+        } else {
+            Err(WrongBlockType {
+                block_key: key,
+                expected: ExpectedBlockType::Numeric,
+                actual: data.block_type(),
+            })
+        }
+    }
+
     pub fn into_object_data(self) -> std::result::Result<ObjectBlock, WrongBlockType> {
         let Block { key, data } = self;
-        let block_type = data.block_type();
         match data {
             BlockData::Object(object_data) => Ok(object_data),
             _ => Err(WrongBlockType {
                 block_key: key,
-                expected: BlockType::Object,
-                actual: block_type,
+                expected: ExpectedBlockType::Object,
+                actual: data.block_type(),
             }),
         }
     }
 
     pub fn into_array_data(self) -> std::result::Result<ArrayBlock, WrongBlockType> {
         let Block { key, data } = self;
-        let block_type = data.block_type();
         if let BlockData::Array(array_data) = data {
             Ok(array_data)
         } else {
             Err(WrongBlockType {
                 block_key: key,
-                expected: BlockType::Array,
-                actual: block_type,
+                expected: ExpectedBlockType::Array,
+                actual: data.block_type(),
             })
+        }
+    }
+}
+
+#[cfg_attr(feature = "wasm", derive(tsify::Tsify, serde::Serialize))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
+#[derive(Debug, Clone, Copy, strum::Display)]
+pub enum ExpectedBlockType {
+    Object,
+    Array,
+    Numeric,
+    Bool,
+}
+
+impl From<BlockType> for ExpectedBlockType {
+    fn from(value: BlockType) -> Self {
+        match value {
+            BlockType::Object => Self::Object,
+            BlockType::Array => Self::Array,
+            BlockType::Scalar(ScalarType::Bool(_)) => Self::Bool,
+            BlockType::Scalar(ScalarType::Numeric(_)) => Self::Numeric,
         }
     }
 }
@@ -218,16 +246,20 @@ impl Block {
 #[derive(Debug)]
 pub struct WrongBlockType {
     block_key: u32,
-    expected: BlockType,
+    expected: ExpectedBlockType,
     actual: BlockType,
 }
 
 impl std::fmt::Display for WrongBlockType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let WrongBlockType {
+            block_key,
+            expected,
+            actual,
+        } = self;
         write!(
             f,
-            "expected SwishCrypto block of type {}, received {}",
-            self.expected, self.actual
+            "expected SwishCrypto block of type {expected}, received {actual} (block key {block_key})"
         )
     }
 }
@@ -243,7 +275,7 @@ impl From<WrongBlockType> for Error {
 
 #[cfg_attr(feature = "wasm", derive(tsify::Tsify, serde::Serialize))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct InvalidTypeId(u8);
 
 impl std::fmt::Display for InvalidTypeId {
@@ -346,6 +378,171 @@ impl NumericType {
             Self::Float64 => 8,
         }
     }
+
+    pub fn block_from_bytes(self, bytes: &[u8]) -> Result<NumericBlock, SwishError> {
+        let byte_length = bytes.len();
+        Ok(match self {
+            Self::UInt8 => NumericBlock::UInt8(u8::from_le_bytes(
+                bytes
+                    .try_into()
+                    .map_err(|_| SwishError::need_1_byte(self, byte_length))?,
+            )),
+            Self::UInt16 => NumericBlock::UInt16(u16::from_le_bytes(
+                bytes
+                    .try_into()
+                    .map_err(|_| SwishError::need_2_bytes(self, byte_length))?,
+            )),
+            Self::UInt32 => NumericBlock::UInt32(u32::from_le_bytes(
+                bytes
+                    .try_into()
+                    .map_err(|_| SwishError::need_4_bytes(self, byte_length))?,
+            )),
+            Self::UInt64 => NumericBlock::UInt64(u64::from_le_bytes(
+                bytes
+                    .try_into()
+                    .map_err(|_| SwishError::need_8_bytes(self, byte_length))?,
+            )),
+            Self::Int8 => NumericBlock::Int8(i8::from_le_bytes(
+                bytes
+                    .try_into()
+                    .map_err(|_| SwishError::need_1_byte(self, byte_length))?,
+            )),
+            Self::Int16 => NumericBlock::Int16(i16::from_le_bytes(
+                bytes
+                    .try_into()
+                    .map_err(|_| SwishError::need_2_bytes(self, byte_length))?,
+            )),
+            Self::Int32 => NumericBlock::Int32(i32::from_le_bytes(
+                bytes
+                    .try_into()
+                    .map_err(|_| SwishError::need_4_bytes(self, byte_length))?,
+            )),
+            Self::Int64 => NumericBlock::Int64(i64::from_le_bytes(
+                bytes
+                    .try_into()
+                    .map_err(|_| SwishError::need_8_bytes(self, byte_length))?,
+            )),
+            Self::Float32 => NumericBlock::Float32(f32::from_le_bytes(
+                bytes
+                    .try_into()
+                    .map_err(|_| SwishError::need_4_bytes(self, byte_length))?,
+            )),
+            Self::Float64 => NumericBlock::Float64(f64::from_le_bytes(
+                bytes
+                    .try_into()
+                    .map_err(|_| SwishError::need_8_bytes(self, byte_length))?,
+            )),
+        })
+    }
+}
+
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    serde::Serialize,
+    serde::Deserialize,
+    tsify::Tsify,
+    strum::Display,
+)]
+pub enum NumericBlock {
+    UInt8(u8),
+    UInt16(u16),
+    UInt32(u32),
+    UInt64(u64),
+
+    Int8(i8),
+    Int16(i16),
+    Int32(i32),
+    Int64(i64),
+
+    Float32(f32),
+    Float64(f64),
+}
+
+impl NumericBlock {
+    pub fn to_le_bytes(self) -> Vec<u8> {
+        match self {
+            Self::UInt8(value) => value.to_le_bytes().to_vec(),
+            Self::UInt16(value) => value.to_le_bytes().to_vec(),
+            Self::UInt32(value) => value.to_le_bytes().to_vec(),
+            Self::UInt64(value) => value.to_le_bytes().to_vec(),
+            Self::Int8(value) => value.to_le_bytes().to_vec(),
+            Self::Int16(value) => value.to_le_bytes().to_vec(),
+            Self::Int32(value) => value.to_le_bytes().to_vec(),
+            Self::Int64(value) => value.to_le_bytes().to_vec(),
+            Self::Float32(value) => value.to_le_bytes().to_vec(),
+            Self::Float64(value) => value.to_le_bytes().to_vec(),
+        }
+    }
+
+    pub const fn id(&self) -> u8 {
+        match self {
+            Self::UInt8(_) => 8,
+            Self::UInt16(_) => 9,
+            Self::UInt32(_) => 10,
+            Self::UInt64(_) => 11,
+
+            Self::Int8(_) => 12,
+            Self::Int16(_) => 13,
+            Self::Int32(_) => 14,
+            Self::Int64(_) => 15,
+
+            Self::Float32(_) => 16,
+            Self::Float64(_) => 17,
+        }
+    }
+
+    pub const fn byte_size(&self) -> usize {
+        match self {
+            Self::UInt8(_) => 1,
+            Self::UInt16(_) => 2,
+            Self::UInt32(_) => 4,
+            Self::UInt64(_) => 8,
+
+            Self::Int8(_) => 1,
+            Self::Int16(_) => 2,
+            Self::Int32(_) => 4,
+            Self::Int64(_) => 8,
+
+            Self::Float32(_) => 4,
+            Self::Float64(_) => 8,
+        }
+    }
+
+    pub const fn numeric_type(&self) -> NumericType {
+        match self {
+            Self::UInt8(_) => NumericType::UInt8,
+            Self::UInt16(_) => NumericType::UInt16,
+            Self::UInt32(_) => NumericType::UInt32,
+            Self::UInt64(_) => NumericType::UInt64,
+            Self::Int8(_) => NumericType::Int8,
+            Self::Int16(_) => NumericType::Int16,
+            Self::Int32(_) => NumericType::Int32,
+            Self::Int64(_) => NumericType::Int64,
+            Self::Float32(_) => NumericType::Float32,
+            Self::Float64(_) => NumericType::Float64,
+        }
+    }
+}
+
+impl std::hash::Hash for NumericBlock {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        core::mem::discriminant(self).hash(state);
+        match self {
+            NumericBlock::UInt8(value) => value.hash(state),
+            NumericBlock::UInt16(value) => value.hash(state),
+            NumericBlock::UInt32(value) => value.hash(state),
+            NumericBlock::UInt64(value) => value.hash(state),
+            NumericBlock::Int8(value) => value.hash(state),
+            NumericBlock::Int16(value) => value.hash(state),
+            NumericBlock::Int32(value) => value.hash(state),
+            NumericBlock::Int64(value) => value.hash(state),
+            NumericBlock::Float32(value) => value.to_le_bytes().hash(state),
+            NumericBlock::Float64(value) => value.to_le_bytes().hash(state),
+        }
+    }
 }
 
 #[cfg_attr(
@@ -358,12 +555,7 @@ pub enum BlockData {
     Bool(BoolType),
     Object(ObjectBlock),
     Array(ArrayBlock),
-    Value {
-        dataype: NumericType,
-        #[serde(with = "serde_bytes")]
-        #[tsify(type = "Uint8Array<ArrayBuffer>")]
-        bytes: Vec<u8>,
-    },
+    Value(NumericBlock),
 }
 
 impl BlockData {
@@ -380,8 +572,8 @@ impl BlockData {
             BlockData::Bool(bool_type) => BlockType::Scalar(ScalarType::Bool(*bool_type)),
             BlockData::Object(_) => BlockType::Object,
             BlockData::Array(_) => BlockType::Array,
-            BlockData::Value { dataype, bytes: _ } => {
-                BlockType::Scalar(ScalarType::Numeric(*dataype))
+            BlockData::Value(numeric_value) => {
+                BlockType::Scalar(ScalarType::Numeric(numeric_value.numeric_type()))
             }
         }
     }
@@ -391,7 +583,7 @@ impl BlockData {
             Self::Object { .. } => 4,
             Self::Array { .. } => 5,
             Self::Bool(bool_type) => bool_type.id(),
-            Self::Value { dataype, .. } => dataype.id(),
+            Self::Value(numeric_value) => numeric_value.id(),
         }
     }
 }
@@ -432,6 +624,28 @@ pub struct ArrayBlock {
 }
 
 impl ArrayBlock {
+    pub fn bytes(&self) -> &[u8] {
+        &self.bytes
+    }
+
+    pub fn bytes_mut(&mut self) -> &mut [u8] {
+        &mut self.bytes
+    }
+}
+
+#[cfg_attr(
+    feature = "wasm",
+    derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
+)]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
+#[derive(Debug, Clone, Hash)]
+pub struct ValueBlock {
+    #[serde(with = "serde_bytes")]
+    #[tsify(type = "Uint8Array<ArrayBuffer>")]
+    bytes: Vec<u8>,
+}
+
+impl ValueBlock {
     pub fn bytes(&self) -> &[u8] {
         &self.bytes
     }
@@ -607,5 +821,59 @@ impl TryFrom<u8> for ScalarType {
 
             _ => Err(InvalidTypeId(value)),
         }
+    }
+}
+
+#[cfg_attr(feature = "wasm", derive(tsify::Tsify, serde::Serialize))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
+#[derive(Debug, Error, Clone, Copy)]
+pub enum SwishError {
+    #[error("invalid block type id: {0}")]
+    TypeId(InvalidTypeId),
+    #[error(
+        "expected SwishCrypto block of type {expected}, received {actual} (block key {block_key})"
+    )]
+    BlockType {
+        block_key: u32,
+        expected: ExpectedBlockType,
+        actual: BlockType,
+    },
+    #[error("expected {expected} bytes for type  block of type {numeric_type}, received {actual}")]
+    ByteLength {
+        numeric_type: NumericType,
+        expected: usize,
+        actual: usize,
+    },
+}
+
+impl SwishError {
+    const fn need_bytes(numeric_type: NumericType, actual: usize, expected: usize) -> Self {
+        Self::ByteLength {
+            numeric_type,
+            expected,
+            actual,
+        }
+    }
+
+    pub const fn need_1_byte(numeric_type: NumericType, actual: usize) -> Self {
+        Self::need_bytes(numeric_type, actual, 1)
+    }
+
+    pub const fn need_2_bytes(numeric_type: NumericType, actual: usize) -> Self {
+        Self::need_bytes(numeric_type, actual, 2)
+    }
+
+    pub const fn need_4_bytes(numeric_type: NumericType, actual: usize) -> Self {
+        Self::need_bytes(numeric_type, actual, 4)
+    }
+
+    pub const fn need_8_bytes(numeric_type: NumericType, actual: usize) -> Self {
+        Self::need_bytes(numeric_type, actual, 8)
+    }
+}
+
+impl From<InvalidTypeId> for SwishError {
+    fn from(value: InvalidTypeId) -> Self {
+        Self::TypeId(value)
     }
 }
