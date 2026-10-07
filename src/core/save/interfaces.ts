@@ -429,6 +429,10 @@ export abstract class WasmOfficialSave<
     return this.inner.language
   }
 
+  get bytes() {
+    return this.inner.prepareBytesForSaving()
+  }
+
   abstract monFromWasm(wasmMon: WasmP): P
 
   abstract MAX_BOX_COUNT: number
