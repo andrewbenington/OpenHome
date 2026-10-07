@@ -1,7 +1,6 @@
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::{metadata_source::MetadataSource, ribbons::OpenHomeRibbonSet};
-use pkm_rs_types::FlagSet;
-use pkm_rs_types::{AbilityNumber, Stats16Le};
+use pkm_rs_types::{AbilityNumber, FlagSet, OriginGame, Stats16Le};
 
 use super::OhpkmConvert;
 use crate::convert_strategy::ConvertStrategy;
@@ -17,6 +16,28 @@ use crate::traits::HasSpeciesAndForm;
 
 impl OhpkmConvert for Pk8 {
     fn to_main_data(&self) -> ohpkm::v2_sections::MainDataV2 {
+        // handle location indices set by HOME
+        let game_of_origin = match self.met_location_index {
+            0 => match self.game_of_origin {
+                OriginGame::Sword => OriginGame::FireRedSwitch,
+                OriginGame::Shield => OriginGame::LeafGreenSwitch,
+                _ => self.game_of_origin,
+            },
+            59996 => OriginGame::Violet,
+            59997 => OriginGame::Scarlet,
+            59998 => OriginGame::ShiningPearl,
+            59999 => OriginGame::BrilliantDiamond,
+            60000 => OriginGame::LegendsArceus,
+            _ => self.game_of_origin,
+        };
+
+        let met_location_index = match self.met_location_index {
+            0 => 254,                   // link trade
+            59996 | 59997 | 60000 => 2, // mystery zone
+            59998 | 59999 => 345,       // mystery zone
+            _ => self.met_location_index,
+        };
+
         ohpkm::v2_sections::MainDataV2 {
             personality_value: self.personality_value,
             encryption_constant: self.encryption_constant,
@@ -64,7 +85,7 @@ impl OhpkmConvert for Pk8 {
             handler_language: self.handler_language,
             fullness: self.fullness,
             enjoyment: self.enjoyment,
-            game_of_origin: self.game_of_origin,
+            game_of_origin,
             game_of_origin_battle: self.game_of_origin_battle,
             language: self.language,
             form_argument: self.form_argument,
@@ -80,7 +101,7 @@ impl OhpkmConvert for Pk8 {
             } else {
                 Some(self.egg_location_index)
             },
-            met_location_index: self.met_location_index,
+            met_location_index,
             met_level: self.met_level,
             hyper_training: self.hyper_training,
             trainer_gender: self.trainer_gender,

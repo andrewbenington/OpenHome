@@ -359,6 +359,7 @@ pub const POKE_TRANSFER_LAB_INDEX_GEN_5: u16 = 60;
 pub const POKE_TRANSFER_MET_LOCATION_GEN_5: u16 = 30001;
 pub const GO_PARK_LETS_GO: u16 = 50;
 pub const FARAWAY_PLACE_SWSH: u16 = 40002;
+pub const DISTANT_LAND_FRLG_SWITCH: u16 = 30007;
 
 impl Location {
     pub fn from_english_text(text: &str) -> Option<Self> {

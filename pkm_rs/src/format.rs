@@ -210,8 +210,8 @@ impl PkmFormat {
         match self {
             Self::PK1 | Self::PK2 => origin, // doesn't matter; these games don't store origin
             Self::PK3 | Self::ColoPkm | Self::XdPkm => match origin {
-                Red | Yellow | LetsGoPikachu => FireRed,
-                BlueGreen | BlueJpn | LetsGoEevee => LeafGreen,
+                FireRedSwitch | Red | Yellow | LetsGoPikachu => FireRed,
+                LeafGreenSwitch | BlueGreen | BlueJpn | LetsGoEevee => LeafGreen,
 
                 AlphaSapphire => Sapphire,
                 OmegaRuby => Ruby,
@@ -219,8 +219,8 @@ impl PkmFormat {
                 _ => Emerald,
             },
             Self::PK4 => match origin {
-                Red | Yellow | LetsGoPikachu => FireRed,
-                BlueGreen | BlueJpn | LetsGoEevee => LeafGreen,
+                FireRedSwitch | Red | Yellow | LetsGoPikachu => FireRed,
+                LeafGreenSwitch | BlueGreen | BlueJpn | LetsGoEevee => LeafGreen,
 
                 AlphaSapphire => Sapphire,
                 OmegaRuby => Ruby,
@@ -235,8 +235,8 @@ impl PkmFormat {
                 _ => SoulSilver,
             },
             Self::PK5 => match origin {
-                Red | Yellow | LetsGoPikachu => FireRed,
-                BlueGreen | BlueJpn | LetsGoEevee => LeafGreen,
+                FireRedSwitch | Red | Yellow | LetsGoPikachu => FireRed,
+                LeafGreenSwitch | BlueGreen | BlueJpn | LetsGoEevee => LeafGreen,
 
                 AlphaSapphire => Sapphire,
                 OmegaRuby => Ruby,
@@ -251,8 +251,8 @@ impl PkmFormat {
                 _ => White2,
             },
             Self::PK6 => match origin {
-                Red | Yellow | LetsGoPikachu => FireRed,
-                BlueGreen | BlueJpn | LetsGoEevee => LeafGreen,
+                FireRedSwitch | Red | Yellow | LetsGoPikachu => FireRed,
+                LeafGreenSwitch | BlueGreen | BlueJpn | LetsGoEevee => LeafGreen,
 
                 BrilliantDiamond => Diamond,
                 ShiningPearl => Pearl,
@@ -266,8 +266,8 @@ impl PkmFormat {
                 _ => Y,
             },
             Self::PK7 => match origin {
-                LetsGoPikachu => FireRed,
-                LetsGoEevee => LeafGreen,
+                FireRedSwitch | LetsGoPikachu => FireRed,
+                LeafGreenSwitch | LetsGoEevee => LeafGreen,
 
                 BrilliantDiamond => Diamond,
                 ShiningPearl => Pearl,
@@ -278,18 +278,34 @@ impl PkmFormat {
                 _ => UltraMoon,
             },
             Self::PB7 => match origin {
-                FireRed | Red | Yellow => LetsGoPikachu,
+                FireRed | FireRedSwitch | Red | Yellow => LetsGoPikachu,
 
                 _ => LetsGoEevee,
             },
-            Self::PK8 => Sword, // Pokémon HOME does this for all post-SwSh Pokémon transferred in
-            Self::PA8 => LegendsArceus,
-            Self::PB8 => ShiningPearl,
+            // Pokémon HOME's game of origin handling is replicated for officially-supported transfer methods, warts and all
+            // this includes setting Invalid0 for FRLG-Switch origin in PA8 thru PA9
+            Self::PK8 => match origin {
+                // all transfers from future games of origin always set SwSh origin, likely to permit Battle Stadium usage without wiping moves
+                LeafGreenSwitch => Shield,
+                _ => Sword,
+            },
+            Self::PA8 => match origin {
+                FireRedSwitch | LeafGreenSwitch => Invalid0,
+                _ => LegendsArceus,
+            },
+            Self::PB8 => match origin {
+                FireRedSwitch | LeafGreenSwitch => Invalid0,
+                _ => ShiningPearl,
+            },
             Self::PK9 => match origin {
                 LegendsZa => X,
+                FireRedSwitch | LeafGreenSwitch => Invalid0,
                 _ => Violet,
             },
-            Self::PA9 => LegendsZa,
+            Self::PA9 => match origin {
+                FireRedSwitch | LeafGreenSwitch => Invalid0,
+                _ => LegendsZa,
+            },
             Self::PK3RR => FireRed,
             Self::PK3UB => FireRed,
             Self::PB8LUMI => ShiningPearl,
@@ -327,6 +343,7 @@ impl PkmFormat {
         if self == Self::PK8 {
             return if original_origin >= OriginGame::LegendsArceus {
                 match original_origin {
+                    origin if origin.is_frlg_switch() => 0,
                     OriginGame::Violet => 59996,
                     OriginGame::Scarlet => 59997,
                     OriginGame::ShiningPearl => 59998,
@@ -334,6 +351,38 @@ impl PkmFormat {
                     OriginGame::LegendsArceus => 60000,
                     _ => super::location::FARAWAY_PLACE_SWSH,
                 }
+            } else {
+                met_location_index
+            };
+        }
+
+        if self == Self::PA8 {
+            return if original_origin.is_frlg_switch() {
+                super::location::DISTANT_LAND_FRLG_SWITCH
+            } else {
+                met_location_index
+            };
+        }
+
+        if self == Self::PB8 {
+            return if original_origin.is_frlg_switch() {
+                super::location::DISTANT_LAND_FRLG_SWITCH
+            } else {
+                met_location_index
+            };
+        }
+
+        if self == Self::PK9 {
+            return if original_origin.is_frlg_switch() {
+                super::location::DISTANT_LAND_FRLG_SWITCH
+            } else {
+                met_location_index
+            };
+        }
+
+        if self == Self::PA9 {
+            return if original_origin.is_frlg_switch() {
+                super::location::DISTANT_LAND_FRLG_SWITCH
             } else {
                 met_location_index
             };

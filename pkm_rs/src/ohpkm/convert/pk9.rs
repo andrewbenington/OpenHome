@@ -1,7 +1,6 @@
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::{metadata_source::MetadataSource, ribbons::OpenHomeRibbonSet};
-use pkm_rs_types::FlagSet;
-use pkm_rs_types::{AbilityNumber, Stats16Le};
+use pkm_rs_types::{AbilityNumber, FlagSet, OriginGame, Stats16Le};
 
 use super::OhpkmConvert;
 use crate::convert_strategy::ConvertStrategy;
@@ -19,6 +18,13 @@ use crate::traits::HasSpeciesAndForm;
 
 impl OhpkmConvert for Pk9 {
     fn to_main_data(&self) -> ohpkm::v2_sections::MainDataV2 {
+        let (game_of_origin, met_location_index) =
+            if self.game_of_origin == OriginGame::Invalid0 && self.met_location_index == 30007 {
+                (OriginGame::FireRedSwitch, 254) // TODO: determine origin game based on currently-open game
+            } else {
+                (self.game_of_origin, self.met_location_index)
+            };
+
         ohpkm::v2_sections::MainDataV2 {
             openhome_id: OpenHomeId::new(
                 self.species_and_form.into_inner().get_ndex(),
@@ -72,7 +78,7 @@ impl OhpkmConvert for Pk9 {
             handler_language: self.handler_language,
             fullness: Default::default(),
             enjoyment: Default::default(),
-            game_of_origin: self.game_of_origin,
+            game_of_origin,
             game_of_origin_battle: self.game_of_origin_battle,
             language: self.language,
             form_argument: self.form_argument,
@@ -88,7 +94,7 @@ impl OhpkmConvert for Pk9 {
             } else {
                 Some(self.egg_location_index)
             },
-            met_location_index: self.met_location_index,
+            met_location_index,
             met_level: self.met_level,
             hyper_training: self.hyper_training,
             trainer_gender: self.trainer_gender,
