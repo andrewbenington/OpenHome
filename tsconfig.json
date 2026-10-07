@@ -49,6 +49,7 @@
     "packages",
     "src-tauri/pokemon-wasm",
     "src/types/pkm-resources-types.d.ts",
+    "pkm_rs/pkg/pkm_rs_emerald_expn.d.ts",
     "scripts",
     "__mocks__",
   ],

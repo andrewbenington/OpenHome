@@ -3,6 +3,7 @@ use pkm_rs_derive::EnumMax;
 use serde::Deserialize;
 use std::fmt::Display;
 
+
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -1119,7 +1120,7 @@ pub enum NationalDex {
     IronCrown,
     Terapagos,
     #[max]
-    Pecharunt,
+    Pecharunt
 }
 
 impl NationalDex {
