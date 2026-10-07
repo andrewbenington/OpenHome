@@ -94,7 +94,7 @@ impl SwShBlocks {
                 pokemon_boxes.into_block(),
                 box_layouts.into_block(),
                 swish_crypto::Block::new(
-                    BlockKey::CurrentBox.to_u32(),
+                    BlockKey::CurrentBox as u32,
                     swish_crypto::BlockData::Value(current_box),
                 ),
             ])
