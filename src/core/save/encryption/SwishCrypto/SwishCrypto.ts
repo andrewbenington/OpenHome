@@ -60,15 +60,7 @@ export function blockDataIsType<T extends BlockType>(
   }
 }
 
-type KeysOfUnion<T> = T extends any ? keyof T : never
-
-type DataType = KeysOfUnion<BlockData>
-
-type DataOf<K extends DataType> = Extract<BlockData, Record<K, any>>[K]
-
-type BlockDataOf<K extends DataType> = Record<K, DataOf<K>>
-
-// Distributes over the NumericBlock union: { UInt8: number } -> "UInt8"
+// Returns inner key of the NumericBlock union: { UInt8: number } -> "UInt8"
 type NumericTypeOf<V> = V extends unknown ? Extract<keyof V, NumericType> : never
 
 export type BlockTypeOf<D extends BlockData> = D extends { Bool: infer B extends BoolType }
