@@ -1,3 +1,5 @@
+use num_enum::IntoPrimitive;
+use num_enum::TryFromPrimitive;
 use pkm_rs_resources::ExpectLog;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::metadata_source::MetadataSource;
@@ -28,7 +30,10 @@ use wasm_bindgen::prelude::*;
 use rand::seq::IteratorRandom;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, EnumIter)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, EnumIter, TryFromPrimitive, IntoPrimitive,
+)]
+#[repr(u64)]
 pub enum ExtraFormIndex {
     /* Cosplay Pikachu */
     PikachuRockStar = 1,
@@ -935,105 +940,6 @@ pub fn extra_form_metadata_js(form: ExtraFormIndex) -> ExtraFormMetadata {
 }
 
 pub struct InvalidExtraFormIndex;
-
-impl TryFrom<u64> for ExtraFormIndex {
-    type Error = InvalidExtraFormIndex;
-
-    fn try_from(value: u64) -> Result<Self, Self::Error> {
-        match value {
-            1 => Ok(Self::PikachuRockStar),
-            2 => Ok(Self::PikachuBelle),
-            3 => Ok(Self::PikachuPopStar),
-            4 => Ok(Self::PikachuPhD),
-            5 => Ok(Self::PikachuLibre),
-            6 => Ok(Self::PikachuCosplay),
-            7 => Ok(Self::PikachuSurfing),
-            8 => Ok(Self::PikachuFlying),
-            9 => Ok(Self::CharizardGiga),
-            10 => Ok(Self::ButterfreeGiga),
-            11 => Ok(Self::PikachuGiga),
-            12 => Ok(Self::MeowthGiga),
-            13 => Ok(Self::MachampGiga),
-            14 => Ok(Self::GengarGiga),
-            15 => Ok(Self::KinglerGiga),
-            16 => Ok(Self::LaprasGiga),
-            17 => Ok(Self::EeveeGiga),
-            18 => Ok(Self::SnorlaxGiga),
-            19 => Ok(Self::GarbodorGiga),
-            20 => Ok(Self::MelmetalGiga),
-            21 => Ok(Self::CorviknightGiga),
-            22 => Ok(Self::OrbeetleGiga),
-            23 => Ok(Self::DrednawGiga),
-            24 => Ok(Self::CoalossalGiga),
-            25 => Ok(Self::FlappleGiga),
-            26 => Ok(Self::AppletunGiga),
-            27 => Ok(Self::SandacondaGiga),
-            28 => Ok(Self::ToxtricityGiga),
-            29 => Ok(Self::ToxtricityLowKeyGiga),
-            30 => Ok(Self::CentiskorchGiga),
-            31 => Ok(Self::HattereneGiga),
-            32 => Ok(Self::GrimmsnarlGiga),
-            33 => Ok(Self::AlcremieGiga),
-            34 => Ok(Self::CopperajahGiga),
-            35 => Ok(Self::DuraludonGiga),
-
-            36 => Ok(Self::VenusaurGiga),
-            37 => Ok(Self::BlastoiseGiga),
-            38 => Ok(Self::RillaboomGiga),
-            39 => Ok(Self::CinderaceGiga),
-            40 => Ok(Self::InteleonGiga),
-            41 => Ok(Self::UrsifuSingleGiga),
-            42 => Ok(Self::UrsifuRapidGiga),
-            43 => Ok(Self::EternatusEternamax),
-
-            44 => Ok(Self::VenusaurClone),
-            45 => Ok(Self::CharizardClone),
-            46 => Ok(Self::BlastoiseClone),
-            47 => Ok(Self::PikachuClone),
-
-            48 => Ok(Self::EeveeBandana),
-            49 => Ok(Self::GengarStitched),
-            50 => Ok(Self::OnixCrystal),
-
-            51 => Ok(Self::MewtwoArmorMk1),
-            52 => Ok(Self::MewtwoArmorMk2),
-
-            53 => Ok(Self::DoduoSevii),
-            54 => Ok(Self::DodrioSevii),
-            55 => Ok(Self::TeddiursaSevii),
-            56 => Ok(Self::UrsaringSevii),
-            57 => Ok(Self::MantykeSevii),
-            58 => Ok(Self::MantineSevii),
-            59 => Ok(Self::FeebasSevii),
-            60 => Ok(Self::MiloticSevii),
-            61 => Ok(Self::CarnivineSevii),
-            62 => Ok(Self::BlitzleSevii),
-            63 => Ok(Self::ZebstrikaSevii),
-            64 => Ok(Self::ClauncherSevii),
-            65 => Ok(Self::ClawitzerSevii),
-            66 => Ok(Self::NoibatSevii),
-            67 => Ok(Self::NoivernSevii),
-            68 => Ok(Self::WishiwashiSevii),
-            69 => Ok(Self::WishiwashiSeviiSchool),
-            70 => Ok(Self::DhelmiseSevii),
-            71 => Ok(Self::SizzlipedeSevii),
-            72 => Ok(Self::CentiskorchSevii),
-            73 => Ok(Self::CentiskorchSeviiGiga),
-            74 => Ok(Self::NymbleSevii),
-            75 => Ok(Self::LokixSevii),
-
-            76 => Ok(Self::DialgaPrimal),
-
-            _ => Err(InvalidExtraFormIndex),
-        }
-    }
-}
-
-impl From<ExtraFormIndex> for u64 {
-    fn from(value: ExtraFormIndex) -> Self {
-        value as u64
-    }
-}
 
 #[test]
 fn try_from_u64() {

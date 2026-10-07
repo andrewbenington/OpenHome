@@ -3018,6 +3018,7 @@ dependencies = [
  "getrandom 0.4.3",
  "js-sys",
  "num",
+ "num_enum",
  "pkm_rs_types",
  "rand",
  "serde",
