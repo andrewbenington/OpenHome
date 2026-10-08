@@ -486,8 +486,10 @@ export abstract class WasmOfficialSave<
   }
 
   getAllMons() {
-    return range(this.MAX_BOX_COUNT)
-      .flatMap((boxIndex) => range(this.SLOTS_PER_BOX).map((boxSlot) => ({ boxIndex, boxSlot })))
+    const boxCount = this.MAX_BOX_COUNT
+    const slotCount = this.SLOTS_PER_BOX
+    return range(boxCount)
+      .flatMap((boxIndex) => range(slotCount).map((boxSlot) => ({ boxIndex, boxSlot })))
       .map(({ boxIndex, boxSlot }) => this.getMonAt(boxIndex, boxSlot))
       .filter(filterUndefined)
   }

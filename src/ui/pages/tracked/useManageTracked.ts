@@ -221,11 +221,12 @@ export function useManageTracked() {
       }
 
       const save = result.data
+      const allSaveMons = save.getAllMons()
       const loadedMons = await ohpkmStore.tryLoadBatch(
-        save.getAllMons().map(ohpkmStore.getPotentialOhpkmId).filter(filterUndefined)
+        allSaveMons.map(ohpkmStore.getPotentialOhpkmId).filter(filterUndefined)
       )
 
-      for (const saveMon of save.getAllMons()) {
+      for (const saveMon of allSaveMons) {
         const saveMonId = ohpkmStore.getPotentialOhpkmId(saveMon)
 
         if (saveMonId === undefined || foundMonIds.has(saveMonId) || hasHomeLocation(saveMonId)) {
