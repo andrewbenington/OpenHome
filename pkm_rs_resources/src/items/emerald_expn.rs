@@ -10,7 +10,8 @@ use pkm_rs_types::randomize::Randomize;
 use rand::RngExt;
 
 
-pub const ITEM_MAX_GEN3_EMERALD_EXPN: usize = 874;
+// pub const ITEM_MAX_GEN3_EMERALD_EXPN: usize = 874;
+pub const ITEM_MAX_GEN3_EMERALD_EXPN: usize = 0;
 
 #[allow(clippy::missing_const_for_fn)]
 #[wasm_bindgen(js_name = "getAllItemsGen3EmeraldExpn")]
@@ -18,5 +19,12 @@ pub const ITEM_MAX_GEN3_EMERALD_EXPN: usize = 874;
 pub fn get_all_items() -> Vec<ItemMetadataPastGen> {
     ALL_ITEMS_GEN3_EMERALD_EXPN.into_iter().copied().collect()
 }
+
+// impl ItemEmeraldExpn {
+//     pub fn from_modern_index(modern_index: u16) -> Option<Self> {
+//         // TODO
+//
+//     }
+// }
 
 pub static ALL_ITEMS_GEN3_EMERALD_EXPN: [&ItemMetadataPastGen; ITEM_MAX_GEN3_EMERALD_EXPN] = [];

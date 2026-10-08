@@ -11,6 +11,9 @@ use std::rc::Rc;
 use std::string::FromUtf8Error;
 
 #[cfg(feature = "wasm")]
+use crate::encryption::swish_crypto::SwishError;
+
+#[cfg(feature = "wasm")]
 use wasm_bindgen::JsValue;
 
 #[derive(Debug)]
@@ -180,6 +183,7 @@ impl Display for Error {
             #[cfg(feature = "wasm")]
             Self::SwishCrypto(error) => error.to_string(),
             Self::Other(msg) => msg.clone(),
+            Self::MoveError { value, source: _source } => format!("Invalid move {value}")
         };
 
         f.write_str(&message)

@@ -1,7 +1,6 @@
 import { G3SAV } from '@openhome-core/save/G3SAV.ts'
-import { ExtraFormIndex, ItemGen3, OriginGame } from '@pkm-rs/pkg'
+import { ExtraFormIndex } from '@pkm-rs/pkg'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex.ts'
-import G3EmeraldExpnSave from '@openhome-core/save/emerald_expn/G3EmeraldExpnSave.ts'
 
 // noinspection JSUnusedGlobalSymbols
 class PK3EmeraldExpn extends G3SAV {

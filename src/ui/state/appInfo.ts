@@ -27,7 +27,7 @@ import { MonDisplayState } from '@openhome-ui/hooks/monDisplay'
 import { SaveViewMode } from '@openhome-ui/saves/util'
 import { updateStyleForUiScale } from '@openhome-ui/util/style'
 import { Dispatch, Reducer, createContext } from 'react'
-import { G3EmeraldExpnSave } from '@openhome-core/save/emerald_expn/G3EmeraldExpnSave.ts'
+// import { G3EmeraldExpnSave } from '@openhome-core/save/emerald_expn/G3EmeraldExpnSave.ts'
 
 export const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
   G1SAV,

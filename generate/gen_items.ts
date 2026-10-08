@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3'
 import * as fs from 'fs'
 import {
+  itemEmeraldExpnGetAll,
   itemGen1GetAll,
   type ItemGen1GetAllRow,
   itemGen2GetAll,
@@ -297,3 +298,42 @@ generateGen2()
 generateGen3()
 generateRadicalRed()
 generateUnbound()
+
+async function generateEmeraldExpn() {
+  const allItems = await itemEmeraldExpnGetAll(new Database('generate/pkm.db'))
+
+  let output = `use crate::items::ItemMetadataPastGen;
+use crate::items::types_extra::ItemEmeraldExpn;
+
+pub const ITEM_MAX_EMERALD_EXPN: usize = ${allItems.length};
+
+impl ItemEmeraldExpn {
+    pub fn from_modern_index(modern_index: u16) -> Option<Self> {
+        match modern_index {`
+
+  const alreadyProcessed: Set<number> = new Set()
+  for (const item of allItems.toSorted((a, b) => (a.modernId ?? 0) - (b.modernId ?? 0))) {
+    if (item.modernId && !alreadyProcessed.has(item.modernId)) {
+      output += `
+            ${item.modernId} => Self::new(${item.id}),`
+      alreadyProcessed.add(item.modernId)
+    }
+  }
+  output += ` _ => None,
+         }
+    }
+}
+
+`
+
+  output +=
+    `pub static ALL_ITEMS_EMERALD_EXPN: [&ItemMetadataPastGen; ITEM_MAX_EMERALD_EXPN] = [\n` +
+    allItems.map(convertItemPastGen).join(',\n') +
+    '];'
+
+  const filename = 'pkm_rs_resources/src/items/emerald_expn_2.rs'
+  fs.writeFileSync(filename, output)
+  console.log(`Rust code written to ${filename}`)
+}
+
+generateEmeraldExpn()
