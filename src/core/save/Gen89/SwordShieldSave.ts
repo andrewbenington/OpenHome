@@ -107,7 +107,7 @@ export class SwordShieldSave extends WasmOfficialSave<Pk8Wasm, PK8, SwordShieldS
   }
 
   get saveVersion(): SwordShieldVersion {
-    // for hack in monSupport.test.ts that calls this from the class itself
+    // for hack in monSupport.test.ts that calls this from the class's prototype
     try {
       return this.inner.saveVersion
     } catch {
@@ -129,13 +129,10 @@ export class SwordShieldSave extends WasmOfficialSave<Pk8Wasm, PK8, SwordShieldS
   }
 
   static fileIsSave(bytes: Uint8Array): boolean {
-    if (bytes.length < SAVE_SIZE_BYTES_MIN || bytes.length > SAVE_SIZE_BYTES_MAX) {
-      return false
-    }
-    return SwishCrypto.getIsHashValid(bytes)
+    return SwordShieldSaveRust.fileIsSave(bytes)
   }
 
   static includesOrigin(origin: OriginGame) {
-    return origin === OriginGame.Sword || origin === OriginGame.Shield
+    return SwordShieldSaveRust.includesOrigin(origin)
   }
 }
