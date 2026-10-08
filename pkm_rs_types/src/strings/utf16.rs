@@ -1,6 +1,7 @@
 use serde::Serialize;
 use std::fmt::{Display, Write};
 use std::ops::Deref;
+use zerocopy::{Immutable, IntoBytes, KnownLayout, TryFromBytes, Unaligned};
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
@@ -19,7 +20,10 @@ use wasm_bindgen::describe::*;
 
 const TERMINATOR: u16 = 0x0000;
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(
+    Clone, Copy, PartialEq, Eq, TryFromBytes, Unaligned, IntoBytes, KnownLayout, Immutable,
+)]
+#[repr(C)]
 pub struct SizedUtf16String<const N: usize> {
     raw_le: [u8; N],
 }

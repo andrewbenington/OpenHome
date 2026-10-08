@@ -2,16 +2,22 @@ use super::save_blocks::{BoxBlock, MyStatusBlock, SwordShieldBlocks};
 use super::{BOX_COLS, BOX_ROWS, BoxName, MAX_BOX_COUNT, Pk8, Pk8Buffer};
 use crate::checksum::RefreshChecksum;
 use crate::encryption::swish_crypto::{self, NumericBlock, SwishBlocks};
+#[cfg(feature = "wasm")]
+use crate::gen8_swsh::save_blocks::SwShBlockKey;
 use crate::gen8_swsh::{BoxIndex, BoxSlot};
+#[cfg(feature = "wasm")]
+use crate::result::StdResult;
 use crate::result::{Error, Result};
 use crate::traits::PkmBytes;
 
 #[cfg(feature = "wasm")]
-use pkm_rs_types::BoundViolated;
 use pkm_rs_types::OriginGame;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{BinaryGender, Language};
+#[cfg(feature = "wasm")]
+use pkm_rs_types::{BoundViolated, NationalDex};
 
+use tsify::Tsify;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -191,6 +197,42 @@ impl SwordShieldSave {
     }
 }
 
+// fn display_bytes(bytes: &[u8]) -> String {
+//     bytes
+//         .iter()
+//         .map(|b| format!("{:02x}", b))
+//         .collect::<Vec<_>>()
+//         .join(",")
+// }
+
+fn display_u16_hex(value: impl Into<u16>) -> String {
+    format!("0x{:04x}", value.into())
+}
+
+fn add_field(
+    obj: &js_sys::Object,
+    key: impl Into<JsValue>,
+    value: impl Into<JsValue>,
+) -> StdResult<bool, JsValue> {
+    js_sys::Reflect::set(obj, &key.into(), &value.into())
+}
+
+fn add_string(
+    obj: &js_sys::Object,
+    key: impl Into<JsValue>,
+    value: impl ToString,
+) -> StdResult<bool, JsValue> {
+    js_sys::Reflect::set(obj, &key.into(), &value.to_string().into())
+}
+
+fn add_u16_hex(
+    obj: &js_sys::Object,
+    key: impl Into<JsValue>,
+    value: impl Into<u16>,
+) -> StdResult<bool, JsValue> {
+    js_sys::Reflect::set(obj, &key.into(), &display_u16_hex(value).into())
+}
+
 #[cfg(feature = "wasm")]
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_class = SwordShieldSaveRust))]
 #[allow(clippy::missing_const_for_fn)]
@@ -301,6 +343,69 @@ impl SwordShieldSave {
         self.language()
     }
 
+    #[wasm_bindgen(js_name = getPokedexOwned)]
+    pub fn pokedex_owned_wasm(&self) -> Result<u16> {
+        match self.blocks.trainer_card.fields() {
+            Ok(fields) => Ok(fields.pokedex_owned.get()),
+            Err(err) => Err(Error::Other(format!("error reading pokedex_owned: {err}"))),
+        }
+    }
+
+    #[wasm_bindgen(js_name = getDisplayData)]
+    pub fn display_data(&self) -> StdResult<js_sys::Object, JsValue> {
+        // let mut map = BTreeMap::new();
+        // map.insert("pokedexOwned", 3);
+
+        // let serializer = Serializer::new().serialize_maps_as_objects(true);
+        // map.serialize(&serializer).map_err(Into::into)
+        let obj = js_sys::Object::new();
+        let trainer_card = self
+            .blocks
+            .trainer_card
+            .fields()
+            .map_err(|e| e.to_string())?;
+
+        // add_field(&obj, "Language", trainer_card.language)?;
+        add_u16_hex(&obj, "Trainer ID", trainer_card.trainer_id.get())?;
+        add_u16_hex(&obj, "Secret ID", trainer_card.secret_id.get())?;
+        add_field(
+            &obj,
+            "Pokédex Entries Registered",
+            trainer_card.pokedex_owned.get(),
+        )?;
+        add_field(
+            &obj,
+            "Shiny Pokémon Found",
+            trainer_card.shiny_pokemon_found.get(),
+        )?;
+        add_string(
+            &obj,
+            "Player Character",
+            if trainer_card.gender {
+                "Gloria"
+            } else {
+                "Victor"
+            },
+        )?;
+        add_string(
+            &obj,
+            "Starter",
+            NationalDex::Grookey
+                .try_add(trainer_card.starter_index)
+                .map(pkm_rs_resources::species_name_en)
+                .unwrap_or("Invalid Starter Index"),
+        )?;
+
+        add_string(&obj, "Starter", SwordShieldVersion::detect(&self.blocks))?;
+
+        Ok(obj)
+    }
+
+    #[wasm_bindgen(getter = saveVersion)]
+    pub fn save_version_wasm(&self) -> SwordShieldVersion {
+        SwordShieldVersion::detect(&self.blocks)
+    }
+
     #[wasm_bindgen(js_name = includesOrigin)]
     pub fn includes_origin_wasm(origin: OriginGame) -> bool {
         Self::includes_origin(origin)
@@ -314,6 +419,31 @@ impl SwordShieldSave {
     #[wasm_bindgen(js_name = prepareBytesForSaving)]
     pub fn prepare_bytes_for_saving_wasm(&self) -> Vec<u8> {
         self.prepare_bytes_for_saving()
+    }
+}
+
+#[cfg_attr(feature = "wasm", derive(Tsify, serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
+#[derive(Debug, Clone, Copy, strum::Display)]
+pub enum SwordShieldVersion {
+    #[serde(rename = "Base Game")]
+    BaseGame,
+    #[serde(rename = "Isle of Armor")]
+    IsleOfArmor,
+    #[serde(rename = "Crown Tundra")]
+    CrownTundra,
+}
+
+impl SwordShieldVersion {
+    fn detect(blocks: &SwordShieldBlocks) -> Self {
+        let other_blocks = &blocks.other_blocks;
+        if other_blocks.has_block(SwShBlockKey::ZukanR2) {
+            Self::CrownTundra
+        } else if other_blocks.has_block(SwShBlockKey::ZukanR1) {
+            Self::IsleOfArmor
+        } else {
+            Self::BaseGame
+        }
     }
 }
 

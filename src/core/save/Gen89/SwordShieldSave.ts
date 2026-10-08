@@ -1,6 +1,5 @@
 import { PK8 } from '@openhome-core/pkm'
 import { Item } from '@openhome-core/resources/consts/Items'
-import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import {
   SWSH_TRANSFER_RESTRICTIONS_BASE,
   SWSH_TRANSFER_RESTRICTIONS_CT,
@@ -8,25 +7,19 @@ import {
 } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { Errorable } from '@openhome-core/util/functional'
-import { utf16BytesToString } from '@openhome-core/util/stringConversion'
 import {
   Block,
-  BlockType,
   ConvertStrategy,
   ExtraFormIndex,
-  Language,
-  Languages,
-  Lookup,
-  ObjectBlock,
   OriginGame,
   Pk8Wasm,
   SwordShieldSaveRust,
+  SwordShieldVersion,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
-import { BlockDataFor, blockIsType, SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
+import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
 import { BoxAndSlot, WasmOfficialSave } from '../interfaces'
 import { PathData } from '../util/path'
-import { G89BlockName } from './Gen8Gen9Save'
 
 const SAVE_SIZE_BYTES_MIN = 0x171500
 const SAVE_SIZE_BYTES_MAX = 0x187800
@@ -54,16 +47,10 @@ export class SwordShieldSave extends WasmOfficialSave<Pk8Wasm, PK8, SwordShieldS
 
   scBlocks: Block[]
 
-  trainerCardBlock: TrainerCardBlock
-
   constructor(path: PathData, bytes: Uint8Array) {
     super(SwordShieldSaveRust.fromBytes(bytes))
     this.scBlocks = SwishCrypto.decrypt(bytes)
     this.filePath = path
-
-    this.trainerCardBlock = new TrainerCardBlock(
-      this.getBlockDataMust('TrainerCard', 'Object').Object
-    )
   }
 
   convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK8> {
@@ -78,40 +65,12 @@ export class SwordShieldSave extends WasmOfficialSave<Pk8Wasm, PK8, SwordShieldS
     return Pk8Wasm.isEmptySlot(new Uint8Array(bytes))
   }
 
-  getBlockKey(blockName: G89BlockName | keyof typeof BlockKeys): number {
-    return BlockKeys[blockName]
-  }
-
-  getBlock(blockName: G89BlockName | keyof typeof BlockKeys): Block | undefined {
-    const key = this.getBlockKey(blockName)
-
-    return this.scBlocks.find((b) => b.key === key)
-  }
-
-  getBlockDataMust<T extends BlockType>(
-    blockName: G89BlockName | keyof typeof BlockKeys,
-    type: T
-  ): BlockDataFor<T> {
-    const block = this.getBlock(blockName)
-
-    if (!block) {
-      throw Error(`Missing block ${blockName}`)
-    }
-    if (!blockIsType(block, type)) {
-      throw Error(
-        `Block ${blockName} has data ${JSON.stringify(block.data)} (expected ${JSON.stringify(type)})`
-      )
-    }
-    return block.data
-  }
-
   monFromWasm(wasmMon: Pk8Wasm): PK8 {
     return PK8.fromWasm(wasmMon)
   }
 
   supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
-    const revision = this.scBlocks ? this.getSaveRevision() : 'Crown Tundra'
-    switch (revision) {
+    switch (this.saveVersion) {
       case 'Base Game':
         return !isRestricted(
           SWSH_TRANSFER_RESTRICTIONS_BASE,
@@ -119,7 +78,7 @@ export class SwordShieldSave extends WasmOfficialSave<Pk8Wasm, PK8, SwordShieldS
           formeNumber,
           extraFormIndex
         )
-      case 'Isle Of Armor':
+      case 'Isle of Armor':
         return !isRestricted(
           SWSH_TRANSFER_RESTRICTIONS_IOA,
           nationalDex,
@@ -137,39 +96,35 @@ export class SwordShieldSave extends WasmOfficialSave<Pk8Wasm, PK8, SwordShieldS
   }
 
   supportsItem(itemIndex: number) {
-    const revision = this.scBlocks ? this.getSaveRevision() : 'Crown Tundra'
-    switch (revision) {
+    switch (this.saveVersion) {
       case 'Base Game':
         return itemIndex <= Item.DynamaxCrystalAql7235
-      case 'Isle Of Armor':
+      case 'Isle of Armor':
         return itemIndex <= Item.MarkCharm
       case 'Crown Tundra':
         return itemIndex <= Item.ReinsOfUnity_3
     }
   }
 
-  getSaveRevision(): SWSH_SAVE_REVISION {
-    return this.getBlock('ZukanR2')
-      ? 'Crown Tundra'
-      : this.getBlock('ZukanR1')
-        ? 'Isle Of Armor'
-        : 'Base Game'
+  get saveVersion(): SwordShieldVersion {
+    // for hack in monSupport.test.ts that calls this from the class itself
+    try {
+      return this.inner.saveVersion
+    } catch {
+      return 'Base Game'
+    }
   }
 
   getDisplayData() {
-    const pokedexOwned = this.trainerCardBlock.getPokeDexOwned()
+    const pokedexOwned = this.inner.getPokedexOwned()
 
     if (pokedexOwned === 0xffff) {
       return { Status: 'New Save File' }
     }
 
     return {
-      'Player Character': this.inner.trainerGender ? 'Gloria' : 'Victor',
-      'Save Version': this.getSaveRevision(),
-      Language: Languages.stringFromByte(this.inner.language || 0),
-      Pokédex: pokedexOwned,
-      'Shiny Pokémon Found': this.trainerCardBlock.getShinyPokemonFound(),
-      Starter: this.trainerCardBlock.getStarter(),
+      'Save Version': this.saveVersion,
+      ...this.inner.getDisplayData(),
     }
   }
 
@@ -182,81 +137,5 @@ export class SwordShieldSave extends WasmOfficialSave<Pk8Wasm, PK8, SwordShieldS
 
   static includesOrigin(origin: OriginGame) {
     return origin === OriginGame.Sword || origin === OriginGame.Shield
-  }
-}
-
-export const BlockKeys = {
-  MyStatus: 0xf25c070e,
-  TeamNames: 0x1920c1e4,
-  TeamIndexes: 0x33f39467,
-  BoxLayout: 0x19722c89,
-  BoxWallpapers: 0x2eb1b190,
-  MenuButtons: 0xb1dddca8,
-
-  Box: 0x0d66012c,
-  MysteryGift: 0x112d5141,
-  Item: 0x1177c2c4,
-  Coordinates: 0x16aaa7fa,
-  Misc: 0x1b882b09,
-  Party: 0x2985fe5d,
-  Daycare: 0x2d6fba6a,
-  Record: 0x37da95a3,
-  Zukan: 0x4716c404,
-  ZukanR1: 0x3f936ba9,
-  ZukanR2: 0x3c9366f0,
-  PokedexRecommendation: 0xc3fb9e77,
-  CurryDex: 0x6eb72940,
-  TrainerCard: 0x874da6fa,
-  PlayTime: 0x8cbbfd90,
-
-  CurrentBox: 0x017c3cbb,
-  BoxesUnlocked: 0x71825204,
-}
-
-class TrainerCardBlock {
-  dataView: DataView<ArrayBuffer>
-
-  constructor(scBlock: ObjectBlock) {
-    this.dataView = new DataView(scBlock.bytes.buffer)
-  }
-
-  public getName(): string {
-    return utf16BytesToString(this.dataView.buffer, 0, 24)
-  }
-  public getLanguage(): number {
-    return this.dataView.getUint8(0x1b)
-  }
-  public getFullID(): number {
-    return this.dataView.getUint32(0x1c, true)
-  }
-  public getTID(): number {
-    return this.dataView.getUint16(0x1c, true)
-  }
-  public getSID(): number {
-    return this.dataView.getUint16(0x1e, true)
-  }
-  public getPokeDexOwned(): number {
-    return this.dataView.getUint16(0x20, true)
-  }
-  public getShinyPokemonFound(): number {
-    return this.dataView.getUint16(0x22, true)
-  }
-  public getGame(): OriginGame {
-    const origin = this.dataView.getUint8(0x24)
-
-    return origin === 0 ? OriginGame.Sword : OriginGame.Shield
-  }
-  public getGender(): boolean {
-    return !!(this.dataView.getUint8(0x38) & 1)
-  }
-  public getStarter(): string {
-    const index = this.dataView.getUint8(0x25)
-
-    if (index <= 2) {
-      const nationalDex = NationalDex.Grookey + index * 3
-      return Lookup.speciesName(nationalDex, Language.English)
-    }
-
-    return 'Not Selected'
   }
 }

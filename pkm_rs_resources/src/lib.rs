@@ -19,6 +19,7 @@ pub mod stats;
 pub mod text_resource;
 pub mod variants;
 
+pub use pkhex_text::species_names::*;
 pub use result::*;
 
 #[cfg(target_arch = "wasm32")]

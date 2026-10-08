@@ -20,11 +20,14 @@ impl SwishBlocks {
         ))
     }
 
+    pub fn has_block(&self, key: impl Into<u32> + Display + Copy) -> bool {
+        self.0.contains_key(&key.into())
+    }
+
     pub fn try_pop_block(
         &mut self,
         key: impl Into<u32> + Display + Copy,
     ) -> StdResult<swish_crypto::Block, SwishError> {
-        dbg!(&key.into());
         Ok(self
             .0
             .remove(&key.into())

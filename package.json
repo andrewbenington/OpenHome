@@ -92,6 +92,7 @@
     "@tauri-apps/cli": "^2.11.4",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
+    "@types/better-sqlite3": "^9.6.0",
     "@types/crypto-js": "^4.2.2",
     "@types/node": "^26.5.1",
     "@types/react": "^19.3.0",
