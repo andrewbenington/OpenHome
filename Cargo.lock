@@ -2999,6 +2999,7 @@ dependencies = [
  "thiserror 2.0.21",
  "tsify",
  "wasm-bindgen",
+ "zerocopy",
 ]
 
 [[package]]
@@ -3054,6 +3055,7 @@ dependencies = [
  "time",
  "tsify",
  "wasm-bindgen",
+ "zerocopy",
 ]
 
 [[package]]
@@ -6198,6 +6200,26 @@ dependencies = [
  "quote",
  "syn 2.0.119",
  "synstructure",
+]
+
+[[package]]
+name = "zerocopy"
+version = "0.8.61"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "879fb705ce98c32e41ebdb970fbe1204f8492423b314c6ab0354c3e7b5542866"
+dependencies = [
+ "zerocopy-derive",
+]
+
+[[package]]
+name = "zerocopy-derive"
+version = "0.8.61"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "708882a28301d604fa039cc7727607a98d04c4b86dc76ec9cc683f805d709759"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.119",
 ]
 
 [[package]]

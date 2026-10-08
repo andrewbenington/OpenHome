@@ -3,18 +3,21 @@ use std::collections::BTreeMap;
 use super::{BOX_NAME_LENGTH, BOX_SLOTS, BoxName, Pk8};
 use crate::encryption::swish_crypto::{self, NumericBlock, SwishBlocks};
 use crate::gen8_swsh::{BoxIndex, BoxSlot};
-use crate::result::Result;
+use crate::result::{Result, StdResult};
 use crate::traits::PkmBytes;
 
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{BinaryGender, Language, read_u16_le};
 use pkm_rs_types::{OriginGame, read_u32_le};
+use static_assertions::const_assert_eq;
 use strum::{Display, EnumIter, EnumString};
+use zerocopy::{Immutable, IntoBytes, KnownLayout, LittleEndian, TryFromBytes};
 
 #[derive(Debug, Clone)]
 pub(super) struct SwordShieldBlocks {
     pub(super) my_status: MyStatusBlock,
+    pub(super) trainer_card: TrainerCard,
     pub(super) pokemon_boxes: BoxBlock,
     pub(super) box_layouts: BoxLayout,
     pub(super) current_box: NumericBlock,
@@ -26,6 +29,11 @@ impl SwordShieldBlocks {
         let my_status = MyStatusBlock(
             blocks
                 .try_pop_block(SwShBlockKey::MyStatus)?
+                .into_object_data()?,
+        );
+        let trainer_card = TrainerCard(
+            blocks
+                .try_pop_block(SwShBlockKey::TrainerCard)?
                 .into_object_data()?,
         );
         let pokemon_boxes = BoxBlock(
@@ -44,6 +52,7 @@ impl SwordShieldBlocks {
 
         Ok(Self {
             my_status,
+            trainer_card,
             pokemon_boxes,
             box_layouts,
             current_box,
@@ -54,6 +63,7 @@ impl SwordShieldBlocks {
     pub fn to_blocks(&self) -> BTreeMap<u32, swish_crypto::Block> {
         let Self {
             my_status,
+            trainer_card,
             pokemon_boxes,
             box_layouts,
             current_box,
@@ -70,6 +80,7 @@ impl SwordShieldBlocks {
         let mut all_blocks = other_blocks.into_inner();
         for block in [
             my_status.into_block(),
+            trainer_card.into_block(),
             pokemon_boxes.into_block(),
             box_layouts.into_block(),
             current_box_block,
@@ -231,3 +242,44 @@ impl BoxLayout {
         )
     }
 }
+
+#[derive(Debug, Clone)]
+pub(super) struct TrainerCard(swish_crypto::ObjectBlock);
+
+impl TrainerCard {
+    pub fn into_block(self) -> swish_crypto::Block {
+        swish_crypto::Block::new(
+            SwShBlockKey::TrainerCard,
+            swish_crypto::BlockData::Object(self.0.clone()),
+        )
+    }
+
+    pub fn fields(
+        &self,
+    ) -> StdResult<TrainerCardFields, zerocopy::TryReadError<&[u8], TrainerCardFields>> {
+        TrainerCardFields::try_read_from_bytes(&self.0.bytes()[..size_of::<TrainerCardFields>()])
+    }
+}
+
+#[derive(Debug, Clone, TryFromBytes, IntoBytes, KnownLayout, Immutable)]
+#[repr(C, packed)]
+pub struct TrainerCardFields {
+    pub trainer_name: SizedUtf16String<26>,
+    _gap1: u8,
+    pub language: Language,
+    pub trainer_id: zerocopy::U16<LittleEndian>,
+    pub secret_id: zerocopy::U16<LittleEndian>,
+    pub pokedex_owned: zerocopy::U16<LittleEndian>,
+    pub shiny_pokemon_found: zerocopy::U16<LittleEndian>,
+    game_raw: u8,
+    pub starter_index: u8,
+    _gap2: [u8; 0x12],
+    pub gender: bool,
+}
+
+use std::mem::offset_of;
+const_assert_eq!(offset_of!(TrainerCardFields, trainer_name), 0x00);
+const_assert_eq!(offset_of!(TrainerCardFields, language), 0x1B);
+const_assert_eq!(offset_of!(TrainerCardFields, pokedex_owned), 0x20);
+const_assert_eq!(offset_of!(TrainerCardFields, starter_index), 0x25);
+const_assert_eq!(offset_of!(TrainerCardFields, gender), 0x38);

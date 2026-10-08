@@ -2,6 +2,7 @@ use serde::Serialize;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
+use zerocopy::{Immutable, IntoBytes, TryFromBytes, Unaligned};
 
 use crate::{Error, Result};
 
@@ -12,7 +13,19 @@ pub const LANGUAGE_MAX: u8 = Language::SpanishLatinAmerica as u8;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
-#[derive(Debug, Default, Serialize, Clone, Copy, PartialEq, Eq)]
+#[derive(
+    Debug,
+    Default,
+    Serialize,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    TryFromBytes,
+    Unaligned,
+    IntoBytes,
+    Immutable,
+)]
 #[repr(u8)]
 pub enum Language {
     #[default]

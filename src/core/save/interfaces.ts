@@ -90,20 +90,20 @@ interface BaseSAV<P extends PKMInterface = PKMInterface> {
 }
 
 export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> implements BaseSAV<P> {
-  abstract origin: OriginGame
-  abstract boxRows: number
-  abstract boxColumns: number
-  abstract filePath: PathData
-  abstract fileCreated?: Date | undefined
-  abstract money: number
-  abstract name: string
-  abstract tid: number
-  abstract sid?: number | undefined
-  abstract trainerGender: BinaryGender
-  abstract language?: Language // TODO: add to save files
-  abstract displayID: string
+  abstract readonly origin: OriginGame
+  abstract readonly boxRows: number
+  abstract readonly boxColumns: number
+  abstract readonly filePath: PathData
+  abstract readonly fileCreated?: Date | undefined
+  abstract readonly money: number
+  abstract readonly name: string
+  abstract readonly tid: number
+  abstract readonly sid?: number | undefined
+  abstract readonly trainerGender: BinaryGender
+  abstract readonly language?: Language // TODO: add to save files
+  abstract readonly displayID: string
   abstract currentPCBox: number
-  abstract boxes: Readonly<Box<P>>[]
+  abstract readonly boxes: Readonly<Box<P>>[]
   abstract bytes: Uint8Array<ArrayBufferLike>
   abstract invalid: boolean
   abstract tooEarlyToOpen: boolean
@@ -378,6 +378,7 @@ export interface WasmSaveInner<P> {
   trainerName: string
   displayId: string
   currentPcBoxIdx: number
+  setCurrentPcBoxIdx?: (v: number) => void
   prepareBytesForSaving(): Uint8Array
 
   getMonAt(box_num: number, offset: number): Option<P>
