@@ -162,13 +162,13 @@ impl Gen7AlolaSave {
         self.bytes[byte_offset..byte_offset + Pk7::BOX_SIZE].copy_from_slice(data);
     }
 
-    fn pokemon_bytes_raw(&self, box_index: BoxIndex, box_slot: BoxSlot) -> &[u8] {
+    fn get_mon_bytes_raw(&self, box_index: BoxIndex, box_slot: BoxSlot) -> &[u8] {
         let byte_offset = self.save_type.mon_byte_offset(box_index, box_slot);
         &self.bytes[byte_offset..byte_offset + Pk7::BOX_SIZE]
     }
 
     fn get_mon_bytes_decrypted(&self, box_index: BoxIndex, box_slot: BoxSlot) -> Box<[u8]> {
-        let mut copied_bytes = Box::from(self.pokemon_bytes_raw(box_index, box_slot));
+        let mut copied_bytes = Box::from(self.get_mon_bytes_raw(box_index, box_slot));
         Pk7Buffer::box_span_mut(&mut copied_bytes).decrypt();
 
         copied_bytes
@@ -230,32 +230,15 @@ impl Gen7AlolaSave {
     }
 
     pub fn box_mon_count(&self, box_index: BoxIndex) -> usize {
-        let mut count: usize = 0;
-
-        for box_slot in 0..BOX_SLOTS {
-            let box_slot = BoxSlot::check_bound(box_slot)
-                .expect("all box indexes are valid if < MAX_BOX_COUNT");
-            if Pk7Buffer::box_span(&self.get_mon_bytes_decrypted(box_index, box_slot))
-                .species_ndex()
-                != 0
-            {
-                count += 1;
-            }
-        }
-
-        count
+        BoxSlot::all()
+            .filter(|&box_slot| !Pk7::is_empty_slot(self.get_mon_bytes_raw(box_index, box_slot)))
+            .count()
     }
 
     pub fn pc_mon_count(&self) -> usize {
-        let mut count: usize = 0;
-
-        for box_index in 0..BOX_COUNT {
-            let box_index = BoxIndex::check_bound(box_index)
-                .expect("all box indexes are valid if < MAX_BOX_COUNT");
-            count += self.box_mon_count(box_index);
-        }
-
-        count
+        BoxIndex::all()
+            .map(|box_index| self.box_mon_count(box_index))
+            .sum()
     }
 
     fn convert_ohpkm(

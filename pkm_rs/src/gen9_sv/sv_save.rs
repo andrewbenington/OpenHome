@@ -3,7 +3,7 @@ use super::{BOX_COLS, BOX_ROWS, BoxName, MAX_BOX_COUNT, Pk9, Pk9Buffer};
 use crate::checksum::RefreshChecksum;
 use crate::encryption::swish_crypto::{self, NumericBlock, SwishBlocks};
 use crate::gen9_sv::save_blocks::SvBlockKey;
-use crate::gen9_sv::{BOX_SLOTS, BoxIndex, BoxSlot};
+use crate::gen9_sv::{BoxIndex, BoxSlot};
 use crate::result::{Error, Result, StdResult};
 use crate::traits::PkmBytes;
 
@@ -138,32 +138,15 @@ impl ScarletVioletSave {
     }
 
     pub fn box_mon_count(&self, box_index: BoxIndex) -> usize {
-        let mut count: usize = 0;
-
-        for box_slot in 0..BOX_SLOTS {
-            let box_slot = BoxSlot::check_bound(box_slot)
-                .expect("all box indexes are valid if < MAX_BOX_COUNT");
-            if Pk9Buffer::new(self.box_data().mon_bytes_at(box_index, box_slot))
-                .species_game_index()
-                != 0
-            {
-                count += 1;
-            }
-        }
-
-        count
+        BoxSlot::all()
+            .filter(|&box_slot| !Pk9::is_empty_slot(&self.get_mon_bytes_raw(box_index, box_slot)))
+            .count()
     }
 
     pub fn pc_mon_count(&self) -> usize {
-        let mut count: usize = 0;
-
-        for box_index in 0..MAX_BOX_COUNT {
-            let box_index = BoxIndex::check_bound(box_index)
-                .expect("all box indexes are valid if < MAX_BOX_COUNT");
-            count += self.box_mon_count(box_index);
-        }
-
-        count
+        BoxIndex::all()
+            .map(|box_index| self.box_mon_count(box_index))
+            .sum()
     }
 
     #[cfg(feature = "wasm")]

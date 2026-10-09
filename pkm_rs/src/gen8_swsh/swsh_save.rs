@@ -4,7 +4,7 @@ use crate::checksum::RefreshChecksum;
 use crate::encryption::swish_crypto::{self, NumericBlock, SwishBlocks};
 #[cfg(feature = "wasm")]
 use crate::gen8_swsh::save_blocks::SwShBlockKey;
-use crate::gen8_swsh::{BOX_SLOTS, BoxIndex, BoxSlot};
+use crate::gen8_swsh::{BoxIndex, BoxSlot};
 #[cfg(feature = "wasm")]
 use crate::result::StdResult;
 use crate::result::{Error, Result};
@@ -72,31 +72,15 @@ impl SwordShieldSave {
     }
 
     pub fn box_mon_count(&self, box_index: BoxIndex) -> usize {
-        let mut count: usize = 0;
-
-        for box_slot in 0..BOX_SLOTS {
-            let box_slot = BoxSlot::check_bound(box_slot)
-                .expect("all box indexes are valid if < MAX_BOX_COUNT");
-            if Pk8Buffer::new(self.box_data().mon_bytes_at(box_index, box_slot)).personality_value()
-                != 0
-            {
-                count += 1;
-            }
-        }
-
-        count
+        BoxSlot::all()
+            .filter(|&box_slot| !Pk8::is_empty_slot(&self.get_mon_bytes_raw(box_index, box_slot)))
+            .count()
     }
 
     pub fn pc_mon_count(&self) -> usize {
-        let mut count: usize = 0;
-
-        for box_index in 0..MAX_BOX_COUNT {
-            let box_index = BoxIndex::check_bound(box_index)
-                .expect("all box indexes are valid if < MAX_BOX_COUNT");
-            count += self.box_mon_count(box_index);
-        }
-
-        count
+        BoxIndex::all()
+            .map(|box_index| self.box_mon_count(box_index))
+            .sum()
     }
 
     pub fn trainer_name(&self) -> SizedUtf16String<{ MyStatusBlock::NAME_BYTE_LENGTH }> {
