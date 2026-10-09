@@ -192,6 +192,14 @@ impl SwordShieldSave {
         }
     }
 
+    const fn set_current_pc_box_idx(&mut self, value: u8) {
+        if value < MAX_BOX_COUNT
+            && let NumericBlock::UInt8(current_box) = &mut self.blocks.current_box
+        {
+            *current_box = value
+        }
+    }
+
     fn includes_origin(origin: OriginGame) -> bool {
         origin.is_swsh()
     }
@@ -333,6 +341,11 @@ impl SwordShieldSave {
         self.current_pc_box_idx()
     }
 
+    #[wasm_bindgen(setter = currentPcBoxIdx)]
+    pub fn set_current_pc_box_idx_wasm(&mut self, value: u8) {
+        self.set_current_pc_box_idx(value)
+    }
+
     #[wasm_bindgen(getter = gameOfOrigin)]
     pub fn game_of_origin_wasm(&self) -> OriginGame {
         self.game_of_origin().unwrap_or_default()
@@ -396,7 +409,7 @@ impl SwordShieldSave {
                 .unwrap_or("Invalid Starter Index"),
         )?;
 
-        add_string(&obj, "Starter", SwordShieldVersion::detect(&self.blocks))?;
+        add_string(&obj, "Version", SwordShieldVersion::detect(&self.blocks))?;
 
         Ok(obj)
     }

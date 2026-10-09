@@ -1,34 +1,33 @@
 use thiserror::Error;
 use wasm_bindgen::prelude::*;
 
-use crate::encryption::swish_crypto::{BlockType, NumericType, ScalarType};
+use crate::encryption::swish_crypto::{BlockType, ScalarType};
 use crate::result::Error;
 
 #[cfg_attr(feature = "wasm", derive(tsify::Tsify, serde::Serialize))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
 #[derive(Debug, Error, Clone)]
 pub enum SwishError {
-    #[error("{0}")]
+    #[error("swish crypto error: {0}")]
     TypeId(#[from] InvalidTypeId),
-    #[error("{0}")]
+    #[error("swish crypto error: {0}")]
     Missing(#[from] MissingBlock),
-    #[error("{0}")]
+    #[error("swish crypto error: {0}")]
     BlockType(WrongType),
-    #[error("expected {expected} bytes for block of type {inner_type}, received {actual}")]
+    #[error("swish crypto error - {context}: expected {expected}, received {actual}")]
     ByteLength {
-        inner_type: NumericType,
+        context: String,
         expected: usize,
         actual: usize,
     },
+    #[error("swish crypto error - other: {0}")]
+    Other(String),
 }
 
 impl SwishError {
-    pub const fn expected_bytes<const EXPECTED: usize>(
-        inner_type: NumericType,
-        actual: usize,
-    ) -> Self {
+    pub const fn expected_bytes<const EXPECTED: usize>(context: String, actual: usize) -> Self {
         Self::ByteLength {
-            inner_type,
+            context,
             expected: EXPECTED,
             actual,
         }

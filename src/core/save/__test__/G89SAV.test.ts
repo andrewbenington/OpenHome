@@ -2,14 +2,14 @@ import { PA8, PK4, PK8 } from '@openhome-core/pkm'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { xorChecksum32BitLe } from '@openhome-core/util'
 import { R } from '@openhome-core/util/functional'
-import { Ball, ConvertStrategies, OriginGame } from '@pkm-rs/pkg'
+import { Ball, ConvertStrategies, OriginGame, ScarletVioletSaveRust } from '@pkm-rs/pkg'
 import { readFileSync } from 'fs'
 import path from 'path'
 import { beforeAll, describe, expect, test } from 'vitest'
 import { PKMInterface } from '../../pkm/interfaces'
 import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
 import { LegendsArceusSave } from '../Gen89/LegendsArceus'
-import { ScarletVioletSaveJs } from '../Gen89/ScarletVioletSave'
+import { ScarletVioletSave } from '../Gen89/ScarletVioletSave'
 import { SwordShieldSave } from '../Gen89/SwordShieldSave'
 import { emptyPathData, PathData } from '../util/path'
 import { initializeWasm } from './init'
@@ -45,6 +45,7 @@ describe('gen 8 save files', () => {
   let swordSave: SwordShieldSave
   let arceusSaveBytes: Uint8Array
   let arceusSave: LegendsArceusSave
+  let violetSaveBytes: Uint8Array
   let magmortar: PK4
 
   beforeAll(() => {
@@ -62,6 +63,8 @@ describe('gen 8 save files', () => {
 
     const monPath = pkmTestFilePath('pk4', 'magmortar.pkm')
     const monBytes = new Uint8Array(readFileSync(monPath))
+
+    violetSaveBytes = new Uint8Array(readFileSync(saveTestFilePath('violet')))
 
     magmortar = PK4.fromBytes(monBytes.buffer)
   })
@@ -159,10 +162,14 @@ describe('gen 8 save files', () => {
     )
   })
 
+  test('scarlet/violet save builds', () => {
+    new ScarletVioletSave(violetPath, violetSaveBytes)
+  })
+
   test("scarlet/violet empty bytes don't crash", () => {
-    const violetSaveBytes = new Uint8Array(readFileSync(saveTestFilePath('violet')))
-    const violetSave = new ScarletVioletSaveJs(violetPath, violetSaveBytes)
-    violetSave.emptyBoxSlotBytes()
+    expect(Array.from(ScarletVioletSaveRust.emptyBoxSlotBytes())).toMatchSnapshot(
+      'empty slot bytes never change'
+    )
   })
 
   test('legends arceus save boxes', () => {

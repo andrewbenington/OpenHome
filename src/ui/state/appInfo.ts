@@ -11,7 +11,7 @@ import { Gen7AlolaSave } from '@openhome-core/save/Gen7AlolaSave'
 import { BdspSave } from '@openhome-core/save/Gen89/BdspSave'
 import { LegendsArceusSave } from '@openhome-core/save/Gen89/LegendsArceus'
 import { LegendsZaSave } from '@openhome-core/save/Gen89/LegendsZaSave'
-import { ScarletVioletSaveJs } from '@openhome-core/save/Gen89/ScarletVioletSave'
+import { ScarletVioletSave } from '@openhome-core/save/Gen89/ScarletVioletSave'
 import { SwordShieldSave } from '@openhome-core/save/Gen89/SwordShieldSave'
 import { HGSSSAV } from '@openhome-core/save/HGSSSAV'
 import { OfficialSAV } from '@openhome-core/save/interfaces'
@@ -27,6 +27,8 @@ import { MonDisplayState } from '@openhome-ui/hooks/monDisplay'
 import { SaveViewMode } from '@openhome-ui/saves/util'
 import { updateStyleForUiScale } from '@openhome-ui/util/style'
 import { Dispatch, Reducer, createContext } from 'react'
+
+const ScarletViolet = ScarletVioletSave
 
 export const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
   G1SAV,
@@ -46,7 +48,7 @@ export const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
   SwordShieldSave,
   BdspSave,
   LegendsArceusSave,
-  ScarletVioletSaveJs,
+  ScarletViolet,
   LegendsZaSave,
 ]
 const EXTRA_SAVE_TYPES = [G3RRSAV, G3UBSAV, G8LumiSAV, CompassSave]
