@@ -127,4 +127,8 @@ export class SwordShieldSave extends WasmOfficialSave<Pk8Wasm, PK8, SwordShieldS
   static includesOrigin(origin: OriginGame) {
     return SwordShieldSaveRust.includesOrigin(origin)
   }
+
+  free() {
+    this.inner.free()
+  }
 }

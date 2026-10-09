@@ -403,7 +403,7 @@ function SaveHeader({ save, setDetailsModal }: SaveHeaderProps) {
   const backend = useBackend()
 
   const currentBoxMonCount = save.getBoxMonCount(save.currentPCBox)
-  const totalMonCount = save.getAllMons().length
+  const totalMonCount = save.getPcMonCount()
 
   const contextElements = [
     Item.label('Details...').action(() => setDetailsModal(true)),

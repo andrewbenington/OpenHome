@@ -4,7 +4,7 @@ use crate::checksum::RefreshChecksum;
 use crate::encryption::swish_crypto::{self, NumericBlock, SwishBlocks};
 #[cfg(feature = "wasm")]
 use crate::gen8_swsh::save_blocks::SwShBlockKey;
-use crate::gen8_swsh::{BoxIndex, BoxSlot};
+use crate::gen8_swsh::{BOX_SLOTS, BoxIndex, BoxSlot};
 #[cfg(feature = "wasm")]
 use crate::result::StdResult;
 use crate::result::{Error, Result};
@@ -69,6 +69,34 @@ impl SwordShieldSave {
 
     fn box_name(&self, box_index: BoxIndex) -> BoxName {
         self.blocks.box_layouts.get_box_name(box_index)
+    }
+
+    pub fn box_mon_count(&self, box_index: BoxIndex) -> usize {
+        let mut count: usize = 0;
+
+        for box_slot in 0..BOX_SLOTS {
+            let box_slot = BoxSlot::check_bound(box_slot)
+                .expect("all box indexes are valid if < MAX_BOX_COUNT");
+            if Pk8Buffer::new(self.box_data().mon_bytes_at(box_index, box_slot)).personality_value()
+                != 0
+            {
+                count += 1;
+            }
+        }
+
+        count
+    }
+
+    pub fn pc_mon_count(&self) -> usize {
+        let mut count: usize = 0;
+
+        for box_index in 0..MAX_BOX_COUNT {
+            let box_index = BoxIndex::check_bound(box_index)
+                .expect("all box indexes are valid if < MAX_BOX_COUNT");
+            count += self.box_mon_count(box_index);
+        }
+
+        count
     }
 
     pub fn trainer_name(&self) -> SizedUtf16String<{ MyStatusBlock::NAME_BYTE_LENGTH }> {
@@ -344,6 +372,19 @@ impl SwordShieldSave {
     #[wasm_bindgen(setter = currentPcBoxIdx)]
     pub fn set_current_pc_box_idx_wasm(&mut self, value: u8) {
         self.set_current_pc_box_idx(value)
+    }
+
+    #[wasm_bindgen(js_name = getBoxMonCount)]
+    pub fn box_mon_count_wasm(&mut self, box_index: u8) -> std::result::Result<usize, JsError> {
+        match BoxIndex::check_bound(box_index) {
+            Ok(index) => Ok(self.box_mon_count(index)),
+            Err(BoundViolated) => Err(BoundViolated.into()),
+        }
+    }
+
+    #[wasm_bindgen(js_name = getPcMonCount)]
+    pub fn pc_mon_count_wasm(&mut self) -> usize {
+        self.pc_mon_count()
     }
 
     #[wasm_bindgen(getter = gameOfOrigin)]
