@@ -21,9 +21,6 @@ import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
 import { BoxAndSlot, WasmOfficialSave } from '../interfaces'
 import { PathData } from '../util/path'
 
-const SAVE_SIZE_BYTES_MIN = 0x171500
-const SAVE_SIZE_BYTES_MAX = 0x187800
-
 export type SWSH_SAVE_REVISION = 'Base Game' | 'Isle Of Armor' | 'Crown Tundra'
 
 export class SwordShieldSave extends WasmOfficialSave<Pk8Wasm, PK8, SwordShieldSaveRust> {

@@ -1,9 +1,10 @@
-use super::save_blocks::{BoxBlock, MyStatusBlock, SvBlocks};
+use super::save_blocks::{BoxData, MyStatusFields, SvBlocks};
 use super::{BOX_COLS, BOX_ROWS, BoxName, MAX_BOX_COUNT, Pk9, Pk9Buffer};
 use crate::checksum::RefreshChecksum;
-use crate::encryption::swish_crypto;
+use crate::encryption::swish_crypto::{self, NumericBlock, SwishBlocks};
+use crate::gen9_sv::save_blocks::SvBlockKey;
 use crate::gen9_sv::{BoxIndex, BoxSlot};
-use crate::result::{Error, Result};
+use crate::result::{Error, Result, StdResult};
 use crate::traits::PkmBytes;
 
 #[cfg(feature = "wasm")]
@@ -13,6 +14,9 @@ use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{BinaryGender, Language};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
+
+#[cfg(feature = "wasm")]
+use tsify::Tsify;
 
 const SAVE_SIZE_BYTES_MIN: usize = 0x31626f;
 const SAVE_SIZE_BYTES_MAX: usize = 0x43c000;
@@ -40,20 +44,23 @@ impl ScarletVioletSave {
             ));
         }
 
-        let blocks = SvBlocks::from_vec(swish_crypto::decrypt_blocks(&bytes)?)?;
+        let blocks = SvBlocks::from_blocks(
+            SwishBlocks::from_bytes(&bytes)
+                .map_err(|e| Error::other(&format!("SwishBlocks from_bytes: {e}")))?,
+        )?;
 
         Ok(Self { bytes, blocks })
     }
 
-    const fn my_status(&self) -> &MyStatusBlock {
+    const fn my_status(&self) -> &MyStatusFields {
         &self.blocks.my_status
     }
 
-    const fn box_data(&self) -> &BoxBlock {
+    const fn box_data(&self) -> &BoxData {
         &self.blocks.pokemon_boxes
     }
 
-    const fn box_data_mut(&mut self) -> &mut BoxBlock {
+    const fn box_data_mut(&mut self) -> &mut BoxData {
         &mut self.blocks.pokemon_boxes
     }
 
@@ -61,23 +68,23 @@ impl ScarletVioletSave {
         self.blocks.box_layouts.get_box_name(box_index)
     }
 
-    pub fn trainer_name(&self) -> SizedUtf16String<{ MyStatusBlock::NAME_BYTE_LENGTH }> {
-        self.my_status().trainer_name()
+    pub const fn trainer_name(&self) -> SizedUtf16String<{ MyStatusFields::NAME_BYTE_LENGTH }> {
+        self.my_status().trainer_name
     }
 
-    pub fn trainer_id(&self) -> u16 {
-        self.my_status().trainer_id()
+    pub const fn trainer_id(&self) -> u16 {
+        self.my_status().trainer_id.get()
     }
 
-    pub fn secret_id(&self) -> u16 {
-        self.my_status().secret_id()
+    pub const fn secret_id(&self) -> u16 {
+        self.my_status().secret_id.get()
     }
 
-    fn language(&self) -> Language {
-        self.my_status().language().unwrap_or_default()
+    const fn language(&self) -> Language {
+        self.my_status().language
     }
 
-    fn copy_pokemon_bytes_to(&mut self, box_index: BoxIndex, box_slot: BoxSlot, data: &[u8]) {
+    const fn copy_pokemon_bytes_to(&mut self, box_index: BoxIndex, box_slot: BoxSlot, data: &[u8]) {
         self.box_data_mut()
             .mon_bytes_at_mut(box_index, box_slot)
             .copy_from_slice(data)
@@ -140,7 +147,15 @@ impl ScarletVioletSave {
 
     #[cfg(feature = "wasm")]
     pub fn prepare_bytes_for_saving(&self) -> Vec<u8> {
-        swish_crypto::encrypt_blocks(&self.blocks.clone().into_vec(), self.bytes.len())
+        swish_crypto::encrypt_blocks(
+            &self
+                .blocks
+                .clone()
+                .to_blocks()
+                .into_values()
+                .collect::<Vec<_>>(),
+            self.bytes.len(),
+        )
     }
 
     fn convert_ohpkm(
@@ -157,18 +172,32 @@ impl ScarletVioletSave {
     }
 
     fn display_tid(&self) -> String {
-        crate::util::six_digit_trainer_id_from_full(self.blocks.my_status.tid_sid_u32())
+        let my_status = &self.blocks.my_status;
+        crate::util::six_digit_trainer_id_from_parts(
+            my_status.trainer_id.get(),
+            my_status.secret_id.get(),
+        )
     }
 
-    fn game_of_origin(&self) -> Option<OriginGame> {
-        self.my_status().origin_game()
+    fn game_of_origin(&self) -> OriginGame {
+        self.my_status().game_raw.into()
     }
 
-    fn current_pc_box_idx(&self) -> usize {
-        if self.bytes[0] >= MAX_BOX_COUNT {
-            0
+    const fn current_pc_box_idx(&self) -> usize {
+        if let NumericBlock::UInt8(current_box) = self.blocks.current_box
+            && current_box < MAX_BOX_COUNT
+        {
+            current_box as usize
         } else {
-            self.bytes[0].into()
+            0
+        }
+    }
+
+    const fn set_current_pc_box_idx(&mut self, value: u8) {
+        if value < MAX_BOX_COUNT
+            && let NumericBlock::UInt8(current_box) = &mut self.blocks.current_box
+        {
+            *current_box = value
         }
     }
 
@@ -249,7 +278,7 @@ impl ScarletVioletSave {
 
     #[wasm_bindgen(getter = trainerGender)]
     pub fn trainer_gender_wasm(&self) -> BinaryGender {
-        self.my_status().trainer_gender()
+        (self.my_status().gender_raw == 1).into()
     }
 
     #[wasm_bindgen(getter = MAX_BOX_COUNT)]
@@ -277,9 +306,14 @@ impl ScarletVioletSave {
         self.current_pc_box_idx()
     }
 
+    #[wasm_bindgen(setter = currentPcBoxIdx)]
+    pub fn set_current_pc_box_idx_wasm(&mut self, value: u8) {
+        self.set_current_pc_box_idx(value)
+    }
+
     #[wasm_bindgen(getter = gameOfOrigin)]
     pub fn game_of_origin_wasm(&self) -> OriginGame {
-        self.game_of_origin().unwrap_or_default()
+        self.game_of_origin()
     }
 
     #[wasm_bindgen(getter = language)]
@@ -301,6 +335,104 @@ impl ScarletVioletSave {
     pub fn prepare_bytes_for_saving_wasm(&self) -> Vec<u8> {
         self.prepare_bytes_for_saving()
     }
+
+    #[wasm_bindgen(js_name = getDisplayData)]
+    pub fn display_data(&self) -> StdResult<js_sys::Object, JsValue> {
+        // let mut map = BTreeMap::new();
+        // map.insert("pokedexOwned", 3);
+
+        // let serializer = Serializer::new().serialize_maps_as_objects(true);
+        // map.serialize(&serializer).map_err(Into::into)
+        let obj = js_sys::Object::new();
+        let MyStatusFields {
+            trainer_id,
+            secret_id,
+            gender_raw,
+            language,
+            trainer_name,
+            ..
+        } = self.blocks.my_status;
+
+        // add_field(&obj, "Language", trainer_card.language)?;
+        add_u16_hex(&obj, "Trainer ID", trainer_id.get())?;
+        add_u16_hex(&obj, "Secret ID", secret_id.get())?;
+        add_string(
+            &obj,
+            "Player Character",
+            if gender_raw == 1 {
+                "Juliana"
+            } else {
+                "Florian"
+            },
+        )?;
+        add_string(&obj, "Language", language)?;
+        add_string(&obj, "Trainer Name", trainer_name)?;
+
+        add_string(&obj, "Version", SvVersion::detect(&self.blocks))?;
+
+        Ok(obj)
+    }
+
+    #[wasm_bindgen(getter = saveVersion)]
+    pub fn save_version_wasm(&self) -> SvVersion {
+        SvVersion::detect(&self.blocks)
+    }
+}
+
+fn display_u16_hex(value: impl Into<u16>) -> String {
+    format!("0x{:04x}", value.into())
+}
+
+// fn add_field(
+//     obj: &js_sys::Object,
+//     key: impl Into<JsValue>,
+//     value: impl Into<JsValue>,
+// ) -> StdResult<bool, JsValue> {
+//     js_sys::Reflect::set(obj, &key.into(), &value.into())
+// }
+
+fn add_string(
+    obj: &js_sys::Object,
+    key: impl Into<JsValue>,
+    value: impl ToString,
+) -> StdResult<bool, JsValue> {
+    js_sys::Reflect::set(obj, &key.into(), &value.to_string().into())
+}
+
+fn add_u16_hex(
+    obj: &js_sys::Object,
+    key: impl Into<JsValue>,
+    value: impl Into<u16>,
+) -> StdResult<bool, JsValue> {
+    js_sys::Reflect::set(obj, &key.into(), &display_u16_hex(value).into())
+}
+
+#[cfg_attr(feature = "wasm", derive(Tsify, serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
+#[derive(Debug, Clone, Copy, strum::Display)]
+pub enum SvVersion {
+    #[strum(to_string = "Base Game")]
+    #[serde(rename = "Base Game")]
+    BaseGame,
+    #[strum(to_string = "Teal Mask")]
+    #[serde(rename = "Teal Mask")]
+    TealMask,
+    #[strum(to_string = "Indigo Disk")]
+    #[serde(rename = "Indigo Disk")]
+    IndigoDisk,
+}
+
+impl SvVersion {
+    fn detect(blocks: &SvBlocks) -> Self {
+        let other_blocks = &blocks.other_blocks;
+        if other_blocks.has_block(SvBlockKey::BlueberryPoints) {
+            Self::IndigoDisk
+        } else if other_blocks.has_block(SvBlockKey::TeraRaidDlc) {
+            Self::TealMask
+        } else {
+            Self::BaseGame
+        }
+    }
 }
 
 #[cfg(feature = "wasm")]
@@ -317,7 +449,7 @@ mod tests {
 
     #[test]
     fn blocks_identical_after_serde() -> std::result::Result<(), Box<dyn std::error::Error>> {
-        let save_path = Path::new("gen9-sv").join("scarlet");
+        let save_path = Path::new("gen9-sv").join("violet");
         let save_bytes = tests::save_bytes_from_file(&save_path)?;
         let block_vec = swish_crypto::decrypt_blocks(&save_bytes)?;
 
@@ -326,9 +458,12 @@ mod tests {
             original_blocks_by_key.insert(block.key(), block.clone());
         }
 
-        assert_eq!(block_vec.len(), 4741);
+        assert_eq!(block_vec.len(), 6242);
 
-        let save = ScarletVioletSave::from_bytes(save_bytes.into_boxed_slice())?;
+        let slice = save_bytes.into_boxed_slice();
+        dbg!(slice.len());
+
+        let save = ScarletVioletSave::from_bytes(slice)?;
 
         let after_serialized_bytes = save.prepare_bytes_for_saving();
 
@@ -356,7 +491,7 @@ mod tests {
     fn pkm_checksum_calculation_is_correct() -> Result<()> {
         use crate::checksum::Checksum;
 
-        let save_path = Path::new("gen9-sv").join("scarlet");
+        let save_path = Path::new("gen9-sv").join("violet");
         let save_bytes = tests::save_bytes_from_file(&save_path)?;
         let save = ScarletVioletSave::from_bytes(save_bytes.into_boxed_slice())?;
 
@@ -378,7 +513,7 @@ mod tests {
 
     #[test]
     fn pokemon_is_same_before_after_setting_in_box() -> Result<()> {
-        let save_bytes = tests::save_bytes_from_file(&Path::new("gen9-sv").join("scarlet"))?;
+        let save_bytes = tests::save_bytes_from_file(&Path::new("gen9-sv").join("violet"))?;
         let mut save = ScarletVioletSave::from_bytes(save_bytes.into_boxed_slice())?;
 
         let ohpkm =
@@ -405,7 +540,7 @@ mod tests {
 
     #[test]
     fn empty_slot_bytes_write_read_are_expected() -> tests::TestResult<()> {
-        let save_bytes = tests::save_bytes_from_file(&Path::new("gen9-sv").join("scarlet2"))?;
+        let save_bytes = tests::save_bytes_from_file(&Path::new("gen9-sv").join("violet"))?;
         let mut save = ScarletVioletSave::from_bytes(save_bytes.into_boxed_slice())?;
 
         let initially_full_box_index = BoxIndex::check_bound(1).expect("should be valid");

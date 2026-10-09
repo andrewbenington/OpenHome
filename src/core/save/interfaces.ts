@@ -378,7 +378,6 @@ export interface WasmSaveInner<P> {
   trainerName: string
   displayId: string
   currentPcBoxIdx: number
-  setCurrentPcBoxIdx?: (v: number) => void
   prepareBytesForSaving(): Uint8Array
 
   getMonAt(box_num: number, offset: number): Option<P>
@@ -405,6 +404,7 @@ export abstract class WasmOfficialSave<
 > extends OfficialSAV<P> {
   inner: WasmSave
   boxes: Array<Box<P>> = []
+  #currentPCBox: number = 0
 
   constructor(inner: WasmSave) {
     super()
@@ -433,12 +433,17 @@ export abstract class WasmOfficialSave<
     return this.inner.trainerGender
   }
 
-  getCurrentPCBox() {
-    return this.inner.currentPcBoxIdx
+  get currentPCBox() {
+    this.#currentPCBox = this.inner.currentPcBoxIdx
+    return this.#currentPCBox
   }
 
-  get currentPCBox() {
-    return this.getCurrentPCBox()
+  set currentPCBox(value: number) {
+    this.#currentPCBox = value
+  }
+
+  saveCurrentPcBox() {
+    this.inner.currentPcBoxIdx = this.#currentPCBox
   }
 
   get origin() {

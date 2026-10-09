@@ -1,8 +1,8 @@
 use serde::Serialize;
 
+use strum::Display;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
-use zerocopy::{Immutable, IntoBytes, TryFromBytes, Unaligned};
 
 use crate::{Error, Result};
 
@@ -21,10 +21,12 @@ pub const LANGUAGE_MAX: u8 = Language::SpanishLatinAmerica as u8;
     Copy,
     PartialEq,
     Eq,
-    TryFromBytes,
-    Unaligned,
-    IntoBytes,
-    Immutable,
+    Display,
+    zerocopy::TryFromBytes,
+    zerocopy::Unaligned,
+    zerocopy::KnownLayout,
+    zerocopy::IntoBytes,
+    zerocopy::Immutable,
 )]
 #[repr(u8)]
 pub enum Language {

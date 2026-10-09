@@ -1,254 +1,211 @@
 use std::collections::BTreeMap;
 
-use crate::encryption::swish_crypto;
-use crate::gen9_sv::{BOX_NAME_LENGTH, BOX_SLOTS, BoxIndex, BoxName, BoxSlot, Pk9};
-use crate::result::{Error, Result};
+use super::{BOX_NAME_LENGTH, BOX_SLOTS, BoxName, Pk9};
+use crate::encryption::swish_crypto::{
+    self, Block, BlockData, NumericBlock, ObjectBlock, SwishBlocks, SwishError,
+};
+use crate::gen9_sv::{BoxIndex, BoxSlot, MAX_BOX_COUNT};
+use crate::result::{Result, StdResult};
 use crate::traits::PkmBytes;
 
+use num_enum::{IntoPrimitive, TryFromPrimitive};
+use pkm_rs_types::Language;
 use pkm_rs_types::strings::SizedUtf16String;
-use pkm_rs_types::{BinaryGender, Language, read_u16_le};
-use pkm_rs_types::{OriginGame, read_u32_le};
+use static_assertions::const_assert_eq;
+use strum::{Display, EnumIter, EnumString};
+use zerocopy::{Immutable, IntoBytes, KnownLayout, LittleEndian, TryFromBytes};
 
 #[derive(Debug, Clone)]
 pub(super) struct SvBlocks {
-    pub(super) my_status: MyStatusBlock,
-    pub(super) pokemon_boxes: BoxBlock,
+    pub(super) my_status: MyStatusFields,
+    pub(super) pokemon_boxes: BoxData,
     pub(super) box_layouts: BoxLayout,
-    pub(super) other_blocks: Vec<swish_crypto::Block>,
+    pub(super) current_box: NumericBlock,
+    pub(super) other_blocks: SwishBlocks,
 }
 
 impl SvBlocks {
-    pub fn from_vec(blocks: impl IntoIterator<Item = swish_crypto::Block>) -> Result<Self> {
-        let mut my_status: Option<MyStatusBlock> = None;
-        let mut pokemon_boxes: Option<BoxBlock> = None;
-        let mut box_layouts: Option<BoxLayout> = None;
-        let mut other_blocks: Vec<swish_crypto::Block> = Vec::new();
+    pub fn from_blocks(mut blocks: SwishBlocks) -> Result<Self> {
+        let my_status =
+            MyStatusFields::read(&blocks.try_pop_block(SvBlockKey::MyStatus)?.to_bytes())?;
 
-        for block in blocks {
-            match BlockKey::try_from(block.key()) {
-                Some(BlockKey::MyStatus) => {
-                    let block_data = block.into_object_data()?;
-                    my_status = Some(MyStatusBlock(block_data));
-                }
-                Some(BlockKey::Box) => {
-                    let block_data = block.into_object_data()?;
-                    pokemon_boxes = Some(BoxBlock(block_data));
-                }
-                Some(BlockKey::BoxLayout) => {
-                    let block_data = block.into_array_data()?;
-                    box_layouts = Some(BoxLayout(block_data));
-                }
-                _ => {
-                    other_blocks.push(block);
-                }
-            };
-        }
+        let pokemon_boxes = BoxData::read(&blocks.try_pop_block(SvBlockKey::Box)?.to_bytes())?;
 
-        let Some(my_status) = my_status else {
-            return Err(Error::build_save("missing MyStatus block", None));
-        };
-
-        let Some(pokemon_boxes) = pokemon_boxes else {
-            return Err(Error::build_save("missing Boxes block", None));
-        };
-
-        let Some(box_layouts) = box_layouts else {
-            return Err(Error::build_save("missing BoxLayouts block", None));
-        };
+        let box_layouts = BoxLayout(
+            blocks
+                .try_pop_block(SvBlockKey::BoxLayout)?
+                .into_array_data()?,
+        );
+        let current_box = blocks
+            .try_pop_block(SvBlockKey::CurrentBox)?
+            .into_numeric_data()?;
 
         Ok(Self {
             my_status,
             pokemon_boxes,
             box_layouts,
-            other_blocks,
+            current_box,
+            other_blocks: blocks,
         })
     }
 
-    pub fn into_vec(self) -> Vec<swish_crypto::Block> {
+    pub fn to_blocks(&self) -> BTreeMap<u32, Block> {
         let Self {
             my_status,
             pokemon_boxes,
             box_layouts,
+            current_box,
             other_blocks,
-        } = self;
+        } = self.clone();
 
         // the game will read the file fine if the blocks aren't sorted, but PKHeX expects them to be in key order.
         // an iterator from a btree will preserve key order.
-        let blocks_btree: BTreeMap<u32, swish_crypto::Block> = other_blocks
-            .into_iter()
-            .chain([
-                my_status.into_block(),
-                pokemon_boxes.into_block(),
-                box_layouts.into_block(),
-            ])
-            .map(|block| (block.key(), block))
-            .collect();
-
-        blocks_btree.into_values().collect()
-    }
-}
-
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
-enum BlockKey {
-    TeamNames,
-    TeamIndexes,
-    BoxLayout,
-    BoxWallpapers,
-
-    Box,
-    Party,
-    Zukan,
-    ZukanT1,
-    MyStatus,
-    PlayTime,
-
-    CurrentBox,
-
-    TeraRaidDlc,
-    BlueberryPoints,
-
-    CompassLevelcap,
-}
-
-impl BlockKey {
-    pub const fn try_from(value: u32) -> Option<Self> {
-        match value {
-            0x1920c1e4 => Some(Self::TeamNames),
-            0x33f39467 => Some(Self::TeamIndexes),
-            0x19722c89 => Some(Self::BoxLayout),
-            0x2eb1b190 => Some(Self::BoxWallpapers),
-
-            0x0d66012c => Some(Self::Box),
-            0x3aa1a9ad => Some(Self::Party),
-            0x0deaaebd => Some(Self::Zukan),
-            0xf5d7c0e2 => Some(Self::ZukanT1),
-            0xe3e89bd1 => Some(Self::MyStatus),
-            0xedaff794 => Some(Self::PlayTime),
-
-            0x017c3cbb => Some(Self::CurrentBox),
-
-            0x100b93da => Some(Self::TeraRaidDlc),
-            0x66a33824 => Some(Self::BlueberryPoints),
-
-            0xcc806ed6 => Some(Self::CompassLevelcap),
-            _ => None,
+        let mut all_blocks = other_blocks.into_inner();
+        for block in [
+            my_status.into_block(),
+            pokemon_boxes.into_block(),
+            box_layouts.into_block(),
+            Block::new(SvBlockKey::CurrentBox, BlockData::Value(current_box)),
+        ] {
+            all_blocks.insert(block.key(), block);
         }
-    }
 
-    pub const fn to_u32(self) -> u32 {
-        match self {
-            Self::TeamNames => 0x1920c1e4,
-            Self::TeamIndexes => 0x33f39467,
-            Self::BoxLayout => 0x19722c89,
-            Self::BoxWallpapers => 0x2eb1b190,
-
-            Self::Box => 0x0d66012c,
-            Self::Party => 0x3aa1a9ad,
-            Self::Zukan => 0x0deaaebd,
-            Self::ZukanT1 => 0xf5d7c0e2,
-            Self::MyStatus => 0xe3e89bd1,
-            Self::PlayTime => 0xedaff794,
-
-            Self::CurrentBox => 0x017c3cbb,
-
-            Self::TeraRaidDlc => 0x100b93da,
-            Self::BlueberryPoints => 0x66a33824,
-
-            Self::CompassLevelcap => 0xcc806ed6,
-        }
+        all_blocks
     }
 }
 
-#[derive(Debug, Clone)]
-pub(super) struct MyStatusBlock(swish_crypto::ObjectBlock);
+#[derive(
+    Debug,
+    PartialEq,
+    Eq,
+    Clone,
+    Copy,
+    EnumIter,
+    EnumString,
+    Display,
+    TryFromPrimitive,
+    IntoPrimitive,
+)]
+#[repr(u32)]
+pub enum SvBlockKey {
+    MyStatus = 0xE3E89BD1,
+    TeamNames = 0x1920c1e4,
+    TeamIndexes = 0x33F39467,
+    BoxLayout = 0x19722c89,
+    BoxWallpapers = 0x2EB1B190,
+    CurrentBox = 0x017C3CBB,
 
-impl MyStatusBlock {
-    const NAME_OFFSET: usize = 0x10;
-    pub const NAME_BYTE_LENGTH: usize = 24;
+    Box = 0x0d66012c,
+    MysteryGift = 0x99E1625E,
+    Item = 0x21C9BD44,
+    Party = 0x2985fe5d,
+    Money = 0x4F35D0DD,
+    Zukan = 0x0DEAAEBD,
+    ZukanT1 = 0xF5D7C0E2,
+    PlayTime = 0xEDAFF794,
 
-    const TID_OFFSET: usize = 0xa0;
-    const SID_OFFSET: usize = 0xa2;
-    const LANGUAGE_OFFSET: usize = 0xa7;
-    const ORIGIN_OFFSET: usize = 0xa4;
-    const GENDER_OFFSET: usize = 0xa5;
+    BlueberryPoints = 0x66A33824,
+    TeraRaidDlc = 0x100B93DA,
+}
 
-    const BUFFER_ERROR: &'static str = "MyStatusBlock buffer is not the correct size";
+#[derive(Debug, Clone, TryFromBytes, IntoBytes, KnownLayout, Immutable)]
+#[repr(C, packed)]
+pub struct MyStatusFields {
+    pub trainer_id: zerocopy::U16<LittleEndian>,
+    pub secret_id: zerocopy::U16<LittleEndian>,
+    pub game_raw: u8,
+    pub gender_raw: u8,
+    _gap1: u8,
+    pub language: Language,
+    _gap2: [u8; 8],
+    pub trainer_name: SizedUtf16String<{ Self::NAME_BYTE_LENGTH }>,
+    _remaining: [u8; 62],
+}
 
-    pub fn trainer_name(&self) -> SizedUtf16String<{ MyStatusBlock::NAME_BYTE_LENGTH }> {
-        SizedUtf16String::from_bytes(
-            self.0.bytes()[Self::NAME_OFFSET..Self::NAME_OFFSET + Self::NAME_BYTE_LENGTH]
-                .try_into()
-                .expect(Self::BUFFER_ERROR),
-        )
-    }
+const_assert_eq!(std::mem::offset_of!(MyStatusFields, game_raw), 0x04);
 
-    pub fn trainer_id(&self) -> u16 {
-        read_u16_le!(self.0.bytes(), Self::TID_OFFSET)
-    }
+const_assert_eq!(std::mem::offset_of!(MyStatusFields, trainer_name), 0x10);
 
-    pub fn secret_id(&self) -> u16 {
-        read_u16_le!(self.0.bytes(), Self::SID_OFFSET)
-    }
-
-    pub fn tid_sid_u32(&self) -> u32 {
-        read_u32_le!(self.0.bytes(), Self::TID_OFFSET)
-    }
-
-    pub fn language(&self) -> Result<Language> {
-        let language_byte = self.0.bytes()[Self::LANGUAGE_OFFSET];
-        Ok(Language::try_from(language_byte)?)
-    }
-
-    pub fn origin_game(&self) -> Option<OriginGame> {
-        let origin_game_raw = self.0.bytes()[Self::ORIGIN_OFFSET];
-        OriginGame::try_from_u8(origin_game_raw)
-    }
-
-    pub fn trainer_gender(&self) -> BinaryGender {
-        let gender_raw = self.0.bytes()[Self::GENDER_OFFSET] & 1;
-        BinaryGender::from(gender_raw == 1)
-    }
+impl MyStatusFields {
+    pub const NAME_BYTE_LENGTH: usize = 26;
 
     pub fn into_block(self) -> swish_crypto::Block {
         swish_crypto::Block::new(
-            BlockKey::MyStatus.to_u32(),
-            swish_crypto::BlockData::Object(self.0.clone()),
+            SvBlockKey::MyStatus,
+            swish_crypto::BlockData::Object(ObjectBlock::new(self.as_bytes().to_vec())),
         )
+    }
+
+    pub fn read(bytes: &[u8]) -> StdResult<Self, SwishError> {
+        Self::try_read_from_bytes(bytes).or(Err(SwishError::ByteLength {
+            context: "MyStatusFields".to_owned(),
+            expected: size_of::<Self>(),
+            actual: bytes.len(),
+        }))
     }
 }
 
+const PK9_PARTY_SIZE: usize = 0x158;
+
+type Pk9PartyBytes = [u8; PK9_PARTY_SIZE];
+type PcBoxBytes = [Pk9PartyBytes; BOX_SLOTS as usize];
+
+#[derive(Debug, Clone, TryFromBytes, IntoBytes, KnownLayout, Immutable)]
+#[repr(C, packed)]
+pub struct BoxDataInner {
+    pub boxes: [PcBoxBytes; MAX_BOX_COUNT as usize],
+    pub ride_legendary_bytes: Pk9PartyBytes,
+    _remaining_bytes: [u8; 9976],
+}
+
 #[derive(Debug, Clone)]
-pub(super) struct BoxBlock(swish_crypto::ObjectBlock);
+pub struct BoxData(Box<BoxDataInner>); // boxed to not overflow the stack
 
-impl BoxBlock {
-    const BOX_SIZE_BYTES: usize = Pk9::BOX_SIZE * (BOX_SLOTS as usize);
-
-    pub const fn box_bytes_start(box_index: BoxIndex) -> usize {
-        Self::BOX_SIZE_BYTES * box_index.get() as usize
+impl BoxData {
+    pub const fn box_bytes(&self, box_index: BoxIndex) -> &PcBoxBytes {
+        &self.0.boxes[box_index.to_usize()]
     }
 
-    pub const fn pokemon_bytes_start(box_index: BoxIndex, box_slot: BoxSlot) -> usize {
-        let box_start = Self::box_bytes_start(box_index);
-        box_start + Pk9::BOX_SIZE * box_slot.get() as usize
+    pub const fn mon_bytes_at(&self, box_index: BoxIndex, box_slot: BoxSlot) -> &[u8] {
+        &self.box_bytes(box_index)[box_slot.to_usize()]
     }
 
-    pub fn mon_bytes_at(&self, box_index: BoxIndex, box_slot: BoxSlot) -> &[u8] {
-        let start = Self::pokemon_bytes_start(box_index, box_slot);
-        &self.0.bytes()[start..start + Pk9::BOX_SIZE]
-    }
-
-    pub fn mon_bytes_at_mut(&mut self, box_index: BoxIndex, box_slot: BoxSlot) -> &mut [u8] {
-        let start = Self::pokemon_bytes_start(box_index, box_slot);
-        &mut self.0.bytes_mut()[start..start + Pk9::BOX_SIZE]
+    pub const fn mon_bytes_at_mut(&mut self, box_index: BoxIndex, box_slot: BoxSlot) -> &mut [u8] {
+        &mut self.0.boxes[box_index.to_usize()][box_slot.to_usize()]
     }
 
     fn into_block(self) -> swish_crypto::Block {
         swish_crypto::Block::new(
-            BlockKey::Box.to_u32(),
-            swish_crypto::BlockData::Object(self.0),
+            SvBlockKey::Box,
+            swish_crypto::BlockData::Object(ObjectBlock::new(self.as_bytes().to_vec())),
         )
     }
+
+    pub fn read(bytes: &[u8]) -> StdResult<Self, SwishError> {
+        let Ok(box_bytes) = BoxDataInner::try_ref_from_bytes(bytes) else {
+            return Err(SwishError::ByteLength {
+                context: "BoxData".to_owned(),
+                expected: size_of::<Self>(),
+                actual: bytes.len(),
+            });
+        };
+
+        Ok(Self(Box::new(box_bytes.clone())))
+    }
 }
+
+impl std::ops::Deref for BoxData {
+    type Target = BoxDataInner;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+const_assert_eq!(
+    std::mem::offset_of!(BoxDataInner, ride_legendary_bytes),
+    MAX_BOX_COUNT as usize * BOX_SLOTS as usize * Pk9::BOX_SIZE
+);
 
 #[derive(Debug, Clone)]
 pub(super) struct BoxLayout(swish_crypto::ArrayBlock);
@@ -266,7 +223,7 @@ impl BoxLayout {
 
     fn into_block(self) -> swish_crypto::Block {
         swish_crypto::Block::new(
-            BlockKey::BoxLayout.to_u32(),
+            SvBlockKey::BoxLayout,
             swish_crypto::BlockData::Array(self.0),
         )
     }

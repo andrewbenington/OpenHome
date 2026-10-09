@@ -186,6 +186,10 @@ impl Block {
         writer.current_offset()
     }
 
+    pub fn to_bytes(&self) -> Vec<u8> {
+        self.data.to_bytes()
+    }
+
     pub fn into_numeric_data(self) -> std::result::Result<NumericBlock, WrongType> {
         let Block { key, data } = self;
         if let BlockData::Value(numeric_block) = data {
@@ -199,15 +203,15 @@ impl Block {
         }
     }
 
-    pub fn into_object_data(self) -> std::result::Result<ObjectBlock, WrongType> {
+    pub fn into_object_data(self) -> std::result::Result<ObjectBlock, SwishError> {
         let Block { key, data } = self;
         match data {
             BlockData::Object(object_data) => Ok(object_data),
-            _ => Err(WrongType {
+            _ => Err(SwishError::BlockType(WrongType {
                 block_key: key,
                 expected: ExpectedBlockType::Object,
                 actual: data.block_type(),
-            }),
+            }))?,
         }
     }
 
@@ -349,9 +353,10 @@ fn numtype_try_into_array<const N: usize>(
     numtype: NumericType,
     bytes: &[u8],
 ) -> Result<[u8; N], SwishError> {
-    bytes
-        .try_into()
-        .map_err(|_| SwishError::expected_bytes::<N>(numtype, bytes.len()))
+    bytes.try_into().or(Err(SwishError::expected_bytes::<N>(
+        numtype.to_string(),
+        bytes.len(),
+    )))
 }
 
 #[cfg(feature = "wasm")]
@@ -512,6 +517,15 @@ impl BlockData {
             Self::Value(numeric_value) => numeric_value.id(),
         }
     }
+
+    pub fn to_bytes(&self) -> Vec<u8> {
+        match self {
+            BlockData::Bool(_bool_type) => vec![],
+            BlockData::Object(object_block) => object_block.bytes.clone(),
+            BlockData::Array(array_block) => array_block.bytes.clone(),
+            BlockData::Value(numeric_block) => numeric_block.to_le_bytes(),
+        }
+    }
 }
 
 #[cfg_attr(
@@ -527,6 +541,10 @@ pub struct ObjectBlock {
 }
 
 impl ObjectBlock {
+    pub const fn new(bytes: Vec<u8>) -> Self {
+        Self { bytes }
+    }
+
     pub fn bytes(&self) -> &[u8] {
         &self.bytes
     }
