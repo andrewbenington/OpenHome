@@ -11,7 +11,7 @@ import App from './ui/App'
 
 addMissingFunctions()
 
-await init()
+const PKM_RS_WASM = await init()
 
 enableMapSet()
 
@@ -20,7 +20,7 @@ dayjs.extend(localizedFormat)
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <BrowserRouter>
-      <App />
+      <App pkmRsWasm={PKM_RS_WASM} />
     </BrowserRouter>
   </React.StrictMode>
 )

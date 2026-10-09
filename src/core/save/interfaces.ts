@@ -80,6 +80,8 @@ interface BaseSAV<P extends PKMInterface = PKMInterface> {
   tryGetMonAt(boxNum: number, boxSlot: number): Result<Option<P>>
   setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void
   getAllMons(): Readonly<P>[]
+  getBoxMonCount(boxIndex: number): number
+  getPcMonCount(): number
 
   supportsMon: (nationalDex: number, formeNumber: number) => boolean
   supportsItem: (itemIndex: number) => boolean
@@ -89,6 +91,8 @@ interface BaseSAV<P extends PKMInterface = PKMInterface> {
   getDisplayData(): Record<string, string | number | undefined> | undefined
   getDisplayPkms(): DisplayPkm<P>[]
   convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<P>
+
+  free?: () => void
 }
 
 export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> implements BaseSAV<P> {
@@ -189,6 +193,10 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
     return box.boxSlots.filter(filterUndefined).length
   }
 
+  getPcMonCount(): number {
+    return this.getAllMons().length
+  }
+
   getFirstNonEmptySlotAfter(boxNum: number, boxSlot: number): number | undefined {
     const box = this.boxes[boxNum]
     if (!box) return undefined
@@ -203,6 +211,8 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   getBoxName(boxNum: number): string | undefined {
     return this.boxes[boxNum]?.name
   }
+
+  free() {}
 }
 
 export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implements BaseSAV<P> {
@@ -308,9 +318,15 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
     return box.boxSlots.filter(filterUndefined).length
   }
 
+  getPcMonCount(): number {
+    return this.getAllMons().length
+  }
+
   get boxSlotCount(): number {
     return this.boxRows * this.boxColumns
   }
+
+  free() {}
 }
 
 export function getSaveRef(save: SAV): SaveRef {
@@ -392,6 +408,8 @@ export interface WasmSaveInner<P> {
 
   getMonAt(box_num: number, offset: number): Option<P>
   setMonAt(box_num: number, offset: number, mon?: P | null): void
+  getBoxMonCount(boxIndex: number): number
+  getPcMonCount(): number
 
   getBoxName(box_num: number): string
 }
@@ -499,6 +517,13 @@ export abstract class WasmOfficialSave<
       .flatMap((boxIndex) => range(slotCount).map((boxSlot) => ({ boxIndex, boxSlot })))
       .map(({ boxIndex, boxSlot }) => this.getMonAt(boxIndex, boxSlot))
       .filter(filterUndefined)
+  }
+
+  getBoxMonCount(boxIndex: number): number {
+    return this.inner.getBoxMonCount(boxIndex)
+  }
+  getPcMonCount(): number {
+    return this.inner.getPcMonCount()
   }
 
   prepareForSaving(): Uint8Array {

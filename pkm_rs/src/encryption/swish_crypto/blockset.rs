@@ -5,7 +5,7 @@ use crate::result::{Result, StdResult};
 
 type SwishBlocksInner = std::collections::BTreeMap<u32, swish_crypto::Block>;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct SwishBlocks(SwishBlocksInner);
 
 impl SwishBlocks {

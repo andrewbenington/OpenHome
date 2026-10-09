@@ -112,4 +112,8 @@ export class ScarletVioletSave extends WasmOfficialSave<Pk9Wasm, PK9, ScarletVio
   static includesOrigin(origin: OriginGame) {
     return ScarletVioletSaveRust.includesOrigin(origin)
   }
+
+  free() {
+    this.inner.free()
+  }
 }
