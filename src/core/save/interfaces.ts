@@ -47,6 +47,7 @@ export type SaveWriter = {
   bytes: Uint8Array
   filepath: string
 }
+type DisplayPkm<P extends PKMInterface> = { mon?: P; description: string }
 
 interface BaseSAV<P extends PKMInterface = PKMInterface> {
   origin: OriginGame
@@ -86,6 +87,7 @@ interface BaseSAV<P extends PKMInterface = PKMInterface> {
   prepareWriter: () => SaveWriter
 
   getDisplayData(): Record<string, string | number | undefined> | undefined
+  getDisplayPkms(): DisplayPkm<P>[]
   convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<P>
 }
 
@@ -127,6 +129,10 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
       'Trainer ID': this.displayID,
       'Secret ID': this.sid,
     }
+  }
+
+  getDisplayPkms(): DisplayPkm<P>[] {
+    return []
   }
 
   isPlugin: false = false
@@ -243,6 +249,10 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
       'Trainer ID': this.displayID,
       Plugin: this.pluginIdentifier,
     }
+  }
+
+  getDisplayPkms(): DisplayPkm<P>[] {
+    return []
   }
 
   isPlugin = true
