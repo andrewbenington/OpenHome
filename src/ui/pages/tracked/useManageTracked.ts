@@ -240,6 +240,7 @@ export function useManageTracked() {
             toUpdate[trackedMon.openhomeId] = trackedMon
             foundMonIds.add(saveMonId)
           })
+        saveMon.free?.()
       }
     }
 
