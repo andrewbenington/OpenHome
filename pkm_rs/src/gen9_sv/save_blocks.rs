@@ -8,12 +8,13 @@ use crate::gen9_sv::{BoxIndex, BoxSlot, MAX_BOX_COUNT};
 use crate::result::{Result, StdResult};
 use crate::traits::PkmBytes;
 
+use arrayref::array_ref;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use pkm_rs_types::Language;
 use pkm_rs_types::strings::SizedUtf16String;
 use static_assertions::const_assert_eq;
 use strum::{Display, EnumIter, EnumString};
-use zerocopy::{Immutable, IntoBytes, KnownLayout, LittleEndian, TryFromBytes};
+use zerocopy::{FromBytes, Immutable, IntoBytes, KnownLayout, LittleEndian, TryFromBytes};
 
 #[derive(Debug, Clone)]
 pub(super) struct SvBlocks {
@@ -150,7 +151,7 @@ const PK9_PARTY_SIZE: usize = 0x158;
 type Pk9PartyBytes = [u8; PK9_PARTY_SIZE];
 type PcBoxBytes = [Pk9PartyBytes; BOX_SLOTS as usize];
 
-#[derive(Debug, Clone, TryFromBytes, IntoBytes, KnownLayout, Immutable)]
+#[derive(Debug, Clone, FromBytes, IntoBytes, KnownLayout, Immutable)]
 #[repr(C, packed)]
 pub struct BoxDataInner {
     pub boxes: [PcBoxBytes; MAX_BOX_COUNT as usize],
@@ -182,7 +183,7 @@ impl BoxData {
     }
 
     pub fn read(bytes: &[u8]) -> StdResult<Self, SwishError> {
-        let Ok(box_bytes) = BoxDataInner::try_ref_from_bytes(bytes) else {
+        let Ok(box_bytes) = BoxDataInner::ref_from_bytes(bytes) else {
             return Err(SwishError::ByteLength {
                 context: "BoxData".to_owned(),
                 expected: size_of::<Self>(),
@@ -213,17 +214,9 @@ pub(super) struct BoxLayout(swish_crypto::ArrayBlock);
 impl BoxLayout {
     pub fn get_box_name(&self, box_index: BoxIndex) -> BoxName {
         let start = BOX_NAME_LENGTH * box_index.get() as usize;
-        let end = start + BOX_NAME_LENGTH;
-        let name_bytes: [u8; BOX_NAME_LENGTH] = self.0.bytes()[start..end]
-            .try_into()
-            .expect("end should be exactly BOX_NAME_LENGTH after start");
+        let name_bytes = array_ref![self.0.bytes(), start, BOX_NAME_LENGTH];
 
-        let box_name = SizedUtf16String::from_bytes(name_bytes);
-        if box_name.is_empty() {
-            format!("Box {}", box_index.to_usize() + 1).into()
-        } else {
-            box_name
-        }
+        SizedUtf16String::from_bytes(*name_bytes)
     }
 
     fn into_block(self) -> swish_crypto::Block {

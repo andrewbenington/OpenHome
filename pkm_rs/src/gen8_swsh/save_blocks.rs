@@ -6,6 +6,7 @@ use crate::gen8_swsh::{BoxIndex, BoxSlot};
 use crate::result::{Result, StdResult};
 use crate::traits::PkmBytes;
 
+use arrayref::array_ref;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{BinaryGender, Language, read_u16_le};
@@ -68,21 +69,21 @@ impl SwordShieldBlocks {
             box_layouts,
             current_box,
             other_blocks,
-        } = self.clone();
+        } = &self;
 
         let current_box_block = swish_crypto::Block::new(
             SwShBlockKey::CurrentBox,
-            swish_crypto::BlockData::Value(current_box),
+            swish_crypto::BlockData::Value(*current_box),
         );
 
         // the game will read the file fine if the blocks aren't sorted, but PKHeX expects them to be in key order.
         // an iterator from a btree will preserve key order.
-        let mut all_blocks = other_blocks.into_inner();
+        let mut all_blocks = other_blocks.clone().into_inner();
         for block in [
-            my_status.into_block(),
-            trainer_card.into_block(),
-            pokemon_boxes.into_block(),
-            box_layouts.into_block(),
+            my_status.clone().into_block(),
+            trainer_card.clone().into_block(),
+            pokemon_boxes.clone().into_block(),
+            box_layouts.clone().into_block(),
             current_box_block,
         ] {
             all_blocks.insert(block.key(), block);
@@ -186,7 +187,7 @@ impl MyStatusBlock {
     pub fn into_block(self) -> swish_crypto::Block {
         swish_crypto::Block::new(
             SwShBlockKey::MyStatus,
-            swish_crypto::BlockData::Object(self.0.clone()),
+            swish_crypto::BlockData::Object(self.0),
         )
     }
 }
@@ -227,12 +228,9 @@ pub(super) struct BoxLayout(swish_crypto::ArrayBlock);
 impl BoxLayout {
     pub fn get_box_name(&self, box_index: BoxIndex) -> BoxName {
         let start = BOX_NAME_LENGTH * box_index.get() as usize;
-        let end = start + BOX_NAME_LENGTH;
-        let name_bytes: [u8; BOX_NAME_LENGTH] = self.0.bytes()[start..end]
-            .try_into()
-            .expect("end should be exactly BOX_NAME_LENGTH after start");
+        let name_bytes = array_ref![self.0.bytes(), start, BOX_NAME_LENGTH];
 
-        SizedUtf16String::from_bytes(name_bytes)
+        SizedUtf16String::from_bytes(*name_bytes)
     }
 
     fn into_block(self) -> swish_crypto::Block {
