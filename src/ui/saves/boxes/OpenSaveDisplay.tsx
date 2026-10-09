@@ -196,7 +196,10 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
               dragID={`arrow_left_${save.tid}_${save.sid}`}
               direction="left"
             />
-            <div className="box-name">{save.getBoxName(save.currentPCBox)}</div>
+            <div className="box-name">
+              {save.getBoxName(save.currentPCBox)}
+              {save.currentPCBox}
+            </div>
             <ArrowButton
               onClick={() => savesManager.saveBoxNavigateRight(save)}
               dragID={`arrow_right_${save.tid}_${save.sid}`}

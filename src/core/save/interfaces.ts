@@ -404,11 +404,12 @@ export abstract class WasmOfficialSave<
 > extends OfficialSAV<P> {
   inner: WasmSave
   boxes: Array<Box<P>> = []
-  #currentPCBox: number = 0
+  currentPCBox: number
 
   constructor(inner: WasmSave) {
     super()
     this.inner = inner
+    this.currentPCBox = inner.currentPcBoxIdx
   }
 
   abstract WASM_SAVE_CLASS: WasmSaveClass<WasmSave>
@@ -433,17 +434,8 @@ export abstract class WasmOfficialSave<
     return this.inner.trainerGender
   }
 
-  get currentPCBox() {
-    this.#currentPCBox = this.inner.currentPcBoxIdx
-    return this.#currentPCBox
-  }
-
-  set currentPCBox(value: number) {
-    this.#currentPCBox = value
-  }
-
   saveCurrentPcBox() {
-    this.inner.currentPcBoxIdx = this.#currentPCBox
+    this.inner.currentPcBoxIdx = this.currentPCBox
   }
 
   get origin() {
