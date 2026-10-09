@@ -17,7 +17,6 @@ import { MouseContext, mouseReducer } from '@openhome-ui/state/mouse'
 import { SavesProvider } from '@openhome-ui/state/saves'
 import ErrorMessageModal from '@openhome-ui/top-level/ErrorMessageModal'
 import UpdateMessageModal from '@openhome-ui/top-level/UpdateMessageModal'
-import { InitOutput } from '@pkm-rs/pkg'
 import { Flex, Text, Theme } from '@radix-ui/themes'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useCallback, useEffect, useEffectEvent, useReducer, useState } from 'react'
@@ -39,12 +38,9 @@ const REDIRECT_WEB_CONSOLE = false
 
 const queryClient = new QueryClient()
 
-type AppProps = { pkmRsWasm: InitOutput }
-
-export default function App(props: AppProps) {
+export default function App() {
   const isDarkMode = useIsDarkMode()
   const [errorState, errorDispatch] = useReducer(errorReducer, {})
-  const [wasmSize, setWasmSize] = useState('loading...')
 
   return (
     <Theme
@@ -59,19 +55,6 @@ export default function App(props: AppProps) {
           <ErrorContext value={[errorState, errorDispatch]}>
             <QueryClientProvider client={queryClient}>
               <BanksAndBoxesProvider>
-                {wasmSize}
-                <button
-                  onClick={() =>
-                    setWasmSize(
-                      props.pkmRsWasm
-                        ? (props.pkmRsWasm.memory.buffer.byteLength / 1024 / 1024).toFixed(1) +
-                            ' MB'
-                        : 'loading...'
-                    )
-                  }
-                >
-                  Refresh
-                </button>
                 <AppWithBackend />
               </BanksAndBoxesProvider>
             </QueryClientProvider>

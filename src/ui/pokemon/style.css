@@ -1,6 +1,5 @@
 .pokemon-modal {
   --content-height: 34rem;
-  --footer-height: 1.6rem;
 
   width: fit-content;
   min-width: min(90vw, 70rem);
