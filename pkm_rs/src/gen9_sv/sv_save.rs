@@ -90,30 +90,18 @@ impl ScarletVioletSave {
             .copy_from_slice(data)
     }
 
-    fn get_mon_bytes_decrypted(&self, box_index: BoxIndex, box_slot: BoxSlot) -> Box<[u8]> {
-        let mut pokemon_bytes = self.get_mon_bytes_raw(box_index, box_slot);
-        Pk9Buffer::new_mut(&mut pokemon_bytes).decrypt();
-
-        pokemon_bytes
-    }
-
     fn get_mon_bytes_raw(&self, box_index: BoxIndex, box_slot: BoxSlot) -> Box<[u8]> {
         Box::from(self.box_data().mon_bytes_at(box_index, box_slot))
     }
 
+    // TODO: show mon parse errors
     fn get_mon_at(&self, box_index: BoxIndex, box_slot: BoxSlot) -> Option<Pk9> {
-        let decrypted_bytes = self.get_mon_bytes_decrypted(box_index, box_slot);
-        let species_game_index = Pk9Buffer::new(&decrypted_bytes).species_game_index();
-
-        if species_game_index > 0 {
-            Pk9::from_bytes(&decrypted_bytes)
-                .inspect_err(|err| {
-                    crate::log!("malformed pkm at box {box_index}, slot {box_slot}: {err}")
-                })
-                .ok()
-        } else {
-            None
+        let mon_bytes = self.get_mon_bytes_raw(box_index, box_slot);
+        if Pk9::is_empty_slot(&mon_bytes) {
+            return None;
         }
+
+        Pk9::from_encrypted_bytes(mon_bytes).ok()
     }
 
     fn set_mon_at(&mut self, box_index: BoxIndex, box_slot: BoxSlot, mut mon: Option<Pk9>) {
@@ -129,6 +117,10 @@ impl ScarletVioletSave {
 
         // write bytes to box slot
         self.copy_pokemon_bytes_to(box_index, box_slot, &mon_bytes);
+    }
+
+    fn get_ride_legend(&self) -> Option<Pk9> {
+        Pk9::from_encrypted_bytes(Box::new(self.blocks.pokemon_boxes.ride_legendary_bytes)).ok()
     }
 
     pub fn empty_box_slot_bytes() -> Box<[u8]> {
@@ -222,6 +214,11 @@ impl ScarletVioletSave {
         {
             self.set_mon_at(box_index, box_slot, mon)
         }
+    }
+
+    #[wasm_bindgen(js_name = getRideLegend)]
+    pub fn get_ride_legend_wasm(&self) -> Option<Pk9> {
+        self.get_ride_legend()
     }
 
     #[wasm_bindgen(js_name = emptyBoxSlotBytes)]
@@ -497,7 +494,7 @@ mod tests {
 
         for box_index in BoxIndex::all() {
             for box_slot in BoxSlot::all() {
-                let mon_bytes = save.get_mon_bytes_decrypted(box_index, box_slot);
+                let mon_bytes = save.get_mon_bytes_raw(box_index, box_slot);
                 let buffer = Pk9Buffer::new(&mon_bytes);
                 if buffer.checksum() != buffer.calculate_checksum() {
                     return Err(Error::other(&format!(

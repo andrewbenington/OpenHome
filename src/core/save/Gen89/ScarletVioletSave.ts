@@ -100,6 +100,11 @@ export class ScarletVioletSave extends WasmOfficialSave<Pk9Wasm, PK9, ScarletVio
     return { ...this.inner.getDisplayData() }
   }
 
+  getDisplayPkms() {
+    const rideLegend = this.inner.getRideLegend()
+    return rideLegend ? [{ mon: PK9.fromWasm(rideLegend), description: 'Ride Legendary' }] : []
+  }
+
   static fileIsSave(bytes: Uint8Array): boolean {
     return ScarletVioletSaveRust.fileIsSave(bytes)
   }

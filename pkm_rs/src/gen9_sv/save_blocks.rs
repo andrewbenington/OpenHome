@@ -218,7 +218,12 @@ impl BoxLayout {
             .try_into()
             .expect("end should be exactly BOX_NAME_LENGTH after start");
 
-        SizedUtf16String::from_bytes(name_bytes)
+        let box_name = SizedUtf16String::from_bytes(name_bytes);
+        if box_name.is_empty() {
+            format!("Box {}", box_index.to_usize() + 1).into()
+        } else {
+            box_name
+        }
     }
 
     fn into_block(self) -> swish_crypto::Block {
