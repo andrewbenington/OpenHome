@@ -229,6 +229,35 @@ impl Gen7AlolaSave {
         SizedUtf16String::from_bytes(name_bytes)
     }
 
+    pub fn box_mon_count(&self, box_index: BoxIndex) -> usize {
+        let mut count: usize = 0;
+
+        for box_slot in 0..BOX_SLOTS {
+            let box_slot = BoxSlot::check_bound(box_slot)
+                .expect("all box indexes are valid if < MAX_BOX_COUNT");
+            if Pk7Buffer::box_span(&self.get_mon_bytes_decrypted(box_index, box_slot))
+                .species_ndex()
+                != 0
+            {
+                count += 1;
+            }
+        }
+
+        count
+    }
+
+    pub fn pc_mon_count(&self) -> usize {
+        let mut count: usize = 0;
+
+        for box_index in 0..BOX_COUNT {
+            let box_index = BoxIndex::check_bound(box_index)
+                .expect("all box indexes are valid if < MAX_BOX_COUNT");
+            count += self.box_mon_count(box_index);
+        }
+
+        count
+    }
+
     fn convert_ohpkm(
         &self,
         ohpkm: crate::ohpkm::OhpkmV2,
@@ -285,6 +314,19 @@ impl Gen7AlolaSave {
         {
             self.set_mon_at(box_index, box_slot, mon)
         }
+    }
+
+    #[wasm_bindgen(js_name = getBoxMonCount)]
+    pub fn box_mon_count_wasm(&mut self, box_index: u8) -> std::result::Result<usize, JsError> {
+        match BoxIndex::check_bound(box_index) {
+            Ok(index) => Ok(self.box_mon_count(index)),
+            Err(BoundViolated) => Err(BoundViolated.into()),
+        }
+    }
+
+    #[wasm_bindgen(js_name = getPcMonCount)]
+    pub fn pc_mon_count_wasm(&mut self) -> usize {
+        self.pc_mon_count()
     }
 
     #[wasm_bindgen(js_name = convertOhpkm)]
