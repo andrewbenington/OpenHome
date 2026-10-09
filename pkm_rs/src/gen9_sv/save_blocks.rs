@@ -45,7 +45,7 @@ impl SvBlocks {
             pokemon_boxes,
             box_layouts,
             current_box,
-            other_blocks: Default::default(),
+            other_blocks: blocks,
         })
     }
 

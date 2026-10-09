@@ -138,9 +138,9 @@ impl SwordShieldSave {
 
         if national_dex > 0 {
             Pk8::from_bytes(&decrypted_bytes)
-                .inspect_err(|err| {
-                    crate::log!("malformed pkm at box {box_index}, slot {box_slot}: {err}")
-                })
+                // .inspect_err(|err| {
+                //     crate::log!("malformed pkm at box {box_index}, slot {box_slot}: {err}")
+                // })
                 .ok()
         } else {
             None
