@@ -327,7 +327,7 @@ impl Pk9 {
     }
 
     pub fn from_encrypted_bytes(mut bytes: Box<[u8]>) -> Result<Self> {
-        Self::from_buffer(Pk9Buffer::new_mut(&mut bytes).decrypted())
+        Self::from_buffer(&Pk9Buffer::new_mut(&mut bytes).decrypted())
     }
 
     pub fn to_box_bytes_encrypted(self) -> Box<[u8]> {

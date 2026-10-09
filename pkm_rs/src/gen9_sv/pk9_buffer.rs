@@ -1054,7 +1054,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk9Buffer<S> {
         self
     }
 
-    pub fn decrypted(&mut self) -> &mut Self {
+    pub fn decrypted(mut self) -> Self {
         self.block_crypto().decrypt(self.0.as_mut());
 
         self

@@ -536,8 +536,8 @@ mod tests {
 
         for box_index in BoxIndex::all() {
             for box_slot in BoxSlot::all() {
-                let mon_bytes = save.get_mon_bytes_raw(box_index, box_slot);
-                let buffer = Pk9Buffer::new(&mon_bytes);
+                let mut mon_bytes = save.get_mon_bytes_raw(box_index, box_slot);
+                let buffer = Pk9Buffer::new_mut(&mut mon_bytes).decrypted();
                 if buffer.checksum() != buffer.calculate_checksum() {
                     return Err(Error::other(&format!(
                         "Invalid checksum for mon at box {box_index}, slot {box_slot}: expected {:#06x}, got {:#06x}",
