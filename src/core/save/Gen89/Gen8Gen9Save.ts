@@ -2,12 +2,7 @@ import { PA8, PA9, PB8, PK8, PK9 } from '@openhome-core/pkm'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Option } from '@openhome-core/util/functional'
 import { Block, BlockType, ExtraFormIndex, Language, OriginGame } from '@pkm-rs/pkg'
-import {
-  ArrayBlock,
-  ObjectBlock,
-  SwishCrypto,
-  ValueBlock,
-} from '../encryption/SwishCrypto/SwishCrypto'
+import { BlockDataFor, SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
 import { Box, BoxAndSlot, OfficialSAV } from '../interfaces'
 import { PathData } from '../util/path'
 import { BoxNamesBlock } from './BoxNamesBlock'
@@ -49,15 +44,15 @@ export abstract class Gen8Gen9Save<P extends PK8 | PB8 | PA8 | PK9 | PA9> extend
     this.filePath = path
     this.scBlocks = SwishCrypto.decrypt(bytes)
 
-    const currentPCBlock = this.getBlockMust<ValueBlock>('CurrentBox', {
+    const currentPCBlock = this.getBlockDataMust('CurrentBox', {
       Scalar: { Numeric: 'UInt8' },
     })
 
-    this.currentPCBox = new DataView(currentPCBlock.data.Value.bytes.buffer).getUint8(0)
+    this.currentPCBox = currentPCBlock.Value.UInt8
 
-    const boxNamesBlock = new BoxNamesBlock(this.getBlockMust<ArrayBlock>('BoxLayout', 'Array'))
+    const boxNamesBlock = new BoxNamesBlock(this.getBlockDataMust('BoxLayout', 'Array').Array)
 
-    const boxBlock = this.getBlockMust<ObjectBlock>('Box', 'Object')
+    const boxBlock = this.getBlockDataMust('Box', 'Object').Object
 
     this.boxes = Array(this.getBoxCount())
     for (let box = 0; box < this.getBoxCount(); box++) {
@@ -73,7 +68,7 @@ export abstract class Gen8Gen9Save<P extends PK8 | PB8 | PA8 | PK9 | PA9> extend
             this.getBoxSizeBytes() * box +
             (this.getMonBoxSizeBytes() + this.getBoxSlotGapBytes()) * monIndex
           const endByte = startByte + this.getMonBoxSizeBytes()
-          const monData = boxBlock.data.Object.bytes.buffer.slice(startByte, endByte)
+          const monData = boxBlock.bytes.buffer.slice(startByte, endByte)
 
           if (!this.isEmptySlot(monData)) {
             this.boxes[box].boxSlots[monIndex] = this.monConstructor(monData, true)
@@ -89,7 +84,7 @@ export abstract class Gen8Gen9Save<P extends PK8 | PB8 | PA8 | PK9 | PA9> extend
   abstract getBoxSizeBytes(): number
   abstract getBoxSlotGapBytes(): number
 
-  abstract getBlockMust<T extends Block = Block>(blockName: G89BlockName, type?: BlockType): T
+  abstract getBlockDataMust<T extends BlockType>(blockName: G89BlockName, type: T): BlockDataFor<T>
 
   abstract supportsMon(
     nationalDex: number,
@@ -113,7 +108,7 @@ export abstract class Gen8Gen9Save<P extends PK8 | PB8 | PA8 | PK9 | PA9> extend
   }
 
   prepareForSaving() {
-    const boxBlock = this.getBlockMust<ObjectBlock>('Box', 'Object')
+    const boxBlock = this.getBlockDataMust('Box', 'Object').Object
 
     this.updatedBoxSlots.forEach(({ box, boxSlot }) => {
       const mon = this.getMonAt(box, boxSlot)
@@ -121,7 +116,7 @@ export abstract class Gen8Gen9Save<P extends PK8 | PB8 | PA8 | PK9 | PA9> extend
       const writeIndex =
         this.getBoxSizeBytes() * box +
         (this.getMonBoxSizeBytes() + this.getBoxSlotGapBytes()) * boxSlot
-      const blockBuffer = boxBlock.data.Object.bytes
+      const blockBuffer = boxBlock.bytes
 
       // mon will be undefined if pokemon was moved from this slot
       // and the slot was left empty
