@@ -9,19 +9,19 @@ export function getHighestFormStatus(
 ): [number, PokedexLevel | undefined] {
   if (!(species.nationalDex in pokedex.byDexNumber)) return [0, undefined]
 
-  let maxStatusForme = 0
+  let maxStatusForm = 0
   let maxStatus: PokedexLevel = 'Seen'
 
   for (const [formIndex, dexEntry] of Object.entries(
     pokedex.byDexNumber[species.nationalDex]?.forms ?? {}
   )) {
     if (dexEntry && StatusIndices[dexEntry.level] > StatusIndices[maxStatus]) {
-      maxStatusForme = parseInt(formIndex)
+      maxStatusForm = parseInt(formIndex)
       maxStatus = dexEntry.level
     }
   }
 
-  return [maxStatusForme, maxStatus]
+  return [maxStatusForm, maxStatus]
 }
 
 export function getFormPokedexData(
@@ -49,14 +49,14 @@ export function getPokedexSummary(
   const name =
     form.formIndex === 0 && !isExtraForm
       ? Lookup.speciesName(species.nationalDex, Language.English)
-      : form.formeName
-  const formeType =
+      : form.formName
+  const formType =
     form.formIndex === 0 ? getBaseFormDescriptor(species) : form.isMega ? 'Mega Evolution' : 'form'
   let text = isExtraForm
     ? `${name} is a ${types} extra form.`
-    : `${name} is a ${types} ${formeType} introduced in Generation ${form.introducedGen}.`
+    : `${name} is a ${types} ${formType} introduced in Generation ${form.introducedGen}.`
 
-  if (form.formeName === 'Basculin-White-Striped') {
+  if (form.formName === 'Basculin-White-Striped') {
     text += ` It is sometimes considered a regional form from the ${form.regional} region.`
   } else if (form.regional) {
     text += ` It is a regional form from the ${form.regional} region.`

@@ -3,10 +3,7 @@ import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { displayIndexAdder, isBattleFormItem, isMegaStone } from '@openhome-core/pkm/util'
 import { PkmFormSpecifiers } from '@openhome-core/pkm/util/pkmInterface'
 import { FullMetadataLookup } from '@openhome-core/util'
-import {
-  TopRightBadge,
-  TopRightBadgelMon as TopRightBadgeMon,
-} from '@openhome-ui/components/badge/TopRightBadge'
+import { TopRightBadge, TopRightBadgeMon } from '@openhome-ui/components/badge/TopRightBadge'
 import { useDraggingActive } from '@openhome-ui/state-zustand/drag-and-drop/dragStore'
 import { MonWithLocation } from '@openhome-ui/state/saves'
 import { Gender } from '@pkm-rs/pkg'

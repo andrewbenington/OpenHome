@@ -6,7 +6,7 @@ import {
   readGameBoyStringFromBytes,
   utf16StringToGen12,
 } from '@openhome-core/util/stringConversion'
-import { PKMFormeRef } from '@openhome-core/util/types'
+import { PKMFormRef } from '@openhome-core/util/types'
 import { Language, MetadataSummaryLookup, OpenHomeId, OriginGame, OriginGames } from '@pkm-rs/pkg'
 
 export type OhpkmIdentifier = string
@@ -130,14 +130,14 @@ export const getMonGen345Identifier = (
   return undefined
 }
 
-export function isEvolution(prevo: PKMFormeRef, possibleEvo: PKMFormeRef): boolean {
-  const prevoForme = MetadataSummaryLookup(prevo.nationalDex, prevo.formIndex)
-  const possibleEvoForme = MetadataSummaryLookup(possibleEvo.nationalDex, possibleEvo.formIndex)
+export function isEvolution(prevo: PKMFormRef, possibleEvo: PKMFormRef): boolean {
+  const prevoForm = MetadataSummaryLookup(prevo.nationalDex, prevo.formIndex)
+  const possibleEvoForm = MetadataSummaryLookup(possibleEvo.nationalDex, possibleEvo.formIndex)
 
-  if (!prevoForme || !possibleEvoForme) return false
+  if (!prevoForm || !possibleEvoForm) return false
 
   if (
-    prevoForme.evolutions.some(
+    prevoForm.evolutions.some(
       (evo) =>
         evo.nationalDex === possibleEvo.nationalDex && evo.formIndex === possibleEvo.formIndex
     )
@@ -145,7 +145,7 @@ export function isEvolution(prevo: PKMFormeRef, possibleEvo: PKMFormeRef): boole
     return true
   }
 
-  for (const evo of prevoForme.evolutions) {
+  for (const evo of prevoForm.evolutions) {
     if (isEvolution(prevo, { nationalDex: evo.nationalDex, formIndex: evo.formIndex })) {
       return true
     }

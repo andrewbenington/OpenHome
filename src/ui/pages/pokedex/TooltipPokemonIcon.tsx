@@ -11,7 +11,7 @@ export type TooltipPokemonIconProps = PokemonIconProps & {
 export default function TooltipPokemonIcon(props: TooltipPokemonIconProps) {
   const { onClick, ...pkmIconProps } = props
   return (
-    <Tooltip content={MetadataSummaryLookup(props.nationalDex, props.formIndex ?? 0)?.formeName}>
+    <Tooltip content={MetadataSummaryLookup(props.nationalDex, props.formIndex ?? 0)?.formName}>
       <PokemonIcon
         {...pkmIconProps}
         onClick={() => onClick?.(props.nationalDex, props.formIndex ?? 0)}

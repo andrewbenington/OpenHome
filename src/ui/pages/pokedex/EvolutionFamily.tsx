@@ -72,7 +72,7 @@ export default function EvolutionFamily(props: EvolutionFamilyProps) {
 function EvolutionLine({ nationalDex, formNumber, pokedex, onClick }: EvolutionFamilyProps) {
   const formMetadata = MetadataSummaryLookup(nationalDex, formNumber)
   const evolutions = formMetadata?.evolutions ?? []
-  const megaFormes = formMetadata?.megaEvolutions ?? []
+  const megaForms = formMetadata?.megaEvolutions ?? []
 
   if (evolutions.length === 8) {
     return (
@@ -135,28 +135,28 @@ function EvolutionLine({ nationalDex, formNumber, pokedex, onClick }: EvolutionF
         silhouette={!getFormPokedexData(pokedex, nationalDex, formNumber)?.level.includes('Caught')}
         onClick={() => onClick?.(nationalDex, formNumber)}
       />
-      {!MetadataSummaryLookup(nationalDex, formNumber)?.regional && megaFormes.length > 0 && (
+      {!MetadataSummaryLookup(nationalDex, formNumber)?.regional && megaForms.length > 0 && (
         <Flex direction="column" gap="2">
-          {megaFormes.map((mega, i) => (
-            <Flex key={`${nationalDex}-${mega.megaForme.formIndex}`} align="center" gap="2">
+          {megaForms.map((mega, i) => (
+            <Flex key={`${nationalDex}-${mega.megaForm.formIndex}`} align="center" gap="2">
               <ArrowLeftRightIcon
                 style={{
-                  rotate: `${((megaFormes.length - 1) / 2 - i) * -36}deg`,
-                  marginTop: ((megaFormes.length - 1) / 2 - i) * 15,
-                  marginBottom: ((megaFormes.length - 1) / 2 - i) * -15,
+                  rotate: `${((megaForms.length - 1) / 2 - i) * -36}deg`,
+                  marginTop: ((megaForms.length - 1) / 2 - i) * 15,
+                  marginBottom: ((megaForms.length - 1) / 2 - i) * -15,
                 }}
               />
               <TooltipPokemonIcon
                 nationalDex={nationalDex}
-                formIndex={mega.megaForme.formIndex}
+                formIndex={mega.megaForm.formIndex}
                 silhouette={
                   !getFormPokedexData(
                     pokedex,
                     nationalDex,
-                    mega.megaForme.formIndex
+                    mega.megaForm.formIndex
                   )?.level.includes('Caught')
                 }
-                onClick={() => onClick?.(nationalDex, mega.megaForme.formIndex)}
+                onClick={() => onClick?.(nationalDex, mega.megaForm.formIndex)}
               />
             </Flex>
           ))}

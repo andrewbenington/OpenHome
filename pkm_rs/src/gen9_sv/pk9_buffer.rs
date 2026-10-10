@@ -658,10 +658,10 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk9Buffer<S> {
 
     // pub fn set_species_and_form(&mut self, v: SpeciesForm) {
     //     if let Some(game_index) =
-    //         METADATA_TABLE_SV.get_game_index(v.get_ndex().index(), v.get_forme_index())
+    //         METADATA_TABLE_SV.get_game_index(v.get_ndex().index(), v.get_form_index())
     //     {
     //         self.set_species_game_index(game_index);
-    //         self.set_form_index(v.get_forme_index());
+    //         self.set_form_index(v.get_form_index());
     //     }
     // }
 

@@ -315,12 +315,12 @@ pub struct FormMetadata {
 }
 
 impl FormMetadata {
-    pub const fn forme_ref(&self) -> SpeciesForm {
+    pub const fn species_form(&self) -> SpeciesForm {
         unsafe { SpeciesForm::unchecked_form(self.national_dex, self.form_index) }
     }
 
     pub const fn species_metadata(&self) -> &SpeciesMetadata {
-        self.forme_ref().get_species_metadata()
+        self.species_form().get_species_metadata()
     }
 
     pub fn get_ability(&self, ability_num: AbilityNumber) -> AbilityIndexBounded {
@@ -333,19 +333,19 @@ impl FormMetadata {
 
     pub fn get_base_evolution(&self) -> SpeciesForm {
         match self.pre_evolution {
-            None => self.forme_ref(),
-            Some(forme_ref) => forme_ref.get_base_evolution(),
+            None => self.species_form(),
+            Some(species_form) => species_form.get_base_evolution(),
         }
     }
 
     pub fn is_evolution_of(&self, other: &FormMetadata) -> bool {
         other.evolutions.iter().any(|other_evo| {
-            *other_evo == self.forme_ref() || self.is_evolution_of(other_evo.get_form_metadata())
+            *other_evo == self.species_form() || self.is_evolution_of(other_evo.get_form_metadata())
         })
     }
 
     #[cfg(feature = "wasm")]
-    fn is_mega_forme_of(&self, other: &FormMetadata) -> bool {
+    fn is_mega_form_of(&self, other: &FormMetadata) -> bool {
         other
             .mega_evolution_data
             .iter()
@@ -353,7 +353,7 @@ impl FormMetadata {
     }
 
     pub const fn is_totem_form(&self) -> bool {
-        crate::variants::is_acquirable_totem_form(self.forme_ref())
+        crate::variants::is_acquirable_totem_form(self.species_form())
     }
 
     #[cfg(feature = "wasm")]
@@ -468,7 +468,7 @@ impl FormMetadata {
         self.evolutions.to_vec()
     }
 
-    #[wasm_bindgen(getter = formeName)]
+    #[wasm_bindgen(getter = formName)]
     pub fn form_name(&self) -> String {
         self.form_name.to_owned()
     }
@@ -534,7 +534,7 @@ impl FormMetadata {
     }
 
     #[wasm_bindgen(js_name = getMegaBaseForm)]
-    pub fn get_mega_base_forme(&self) -> Option<FormMetadata> {
+    pub fn get_mega_base_form(&self) -> Option<FormMetadata> {
         if !self.is_mega {
             return None;
         }
@@ -542,14 +542,14 @@ impl FormMetadata {
         self.species_metadata()
             .forms
             .iter()
-            .find(|other| self.is_mega_forme_of(other))
+            .find(|other| self.is_mega_form_of(other))
             .cloned()
     }
 
     #[wasm_bindgen(js_name = levelUpLearnset)]
     pub fn level_up_learnset(&self, source: Option<MetadataSource>) -> Option<Vec<LearnsetMoveJs>> {
         Some(
-            self.forme_ref()
+            self.species_form()
                 .get_levelup_learnset(source)?
                 .all_moves()
                 .into_iter()
@@ -560,19 +560,19 @@ impl FormMetadata {
 
     #[wasm_bindgen(js_name = moveMasteryLa)]
     pub fn move_mastery_la(&self) -> Option<Vec<LevelupLearnsetMove>> {
-        Some(self.forme_ref().get_move_mastery_la()?.all_moves())
+        Some(self.species_form().get_move_mastery_la()?.all_moves())
     }
 
     #[wasm_bindgen(js_name = plusMovesLza)]
     pub fn plus_moves_lza(&self) -> Option<Vec<LevelupLearnsetMove>> {
-        Some(self.forme_ref().get_plus_moves_lza()?.all_moves())
+        Some(self.species_form().get_plus_moves_lza()?.all_moves())
     }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Clone, Copy)]
 pub struct MegaEvolutionMetadata {
-    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = megaForme))]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = megaForm))]
     pub mega_form: SpeciesForm,
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = requiredItemId))]
     pub required_item_id: Option<u16>,
@@ -590,7 +590,7 @@ pub struct SpeciesMetadata {
 }
 
 impl SpeciesMetadata {
-    pub const fn get_forme(&self, form_index: usize) -> Option<&'static FormMetadata> {
+    pub const fn get_form(&self, form_index: usize) -> Option<&'static FormMetadata> {
         if form_index < self.forms.len() {
             Some(&self.forms[form_index])
         } else {

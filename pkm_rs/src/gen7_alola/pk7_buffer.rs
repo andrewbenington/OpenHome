@@ -678,7 +678,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk7Buffer<S> {
         self.set_u16_le(Offset::NationalDex, v);
     }
 
-    pub fn set_forme_index(&mut self, v: u8) {
+    pub fn set_form_index(&mut self, v: u8) {
         pkm_rs_types::write_uint5_to_bits(
             v,
             &mut self.bytes_mut()[Offset::FormIndexFatefulEncounterGender as usize],
@@ -688,7 +688,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk7Buffer<S> {
 
     pub fn set_species_and_form(&mut self, v: SpeciesForm) {
         self.set_species_ndex(v.get_ndex() as u16);
-        self.set_forme_index(v.get_form_index() as u8);
+        self.set_form_index(v.get_form_index() as u8);
     }
 
     pub fn set_held_item_index(&mut self, v: u16) {

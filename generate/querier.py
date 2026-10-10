@@ -111,7 +111,7 @@ class PokemonSpriteGroup(BaseModel):
         # if self.introduced_gen != 9 or not self.is_mega:
         #     return None
         segments = form.name.split("-")
-        forme_name = "-" + "_".join(segments[1:]).replace("%", "_Percent").replace(
+        form_name = "-" + "_".join(segments[1:]).replace("%", "_Percent").replace(
             "keball", "ké_Ball"
         ).replace("Paldea_Fire", "Paldea_Blaze").replace(
             "Paldea_Water", "Paldea_Aqua"
@@ -120,45 +120,45 @@ class PokemonSpriteGroup(BaseModel):
         ).replace(
             " ", "_"
         )
-        if "Totem" in forme_name:
+        if "Totem" in form_name:
             return ""
-        if forme_name in ["-Meadow", "-Four"]:
-            forme_name = ""
+        if form_name in ["-Meadow", "-Four"]:
+            form_name = ""
         elif "Pikachu-" in form.name:
-            forme_name = forme_name[1:2]
-        elif forme_name == "-La Reine":
-            forme_name = "-La_Reine"
+            form_name = form_name[1:2]
+        elif form_name == "-La Reine":
+            form_name = "-La_Reine"
         elif (
-            "_Cream" in forme_name
-            or "Caramel_Swirl" in forme_name
-            or "Rainbow_Swirl" in forme_name
+            "_Cream" in form_name
+            or "Caramel_Swirl" in form_name
+            or "Rainbow_Swirl" in form_name
         ) and self.sprite_source != SpriteSource.CHAMPIONS:
-            forme_name = forme_name[:-6]
+            form_name = form_name[:-6]
         elif form.name == "Tauros-Paldea":
-            forme_name = "-Paldea_Combat"
-        elif forme_name == "-Galar_Zen":
-            forme_name = "GZ"
-        elif forme_name == "-Original":
-            forme_name = "-Original_Color"
-        elif forme_name == "-Male_Mega" or forme_name == "-Female_Mega":
-            forme_name = "-Mega"
-        elif "-Mega_" in forme_name:
-            forme_name = forme_name.replace("-Mega_", "M")
-        elif "-Eternal" in forme_name:
-            forme_name = "E"
+            form_name = "-Paldea_Combat"
+        elif form_name == "-Galar_Zen":
+            form_name = "GZ"
+        elif form_name == "-Original":
+            form_name = "-Original_Color"
+        elif form_name == "-Male_Mega" or form_name == "-Female_Mega":
+            form_name = "-Mega"
+        elif "-Mega_" in form_name:
+            form_name = form_name.replace("-Mega_", "M")
+        elif "-Eternal" in form_name:
+            form_name = "E"
         elif self.is_female:
-            forme_name = "_f"
+            form_name = "_f"
 
         if self.sprite_source == SpriteSource.CHAMPIONS:
-            if forme_name == "-Super":
-                forme_name = "-Jumbo"
-            elif forme_name == "-Masterpiece" or "-Busted" in forme_name:
-                forme_name = ""
+            if form_name == "-Super":
+                form_name = "-Jumbo"
+            elif form_name == "-Masterpiece" or "-Busted" in form_name:
+                form_name = ""
 
         shiny_suffix = "_s" if self.is_shiny else ""
 
         if self.sprite_source == SpriteSource.HOME and "Vivillon" in form.name:
-            forme_name = forme_name[1:4]
+            form_name = form_name[1:4]
             shiny_suffix = "_s" if self.is_shiny else ""
 
         form_suffix = (
@@ -167,7 +167,7 @@ class PokemonSpriteGroup(BaseModel):
             and not (
                 form.national_dex == 666 or form.national_dex == 671 or self.is_female
             )
-            else forme_name
+            else form_name
         )
 
         bulbaFilePage = f"https://archives.bulbagarden.net/wiki/File:{self.sprite_source.prefix()}{str(form.national_dex).zfill(4)}{form_suffix}{shiny_suffix}.png"

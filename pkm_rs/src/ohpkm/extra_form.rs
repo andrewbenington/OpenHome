@@ -784,12 +784,12 @@ impl ExtraFormMetadata {
         }
     }
 
-    pub const fn forme_ref(&self) -> SpeciesForm {
+    pub const fn species_form(&self) -> SpeciesForm {
         unsafe { SpeciesForm::unchecked_form(self.national_dex, self.form_index) }
     }
 
     pub const fn species_metadata(&self) -> &SpeciesMetadata {
-        self.forme_ref().get_species_metadata()
+        self.species_form().get_species_metadata()
     }
 
     pub fn get_ability(&self, ability_num: AbilityNumber) -> AbilityIndexBounded {
@@ -802,8 +802,8 @@ impl ExtraFormMetadata {
 
     pub fn get_base_evolution(&self) -> SpeciesForm {
         match self.pre_evolution {
-            None => self.forme_ref(),
-            Some(forme_ref) => forme_ref.get_base_evolution(),
+            None => self.species_form(),
+            Some(species_form) => species_form.get_base_evolution(),
         }
     }
 
@@ -886,7 +886,7 @@ impl ExtraFormMetadata {
         self.evolutions.to_vec()
     }
 
-    #[wasm_bindgen(getter = formeName)]
+    #[wasm_bindgen(getter = formName)]
     pub fn form_name(&self) -> String {
         self.form_name.to_owned()
     }
