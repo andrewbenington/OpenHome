@@ -235,8 +235,8 @@ export class LGPESAV extends OfficialSAV<PB7> {
     return null
   }
 
-  supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
-    return !isRestricted(LGPE_TRANSFER_RESTRICTIONS, nationalDex, formeNumber, extraFormIndex)
+  supportsMon(nationalDex: number, formNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    return !isRestricted(LGPE_TRANSFER_RESTRICTIONS, nationalDex, formNumber, extraFormIndex)
   }
 
   supportsItem(itemIndex: number) {

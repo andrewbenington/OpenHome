@@ -88,7 +88,7 @@ export abstract class Gen8Gen9Save<P extends PK8 | PB8 | PA8 | PK9 | PA9> extend
 
   abstract supportsMon(
     nationalDex: number,
-    formeNumber: number,
+    formNumber: number,
     extraFormIndex?: ExtraFormIndex
   ): boolean
 

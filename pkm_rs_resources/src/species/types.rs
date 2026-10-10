@@ -353,7 +353,7 @@ impl FormMetadata {
 
     pub fn is_evolution_of(&self, other: &FormMetadata) -> bool {
         other.evolutions.iter().any(|other_evo| {
-            *other_evo == self.forme_ref() || self.is_evolution_of(other_evo.get_forme_metadata())
+            *other_evo == self.forme_ref() || self.is_evolution_of(other_evo.get_form_metadata())
         })
     }
 
@@ -708,7 +708,7 @@ impl SpeciesForm {
     }
 
     pub fn get_base_evolution(&self) -> SpeciesForm {
-        match self.get_forme_metadata().pre_evolution {
+        match self.get_form_metadata().pre_evolution {
             None => *self,
             Some(species_form) => species_form.get_base_evolution(),
         }
@@ -742,7 +742,7 @@ impl SpeciesForm {
         self.national_dex
     }
 
-    pub const fn get_forme_index(&self) -> u16 {
+    pub const fn get_form_index(&self) -> u16 {
         self.form_index
     }
 
@@ -766,7 +766,7 @@ impl SpeciesForm {
         super::get_ndex_species_metadata(self.national_dex)
     }
 
-    pub const fn get_forme_metadata(&self) -> &'static FormMetadata {
+    pub const fn get_form_metadata(&self) -> &'static FormMetadata {
         &self.get_species_metadata().forms[self.form_index as usize]
     }
 
@@ -808,7 +808,7 @@ impl Evolutions {
 
     pub fn not_including(first: SpeciesForm) -> Self {
         Self {
-            queue: first.get_forme_metadata().evolutions(),
+            queue: first.get_form_metadata().evolutions(),
         }
     }
 }
@@ -820,7 +820,7 @@ impl Iterator for Evolutions {
         let current = self.queue.pop()?;
 
         self.queue
-            .append(&mut current.get_forme_metadata().evolutions());
+            .append(&mut current.get_form_metadata().evolutions());
 
         Some(current)
     }
@@ -839,7 +839,7 @@ impl Preevolutions {
     pub fn not_including(first: SpeciesForm) -> Self {
         Self {
             queue: first
-                .get_forme_metadata()
+                .get_form_metadata()
                 .pre_evolution
                 .into_iter()
                 .collect(),
@@ -853,7 +853,7 @@ impl Iterator for Preevolutions {
     fn next(&mut self) -> Option<Self::Item> {
         let current = self.queue.pop()?;
 
-        if let Some(prevo) = current.get_forme_metadata().pre_evolution {
+        if let Some(prevo) = current.get_form_metadata().pre_evolution {
             self.queue.push(prevo);
         }
 
@@ -876,7 +876,7 @@ impl SpeciesForm {
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter = formIndex))]
-    pub fn get_forme_index_wasm(&self) -> u16 {
+    pub fn get_form_index_wasm(&self) -> u16 {
         self.form_index
     }
 
@@ -886,8 +886,8 @@ impl SpeciesForm {
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = getMetadata))]
-    pub fn get_forme_metadata_js(&self) -> FormMetadata {
-        self.get_forme_metadata().clone()
+    pub fn get_form_metadata_js(&self) -> FormMetadata {
+        self.get_form_metadata().clone()
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = tryNew))]
@@ -901,8 +901,8 @@ impl Randomize for SpeciesForm {
     fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
         let national_dex = NationalDex::randomized(rng);
         println!("randomized ndex: {}", national_dex);
-        let forme_count = national_dex.get_species_metadata().forms().len();
-        let form_index = rng.random_range(0..forme_count) as u16;
+        let form_count = national_dex.get_species_metadata().forms().len();
+        let form_index = rng.random_range(0..form_count) as u16;
         println!("randomized form: {}", form_index);
 
         Self {

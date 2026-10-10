@@ -82,20 +82,20 @@ const DraggableMon = (props: DraggableMonProps) => {
   })
   const draggingActive = useDraggingActive()
 
-  const formeNumber = useMemo(() => {
-    let formeNumber = mon.formIndex
+  const formNumber = useMemo(() => {
+    let formNumber = mon.formIndex
 
     if (isMegaStone(mon.heldItemIndex)) {
       const megaForStone = FullMetadataLookup(mon)?.megaEvolutions.find(
         (mega) => mega.requiredItemId === mon.heldItemIndex
       )
 
-      if (megaForStone) formeNumber = megaForStone.megaForme.formIndex
+      if (megaForStone) formNumber = megaForStone.megaForm.formIndex
     } else if (isBattleFormItem(mon.nationalDex, mon.heldItemIndex)) {
-      formeNumber = displayIndexAdder(mon.heldItemIndex)(mon.formIndex)
+      formNumber = displayIndexAdder(mon.heldItemIndex)(mon.formIndex)
     }
 
-    return formeNumber
+    return formNumber
   }, [mon])
 
   const topRightIndicatorComponent = useMemo(
@@ -117,7 +117,7 @@ const DraggableMon = (props: DraggableMonProps) => {
     >
       <PokemonIcon
         nationalDex={mon.nationalDex}
-        formIndex={formeNumber}
+        formIndex={formNumber}
         isShiny={showShiny && mon.isShiny()}
         gender={mon.gender}
         isEgg={mon.isEgg}

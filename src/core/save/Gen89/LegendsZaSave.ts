@@ -110,18 +110,13 @@ export class LegendsZaSave extends Gen8Gen9Save<PA9> {
     return BOX_SLOT_GAP_BYTES
   }
 
-  supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+  supportsMon(nationalDex: number, formNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
     const revision = this.scBlocks ? this.getSaveRevision() : 'Mega Dimension'
     switch (revision) {
       case 'Base Game':
-        return !isRestricted(
-          ZA_TRANSFER_RESTRICTIONS_BASE,
-          nationalDex,
-          formeNumber,
-          extraFormIndex
-        )
+        return !isRestricted(ZA_TRANSFER_RESTRICTIONS_BASE, nationalDex, formNumber, extraFormIndex)
       case 'Mega Dimension':
-        return !isRestricted(ZA_TRANSFER_RESTRICTIONS_MD, nationalDex, formeNumber, extraFormIndex)
+        return !isRestricted(ZA_TRANSFER_RESTRICTIONS_MD, nationalDex, formNumber, extraFormIndex)
     }
   }
 

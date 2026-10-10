@@ -88,9 +88,7 @@ impl Filter {
             Self::BaseEvolution(base_evo_ndex) => {
                 ohpkm.species_and_form().get_base_evolution().get_ndex() == *base_evo_ndex
             }
-            Self::FormIndex(form_index) => {
-                ohpkm.species_and_form().get_forme_index() == *form_index
-            }
+            Self::FormIndex(form_index) => ohpkm.species_and_form().get_form_index() == *form_index,
             Self::HasType(pkm_type) => {
                 ohpkm.type1() == *pkm_type || ohpkm.type2().is_some_and(|t2| t2 == *pkm_type)
             }

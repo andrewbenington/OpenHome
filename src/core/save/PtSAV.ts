@@ -76,8 +76,8 @@ export class PtSAV extends G4SAV {
     this.buildBoxes()
   }
 
-  supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
-    return !isRestricted(PT_TRANSFER_RESTRICTIONS, nationalDex, formeNumber, extraFormIndex)
+  supportsMon(nationalDex: number, formNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    return !isRestricted(PT_TRANSFER_RESTRICTIONS, nationalDex, formNumber, extraFormIndex)
   }
 
   supportsItem(itemIndex: number) {

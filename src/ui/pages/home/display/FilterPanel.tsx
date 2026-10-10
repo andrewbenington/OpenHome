@@ -163,10 +163,10 @@ export default function FilterPanel() {
             getOptionString={(opt) => opt.formeName}
             getOptionUniqueID={(opt) => opt.formIndex.toString()}
             value={
-              filter.formeNumber !== undefined ? currentMon.forms[filter.formeNumber] : undefined
+              filter.formNumber !== undefined ? currentMon.forms[filter.formNumber] : undefined
             }
             placeholder="Form"
-            onChange={(option) => setFilter({ formeNumber: option?.formIndex })}
+            onChange={(option) => setFilter({ formNumber: option?.formIndex })}
             getIconComponent={(currentForme) =>
               filter.nationalDex &&
               currentForme && (

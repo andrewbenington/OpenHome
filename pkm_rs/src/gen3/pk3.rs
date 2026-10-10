@@ -119,7 +119,7 @@ impl Pk3 {
             gender: pokemon_index
                 .to_national_dex()
                 .base_form()
-                .get_forme_metadata()
+                .get_form_metadata()
                 .gender_from_pid(personality_value),
             evs: buf.evs(),
             contest: buf.contest(),
@@ -336,8 +336,8 @@ impl HasSpeciesAndForm for Pk3 {
         self.species_and_form().get_species_metadata()
     }
 
-    fn get_forme_metadata(&self) -> &'static FormMetadata {
-        self.species_and_form().get_forme_metadata()
+    fn get_form_metadata(&self) -> &'static FormMetadata {
+        self.species_and_form().get_form_metadata()
     }
 
     fn calculate_level(&self) -> u8 {
@@ -398,7 +398,7 @@ impl Pk3 {
 
     #[wasm_bindgen(getter = formIndex)]
     pub fn form_index_js(&self) -> u16 {
-        self.species_and_form().get_forme_index()
+        self.species_and_form().get_form_index()
     }
 
     #[wasm_bindgen(getter = isNicknamed)]

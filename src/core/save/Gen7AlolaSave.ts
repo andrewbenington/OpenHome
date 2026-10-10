@@ -66,8 +66,8 @@ export class Gen7AlolaSave extends WasmOfficialSave<PK7, Pk7Wasm, Gen7AlolaSaveR
     return PK7.fromOhpkm(ohpkm, strategy)
   }
 
-  supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
-    return !isRestricted(USUM_TRANSFER_RESTRICTIONS, nationalDex, formeNumber, extraFormIndex)
+  supportsMon(nationalDex: number, formNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    return !isRestricted(USUM_TRANSFER_RESTRICTIONS, nationalDex, formNumber, extraFormIndex)
   }
 
   supportsItem(itemIndex: number) {

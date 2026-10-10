@@ -299,7 +299,7 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
     this.bytes.set(this.primarySave.bytes, this.primarySaveOffset)
   }
 
-  abstract supportsMon(nationalDex: number, formeNumber: number): boolean
+  abstract supportsMon(nationalDex: number, formNumber: number): boolean
 
   abstract getBoxCount(): number
 

@@ -60,7 +60,7 @@ impl Pk9SpeciesAndForm {
         if source_has_form_metadata(
             MetadataSource::ScarletViolet,
             species_and_form.get_ndex() as u16,
-            species_and_form.get_forme_index(),
+            species_and_form.get_form_index(),
         ) {
             Some(Self(species_and_form))
         } else {
@@ -100,7 +100,7 @@ impl TryFrom<SpeciesForm> for Pk9SpeciesAndForm {
         Self::try_new(value).ok_or(Error::other(&format!(
             "invalid species form for pk9: {}/{}",
             value.get_ndex(),
-            value.get_forme_index()
+            value.get_form_index()
         )))
     }
 }

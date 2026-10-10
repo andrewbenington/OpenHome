@@ -85,7 +85,7 @@ impl PokedexFlag {
             PokedexFlag::Male => ohpkm.gender() == pkm_rs_types::Gender::Male,
             PokedexFlag::Female => ohpkm.gender() == pkm_rs_types::Gender::Female,
             PokedexFlag::NsPokemon => ohpkm.is_ns_pokemon().is_some_and(is_true),
-            PokedexFlag::Totem => ohpkm.get_forme_metadata().is_totem_form(),
+            PokedexFlag::Totem => ohpkm.get_form_metadata().is_totem_form(),
             PokedexFlag::Gigantamax => ohpkm.can_gigantamax().is_some_and(is_true),
             PokedexFlag::Alpha => ohpkm.is_alpha().is_some_and(is_true),
             PokedexFlag::Titan => ohpkm.ribbons().includes(ModernRibbon::TitanMark),
@@ -198,7 +198,7 @@ impl Pokedex {
             && let Some(base_form) = acquirable_totem_base_form(species_form.get_ndex())
         {
             species_entry
-                .form_mut(base_form.get_forme_index())
+                .form_mut(base_form.get_form_index())
                 .flags
                 .insert(PokedexFlag::Totem);
         }
