@@ -1,10 +1,15 @@
 import { useDraggable } from '@dnd-kit/react'
-import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
-import { TopRightBadge } from '@openhome-ui/components/badge/TopRightBadge'
+import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
+import { displayIndexAdder, isBattleFormItem, isMegaStone } from '@openhome-core/pkm/util'
+import { PkmFormSpecifiers } from '@openhome-core/pkm/util/pkmInterface'
+import { FullMetadataLookup } from '@openhome-core/util'
+import {
+  TopRightBadge,
+  TopRightBadgelMon as TopRightBadgeMon,
+} from '@openhome-ui/components/badge/TopRightBadge'
 import { useDraggingActive } from '@openhome-ui/state-zustand/drag-and-drop/dragStore'
 import { MonWithLocation } from '@openhome-ui/state/saves'
-import { MetadataSummaryLookup } from '@pkm-rs/pkg'
+import { Gender } from '@pkm-rs/pkg'
 import { CSSProperties, useMemo } from 'react'
 import PokemonIcon from '../../components/PokemonIcon'
 import { MonDisplayState, TopRightBadgeType } from '../../hooks/monDisplay'
@@ -25,7 +30,7 @@ const getBackgroundDetails = (disabled?: boolean) => {
 interface DraggableMonProps {
   onClick: () => void
   disabled?: boolean
-  mon: PKMInterface
+  mon: DraggableMonData
   style: CSSProperties
   dragID?: string
   dragData?: MonWithLocation
@@ -36,10 +41,25 @@ interface DraggableMonProps {
   monDisplayState: MonDisplayState
 }
 
-type MonWithManagementData = PKMInterface & {
-  tags?: MonTag[]
-  notes?: string
-}
+export type DraggableMonData = PkmFormSpecifiers &
+  TopRightBadgeMon & {
+    heldItemIndex: number
+    nickname: string
+
+    gender?: Gender
+
+    personalityValue?: number
+
+    isNicknamed?: boolean
+    isShiny: () => boolean
+    isEgg?: boolean
+
+    tags?: MonTag[]
+    notes?: string
+    displayColor?: string
+
+    openhomeId?: OhpkmIdentifier
+  }
 
 const DraggableMon = (props: DraggableMonProps) => {
   const {
@@ -61,24 +81,22 @@ const DraggableMon = (props: DraggableMonProps) => {
     disabled: disabled || !dragID,
   })
   const draggingActive = useDraggingActive()
-  const monWithManagement = mon as MonWithManagementData
 
   const formeNumber = useMemo(() => {
     let formeNumber = mon.formIndex
 
     if (isMegaStone(mon.heldItemIndex)) {
-      const megaForStone = MetadataSummaryLookup(
-        mon.nationalDex,
-        mon.formIndex
-      )?.megaEvolutions.find((mega) => mega.requiredItemId === mon.heldItemIndex)
+      const megaForStone = FullMetadataLookup(mon)?.megaEvolutions.find(
+        (mega) => mega.requiredItemId === mon.heldItemIndex
+      )
 
       if (megaForStone) formeNumber = megaForStone.megaForme.formIndex
-    } else if (isBattleFormeItem(mon.nationalDex, mon.heldItemIndex)) {
+    } else if (isBattleFormItem(mon.nationalDex, mon.heldItemIndex)) {
       formeNumber = displayIndexAdder(mon.heldItemIndex)(mon.formIndex)
     }
 
     return formeNumber
-  }, [mon.nationalDex, mon.formIndex, mon.heldItemIndex])
+  }, [mon])
 
   const topRightIndicatorComponent = useMemo(
     () => (topRightIndicator ? <TopRightBadge badgeType={topRightIndicator} mon={mon} /> : <></>),
@@ -111,10 +129,8 @@ const DraggableMon = (props: DraggableMonProps) => {
         grayedOut={disabled}
         topRightIndicator={topRightIndicatorComponent}
         extraFormIndex={mon.extraFormIndex}
-        tags={monWithManagement.tags}
-        hasNotes={
-          typeof monWithManagement.notes === 'string' && monWithManagement.notes.trim().length > 0
-        }
+        tags={mon.tags}
+        hasNotes={typeof mon.notes === 'string' && mon.notes.trim().length > 0}
         monDisplayState={monDisplayState}
       />
     </div>

@@ -1,12 +1,12 @@
 import BackendInterface from '@openhome-core/backend/backendInterface'
 import useBackend from '@openhome-core/backend/useBackend'
-import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
+import { displayIndexAdder, isBattleFormItem, isMegaStone } from '@openhome-core/pkm/util'
+import { FullMetadataLookup } from '@openhome-core/util'
 import { Option, R } from '@openhome-core/util/functional'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getPokemonSpritePath } from '@openhome-ui/images/pokemon'
 import { MonSpriteData, OpenHomePlugin, PluginContext } from '@openhome-ui/state/plugin/reducer'
-import { MetadataSummaryLookup } from '@pkm-rs/pkg'
 import { useContext, useEffect, useState } from 'react'
 
 type PluginSpriteResult = {
@@ -43,12 +43,12 @@ export function getMonSprite(
   enabledPlugins: OpenHomePlugin[]
 ): GetMonSpriteResult {
   if (isMegaStone(mon.heldItemIndex)) {
-    const megaForStone = MetadataSummaryLookup(mon.nationalDex, mon.formIndex)?.megaEvolutions.find(
+    const megaForStone = FullMetadataLookup(mon)?.megaEvolutions.find(
       (mega) => mega.requiredItemId === mon.heldItemIndex
     )
 
     if (megaForStone) mon.formIndex = megaForStone.megaForme.formIndex
-  } else if (isBattleFormeItem(mon.nationalDex, mon.heldItemIndex)) {
+  } else if (isBattleFormItem(mon.nationalDex, mon.heldItemIndex)) {
     mon.formIndex = displayIndexAdder(mon.heldItemIndex)(mon.formIndex)
   }
 
@@ -87,13 +87,12 @@ export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
     if (spriteResult.errorMessage || spriteResult.path) return
 
     if (isMegaStone(mon.heldItemIndex)) {
-      const megaForStone = MetadataSummaryLookup(
-        mon.nationalDex,
-        mon.formIndex
-      )?.megaEvolutions.find((mega) => mega.requiredItemId === mon.heldItemIndex)
+      const megaForStone = FullMetadataLookup(mon)?.megaEvolutions.find(
+        (mega) => mega.requiredItemId === mon.heldItemIndex
+      )
 
       if (megaForStone) mon.formIndex = megaForStone.megaForme.formIndex
-    } else if (isBattleFormeItem(mon.nationalDex, mon.heldItemIndex)) {
+    } else if (isBattleFormItem(mon.nationalDex, mon.heldItemIndex)) {
       mon.formIndex = displayIndexAdder(mon.heldItemIndex)(mon.formIndex)
     }
 

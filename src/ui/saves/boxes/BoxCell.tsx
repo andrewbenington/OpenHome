@@ -1,7 +1,10 @@
 import useBackend from '@openhome-core/backend/useBackend'
 import { bytesToPKM } from '@openhome-core/pkm/FileImport'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { DisplayDataOhpkm } from '@openhome-core/pkm/util/pkmInterface'
+import { TopRightBadgelMon as TopRightBadgeMon } from '@openhome-ui/components/badge/TopRightBadge'
 import {
   CtxMenuElementBuilder,
   Item,
@@ -14,7 +17,7 @@ import useDisplayError from '@openhome-ui/hooks/displayError'
 import { useMonDisplay } from '@openhome-ui/hooks/monDisplay'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
-import { filterApplies } from '@openhome-ui/util/filter'
+import { FilterableMon, filterApplies } from '@openhome-ui/util/filter'
 import { PokedexUpdate, updatesFromMon } from '@openhome-ui/util/pokedex'
 import { DISPLAY_COLOR_PRESETS, TAG_PRESETS } from '@openhome-ui/util/tags'
 import { Lookup } from '@pkm-rs/pkg'
@@ -26,8 +29,8 @@ import DroppableSpace from './DroppableSpace'
 
 type MonWithOpenHomeId = PKMInterface & { openhomeId: string }
 
-function hasOpenHomeId(mon: PKMInterface): mon is MonWithOpenHomeId {
-  return typeof (mon as { openhomeId?: unknown }).openhomeId === 'string'
+function hasOpenHomeId(mon: { openhomeId?: string }): mon is MonWithOpenHomeId {
+  return typeof mon.openhomeId === 'string'
 }
 
 interface BoxCellProps {
@@ -37,7 +40,7 @@ interface BoxCellProps {
   disabled?: boolean
   loading?: boolean
   disabledReason?: string
-  mon: PKMInterface | undefined
+  mon: BoxCellMon | undefined
   borderColor?: string
   dragID: string
   location: MonLocation
@@ -47,6 +50,19 @@ interface BoxCellProps {
   multiSelectEnabled?: boolean
   style?: CSSProperties
 }
+
+export type BoxCellMon = FilterableMon &
+  TopRightBadgeMon &
+  DisplayDataOhpkm & {
+    heldItemIndex: number
+    nickname: string
+
+    isNicknamed?: boolean
+    isShiny: () => boolean
+    formArgument?: number
+
+    openhomeId?: OhpkmIdentifier
+  }
 
 function BoxCell(props: BoxCellProps) {
   const { onClick, onDrop, disabled, disabledReason, mon, borderColor, dragID } = props
