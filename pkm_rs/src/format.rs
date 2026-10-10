@@ -341,7 +341,7 @@ impl PkmFormat {
             };
         }
 
-        if matches!(self, Self::PA8 | Self::PA8 | Self::PA8 | Self::PA8) {
+        if matches!(self, Self::PA8 | Self::PB8 | Self::PK9 | Self::PA9) {
             return if original_origin.is_frlg_switch() {
                 super::location::DISTANT_LAND_FRLG_SWITCH
             } else {
