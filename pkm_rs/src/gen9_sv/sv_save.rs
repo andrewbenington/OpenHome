@@ -24,32 +24,36 @@ const SAVE_SIZE_BYTES_MAX: usize = 0x43c000;
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = ScarletVioletSaveRust))]
 #[derive(Debug)]
 pub struct ScarletVioletSave {
-    bytes: Box<[u8]>,
     blocks: SvBlocks,
+    byte_length: usize,
 }
 
 impl ScarletVioletSave {
     pub fn from_bytes(bytes: Box<[u8]>) -> Result<Self> {
-        if bytes.len() < SAVE_SIZE_BYTES_MIN {
+        let byte_length = bytes.len();
+        if byte_length < SAVE_SIZE_BYTES_MIN {
             return Err(Error::buffer_size_with_source(
                 "scarlet/violet save file min",
                 SAVE_SIZE_BYTES_MIN,
-                bytes.len(),
+                byte_length,
             ));
-        } else if bytes.len() > SAVE_SIZE_BYTES_MAX {
+        } else if byte_length > SAVE_SIZE_BYTES_MAX {
             return Err(Error::buffer_size_with_source(
                 "scarlet/violet save file max",
                 SAVE_SIZE_BYTES_MAX,
-                bytes.len(),
+                byte_length,
             ));
         }
 
         let blocks = SvBlocks::from_blocks(
-            SwishBlocks::from_bytes(&bytes)
+            SwishBlocks::from_bytes(bytes)
                 .map_err(|e| Error::other(&format!("SwishBlocks from_bytes: {e}")))?,
         )?;
 
-        Ok(Self { bytes, blocks })
+        Ok(Self {
+            blocks,
+            byte_length,
+        })
     }
 
     const fn my_status(&self) -> &MyStatusFields {
@@ -152,13 +156,8 @@ impl ScarletVioletSave {
     #[cfg(feature = "wasm")]
     pub fn prepare_bytes_for_saving(&self) -> Vec<u8> {
         swish_crypto::encrypt_blocks(
-            &self
-                .blocks
-                .clone()
-                .to_blocks()
-                .into_values()
-                .collect::<Vec<_>>(),
-            self.bytes.len(),
+            self.blocks.to_blocks().into_values().collect(),
+            self.byte_length,
         )
     }
 
@@ -473,7 +472,7 @@ mod tests {
     fn blocks_identical_after_serde() -> std::result::Result<(), Box<dyn std::error::Error>> {
         let save_path = Path::new("gen9-sv").join("violet");
         let save_bytes = tests::save_bytes_from_file(&save_path)?;
-        let block_vec = swish_crypto::decrypt_blocks(&save_bytes)?;
+        let block_vec = swish_crypto::decrypt_blocks(save_bytes.clone().into_boxed_slice())?;
 
         let mut original_blocks_by_key: HashMap<u32, swish_crypto::Block> = HashMap::new();
         for block in &block_vec {
@@ -489,7 +488,7 @@ mod tests {
 
         let after_serialized_bytes = save.prepare_bytes_for_saving();
 
-        let block_vec = swish_crypto::decrypt_blocks(&after_serialized_bytes)?;
+        let block_vec = swish_crypto::decrypt_blocks(after_serialized_bytes.into_boxed_slice())?;
         for block in &block_vec {
             let key = block.key();
             let Some(original_block) = original_blocks_by_key.get(&key) else {

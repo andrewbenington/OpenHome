@@ -18,10 +18,10 @@ const STATIC_XOR_PAD: [u8; PAD_LENGTH] = [
 ];
 
 // with compiler optimizations the iterator is erased completely (at least on x86)
-fn crypt_static_xor_pad_bytes(data: &[u8]) -> Vec<u8> {
-    data.iter()
+fn crypt_static_xor_pad_bytes_in_place(data: &mut [u8]) {
+    data.iter_mut()
         .zip(STATIC_XOR_PAD.iter().cycle())
-        .map(|(val, pad)| val ^ pad)
+        .map(|(val, pad)| *val ^= pad)
         .collect()
 }
 
@@ -36,12 +36,17 @@ fn read_blocks(data: &[u8]) -> Result<Vec<Block>, SwishError> {
     Ok(result)
 }
 
+#[allow(
+    clippy::boxed_local,
+    reason = "buffer length remains the same, but the data is mutated so ownership should be passed."
+)]
 #[wasm_bindgen(js_name = decryptBlocks)]
-pub fn decrypt_blocks(data: &[u8]) -> Result<Vec<Block>, SwishError> {
-    let data_before_hash = &data[..data.len() - super::HASH_SIZE];
-    let data_after_xor = crypt_static_xor_pad_bytes(data_before_hash);
+pub fn decrypt_blocks(mut data: Box<[u8]>) -> Result<Vec<Block>, SwishError> {
+    let data_length = data.len();
+    let data_before_hash = &mut data[..data_length - super::HASH_SIZE];
+    crypt_static_xor_pad_bytes_in_place(data_before_hash);
 
-    read_blocks(&data_after_xor)
+    read_blocks(data_before_hash)
 }
 
 #[wasm_bindgen(js_name = writeBlock)]
@@ -50,7 +55,7 @@ pub fn write_block(block: &Block, bytes: &mut [u8], offset: usize) -> usize {
     block.write_encrypted(&mut writer)
 }
 
-fn write_blocks(blocks: &[Block], size: usize) -> Vec<u8> {
+fn write_blocks(blocks: Box<[Block]>, size: usize) -> Vec<u8> {
     let mut buffer = vec![0u8; size];
     let mut writer = Writer::new(&mut buffer);
 
@@ -64,9 +69,9 @@ fn write_blocks(blocks: &[Block], size: usize) -> Vec<u8> {
     buffer
 }
 
-pub fn encrypt_blocks(blocks: &[Block], size: usize) -> Vec<u8> {
-    let encrypted_blocks = write_blocks(blocks, size);
-    let mut encrypted_bytes = crypt_static_xor_pad_bytes(&encrypted_blocks);
+pub fn encrypt_blocks(blocks: Box<[Block]>, size: usize) -> Vec<u8> {
+    let mut encrypted_bytes = write_blocks(blocks, size);
+    crypt_static_xor_pad_bytes_in_place(&mut encrypted_bytes);
 
     let hash = super::hash::compute_hash(&encrypted_bytes);
     encrypted_bytes.extend_from_slice(&hash);
@@ -76,7 +81,7 @@ pub fn encrypt_blocks(blocks: &[Block], size: usize) -> Vec<u8> {
 
 #[wasm_bindgen(js_name = encryptBlocks)]
 pub fn encrypt_blocks_js(blocks: Box<[Block]>, size: usize) -> Vec<u8> {
-    encrypt_blocks(&blocks, size)
+    encrypt_blocks(blocks, size)
 }
 
 #[cfg_attr(
@@ -184,10 +189,6 @@ impl Block {
         }
 
         writer.current_offset()
-    }
-
-    pub fn to_bytes(&self) -> Vec<u8> {
-        self.data.to_bytes()
     }
 
     pub fn into_numeric_data(self) -> std::result::Result<NumericBlock, SwishError> {
