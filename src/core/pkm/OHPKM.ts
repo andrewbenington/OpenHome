@@ -40,7 +40,6 @@ import {
   Lookup,
   MetadataSummaryLookup,
   NatureIndex,
-  OriginGame,
   OriginGames,
   PkmFormat,
   PlusMoveFlags,
@@ -147,20 +146,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       }
 
       this.language = other.language
-
-      if (
-        // handle FRLG-Switch origin
-        ['PB8', 'PA8', 'PA9'].includes(other.format) &&
-        other.gameOfOrigin === OriginGame.Invalid0 &&
-        other.metLocationIndex === 30007
-      ) {
-        this.gameOfOrigin = OriginGame.FireRedSwitch
-        this.metLocationIndex = 254
-      } else {
-        this.gameOfOrigin = other.gameOfOrigin
-        this.metLocationIndex = other.metLocationIndex ?? 0
-      }
-
+      this.gameOfOrigin = other.gameOfOrigin
       this.gameOfOriginBattle = other.gameOfOriginBattle
       this.pluginOrigin = other.pluginOrigin
       this.isEgg = other.isEgg ?? false
@@ -202,6 +188,17 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
       this.ball = other.ball !== undefined ? other.ball : Ball.Poke
       this.markings = markingsSixShapesWithColorFromOther(other.markings)
+
+      if (
+        // handle FRLG (Switch) met location
+        ['PB8', 'PA8', 'PA9'].includes(other.format) &&
+        OriginGames.isFrlgSwitch(other.gameOfOrigin) &&
+        other.metLocationIndex === 30007
+      ) {
+        this.metLocationIndex = 254
+      } else {
+        this.metLocationIndex = other.metLocationIndex ?? 0
+      }
 
       this.metLevel = other.metLevel ?? 0
 
@@ -381,28 +378,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   static fromMonInSave(mon: PKMInterface, save: SAV): OHPKM {
     const ohpkm = OHPKM.fromMonUnknownSave(mon)
     ohpkm.syncWithGameData(mon, save)
-
-    if (
-      // handle FRLG-Switch origin
-      ['PB8', 'PA8', 'PA9'].includes(mon.format) &&
-      mon.gameOfOrigin === OriginGame.Invalid0 &&
-      mon.metLocationIndex === 30007
-    ) {
-      if (
-        [
-          OriginGame.Shield,
-          OriginGame.ShiningPearl,
-          OriginGame.Violet,
-          OriginGame.LegendsZa,
-        ].includes(save.origin)
-      ) {
-        ohpkm.gameOfOrigin = OriginGame.LeafGreenSwitch
-      } else ohpkm.gameOfOrigin = OriginGame.FireRedSwitch
-      ohpkm.metLocationIndex = 254
-    } else {
-      ohpkm.gameOfOrigin = mon.gameOfOrigin
-      ohpkm.metLocationIndex = mon.metLocationIndex ?? 0
-    }
 
     return ohpkm
   }

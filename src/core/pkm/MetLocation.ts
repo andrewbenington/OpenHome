@@ -32,7 +32,7 @@ export function getLocationStringOrOrigin(
   } else if (format === 'PB8' && !OriginGames.isBdsp(game)) {
     if (game === OriginGame.LegendsArceus) {
       return 'in the Sinnoh region of old' // todo: i18n
-    } else if (game === OriginGame.Invalid0 || OriginGames.isFrlgSwitch(game)) {
+    } else if (OriginGames.isFrlgSwitch(game)) {
       return 'in a distant land' // todo: i18n
     }
     return game <= OriginGame.Shield
@@ -41,21 +41,21 @@ export function getLocationStringOrOrigin(
   } else if (format === 'PA8' && game !== OriginGame.LegendsArceus) {
     if (OriginGames.isBdsp(game)) {
       return 'in the Sinnoh region made new' // todo: i18n
-    } else if (game === OriginGame.Invalid0 || OriginGames.isFrlgSwitch(game)) {
+    } else if (OriginGames.isFrlgSwitch(game)) {
       return 'in a distant land' // todo: i18n
     }
     return game <= OriginGame.ShiningPearl
       ? `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
       : FARAWAY_PLACE_STRING
   } else if (format === 'PK9' && !OriginGames.isScarletViolet(game)) {
-    if (game === OriginGame.Invalid0 || OriginGames.isFrlgSwitch(game)) {
+    if (OriginGames.isFrlgSwitch(game)) {
       return 'in a distant land' // todo: i18n
     }
     return game <= OriginGame.Violet
       ? `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
       : FARAWAY_PLACE_STRING
   } else if (format === 'PA9' && game !== OriginGame.LegendsZa) {
-    if (game === OriginGame.Invalid0 || OriginGames.isFrlgSwitch(game)) {
+    if (OriginGames.isFrlgSwitch(game)) {
       return 'in a distant land' // todo: i18n
     }
     return game <= OriginGame.LegendsZa
@@ -73,6 +73,10 @@ export const getLocationString = (
 ) => {
   if (game <= OriginGame.White && index === 30001) {
     return 'at the Poké Transfer Lab' // todo: i18n
+  }
+
+  if (OriginGames.isSwSh(game) && index >= 59994 && index <= 60000) {
+    return 'in a faraway place' // todo: i18n
   }
 
   const location = Lookup.locationName(game, language, index)

@@ -183,9 +183,7 @@ impl PkmFormat {
             Self::PK7 => origin <= OriginGame::Crystal,
             Self::PB7 => origin.is_lets_go() || origin == OriginGame::Go,
             Self::PK8 => origin <= OriginGame::Shield,
-            Self::PA8 | Self::PB8 => origin <= OriginGame::ShiningPearl,
-            Self::PK9 => origin <= OriginGame::Violet,
-            Self::PA9 => origin <= OriginGame::LegendsZa,
+            Self::PA8 | Self::PB8 | Self::PK9 | Self::PA9 => origin <= OriginGame::LeafGreenSwitch,
             Self::PK3RR => origin.generation() == Generation::G3,
             Self::PK3UB => origin.generation() == Generation::G3,
             Self::PB8LUMI => origin <= OriginGame::ShiningPearl,
@@ -282,30 +280,16 @@ impl PkmFormat {
 
                 _ => LetsGoEevee,
             },
-            // Pokémon HOME's game of origin handling is replicated for officially-supported transfer methods, warts and all
-            // this includes setting Invalid0 for FRLG-Switch origin in PA8 thru PA9
+            // Pokémon HOME's game of origin handling is replicated for officially-supported transfer methods
             Self::PK8 => match origin {
                 // all transfers from future games of origin always set SwSh origin, likely to permit Battle Stadium usage without wiping moves
-                LeafGreenSwitch => Shield,
+                ShiningPearl | Violet | LegendsZa | LeafGreenSwitch => Shield,
                 _ => Sword,
             },
-            Self::PA8 => match origin {
-                FireRedSwitch | LeafGreenSwitch => Invalid0,
-                _ => LegendsArceus,
-            },
-            Self::PB8 => match origin {
-                FireRedSwitch | LeafGreenSwitch => Invalid0,
-                _ => ShiningPearl,
-            },
-            Self::PK9 => match origin {
-                LegendsZa => X,
-                FireRedSwitch | LeafGreenSwitch => Invalid0,
-                _ => Violet,
-            },
-            Self::PA9 => match origin {
-                FireRedSwitch | LeafGreenSwitch => Invalid0,
-                _ => LegendsZa,
-            },
+            Self::PA8 => LegendsArceus,
+            Self::PB8 => ShiningPearl,
+            Self::PK9 => Violet,
+            Self::PA9 => LegendsZa,
             Self::PK3RR => FireRed,
             Self::PK3UB => FireRed,
             Self::PB8LUMI => ShiningPearl,
@@ -343,7 +327,8 @@ impl PkmFormat {
         if self == Self::PK8 {
             return if original_origin >= OriginGame::LegendsArceus {
                 match original_origin {
-                    origin if origin.is_frlg_switch() => 0,
+                    OriginGame::LeafGreenSwitch => 59994,
+                    OriginGame::FireRedSwitch => 59995,
                     OriginGame::Violet => 59996,
                     OriginGame::Scarlet => 59997,
                     OriginGame::ShiningPearl => 59998,
