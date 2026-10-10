@@ -116,6 +116,18 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
         )
 
         this.personalityValue = prng.nextInt(0, 0xffffffff)
+        // if Shiny, reroll PID until valid
+        if (other.isShiny()) {
+          while (
+            ((this.personalityValue & 0xffff) ^
+              ((this.personalityValue >> 16) & 0xffff) ^
+              (other.trainerID & 0xffff) ^
+              0) >
+            16
+          ) {
+            this.personalityValue = prng.nextInt(0, 0xffffffff)
+          }
+        }
       } else {
         prng = new Prando(other.trainerName.concat(other.trainerID.toString()))
       }
