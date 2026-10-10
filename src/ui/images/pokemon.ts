@@ -1,7 +1,7 @@
 import { isRomHackFormat } from '@openhome-core/pkm/interfaces'
 import {
   displayIndexAdder,
-  isBattleFormeItem as isBattleFormItem,
+  isBattleFormItem,
   isMegaStone,
   PkmOrOhpkmFormat,
 } from '@openhome-core/pkm/util'
@@ -18,13 +18,9 @@ import { RRSprites } from '@openhome-core/save/radicalred/conversion/RadicalRedS
 import { toRadicalRedPokemonIndex } from '@openhome-core/save/radicalred/conversion/species'
 import { toUnboundPokemonIndex } from '@openhome-core/save/unbound/conversion/UnboundSpeciesMap'
 import { UBSprites } from '@openhome-core/save/unbound/conversion/UnboundSprites'
+import { FullMetadataLookup } from '@openhome-core/util'
 import { MonSpriteData } from '@openhome-ui/state/plugin/reducer'
-import {
-  ExtraFormIndex,
-  extraFormSpriteName,
-  isSeviiForm,
-  MetadataSummaryLookup,
-} from '@pkm-rs/pkg'
+import { ExtraFormIndex, extraFormSpriteName, isSeviiForm } from '@pkm-rs/pkg'
 
 export type PokemonImageSource = {
   directory: string
@@ -117,7 +113,7 @@ export const getPokemonSpritePathFromSource = (
   monFormat?: string
 ) => {
   if (isMegaStone(mon.heldItemIndex)) {
-    const megaForStone = MetadataSummaryLookup(mon.nationalDex, mon.formIndex)?.megaEvolutions.find(
+    const megaForStone = FullMetadataLookup(mon)?.megaEvolutions.find(
       (mega) => mega.requiredItemId === mon.heldItemIndex
     )
 
@@ -165,7 +161,7 @@ export const getPokemonSpritePathFromSource = (
 }
 
 export function getSpriteName(mon: MonSpriteData, format?: string): string {
-  const formeMetadata = MetadataSummaryLookup(mon.nationalDex, mon.formIndex)
+  const formeMetadata = FullMetadataLookup(mon)
   if (!formeMetadata) return ''
   let spriteName = formeMetadata?.sprite ?? ''
 

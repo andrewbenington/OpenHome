@@ -1,4 +1,4 @@
-import { displayIndexAdder, isBattleFormeItem } from '@openhome-core/pkm'
+import { displayIndexAdder, isBattleFormItem } from '@openhome-core/pkm'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { isPluginGame, PluginIdentifier, SAV } from '@openhome-core/save/interfaces'
 import * as SpectaGenerated from '@openhome-core/tauri/spectaCommands'
@@ -41,7 +41,7 @@ export function pokedexUpdatesFromSave(saveFile: SAV) {
       data,
     })
 
-    if (isBattleFormeItem(mon.nationalDex, mon.heldItemIndex)) {
+    if (isBattleFormItem(mon.nationalDex, mon.heldItemIndex)) {
       pokedexUpdates.push({
         nationalDex: mon.nationalDex,
         formIndex: displayIndexAdder(mon.heldItemIndex)(mon.formIndex),
@@ -109,7 +109,7 @@ export function updatesFromMon(
     data: pokedexCaughtEntryFromMon(mon, game),
   })
 
-  if (isBattleFormeItem(mon.nationalDex, mon.heldItemIndex)) {
+  if (isBattleFormItem(mon.nationalDex, mon.heldItemIndex)) {
     pokedexUpdates.push({
       nationalDex: mon.nationalDex,
       formIndex: displayIndexAdder(mon.heldItemIndex)(mon.formIndex),

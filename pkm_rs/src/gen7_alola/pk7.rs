@@ -400,7 +400,7 @@ impl HasSpeciesAndForm for Pk7 {
 
     fn calculate_level(&self) -> u8 {
         self.get_species_metadata()
-            .level_up_type
+            .experience_growth
             .calculate_level(self.exp)
     }
 }

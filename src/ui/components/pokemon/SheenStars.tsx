@@ -1,13 +1,13 @@
 import { COLOPKM, PK3, XDPKM } from '@openhome-core/pkm'
-import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { ContestDataPkm, FormatPkm } from '@openhome-core/pkm/util/pkmInterface'
 import { range } from '@openhome-core/util/functional'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 
 interface SheenStarsProps {
-  mon: PKMInterface
+  mon: FormatPkm & ContestDataPkm
 }
 
-const getSheenStars = (mon: PKMInterface) => {
+const getSheenStars = (mon: ContestDataPkm) => {
   if (!mon.contest) {
     return 0
   }
@@ -72,6 +72,6 @@ export default function SheenStars({ mon }: SheenStarsProps) {
   )
 }
 
-function isGen3(mon: PKMInterface) {
+function isGen3(mon: FormatPkm) {
   return mon instanceof PK3 || mon instanceof COLOPKM || mon instanceof XDPKM
 }

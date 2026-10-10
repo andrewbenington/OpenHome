@@ -3,6 +3,7 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
 import { monSupportedBySave } from '@openhome-core/save/util'
+import { FullMetadataLookup } from '@openhome-core/util'
 import { $R, Option, R, range, Result } from '@openhome-core/util/functional'
 import { $O } from '@openhome-core/util/option'
 import { isThenable, NowOrLater } from '@openhome-core/util/promise'
@@ -23,7 +24,6 @@ import useOhpkmBatchIdLookup from '@openhome-ui/state/ohpkm/useOhpkmIdBatchLooku
 import useTrackedDataRecovery from '@openhome-ui/state/ohpkm/useTrackedDataRecovery'
 import { EMPTY_SLOT, MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { colorIsDark } from '@openhome-ui/util/color'
-import { MetadataSummaryLookup } from '@pkm-rs/pkg'
 import { Button, Dialog, Flex, Grid, Separator } from '@radix-ui/themes'
 import { useContext, useMemo, useState } from 'react'
 import { MdClose } from 'react-icons/md'
@@ -109,7 +109,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           title: 'Import Failed',
           messages: unsupportedMons.map(
             (mon) =>
-              `${MetadataSummaryLookup(mon.nationalDex, mon.formIndex)?.formeName} cannot be moved into ${save.gameNameFull}`
+              `${FullMetadataLookup(mon)?.formeName} cannot be moved into ${save.gameNameFull}`
           ),
         },
       })

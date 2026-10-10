@@ -3,10 +3,10 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import {
   Gen12Identifier,
   Gen345Identifier,
-  getMonFileIdentifier,
   getMonGen12Identifier,
   getMonGen345Identifier,
   OhpkmIdentifier,
+  tryCalculateIdentifier,
 } from '@openhome-core/pkm/Lookup'
 import {
   BDSP_TRANSFER_RESTRICTIONS,
@@ -340,7 +340,7 @@ function searchSaveForMon(save: SAV, id: OhpkmIdentifier): Option<SaveSearchResu
   for (const boxIndex of range(save.getBoxCount())) {
     for (const boxSlot of range(save.boxSlotCount)) {
       const mon = save.getMonAt(boxIndex, boxSlot)
-      if (mon && getMonFileIdentifier(mon) === id) {
+      if (mon && tryCalculateIdentifier(mon) === id) {
         return {
           match: mon,
           location: { box: boxIndex, boxSlot },

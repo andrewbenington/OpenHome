@@ -1,6 +1,6 @@
 use crate::abilities::AbilityIndexBounded;
 use crate::species::{
-    EggGroup, FormMetadata, GenderRatio, LevelUpType, MegaEvolutionMetadata, SpeciesForm,
+    EggGroup, ExperienceGrowth, FormMetadata, GenderRatio, MegaEvolutionMetadata, SpeciesForm,
     SpeciesMetadata,
 };
 use pkm_rs_types::{GameSetting, Generation, NationalDex};
@@ -18,7 +18,7 @@ pub fn all_species_data() -> Vec<SpeciesMetadata> {
 pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     SpeciesMetadata {
         national_dex: NationalDex::Bulbasaur,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Bulbasaur,
             form_name: "Bulbasaur",
@@ -52,7 +52,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Ivysaur,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Ivysaur,
             form_name: "Ivysaur",
@@ -86,7 +86,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Venusaur,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Venusaur,
@@ -155,7 +155,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Charmander,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Charmander,
             form_name: "Charmander",
@@ -189,7 +189,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Charmeleon,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Charmeleon,
             form_name: "Charmeleon",
@@ -223,7 +223,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Charizard,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Charizard,
@@ -332,7 +332,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Squirtle,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Squirtle,
             form_name: "Squirtle",
@@ -366,7 +366,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Wartortle,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Wartortle,
             form_name: "Wartortle",
@@ -400,7 +400,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Blastoise,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Blastoise,
@@ -469,7 +469,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Caterpie,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Caterpie,
             form_name: "Caterpie",
@@ -503,7 +503,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Metapod,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Metapod,
             form_name: "Metapod",
@@ -537,7 +537,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Butterfree,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Butterfree,
             form_name: "Butterfree",
@@ -571,7 +571,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Weedle,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Weedle,
             form_name: "Weedle",
@@ -605,7 +605,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Kakuna,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Kakuna,
             form_name: "Kakuna",
@@ -639,7 +639,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Beedrill,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Beedrill,
@@ -708,7 +708,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Pidgey,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Pidgey,
             form_name: "Pidgey",
@@ -742,7 +742,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Pidgeotto,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Pidgeotto,
             form_name: "Pidgeotto",
@@ -776,7 +776,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Pidgeot,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Pidgeot,
@@ -845,7 +845,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Rattata,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Rattata,
@@ -911,7 +911,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Raticate,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Raticate,
@@ -1009,7 +1009,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Spearow,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Spearow,
             form_name: "Spearow",
@@ -1043,7 +1043,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Fearow,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Fearow,
             form_name: "Fearow",
@@ -1077,7 +1077,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Ekans,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Ekans,
             form_name: "Ekans",
@@ -1111,7 +1111,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Arbok,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Arbok,
             form_name: "Arbok",
@@ -1145,7 +1145,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Pikachu,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Pikachu,
@@ -1453,7 +1453,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Raichu,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Raichu,
@@ -1588,7 +1588,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Sandshrew,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Sandshrew,
@@ -1654,7 +1654,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Sandslash,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Sandslash,
@@ -1722,7 +1722,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::NidoranF,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::NidoranF,
             form_name: "Nidoran-F",
@@ -1756,7 +1756,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Nidorina,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Nidorina,
             form_name: "Nidorina",
@@ -1790,7 +1790,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Nidoqueen,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Nidoqueen,
             form_name: "Nidoqueen",
@@ -1824,7 +1824,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::NidoranM,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::NidoranM,
             form_name: "Nidoran-M",
@@ -1858,7 +1858,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Nidorino,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Nidorino,
             form_name: "Nidorino",
@@ -1892,7 +1892,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Nidoking,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Nidoking,
             form_name: "Nidoking",
@@ -1926,7 +1926,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Clefairy,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Clefairy,
             form_name: "Clefairy",
@@ -1960,7 +1960,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Clefable,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Clefable,
@@ -2029,7 +2029,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Vulpix,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Vulpix,
@@ -2095,7 +2095,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Ninetales,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Ninetales,
@@ -2161,7 +2161,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Jigglypuff,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Jigglypuff,
             form_name: "Jigglypuff",
@@ -2195,7 +2195,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Wigglytuff,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Wigglytuff,
             form_name: "Wigglytuff",
@@ -2229,7 +2229,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Zubat,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Zubat,
             form_name: "Zubat",
@@ -2263,7 +2263,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Golbat,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Golbat,
             form_name: "Golbat",
@@ -2297,7 +2297,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Oddish,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Oddish,
             form_name: "Oddish",
@@ -2331,7 +2331,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Gloom,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Gloom,
             form_name: "Gloom",
@@ -2368,7 +2368,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Vileplume,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Vileplume,
             form_name: "Vileplume",
@@ -2402,7 +2402,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Paras,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Paras,
             form_name: "Paras",
@@ -2436,7 +2436,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Parasect,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Parasect,
             form_name: "Parasect",
@@ -2470,7 +2470,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Venonat,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Venonat,
             form_name: "Venonat",
@@ -2504,7 +2504,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Venomoth,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Venomoth,
             form_name: "Venomoth",
@@ -2538,7 +2538,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Diglett,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Diglett,
@@ -2604,7 +2604,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Dugtrio,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Dugtrio,
@@ -2672,7 +2672,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Meowth,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Meowth,
@@ -2768,7 +2768,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Persian,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Persian,
@@ -2834,7 +2834,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Psyduck,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Psyduck,
             form_name: "Psyduck",
@@ -2868,7 +2868,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Golduck,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Golduck,
             form_name: "Golduck",
@@ -2902,7 +2902,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Mankey,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Mankey,
             form_name: "Mankey",
@@ -2936,7 +2936,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Primeape,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Primeape,
             form_name: "Primeape",
@@ -2970,7 +2970,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Growlithe,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Growlithe,
@@ -3036,7 +3036,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Arcanine,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Arcanine,
@@ -3104,7 +3104,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Poliwag,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Poliwag,
             form_name: "Poliwag",
@@ -3138,7 +3138,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Poliwhirl,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Poliwhirl,
             form_name: "Poliwhirl",
@@ -3175,7 +3175,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Poliwrath,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Poliwrath,
             form_name: "Poliwrath",
@@ -3209,7 +3209,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Abra,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Abra,
             form_name: "Abra",
@@ -3243,7 +3243,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Kadabra,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Kadabra,
             form_name: "Kadabra",
@@ -3277,7 +3277,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Alakazam,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Alakazam,
@@ -3346,7 +3346,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Machop,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Machop,
             form_name: "Machop",
@@ -3380,7 +3380,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Machoke,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Machoke,
             form_name: "Machoke",
@@ -3414,7 +3414,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Machamp,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Machamp,
             form_name: "Machamp",
@@ -3448,7 +3448,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Bellsprout,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Bellsprout,
             form_name: "Bellsprout",
@@ -3482,7 +3482,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Weepinbell,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Weepinbell,
             form_name: "Weepinbell",
@@ -3516,7 +3516,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Victreebel,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Victreebel,
@@ -3585,7 +3585,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Tentacool,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Tentacool,
             form_name: "Tentacool",
@@ -3619,7 +3619,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Tentacruel,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Tentacruel,
             form_name: "Tentacruel",
@@ -3653,7 +3653,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Geodude,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Geodude,
@@ -3719,7 +3719,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Graveler,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Graveler,
@@ -3787,7 +3787,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Golem,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Golem,
@@ -3855,7 +3855,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Ponyta,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Ponyta,
@@ -3921,7 +3921,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Rapidash,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Rapidash,
@@ -3987,7 +3987,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Slowpoke,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Slowpoke,
@@ -4059,7 +4059,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Slowbro,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Slowbro,
@@ -4160,7 +4160,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Magnemite,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Magnemite,
             form_name: "Magnemite",
@@ -4194,7 +4194,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Magneton,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Magneton,
             form_name: "Magneton",
@@ -4228,7 +4228,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Farfetchd,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Farfetchd,
@@ -4294,7 +4294,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Doduo,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Doduo,
             form_name: "Doduo",
@@ -4328,7 +4328,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Dodrio,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Dodrio,
             form_name: "Dodrio",
@@ -4362,7 +4362,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Seel,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Seel,
             form_name: "Seel",
@@ -4396,7 +4396,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Dewgong,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Dewgong,
             form_name: "Dewgong",
@@ -4430,7 +4430,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Grimer,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Grimer,
@@ -4496,7 +4496,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Muk,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Muk,
@@ -4562,7 +4562,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Shellder,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Shellder,
             form_name: "Shellder",
@@ -4596,7 +4596,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Cloyster,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Cloyster,
             form_name: "Cloyster",
@@ -4630,7 +4630,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Gastly,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Gastly,
             form_name: "Gastly",
@@ -4664,7 +4664,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Haunter,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Haunter,
             form_name: "Haunter",
@@ -4698,7 +4698,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Gengar,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Gengar,
@@ -4767,7 +4767,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Onix,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Onix,
             form_name: "Onix",
@@ -4801,7 +4801,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Drowzee,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Drowzee,
             form_name: "Drowzee",
@@ -4835,7 +4835,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Hypno,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Hypno,
             form_name: "Hypno",
@@ -4869,7 +4869,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Krabby,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Krabby,
             form_name: "Krabby",
@@ -4903,7 +4903,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Kingler,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Kingler,
             form_name: "Kingler",
@@ -4937,7 +4937,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Voltorb,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Voltorb,
@@ -5003,7 +5003,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Electrode,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Electrode,
@@ -5071,7 +5071,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Exeggcute,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Exeggcute,
             form_name: "Exeggcute",
@@ -5107,7 +5107,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Exeggutor,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Exeggutor,
@@ -5173,7 +5173,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Cubone,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Cubone,
             form_name: "Cubone",
@@ -5209,7 +5209,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Marowak,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Marowak,
@@ -5305,7 +5305,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Hitmonlee,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Hitmonlee,
             form_name: "Hitmonlee",
@@ -5339,7 +5339,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Hitmonchan,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Hitmonchan,
             form_name: "Hitmonchan",
@@ -5373,7 +5373,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Lickitung,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Lickitung,
             form_name: "Lickitung",
@@ -5407,7 +5407,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Koffing,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Koffing,
             form_name: "Koffing",
@@ -5443,7 +5443,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Weezing,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Weezing,
@@ -5509,7 +5509,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Rhyhorn,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Rhyhorn,
             form_name: "Rhyhorn",
@@ -5543,7 +5543,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Rhydon,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Rhydon,
             form_name: "Rhydon",
@@ -5577,7 +5577,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Chansey,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Chansey,
             form_name: "Chansey",
@@ -5611,7 +5611,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Tangela,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Tangela,
             form_name: "Tangela",
@@ -5645,7 +5645,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Kangaskhan,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Kangaskhan,
@@ -5714,7 +5714,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Horsea,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Horsea,
             form_name: "Horsea",
@@ -5748,7 +5748,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Seadra,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Seadra,
             form_name: "Seadra",
@@ -5782,7 +5782,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Goldeen,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Goldeen,
             form_name: "Goldeen",
@@ -5816,7 +5816,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Seaking,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Seaking,
             form_name: "Seaking",
@@ -5850,7 +5850,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Staryu,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Staryu,
             form_name: "Staryu",
@@ -5884,7 +5884,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Starmie,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Starmie,
@@ -5953,7 +5953,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::MrMime,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::MrMime,
@@ -6019,7 +6019,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Scyther,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Scyther,
             form_name: "Scyther",
@@ -6056,7 +6056,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Jynx,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Jynx,
             form_name: "Jynx",
@@ -6090,7 +6090,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Electabuzz,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Electabuzz,
             form_name: "Electabuzz",
@@ -6124,7 +6124,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Magmar,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Magmar,
             form_name: "Magmar",
@@ -6158,7 +6158,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Pinsir,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Pinsir,
@@ -6227,7 +6227,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Tauros,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Tauros,
@@ -6353,7 +6353,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Magikarp,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Magikarp,
             form_name: "Magikarp",
@@ -6387,7 +6387,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Gyarados,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Gyarados,
@@ -6456,7 +6456,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Lapras,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Lapras,
             form_name: "Lapras",
@@ -6490,7 +6490,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Ditto,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Ditto,
             form_name: "Ditto",
@@ -6524,7 +6524,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Eevee,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Eevee,
@@ -6599,7 +6599,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Vaporeon,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Vaporeon,
             form_name: "Vaporeon",
@@ -6633,7 +6633,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Jolteon,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Jolteon,
             form_name: "Jolteon",
@@ -6667,7 +6667,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Flareon,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Flareon,
             form_name: "Flareon",
@@ -6701,7 +6701,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Porygon,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Porygon,
             form_name: "Porygon",
@@ -6735,7 +6735,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Omanyte,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Omanyte,
             form_name: "Omanyte",
@@ -6769,7 +6769,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Omastar,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Omastar,
             form_name: "Omastar",
@@ -6803,7 +6803,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Kabuto,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Kabuto,
             form_name: "Kabuto",
@@ -6837,7 +6837,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Kabutops,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Kabutops,
             form_name: "Kabutops",
@@ -6871,7 +6871,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Aerodactyl,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Aerodactyl,
@@ -6940,7 +6940,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Snorlax,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Snorlax,
             form_name: "Snorlax",
@@ -6974,7 +6974,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Articuno,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Articuno,
@@ -7040,7 +7040,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Zapdos,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Zapdos,
@@ -7106,7 +7106,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Moltres,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Moltres,
@@ -7172,7 +7172,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Dratini,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Dratini,
             form_name: "Dratini",
@@ -7206,7 +7206,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Dragonair,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Dragonair,
             form_name: "Dragonair",
@@ -7240,7 +7240,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Dragonite,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Dragonite,
@@ -7309,7 +7309,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Mewtwo,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Mewtwo,
@@ -7414,7 +7414,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Mew,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Mew,
             form_name: "Mew",
@@ -7448,7 +7448,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Chikorita,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Chikorita,
             form_name: "Chikorita",
@@ -7482,7 +7482,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Bayleef,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Bayleef,
             form_name: "Bayleef",
@@ -7516,7 +7516,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Meganium,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Meganium,
@@ -7585,7 +7585,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Cyndaquil,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Cyndaquil,
             form_name: "Cyndaquil",
@@ -7619,7 +7619,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Quilava,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Quilava,
             form_name: "Quilava",
@@ -7655,7 +7655,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Typhlosion,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Typhlosion,
@@ -7721,7 +7721,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Totodile,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Totodile,
             form_name: "Totodile",
@@ -7755,7 +7755,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Croconaw,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Croconaw,
             form_name: "Croconaw",
@@ -7789,7 +7789,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Feraligatr,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Feraligatr,
@@ -7858,7 +7858,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Sentret,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Sentret,
             form_name: "Sentret",
@@ -7892,7 +7892,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Furret,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Furret,
             form_name: "Furret",
@@ -7926,7 +7926,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Hoothoot,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Hoothoot,
             form_name: "Hoothoot",
@@ -7960,7 +7960,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Noctowl,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Noctowl,
             form_name: "Noctowl",
@@ -7994,7 +7994,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Ledyba,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Ledyba,
             form_name: "Ledyba",
@@ -8028,7 +8028,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Ledian,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Ledian,
             form_name: "Ledian",
@@ -8062,7 +8062,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Spinarak,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Spinarak,
             form_name: "Spinarak",
@@ -8096,7 +8096,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Ariados,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Ariados,
             form_name: "Ariados",
@@ -8130,7 +8130,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Crobat,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Crobat,
             form_name: "Crobat",
@@ -8164,7 +8164,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Chinchou,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Chinchou,
             form_name: "Chinchou",
@@ -8198,7 +8198,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Lanturn,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Lanturn,
             form_name: "Lanturn",
@@ -8232,7 +8232,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Pichu,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Pichu,
@@ -8298,7 +8298,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Cleffa,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Cleffa,
             form_name: "Cleffa",
@@ -8332,7 +8332,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Igglybuff,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Igglybuff,
             form_name: "Igglybuff",
@@ -8366,7 +8366,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Togepi,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Togepi,
             form_name: "Togepi",
@@ -8400,7 +8400,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Togetic,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Togetic,
             form_name: "Togetic",
@@ -8434,7 +8434,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Natu,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Natu,
             form_name: "Natu",
@@ -8468,7 +8468,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Xatu,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Xatu,
             form_name: "Xatu",
@@ -8502,7 +8502,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Mareep,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Mareep,
             form_name: "Mareep",
@@ -8536,7 +8536,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Flaaffy,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Flaaffy,
             form_name: "Flaaffy",
@@ -8570,7 +8570,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Ampharos,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Ampharos,
@@ -8639,7 +8639,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Bellossom,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Bellossom,
             form_name: "Bellossom",
@@ -8673,7 +8673,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Marill,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Marill,
             form_name: "Marill",
@@ -8707,7 +8707,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Azumarill,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Azumarill,
             form_name: "Azumarill",
@@ -8741,7 +8741,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Sudowoodo,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Sudowoodo,
             form_name: "Sudowoodo",
@@ -8775,7 +8775,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Politoed,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Politoed,
             form_name: "Politoed",
@@ -8809,7 +8809,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Hoppip,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Hoppip,
             form_name: "Hoppip",
@@ -8843,7 +8843,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Skiploom,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Skiploom,
             form_name: "Skiploom",
@@ -8877,7 +8877,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Jumpluff,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Jumpluff,
             form_name: "Jumpluff",
@@ -8911,7 +8911,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Aipom,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Aipom,
             form_name: "Aipom",
@@ -8945,7 +8945,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Sunkern,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Sunkern,
             form_name: "Sunkern",
@@ -8979,7 +8979,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Sunflora,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Sunflora,
             form_name: "Sunflora",
@@ -9013,7 +9013,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Yanma,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Yanma,
             form_name: "Yanma",
@@ -9047,7 +9047,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Wooper,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Wooper,
@@ -9113,7 +9113,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Quagsire,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Quagsire,
             form_name: "Quagsire",
@@ -9147,7 +9147,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Espeon,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Espeon,
             form_name: "Espeon",
@@ -9181,7 +9181,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Umbreon,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Umbreon,
             form_name: "Umbreon",
@@ -9215,7 +9215,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Murkrow,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Murkrow,
             form_name: "Murkrow",
@@ -9249,7 +9249,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Slowking,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Slowking,
@@ -9317,7 +9317,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Misdreavus,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Misdreavus,
             form_name: "Misdreavus",
@@ -9351,7 +9351,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Unown,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Unown,
@@ -10197,7 +10197,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Wobbuffet,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Wobbuffet,
             form_name: "Wobbuffet",
@@ -10231,7 +10231,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Girafarig,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Girafarig,
             form_name: "Girafarig",
@@ -10265,7 +10265,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Pineco,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Pineco,
             form_name: "Pineco",
@@ -10299,7 +10299,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Forretress,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Forretress,
             form_name: "Forretress",
@@ -10333,7 +10333,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Dunsparce,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Dunsparce,
             form_name: "Dunsparce",
@@ -10369,7 +10369,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Gligar,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Gligar,
             form_name: "Gligar",
@@ -10403,7 +10403,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Steelix,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Steelix,
@@ -10472,7 +10472,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Snubbull,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Snubbull,
             form_name: "Snubbull",
@@ -10506,7 +10506,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Granbull,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Granbull,
             form_name: "Granbull",
@@ -10540,7 +10540,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Qwilfish,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Qwilfish,
@@ -10606,7 +10606,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Scizor,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Scizor,
@@ -10675,7 +10675,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Shuckle,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Shuckle,
             form_name: "Shuckle",
@@ -10709,7 +10709,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Heracross,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Heracross,
@@ -10778,7 +10778,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Sneasel,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Sneasel,
@@ -10844,7 +10844,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Teddiursa,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Teddiursa,
             form_name: "Teddiursa",
@@ -10878,7 +10878,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Ursaring,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Ursaring,
             form_name: "Ursaring",
@@ -10912,7 +10912,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Slugma,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Slugma,
             form_name: "Slugma",
@@ -10946,7 +10946,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Magcargo,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Magcargo,
             form_name: "Magcargo",
@@ -10980,7 +10980,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Swinub,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Swinub,
             form_name: "Swinub",
@@ -11014,7 +11014,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Piloswine,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Piloswine,
             form_name: "Piloswine",
@@ -11048,7 +11048,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Corsola,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Corsola,
@@ -11114,7 +11114,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Remoraid,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Remoraid,
             form_name: "Remoraid",
@@ -11148,7 +11148,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Octillery,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Octillery,
             form_name: "Octillery",
@@ -11182,7 +11182,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Delibird,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Delibird,
             form_name: "Delibird",
@@ -11216,7 +11216,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Mantine,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Mantine,
             form_name: "Mantine",
@@ -11250,7 +11250,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Skarmory,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Skarmory,
@@ -11319,7 +11319,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Houndour,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Houndour,
             form_name: "Houndour",
@@ -11353,7 +11353,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Houndoom,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Houndoom,
@@ -11422,7 +11422,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Kingdra,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Kingdra,
             form_name: "Kingdra",
@@ -11456,7 +11456,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Phanpy,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Phanpy,
             form_name: "Phanpy",
@@ -11490,7 +11490,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Donphan,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Donphan,
             form_name: "Donphan",
@@ -11524,7 +11524,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Porygon2,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Porygon2,
             form_name: "Porygon2",
@@ -11558,7 +11558,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Stantler,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Stantler,
             form_name: "Stantler",
@@ -11592,7 +11592,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Smeargle,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Smeargle,
             form_name: "Smeargle",
@@ -11626,7 +11626,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Tyrogue,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Tyrogue,
             form_name: "Tyrogue",
@@ -11664,7 +11664,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Hitmontop,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Hitmontop,
             form_name: "Hitmontop",
@@ -11698,7 +11698,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Smoochum,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Smoochum,
             form_name: "Smoochum",
@@ -11732,7 +11732,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Elekid,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Elekid,
             form_name: "Elekid",
@@ -11766,7 +11766,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Magby,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Magby,
             form_name: "Magby",
@@ -11800,7 +11800,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Miltank,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Miltank,
             form_name: "Miltank",
@@ -11834,7 +11834,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Blissey,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Blissey,
             form_name: "Blissey",
@@ -11868,7 +11868,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Raikou,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Raikou,
             form_name: "Raikou",
@@ -11902,7 +11902,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Entei,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Entei,
             form_name: "Entei",
@@ -11936,7 +11936,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Suicune,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Suicune,
             form_name: "Suicune",
@@ -11970,7 +11970,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Larvitar,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Larvitar,
             form_name: "Larvitar",
@@ -12004,7 +12004,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Pupitar,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Pupitar,
             form_name: "Pupitar",
@@ -12038,7 +12038,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Tyranitar,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Tyranitar,
@@ -12107,7 +12107,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Lugia,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Lugia,
             form_name: "Lugia",
@@ -12141,7 +12141,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::HoOh,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::HoOh,
             form_name: "Ho-Oh",
@@ -12175,7 +12175,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Celebi,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Celebi,
             form_name: "Celebi",
@@ -12209,7 +12209,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Treecko,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Treecko,
             form_name: "Treecko",
@@ -12243,7 +12243,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Grovyle,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Grovyle,
             form_name: "Grovyle",
@@ -12277,7 +12277,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Sceptile,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Sceptile,
@@ -12346,7 +12346,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Torchic,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Torchic,
             form_name: "Torchic",
@@ -12380,7 +12380,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Combusken,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Combusken,
             form_name: "Combusken",
@@ -12414,7 +12414,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Blaziken,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Blaziken,
@@ -12483,7 +12483,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Mudkip,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Mudkip,
             form_name: "Mudkip",
@@ -12517,7 +12517,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Marshtomp,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Marshtomp,
             form_name: "Marshtomp",
@@ -12551,7 +12551,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Swampert,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Swampert,
@@ -12620,7 +12620,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Poochyena,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Poochyena,
             form_name: "Poochyena",
@@ -12654,7 +12654,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Mightyena,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Mightyena,
             form_name: "Mightyena",
@@ -12688,7 +12688,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Zigzagoon,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Zigzagoon,
@@ -12754,7 +12754,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Linoone,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Linoone,
@@ -12822,7 +12822,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Wurmple,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Wurmple,
             form_name: "Wurmple",
@@ -12859,7 +12859,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Silcoon,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Silcoon,
             form_name: "Silcoon",
@@ -12893,7 +12893,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Beautifly,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Beautifly,
             form_name: "Beautifly",
@@ -12927,7 +12927,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Cascoon,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Cascoon,
             form_name: "Cascoon",
@@ -12961,7 +12961,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Dustox,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Dustox,
             form_name: "Dustox",
@@ -12995,7 +12995,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Lotad,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Lotad,
             form_name: "Lotad",
@@ -13029,7 +13029,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Lombre,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Lombre,
             form_name: "Lombre",
@@ -13063,7 +13063,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Ludicolo,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Ludicolo,
             form_name: "Ludicolo",
@@ -13097,7 +13097,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Seedot,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Seedot,
             form_name: "Seedot",
@@ -13131,7 +13131,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Nuzleaf,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Nuzleaf,
             form_name: "Nuzleaf",
@@ -13165,7 +13165,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Shiftry,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Shiftry,
             form_name: "Shiftry",
@@ -13199,7 +13199,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Taillow,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Taillow,
             form_name: "Taillow",
@@ -13233,7 +13233,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Swellow,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Swellow,
             form_name: "Swellow",
@@ -13267,7 +13267,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Wingull,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Wingull,
             form_name: "Wingull",
@@ -13301,7 +13301,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Pelipper,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Pelipper,
             form_name: "Pelipper",
@@ -13335,7 +13335,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Ralts,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Ralts,
             form_name: "Ralts",
@@ -13369,7 +13369,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Kirlia,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Kirlia,
             form_name: "Kirlia",
@@ -13406,7 +13406,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Gardevoir,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Gardevoir,
@@ -13475,7 +13475,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Surskit,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Surskit,
             form_name: "Surskit",
@@ -13509,7 +13509,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Masquerain,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Masquerain,
             form_name: "Masquerain",
@@ -13543,7 +13543,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Shroomish,
-        level_up_type: LevelUpType::Fluctuating,
+        experience_growth: ExperienceGrowth::Fluctuating,
         forms: &[FormMetadata {
             national_dex: NationalDex::Shroomish,
             form_name: "Shroomish",
@@ -13577,7 +13577,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Breloom,
-        level_up_type: LevelUpType::Fluctuating,
+        experience_growth: ExperienceGrowth::Fluctuating,
         forms: &[FormMetadata {
             national_dex: NationalDex::Breloom,
             form_name: "Breloom",
@@ -13611,7 +13611,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Slakoth,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Slakoth,
             form_name: "Slakoth",
@@ -13645,7 +13645,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Vigoroth,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Vigoroth,
             form_name: "Vigoroth",
@@ -13679,7 +13679,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Slaking,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Slaking,
             form_name: "Slaking",
@@ -13713,7 +13713,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Nincada,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[FormMetadata {
             national_dex: NationalDex::Nincada,
             form_name: "Nincada",
@@ -13750,7 +13750,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Ninjask,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[FormMetadata {
             national_dex: NationalDex::Ninjask,
             form_name: "Ninjask",
@@ -13784,7 +13784,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Shedinja,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[FormMetadata {
             national_dex: NationalDex::Shedinja,
             form_name: "Shedinja",
@@ -13818,7 +13818,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Whismur,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Whismur,
             form_name: "Whismur",
@@ -13852,7 +13852,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Loudred,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Loudred,
             form_name: "Loudred",
@@ -13886,7 +13886,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Exploud,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Exploud,
             form_name: "Exploud",
@@ -13920,7 +13920,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Makuhita,
-        level_up_type: LevelUpType::Fluctuating,
+        experience_growth: ExperienceGrowth::Fluctuating,
         forms: &[FormMetadata {
             national_dex: NationalDex::Makuhita,
             form_name: "Makuhita",
@@ -13954,7 +13954,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Hariyama,
-        level_up_type: LevelUpType::Fluctuating,
+        experience_growth: ExperienceGrowth::Fluctuating,
         forms: &[FormMetadata {
             national_dex: NationalDex::Hariyama,
             form_name: "Hariyama",
@@ -13988,7 +13988,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Azurill,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Azurill,
             form_name: "Azurill",
@@ -14022,7 +14022,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Nosepass,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Nosepass,
             form_name: "Nosepass",
@@ -14056,7 +14056,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Skitty,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Skitty,
             form_name: "Skitty",
@@ -14090,7 +14090,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Delcatty,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Delcatty,
             form_name: "Delcatty",
@@ -14124,7 +14124,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Sableye,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Sableye,
@@ -14193,7 +14193,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Mawile,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Mawile,
@@ -14262,7 +14262,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Aron,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Aron,
             form_name: "Aron",
@@ -14296,7 +14296,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Lairon,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Lairon,
             form_name: "Lairon",
@@ -14330,7 +14330,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Aggron,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Aggron,
@@ -14399,7 +14399,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Meditite,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Meditite,
             form_name: "Meditite",
@@ -14433,7 +14433,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Medicham,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Medicham,
@@ -14502,7 +14502,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Electrike,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Electrike,
             form_name: "Electrike",
@@ -14536,7 +14536,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Manectric,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Manectric,
@@ -14605,7 +14605,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Plusle,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Plusle,
             form_name: "Plusle",
@@ -14639,7 +14639,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Minun,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Minun,
             form_name: "Minun",
@@ -14673,7 +14673,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Volbeat,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[FormMetadata {
             national_dex: NationalDex::Volbeat,
             form_name: "Volbeat",
@@ -14707,7 +14707,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Illumise,
-        level_up_type: LevelUpType::Fluctuating,
+        experience_growth: ExperienceGrowth::Fluctuating,
         forms: &[FormMetadata {
             national_dex: NationalDex::Illumise,
             form_name: "Illumise",
@@ -14741,7 +14741,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Roselia,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Roselia,
             form_name: "Roselia",
@@ -14775,7 +14775,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Gulpin,
-        level_up_type: LevelUpType::Fluctuating,
+        experience_growth: ExperienceGrowth::Fluctuating,
         forms: &[FormMetadata {
             national_dex: NationalDex::Gulpin,
             form_name: "Gulpin",
@@ -14809,7 +14809,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Swalot,
-        level_up_type: LevelUpType::Fluctuating,
+        experience_growth: ExperienceGrowth::Fluctuating,
         forms: &[FormMetadata {
             national_dex: NationalDex::Swalot,
             form_name: "Swalot",
@@ -14843,7 +14843,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Carvanha,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Carvanha,
             form_name: "Carvanha",
@@ -14877,7 +14877,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Sharpedo,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Sharpedo,
@@ -14946,7 +14946,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Wailmer,
-        level_up_type: LevelUpType::Fluctuating,
+        experience_growth: ExperienceGrowth::Fluctuating,
         forms: &[FormMetadata {
             national_dex: NationalDex::Wailmer,
             form_name: "Wailmer",
@@ -14980,7 +14980,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Wailord,
-        level_up_type: LevelUpType::Fluctuating,
+        experience_growth: ExperienceGrowth::Fluctuating,
         forms: &[FormMetadata {
             national_dex: NationalDex::Wailord,
             form_name: "Wailord",
@@ -15014,7 +15014,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Numel,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Numel,
             form_name: "Numel",
@@ -15048,7 +15048,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Camerupt,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Camerupt,
@@ -15117,7 +15117,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Torkoal,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Torkoal,
             form_name: "Torkoal",
@@ -15151,7 +15151,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Spoink,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Spoink,
             form_name: "Spoink",
@@ -15185,7 +15185,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Grumpig,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Grumpig,
             form_name: "Grumpig",
@@ -15219,7 +15219,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Spinda,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Spinda,
             form_name: "Spinda",
@@ -15253,7 +15253,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Trapinch,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Trapinch,
             form_name: "Trapinch",
@@ -15287,7 +15287,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Vibrava,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Vibrava,
             form_name: "Vibrava",
@@ -15321,7 +15321,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Flygon,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Flygon,
             form_name: "Flygon",
@@ -15355,7 +15355,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Cacnea,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Cacnea,
             form_name: "Cacnea",
@@ -15389,7 +15389,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Cacturne,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Cacturne,
             form_name: "Cacturne",
@@ -15423,7 +15423,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Swablu,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[FormMetadata {
             national_dex: NationalDex::Swablu,
             form_name: "Swablu",
@@ -15457,7 +15457,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Altaria,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Altaria,
@@ -15526,7 +15526,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Zangoose,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[FormMetadata {
             national_dex: NationalDex::Zangoose,
             form_name: "Zangoose",
@@ -15560,7 +15560,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Seviper,
-        level_up_type: LevelUpType::Fluctuating,
+        experience_growth: ExperienceGrowth::Fluctuating,
         forms: &[FormMetadata {
             national_dex: NationalDex::Seviper,
             form_name: "Seviper",
@@ -15594,7 +15594,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Lunatone,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Lunatone,
             form_name: "Lunatone",
@@ -15628,7 +15628,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Solrock,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Solrock,
             form_name: "Solrock",
@@ -15662,7 +15662,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Barboach,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Barboach,
             form_name: "Barboach",
@@ -15696,7 +15696,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Whiscash,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Whiscash,
             form_name: "Whiscash",
@@ -15730,7 +15730,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Corphish,
-        level_up_type: LevelUpType::Fluctuating,
+        experience_growth: ExperienceGrowth::Fluctuating,
         forms: &[FormMetadata {
             national_dex: NationalDex::Corphish,
             form_name: "Corphish",
@@ -15764,7 +15764,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Crawdaunt,
-        level_up_type: LevelUpType::Fluctuating,
+        experience_growth: ExperienceGrowth::Fluctuating,
         forms: &[FormMetadata {
             national_dex: NationalDex::Crawdaunt,
             form_name: "Crawdaunt",
@@ -15798,7 +15798,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Baltoy,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Baltoy,
             form_name: "Baltoy",
@@ -15832,7 +15832,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Claydol,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Claydol,
             form_name: "Claydol",
@@ -15866,7 +15866,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Lileep,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[FormMetadata {
             national_dex: NationalDex::Lileep,
             form_name: "Lileep",
@@ -15900,7 +15900,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Cradily,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[FormMetadata {
             national_dex: NationalDex::Cradily,
             form_name: "Cradily",
@@ -15934,7 +15934,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Anorith,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[FormMetadata {
             national_dex: NationalDex::Anorith,
             form_name: "Anorith",
@@ -15968,7 +15968,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Armaldo,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[FormMetadata {
             national_dex: NationalDex::Armaldo,
             form_name: "Armaldo",
@@ -16002,7 +16002,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Feebas,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[FormMetadata {
             national_dex: NationalDex::Feebas,
             form_name: "Feebas",
@@ -16036,7 +16036,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Milotic,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[FormMetadata {
             national_dex: NationalDex::Milotic,
             form_name: "Milotic",
@@ -16070,7 +16070,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Castform,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Castform,
@@ -16196,7 +16196,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Kecleon,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Kecleon,
             form_name: "Kecleon",
@@ -16230,7 +16230,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Shuppet,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Shuppet,
             form_name: "Shuppet",
@@ -16264,7 +16264,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Banette,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Banette,
@@ -16333,7 +16333,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Duskull,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Duskull,
             form_name: "Duskull",
@@ -16367,7 +16367,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Dusclops,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Dusclops,
             form_name: "Dusclops",
@@ -16401,7 +16401,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Tropius,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Tropius,
             form_name: "Tropius",
@@ -16435,7 +16435,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Chimecho,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Chimecho,
@@ -16504,7 +16504,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Absol,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Absol,
@@ -16609,7 +16609,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Wynaut,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Wynaut,
             form_name: "Wynaut",
@@ -16643,7 +16643,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Snorunt,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Snorunt,
             form_name: "Snorunt",
@@ -16680,7 +16680,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Glalie,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Glalie,
@@ -16749,7 +16749,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Spheal,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Spheal,
             form_name: "Spheal",
@@ -16783,7 +16783,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Sealeo,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Sealeo,
             form_name: "Sealeo",
@@ -16817,7 +16817,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Walrein,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Walrein,
             form_name: "Walrein",
@@ -16851,7 +16851,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Clamperl,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[FormMetadata {
             national_dex: NationalDex::Clamperl,
             form_name: "Clamperl",
@@ -16888,7 +16888,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Huntail,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[FormMetadata {
             national_dex: NationalDex::Huntail,
             form_name: "Huntail",
@@ -16922,7 +16922,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Gorebyss,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[FormMetadata {
             national_dex: NationalDex::Gorebyss,
             form_name: "Gorebyss",
@@ -16956,7 +16956,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Relicanth,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Relicanth,
             form_name: "Relicanth",
@@ -16990,7 +16990,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Luvdisc,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Luvdisc,
             form_name: "Luvdisc",
@@ -17024,7 +17024,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Bagon,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Bagon,
             form_name: "Bagon",
@@ -17058,7 +17058,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Shelgon,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Shelgon,
             form_name: "Shelgon",
@@ -17092,7 +17092,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Salamence,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Salamence,
@@ -17161,7 +17161,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Beldum,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Beldum,
             form_name: "Beldum",
@@ -17195,7 +17195,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Metang,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Metang,
             form_name: "Metang",
@@ -17229,7 +17229,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Metagross,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Metagross,
@@ -17298,7 +17298,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Regirock,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Regirock,
             form_name: "Regirock",
@@ -17332,7 +17332,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Regice,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Regice,
             form_name: "Regice",
@@ -17366,7 +17366,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Registeel,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Registeel,
             form_name: "Registeel",
@@ -17400,7 +17400,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Latias,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Latias,
@@ -17469,7 +17469,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Latios,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Latios,
@@ -17538,7 +17538,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Kyogre,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Kyogre,
@@ -17604,7 +17604,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Groudon,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Groudon,
@@ -17670,7 +17670,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Rayquaza,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Rayquaza,
@@ -17739,7 +17739,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Jirachi,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Jirachi,
             form_name: "Jirachi",
@@ -17773,7 +17773,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Deoxys,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Deoxys,
@@ -17899,7 +17899,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Turtwig,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Turtwig,
             form_name: "Turtwig",
@@ -17933,7 +17933,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Grotle,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Grotle,
             form_name: "Grotle",
@@ -17967,7 +17967,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Torterra,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Torterra,
             form_name: "Torterra",
@@ -18001,7 +18001,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Chimchar,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Chimchar,
             form_name: "Chimchar",
@@ -18035,7 +18035,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Monferno,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Monferno,
             form_name: "Monferno",
@@ -18069,7 +18069,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Infernape,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Infernape,
             form_name: "Infernape",
@@ -18103,7 +18103,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Piplup,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Piplup,
             form_name: "Piplup",
@@ -18137,7 +18137,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Prinplup,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Prinplup,
             form_name: "Prinplup",
@@ -18171,7 +18171,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Empoleon,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Empoleon,
             form_name: "Empoleon",
@@ -18205,7 +18205,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Starly,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Starly,
             form_name: "Starly",
@@ -18239,7 +18239,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Staravia,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Staravia,
             form_name: "Staravia",
@@ -18273,7 +18273,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Staraptor,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Staraptor,
@@ -18342,7 +18342,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Bidoof,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Bidoof,
             form_name: "Bidoof",
@@ -18376,7 +18376,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Bibarel,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Bibarel,
             form_name: "Bibarel",
@@ -18410,7 +18410,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Kricketot,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Kricketot,
             form_name: "Kricketot",
@@ -18444,7 +18444,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Kricketune,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Kricketune,
             form_name: "Kricketune",
@@ -18478,7 +18478,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Shinx,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Shinx,
             form_name: "Shinx",
@@ -18512,7 +18512,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Luxio,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Luxio,
             form_name: "Luxio",
@@ -18546,7 +18546,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Luxray,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Luxray,
             form_name: "Luxray",
@@ -18580,7 +18580,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Budew,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Budew,
             form_name: "Budew",
@@ -18614,7 +18614,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Roserade,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Roserade,
             form_name: "Roserade",
@@ -18648,7 +18648,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Cranidos,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[FormMetadata {
             national_dex: NationalDex::Cranidos,
             form_name: "Cranidos",
@@ -18682,7 +18682,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Rampardos,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[FormMetadata {
             national_dex: NationalDex::Rampardos,
             form_name: "Rampardos",
@@ -18716,7 +18716,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Shieldon,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[FormMetadata {
             national_dex: NationalDex::Shieldon,
             form_name: "Shieldon",
@@ -18750,7 +18750,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Bastiodon,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[FormMetadata {
             national_dex: NationalDex::Bastiodon,
             form_name: "Bastiodon",
@@ -18784,7 +18784,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Burmy,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Burmy,
@@ -18889,7 +18889,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Wormadam,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Wormadam,
@@ -18985,7 +18985,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Mothim,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Mothim,
@@ -19081,7 +19081,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Combee,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Combee,
             form_name: "Combee",
@@ -19115,7 +19115,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Vespiquen,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Vespiquen,
             form_name: "Vespiquen",
@@ -19149,7 +19149,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Pachirisu,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Pachirisu,
             form_name: "Pachirisu",
@@ -19183,7 +19183,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Buizel,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Buizel,
             form_name: "Buizel",
@@ -19217,7 +19217,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Floatzel,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Floatzel,
             form_name: "Floatzel",
@@ -19251,7 +19251,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Cherubi,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Cherubi,
             form_name: "Cherubi",
@@ -19285,7 +19285,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Cherrim,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Cherrim,
@@ -19351,7 +19351,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Shellos,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Shellos,
@@ -19419,7 +19419,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Gastrodon,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Gastrodon,
@@ -19487,7 +19487,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Ambipom,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Ambipom,
             form_name: "Ambipom",
@@ -19521,7 +19521,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Drifloon,
-        level_up_type: LevelUpType::Fluctuating,
+        experience_growth: ExperienceGrowth::Fluctuating,
         forms: &[FormMetadata {
             national_dex: NationalDex::Drifloon,
             form_name: "Drifloon",
@@ -19555,7 +19555,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Drifblim,
-        level_up_type: LevelUpType::Fluctuating,
+        experience_growth: ExperienceGrowth::Fluctuating,
         forms: &[FormMetadata {
             national_dex: NationalDex::Drifblim,
             form_name: "Drifblim",
@@ -19589,7 +19589,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Buneary,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Buneary,
             form_name: "Buneary",
@@ -19623,7 +19623,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Lopunny,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Lopunny,
@@ -19692,7 +19692,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Mismagius,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Mismagius,
             form_name: "Mismagius",
@@ -19726,7 +19726,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Honchkrow,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Honchkrow,
             form_name: "Honchkrow",
@@ -19760,7 +19760,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Glameow,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Glameow,
             form_name: "Glameow",
@@ -19794,7 +19794,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Purugly,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Purugly,
             form_name: "Purugly",
@@ -19828,7 +19828,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Chingling,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Chingling,
             form_name: "Chingling",
@@ -19862,7 +19862,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Stunky,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Stunky,
             form_name: "Stunky",
@@ -19896,7 +19896,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Skuntank,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Skuntank,
             form_name: "Skuntank",
@@ -19930,7 +19930,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Bronzor,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Bronzor,
             form_name: "Bronzor",
@@ -19964,7 +19964,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Bronzong,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Bronzong,
             form_name: "Bronzong",
@@ -19998,7 +19998,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Bonsly,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Bonsly,
             form_name: "Bonsly",
@@ -20032,7 +20032,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::MimeJr,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::MimeJr,
             form_name: "Mime Jr.",
@@ -20068,7 +20068,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Happiny,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Happiny,
             form_name: "Happiny",
@@ -20102,7 +20102,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Chatot,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Chatot,
             form_name: "Chatot",
@@ -20136,7 +20136,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Spiritomb,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Spiritomb,
             form_name: "Spiritomb",
@@ -20170,7 +20170,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Gible,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Gible,
             form_name: "Gible",
@@ -20204,7 +20204,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Gabite,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Gabite,
             form_name: "Gabite",
@@ -20238,7 +20238,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Garchomp,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Garchomp,
@@ -20343,7 +20343,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Munchlax,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Munchlax,
             form_name: "Munchlax",
@@ -20377,7 +20377,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Riolu,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Riolu,
             form_name: "Riolu",
@@ -20411,7 +20411,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Lucario,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Lucario,
@@ -20516,7 +20516,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Hippopotas,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Hippopotas,
             form_name: "Hippopotas",
@@ -20550,7 +20550,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Hippowdon,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Hippowdon,
             form_name: "Hippowdon",
@@ -20584,7 +20584,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Skorupi,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Skorupi,
             form_name: "Skorupi",
@@ -20618,7 +20618,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Drapion,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Drapion,
             form_name: "Drapion",
@@ -20652,7 +20652,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Croagunk,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Croagunk,
             form_name: "Croagunk",
@@ -20686,7 +20686,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Toxicroak,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Toxicroak,
             form_name: "Toxicroak",
@@ -20720,7 +20720,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Carnivine,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Carnivine,
             form_name: "Carnivine",
@@ -20754,7 +20754,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Finneon,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[FormMetadata {
             national_dex: NationalDex::Finneon,
             form_name: "Finneon",
@@ -20788,7 +20788,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Lumineon,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[FormMetadata {
             national_dex: NationalDex::Lumineon,
             form_name: "Lumineon",
@@ -20822,7 +20822,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Mantyke,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Mantyke,
             form_name: "Mantyke",
@@ -20856,7 +20856,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Snover,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Snover,
             form_name: "Snover",
@@ -20890,7 +20890,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Abomasnow,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Abomasnow,
@@ -20959,7 +20959,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Weavile,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Weavile,
             form_name: "Weavile",
@@ -20993,7 +20993,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Magnezone,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Magnezone,
             form_name: "Magnezone",
@@ -21027,7 +21027,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Lickilicky,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Lickilicky,
             form_name: "Lickilicky",
@@ -21061,7 +21061,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Rhyperior,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Rhyperior,
             form_name: "Rhyperior",
@@ -21095,7 +21095,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Tangrowth,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Tangrowth,
             form_name: "Tangrowth",
@@ -21129,7 +21129,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Electivire,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Electivire,
             form_name: "Electivire",
@@ -21163,7 +21163,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Magmortar,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Magmortar,
             form_name: "Magmortar",
@@ -21197,7 +21197,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Togekiss,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Togekiss,
             form_name: "Togekiss",
@@ -21231,7 +21231,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Yanmega,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Yanmega,
             form_name: "Yanmega",
@@ -21265,7 +21265,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Leafeon,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Leafeon,
             form_name: "Leafeon",
@@ -21299,7 +21299,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Glaceon,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Glaceon,
             form_name: "Glaceon",
@@ -21333,7 +21333,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Gliscor,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Gliscor,
             form_name: "Gliscor",
@@ -21367,7 +21367,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Mamoswine,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Mamoswine,
             form_name: "Mamoswine",
@@ -21401,7 +21401,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::PorygonZ,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::PorygonZ,
             form_name: "Porygon-Z",
@@ -21435,7 +21435,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Gallade,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Gallade,
@@ -21504,7 +21504,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Probopass,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Probopass,
             form_name: "Probopass",
@@ -21538,7 +21538,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Dusknoir,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Dusknoir,
             form_name: "Dusknoir",
@@ -21572,7 +21572,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Froslass,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Froslass,
@@ -21641,7 +21641,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Rotom,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Rotom,
@@ -21827,7 +21827,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Uxie,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Uxie,
             form_name: "Uxie",
@@ -21861,7 +21861,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Mesprit,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Mesprit,
             form_name: "Mesprit",
@@ -21895,7 +21895,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Azelf,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Azelf,
             form_name: "Azelf",
@@ -21929,7 +21929,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Dialga,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Dialga,
@@ -21995,7 +21995,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Palkia,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Palkia,
@@ -22061,7 +22061,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Heatran,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Heatran,
@@ -22130,7 +22130,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Regigigas,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Regigigas,
             form_name: "Regigigas",
@@ -22164,7 +22164,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Giratina,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Giratina,
@@ -22230,7 +22230,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Cresselia,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Cresselia,
             form_name: "Cresselia",
@@ -22264,7 +22264,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Phione,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Phione,
             form_name: "Phione",
@@ -22298,7 +22298,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Manaphy,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Manaphy,
             form_name: "Manaphy",
@@ -22332,7 +22332,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Darkrai,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Darkrai,
@@ -22401,7 +22401,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Shaymin,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Shaymin,
@@ -22467,7 +22467,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Arceus,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Arceus,
@@ -23043,7 +23043,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Victini,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Victini,
             form_name: "Victini",
@@ -23077,7 +23077,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Snivy,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Snivy,
             form_name: "Snivy",
@@ -23111,7 +23111,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Servine,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Servine,
             form_name: "Servine",
@@ -23145,7 +23145,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Serperior,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Serperior,
             form_name: "Serperior",
@@ -23179,7 +23179,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Tepig,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Tepig,
             form_name: "Tepig",
@@ -23213,7 +23213,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Pignite,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Pignite,
             form_name: "Pignite",
@@ -23247,7 +23247,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Emboar,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Emboar,
@@ -23316,7 +23316,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Oshawott,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Oshawott,
             form_name: "Oshawott",
@@ -23350,7 +23350,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Dewott,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Dewott,
             form_name: "Dewott",
@@ -23386,7 +23386,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Samurott,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Samurott,
@@ -23452,7 +23452,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Patrat,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Patrat,
             form_name: "Patrat",
@@ -23486,7 +23486,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Watchog,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Watchog,
             form_name: "Watchog",
@@ -23520,7 +23520,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Lillipup,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Lillipup,
             form_name: "Lillipup",
@@ -23554,7 +23554,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Herdier,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Herdier,
             form_name: "Herdier",
@@ -23588,7 +23588,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Stoutland,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Stoutland,
             form_name: "Stoutland",
@@ -23622,7 +23622,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Purrloin,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Purrloin,
             form_name: "Purrloin",
@@ -23656,7 +23656,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Liepard,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Liepard,
             form_name: "Liepard",
@@ -23690,7 +23690,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Pansage,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Pansage,
             form_name: "Pansage",
@@ -23724,7 +23724,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Simisage,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Simisage,
             form_name: "Simisage",
@@ -23758,7 +23758,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Pansear,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Pansear,
             form_name: "Pansear",
@@ -23792,7 +23792,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Simisear,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Simisear,
             form_name: "Simisear",
@@ -23826,7 +23826,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Panpour,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Panpour,
             form_name: "Panpour",
@@ -23860,7 +23860,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Simipour,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Simipour,
             form_name: "Simipour",
@@ -23894,7 +23894,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Munna,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Munna,
             form_name: "Munna",
@@ -23928,7 +23928,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Musharna,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Musharna,
             form_name: "Musharna",
@@ -23962,7 +23962,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Pidove,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Pidove,
             form_name: "Pidove",
@@ -23996,7 +23996,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Tranquill,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Tranquill,
             form_name: "Tranquill",
@@ -24030,7 +24030,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Unfezant,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Unfezant,
             form_name: "Unfezant",
@@ -24064,7 +24064,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Blitzle,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Blitzle,
             form_name: "Blitzle",
@@ -24098,7 +24098,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Zebstrika,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Zebstrika,
             form_name: "Zebstrika",
@@ -24132,7 +24132,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Roggenrola,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Roggenrola,
             form_name: "Roggenrola",
@@ -24166,7 +24166,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Boldore,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Boldore,
             form_name: "Boldore",
@@ -24200,7 +24200,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Gigalith,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Gigalith,
             form_name: "Gigalith",
@@ -24234,7 +24234,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Woobat,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Woobat,
             form_name: "Woobat",
@@ -24268,7 +24268,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Swoobat,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Swoobat,
             form_name: "Swoobat",
@@ -24302,7 +24302,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Drilbur,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Drilbur,
             form_name: "Drilbur",
@@ -24336,7 +24336,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Excadrill,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Excadrill,
@@ -24405,7 +24405,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Audino,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Audino,
@@ -24474,7 +24474,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Timburr,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Timburr,
             form_name: "Timburr",
@@ -24508,7 +24508,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Gurdurr,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Gurdurr,
             form_name: "Gurdurr",
@@ -24542,7 +24542,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Conkeldurr,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Conkeldurr,
             form_name: "Conkeldurr",
@@ -24576,7 +24576,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Tympole,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Tympole,
             form_name: "Tympole",
@@ -24610,7 +24610,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Palpitoad,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Palpitoad,
             form_name: "Palpitoad",
@@ -24644,7 +24644,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Seismitoad,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Seismitoad,
             form_name: "Seismitoad",
@@ -24678,7 +24678,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Throh,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Throh,
             form_name: "Throh",
@@ -24712,7 +24712,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Sawk,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Sawk,
             form_name: "Sawk",
@@ -24746,7 +24746,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Sewaddle,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Sewaddle,
             form_name: "Sewaddle",
@@ -24780,7 +24780,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Swadloon,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Swadloon,
             form_name: "Swadloon",
@@ -24814,7 +24814,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Leavanny,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Leavanny,
             form_name: "Leavanny",
@@ -24848,7 +24848,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Venipede,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Venipede,
             form_name: "Venipede",
@@ -24882,7 +24882,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Whirlipede,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Whirlipede,
             form_name: "Whirlipede",
@@ -24916,7 +24916,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Scolipede,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Scolipede,
@@ -24985,7 +24985,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Cottonee,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Cottonee,
             form_name: "Cottonee",
@@ -25019,7 +25019,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Whimsicott,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Whimsicott,
             form_name: "Whimsicott",
@@ -25053,7 +25053,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Petilil,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Petilil,
             form_name: "Petilil",
@@ -25089,7 +25089,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Lilligant,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Lilligant,
@@ -25155,7 +25155,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Basculin,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Basculin,
@@ -25253,7 +25253,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Sandile,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Sandile,
             form_name: "Sandile",
@@ -25287,7 +25287,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Krokorok,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Krokorok,
             form_name: "Krokorok",
@@ -25321,7 +25321,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Krookodile,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Krookodile,
             form_name: "Krookodile",
@@ -25355,7 +25355,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Darumaka,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Darumaka,
@@ -25421,7 +25421,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Darmanitan,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Darmanitan,
@@ -25549,7 +25549,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Maractus,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Maractus,
             form_name: "Maractus",
@@ -25583,7 +25583,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Dwebble,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Dwebble,
             form_name: "Dwebble",
@@ -25617,7 +25617,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Crustle,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Crustle,
             form_name: "Crustle",
@@ -25651,7 +25651,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Scraggy,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Scraggy,
             form_name: "Scraggy",
@@ -25685,7 +25685,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Scrafty,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Scrafty,
@@ -25754,7 +25754,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Sigilyph,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Sigilyph,
             form_name: "Sigilyph",
@@ -25788,7 +25788,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Yamask,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Yamask,
@@ -25854,7 +25854,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Cofagrigus,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Cofagrigus,
             form_name: "Cofagrigus",
@@ -25888,7 +25888,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Tirtouga,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Tirtouga,
             form_name: "Tirtouga",
@@ -25922,7 +25922,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Carracosta,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Carracosta,
             form_name: "Carracosta",
@@ -25956,7 +25956,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Archen,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Archen,
             form_name: "Archen",
@@ -25990,7 +25990,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Archeops,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Archeops,
             form_name: "Archeops",
@@ -26024,7 +26024,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Trubbish,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Trubbish,
             form_name: "Trubbish",
@@ -26058,7 +26058,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Garbodor,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Garbodor,
             form_name: "Garbodor",
@@ -26092,7 +26092,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Zorua,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Zorua,
@@ -26158,7 +26158,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Zoroark,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Zoroark,
@@ -26224,7 +26224,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Minccino,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Minccino,
             form_name: "Minccino",
@@ -26258,7 +26258,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Cinccino,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Cinccino,
             form_name: "Cinccino",
@@ -26292,7 +26292,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Gothita,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Gothita,
             form_name: "Gothita",
@@ -26326,7 +26326,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Gothorita,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Gothorita,
             form_name: "Gothorita",
@@ -26360,7 +26360,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Gothitelle,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Gothitelle,
             form_name: "Gothitelle",
@@ -26394,7 +26394,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Solosis,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Solosis,
             form_name: "Solosis",
@@ -26428,7 +26428,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Duosion,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Duosion,
             form_name: "Duosion",
@@ -26462,7 +26462,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Reuniclus,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Reuniclus,
             form_name: "Reuniclus",
@@ -26496,7 +26496,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Ducklett,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Ducklett,
             form_name: "Ducklett",
@@ -26530,7 +26530,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Swanna,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Swanna,
             form_name: "Swanna",
@@ -26564,7 +26564,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Vanillite,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Vanillite,
             form_name: "Vanillite",
@@ -26598,7 +26598,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Vanillish,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Vanillish,
             form_name: "Vanillish",
@@ -26632,7 +26632,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Vanilluxe,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Vanilluxe,
             form_name: "Vanilluxe",
@@ -26666,7 +26666,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Deerling,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Deerling,
@@ -26792,7 +26792,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Sawsbuck,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Sawsbuck,
@@ -26924,7 +26924,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Emolga,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Emolga,
             form_name: "Emolga",
@@ -26958,7 +26958,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Karrablast,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Karrablast,
             form_name: "Karrablast",
@@ -26992,7 +26992,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Escavalier,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Escavalier,
             form_name: "Escavalier",
@@ -27026,7 +27026,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Foongus,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Foongus,
             form_name: "Foongus",
@@ -27060,7 +27060,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Amoonguss,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Amoonguss,
             form_name: "Amoonguss",
@@ -27094,7 +27094,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Frillish,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Frillish,
             form_name: "Frillish",
@@ -27128,7 +27128,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Jellicent,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Jellicent,
             form_name: "Jellicent",
@@ -27162,7 +27162,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Alomomola,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Alomomola,
             form_name: "Alomomola",
@@ -27196,7 +27196,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Joltik,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Joltik,
             form_name: "Joltik",
@@ -27230,7 +27230,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Galvantula,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Galvantula,
             form_name: "Galvantula",
@@ -27264,7 +27264,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Ferroseed,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Ferroseed,
             form_name: "Ferroseed",
@@ -27298,7 +27298,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Ferrothorn,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Ferrothorn,
             form_name: "Ferrothorn",
@@ -27332,7 +27332,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Klink,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Klink,
             form_name: "Klink",
@@ -27366,7 +27366,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Klang,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Klang,
             form_name: "Klang",
@@ -27400,7 +27400,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Klinklang,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Klinklang,
             form_name: "Klinklang",
@@ -27434,7 +27434,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Tynamo,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Tynamo,
             form_name: "Tynamo",
@@ -27468,7 +27468,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Eelektrik,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Eelektrik,
             form_name: "Eelektrik",
@@ -27502,7 +27502,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Eelektross,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Eelektross,
@@ -27571,7 +27571,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Elgyem,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Elgyem,
             form_name: "Elgyem",
@@ -27605,7 +27605,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Beheeyem,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Beheeyem,
             form_name: "Beheeyem",
@@ -27639,7 +27639,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Litwick,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Litwick,
             form_name: "Litwick",
@@ -27673,7 +27673,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Lampent,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Lampent,
             form_name: "Lampent",
@@ -27707,7 +27707,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Chandelure,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Chandelure,
@@ -27776,7 +27776,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Axew,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Axew,
             form_name: "Axew",
@@ -27810,7 +27810,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Fraxure,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Fraxure,
             form_name: "Fraxure",
@@ -27844,7 +27844,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Haxorus,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Haxorus,
             form_name: "Haxorus",
@@ -27878,7 +27878,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Cubchoo,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Cubchoo,
             form_name: "Cubchoo",
@@ -27912,7 +27912,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Beartic,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Beartic,
             form_name: "Beartic",
@@ -27946,7 +27946,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Cryogonal,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Cryogonal,
             form_name: "Cryogonal",
@@ -27980,7 +27980,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Shelmet,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Shelmet,
             form_name: "Shelmet",
@@ -28014,7 +28014,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Accelgor,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Accelgor,
             form_name: "Accelgor",
@@ -28048,7 +28048,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Stunfisk,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Stunfisk,
@@ -28114,7 +28114,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Mienfoo,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Mienfoo,
             form_name: "Mienfoo",
@@ -28148,7 +28148,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Mienshao,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Mienshao,
             form_name: "Mienshao",
@@ -28182,7 +28182,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Druddigon,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Druddigon,
             form_name: "Druddigon",
@@ -28216,7 +28216,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Golett,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Golett,
             form_name: "Golett",
@@ -28250,7 +28250,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Golurk,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Golurk,
@@ -28319,7 +28319,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Pawniard,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Pawniard,
             form_name: "Pawniard",
@@ -28353,7 +28353,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Bisharp,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Bisharp,
             form_name: "Bisharp",
@@ -28387,7 +28387,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Bouffalant,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Bouffalant,
             form_name: "Bouffalant",
@@ -28421,7 +28421,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Rufflet,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Rufflet,
             form_name: "Rufflet",
@@ -28457,7 +28457,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Braviary,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Braviary,
@@ -28523,7 +28523,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Vullaby,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Vullaby,
             form_name: "Vullaby",
@@ -28557,7 +28557,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Mandibuzz,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Mandibuzz,
             form_name: "Mandibuzz",
@@ -28591,7 +28591,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Heatmor,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Heatmor,
             form_name: "Heatmor",
@@ -28625,7 +28625,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Durant,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Durant,
             form_name: "Durant",
@@ -28659,7 +28659,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Deino,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Deino,
             form_name: "Deino",
@@ -28693,7 +28693,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Zweilous,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Zweilous,
             form_name: "Zweilous",
@@ -28727,7 +28727,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Hydreigon,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Hydreigon,
             form_name: "Hydreigon",
@@ -28761,7 +28761,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Larvesta,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Larvesta,
             form_name: "Larvesta",
@@ -28795,7 +28795,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Volcarona,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Volcarona,
             form_name: "Volcarona",
@@ -28829,7 +28829,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Cobalion,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Cobalion,
             form_name: "Cobalion",
@@ -28863,7 +28863,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Terrakion,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Terrakion,
             form_name: "Terrakion",
@@ -28897,7 +28897,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Virizion,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Virizion,
             form_name: "Virizion",
@@ -28931,7 +28931,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Tornadus,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Tornadus,
@@ -28997,7 +28997,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Thundurus,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Thundurus,
@@ -29063,7 +29063,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Reshiram,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Reshiram,
             form_name: "Reshiram",
@@ -29097,7 +29097,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Zekrom,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Zekrom,
             form_name: "Zekrom",
@@ -29131,7 +29131,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Landorus,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Landorus,
@@ -29197,7 +29197,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Kyurem,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Kyurem,
@@ -29293,7 +29293,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Keldeo,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Keldeo,
@@ -29359,7 +29359,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Meloetta,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Meloetta,
@@ -29425,7 +29425,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Genesect,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Genesect,
@@ -29581,7 +29581,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Chespin,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Chespin,
             form_name: "Chespin",
@@ -29615,7 +29615,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Quilladin,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Quilladin,
             form_name: "Quilladin",
@@ -29649,7 +29649,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Chesnaught,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Chesnaught,
@@ -29718,7 +29718,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Fennekin,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Fennekin,
             form_name: "Fennekin",
@@ -29752,7 +29752,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Braixen,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Braixen,
             form_name: "Braixen",
@@ -29786,7 +29786,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Delphox,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Delphox,
@@ -29855,7 +29855,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Froakie,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Froakie,
             form_name: "Froakie",
@@ -29889,7 +29889,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Frogadier,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Frogadier,
             form_name: "Frogadier",
@@ -29923,7 +29923,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Greninja,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Greninja,
@@ -30052,7 +30052,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Bunnelby,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Bunnelby,
             form_name: "Bunnelby",
@@ -30086,7 +30086,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Diggersby,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Diggersby,
             form_name: "Diggersby",
@@ -30120,7 +30120,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Fletchling,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Fletchling,
             form_name: "Fletchling",
@@ -30154,7 +30154,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Fletchinder,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Fletchinder,
             form_name: "Fletchinder",
@@ -30188,7 +30188,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Talonflame,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Talonflame,
             form_name: "Talonflame",
@@ -30222,7 +30222,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Scatterbug,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Scatterbug,
@@ -30828,7 +30828,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Spewpa,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Spewpa,
@@ -31472,7 +31472,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Vivillon,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Vivillon,
@@ -32098,7 +32098,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Litleo,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Litleo,
             form_name: "Litleo",
@@ -32132,7 +32132,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Pyroar,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Pyroar,
@@ -32201,7 +32201,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Flabebe,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Flabebe,
@@ -32357,7 +32357,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Floette,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Floette,
@@ -32584,7 +32584,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Florges,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Florges,
@@ -32748,7 +32748,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Skiddo,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Skiddo,
             form_name: "Skiddo",
@@ -32782,7 +32782,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Gogoat,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Gogoat,
             form_name: "Gogoat",
@@ -32816,7 +32816,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Pancham,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Pancham,
             form_name: "Pancham",
@@ -32850,7 +32850,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Pangoro,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Pangoro,
             form_name: "Pangoro",
@@ -32884,7 +32884,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Furfrou,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Furfrou,
@@ -33190,7 +33190,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Espurr,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Espurr,
             form_name: "Espurr",
@@ -33226,7 +33226,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Meowstic,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Meowstic,
@@ -33358,7 +33358,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Honedge,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Honedge,
             form_name: "Honedge",
@@ -33392,7 +33392,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Doublade,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Doublade,
             form_name: "Doublade",
@@ -33426,7 +33426,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Aegislash,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Aegislash,
@@ -33492,7 +33492,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Spritzee,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Spritzee,
             form_name: "Spritzee",
@@ -33526,7 +33526,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Aromatisse,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Aromatisse,
             form_name: "Aromatisse",
@@ -33560,7 +33560,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Swirlix,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Swirlix,
             form_name: "Swirlix",
@@ -33594,7 +33594,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Slurpuff,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Slurpuff,
             form_name: "Slurpuff",
@@ -33628,7 +33628,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Inkay,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Inkay,
             form_name: "Inkay",
@@ -33662,7 +33662,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Malamar,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Malamar,
@@ -33731,7 +33731,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Binacle,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Binacle,
             form_name: "Binacle",
@@ -33765,7 +33765,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Barbaracle,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Barbaracle,
@@ -33834,7 +33834,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Skrelp,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Skrelp,
             form_name: "Skrelp",
@@ -33868,7 +33868,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Dragalge,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Dragalge,
@@ -33937,7 +33937,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Clauncher,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Clauncher,
             form_name: "Clauncher",
@@ -33971,7 +33971,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Clawitzer,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Clawitzer,
             form_name: "Clawitzer",
@@ -34005,7 +34005,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Helioptile,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Helioptile,
             form_name: "Helioptile",
@@ -34039,7 +34039,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Heliolisk,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Heliolisk,
             form_name: "Heliolisk",
@@ -34073,7 +34073,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Tyrunt,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Tyrunt,
             form_name: "Tyrunt",
@@ -34107,7 +34107,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Tyrantrum,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Tyrantrum,
             form_name: "Tyrantrum",
@@ -34141,7 +34141,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Amaura,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Amaura,
             form_name: "Amaura",
@@ -34175,7 +34175,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Aurorus,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Aurorus,
             form_name: "Aurorus",
@@ -34209,7 +34209,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Sylveon,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Sylveon,
             form_name: "Sylveon",
@@ -34243,7 +34243,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Hawlucha,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Hawlucha,
@@ -34312,7 +34312,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Dedenne,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Dedenne,
             form_name: "Dedenne",
@@ -34346,7 +34346,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Carbink,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Carbink,
             form_name: "Carbink",
@@ -34380,7 +34380,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Goomy,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Goomy,
             form_name: "Goomy",
@@ -34416,7 +34416,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Sliggoo,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Sliggoo,
@@ -34482,7 +34482,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Goodra,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Goodra,
@@ -34550,7 +34550,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Klefki,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Klefki,
             form_name: "Klefki",
@@ -34584,7 +34584,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Phantump,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Phantump,
             form_name: "Phantump",
@@ -34618,7 +34618,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Trevenant,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Trevenant,
             form_name: "Trevenant",
@@ -34652,7 +34652,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Pumpkaboo,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Pumpkaboo,
@@ -34778,7 +34778,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Gourgeist,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Gourgeist,
@@ -34910,7 +34910,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Bergmite,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Bergmite,
             form_name: "Bergmite",
@@ -34946,7 +34946,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Avalugg,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Avalugg,
@@ -35012,7 +35012,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Noibat,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Noibat,
             form_name: "Noibat",
@@ -35046,7 +35046,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Noivern,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Noivern,
             form_name: "Noivern",
@@ -35080,7 +35080,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Xerneas,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Xerneas,
@@ -35146,7 +35146,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Yveltal,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Yveltal,
             form_name: "Yveltal",
@@ -35180,7 +35180,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Zygarde,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Zygarde,
@@ -35369,7 +35369,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Diancie,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Diancie,
@@ -35438,7 +35438,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Hoopa,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Hoopa,
@@ -35504,7 +35504,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Volcanion,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Volcanion,
             form_name: "Volcanion",
@@ -35538,7 +35538,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Rowlet,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Rowlet,
             form_name: "Rowlet",
@@ -35572,7 +35572,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Dartrix,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Dartrix,
             form_name: "Dartrix",
@@ -35608,7 +35608,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Decidueye,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Decidueye,
@@ -35674,7 +35674,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Litten,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Litten,
             form_name: "Litten",
@@ -35708,7 +35708,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Torracat,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Torracat,
             form_name: "Torracat",
@@ -35742,7 +35742,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Incineroar,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Incineroar,
             form_name: "Incineroar",
@@ -35776,7 +35776,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Popplio,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Popplio,
             form_name: "Popplio",
@@ -35810,7 +35810,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Brionne,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Brionne,
             form_name: "Brionne",
@@ -35844,7 +35844,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Primarina,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Primarina,
             form_name: "Primarina",
@@ -35878,7 +35878,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Pikipek,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Pikipek,
             form_name: "Pikipek",
@@ -35912,7 +35912,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Trumbeak,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Trumbeak,
             form_name: "Trumbeak",
@@ -35946,7 +35946,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Toucannon,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Toucannon,
             form_name: "Toucannon",
@@ -35980,7 +35980,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Yungoos,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Yungoos,
             form_name: "Yungoos",
@@ -36014,7 +36014,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Gumshoos,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Gumshoos,
@@ -36080,7 +36080,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Grubbin,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Grubbin,
             form_name: "Grubbin",
@@ -36114,7 +36114,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Charjabug,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Charjabug,
             form_name: "Charjabug",
@@ -36148,7 +36148,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Vikavolt,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Vikavolt,
@@ -36214,7 +36214,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Crabrawler,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Crabrawler,
             form_name: "Crabrawler",
@@ -36248,7 +36248,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Crabominable,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Crabominable,
@@ -36317,7 +36317,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Oricorio,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Oricorio,
@@ -36443,7 +36443,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Cutiefly,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Cutiefly,
             form_name: "Cutiefly",
@@ -36477,7 +36477,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Ribombee,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Ribombee,
@@ -36543,7 +36543,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Rockruff,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Rockruff,
@@ -36611,7 +36611,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Lycanroc,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Lycanroc,
@@ -36709,7 +36709,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Wishiwashi,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Wishiwashi,
@@ -36775,7 +36775,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Mareanie,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Mareanie,
             form_name: "Mareanie",
@@ -36809,7 +36809,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Toxapex,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Toxapex,
             form_name: "Toxapex",
@@ -36843,7 +36843,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Mudbray,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Mudbray,
             form_name: "Mudbray",
@@ -36877,7 +36877,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Mudsdale,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Mudsdale,
             form_name: "Mudsdale",
@@ -36911,7 +36911,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Dewpider,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Dewpider,
             form_name: "Dewpider",
@@ -36945,7 +36945,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Araquanid,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Araquanid,
@@ -37011,7 +37011,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Fomantis,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Fomantis,
             form_name: "Fomantis",
@@ -37045,7 +37045,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Lurantis,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Lurantis,
@@ -37111,7 +37111,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Morelull,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Morelull,
             form_name: "Morelull",
@@ -37145,7 +37145,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Shiinotic,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Shiinotic,
             form_name: "Shiinotic",
@@ -37179,7 +37179,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Salandit,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Salandit,
             form_name: "Salandit",
@@ -37213,7 +37213,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Salazzle,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Salazzle,
@@ -37279,7 +37279,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Stufful,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Stufful,
             form_name: "Stufful",
@@ -37313,7 +37313,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Bewear,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Bewear,
             form_name: "Bewear",
@@ -37347,7 +37347,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Bounsweet,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Bounsweet,
             form_name: "Bounsweet",
@@ -37381,7 +37381,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Steenee,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Steenee,
             form_name: "Steenee",
@@ -37415,7 +37415,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Tsareena,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Tsareena,
             form_name: "Tsareena",
@@ -37449,7 +37449,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Comfey,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Comfey,
             form_name: "Comfey",
@@ -37483,7 +37483,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Oranguru,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Oranguru,
             form_name: "Oranguru",
@@ -37517,7 +37517,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Passimian,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Passimian,
             form_name: "Passimian",
@@ -37551,7 +37551,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Wimpod,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Wimpod,
             form_name: "Wimpod",
@@ -37585,7 +37585,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Golisopod,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Golisopod,
@@ -37654,7 +37654,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Sandygast,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Sandygast,
             form_name: "Sandygast",
@@ -37688,7 +37688,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Palossand,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Palossand,
             form_name: "Palossand",
@@ -37722,7 +37722,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Pyukumuku,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Pyukumuku,
             form_name: "Pyukumuku",
@@ -37756,7 +37756,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::TypeNull,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::TypeNull,
             form_name: "Type: Null",
@@ -37790,7 +37790,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Silvally,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Silvally,
@@ -38336,7 +38336,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Minior,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Minior,
@@ -38762,7 +38762,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Komala,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Komala,
             form_name: "Komala",
@@ -38796,7 +38796,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Turtonator,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Turtonator,
             form_name: "Turtonator",
@@ -38830,7 +38830,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Togedemaru,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Togedemaru,
@@ -38896,7 +38896,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Mimikyu,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Mimikyu,
@@ -39022,7 +39022,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Bruxish,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Bruxish,
             form_name: "Bruxish",
@@ -39056,7 +39056,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Drampa,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Drampa,
@@ -39125,7 +39125,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Dhelmise,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Dhelmise,
             form_name: "Dhelmise",
@@ -39159,7 +39159,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Jangmoo,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Jangmoo,
             form_name: "Jangmo-o",
@@ -39193,7 +39193,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Hakamoo,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Hakamoo,
             form_name: "Hakamo-o",
@@ -39227,7 +39227,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Kommoo,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Kommoo,
@@ -39293,7 +39293,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::TapuKoko,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::TapuKoko,
             form_name: "Tapu Koko",
@@ -39327,7 +39327,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::TapuLele,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::TapuLele,
             form_name: "Tapu Lele",
@@ -39361,7 +39361,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::TapuBulu,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::TapuBulu,
             form_name: "Tapu Bulu",
@@ -39395,7 +39395,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::TapuFini,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::TapuFini,
             form_name: "Tapu Fini",
@@ -39429,7 +39429,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Cosmog,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Cosmog,
             form_name: "Cosmog",
@@ -39463,7 +39463,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Cosmoem,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Cosmoem,
             form_name: "Cosmoem",
@@ -39500,7 +39500,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Solgaleo,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Solgaleo,
             form_name: "Solgaleo",
@@ -39534,7 +39534,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Lunala,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Lunala,
             form_name: "Lunala",
@@ -39568,7 +39568,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Nihilego,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Nihilego,
             form_name: "Nihilego",
@@ -39602,7 +39602,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Buzzwole,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Buzzwole,
             form_name: "Buzzwole",
@@ -39636,7 +39636,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Pheromosa,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Pheromosa,
             form_name: "Pheromosa",
@@ -39670,7 +39670,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Xurkitree,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Xurkitree,
             form_name: "Xurkitree",
@@ -39704,7 +39704,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Celesteela,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Celesteela,
             form_name: "Celesteela",
@@ -39738,7 +39738,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Kartana,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Kartana,
             form_name: "Kartana",
@@ -39772,7 +39772,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Guzzlord,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Guzzlord,
             form_name: "Guzzlord",
@@ -39806,7 +39806,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Necrozma,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Necrozma,
@@ -39932,7 +39932,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Magearna,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Magearna,
@@ -40064,7 +40064,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Marshadow,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Marshadow,
             form_name: "Marshadow",
@@ -40098,7 +40098,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Poipole,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Poipole,
             form_name: "Poipole",
@@ -40132,7 +40132,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Naganadel,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Naganadel,
             form_name: "Naganadel",
@@ -40166,7 +40166,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Stakataka,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Stakataka,
             form_name: "Stakataka",
@@ -40200,7 +40200,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Blacephalon,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Blacephalon,
             form_name: "Blacephalon",
@@ -40234,7 +40234,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Zeraora,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Zeraora,
@@ -40303,7 +40303,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Meltan,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Meltan,
             form_name: "Meltan",
@@ -40337,7 +40337,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Melmetal,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Melmetal,
             form_name: "Melmetal",
@@ -40371,7 +40371,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Grookey,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Grookey,
             form_name: "Grookey",
@@ -40405,7 +40405,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Thwackey,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Thwackey,
             form_name: "Thwackey",
@@ -40439,7 +40439,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Rillaboom,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Rillaboom,
             form_name: "Rillaboom",
@@ -40473,7 +40473,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Scorbunny,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Scorbunny,
             form_name: "Scorbunny",
@@ -40507,7 +40507,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Raboot,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Raboot,
             form_name: "Raboot",
@@ -40541,7 +40541,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Cinderace,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Cinderace,
             form_name: "Cinderace",
@@ -40575,7 +40575,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Sobble,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Sobble,
             form_name: "Sobble",
@@ -40609,7 +40609,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Drizzile,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Drizzile,
             form_name: "Drizzile",
@@ -40643,7 +40643,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Inteleon,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Inteleon,
             form_name: "Inteleon",
@@ -40677,7 +40677,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Skwovet,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Skwovet,
             form_name: "Skwovet",
@@ -40711,7 +40711,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Greedent,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Greedent,
             form_name: "Greedent",
@@ -40745,7 +40745,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Rookidee,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Rookidee,
             form_name: "Rookidee",
@@ -40779,7 +40779,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Corvisquire,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Corvisquire,
             form_name: "Corvisquire",
@@ -40813,7 +40813,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Corviknight,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Corviknight,
             form_name: "Corviknight",
@@ -40847,7 +40847,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Blipbug,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Blipbug,
             form_name: "Blipbug",
@@ -40881,7 +40881,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Dottler,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Dottler,
             form_name: "Dottler",
@@ -40915,7 +40915,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Orbeetle,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Orbeetle,
             form_name: "Orbeetle",
@@ -40949,7 +40949,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Nickit,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Nickit,
             form_name: "Nickit",
@@ -40983,7 +40983,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Thievul,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Thievul,
             form_name: "Thievul",
@@ -41017,7 +41017,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Gossifleur,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Gossifleur,
             form_name: "Gossifleur",
@@ -41051,7 +41051,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Eldegoss,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Eldegoss,
             form_name: "Eldegoss",
@@ -41085,7 +41085,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Wooloo,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Wooloo,
             form_name: "Wooloo",
@@ -41119,7 +41119,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Dubwool,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Dubwool,
             form_name: "Dubwool",
@@ -41153,7 +41153,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Chewtle,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Chewtle,
             form_name: "Chewtle",
@@ -41187,7 +41187,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Drednaw,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Drednaw,
             form_name: "Drednaw",
@@ -41221,7 +41221,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Yamper,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Yamper,
             form_name: "Yamper",
@@ -41255,7 +41255,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Boltund,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Boltund,
             form_name: "Boltund",
@@ -41289,7 +41289,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Rolycoly,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Rolycoly,
             form_name: "Rolycoly",
@@ -41323,7 +41323,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Carkol,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Carkol,
             form_name: "Carkol",
@@ -41357,7 +41357,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Coalossal,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Coalossal,
             form_name: "Coalossal",
@@ -41391,7 +41391,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Applin,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[FormMetadata {
             national_dex: NationalDex::Applin,
             form_name: "Applin",
@@ -41429,7 +41429,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Flapple,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[FormMetadata {
             national_dex: NationalDex::Flapple,
             form_name: "Flapple",
@@ -41463,7 +41463,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Appletun,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[FormMetadata {
             national_dex: NationalDex::Appletun,
             form_name: "Appletun",
@@ -41497,7 +41497,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Silicobra,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Silicobra,
             form_name: "Silicobra",
@@ -41531,7 +41531,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Sandaconda,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Sandaconda,
             form_name: "Sandaconda",
@@ -41565,7 +41565,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Cramorant,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Cramorant,
@@ -41661,7 +41661,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Arrokuda,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Arrokuda,
             form_name: "Arrokuda",
@@ -41695,7 +41695,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Barraskewda,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Barraskewda,
             form_name: "Barraskewda",
@@ -41729,7 +41729,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Toxel,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Toxel,
             form_name: "Toxel",
@@ -41765,7 +41765,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Toxtricity,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Toxtricity,
@@ -41831,7 +41831,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Sizzlipede,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Sizzlipede,
             form_name: "Sizzlipede",
@@ -41865,7 +41865,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Centiskorch,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Centiskorch,
             form_name: "Centiskorch",
@@ -41899,7 +41899,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Clobbopus,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Clobbopus,
             form_name: "Clobbopus",
@@ -41933,7 +41933,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Grapploct,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Grapploct,
             form_name: "Grapploct",
@@ -41967,7 +41967,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Sinistea,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Sinistea,
@@ -42033,7 +42033,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Polteageist,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Polteageist,
@@ -42101,7 +42101,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Hatenna,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Hatenna,
             form_name: "Hatenna",
@@ -42135,7 +42135,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Hattrem,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Hattrem,
             form_name: "Hattrem",
@@ -42169,7 +42169,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Hatterene,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Hatterene,
             form_name: "Hatterene",
@@ -42203,7 +42203,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Impidimp,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Impidimp,
             form_name: "Impidimp",
@@ -42237,7 +42237,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Morgrem,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Morgrem,
             form_name: "Morgrem",
@@ -42271,7 +42271,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Grimmsnarl,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Grimmsnarl,
             form_name: "Grimmsnarl",
@@ -42305,7 +42305,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Obstagoon,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Obstagoon,
             form_name: "Obstagoon",
@@ -42339,7 +42339,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Perrserker,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Perrserker,
             form_name: "Perrserker",
@@ -42373,7 +42373,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Cursola,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Cursola,
             form_name: "Cursola",
@@ -42407,7 +42407,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Sirfetchd,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Sirfetchd,
             form_name: "Sirfetch'd",
@@ -42441,7 +42441,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::MrRime,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::MrRime,
             form_name: "Mr. Rime",
@@ -42475,7 +42475,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Runerigus,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Runerigus,
             form_name: "Runerigus",
@@ -42509,7 +42509,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Milcery,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Milcery,
             form_name: "Milcery",
@@ -42543,7 +42543,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Alcremie,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Alcremie,
@@ -42819,7 +42819,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Falinks,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Falinks,
@@ -42888,7 +42888,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Pincurchin,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Pincurchin,
             form_name: "Pincurchin",
@@ -42922,7 +42922,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Snom,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Snom,
             form_name: "Snom",
@@ -42956,7 +42956,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Frosmoth,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Frosmoth,
             form_name: "Frosmoth",
@@ -42990,7 +42990,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Stonjourner,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Stonjourner,
             form_name: "Stonjourner",
@@ -43024,7 +43024,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Eiscue,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Eiscue,
@@ -43090,7 +43090,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Indeedee,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Indeedee,
@@ -43156,7 +43156,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Morpeko,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Morpeko,
@@ -43222,7 +43222,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Cufant,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Cufant,
             form_name: "Cufant",
@@ -43256,7 +43256,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Copperajah,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Copperajah,
             form_name: "Copperajah",
@@ -43290,7 +43290,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Dracozolt,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Dracozolt,
             form_name: "Dracozolt",
@@ -43324,7 +43324,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Arctozolt,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Arctozolt,
             form_name: "Arctozolt",
@@ -43358,7 +43358,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Dracovish,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Dracovish,
             form_name: "Dracovish",
@@ -43392,7 +43392,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Arctovish,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Arctovish,
             form_name: "Arctovish",
@@ -43426,7 +43426,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Duraludon,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Duraludon,
             form_name: "Duraludon",
@@ -43460,7 +43460,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Dreepy,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Dreepy,
             form_name: "Dreepy",
@@ -43494,7 +43494,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Drakloak,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Drakloak,
             form_name: "Drakloak",
@@ -43528,7 +43528,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Dragapult,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Dragapult,
             form_name: "Dragapult",
@@ -43562,7 +43562,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Zacian,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Zacian,
@@ -43628,7 +43628,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Zamazenta,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Zamazenta,
@@ -43694,7 +43694,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Eternatus,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Eternatus,
@@ -43760,7 +43760,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Kubfu,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Kubfu,
             form_name: "Kubfu",
@@ -43796,7 +43796,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Urshifu,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Urshifu,
@@ -43862,7 +43862,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Zarude,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Zarude,
@@ -43928,7 +43928,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Regieleki,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Regieleki,
             form_name: "Regieleki",
@@ -43962,7 +43962,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Regidrago,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Regidrago,
             form_name: "Regidrago",
@@ -43996,7 +43996,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Glastrier,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Glastrier,
             form_name: "Glastrier",
@@ -44030,7 +44030,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Spectrier,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Spectrier,
             form_name: "Spectrier",
@@ -44064,7 +44064,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Calyrex,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Calyrex,
@@ -44160,7 +44160,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Wyrdeer,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Wyrdeer,
             form_name: "Wyrdeer",
@@ -44194,7 +44194,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Kleavor,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Kleavor,
             form_name: "Kleavor",
@@ -44228,7 +44228,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Ursaluna,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Ursaluna,
@@ -44294,7 +44294,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Basculegion,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Basculegion,
@@ -44364,7 +44364,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Sneasler,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Sneasler,
             form_name: "Sneasler",
@@ -44398,7 +44398,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Overqwil,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Overqwil,
             form_name: "Overqwil",
@@ -44432,7 +44432,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Enamorus,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Enamorus,
@@ -44498,7 +44498,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Sprigatito,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Sprigatito,
             form_name: "Sprigatito",
@@ -44532,7 +44532,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Floragato,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Floragato,
             form_name: "Floragato",
@@ -44566,7 +44566,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Meowscarada,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Meowscarada,
             form_name: "Meowscarada",
@@ -44600,7 +44600,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Fuecoco,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Fuecoco,
             form_name: "Fuecoco",
@@ -44634,7 +44634,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Crocalor,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Crocalor,
             form_name: "Crocalor",
@@ -44668,7 +44668,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Skeledirge,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Skeledirge,
             form_name: "Skeledirge",
@@ -44702,7 +44702,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Quaxly,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Quaxly,
             form_name: "Quaxly",
@@ -44736,7 +44736,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Quaxwell,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Quaxwell,
             form_name: "Quaxwell",
@@ -44770,7 +44770,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Quaquaval,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Quaquaval,
             form_name: "Quaquaval",
@@ -44804,7 +44804,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Lechonk,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Lechonk,
             form_name: "Lechonk",
@@ -44840,7 +44840,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Oinkologne,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Oinkologne,
@@ -44906,7 +44906,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Tarountula,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[FormMetadata {
             national_dex: NationalDex::Tarountula,
             form_name: "Tarountula",
@@ -44940,7 +44940,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Spidops,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[FormMetadata {
             national_dex: NationalDex::Spidops,
             form_name: "Spidops",
@@ -44974,7 +44974,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Nymble,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Nymble,
             form_name: "Nymble",
@@ -45008,7 +45008,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Lokix,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Lokix,
             form_name: "Lokix",
@@ -45042,7 +45042,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Pawmi,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Pawmi,
             form_name: "Pawmi",
@@ -45076,7 +45076,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Pawmo,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Pawmo,
             form_name: "Pawmo",
@@ -45110,7 +45110,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Pawmot,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Pawmot,
             form_name: "Pawmot",
@@ -45144,7 +45144,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Tandemaus,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Tandemaus,
             form_name: "Tandemaus",
@@ -45180,7 +45180,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Maushold,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Maushold,
@@ -45246,7 +45246,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Fidough,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Fidough,
             form_name: "Fidough",
@@ -45280,7 +45280,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Dachsbun,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Dachsbun,
             form_name: "Dachsbun",
@@ -45314,7 +45314,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Smoliv,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Smoliv,
             form_name: "Smoliv",
@@ -45348,7 +45348,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Dolliv,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Dolliv,
             form_name: "Dolliv",
@@ -45382,7 +45382,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Arboliva,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Arboliva,
             form_name: "Arboliva",
@@ -45416,7 +45416,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Squawkabilly,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Squawkabilly,
@@ -45542,7 +45542,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Nacli,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Nacli,
             form_name: "Nacli",
@@ -45576,7 +45576,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Naclstack,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Naclstack,
             form_name: "Naclstack",
@@ -45610,7 +45610,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Garganacl,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Garganacl,
             form_name: "Garganacl",
@@ -45644,7 +45644,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Charcadet,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Charcadet,
             form_name: "Charcadet",
@@ -45681,7 +45681,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Armarouge,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Armarouge,
             form_name: "Armarouge",
@@ -45715,7 +45715,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Ceruledge,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Ceruledge,
             form_name: "Ceruledge",
@@ -45749,7 +45749,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Tadbulb,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Tadbulb,
             form_name: "Tadbulb",
@@ -45783,7 +45783,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Bellibolt,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Bellibolt,
             form_name: "Bellibolt",
@@ -45817,7 +45817,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Wattrel,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Wattrel,
             form_name: "Wattrel",
@@ -45851,7 +45851,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Kilowattrel,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Kilowattrel,
             form_name: "Kilowattrel",
@@ -45885,7 +45885,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Maschiff,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Maschiff,
             form_name: "Maschiff",
@@ -45919,7 +45919,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Mabosstiff,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Mabosstiff,
             form_name: "Mabosstiff",
@@ -45953,7 +45953,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Shroodle,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Shroodle,
             form_name: "Shroodle",
@@ -45987,7 +45987,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Grafaiai,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Grafaiai,
             form_name: "Grafaiai",
@@ -46021,7 +46021,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Bramblin,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Bramblin,
             form_name: "Bramblin",
@@ -46055,7 +46055,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Brambleghast,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Brambleghast,
             form_name: "Brambleghast",
@@ -46089,7 +46089,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Toedscool,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Toedscool,
             form_name: "Toedscool",
@@ -46123,7 +46123,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Toedscruel,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Toedscruel,
             form_name: "Toedscruel",
@@ -46157,7 +46157,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Klawf,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Klawf,
             form_name: "Klawf",
@@ -46191,7 +46191,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Capsakid,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Capsakid,
             form_name: "Capsakid",
@@ -46225,7 +46225,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Scovillain,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Scovillain,
@@ -46294,7 +46294,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Rellor,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Rellor,
             form_name: "Rellor",
@@ -46328,7 +46328,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Rabsca,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Rabsca,
             form_name: "Rabsca",
@@ -46362,7 +46362,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Flittle,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Flittle,
             form_name: "Flittle",
@@ -46396,7 +46396,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Espathra,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Espathra,
             form_name: "Espathra",
@@ -46430,7 +46430,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Tinkatink,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Tinkatink,
             form_name: "Tinkatink",
@@ -46464,7 +46464,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Tinkatuff,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Tinkatuff,
             form_name: "Tinkatuff",
@@ -46498,7 +46498,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Tinkaton,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Tinkaton,
             form_name: "Tinkaton",
@@ -46532,7 +46532,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Wiglett,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Wiglett,
             form_name: "Wiglett",
@@ -46566,7 +46566,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Wugtrio,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Wugtrio,
             form_name: "Wugtrio",
@@ -46600,7 +46600,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Bombirdier,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Bombirdier,
             form_name: "Bombirdier",
@@ -46634,7 +46634,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Finizen,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Finizen,
             form_name: "Finizen",
@@ -46668,7 +46668,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Palafin,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Palafin,
@@ -46734,7 +46734,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Varoom,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Varoom,
             form_name: "Varoom",
@@ -46768,7 +46768,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Revavroom,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Revavroom,
             form_name: "Revavroom",
@@ -46802,7 +46802,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Cyclizar,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Cyclizar,
             form_name: "Cyclizar",
@@ -46836,7 +46836,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Orthworm,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Orthworm,
             form_name: "Orthworm",
@@ -46870,7 +46870,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Glimmet,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Glimmet,
             form_name: "Glimmet",
@@ -46904,7 +46904,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Glimmora,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Glimmora,
@@ -46973,7 +46973,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Greavard,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Greavard,
             form_name: "Greavard",
@@ -47007,7 +47007,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Houndstone,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Houndstone,
             form_name: "Houndstone",
@@ -47041,7 +47041,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Flamigo,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Flamigo,
             form_name: "Flamigo",
@@ -47075,7 +47075,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Cetoddle,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Cetoddle,
             form_name: "Cetoddle",
@@ -47109,7 +47109,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Cetitan,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Cetitan,
             form_name: "Cetitan",
@@ -47143,7 +47143,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Veluza,
-        level_up_type: LevelUpType::Fast,
+        experience_growth: ExperienceGrowth::Fast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Veluza,
             form_name: "Veluza",
@@ -47177,7 +47177,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Dondozo,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Dondozo,
             form_name: "Dondozo",
@@ -47211,7 +47211,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Tatsugiri,
-        level_up_type: LevelUpType::MediumSlow,
+        experience_growth: ExperienceGrowth::MediumSlow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Tatsugiri,
@@ -47406,7 +47406,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Annihilape,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Annihilape,
             form_name: "Annihilape",
@@ -47440,7 +47440,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Clodsire,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Clodsire,
             form_name: "Clodsire",
@@ -47474,7 +47474,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Farigiraf,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Farigiraf,
             form_name: "Farigiraf",
@@ -47508,7 +47508,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Dudunsparce,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Dudunsparce,
@@ -47574,7 +47574,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Kingambit,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Kingambit,
             form_name: "Kingambit",
@@ -47608,7 +47608,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::GreatTusk,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::GreatTusk,
             form_name: "Great Tusk",
@@ -47642,7 +47642,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::ScreamTail,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::ScreamTail,
             form_name: "Scream Tail",
@@ -47676,7 +47676,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::BruteBonnet,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::BruteBonnet,
             form_name: "Brute Bonnet",
@@ -47710,7 +47710,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::FlutterMane,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::FlutterMane,
             form_name: "Flutter Mane",
@@ -47744,7 +47744,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::SlitherWing,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::SlitherWing,
             form_name: "Slither Wing",
@@ -47778,7 +47778,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::SandyShocks,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::SandyShocks,
             form_name: "Sandy Shocks",
@@ -47812,7 +47812,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::IronTreads,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::IronTreads,
             form_name: "Iron Treads",
@@ -47846,7 +47846,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::IronBundle,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::IronBundle,
             form_name: "Iron Bundle",
@@ -47880,7 +47880,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::IronHands,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::IronHands,
             form_name: "Iron Hands",
@@ -47914,7 +47914,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::IronJugulis,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::IronJugulis,
             form_name: "Iron Jugulis",
@@ -47948,7 +47948,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::IronMoth,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::IronMoth,
             form_name: "Iron Moth",
@@ -47982,7 +47982,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::IronThorns,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::IronThorns,
             form_name: "Iron Thorns",
@@ -48016,7 +48016,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Frigibax,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Frigibax,
             form_name: "Frigibax",
@@ -48050,7 +48050,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Arctibax,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Arctibax,
             form_name: "Arctibax",
@@ -48084,7 +48084,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Baxcalibur,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Baxcalibur,
@@ -48153,7 +48153,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Gimmighoul,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Gimmighoul,
@@ -48219,7 +48219,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Gholdengo,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Gholdengo,
             form_name: "Gholdengo",
@@ -48253,7 +48253,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::WoChien,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::WoChien,
             form_name: "Wo-Chien",
@@ -48287,7 +48287,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::ChienPao,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::ChienPao,
             form_name: "Chien-Pao",
@@ -48321,7 +48321,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::TingLu,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::TingLu,
             form_name: "Ting-Lu",
@@ -48355,7 +48355,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::ChiYu,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::ChiYu,
             form_name: "Chi-Yu",
@@ -48389,7 +48389,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::RoaringMoon,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::RoaringMoon,
             form_name: "Roaring Moon",
@@ -48423,7 +48423,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::IronValiant,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::IronValiant,
             form_name: "Iron Valiant",
@@ -48457,7 +48457,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Koraidon,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Koraidon,
@@ -48613,7 +48613,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Miraidon,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Miraidon,
@@ -48769,7 +48769,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::WalkingWake,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::WalkingWake,
             form_name: "Walking Wake",
@@ -48803,7 +48803,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::IronLeaves,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::IronLeaves,
             form_name: "Iron Leaves",
@@ -48837,7 +48837,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Dipplin,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[FormMetadata {
             national_dex: NationalDex::Dipplin,
             form_name: "Dipplin",
@@ -48871,7 +48871,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Poltchageist,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Poltchageist,
@@ -48937,7 +48937,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Sinistcha,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Sinistcha,
@@ -49003,7 +49003,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Okidogi,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Okidogi,
             form_name: "Okidogi",
@@ -49037,7 +49037,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Munkidori,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Munkidori,
             form_name: "Munkidori",
@@ -49071,7 +49071,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Fezandipiti,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Fezandipiti,
             form_name: "Fezandipiti",
@@ -49105,7 +49105,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Ogerpon,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Ogerpon,
@@ -49231,7 +49231,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Archaludon,
-        level_up_type: LevelUpType::MediumFast,
+        experience_growth: ExperienceGrowth::MediumFast,
         forms: &[FormMetadata {
             national_dex: NationalDex::Archaludon,
             form_name: "Archaludon",
@@ -49265,7 +49265,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Hydrapple,
-        level_up_type: LevelUpType::Erratic,
+        experience_growth: ExperienceGrowth::Erratic,
         forms: &[FormMetadata {
             national_dex: NationalDex::Hydrapple,
             form_name: "Hydrapple",
@@ -49299,7 +49299,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::GougingFire,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::GougingFire,
             form_name: "Gouging Fire",
@@ -49333,7 +49333,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::RagingBolt,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::RagingBolt,
             form_name: "Raging Bolt",
@@ -49367,7 +49367,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::IronBoulder,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::IronBoulder,
             form_name: "Iron Boulder",
@@ -49401,7 +49401,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::IronCrown,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::IronCrown,
             form_name: "Iron Crown",
@@ -49435,7 +49435,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Terapagos,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[
             FormMetadata {
                 national_dex: NationalDex::Terapagos,
@@ -49531,7 +49531,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
     },
     SpeciesMetadata {
         national_dex: NationalDex::Pecharunt,
-        level_up_type: LevelUpType::Slow,
+        experience_growth: ExperienceGrowth::Slow,
         forms: &[FormMetadata {
             national_dex: NationalDex::Pecharunt,
             form_name: "Pecharunt",
