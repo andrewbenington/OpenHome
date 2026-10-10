@@ -22,24 +22,15 @@ pub(super) struct SvBlocks {
     pub(super) pokemon_boxes: BoxData,
     pub(super) box_layouts: BoxLayout,
     pub(super) current_box: NumericBlock,
-    pub(super) other_blocks: SwishBlocks,
+    pub(super) other_blocks: SwishBlocks<SvBlockKey>,
 }
 
 impl SvBlocks {
-    pub fn from_blocks(mut blocks: SwishBlocks) -> Result<Self> {
-        let my_status =
-            MyStatusFields::read(&blocks.try_pop_block(SvBlockKey::MyStatus)?.to_bytes())?;
-
-        let pokemon_boxes = BoxData::read(&blocks.try_pop_block(SvBlockKey::Box)?.to_bytes())?;
-
-        let box_layouts = BoxLayout(
-            blocks
-                .try_pop_block(SvBlockKey::BoxLayout)?
-                .into_array_data()?,
-        );
-        let current_box = blocks
-            .try_pop_block(SvBlockKey::CurrentBox)?
-            .into_numeric_data()?;
+    pub fn from_blocks(mut blocks: SwishBlocks<SvBlockKey>) -> Result<Self> {
+        let my_status = MyStatusFields::read(blocks.try_pop_object(SvBlockKey::MyStatus)?.bytes())?;
+        let pokemon_boxes = BoxData::read(blocks.try_pop_object(SvBlockKey::Box)?.bytes())?;
+        let box_layouts = BoxLayout(blocks.try_pop_array(SvBlockKey::BoxLayout)?);
+        let current_box = blocks.try_pop_numeric(SvBlockKey::CurrentBox)?;
 
         Ok(Self {
             my_status,
