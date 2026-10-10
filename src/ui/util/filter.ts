@@ -17,7 +17,7 @@ import {
 
 export interface Filter {
   nationalDex?: number
-  formeNumber?: number
+  formNumber?: number
   heldItem?: number | HeldItemCategory
   gender?: Gender
   ability?: number
@@ -78,7 +78,7 @@ export function filterApplies(filter: Filter, mon: FilterableMon) {
   if (filter.nationalDex && mon.nationalDex !== filter.nationalDex) {
     return false
   }
-  if (filter.formeNumber !== undefined && mon.formIndex !== filter.formeNumber) {
+  if (filter.formNumber !== undefined && mon.formIndex !== filter.formNumber) {
     return false
   }
   if (filter.heldItem !== undefined && !heldItemPassesFilter(mon.heldItemIndex, filter.heldItem)) {

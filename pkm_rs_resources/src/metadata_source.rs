@@ -180,7 +180,7 @@ impl MetadataSource {
         species::metadata_table::source_has_form_metadata(
             *self,
             species_form.get_ndex() as u16,
-            species_form.get_forme_index(),
+            species_form.get_form_index(),
         )
     }
 }

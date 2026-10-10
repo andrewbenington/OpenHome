@@ -40,7 +40,7 @@ impl GameboyData {
 
     pub fn from_main_data(main_data: &MainDataV2) -> Self {
         if main_data.species_and_form.get_ndex() == NationalDex::Unown {
-            let letter_index = main_data.species_and_form.get_forme_index();
+            let letter_index = main_data.species_and_form.get_form_index();
 
             Self {
                 dvs: Dvs::from_ivs_lossy(&main_data.ivs).to_unown_letter(letter_index),

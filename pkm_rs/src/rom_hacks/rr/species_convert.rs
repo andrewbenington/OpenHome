@@ -1363,9 +1363,9 @@ pub static RR_TO_NATIONAL_DEX_MAP: phf::Map<u16, SpeciesForm> = phf_map! {
   // 1375: not present
 };
 
-type NdexAndForme = (u16, u16);
+type NdexAndForm = (u16, u16);
 
-pub static NATIONAL_DEX_TO_RR_MAP: phf::Map<NdexAndForme, u16> = phf_map! {
+pub static NATIONAL_DEX_TO_RR_MAP: phf::Map<NdexAndForm, u16> = phf_map! {
     (0u16, 0u16) => 0,
     (1000u16, 0u16) => 852,
     (1001u16, 0u16) => 749,

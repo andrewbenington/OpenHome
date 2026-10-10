@@ -22,14 +22,14 @@ impl<T: PkmBytes + Serialize + IsShiny + Sized + Randomize> Pkm for T {}
 
 pub trait HasSpeciesAndForm: Pkm {
     fn get_species_metadata(&self) -> &'static SpeciesMetadata;
-    fn get_forme_metadata(&self) -> &'static FormMetadata;
+    fn get_form_metadata(&self) -> &'static FormMetadata;
 
     fn calculate_level(&self) -> u8;
 }
 
 pub trait MaybeHasSpeciesAndForm: Pkm {
     fn try_get_species_metadata(&self) -> Option<&'static SpeciesMetadata>;
-    fn get_forme_metadata(&self) -> Option<&'static FormMetadata>;
+    fn get_form_metadata(&self) -> Option<&'static FormMetadata>;
 
     fn calculate_level(&self) -> Option<u8>;
 }

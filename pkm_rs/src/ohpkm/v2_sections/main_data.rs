@@ -267,12 +267,12 @@ impl MainDataV2 {
     }
 
     fn ability_index_by_num(&self, ability_num: AbilityNumber) -> AbilityIndexBounded {
-        let form_metadata = self.species_and_form.get_forme_metadata();
+        let form_metadata = self.species_and_form.get_form_metadata();
         form_metadata.get_ability(ability_num)
     }
 
     const fn ability_num_by_index(&self) -> Option<AbilityNumber> {
-        let form_metadata = self.species_and_form.get_forme_metadata();
+        let form_metadata = self.species_and_form.get_form_metadata();
         if self.ability_index.to_u16() == form_metadata.abilities.0.to_u16() {
             Some(AbilityNumber::First)
         } else if self.ability_index.to_u16() == form_metadata.abilities.1.to_u16() {
@@ -299,7 +299,7 @@ impl MainDataV2 {
     }
 
     pub fn ability_changed_from(&self) -> Option<AbilityIndexBounded> {
-        let form_metadata = self.species_and_form.get_forme_metadata();
+        let form_metadata = self.species_and_form.get_form_metadata();
 
         let origin_generation = self.game_of_origin.generation();
         if origin_generation == Generation::G3 {
@@ -337,7 +337,7 @@ impl MainDataV2 {
 
     pub fn fix_errors(&mut self) -> Vec<OhpkmIssue> {
         let mut errors_found = Vec::<OhpkmIssue>::new();
-        let form_metadata = self.species_and_form.get_forme_metadata();
+        let form_metadata = self.species_and_form.get_form_metadata();
 
         // Previous versions of OpenHome incorrectly translated the gender symbols for the Nidorans; here we will fix that
         if (self.national_dex() == NationalDex::NidoranF
@@ -586,7 +586,7 @@ impl DataSection for MainDataV2 {
         bytes[0..4].copy_from_slice(&self.personality_value.to_le_bytes());
         bytes[4..8].copy_from_slice(&self.encryption_constant.to_le_bytes());
         bytes[8..10].copy_from_slice(&self.species_and_form.get_ndex().to_le_bytes());
-        bytes[10..12].copy_from_slice(&self.species_and_form.get_forme_index().to_le_bytes());
+        bytes[10..12].copy_from_slice(&self.species_and_form.get_form_index().to_le_bytes());
         bytes[12..14].copy_from_slice(&self.trainer_id.to_le_bytes());
         bytes[14..16].copy_from_slice(&self.secret_id.to_le_bytes());
         bytes[16..20].copy_from_slice(&self.exp.to_le_bytes());
@@ -732,7 +732,7 @@ impl Randomize for MainDataV2 {
 
         let ability_num = AbilityNumber::randomized(rng);
         let ability_index = species_and_form
-            .get_forme_metadata()
+            .get_form_metadata()
             .get_ability(ability_num);
 
         Self {

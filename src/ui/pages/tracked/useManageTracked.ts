@@ -288,14 +288,14 @@ export type FindingSavesForAllState =
 
 function monPossiblySupported(
   nationalDex: number,
-  formeNumber: number,
+  formNumber: number,
   saveRef: SaveRef,
   extraFormIndex?: ExtraFormIndex
 ) {
   if (saveRef.game === null) return false
 
   function isSupported(restrictions: TransferRestrictions) {
-    return !isRestricted(restrictions, nationalDex, formeNumber, extraFormIndex)
+    return !isRestricted(restrictions, nationalDex, formNumber, extraFormIndex)
   }
 
   if (saveRef.pluginIdentifier === 'radical_red') {

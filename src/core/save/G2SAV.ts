@@ -273,11 +273,11 @@ export class G2SAV extends OfficialSAV<PK2> {
     return checksum2 === this.bytes[0x1f0d]
   }
 
-  supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+  supportsMon(nationalDex: number, formNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
     if (extraFormIndex !== undefined) return false
     return (
-      (nationalDex <= NationalDex.Celebi && formeNumber === 0) ||
-      (nationalDex === NationalDex.Unown && formeNumber < UNOWN_EXCLAMATION)
+      (nationalDex <= NationalDex.Celebi && formNumber === 0) ||
+      (nationalDex === NationalDex.Unown && formNumber < UNOWN_EXCLAMATION)
     )
   }
 

@@ -933,7 +933,7 @@ impl ExtraFormMetadata {
 #[wasm_bindgen(js_name = "extraFormMetadata")]
 pub fn extra_form_metadata_js(form: ExtraFormIndex) -> ExtraFormMetadata {
     let base_form_metadata = SpeciesForm::base_form(form.national_dex())
-        .get_forme_metadata()
+        .get_form_metadata()
         .clone();
 
     ExtraFormMetadata::from_base_metadata(base_form_metadata, form)

@@ -97,7 +97,7 @@ impl OhpkmConvert for Pk7 {
     }
 
     fn from_ohpkm(ohpkm: &OhpkmV2, strategy: ConvertStrategy) -> Result<Self> {
-        let form_metadata = ohpkm.get_forme_metadata();
+        let form_metadata = ohpkm.get_form_metadata();
         let converter = PkmConverter::new(PkmFormat::PK7, strategy);
         let met_data = converter.met_data(ohpkm);
 

@@ -1299,9 +1299,9 @@ pub static UB_TO_NATIONAL_DEX_MAP: phf::Map<u16, SpeciesForm> = phf_map! {
   // '1293': null, // SPECIES_URSHIFU_RAPID_GIGA (not found)
 };
 
-type NdexAndForme = (u16, u16);
+type NdexAndForm = (u16, u16);
 
-pub static NATIONAL_DEX_TO_UB_MAP: phf::Map<NdexAndForme, u16> = phf_map! {
+pub static NATIONAL_DEX_TO_UB_MAP: phf::Map<NdexAndForm, u16> = phf_map! {
     (1u16, 0u16) => 1,
     (10u16, 0u16) => 10,
     (100u16, 0u16) => 100,

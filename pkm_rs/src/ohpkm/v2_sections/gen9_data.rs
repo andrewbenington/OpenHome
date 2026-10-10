@@ -52,9 +52,7 @@ impl ScarletVioletData {
 
     pub fn default_generated_tera_type(species_and_form: SpeciesForm) -> Self {
         Self {
-            tera_type_original: species_and_form
-                .get_forme_metadata()
-                .transferred_tera_type(),
+            tera_type_original: species_and_form.get_form_metadata().transferred_tera_type(),
             ..Default::default()
         }
     }

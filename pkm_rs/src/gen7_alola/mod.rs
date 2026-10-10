@@ -39,7 +39,7 @@ impl Pk7SpeciesAndForm {
         if source_has_form_metadata(
             MetadataSource::UltraSunUltraMoon,
             species_and_form.get_ndex() as u16,
-            species_and_form.get_forme_index(),
+            species_and_form.get_form_index(),
         ) {
             Some(Self(species_and_form))
         } else {

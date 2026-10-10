@@ -80,7 +80,7 @@ interface BaseSAV<P extends PKMInterface = PKMInterface> {
   setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void
   getAllMons(): Readonly<P>[]
 
-  supportsMon: (nationalDex: number, formeNumber: number) => boolean
+  supportsMon: (nationalDex: number, formNumber: number) => boolean
   supportsItem: (itemIndex: number) => boolean
 
   prepareWriter: () => SaveWriter
@@ -108,7 +108,7 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   abstract invalid: boolean
   abstract tooEarlyToOpen: boolean
   abstract updatedBoxSlots: BoxAndSlot[]
-  abstract supportsMon(nationalDex: number, formeNumber: number): boolean
+  abstract supportsMon(nationalDex: number, formNumber: number): boolean
   abstract supportsItem(itemIndex: number): boolean
   abstract prepareForSaving(): void
   abstract convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<P>
@@ -221,7 +221,7 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   abstract updatedBoxSlots: BoxAndSlot[]
   abstract supportsMon(
     nationalDex: number,
-    formeNumber: number,
+    formNumber: number,
     extraFormIndex?: ExtraFormIndex
   ): boolean
   abstract supportsItem(itemIndex: number): boolean

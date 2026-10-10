@@ -19,7 +19,7 @@ export type EvolutionFamilyProps = {
   formNumber: number
   pokedex: Pokedex
   height?: Responsive<string>
-  onClick?: (nationalDex: number, formeNumber: number) => void
+  onClick?: (nationalDex: number, formNumber: number) => void
 }
 
 export default function EvolutionFamily(props: EvolutionFamilyProps) {
@@ -70,9 +70,9 @@ export default function EvolutionFamily(props: EvolutionFamilyProps) {
 }
 
 function EvolutionLine({ nationalDex, formNumber, pokedex, onClick }: EvolutionFamilyProps) {
-  const formeMetadata = MetadataSummaryLookup(nationalDex, formNumber)
-  const evolutions = formeMetadata?.evolutions ?? []
-  const megaFormes = formeMetadata?.megaEvolutions ?? []
+  const formMetadata = MetadataSummaryLookup(nationalDex, formNumber)
+  const evolutions = formMetadata?.evolutions ?? []
+  const megaFormes = formMetadata?.megaEvolutions ?? []
 
   if (evolutions.length === 8) {
     return (

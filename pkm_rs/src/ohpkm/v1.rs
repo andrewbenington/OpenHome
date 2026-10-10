@@ -344,7 +344,7 @@ impl PkmBytes for OhpkmV1 {
         util::set_flag(bytes, 34, 1, self.flag2_la);
         self.gender.set_bits_2_3(&mut bytes[34]);
 
-        bytes[36..38].copy_from_slice(&self.species_and_form.get_forme_index().to_le_bytes());
+        bytes[36..38].copy_from_slice(&self.species_and_form.get_form_index().to_le_bytes());
 
         // THIS IS DIFFERENT FROM Stats8::to_bytes() ON PURPOSE
         // DO NOT CHANGE

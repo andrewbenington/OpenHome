@@ -242,7 +242,7 @@ impl Pk9 {
             SvPokemonIndex::from_species_and_form(self.species_and_form.0)
                 .expect("Pk9 has SV-compatible species/form"),
         );
-        buf.set_form_index(self.species_and_form.0.get_forme_index());
+        buf.set_form_index(self.species_and_form.0.get_form_index());
         buf.set_held_item_index(self.held_item_index);
         buf.set_trainer_id(self.trainer_id);
         buf.set_secret_id(self.secret_id);
@@ -398,8 +398,8 @@ impl HasSpeciesAndForm for Pk9 {
         self.species_and_form.0.get_species_metadata()
     }
 
-    fn get_forme_metadata(&self) -> &'static FormMetadata {
-        self.species_and_form.0.get_forme_metadata()
+    fn get_form_metadata(&self) -> &'static FormMetadata {
+        self.species_and_form.0.get_form_metadata()
     }
 
     fn calculate_level(&self) -> u8 {
@@ -536,7 +536,7 @@ impl Pk9 {
 
     #[wasm_bindgen(getter = formIndex)]
     pub fn form_index_wasm(&self) -> u16 {
-        self.species_and_form.0.get_forme_index()
+        self.species_and_form.0.get_form_index()
     }
 
     #[wasm_bindgen(getter = evs)]

@@ -15,7 +15,7 @@ use crate::{gen3, ohpkm, util::personality_value};
 
 impl OhpkmConvert for Pk3 {
     fn to_main_data(&self) -> ohpkm::v2_sections::MainDataV2 {
-        let form_metadata = self.get_forme_metadata();
+        let form_metadata = self.get_form_metadata();
 
         let ability_index_unchecked = form_metadata.get_ability(self.ability_num.into());
         let ability_index = if ability_index_unchecked.to_u16() > PK3_MAX_ABILITY {
@@ -127,7 +127,7 @@ impl OhpkmConvert for Pk3 {
             ohpkm.personality_value()
         };
 
-        let form_metadata = ohpkm.get_forme_metadata();
+        let form_metadata = ohpkm.get_form_metadata();
 
         let ability_index_unchecked = form_metadata.get_ability(ohpkm.ability_num());
         let ability_num = if ability_index_unchecked.to_u16() <= PK3_MAX_ABILITY {

@@ -825,11 +825,11 @@ impl OhpkmV2 {
     // Species/Form metadata
 
     pub fn type1(&self) -> PkmType {
-        self.get_forme_metadata().type_1()
+        self.get_form_metadata().type_1()
     }
 
     pub fn type2(&self) -> Option<PkmType> {
-        self.get_forme_metadata().type_2()
+        self.get_form_metadata().type_2()
     }
 
     // Plugins
@@ -1391,7 +1391,7 @@ impl OhpkmV2 {
     pub fn tera_type_original(&self) -> TeraType {
         self.sv_data.map(|d| d.tera_type_original).unwrap_or(
             self.species_and_form()
-                .get_forme_metadata()
+                .get_form_metadata()
                 .transferred_tera_type(),
         )
     }
@@ -3384,7 +3384,7 @@ impl OhpkmV2 {
     pub fn tera_type_original_js(&self) -> TeraType {
         self.sv_data.map(|d| d.tera_type_original).unwrap_or(
             self.species_and_form()
-                .get_forme_metadata()
+                .get_form_metadata()
                 .transferred_tera_type(),
         )
     }
@@ -3600,12 +3600,12 @@ impl OhpkmV2 {
 
     #[wasm_bindgen(getter = type1Index)]
     pub fn type1_index_wasm(&self) -> u8 {
-        self.get_forme_metadata().type_1_index()
+        self.get_form_metadata().type_1_index()
     }
 
     #[wasm_bindgen(getter = type2Index)]
     pub fn type2_index_wasm(&self) -> Option<u8> {
-        self.get_forme_metadata().type_2_index()
+        self.get_form_metadata().type_2_index()
     }
 
     // Notes
@@ -3826,8 +3826,8 @@ impl HasSpeciesAndForm for OhpkmV2 {
         self.main_data.species_and_form.get_species_metadata()
     }
 
-    fn get_forme_metadata(&self) -> &'static pkm_rs_resources::species::FormMetadata {
-        self.main_data.species_and_form.get_forme_metadata()
+    fn get_form_metadata(&self) -> &'static pkm_rs_resources::species::FormMetadata {
+        self.main_data.species_and_form.get_form_metadata()
     }
 
     fn calculate_level(&self) -> u8 {

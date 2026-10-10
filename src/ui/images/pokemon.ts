@@ -117,7 +117,7 @@ export const getPokemonSpritePathFromSource = (
       (mega) => mega.requiredItemId === mon.heldItemIndex
     )
 
-    if (megaForStone) mon.formIndex = megaForStone.megaForme.formIndex
+    if (megaForStone) mon.formIndex = megaForStone.megaForm.formIndex
   } else if (isBattleFormItem(mon.nationalDex, mon.heldItemIndex)) {
     mon.formIndex = displayIndexAdder(mon.heldItemIndex)(mon.formIndex)
   }
@@ -161,9 +161,9 @@ export const getPokemonSpritePathFromSource = (
 }
 
 export function getSpriteName(mon: MonSpriteData, format?: string): string {
-  const formeMetadata = FullMetadataLookup(mon)
-  if (!formeMetadata) return ''
-  let spriteName = formeMetadata?.sprite ?? ''
+  const formMetadata = FullMetadataLookup(mon)
+  if (!formMetadata) return ''
+  let spriteName = formMetadata?.sprite ?? ''
 
   if (mon.nationalDex === NationalDex.Alcremie) {
     if (format === 'PK9' || format === 'PK9Compass') return spriteName

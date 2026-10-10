@@ -249,11 +249,11 @@ export function getHeightCalculated(mon: SizePkm) {
 }
 
 export function getWeightCalculated(mon: SizePkm) {
-  const formeMetadata = FullMetadataLookup(mon)
-  if (!formeMetadata || mon.weightScalar === undefined || !mon.weightDeviation) return 0
+  const formMetadata = FullMetadataLookup(mon)
+  if (!formMetadata || mon.weightScalar === undefined || !mon.weightDeviation) return 0
 
   const deviation = (mon.weightScalar / 255) * 0.40000004 + (1 - mon.weightDeviation)
-  return formeMetadata.baseWeight * 10 * deviation
+  return formMetadata.baseWeight * 10 * deviation
 }
 
 export function mapToObject<T>(m: Map<string | number, T>): Record<string, T> {

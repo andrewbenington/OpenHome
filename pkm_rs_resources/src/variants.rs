@@ -15,7 +15,7 @@ pub fn can_be_alpha(species_form: SpeciesForm) -> bool {
 }
 
 pub fn can_be_alpha_la(species_form: SpeciesForm) -> bool {
-    let form_metadata = species_form.get_forme_metadata();
+    let form_metadata = species_form.get_form_metadata();
     MetadataSource::LegendsArceus.supports_form(species_form)
         && !form_metadata.is_sub_legend
         && !form_metadata.is_restricted_legend
@@ -29,9 +29,9 @@ const FLOETTE_ETERNAL: u16 = 5;
 const GRENINJA_BATTLE_BOND: u16 = 1;
 
 pub fn can_be_alpha_lza(species_form: SpeciesForm) -> bool {
-    let form_metadata = species_form.get_forme_metadata();
+    let form_metadata = species_form.get_form_metadata();
 
-    match (species_form.get_ndex(), species_form.get_forme_index()) {
+    match (species_form.get_ndex(), species_form.get_form_index()) {
         (NationalDex::Floette, FLOETTE_ETERNAL) | (NationalDex::Greninja, GRENINJA_BATTLE_BOND) => {
             false
         }
@@ -84,7 +84,7 @@ pub const fn has_gigantamax_form(species_form: SpeciesForm) -> bool {
         | NationalDex::Pikachu
         | NationalDex::Meowth
         | NationalDex::Gengar
-        | NationalDex::Eevee => species_form.get_forme_index() == 0,
+        | NationalDex::Eevee => species_form.get_form_index() == 0,
         _ => false,
     }
 }
@@ -129,7 +129,7 @@ pub const fn totem_form_acquirable(species_form: SpeciesForm) -> bool {
         | NationalDex::Mimikyu
         | NationalDex::Ribombee
         | NationalDex::Kommoo => true,
-        NationalDex::Raticate | NationalDex::Marowak => species_form.get_forme_index() == 1,
+        NationalDex::Raticate | NationalDex::Marowak => species_form.get_form_index() == 1,
         _ => false,
     }
 }

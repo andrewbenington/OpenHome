@@ -181,20 +181,15 @@ export class CompassSave extends PluginSAV<PK9Compass> {
     return 0
   }
 
-  supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+  supportsMon(nationalDex: number, formNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
     const revision = this.scBlocks ? this.getSaveRevision() : 'Indigo Disk'
     switch (revision) {
       case 'Base Game':
-        return !isRestricted(
-          SV_TRANSFER_RESTRICTIONS_BASE,
-          nationalDex,
-          formeNumber,
-          extraFormIndex
-        )
+        return !isRestricted(SV_TRANSFER_RESTRICTIONS_BASE, nationalDex, formNumber, extraFormIndex)
       case 'Teal Mask':
-        return !isRestricted(SV_TRANSFER_RESTRICTIONS_TM, nationalDex, formeNumber, extraFormIndex)
+        return !isRestricted(SV_TRANSFER_RESTRICTIONS_TM, nationalDex, formNumber, extraFormIndex)
       case 'Indigo Disk':
-        return !isRestricted(SV_TRANSFER_RESTRICTIONS_ID, nationalDex, formeNumber, extraFormIndex)
+        return !isRestricted(SV_TRANSFER_RESTRICTIONS_ID, nationalDex, formNumber, extraFormIndex)
     }
   }
 

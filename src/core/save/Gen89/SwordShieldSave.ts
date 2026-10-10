@@ -162,30 +162,25 @@ export class SwordShieldSave extends WasmOfficialSave<PK8, Pk8Wasm, SwordShieldS
     return this.inner.getBoxName(boxIndex)
   }
 
-  supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+  supportsMon(nationalDex: number, formNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
     const revision = this.scBlocks ? this.getSaveRevision() : 'Crown Tundra'
     switch (revision) {
       case 'Base Game':
         return !isRestricted(
           SWSH_TRANSFER_RESTRICTIONS_BASE,
           nationalDex,
-          formeNumber,
+          formNumber,
           extraFormIndex
         )
       case 'Isle Of Armor':
         return !isRestricted(
           SWSH_TRANSFER_RESTRICTIONS_IOA,
           nationalDex,
-          formeNumber,
+          formNumber,
           extraFormIndex
         )
       case 'Crown Tundra':
-        return !isRestricted(
-          SWSH_TRANSFER_RESTRICTIONS_CT,
-          nationalDex,
-          formeNumber,
-          extraFormIndex
-        )
+        return !isRestricted(SWSH_TRANSFER_RESTRICTIONS_CT, nationalDex, formNumber, extraFormIndex)
     }
   }
 

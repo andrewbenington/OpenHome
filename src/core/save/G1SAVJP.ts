@@ -224,9 +224,9 @@ export class G1SAVJP extends OfficialSAV<PK1> {
     return PK1.fromOhpkm(ohpkm, strategy)
   }
 
-  supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+  supportsMon(nationalDex: number, formNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
     if (extraFormIndex !== undefined) return false
-    return nationalDex <= NationalDex.Mew && formeNumber === 0
+    return nationalDex <= NationalDex.Mew && formNumber === 0
   }
 
   supportsItem(itemIndex: number) {

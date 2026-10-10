@@ -381,10 +381,10 @@ export class G3SAV extends OfficialSAV<PK3> {
     return PK3.fromOhpkm(ohpkm, strategy)
   }
 
-  supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+  supportsMon(nationalDex: number, formNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
     if (extraFormIndex !== undefined) return false
     return (
-      nationalDex <= NationalDex.Deoxys && (formeNumber === 0 || nationalDex === NationalDex.Unown)
+      nationalDex <= NationalDex.Deoxys && (formNumber === 0 || nationalDex === NationalDex.Unown)
     )
   }
 

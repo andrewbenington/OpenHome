@@ -81,7 +81,7 @@ impl Error {
     pub const fn form_index(species_and_form: SpeciesForm) -> Self {
         Self::FormIndex {
             national_dex: species_and_form.get_ndex(),
-            form_index: species_and_form.get_forme_index(),
+            form_index: species_and_form.get_form_index(),
         }
     }
 

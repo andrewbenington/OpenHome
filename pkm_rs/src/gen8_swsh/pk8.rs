@@ -377,8 +377,8 @@ impl HasSpeciesAndForm for Pk8 {
         self.species_and_form.0.get_species_metadata()
     }
 
-    fn get_forme_metadata(&self) -> &'static FormMetadata {
-        self.species_and_form.0.get_forme_metadata()
+    fn get_form_metadata(&self) -> &'static FormMetadata {
+        self.species_and_form.0.get_form_metadata()
     }
 
     fn calculate_level(&self) -> u8 {
@@ -515,7 +515,7 @@ impl Pk8 {
 
     #[wasm_bindgen(getter = formIndex)]
     pub fn form_index_js(&self) -> u16 {
-        self.species_and_form.0.get_forme_index()
+        self.species_and_form.0.get_form_index()
     }
 
     #[wasm_bindgen(getter = evs)]
