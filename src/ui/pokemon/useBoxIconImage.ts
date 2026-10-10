@@ -59,7 +59,7 @@ export function boxIconImagePath(
     )
   }
 
-  const { formeName, sprite } = metadata
+  const { formName, sprite } = metadata
 
   if (
     !isRestricted(
@@ -68,7 +68,7 @@ export function boxIconImagePath(
       mon.formIndex,
       mon.extraFormIndex
     ) &&
-    !formeName?.includes('Battle Bond')
+    !formName?.includes('Battle Bond')
   ) {
     const female =
       mon.isFemale &&

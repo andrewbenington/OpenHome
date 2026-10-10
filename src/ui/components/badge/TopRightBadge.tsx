@@ -11,11 +11,11 @@ import Badge from './Badge'
 import './Badge.css'
 
 type TopRightBadgeProps = {
-  mon: TopRightBadgelMon
+  mon: TopRightBadgeMon
   badgeType: TopRightBadgeType
 }
 
-export type TopRightBadgelMon = {
+export type TopRightBadgeMon = {
   heldItemIndex: number
   nickname: string
   pluginOrigin?: PluginIdentifier
@@ -119,21 +119,21 @@ export function TopRightBadge({ mon, badgeType }: TopRightBadgeProps) {
   }
 }
 
-function hasDvs(mon: TopRightBadgelMon): mon is TopRightBadgelMon & { dvs: StatsPreSplit } {
+function hasDvs(mon: TopRightBadgeMon): mon is TopRightBadgeMon & { dvs: StatsPreSplit } {
   return (mon as any).dvs !== undefined
 }
 
-function getIvsPercent(mon: TopRightBadgelMon): number {
+function getIvsPercent(mon: TopRightBadgeMon): number {
   const ivsTotal = Object.values(mon.ivs ?? {}).reduce((p, c) => p + c, 0)
   return Math.round((ivsTotal / (6 * 31)) * 100)
 }
 
-function getDvsPercent(mon: TopRightBadgelMon & { dvs: StatsPreSplit }): number {
+function getDvsPercent(mon: TopRightBadgeMon & { dvs: StatsPreSplit }): number {
   const dvsTotal = Object.values(mon.dvs).reduce((p, c) => p + c, 0)
   return Math.round((dvsTotal / (5 * 15)) * 100)
 }
 
-function getPerfectIvsCount(mon: TopRightBadgelMon): number {
+function getPerfectIvsCount(mon: TopRightBadgeMon): number {
   if (!mon.ivs) return 0
   return Object.values(mon.ivs).filter((iv) => iv === 31).length
 }

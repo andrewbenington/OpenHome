@@ -16,7 +16,7 @@ export interface OpenHomePlugin {
   api_version: number
   icon: string
   assets: Record<string, string>
-  getMonSpritePath?: (params: MonSpriteData & { dexNum: number; formNum: number }) => string | null
+  getMonSpritePath?: (params: MonSpriteData & { dexNum: number; formeNum: number }) => string | null
 }
 
 export type PluginStateInternal = { plugins: OpenHomePlugin[]; loaded: boolean }

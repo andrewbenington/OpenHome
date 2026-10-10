@@ -204,7 +204,7 @@ impl PkmBytes for Pb7 {
         self.gender.set_bits_1_2(&mut bytes[29]);
         util::set_flag(bytes, 29, 0, self.is_fateful_encounter);
         util::write_uint5_to_bits(
-            self.species_and_form.get_forme_index() as u8,
+            self.species_and_form.get_form_index() as u8,
             &mut bytes[29],
             3,
         );

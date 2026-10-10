@@ -4,7 +4,7 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { DisplayDataOhpkm } from '@openhome-core/pkm/util/pkmInterface'
-import { TopRightBadgelMon as TopRightBadgeMon } from '@openhome-ui/components/badge/TopRightBadge'
+import { TopRightBadgeMon } from '@openhome-ui/components/badge/TopRightBadge'
 import {
   CtxMenuElementBuilder,
   Item,
