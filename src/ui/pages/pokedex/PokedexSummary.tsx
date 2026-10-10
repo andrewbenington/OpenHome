@@ -130,6 +130,10 @@ export default function PokedexSummary(props: PokedexSummaryProps) {
                 const firstRegistered = caughtOrigins?.find((game) => gamesForOrigin.includes(game))
                 const badgeGame = firstRegistered ?? gamesForOrigin[0]
 
+                const gameGroup = ALL_GAME_GROUPS.find((group) =>
+                  group.originGames.includes(badgeGame)
+                )
+
                 return (
                   <Badge.Game
                     key={badgeGame}
@@ -137,6 +141,7 @@ export default function PokedexSummary(props: PokedexSummaryProps) {
                     size="3"
                     style={{ fontWeight: 'bold' }}
                     inactive={!firstRegistered}
+                    tooltip={gameGroup?.description}
                   />
                 )
               })}
@@ -186,7 +191,8 @@ function compatibleGamesPrioritizeCaught(
         )
       }
     }),
-    (source) => `${MetadataSources.originMark(source)}`
+    (source) =>
+      `${MetadataSources.originMark(source)}-${OriginGames.generation(MetadataSources.defaultOriginGame(source))}`
   )
 
   const orderedGameSets: OriginGame[][] = Object.entries(groupedSources)
@@ -205,3 +211,75 @@ function compatibleGamesPrioritizeCaught(
 
   return orderedGameSets
 }
+
+type GameGroup = {
+  originGames: OriginGame[]
+  description: string
+}
+
+const ALL_GAME_GROUPS: GameGroup[] = [
+  {
+    originGames: [OriginGame.Red, OriginGame.BlueGreen, OriginGame.BlueJpn, OriginGame.Yellow],
+    description: 'Generation 1',
+  },
+  {
+    originGames: [OriginGame.Gold, OriginGame.Crystal],
+    description: 'Generation 2',
+  },
+  {
+    originGames: [
+      OriginGame.Ruby,
+      OriginGame.Sapphire,
+      OriginGame.Emerald,
+      OriginGame.FireRed,
+      OriginGame.LeafGreen,
+    ],
+    description: 'Generation 3 (GBA)',
+  },
+  {
+    originGames: [
+      OriginGame.Diamond,
+      OriginGame.Pearl,
+      OriginGame.Platinum,
+      OriginGame.HeartGold,
+      OriginGame.SoulSilver,
+    ],
+    description: 'Generation 4',
+  },
+  {
+    originGames: [OriginGame.Black, OriginGame.Black2, OriginGame.White, OriginGame.White2],
+    description: 'Generation 5',
+  },
+  {
+    originGames: [OriginGame.X, OriginGame.Y, OriginGame.OmegaRuby, OriginGame.AlphaSapphire],
+    description: 'Generation 6',
+  },
+  {
+    originGames: [OriginGame.Sun, OriginGame.Moon, OriginGame.UltraSun, OriginGame.UltraMoon],
+    description: 'Generation 7 (Alola)',
+  },
+  {
+    originGames: [OriginGame.LetsGoPikachu, OriginGame.LetsGoEevee],
+    description: "Generation 7 (Let's Go)",
+  },
+  {
+    originGames: [OriginGame.Sword, OriginGame.Shield],
+    description: 'Sword/Shield',
+  },
+  {
+    originGames: [OriginGame.BrilliantDiamond, OriginGame.ShiningPearl],
+    description: 'Brilliant Diamond/Shining Pearl',
+  },
+  {
+    originGames: [OriginGame.LegendsArceus],
+    description: 'Legends Arceus',
+  },
+  {
+    originGames: [OriginGame.Scarlet, OriginGame.Violet],
+    description: 'Scarlet/Violet',
+  },
+  {
+    originGames: [OriginGame.LegendsZa],
+    description: 'Legends Z-A',
+  },
+]

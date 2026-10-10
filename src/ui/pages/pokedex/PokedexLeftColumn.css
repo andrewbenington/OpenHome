@@ -68,8 +68,22 @@
 
 .evo-family-card {
   height: fit-content;
+  box-sizing: border-box;
+  display: flex;
+  max-height: 40%;
+  width: calc(100% - 0.8rem);
+  margin-bottom: var(--space-1);
+  flex-direction: column;
+  flex: 1;
   padding: 0.5rem 0.75rem;
-  margin-bottom: 1rem;
+  overflow: hidden;
+
+  .rt-Separator {
+    margin-left: calc(-2 * var(--space-1));
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+    width: calc(100% + 2rem);
+  }
 }
 
 .desaturated {

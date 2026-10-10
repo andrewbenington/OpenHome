@@ -24,7 +24,7 @@ import {
   SpeciesLookup,
   totemFormAcquirable,
 } from '@pkm-rs/pkg'
-import { Button, Card, Flex, Inset, Separator, Spinner, Text } from '@radix-ui/themes'
+import { Button, Card, Flex, ScrollArea, Separator, Spinner, Text } from '@radix-ui/themes'
 import { ReactNode, useEffect, useState } from 'react'
 import EvolutionFamily from './EvolutionFamily'
 import './pokedex.css'
@@ -212,10 +212,8 @@ export default function PokedexLeftColumn(props: PokedexDetailsProps) {
         <Text weight="bold" size="2">
           Evolution Family
         </Text>
-        <Inset side="x" p="0" mx="-2" mt="1">
-          <Separator />
-        </Inset>
-        <div style={{ padding: '1rem 0' }}>
+        <Separator />
+        <ScrollArea style={{ margin: 'auto' }}>
           <EvolutionFamily
             key={speciesMetadata.nationalDex}
             height="fit-content"
@@ -226,8 +224,9 @@ export default function PokedexLeftColumn(props: PokedexDetailsProps) {
               props.setSelectedSpecies(SpeciesLookup(nationalDex))
               props.setSelectedForm(MetadataSummaryLookup(nationalDex, formIndex))
             }}
+            style={{ height: '100%' }}
           />
-        </div>
+        </ScrollArea>
       </Card>
     </OhoFlex.ColCentered>
   )

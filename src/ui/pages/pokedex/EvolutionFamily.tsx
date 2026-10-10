@@ -5,6 +5,7 @@ import { Pokedex } from '@openhome-ui/util/pokedex'
 import { MetadataSummaryLookup, SpeciesForm } from '@pkm-rs/pkg'
 import { Flex } from '@radix-ui/themes'
 import { Responsive } from '@radix-ui/themes/props'
+import { CSSProperties } from 'react'
 import TooltipPokemonIcon from './TooltipPokemonIcon'
 import { getFormPokedexData } from './util'
 
@@ -20,6 +21,7 @@ export type EvolutionFamilyProps = {
   pokedex: Pokedex
   height?: Responsive<string>
   onClick?: (nationalDex: number, formeNumber: number) => void
+  style?: CSSProperties
 }
 
 export default function EvolutionFamily(props: EvolutionFamilyProps) {
@@ -53,6 +55,7 @@ export default function EvolutionFamily(props: EvolutionFamilyProps) {
       justify="center"
       align="center"
       overflow="auto"
+      style={props.style}
     >
       {baseEvolutionForms
         .filter((form) => !form.isMega)
@@ -103,6 +106,7 @@ function EvolutionLine({ nationalDex, formNumber, pokedex, onClick }: EvolutionF
             !getFormPokedexData(pokedex, nationalDex, formNumber)?.level.includes('Caught')
           }
           onClick={() => onClick?.(nationalDex, formNumber)}
+          style={{ width: '3rem', height: '3rem' }}
         />
         <Flex direction="column" gap="2">
           {evolutions.slice(4).map((evo, i) => (
@@ -134,6 +138,7 @@ function EvolutionLine({ nationalDex, formNumber, pokedex, onClick }: EvolutionF
         formIndex={formNumber}
         silhouette={!getFormPokedexData(pokedex, nationalDex, formNumber)?.level.includes('Caught')}
         onClick={() => onClick?.(nationalDex, formNumber)}
+        style={{ width: '3rem', height: '3rem' }}
       />
       {!MetadataSummaryLookup(nationalDex, formNumber)?.regional && megaFormes.length > 0 && (
         <Flex direction="column" gap="2">
