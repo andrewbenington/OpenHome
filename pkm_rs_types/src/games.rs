@@ -89,6 +89,11 @@ pub enum OriginGame {
     Scarlet,
     Violet,
     LegendsZa,
+    Invalid53,
+    Invalid54,
+    Invalid55,
+    FireRedSwitch,
+    LeafGreenSwitch,
 }
 
 impl OriginGame {
@@ -146,6 +151,8 @@ impl OriginGame {
             Self::Scarlet => "Scarlet",
             Self::Violet => "Violet",
             Self::LegendsZa => "Legends: Z-A",
+            Self::FireRedSwitch => "FireRed (Switch)",
+            Self::LeafGreenSwitch => "LeafGreen (Switch)",
             Self::Invalid0 => "Invalid (0)",
             Self::Invalid6 => "Invalid (6)",
             Self::Invalid9 => "Invalid (9)",
@@ -156,6 +163,9 @@ impl OriginGame {
             Self::Invalid19 => "Invalid (19)",
             Self::Invalid28 => "Invalid (28)",
             Self::Invalid29 => "Invalid (29)",
+            Self::Invalid53 => "Invalid (53)",
+            Self::Invalid54 => "Invalid (54)",
+            Self::Invalid55 => "Invalid (55)",
         }
     }
 
@@ -179,7 +189,8 @@ impl OriginGame {
         match *self {
             Red | BlueGreen | BlueJpn | Yellow => Generation::G1,
             Gold | Silver | Crystal => Generation::G2,
-            Ruby | Sapphire | Emerald | FireRed | LeafGreen | ColosseumXd => Generation::G3,
+            Ruby | Sapphire | Emerald | FireRed | LeafGreen | ColosseumXd | FireRedSwitch
+            | LeafGreenSwitch => Generation::G3,
             Diamond | Pearl | Platinum | HeartGold | SoulSilver | BattleRevolution => {
                 Generation::G4
             }
@@ -198,7 +209,7 @@ impl OriginGame {
         use OriginGame::*;
         match *self {
             Red | BlueGreen | BlueJpn | Yellow => Some(GameSetting::Kanto),
-            FireRed | LeafGreen => Some(GameSetting::Kanto),
+            FireRed | LeafGreen | FireRedSwitch | LeafGreenSwitch => Some(GameSetting::Kanto),
             LetsGoPikachu | LetsGoEevee => Some(GameSetting::Kanto),
 
             Gold | Silver | Crystal => Some(GameSetting::Johto),
@@ -231,8 +242,8 @@ impl OriginGame {
 
     pub const fn gamecube_index(&self) -> Option<u8> {
         match *self {
-            Self::FireRed => Some(1),
-            Self::LeafGreen => Some(2),
+            Self::FireRed | Self::FireRedSwitch => Some(1),
+            Self::LeafGreen | Self::LeafGreenSwitch => Some(2),
             Self::Sapphire => Some(8),
             Self::Ruby => Some(9),
             Self::Emerald => Some(10),
@@ -248,7 +259,9 @@ impl OriginGame {
             Red | BlueGreen | BlueJpn | Yellow => Some(OriginMark::GameBoy),
             Gold | Silver | Crystal => Some(OriginMark::GameBoy),
 
-            Ruby | Sapphire | Emerald | FireRed | LeafGreen => Some(OriginMark::GameBoyAdvance),
+            Ruby | Sapphire | Emerald | FireRed | LeafGreen | FireRedSwitch | LeafGreenSwitch => {
+                Some(OriginMark::GameBoyAdvance)
+            }
             ColosseumXd => Some(OriginMark::GameCube),
 
             Diamond | Pearl | Platinum | HeartGold | SoulSilver => Some(OriginMark::NintendoDs),
@@ -283,8 +296,8 @@ impl OriginGame {
             Self::Ruby => Some("Ruby"),
             Self::Sapphire => Some("Sapphire"),
             Self::Emerald => Some("Emerald"),
-            Self::FireRed => Some("FireRed"),
-            Self::LeafGreen => Some("LeafGreen"),
+            Self::FireRed | Self::FireRedSwitch => Some("FireRed"),
+            Self::LeafGreen | Self::LeafGreenSwitch => Some("LeafGreen"),
             Self::ColosseumXd => Some("ColosseumXd"),
             Self::Diamond => Some("Diamond"),
             Self::Pearl => Some("Pearl"),
@@ -336,8 +349,8 @@ impl OriginGame {
             Self::Ruby => "#CD2236",
             Self::Sapphire => "#3D51A7",
             Self::Emerald => "#50C878",
-            Self::FireRed => "#F15C01",
-            Self::LeafGreen => "#9FDC00",
+            Self::FireRed | Self::FireRedSwitch => "#F15C01",
+            Self::LeafGreen | Self::LeafGreenSwitch => "#9FDC00",
             Self::ColosseumXd => "#604E82",
             Self::Diamond => "#90BEED",
             Self::Pearl => "#DD7CB1",
@@ -373,7 +386,7 @@ impl OriginGame {
         }
     }
 
-    pub const fn all_valid() -> [OriginGame; 41] {
+    pub const fn all_valid() -> [OriginGame; 43] {
         [
             Self::Sapphire,
             Self::Ruby,
@@ -416,6 +429,8 @@ impl OriginGame {
             Self::Scarlet,
             Self::Violet,
             Self::LegendsZa,
+            Self::FireRedSwitch,
+            Self::LeafGreenSwitch,
         ]
     }
 
@@ -424,7 +439,7 @@ impl OriginGame {
     }
 
     pub fn is_gba(self) -> bool {
-        self <= Self::LeafGreen
+        self <= Self::LeafGreen || self == Self::FireRedSwitch || self == Self::LeafGreenSwitch
     }
 
     pub fn is_ds(self) -> bool {
@@ -454,6 +469,10 @@ impl OriginGame {
 
     pub fn is_scarlet_violet(self) -> bool {
         self == Self::Scarlet || self == Self::Violet
+    }
+
+    pub fn is_frlg_switch(self) -> bool {
+        self == Self::FireRedSwitch || self == Self::LeafGreenSwitch
     }
 
     pub fn is_origin_string(v: &str) -> bool {
@@ -517,6 +536,11 @@ impl From<u8> for OriginGame {
             50 => OriginGame::Scarlet,
             51 => OriginGame::Violet,
             52 => OriginGame::LegendsZa,
+            53 => OriginGame::Invalid53,
+            54 => OriginGame::Invalid54,
+            55 => OriginGame::Invalid55,
+            56 => OriginGame::FireRedSwitch,
+            57 => OriginGame::LeafGreenSwitch,
             _ => OriginGame::Invalid0,
         }
     }
@@ -658,6 +682,11 @@ impl OriginGames {
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "isScarletViolet"))]
     pub fn is_scarlet_violet(value: u8) -> bool {
         OriginGame::from(value).is_scarlet_violet()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "isFrlgSwitch"))]
+    pub fn is_frlg_switch(value: u8) -> bool {
+        OriginGame::from(value).is_frlg_switch()
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "isOriginGameString"))]

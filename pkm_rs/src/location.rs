@@ -359,6 +359,7 @@ pub const POKE_TRANSFER_LAB_INDEX_GEN_5: u16 = 60;
 pub const POKE_TRANSFER_MET_LOCATION_GEN_5: u16 = 30001;
 pub const GO_PARK_LETS_GO: u16 = 50;
 pub const FARAWAY_PLACE_SWSH: u16 = 40002;
+pub const DISTANT_LAND_FRLG_SWITCH: u16 = 30007;
 
 impl Location {
     pub fn from_english_text(text: &str) -> Option<Self> {
@@ -682,7 +683,7 @@ impl Location {
     pub const fn game_setting_best_match(origin: OriginGame) -> Self {
         use OriginGame::*;
         match origin {
-            FireRed | LeafGreen => Self::KantoGen3,
+            FireRed | LeafGreen | FireRedSwitch | LeafGreenSwitch => Self::KantoGen3,
             Red | BlueGreen | BlueJpn | Yellow => Self::KantoVirtualConsole,
             LetsGoPikachu | LetsGoEevee => Self::KantoLetsGo,
 
@@ -716,7 +717,8 @@ impl Location {
             // LEAVE THESE HERE EXPLICITLY!
             // We want a compiler error when a new OriginGame is introduced and not handled here, so we don't want to have a catch-all case
             Invalid0 | Invalid6 | Invalid9 | Invalid13 | Invalid14 | BattleRevolution
-            | Invalid17 | Invalid18 | Invalid19 | Invalid28 | Invalid29 => Self::LinkTrade,
+            | Invalid17 | Invalid18 | Invalid19 | Invalid28 | Invalid29 | Invalid53 | Invalid54
+            | Invalid55 => Self::LinkTrade,
         }
     }
 
@@ -726,7 +728,7 @@ impl Location {
         use OriginGame::*;
         match origin {
             FireRed | LeafGreen | Red | BlueGreen | BlueJpn | Yellow | LetsGoPikachu
-            | LetsGoEevee => Self::KantoGen3,
+            | LetsGoEevee | FireRedSwitch | LeafGreenSwitch => Self::KantoGen3,
 
             Sapphire | Ruby | Emerald | AlphaSapphire | OmegaRuby => Self::HoennGen3,
 
@@ -755,7 +757,8 @@ impl Location {
             // LEAVE THESE HERE EXPLICITLY!
             // We want a compiler error when a new OriginGame is introduced and not handled here, so we don't want to have a catch-all case
             Invalid0 | Invalid6 | Invalid9 | Invalid13 | Invalid14 | BattleRevolution
-            | Invalid17 | Invalid18 | Invalid19 | Invalid28 | Invalid29 => Self::LinkTrade,
+            | Invalid17 | Invalid18 | Invalid19 | Invalid28 | Invalid29 | Invalid53 | Invalid54
+            | Invalid55 => Self::LinkTrade,
         }
     }
 }

@@ -189,14 +189,23 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.ball = other.ball !== undefined ? other.ball : Ball.Poke
       this.markings = markingsSixShapesWithColorFromOther(other.markings)
 
-      this.metLocationIndex = other.metLocationIndex ?? 0
+      if (
+        // handle FRLG (Switch) met location
+        ['PB8', 'PA8', 'PA9'].includes(other.format) &&
+        OriginGames.isFrlgSwitch(other.gameOfOrigin) &&
+        other.metLocationIndex === 30007
+      ) {
+        this.metLocationIndex = 254
+      } else {
+        this.metLocationIndex = other.metLocationIndex ?? 0
+      }
+
       this.metLevel = other.metLevel ?? 0
 
       if (other.dvs && other.evsG12) {
         this.setGameboyData(other.dvs, other.metTimeOfDay ?? 0, other.evsG12)
       }
 
-      this.metLocationIndex = other.metLocationIndex ?? 0
       this.ability =
         other.ability ??
         getAbilityFromNumber(this.nationalDex, this.formIndex, this.abilityNum) ??

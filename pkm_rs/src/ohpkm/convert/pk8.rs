@@ -1,7 +1,6 @@
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::{metadata_source::MetadataSource, ribbons::OpenHomeRibbonSet};
-use pkm_rs_types::FlagSet;
-use pkm_rs_types::{AbilityNumber, Stats16Le};
+use pkm_rs_types::{AbilityNumber, FlagSet, OriginGame, Stats16Le};
 
 use super::OhpkmConvert;
 use crate::convert_strategy::ConvertStrategy;
@@ -64,7 +63,17 @@ impl OhpkmConvert for Pk8 {
             handler_language: self.handler_language,
             fullness: self.fullness,
             enjoyment: self.enjoyment,
-            game_of_origin: self.game_of_origin,
+            game_of_origin: match self.met_location_index {
+                // Pokemon HOME sets these met location indices to store the game of origin for Pokemon transferred in from these games
+                59994 => OriginGame::LeafGreenSwitch,
+                59995 => OriginGame::FireRedSwitch,
+                59996 => OriginGame::Violet,
+                59997 => OriginGame::Scarlet,
+                59998 => OriginGame::ShiningPearl,
+                59999 => OriginGame::BrilliantDiamond,
+                60000 => OriginGame::LegendsArceus,
+                _ => self.game_of_origin,
+            },
             game_of_origin_battle: self.game_of_origin_battle,
             language: self.language,
             form_argument: self.form_argument,
@@ -75,12 +84,25 @@ impl OhpkmConvert for Pk8 {
             egg_date: self.egg_date,
             met_date: self.met_date,
             ball: self.ball,
-            egg_location_index: if self.egg_location_index == 0 {
-                None
-            } else {
-                Some(self.egg_location_index)
+            egg_location_index: match self.egg_location_index {
+                0 => None,
+                65534 => match self.met_location_index {
+                    // this Pokemon was transferred in from a later-released game using Pokemon HOME; its met location data was not preserved.
+                    // use a default value that best fits the origin game.
+                    59994 | 59995 => Some(253), // "a gift Egg" for Switch FRLG
+                    59996..60000 => Some(60001), // "a stranger" for BDSP thru SV
+                    _ => Some(self.egg_location_index),
+                },
+                _ => Some(self.egg_location_index),
             },
-            met_location_index: self.met_location_index,
+            met_location_index: match self.met_location_index {
+                // Pokemon transferred in from later-released games using Pokemon HOME lack met location data.
+                // use a default value that best fits the origin game, if necessary.
+                59994 | 59995 => 254,       // link trade for Switch FRLG
+                59996 | 59997 | 60000 => 2, // mystery zone for BDSP, PLA
+                59998 | 59999 => 345,       // mystery zone for SV
+                _ => self.met_location_index,
+            },
             met_level: self.met_level,
             hyper_training: self.hyper_training,
             trainer_gender: self.trainer_gender,

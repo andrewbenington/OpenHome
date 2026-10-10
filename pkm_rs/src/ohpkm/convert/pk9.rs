@@ -1,7 +1,6 @@
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::{metadata_source::MetadataSource, ribbons::OpenHomeRibbonSet};
-use pkm_rs_types::FlagSet;
-use pkm_rs_types::{AbilityNumber, Stats16Le};
+use pkm_rs_types::{AbilityNumber, FlagSet, OriginGame, Stats16Le};
 
 use super::OhpkmConvert;
 use crate::convert_strategy::ConvertStrategy;
@@ -88,7 +87,11 @@ impl OhpkmConvert for Pk9 {
             } else {
                 Some(self.egg_location_index)
             },
-            met_location_index: self.met_location_index,
+            met_location_index: if OriginGame::is_frlg_switch(self.game_of_origin) {
+                254
+            } else {
+                self.met_location_index
+            },
             met_level: self.met_level,
             hyper_training: self.hyper_training,
             trainer_gender: self.trainer_gender,

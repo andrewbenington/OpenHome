@@ -78,7 +78,10 @@ impl MetadataSource {
 
             OriginGame::Sapphire | OriginGame::Ruby => Some(Self::RubySapphire),
             OriginGame::Emerald => Some(Self::Emerald),
-            OriginGame::FireRed | OriginGame::LeafGreen => Some(Self::FireRedLeafGreen),
+            OriginGame::FireRed
+            | OriginGame::LeafGreen
+            | OriginGame::FireRedSwitch
+            | OriginGame::LeafGreenSwitch => Some(Self::FireRedLeafGreen),
             OriginGame::ColosseumXd => None,
 
             OriginGame::Diamond | OriginGame::Pearl => Some(Self::DiamondPearl),
@@ -116,7 +119,10 @@ impl MetadataSource {
             | OriginGame::Invalid18
             | OriginGame::Invalid19
             | OriginGame::Invalid28
-            | OriginGame::Invalid29 => None,
+            | OriginGame::Invalid29
+            | OriginGame::Invalid53
+            | OriginGame::Invalid54
+            | OriginGame::Invalid55 => None,
         }
     }
 
@@ -128,7 +134,12 @@ impl MetadataSource {
             Self::Crystal => vec![OriginGame::Crystal],
             Self::RubySapphire => vec![OriginGame::Ruby, OriginGame::Sapphire],
             Self::Emerald => vec![OriginGame::Emerald],
-            Self::FireRedLeafGreen => vec![OriginGame::FireRed, OriginGame::LeafGreen],
+            Self::FireRedLeafGreen => vec![
+                OriginGame::FireRed,
+                OriginGame::LeafGreen,
+                OriginGame::FireRedSwitch,
+                OriginGame::LeafGreenSwitch,
+            ],
             Self::DiamondPearl => vec![OriginGame::Diamond, OriginGame::Pearl],
             Self::Platinum => vec![OriginGame::Platinum],
             Self::HeartGoldSoulSilver => vec![OriginGame::HeartGold, OriginGame::SoulSilver],
