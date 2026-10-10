@@ -83,10 +83,14 @@ impl OhpkmConvert for Pk8 {
             egg_date: self.egg_date,
             met_date: self.met_date,
             ball: self.ball,
-            egg_location_index: if self.egg_location_index == 0 {
-                None
-            } else {
-                Some(self.egg_location_index)
+            egg_location_index: match self.egg_location_index {
+                0 => None,
+                65534 => match self.met_location_index {
+                    59994 | 59995 => Some(253),  // "a gift Egg" for Switch FRLG
+                    59996..60000 => Some(60001), // "a stranger" for BDSP thru SV
+                    _ => Some(self.egg_location_index),
+                },
+                _ => Some(self.egg_location_index),
             },
             met_location_index: match self.met_location_index {
                 59994 | 59995 => 254,       // link trade for Switch FRLG
