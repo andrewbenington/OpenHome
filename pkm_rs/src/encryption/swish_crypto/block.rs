@@ -190,16 +190,16 @@ impl Block {
         self.data.to_bytes()
     }
 
-    pub fn into_numeric_data(self) -> std::result::Result<NumericBlock, WrongType> {
+    pub fn into_numeric_data(self) -> std::result::Result<NumericBlock, SwishError> {
         let Block { key, data } = self;
         if let BlockData::Value(numeric_block) = data {
             Ok(numeric_block)
         } else {
-            Err(WrongType {
+            Err(SwishError::BlockType(WrongType {
                 block_key: key,
                 expected: ExpectedBlockType::Numeric,
                 actual: data.block_type(),
-            })
+            }))
         }
     }
 
@@ -215,16 +215,16 @@ impl Block {
         }
     }
 
-    pub fn into_array_data(self) -> std::result::Result<ArrayBlock, WrongType> {
+    pub fn into_array_data(self) -> std::result::Result<ArrayBlock, SwishError> {
         let Block { key, data } = self;
         if let BlockData::Array(array_data) = data {
             Ok(array_data)
         } else {
-            Err(WrongType {
+            Err(SwishError::BlockType(WrongType {
                 block_key: key,
                 expected: ExpectedBlockType::Array,
                 actual: data.block_type(),
-            })
+            }))
         }
     }
 }

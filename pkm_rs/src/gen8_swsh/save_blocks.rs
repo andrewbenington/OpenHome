@@ -22,34 +22,16 @@ pub(super) struct SwordShieldBlocks {
     pub(super) pokemon_boxes: BoxBlock,
     pub(super) box_layouts: BoxLayout,
     pub(super) current_box: NumericBlock,
-    pub(super) other_blocks: SwishBlocks,
+    pub(super) other_blocks: SwishBlocks<SwShBlockKey>,
 }
 
 impl SwordShieldBlocks {
-    pub fn from_blocks(mut blocks: SwishBlocks) -> Result<Self> {
-        let my_status = MyStatusBlock(
-            blocks
-                .try_pop_block(SwShBlockKey::MyStatus)?
-                .into_object_data()?,
-        );
-        let trainer_card = TrainerCard(
-            blocks
-                .try_pop_block(SwShBlockKey::TrainerCard)?
-                .into_object_data()?,
-        );
-        let pokemon_boxes = BoxBlock(
-            blocks
-                .try_pop_block(SwShBlockKey::Box)?
-                .into_object_data()?,
-        );
-        let box_layouts = BoxLayout(
-            blocks
-                .try_pop_block(SwShBlockKey::BoxLayout)?
-                .into_array_data()?,
-        );
-        let current_box = blocks
-            .try_pop_block(SwShBlockKey::CurrentBox)?
-            .into_numeric_data()?;
+    pub fn from_blocks(mut blocks: SwishBlocks<SwShBlockKey>) -> Result<Self> {
+        let my_status = MyStatusBlock(blocks.try_pop_object(SwShBlockKey::MyStatus)?);
+        let trainer_card = TrainerCard(blocks.try_pop_object(SwShBlockKey::TrainerCard)?);
+        let pokemon_boxes = BoxBlock(blocks.try_pop_object(SwShBlockKey::Box)?);
+        let box_layouts = BoxLayout(blocks.try_pop_array(SwShBlockKey::BoxLayout)?);
+        let current_box = blocks.try_pop_numeric(SwShBlockKey::CurrentBox)?;
 
         Ok(Self {
             my_status,
