@@ -162,13 +162,13 @@ impl Gen7AlolaSave {
         self.bytes[byte_offset..byte_offset + Pk7::BOX_SIZE].copy_from_slice(data);
     }
 
-    fn pokemon_bytes_raw(&self, box_index: BoxIndex, box_slot: BoxSlot) -> &[u8] {
+    fn get_mon_bytes_raw(&self, box_index: BoxIndex, box_slot: BoxSlot) -> &[u8] {
         let byte_offset = self.save_type.mon_byte_offset(box_index, box_slot);
         &self.bytes[byte_offset..byte_offset + Pk7::BOX_SIZE]
     }
 
     fn get_mon_bytes_decrypted(&self, box_index: BoxIndex, box_slot: BoxSlot) -> Box<[u8]> {
-        let mut copied_bytes = Box::from(self.pokemon_bytes_raw(box_index, box_slot));
+        let mut copied_bytes = Box::from(self.get_mon_bytes_raw(box_index, box_slot));
         Pk7Buffer::box_span_mut(&mut copied_bytes).decrypt();
 
         copied_bytes
@@ -229,6 +229,18 @@ impl Gen7AlolaSave {
         SizedUtf16String::from_bytes(name_bytes)
     }
 
+    pub fn box_mon_count(&self, box_index: BoxIndex) -> usize {
+        BoxSlot::all()
+            .filter(|&box_slot| !Pk7::is_empty_slot(self.get_mon_bytes_raw(box_index, box_slot)))
+            .count()
+    }
+
+    pub fn pc_mon_count(&self) -> usize {
+        BoxIndex::all()
+            .map(|box_index| self.box_mon_count(box_index))
+            .sum()
+    }
+
     fn convert_ohpkm(
         &self,
         ohpkm: crate::ohpkm::OhpkmV2,
@@ -285,6 +297,19 @@ impl Gen7AlolaSave {
         {
             self.set_mon_at(box_index, box_slot, mon)
         }
+    }
+
+    #[wasm_bindgen(js_name = getBoxMonCount)]
+    pub fn box_mon_count_wasm(&mut self, box_index: u8) -> std::result::Result<usize, JsError> {
+        match BoxIndex::check_bound(box_index) {
+            Ok(index) => Ok(self.box_mon_count(index)),
+            Err(BoundViolated) => Err(BoundViolated.into()),
+        }
+    }
+
+    #[wasm_bindgen(js_name = getPcMonCount)]
+    pub fn pc_mon_count_wasm(&mut self) -> usize {
+        self.pc_mon_count()
     }
 
     #[wasm_bindgen(js_name = convertOhpkm)]

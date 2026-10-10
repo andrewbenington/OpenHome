@@ -1,10 +1,9 @@
 // PKHeX reference implementation: PKHeX.Core/Saves/Encryption/SwishCrypto/SwishCrypto.cs
 
-use thiserror::Error;
 use wasm_bindgen::prelude::*;
 
 use crate::bytes::{Reader, Writer};
-use crate::result::Error;
+use crate::encryption::swish_crypto::{ExpectedBlockType, InvalidTypeId, SwishError, WrongType};
 const PAD_LENGTH: usize = 127;
 
 const STATIC_XOR_PAD: [u8; PAD_LENGTH] = [
@@ -19,10 +18,10 @@ const STATIC_XOR_PAD: [u8; PAD_LENGTH] = [
 ];
 
 // with compiler optimizations the iterator is erased completely (at least on x86)
-fn crypt_static_xor_pad_bytes(data: &[u8]) -> Vec<u8> {
-    data.iter()
+fn crypt_static_xor_pad_bytes_in_place(data: &mut [u8]) {
+    data.iter_mut()
         .zip(STATIC_XOR_PAD.iter().cycle())
-        .map(|(val, pad)| val ^ pad)
+        .map(|(val, pad)| *val ^= pad)
         .collect()
 }
 
@@ -37,12 +36,17 @@ fn read_blocks(data: &[u8]) -> Result<Vec<Block>, SwishError> {
     Ok(result)
 }
 
+#[allow(
+    clippy::boxed_local,
+    reason = "buffer length remains the same, but the data is mutated so ownership should be passed."
+)]
 #[wasm_bindgen(js_name = decryptBlocks)]
-pub fn decrypt_blocks(data: &[u8]) -> Result<Vec<Block>, SwishError> {
-    let data_before_hash = &data[..data.len() - super::HASH_SIZE];
-    let data_after_xor = crypt_static_xor_pad_bytes(data_before_hash);
+pub fn decrypt_blocks(mut data: Box<[u8]>) -> Result<Vec<Block>, SwishError> {
+    let data_length = data.len();
+    let data_before_hash = &mut data[..data_length - super::HASH_SIZE];
+    crypt_static_xor_pad_bytes_in_place(data_before_hash);
 
-    read_blocks(&data_after_xor)
+    read_blocks(data_before_hash)
 }
 
 #[wasm_bindgen(js_name = writeBlock)]
@@ -51,7 +55,7 @@ pub fn write_block(block: &Block, bytes: &mut [u8], offset: usize) -> usize {
     block.write_encrypted(&mut writer)
 }
 
-fn write_blocks(blocks: &[Block], size: usize) -> Vec<u8> {
+fn write_blocks(blocks: Box<[Block]>, size: usize) -> Vec<u8> {
     let mut buffer = vec![0u8; size];
     let mut writer = Writer::new(&mut buffer);
 
@@ -65,9 +69,9 @@ fn write_blocks(blocks: &[Block], size: usize) -> Vec<u8> {
     buffer
 }
 
-pub fn encrypt_blocks(blocks: &[Block], size: usize) -> Vec<u8> {
-    let encrypted_blocks = write_blocks(blocks, size);
-    let mut encrypted_bytes = crypt_static_xor_pad_bytes(&encrypted_blocks);
+pub fn encrypt_blocks(blocks: Box<[Block]>, size: usize) -> Vec<u8> {
+    let mut encrypted_bytes = write_blocks(blocks, size);
+    crypt_static_xor_pad_bytes_in_place(&mut encrypted_bytes);
 
     let hash = super::hash::compute_hash(&encrypted_bytes);
     encrypted_bytes.extend_from_slice(&hash);
@@ -77,7 +81,7 @@ pub fn encrypt_blocks(blocks: &[Block], size: usize) -> Vec<u8> {
 
 #[wasm_bindgen(js_name = encryptBlocks)]
 pub fn encrypt_blocks_js(blocks: Box<[Block]>, size: usize) -> Vec<u8> {
-    encrypt_blocks(&blocks, size)
+    encrypt_blocks(blocks, size)
 }
 
 #[cfg_attr(
@@ -95,8 +99,11 @@ pub struct Block {
 }
 
 impl Block {
-    pub const fn new(key: u32, data: BlockData) -> Self {
-        Self { key, data }
+    pub fn new(key: impl Into<u32>, data: BlockData) -> Self {
+        Self {
+            key: key.into(),
+            data,
+        }
     }
 
     pub const fn key(&self) -> u32 {
@@ -184,117 +191,42 @@ impl Block {
         writer.current_offset()
     }
 
-    pub fn into_numeric_data(self) -> std::result::Result<NumericBlock, WrongBlockType> {
+    pub fn into_numeric_data(self) -> std::result::Result<NumericBlock, SwishError> {
         let Block { key, data } = self;
         if let BlockData::Value(numeric_block) = data {
             Ok(numeric_block)
         } else {
-            Err(WrongBlockType {
+            Err(SwishError::BlockType(WrongType {
                 block_key: key,
                 expected: ExpectedBlockType::Numeric,
                 actual: data.block_type(),
-            })
+            }))
         }
     }
 
-    pub fn into_object_data(self) -> std::result::Result<ObjectBlock, WrongBlockType> {
+    pub fn into_object_data(self) -> std::result::Result<ObjectBlock, SwishError> {
         let Block { key, data } = self;
         match data {
             BlockData::Object(object_data) => Ok(object_data),
-            _ => Err(WrongBlockType {
+            _ => Err(SwishError::BlockType(WrongType {
                 block_key: key,
                 expected: ExpectedBlockType::Object,
                 actual: data.block_type(),
-            }),
+            }))?,
         }
     }
 
-    pub fn into_array_data(self) -> std::result::Result<ArrayBlock, WrongBlockType> {
+    pub fn into_array_data(self) -> std::result::Result<ArrayBlock, SwishError> {
         let Block { key, data } = self;
         if let BlockData::Array(array_data) = data {
             Ok(array_data)
         } else {
-            Err(WrongBlockType {
+            Err(SwishError::BlockType(WrongType {
                 block_key: key,
                 expected: ExpectedBlockType::Array,
                 actual: data.block_type(),
-            })
+            }))
         }
-    }
-}
-
-#[cfg_attr(feature = "wasm", derive(tsify::Tsify, serde::Serialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
-#[derive(Debug, Clone, Copy, strum::Display)]
-pub enum ExpectedBlockType {
-    Object,
-    Array,
-    Numeric,
-    Bool,
-}
-
-impl From<BlockType> for ExpectedBlockType {
-    fn from(value: BlockType) -> Self {
-        match value {
-            BlockType::Object => Self::Object,
-            BlockType::Array => Self::Array,
-            BlockType::Scalar(ScalarType::Bool(_)) => Self::Bool,
-            BlockType::Scalar(ScalarType::Numeric(_)) => Self::Numeric,
-        }
-    }
-}
-
-#[cfg_attr(feature = "wasm", derive(tsify::Tsify, serde::Serialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
-#[derive(Debug)]
-pub struct WrongBlockType {
-    block_key: u32,
-    expected: ExpectedBlockType,
-    actual: BlockType,
-}
-
-impl std::fmt::Display for WrongBlockType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let WrongBlockType {
-            block_key,
-            expected,
-            actual,
-        } = self;
-        write!(
-            f,
-            "expected SwishCrypto block of type {expected}, received {actual} (block key {block_key})"
-        )
-    }
-}
-
-impl std::error::Error for WrongBlockType {}
-
-impl From<WrongBlockType> for Error {
-    fn from(value: WrongBlockType) -> Self {
-        let message = format!("block with key {}", value.block_key);
-        Error::build_save(message, Some(Box::new(value)))
-    }
-}
-
-#[cfg_attr(feature = "wasm", derive(tsify::Tsify, serde::Serialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
-#[derive(Debug, Clone, Copy)]
-pub struct InvalidTypeId(u8);
-
-impl std::fmt::Display for InvalidTypeId {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&format!(
-            "swish crypto block has invalid type id: {}",
-            self.0
-        ))
-    }
-}
-
-impl std::error::Error for InvalidTypeId {}
-
-impl From<InvalidTypeId> for Error {
-    fn from(value: InvalidTypeId) -> Self {
-        Error::build_save("Invalid block type id".to_owned(), Some(Box::new(value)))
     }
 }
 
@@ -422,9 +354,10 @@ fn numtype_try_into_array<const N: usize>(
     numtype: NumericType,
     bytes: &[u8],
 ) -> Result<[u8; N], SwishError> {
-    bytes
-        .try_into()
-        .map_err(|_| SwishError::expected_bytes::<N>(numtype, bytes.len()))
+    bytes.try_into().or(Err(SwishError::expected_bytes::<N>(
+        numtype.to_string(),
+        bytes.len(),
+    )))
 }
 
 #[cfg(feature = "wasm")]
@@ -585,6 +518,15 @@ impl BlockData {
             Self::Value(numeric_value) => numeric_value.id(),
         }
     }
+
+    pub fn to_bytes(&self) -> Vec<u8> {
+        match self {
+            BlockData::Bool(_bool_type) => vec![],
+            BlockData::Object(object_block) => object_block.bytes.clone(),
+            BlockData::Array(array_block) => array_block.bytes.clone(),
+            BlockData::Value(numeric_block) => numeric_block.to_le_bytes(),
+        }
+    }
 }
 
 #[cfg_attr(
@@ -600,6 +542,10 @@ pub struct ObjectBlock {
 }
 
 impl ObjectBlock {
+    pub const fn new(bytes: Vec<u8>) -> Self {
+        Self { bytes }
+    }
+
     pub fn bytes(&self) -> &[u8] {
         &self.bytes
     }
@@ -820,43 +766,5 @@ impl TryFrom<u8> for ScalarType {
 
             _ => Err(InvalidTypeId(value)),
         }
-    }
-}
-
-#[cfg_attr(feature = "wasm", derive(tsify::Tsify, serde::Serialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
-#[derive(Debug, Error, Clone, Copy)]
-pub enum SwishError {
-    #[error("invalid block type id: {0}")]
-    TypeId(InvalidTypeId),
-    #[error(
-        "expected SwishCrypto block of type {expected}, received {actual} (block key {block_key})"
-    )]
-    BlockType {
-        block_key: u32,
-        expected: ExpectedBlockType,
-        actual: BlockType,
-    },
-    #[error("expected {expected} bytes for block of type {inner_type}, received {actual}")]
-    ByteLength {
-        inner_type: NumericType,
-        expected: usize,
-        actual: usize,
-    },
-}
-
-impl SwishError {
-    const fn expected_bytes<const EXPECTED: usize>(inner_type: NumericType, actual: usize) -> Self {
-        Self::ByteLength {
-            inner_type,
-            expected: EXPECTED,
-            actual,
-        }
-    }
-}
-
-impl From<InvalidTypeId> for SwishError {
-    fn from(value: InvalidTypeId) -> Self {
-        Self::TypeId(value)
     }
 }

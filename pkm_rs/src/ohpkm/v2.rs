@@ -21,6 +21,7 @@ use crate::traits::{HasSpeciesAndForm, IsShiny, PkmBytes};
 
 #[cfg(feature = "wasm")]
 use arrayref::array_ref;
+use num_enum::{IntoPrimitive, TryFromPrimitive};
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::{MoveIndex, MoveSlots, la_tutor, lza_tm, sv_tm, swsh_tr};
@@ -114,7 +115,7 @@ fn rgb_to_display_color(rgb: [u8; 3]) -> String {
     format!("#{:02x}{:02x}{:02x}", rgb[0], rgb[1], rgb[2])
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Display)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Display, IntoPrimitive, TryFromPrimitive)]
 #[repr(u16)]
 pub enum OhpkmSectionTag {
     MainData = 0x00,
@@ -140,31 +141,6 @@ pub enum OhpkmSectionTag {
 }
 
 impl OhpkmSectionTag {
-    pub const fn new(tag: u16) -> Option<Self> {
-        match tag {
-            0x00 => Some(Self::MainData),
-            0x01 => Some(Self::GameboyData),
-            0x02 => Some(Self::Gen45Data),
-            0x03 => Some(Self::Gen67Data),
-            0x04 => Some(Self::SwordShield),
-            0x05 => Some(Self::BdspTmFlags),
-            0x06 => Some(Self::LegendsArceus),
-            0x07 => Some(Self::ScarletViolet),
-            0x11 => Some(Self::LegendsZa),
-            #[allow(deprecated)]
-            0x08 => Some(Self::PastHandlerV1),
-            0x09 => Some(Self::PluginData),
-            0x0A => Some(Self::Notes),
-            0x0B => Some(Self::MostRecentSave),
-            0x0C => Some(Self::Tag),
-            0x0D => Some(Self::OriginalBackup),
-            0x0E => Some(Self::UnconvertedPkm),
-            0x0F => Some(Self::PastHandlerV2),
-            0x10 => Some(Self::LearnedMoves),
-            _ => None,
-        }
-    }
-
     // The minimum guaranteed size of the section's data after being serialized to bytes. This number should never increase,
     // because that would break the ability to read older OHPKM files. If new fields are added to a section, they should be added
     // after the existing fields, and the new fields should be either optional or default to a specific value. If neither of these
@@ -199,7 +175,7 @@ impl OhpkmSectionTag {
 
 impl SectionTag for OhpkmSectionTag {
     fn from_index(index: u16) -> Option<Self> {
-        Self::new(index)
+        Self::try_from(index).ok()
     }
 
     fn min_size(&self) -> usize {

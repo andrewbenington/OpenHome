@@ -163,6 +163,7 @@ export interface AllPKMFields {
 
   toBytes: ((_options?: types.ToBytesOptions) => ArrayBuffer) | (() => ArrayBuffer)
   extraDisplayFields?: () => Record<string, string | number | boolean>
+  free?: () => void
 }
 
 export type FormatPkm = { format: PkmOrOhpkmFormat }

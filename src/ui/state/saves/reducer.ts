@@ -205,6 +205,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
       return { ...state, monsToRelease: [] }
     }
     case 'close_all_saves': {
+      Object.values(state.openSaves).forEach(({ save }) => save.free())
       return { ...state, openSaves: {} }
     }
     case 'add_pending_mon_locations': {

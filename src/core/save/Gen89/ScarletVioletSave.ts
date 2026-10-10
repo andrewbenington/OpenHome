@@ -1,123 +1,66 @@
 import { PK9 } from '@openhome-core/pkm'
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Item } from '@openhome-core/resources/consts/Items'
 import {
   SV_TRANSFER_RESTRICTIONS_BASE,
   SV_TRANSFER_RESTRICTIONS_ID,
   SV_TRANSFER_RESTRICTIONS_TM,
 } from '@openhome-core/resources/consts/TransferRestrictions'
-import {
-  BlockDataFor,
-  blockIsType,
-  SwishCrypto,
-} from '@openhome-core/save/encryption/SwishCrypto/SwishCrypto'
-import { G89BlockName, Gen8Gen9Save } from '@openhome-core/save/Gen89/Gen8Gen9Save'
-import { emptyPathData, PathData } from '@openhome-core/save/util/path'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { Errorable } from '@openhome-core/util/functional'
-import { utf16BytesToString } from '@openhome-core/util/stringConversion'
+import { Result } from '@openhome-core/util/functional'
 import {
-  BinaryGender,
-  Block,
-  BlockType,
   ConvertStrategy,
-  emptyBoxSlotBytesScarletViolet,
   ExtraFormIndex,
-  Languages,
-  ObjectBlock,
   OriginGame,
+  Pk9Wasm,
+  ScarletVioletSaveRust,
+  SvVersion,
 } from '@pkm-rs/pkg'
+import { OHPKM } from '../../pkm/OHPKM'
+import { BoxAndSlot, WasmOfficialSave } from '../interfaces'
+import { PathData } from '../util/path'
 
-const SAVE_SIZE_BYTES_MIN = 0x31626f
-const SAVE_SIZE_BYTES_MAX = 0x43c000
+export class ScarletVioletSave extends WasmOfficialSave<Pk9Wasm, PK9, ScarletVioletSaveRust> {
+  WASM_SAVE_CLASS = ScarletVioletSaveRust
 
-export type SV_SAVE_REVISION = 'Base Game' | 'Teal Mask' | 'Indigo Disk'
-
-export class ScarletVioletSave extends Gen8Gen9Save<PK9> {
   static boxSizeBytes = PK9.getBoxSize() * 30
   static pkmType = PK9
   static saveTypeAbbreviation = 'SV'
   static saveTypeName = 'Pokémon Scarlet/Violet'
   static saveTypeID = 'SVSAV'
 
-  trainerBlock: MyStatus
+  filePath: PathData
+  fileCreated?: Date
 
-  origin: OriginGame
+  money: number = 0 // TODO: Gen 8 money
+
+  invalid = false
+  tooEarlyToOpen = false
+
+  updatedBoxSlots: BoxAndSlot[] = []
 
   constructor(path: PathData, bytes: Uint8Array) {
-    super(path, bytes)
-
-    this.trainerBlock = new MyStatus(this.getBlockDataMust('MyStatus', 'Object').Object)
-    this.name = this.trainerBlock.getName()
-
-    this.boxes.forEach((box, i) => {
-      if (!box.name) {
-        box.name = `Box ${i + 1}`
-      }
-    })
-
-    this.tid = this.trainerBlock.getTID()
-    this.sid = this.trainerBlock.getSID()
-    this.displayID = this.trainerBlock.getFullID().toString().slice(-6).padStart(6, '0')
-    this.origin = this.trainerBlock.getGame()
+    super(ScarletVioletSaveRust.fromBytes(bytes))
+    this.filePath = path
   }
 
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK9> {
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Result<PK9> {
     return PK9.fromOhpkm(ohpkm, strategy)
   }
 
-  getBoxCount(): number {
-    return 32
+  monConstructor(buffer: ArrayBuffer, encrypted: boolean): PK9 {
+    return PK9.fromBytes(buffer, encrypted)
   }
 
-  monConstructor(bytes: ArrayBuffer, encrypted: boolean): PK9 {
-    return PK9.fromBytes(bytes, encrypted)
+  isEmptySlot(bytes: ArrayBuffer): boolean {
+    return Pk9Wasm.isEmptySlot(new Uint8Array(bytes))
   }
 
-  getBlockKey(blockName: G89BlockName | keyof typeof BlockKeys): number {
-    return BlockKeys[blockName]
-  }
-
-  getBlock(blockName: G89BlockName | keyof typeof BlockKeys): Block | undefined {
-    const key = this.getBlockKey(blockName)
-
-    return this.scBlocks.find((b) => b.key === key)
-  }
-
-  getBlockDataMust<T extends BlockType>(
-    blockName: G89BlockName | keyof typeof BlockKeys,
-    type: T
-  ): BlockDataFor<T> {
-    const block = this.getBlock(blockName)
-
-    if (!block) {
-      throw Error(`Missing block ${blockName}`)
-    }
-    if (!blockIsType(block, type)) {
-      throw Error(`Block ${blockName} is type ${JSON.stringify(block.data)} (expected ${type})`)
-    }
-
-    return block.data
-  }
-
-  getMonBoxSizeBytes(): number {
-    return PK9.getBoxSize()
-  }
-
-  getBoxSizeBytes(): number {
-    return ScarletVioletSave.boxSizeBytes
-  }
-
-  getBoxSlotGapBytes(): number {
-    return 0
-  }
-
-  emptyBoxSlotBytes() {
-    return emptyBoxSlotBytesScarletViolet()
+  monFromWasm(wasmMon: Pk9Wasm): PK9 {
+    return PK9.fromWasm(wasmMon)
   }
 
   supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
-    const revision = this.scBlocks ? this.getSaveRevision() : 'Indigo Disk'
+    const revision = this.saveVersion
     switch (revision) {
       case 'Base Game':
         return !isRestricted(
@@ -134,7 +77,7 @@ export class ScarletVioletSave extends Gen8Gen9Save<PK9> {
   }
 
   supportsItem(itemIndex: number) {
-    const revision = this.scBlocks ? this.getSaveRevision() : 'Indigo Disk'
+    const revision = this.saveVersion
     switch (revision) {
       case 'Base Game':
         return itemIndex <= Item.YellowDish
@@ -144,95 +87,33 @@ export class ScarletVioletSave extends Gen8Gen9Save<PK9> {
         return itemIndex <= Item.BriarsBook
     }
   }
-
-  getSaveRevision(): SV_SAVE_REVISION {
-    return this.getBlock('BlueberryPoints')
-      ? 'Indigo Disk'
-      : this.getBlock('TeraRaidDLC')
-        ? 'Teal Mask'
-        : 'Base Game'
+  get saveVersion(): SvVersion {
+    // for hack in monSupport.test.ts that calls this from the class's prototype
+    try {
+      return this.inner.saveVersion
+    } catch {
+      return 'Base Game'
+    }
   }
 
-  getDisplayData(): Record<string, string | number | undefined> {
-    const trainerBlock = this.trainerBlock
+  getDisplayData() {
+    return { ...this.inner.getDisplayData() }
+  }
 
-    return {
-      'Player Character': trainerBlock.getGender() ? 'Juliana' : 'Florian',
-      'Save Version': this.getSaveRevision(),
-      Language: Languages.stringFromByte(trainerBlock.getLanguage()),
-      'Is Compass': String(this.getBlock('Compass_Levelcap') !== undefined),
-    }
+  getDisplayPkms() {
+    const rideLegend = this.inner.getRideLegend()
+    return rideLegend ? [{ mon: PK9.fromWasm(rideLegend), description: 'Ride Legendary' }] : []
   }
 
   static fileIsSave(bytes: Uint8Array): boolean {
-    if (bytes.length < SAVE_SIZE_BYTES_MIN || bytes.length > SAVE_SIZE_BYTES_MAX) {
-      return false
-    }
-    if (!SwishCrypto.getIsHashValid(bytes)) return false
-    // ensure this isn't Pokémon Compass
-    return new ScarletVioletSave(emptyPathData, bytes).getBlock('Compass_Levelcap') === undefined
+    return ScarletVioletSaveRust.fileIsSave(bytes)
   }
 
   static includesOrigin(origin: OriginGame) {
-    return origin === OriginGame.Scarlet || origin === OriginGame.Violet
+    return ScarletVioletSaveRust.includesOrigin(origin)
   }
 
-  get trainerGender() {
-    return this.trainerBlock.getGender() ? BinaryGender.Female : BinaryGender.Male
-  }
-
-  get language() {
-    return this.trainerBlock.getLanguage()
-  }
-}
-
-const BlockKeys = {
-  TeamNames: 0x1920c1e4,
-  TeamIndexes: 0x33f39467,
-  BoxLayout: 0x19722c89,
-  BoxWallpapers: 0x2eb1b190,
-
-  Box: 0x0d66012c,
-  Party: 0x3aa1a9ad,
-  Zukan: 0x0deaaebd,
-  ZukanT1: 0xf5d7c0e2,
-  MyStatus: 0xe3e89bd1,
-  PlayTime: 0xedaff794,
-
-  CurrentBox: 0x017c3cbb,
-
-  TeraRaidDLC: 0x100b93da,
-  BlueberryPoints: 0x66a33824,
-
-  Compass_Levelcap: 0xcc806ed6,
-}
-
-class MyStatus {
-  dataView: DataView<ArrayBuffer>
-
-  constructor(scBlock: ObjectBlock) {
-    this.dataView = new DataView(scBlock.bytes.buffer)
-  }
-
-  public getName(): string {
-    return utf16BytesToString(this.dataView.buffer, 0x10, 24)
-  }
-  public getLanguage(): number {
-    return this.dataView.getUint8(0x07)
-  }
-  public getFullID(): number {
-    return this.dataView.getUint32(0x00, true)
-  }
-  public getTID(): number {
-    return this.dataView.getUint16(0x00, true)
-  }
-  public getSID(): number {
-    return this.dataView.getUint16(0x02, true)
-  }
-  public getGame(): OriginGame {
-    return this.dataView.getUint8(0x04)
-  }
-  public getGender(): boolean {
-    return !!(this.dataView.getUint8(0x05) & 1)
+  free() {
+    this.inner.free()
   }
 }
