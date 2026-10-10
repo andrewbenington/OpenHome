@@ -341,31 +341,7 @@ impl PkmFormat {
             };
         }
 
-        if self == Self::PA8 {
-            return if original_origin.is_frlg_switch() {
-                super::location::DISTANT_LAND_FRLG_SWITCH
-            } else {
-                met_location_index
-            };
-        }
-
-        if self == Self::PB8 {
-            return if original_origin.is_frlg_switch() {
-                super::location::DISTANT_LAND_FRLG_SWITCH
-            } else {
-                met_location_index
-            };
-        }
-
-        if self == Self::PK9 {
-            return if original_origin.is_frlg_switch() {
-                super::location::DISTANT_LAND_FRLG_SWITCH
-            } else {
-                met_location_index
-            };
-        }
-
-        if self == Self::PA9 {
+        if matches!(self, Self::PA8 | Self::PA8 | Self::PA8 | Self::PA8) {
             return if original_origin.is_frlg_switch() {
                 super::location::DISTANT_LAND_FRLG_SWITCH
             } else {
