@@ -2,10 +2,10 @@ import useBackend from '@openhome-core/backend/useBackend'
 import { getMoveMaxPP } from '@openhome-core/pkm'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import {
-  getMonFileIdentifier,
   getMonGen12Identifier,
   getMonGen345Identifier,
   OhpkmIdentifier,
+  tryCalculateIdentifier,
 } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
@@ -368,7 +368,7 @@ export function useOhpkmStore() {
       case 'PK9':
       case 'PK9Compass':
       case 'PA9': {
-        return getMonFileIdentifier(mon)
+        return tryCalculateIdentifier(mon)
       }
       default:
         expectExhaustive(mon.format, `unrecognized format: ${mon.format}`)

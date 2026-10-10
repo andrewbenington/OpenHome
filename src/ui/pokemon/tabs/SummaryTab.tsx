@@ -1,8 +1,8 @@
-import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { PKMInterface as PkmInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PKM } from '@openhome-core/pkm/PKM'
 import { getTypes } from '@openhome-core/pkm/util'
-import { getDisplayID } from '@openhome-core/util'
+import { FullMetadataLookup, getDisplayID } from '@openhome-core/util'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import Badge from '@openhome-ui/components/badge/Badge'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
@@ -15,14 +15,7 @@ import { BallsImageList, getItemIconPath } from '@openhome-ui/images/items'
 import { useSaves } from '@openhome-ui/state/saves'
 import { colorIsDark, SHADOW_TYPE_COLOR } from '@openhome-ui/util/color'
 import { formatTitleAndNickname } from '@openhome-ui/util/format'
-import {
-  AbilityNumber,
-  Ball,
-  extraFormDisplayName,
-  Languages,
-  MetadataSummaryLookup,
-  OriginGames,
-} from '@pkm-rs/pkg'
+import { AbilityNumber, Ball, extraFormDisplayName, Languages, OriginGames } from '@pkm-rs/pkg'
 import { Button, Flex, Badge as RadixBadge, Spinner, Tooltip } from '@radix-ui/themes'
 import { useMemo, useState } from 'react'
 import { TagIcon } from '../../components/TagIcon'
@@ -30,14 +23,14 @@ import useMonSprite from '../useMonSprite'
 import './SummaryTab.css'
 
 type SummaryDisplayProps = {
-  mon: PKMInterface
+  mon: PkmInterface
 }
 
 const SummaryDisplay = (props: SummaryDisplayProps) => {
   const { mon } = props
   const [spriteError, setSpriteError] = useState<string>()
 
-  const monMetadata = MetadataSummaryLookup(mon.nationalDex, mon.formIndex)
+  const monMetadata = FullMetadataLookup(mon)
 
   const spriteResult = useMonSprite({
     nationalDex: mon.nationalDex,
@@ -204,30 +197,35 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
         {mon.ability !== undefined && mon instanceof OHPKM && mon.abilityWasChanged() ? (
           <AttributeRow label="Ability">
             {mon.ability.name} ({mon.abilityNum === 4 ? 'HA' : mon.abilityNum})
-            {!monMetadata
-              ?.abilityByNum(AbilityNumber.First)
-              .equals(monMetadata?.abilityByNum(AbilityNumber.Second)) && (
-              <Button
-                size="1"
-                radius="full"
-                style={{ height: '1rem', marginLeft: 5 }}
-                onClick={() => revertMonAbility(mon.openhomeId)}
-              >
-                Revert
-              </Button>
-            )}
+            {monMetadata &&
+              'abilityByNum' in monMetadata &&
+              !monMetadata
+                .abilityByNum(AbilityNumber.First)
+                .equals(monMetadata?.abilityByNum(AbilityNumber.Second)) && (
+                <Button
+                  size="1"
+                  radius="full"
+                  style={{ height: '1rem', marginLeft: 5 }}
+                  onClick={() => revertMonAbility(mon.openhomeId)}
+                >
+                  Revert
+                </Button>
+              )}
           </AttributeRow>
         ) : (
-          <AttributeRow label="Ability">
-            <ToggleTabs
-              options={[
-                { id: '1', display: `1. ${monMetadata?.abilityByNum(1).name}` },
-                { id: '2', display: `2. ${monMetadata?.abilityByNum(2).name}` },
-                { id: '4', display: `HA. ${monMetadata?.abilityByNum(4).name}` },
-              ]}
-              active={String(mon.abilityNum)}
-            />
-          </AttributeRow>
+          monMetadata &&
+          'abilityByNum' in monMetadata && (
+            <AttributeRow label="Ability">
+              <ToggleTabs
+                options={[
+                  { id: '1', display: `1. ${monMetadata?.abilityByNum(1).name}` },
+                  { id: '2', display: `2. ${monMetadata?.abilityByNum(2).name}` },
+                  { id: '4', display: `HA. ${monMetadata?.abilityByNum(4).name}` },
+                ]}
+                active={String(mon.abilityNum)}
+              />
+            </AttributeRow>
+          )
         )}
         <AttributeRow label="Level">{mon.getLevel()}</AttributeRow>
         <AttributeRow label="EXP">{mon.exp}</AttributeRow>

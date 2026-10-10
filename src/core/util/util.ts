@@ -4,6 +4,9 @@ import { PKM, PkmClass } from '@openhome-core/pkm/PKM'
 import { Moves } from '@openhome-core/resources'
 import { filterUndefined } from '@openhome-core/util/sort'
 import {
+  ExtraFormMetadata,
+  extraFormMetadata,
+  FormMetadata,
   Generation,
   MetadataSummaryLookup,
   OriginGame,
@@ -11,7 +14,14 @@ import {
   PkmFormat,
   PkmFormats,
 } from '@pkm-rs/pkg'
-import { AllPKMFields } from '../pkm/util/pkmInterface'
+import {
+  AllPKMFields,
+  FormatPkm,
+  FourMovesPkm,
+  LevelPkm,
+  PkmFormSpecifiers,
+} from '../pkm/util/pkmInterface'
+import { Option } from './functional'
 import { FourMoves } from './types'
 
 export function getDisplayID(pokemon: PKM): string {
@@ -137,7 +147,7 @@ export class MoveFilter<P extends PKMInterface> {
       : moveIndex <= this.filter.maxValidMove()
   }
 
-  private filterByMoves(mon: AllPKMFields, toFilter: FourMoves): FourMoves {
+  private filterByMoves(mon: FourMovesPkm, toFilter: FourMoves): FourMoves {
     const filtered = mon.moves
       .map((move, i) => (this.moveIsAllowed(move) ? toFilter[i] : undefined))
       .filter(filterUndefined)
@@ -149,7 +159,7 @@ export class MoveFilter<P extends PKMInterface> {
     return mon.moves.some((move) => this.moveIsAllowed(move))
   }
 
-  private filteredMovesOrLevelupIfEmpty(mon: AllPKMFields) {
+  private filteredMovesOrLevelupIfEmpty(mon: FourMovesPkm & PkmFormSpecifiers & LevelPkm) {
     const filtered = this.filterByMoves(mon, mon.moves)
     if (filtered.every((move) => move === 0)) {
       const metadataSource = PkmFormats.getMetadataSource(this.format)
@@ -174,12 +184,12 @@ export class MoveFilter<P extends PKMInterface> {
     return filtered
   }
 
-  moves(mon: AllPKMFields) {
+  moves(mon: AdjustableMovePkm) {
     return this.filteredMovesOrLevelupIfEmpty(mon)
   }
 
   movePp(
-    mon: AllPKMFields,
+    mon: AdjustableMovePkm,
     adjustForFormat: string,
     destFormatNoPpUps: boolean = false
   ): FourMoves {
@@ -214,16 +224,32 @@ export class MoveFilter<P extends PKMInterface> {
   }
 }
 
-export function getHeightCalculated(mon: AllPKMFields) {
-  const formeMetadata = MetadataSummaryLookup(mon.nationalDex, mon.formIndex)
-  if (!formeMetadata || mon.heightScalar === undefined || !mon.heightDeviation) return 0
-
-  const deviation = (mon.heightScalar / 255) * 0.40000004 + (1 - mon.heightDeviation)
-  return formeMetadata.baseHeight * 100 * deviation
+export type AdjustableMovePkm = FourMovesPkm & PkmFormSpecifiers & LevelPkm & FormatPkm
+export type SizePkm = PkmFormSpecifiers & {
+  heightScalar?: number
+  heightDeviation?: number
+  weightScalar?: number
+  weightDeviation?: number
 }
 
-export function getWeightCalculated(mon: AllPKMFields) {
-  const formeMetadata = MetadataSummaryLookup(mon.nationalDex, mon.formIndex)
+export function FullMetadataLookup(
+  mon: PkmFormSpecifiers
+): Option<FormMetadata | ExtraFormMetadata> {
+  return mon.extraFormIndex
+    ? extraFormMetadata(mon.extraFormIndex)
+    : MetadataSummaryLookup(mon.nationalDex, mon.formIndex)
+}
+
+export function getHeightCalculated(mon: SizePkm) {
+  const formMetadata = FullMetadataLookup(mon)
+  if (!formMetadata || mon.heightScalar === undefined || !mon.heightDeviation) return 0
+
+  const deviation = (mon.heightScalar / 255) * 0.40000004 + (1 - mon.heightDeviation)
+  return formMetadata.baseHeight * 100 * deviation
+}
+
+export function getWeightCalculated(mon: SizePkm) {
+  const formeMetadata = FullMetadataLookup(mon)
   if (!formeMetadata || mon.weightScalar === undefined || !mon.weightDeviation) return 0
 
   const deviation = (mon.weightScalar / 255) * 0.40000004 + (1 - mon.weightDeviation)

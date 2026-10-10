@@ -3,6 +3,7 @@ import { LGE_STARTER, SPIKY_EAR } from '@openhome-core/resources//consts/Forms'
 import { NationalDex } from '@openhome-core/resources//consts/NationalDex'
 import { CHAMPS_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
+import { FullMetadataLookup } from '@openhome-core/util'
 import { R, Result } from '@openhome-core/util/functional'
 import { BoxIconSpriteType } from '@openhome-ui/hooks/monDisplay'
 import {
@@ -12,7 +13,7 @@ import {
   HomeSprites,
 } from '@openhome-ui/images/pokemon'
 import { MonSpriteData } from '@openhome-ui/state/plugin/reducer'
-import { ExtraFormIndex, extraFormSpriteName, MetadataSummaryLookup } from '@pkm-rs/pkg'
+import { ExtraFormIndex, extraFormSpriteName } from '@pkm-rs/pkg'
 
 export const FormsUsingImages: Map<number, number[]> = new Map([
   [NationalDex.Eevee, [LGE_STARTER]],
@@ -51,15 +52,22 @@ export function boxIconImagePath(
     return R.Ok(`icons/box/${extraFormSprite}.webp`)
   }
 
-  const metadata = MetadataSummaryLookup(mon.nationalDex, mon.formIndex)
+  const metadata = FullMetadataLookup(mon)
   if (!metadata) {
-    return R.Err(`invalid species data: ndex ${mon.nationalDex}/form ${mon.formIndex}`)
+    return R.Err(
+      `invalid species data: ndex ${mon.nationalDex}/form ${mon.formIndex}/extra form ${mon.extraFormIndex}`
+    )
   }
 
   const { formeName, sprite } = metadata
 
   if (
-    !isRestricted(CHAMPS_TRANSFER_RESTRICTIONS, mon.nationalDex, mon.formIndex) &&
+    !isRestricted(
+      CHAMPS_TRANSFER_RESTRICTIONS,
+      mon.nationalDex,
+      mon.formIndex,
+      mon.extraFormIndex
+    ) &&
     !formeName?.includes('Battle Bond')
   ) {
     const female =

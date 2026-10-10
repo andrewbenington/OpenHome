@@ -838,6 +838,11 @@ impl ExtraFormMetadata {
         self.mega_evolution_data.to_vec()
     }
 
+    #[wasm_bindgen(js_name = getMegaBaseForm)]
+    pub fn get_mega_base_forme(&self) -> Option<FormMetadata> {
+        None
+    }
+
     #[wasm_bindgen(getter = type1)]
     pub fn type_1(&self) -> PkmType {
         self.types_from_source_or_latest(None).0

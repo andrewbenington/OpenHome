@@ -1,7 +1,8 @@
 import { PointerActivationConstraints, PointerSensor } from '@dnd-kit/dom'
 import { DragDropProvider, DragOverlay, useDragDropMonitor, useDragOperation } from '@dnd-kit/react'
-import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
+import { displayIndexAdder, isBattleFormItem, isMegaStone } from '@openhome-core/pkm/util'
 import { monSupportedBySave } from '@openhome-core/save/util'
+import { FullMetadataLookup } from '@openhome-core/util'
 import { Option, R } from '@openhome-core/util/functional'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import useDisplayError from '@openhome-ui/hooks/displayError'
@@ -9,7 +10,6 @@ import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
 import { useDragStore } from '@openhome-ui/state-zustand/drag-and-drop/dragStore'
 import { isMonLocation, MonLocation, useSaves } from '@openhome-ui/state/saves'
-import { MetadataSummaryLookup } from '@pkm-rs/pkg'
 import { Badge } from '@radix-ui/themes'
 import { ReactNode } from 'react'
 import { DragPayload, locationKey } from '.'
@@ -221,13 +221,12 @@ function PokemonDndOverlay(props: { multiSelectState: MultiSelectState; children
   let formeNumber = draggingMon?.formIndex ?? 0
 
   if (draggingMon && isMegaStone(draggingMon.heldItemIndex)) {
-    const megaForStone = MetadataSummaryLookup(
-      draggingMon.nationalDex,
-      draggingMon.formIndex
-    )?.megaEvolutions.find((mega) => mega.requiredItemId === draggingMon.heldItemIndex)
+    const megaForStone = FullMetadataLookup(draggingMon)?.megaEvolutions.find(
+      (mega) => mega.requiredItemId === draggingMon.heldItemIndex
+    )
 
     if (megaForStone) formeNumber = megaForStone.megaForme.formIndex
-  } else if (draggingMon && isBattleFormeItem(draggingMon.nationalDex, draggingMon.heldItemIndex)) {
+  } else if (draggingMon && isBattleFormItem(draggingMon.nationalDex, draggingMon.heldItemIndex)) {
     formeNumber = displayIndexAdder(draggingMon.heldItemIndex)(draggingMon.formIndex)
   }
 

@@ -1,5 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { PkmFormSpecifiers } from '@openhome-core/pkm/util/pkmInterface'
 import { Errorable } from '@openhome-core/util/functional'
 import { ConvertStrategy, ExtraFormIndex, OriginGame, PkmFormat } from '@pkm-rs/pkg'
 import { PluginIdentifier, PluginSAV, SAV } from '../interfaces'
@@ -53,7 +54,7 @@ export function monSupportedBySaveType(
   return supportsMon(saveType, mon.nationalDex, mon.formIndex, mon.extraFormIndex)
 }
 
-export function monSupportedBySave(save?: SAV, mon?: PKMInterface): boolean {
+export function monSupportedBySave(save?: SAV, mon?: PkmFormSpecifiers): boolean {
   if (!save || !mon) return false
   return save.supportsMon(mon.nationalDex, mon.formIndex, mon.extraFormIndex)
 }

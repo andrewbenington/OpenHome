@@ -9,7 +9,7 @@ import { OhpkmLookupResult } from '@openhome-ui/state/ohpkm'
 import { MonLocation } from '@openhome-ui/state/saves'
 import { CSSProperties, Suspense, use } from 'react'
 import '../style.css'
-import BoxCell from './BoxCell'
+import BoxCell, { BoxCellMon } from './BoxCell'
 
 export type BoxSlotResult = Result<Option<PKMInterface>> | OhpkmLookupResult
 export type BoxSlotContents = NowOrLater<Option<BoxSlotResult>>
@@ -18,10 +18,10 @@ export type BoxSlotError = ErrorOf<BoxSlotResult>
 interface BoxCellAsyncProps {
   title?: string
   onClick: () => void
-  monPlaceholder?: Option<PKMInterface>
+  monPlaceholder?: Option<BoxCellMon>
   monPromise?: BoxSlotContents
   onDrop: (_: PKMInterface[]) => void
-  isDisabled?: (mon: Option<PKMInterface>) => boolean
+  isDisabled?: (mon: Option<BoxCellMon>) => boolean
   disabledReason?: string
   openhomeId?: OhpkmIdentifier
   borderColor?: CSSProperties['color']

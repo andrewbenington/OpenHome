@@ -1,7 +1,7 @@
 import useBackend from '@openhome-core/backend/useBackend'
 import { bytesToPKM } from '@openhome-core/pkm/FileImport'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
+import { tryCalculateIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { range } from '@openhome-core/util/functional'
 import useDisplayError from '@openhome-ui/hooks/displayError'
@@ -111,7 +111,7 @@ const Home = () => {
         <ReleaseArea />
       </Flex>
       <PokemonDetailsModal
-        key={selectedMon ? getMonFileIdentifier(selectedMon) : ''}
+        key={selectedMon ? tryCalculateIdentifier(selectedMon) : ''}
         mon={selectedMon}
         onClose={() => setSelectedMon(undefined)}
       />
