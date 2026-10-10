@@ -64,6 +64,7 @@ impl OhpkmConvert for Pk8 {
             fullness: self.fullness,
             enjoyment: self.enjoyment,
             game_of_origin: match self.met_location_index {
+                // Pokemon HOME sets these met location indices to store the game of origin for Pokemon transferred in from these games
                 59994 => OriginGame::LeafGreenSwitch,
                 59995 => OriginGame::FireRedSwitch,
                 59996 => OriginGame::Violet,
@@ -86,13 +87,17 @@ impl OhpkmConvert for Pk8 {
             egg_location_index: match self.egg_location_index {
                 0 => None,
                 65534 => match self.met_location_index {
-                    59994 | 59995 => Some(253),  // "a gift Egg" for Switch FRLG
+                    // this Pokemon was transferred in from a later-released game using Pokemon HOME; its met location data was not preserved.
+                    // use a default value that best fits the origin game.
+                    59994 | 59995 => Some(253), // "a gift Egg" for Switch FRLG
                     59996..60000 => Some(60001), // "a stranger" for BDSP thru SV
                     _ => Some(self.egg_location_index),
                 },
                 _ => Some(self.egg_location_index),
             },
             met_location_index: match self.met_location_index {
+                // Pokemon transferred in from later-released games using Pokemon HOME lack met location data.
+                // use a default value that best fits the origin game, if necessary.
                 59994 | 59995 => 254,       // link trade for Switch FRLG
                 59996 | 59997 | 60000 => 2, // mystery zone for BDSP, PLA
                 59998 | 59999 => 345,       // mystery zone for SV
