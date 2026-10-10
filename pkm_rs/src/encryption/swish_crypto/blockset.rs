@@ -9,7 +9,7 @@ type SwishBlocksInner = std::collections::BTreeMap<u32, Block>;
 pub struct SwishBlocks<Key: SwishKey>(SwishBlocksInner, std::marker::PhantomData<Key>);
 
 impl<Key: SwishKey> SwishBlocks<Key> {
-    pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
+    pub fn from_bytes(bytes: Box<[u8]>) -> Result<Self> {
         let blocks = decrypt_blocks(bytes)?;
 
         Ok(Self(
