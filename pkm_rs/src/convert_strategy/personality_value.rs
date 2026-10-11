@@ -213,8 +213,6 @@ impl Default for PidModificationStrategy {
     }
 }
 
-#[cfg_attr(feature = "wasm", derive(Tsify, Serialize, Deserialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Clone, Copy)]
 pub struct PidGenerationParameters {
     pub species_form: SpeciesForm,
@@ -226,12 +224,53 @@ pub struct PidGenerationParameters {
     pub secret_id: u16,
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = generatePk3CompatiblePid))]
 pub fn generate_pk3_compatible_pid(
     parameters: &PidGenerationParameters,
     strategy: &PidModificationStrategy,
 ) -> u32 {
     strategy.generate_pid_matching_fields(*parameters)
+}
+
+#[cfg(feature = "wasm")]
+#[derive(Tsify, Serialize, Deserialize)]
+#[tsify(into_wasm_abi, from_wasm_abi)]
+#[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone, Copy)]
+pub struct PidGenerationParametersJs {
+    pub national_dex: u16,
+    pub form_index: u16,
+    pub nature: Option<NatureIndex>,
+    pub gender: Option<Gender>,
+    pub is_shiny: bool,
+    pub unown_letter: Option<u8>,
+    pub trainer_id: u16,
+    pub secret_id: u16,
+}
+
+#[cfg(feature = "wasm")]
+impl TryFrom<PidGenerationParametersJs> for PidGenerationParameters {
+    type Error = crate::result::Error;
+
+    fn try_from(value: PidGenerationParametersJs) -> Result<Self, Self::Error> {
+        Ok(Self {
+            species_form: SpeciesForm::new(value.national_dex, value.form_index)?,
+            nature: value.nature,
+            gender: value.gender,
+            is_shiny: value.is_shiny,
+            unown_letter: value.unown_letter,
+            trainer_id: value.trainer_id,
+            secret_id: value.secret_id,
+        })
+    }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_name = generatePk3CompatiblePid)]
+pub fn generate_pk3_compatible_pid_wasm(
+    parameters: PidGenerationParametersJs,
+    strategy: PidModificationStrategy,
+) -> Result<u32, crate::result::Error> {
+    Ok(strategy.generate_pid_matching_fields(PidGenerationParameters::try_from(parameters)?))
 }
 
 #[derive(Debug, Clone, Copy)]
