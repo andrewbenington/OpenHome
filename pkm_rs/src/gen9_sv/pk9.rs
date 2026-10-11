@@ -713,7 +713,7 @@ mod tests {
     }
 
     #[test]
-    fn compare_pkhex_wasmon() -> TestResult<()> {
+    fn compare_pkhex_wasm() -> TestResult<()> {
         tests::compare_pkhex_json_all_in_dir::<Pk9>(&PathBuf::from("pk9"))
     }
 
