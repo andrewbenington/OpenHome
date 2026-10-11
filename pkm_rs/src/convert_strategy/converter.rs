@@ -1,4 +1,5 @@
 use super::{ConvertStrategy, MetDataStrategy};
+use crate::convert_strategy::ShinyOdds;
 use crate::format::PkmFormat;
 use crate::location::{Location, MetData};
 use crate::ohpkm::OhpkmV2;
@@ -121,6 +122,12 @@ impl PkmConverter {
         } else {
             ohpkm.get_ivs()
         }
+    }
+
+    pub fn personality_value(&self, ohpkm: &OhpkmV2, shiny_odds: ShinyOdds) -> u32 {
+        self.strategy
+            .pid_strategy(shiny_odds)
+            .generate_pid_matching_fields(ohpkm)
     }
 }
 

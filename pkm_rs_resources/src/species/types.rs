@@ -11,13 +11,14 @@ use crate::species::metadata_table::{levelup_learnset_lookup, types_lookup};
 use crate::{Error, Result, abilities::AbilityIndexWasm, metadata_source::MetadataSource};
 use crate::{abilities::AbilityIndexBounded, levelup::LearnsetMoveJs};
 use pkm_rs_types::{AbilityNumber, GameSetting, Generation, NationalDex, PkmType, TeraType};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use strum_macros::{Display, EnumString};
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 #[cfg(feature = "randomize")]
 use rand::RngExt;
+use tsify::Tsify;
 
 #[cfg(feature = "wasm")]
 use crate::species::metadata_table::current_base_stats;
@@ -641,8 +642,9 @@ impl SpeciesMetadata {
     }
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, PartialEq, Eq, Clone, Copy, Serialize)]
+#[derive(Debug, Default, PartialEq, Eq, Clone, Copy, Serialize, Tsify)]
+#[cfg_attr(feature = "wasm", derive(Deserialize))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 pub struct SpeciesForm {
     national_dex: NationalDex,
     form_index: u16,
@@ -865,21 +867,6 @@ impl Iterator for Preevolutions {
 #[allow(clippy::missing_const_for_fn)]
 #[cfg(feature = "wasm")]
 impl SpeciesForm {
-    #[wasm_bindgen(constructor)]
-    pub fn new_js(national_dex: u16, form_index: u16) -> core::result::Result<Self, JsValue> {
-        Self::new(national_dex, form_index).map_err(|e| JsValue::from_str(&e.to_string()))
-    }
-
-    #[cfg_attr(feature = "wasm", wasm_bindgen(getter = nationalDex))]
-    pub fn get_ndex_wasm(&self) -> u16 {
-        self.national_dex as u16
-    }
-
-    #[cfg_attr(feature = "wasm", wasm_bindgen(getter = formIndex))]
-    pub fn get_form_index_wasm(&self) -> u16 {
-        self.form_index
-    }
-
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = getSpeciesMetadata))]
     pub fn get_species_metadata_js(&self) -> SpeciesMetadata {
         self.get_species_metadata().clone()

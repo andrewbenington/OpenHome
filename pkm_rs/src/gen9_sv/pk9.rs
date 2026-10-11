@@ -531,7 +531,7 @@ impl Pk9 {
 
     #[wasm_bindgen(getter = nationalDex)]
     pub fn national_dex_wasm(&self) -> u16 {
-        self.species_and_form.0.get_ndex_wasm()
+        self.species_and_form.0.get_ndex() as u16
     }
 
     #[wasm_bindgen(getter = formIndex)]

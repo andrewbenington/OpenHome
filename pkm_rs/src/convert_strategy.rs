@@ -4,6 +4,8 @@ use crate::convert_strategy::personality_value::NatureStrategy;
 mod converter;
 mod personality_value;
 
+pub use personality_value::ShinyOdds;
+
 mod option;
 
 use std::fmt::Display;
@@ -17,7 +19,9 @@ use tsify::Tsify;
 use wasm_bindgen::prelude::*;
 
 pub use converter::PkmConverter;
-pub use personality_value::{PidModificationStrategy, generate_pk3_compatible_pid};
+pub use personality_value::{
+    PidGenerationParameters, PidModificationStrategy, generate_pk3_compatible_pid,
+};
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Serialize))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
@@ -140,7 +144,7 @@ pub fn settings_schema_js() -> SettingsSchemaWrapper {
 
 #[cfg_attr(feature = "wasm", derive(Tsify))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
-#[derive(Debug, Clone, Serialize, Deserialize, specta::Type)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, specta::Type)]
 pub struct ConvertStrategy {
     #[serde(rename = "nickname__capitalization")]
     pub nickname_capitalization: NicknameCapitalization,
@@ -156,6 +160,17 @@ pub struct ConvertStrategy {
     pub preserve_pid_nature: NatureStrategy,
     #[serde(rename = "personalityValue__preserveUnownForm")]
     pub preserve_pid_unown_form: bool,
+}
+
+impl ConvertStrategy {
+    pub const fn pid_strategy(&self, shiny_odss: ShinyOdds) -> PidModificationStrategy {
+        PidModificationStrategy {
+            nature: Some(self.preserve_pid_nature),
+            keep_gender: self.preserve_pid_gender,
+            shiny: Some(shiny_odss),
+            keep_unown_letter: self.preserve_pid_unown_form,
+        }
+    }
 }
 
 impl Default for ConvertStrategy {
@@ -262,7 +277,7 @@ impl ConvertStrategies {
 
 #[cfg_attr(feature = "wasm", derive(Tsify))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
-#[derive(Clone, Debug, PartialEq, Eq, Default, Serialize, Deserialize, specta::Type)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize, specta::Type)]
 pub enum NicknameCapitalization {
     #[default]
     GameDefault,
@@ -271,7 +286,7 @@ pub enum NicknameCapitalization {
 
 #[cfg_attr(feature = "wasm", derive(Tsify))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
-#[derive(Clone, Debug, PartialEq, Eq, Default, Serialize, Deserialize, specta::Type)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize, specta::Type)]
 pub enum MetDataStrategy {
     UseLocationNameMatch,
     #[default]

@@ -483,6 +483,11 @@ export type OriginGameStr =
   | 'Scarlet'
   | 'Violet'
   | 'LegendsZa'
+  | 'Invalid53'
+  | 'Invalid54'
+  | 'Invalid55'
+  | 'FireRedSwitch'
+  | 'LeafGreenSwitch'
 export type PaginatedPage<T> = {
   results: T[]
   nextPageExists: boolean

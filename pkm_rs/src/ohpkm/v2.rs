@@ -5,6 +5,7 @@ use super::v2_sections::{
     MonTags, MostRecentSave, Notes, PastHandlerDataV2, PluginData, SV_BASE_TM_BYTES_EXCLUDE_UNUSED,
     ScarletVioletData, SwordShieldData,
 };
+use crate::convert_strategy::{PidGenerationParameters, PidModificationStrategy};
 use crate::gen9_lza::PlusMoveFlags;
 use crate::ohpkm::OhpkmConvert;
 #[allow(deprecated)]
@@ -24,17 +25,17 @@ use arrayref::array_ref;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::{MoveIndex, MoveSlots, la_tutor, lza_tm, sv_tm, swsh_tr};
-use pkm_rs_resources::natures::NatureIndex;
+use pkm_rs_resources::natures::{NatureIndex, WithNature};
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_resources::species::SpeciesMetadata;
-use pkm_rs_types::Dvs;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, FlagSet, Gender, Geolocations, HyperTraining, Ivs,
     Language, MarkingsSixShapesColors, OriginGame, PkmType, PokeDate, Pokerus, ShinyLeaves, Stats8,
     Stats16Le, StatsPreSplit, TeraType, TrainerData, TrainerMemory,
 };
+use pkm_rs_types::{Dvs, NationalDex};
 use serde::Serialize;
 use strum_macros::Display;
 
@@ -280,9 +281,10 @@ impl OhpkmV2 {
         );
     }
 
-    pub fn gen_345_id(&self) -> String {
+    pub fn gen_345_id(&self, strategy: &PidModificationStrategy) -> String {
         let base_mon = self.main_data.species_and_form.get_base_evolution();
-        let gen3_compatible_pid = crate::convert_strategy::generate_pk3_compatible_pid(self);
+        let gen3_compatible_pid =
+            crate::convert_strategy::generate_pk3_compatible_pid(&self.into(), strategy);
         format!(
             "{:04}-{:04x}{:04x}-{:08x}",
             base_mon.get_ndex(),
@@ -1964,6 +1966,35 @@ impl OhpkmV2 {
     }
 }
 
+impl WithNature for OhpkmV2 {
+    fn nature(&self) -> NatureIndex {
+        self.nature()
+    }
+
+    fn mint_nature(&self) -> Option<NatureIndex> {
+        Some(self.mint_nature())
+    }
+}
+
+impl From<&OhpkmV2> for PidGenerationParameters {
+    fn from(value: &OhpkmV2) -> Self {
+        let (national_dex, form_index) = value.species_and_form().split();
+        Self {
+            species_form: value.species_and_form(),
+            nature: Some(value.mint_nature()),
+            gender: Some(value.gender()),
+            is_shiny: value.is_shiny(),
+            unown_letter: if national_dex == NationalDex::Unown {
+                Some(form_index as u8)
+            } else {
+                None
+            },
+            trainer_id: value.trainer_id(),
+            secret_id: value.secret_id(),
+        }
+    }
+}
+
 #[cfg(feature = "wasm")]
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
@@ -2062,8 +2093,8 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = gen345Identifier)]
-    pub fn gen_345_id_js(&self) -> String {
-        self.gen_345_id()
+    pub fn gen_345_id_js(&self, strategy: &PidModificationStrategy) -> String {
+        self.gen_345_id(strategy)
     }
 
     #[wasm_bindgen(getter = personalityValue)]
