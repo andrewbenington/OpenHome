@@ -193,7 +193,7 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
   }
 
   static emptySlotBytes(): Uint8Array<ArrayBuffer> {
-    const shuffledBytes = encryption.shuffleBlocksGen45(emptySlotBytes().buffer)
+    const shuffledBytes = encryption.shuffleBlocksGen45(gen45EmptySlotBytes().buffer)
     return new Uint8Array(encryption.decryptByteArrayGen45(shuffledBytes))
   }
 
@@ -245,4 +245,4 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
 }
 
 // return new array so mutations don't happen
-const emptySlotBytes = () => new Uint8Array(136)
+export const gen45EmptySlotBytes = () => new Uint8Array(136)
