@@ -693,10 +693,10 @@ impl Dvs {
     }
 
     pub const fn unown_letter(&self) -> u16 {
-        let mut iv_combination_val = ((self.get_atk() >> 1) & 0b11) << 6;
-        iv_combination_val += ((self.get_def() >> 1) & 0b11) << 4;
-        iv_combination_val += ((self.get_spe() >> 1) & 0b11) << 2;
-        iv_combination_val += (self.get_spc() >> 1) & 0b11;
+        let iv_combination_val = (u2_offset_one_bit(self.get_atk()) << 6)
+            + (u2_offset_one_bit(self.get_def()) << 4)
+            + (u2_offset_one_bit(self.get_spe()) << 2)
+            + u2_offset_one_bit(self.get_spc());
         iv_combination_val / 10
     }
 
@@ -716,6 +716,10 @@ impl Dvs {
             dvs
         }
     }
+}
+
+const fn u2_offset_one_bit(value: u16) -> u16 {
+    arbitrary_int::u2::extract_u16(value, 1).value() as u16
 }
 
 #[cfg(feature = "wasm")]
