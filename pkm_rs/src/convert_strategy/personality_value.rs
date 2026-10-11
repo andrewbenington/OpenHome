@@ -244,6 +244,7 @@ pub struct PidGenerationParametersJs {
     pub trainer_id: u16,
     pub secret_id: u16,
 }
+
 #[cfg(feature = "wasm")]
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn, clippy::too_many_arguments)]

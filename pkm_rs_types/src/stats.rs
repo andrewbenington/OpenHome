@@ -664,8 +664,10 @@ impl Dvs {
     }
 
     pub const fn is_shiny(&self) -> bool {
-        self.get_def() == 10 && self.get_spe() == 10 && self.get_spc() == 10
-        // && (self.get_atk() & 0b10 == 0b10) // shiny values are 2, 3, 6, 7, 10, 11, 14 and 15, AKA all values with the second bit set <= 15
+        self.get_def() == 10
+            && self.get_spe() == 10
+            && self.get_spc() == 10
+            && (self.get_atk() & 0b10 == 0b10) // shiny values are 2, 3, 6, 7, 10, 11, 14 and 15, AKA all values with the second bit set <= 15
     }
 
     pub const fn shiny_from_ivs(ivs: &Ivs) -> Self {
