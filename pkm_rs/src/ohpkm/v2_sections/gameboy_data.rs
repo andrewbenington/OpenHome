@@ -104,7 +104,7 @@ mod tests {
         let gb_data = GameboyData::from_main_data(shiny_unown_v.get_main_data());
 
         assert_eq!(gb_data.dvs.unown_letter(), UNOWN_V);
-        assert!(gb_data.dvs.is_shiny());
+        assert!(gb_data.dvs.shiny());
 
         Ok(())
     }
