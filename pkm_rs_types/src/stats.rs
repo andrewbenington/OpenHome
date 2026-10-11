@@ -1,3 +1,4 @@
+use crate::form;
 use crate::util::bit_is_set;
 
 use pkm_rs_derive::Stats;
@@ -185,35 +186,6 @@ impl Stats8 {
             spa: Stats8::gv_from_iv(self.spa),
             spd: Stats8::gv_from_iv(self.spd),
             spe: Stats8::gv_from_iv(self.spe),
-        }
-    }
-
-    pub const fn dvs_from_ivs(self, is_shiny: bool) -> StatsPreSplit {
-        if is_shiny {
-            let mut atk_dv = (self.atk - 1).div_ceil(2);
-
-            if (atk_dv & 0b11) == 0b01 {
-                atk_dv += 1
-            } else if atk_dv.is_multiple_of(4) {
-                atk_dv += 2
-            }
-            let hp_dv = (atk_dv & 1) << 3;
-
-            StatsPreSplit {
-                hp: hp_dv as u16,
-                atk: atk_dv as u16,
-                def: 10,
-                spc: 10,
-                spe: 10,
-            }
-        } else {
-            StatsPreSplit {
-                hp: (self.hp - 1).div_ceil(2) as u16,
-                atk: (self.atk - 1).div_ceil(2) as u16,
-                def: (self.def - 1).div_ceil(2) as u16,
-                spc: (self.spa.midpoint(self.spd) - 1).div_ceil(2) as u16,
-                spe: (self.spe - 1).div_ceil(2) as u16,
-            }
         }
     }
 
@@ -654,6 +626,48 @@ impl Dvs {
         )
     }
 
+    pub fn from_ivs(ivs: &Ivs, is_shiny: bool, unown_letter: Option<u16>) -> Self {
+        let dvs = if is_shiny {
+            let mut atk_dv = (ivs.get_atk() - 1).div_ceil(2);
+
+            if (atk_dv & 0b11) == 0b01 {
+                atk_dv += 1
+            } else if atk_dv.is_multiple_of(4) {
+                atk_dv += 2
+            }
+            let hp_dv = (atk_dv & 1) << 3;
+
+            Dvs::from(StatsPreSplit {
+                hp: hp_dv,
+                atk: atk_dv,
+                def: 10,
+                spc: 10,
+                spe: 10,
+            })
+        } else {
+            Dvs::from(StatsPreSplit {
+                hp: (ivs.get_hp() - 1).div_ceil(2),
+                atk: (ivs.get_atk() - 1).div_ceil(2),
+                def: (ivs.get_def() - 1).div_ceil(2),
+                spc: (ivs.get_spa().midpoint(ivs.get_spd()) - 1).div_ceil(2),
+                spe: (ivs.get_spe() - 1).div_ceil(2),
+            })
+        };
+
+        if let Some(letter) = unown_letter
+            && (!is_shiny || matches!(letter, form::UNOWN_I | form::UNOWN_V))
+        {
+            dvs.to_unown_letter(letter, is_shiny)
+        } else {
+            dvs
+        }
+    }
+
+    pub const fn is_shiny(&self) -> bool {
+        self.get_def() == 10 && self.get_spe() == 10 && self.get_spc() == 10
+        // && (self.get_atk() & 0b10 == 0b10) // shiny values are 2, 3, 6, 7, 10, 11, 14 and 15, AKA all values with the second bit set <= 15
+    }
+
     pub const fn shiny_from_ivs(ivs: &Ivs) -> Self {
         let mut atk = (ivs.0.atk.saturating_sub(1)).div_ceil(2) as u16;
         if atk & 0b11 == 0b01 {
@@ -665,14 +679,38 @@ impl Dvs {
         Self::from_all(atk, 10, 10, 10)
     }
 
-    pub const fn to_unown_letter(&self, letter_index: u16) -> Self {
+    const fn make_shiny(&mut self) {
+        let mut atk = (self.get_atk().saturating_sub(1)).div_ceil(2);
+        if atk & 0b11 == 0b01 {
+            atk += 1;
+        } else if atk.is_multiple_of(4) {
+            atk += 2
+        }
+
+        *self = Self::from_all(atk, 10, 10, 10);
+    }
+
+    pub const fn unown_letter(&self) -> u16 {
+        let mut iv_combination_val = ((self.get_atk() >> 1) & 0b11) << 6;
+        iv_combination_val += ((self.get_def() >> 1) & 0b11) << 4;
+        iv_combination_val += ((self.get_spe() >> 1) & 0b11) << 2;
+        iv_combination_val += (self.get_spc() >> 1) & 0b11;
+        iv_combination_val / 10
+    }
+
+    pub const fn to_unown_letter(&self, letter_index: u16, is_shiny: bool) -> Self {
         let letter_bits = letter_index * 10;
         let atk = (self.get_atk() & 0b1001) | (((letter_bits >> 6) & 0b11) << 1);
         let def = (self.get_def() & 0b1001) | (((letter_bits >> 4) & 0b11) << 1);
         let spe = (self.get_spe() & 0b1001) | (((letter_bits >> 2) & 0b11) << 1);
         let spc = (self.get_spc() & 0b1001) | ((letter_bits & 0b11) << 1);
 
-        Self::from_all(atk, def, spe, spc)
+        let mut dvs = Self::from_all(atk, def, spe, spc);
+        if is_shiny {
+            dvs.make_shiny();
+        };
+
+        dvs
     }
 }
 

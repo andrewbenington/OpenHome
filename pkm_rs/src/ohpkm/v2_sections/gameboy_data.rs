@@ -39,23 +39,15 @@ impl GameboyData {
     }
 
     pub fn from_main_data(main_data: &MainDataV2) -> Self {
-        if main_data.species_and_form.get_ndex() == NationalDex::Unown {
-            let letter_index = main_data.species_and_form.get_form_index();
-
-            Self {
-                dvs: Dvs::from_ivs_lossy(&main_data.ivs).to_unown_letter(letter_index),
-                ..Default::default()
-            }
+        let unown_letter = if main_data.species_and_form.get_ndex() == NationalDex::Unown {
+            Some(main_data.species_and_form.get_form_index())
         } else {
-            let dvs = if main_data.is_shiny() {
-                Dvs::shiny_from_ivs(&main_data.ivs)
-            } else {
-                Dvs::from_ivs_lossy(&main_data.ivs)
-            };
-            Self {
-                dvs,
-                ..Default::default()
-            }
+            None
+        };
+
+        Self {
+            dvs: Dvs::from_ivs(&main_data.ivs, main_data.is_shiny(), unown_letter),
+            ..Default::default()
         }
     }
 }
@@ -89,5 +81,31 @@ impl DataSection for GameboyData {
 
     fn is_empty(&self) -> bool {
         self.met_time_of_day == 0 && self.evs_g12.is_empty()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::path::PathBuf;
+
+    use pkm_rs_types::form::UNOWN_V;
+
+    use super::*;
+    use crate::ohpkm::OhpkmV2;
+    use crate::tests::TestResult;
+
+    #[test]
+    fn unown_retains_form_and_shiny_if_possible() -> TestResult<()> {
+        let shiny_unown_v: OhpkmV2 =
+            crate::tests::pkm_from_file(&PathBuf::from("ohpkm").join("unown-v-shiny.ohpkm"))?.0;
+
+        assert!(shiny_unown_v.is_shiny());
+
+        let gb_data = GameboyData::from_main_data(shiny_unown_v.get_main_data());
+
+        assert_eq!(gb_data.dvs.unown_letter(), UNOWN_V);
+        assert!(gb_data.dvs.is_shiny());
+
+        Ok(())
     }
 }
