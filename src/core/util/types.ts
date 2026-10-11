@@ -44,7 +44,7 @@ export type LoadSaveResponse = {
   createdDate?: Date
 }
 
-export interface PKMFormeRef {
+export interface PKMFormRef {
   nationalDex: number
   formIndex: number
 }

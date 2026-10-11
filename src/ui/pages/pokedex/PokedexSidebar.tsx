@@ -21,7 +21,7 @@ export default function PokedexSidebar(props: PokedexSidebarProps) {
     filter,
     selectedSpecies,
     setSelectedSpecies,
-    setSelectedForm: setSelectedForme,
+    setSelectedForm: setSelectedForm,
     pokedex,
   } = props
 
@@ -66,12 +66,12 @@ export default function PokedexSidebar(props: PokedexSidebarProps) {
             species={filteredSpecies[virtualRow.index]}
             onClick={() => {
               setSelectedSpecies(filteredSpecies[virtualRow.index])
-              const [caughtFormeIndex] = getHighestFormStatus(
+              const [caughtFormIndex] = getHighestFormStatus(
                 pokedex,
                 filteredSpecies[virtualRow.index]
               )
 
-              setSelectedForme(filteredSpecies[virtualRow.index].forms[caughtFormeIndex])
+              setSelectedForm(filteredSpecies[virtualRow.index].forms[caughtFormIndex])
               virtualizer.scrollToIndex(virtualRow.index, { behavior: 'smooth', align: 'center' })
             }}
             selected={

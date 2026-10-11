@@ -121,7 +121,7 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
 
   abstract supportsMon(
     nationalDex: number,
-    formeNumber: number,
+    formNumber: number,
     extraFormIndex?: ExtraFormIndex
   ): boolean
 

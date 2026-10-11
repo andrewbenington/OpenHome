@@ -203,7 +203,7 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
 
   abstract supportsMon(
     nationalDex: number,
-    formeNumber: number,
+    formNumber: number,
     extraFormIndex?: ExtraFormIndex
   ): boolean
 

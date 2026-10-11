@@ -266,27 +266,27 @@ async function getAllSpeciesAndForms() {
   const allSpecies: Species[] = []
 
   for (const species of speciesRows) {
-    const formeRows = camelcaseKeys(await formGetByNationalDex(db, species.nationalDex))
+    const formRows = camelcaseKeys(await formGetByNationalDex(db, species.nationalDex))
     const speciesForms: Form[] = []
-    for (const formeRow of formeRows) {
+    for (const formRow of formRows) {
       const evolutions = camelcaseKeys(
         await evolutionsGetByPrevo(db, {
-          prevoNationalDex: formeRow.nationalDex,
-          prevoFormIndex: formeRow.formIndex,
+          prevoNationalDex: formRow.nationalDex,
+          prevoFormIndex: formRow.formIndex,
         })
       )
       const preEvoResult = await evolutionsGetByEvo(db, {
-        evoNationalDex: formeRow.nationalDex,
-        evoFormIndex: formeRow.formIndex,
+        evoNationalDex: formRow.nationalDex,
+        evoFormIndex: formRow.formIndex,
       })
       const preEvolution = preEvoResult ? camelcaseKeys(preEvoResult) : null
       const megas = camelcaseKeys(
         await megaEvolutionGetByBaseForm(db, {
-          nationalDex: formeRow.nationalDex,
-          baseFormIndex: formeRow.formIndex,
+          nationalDex: formRow.nationalDex,
+          baseFormIndex: formRow.formIndex,
         })
       )
-      speciesForms.push(rowToForm(formeRow, evolutions, preEvolution, megas))
+      speciesForms.push(rowToForm(formRow, evolutions, preEvolution, megas))
     }
     const fullSpecies = rowToSpecies(species, speciesForms)
     allSpecies.push(fullSpecies)

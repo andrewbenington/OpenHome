@@ -40,10 +40,10 @@ export interface PluginSaveClass<S extends PluginSAV = PluginSAV> extends SAVCla
 export function supportsMon(
   saveType: SAVClass,
   nationalDex: number,
-  formeNumber: number,
+  formNumber: number,
   extraFormIndex?: ExtraFormIndex
 ): boolean {
-  return saveType.prototype.supportsMon(nationalDex, formeNumber, extraFormIndex)
+  return saveType.prototype.supportsMon(nationalDex, formNumber, extraFormIndex)
 }
 
 export function monSupportedBySaveType(

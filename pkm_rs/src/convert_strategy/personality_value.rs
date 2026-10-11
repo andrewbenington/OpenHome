@@ -67,7 +67,7 @@ pub struct PidModificationStrategy {
 impl PidModificationStrategy {
     fn find_inconsistencies(&self, pid: u32, mon: &OhpkmV2) -> Vec<DerivedField> {
         let mut inconsistencies = Vec::<DerivedField>::new();
-        if self.keep_gender && mon.get_forme_metadata().gender_from_pid(pid) != mon.gender() {
+        if self.keep_gender && mon.get_form_metadata().gender_from_pid(pid) != mon.gender() {
             inconsistencies.push(DerivedField::Gender);
         }
 
@@ -85,7 +85,7 @@ impl PidModificationStrategy {
 
         if self.keep_unown_letter
             && mon.species_and_form().get_ndex() == NationalDex::Unown
-            && unown_form_from_pid_gen3(pid) as u16 != mon.species_and_form().get_forme_index()
+            && unown_form_from_pid_gen3(pid) as u16 != mon.species_and_form().get_form_index()
         {
             inconsistencies.push(DerivedField::UnownLetter);
         }
@@ -250,7 +250,7 @@ mod tests {
         assert!(pkm_rs_types::shiny_xor_value(new_pid, mon.trainer_id(), mon.secret_id()) < 8);
         assert_eq!(NatureIndex::new_from_modulo(new_pid), mon.nature());
         assert_eq!(
-            mon.get_forme_metadata().gender_from_pid(new_pid),
+            mon.get_form_metadata().gender_from_pid(new_pid),
             mon.gender()
         );
 
@@ -274,7 +274,7 @@ mod tests {
         assert!(pkm_rs_types::shiny_xor_value(new_pid, mon.trainer_id(), mon.secret_id()) >= 8);
         assert_eq!(NatureIndex::new_from_modulo(new_pid), mon.nature());
         assert_eq!(
-            mon.get_forme_metadata().gender_from_pid(new_pid),
+            mon.get_form_metadata().gender_from_pid(new_pid),
             mon.gender()
         );
 

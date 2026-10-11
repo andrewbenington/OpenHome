@@ -218,16 +218,16 @@ function PokemonDndOverlay(props: { multiSelectState: MultiSelectState; children
   })
 
   const draggingMon = dragPayload?.kind === 'mon' ? dragPayload.monData.mon : undefined
-  let formeNumber = draggingMon?.formIndex ?? 0
+  let formNumber = draggingMon?.formIndex ?? 0
 
   if (draggingMon && isMegaStone(draggingMon.heldItemIndex)) {
     const megaForStone = FullMetadataLookup(draggingMon)?.megaEvolutions.find(
       (mega) => mega.requiredItemId === draggingMon.heldItemIndex
     )
 
-    if (megaForStone) formeNumber = megaForStone.megaForme.formIndex
+    if (megaForStone) formNumber = megaForStone.megaForm.formIndex
   } else if (draggingMon && isBattleFormItem(draggingMon.nationalDex, draggingMon.heldItemIndex)) {
-    formeNumber = displayIndexAdder(draggingMon.heldItemIndex)(draggingMon.formIndex)
+    formNumber = displayIndexAdder(draggingMon.heldItemIndex)(draggingMon.formIndex)
   }
 
   const { multiSelectState } = props
@@ -247,7 +247,7 @@ function PokemonDndOverlay(props: { multiSelectState: MultiSelectState; children
             <div style={{ width: '100%', height: '100%', position: 'absolute' }}>
               <PokemonIcon
                 nationalDex={dragPayload.monData.mon.nationalDex ?? 0}
-                formIndex={formeNumber}
+                formIndex={formNumber}
                 isShiny={dragPayload.monData.mon.isShiny()}
                 heldItemIndex={dragPayload.monData.mon.heldItemIndex}
                 onlyItem={

@@ -603,10 +603,10 @@ mod tests {
     fn no_form_panics_for_any_source() -> Result<(), String> {
         crate::tests::try_all_forms(|form| {
             METADATA_SOURCES_IMPLEMENTED.into_iter().for_each(|source| {
-                base_stats_lookup(form.get_ndex(), form.get_forme_index(), source);
-                types_lookup(form.get_ndex(), form.get_forme_index(), Some(source));
+                base_stats_lookup(form.get_ndex(), form.get_form_index(), source);
+                types_lookup(form.get_ndex(), form.get_form_index(), Some(source));
             });
-            let most_recent_types = types_lookup(form.get_ndex(), form.get_forme_index(), None);
+            let most_recent_types = types_lookup(form.get_ndex(), form.get_form_index(), None);
             assert!(most_recent_types.is_some());
 
             Ok(())

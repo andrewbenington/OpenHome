@@ -109,7 +109,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           title: 'Import Failed',
           messages: unsupportedMons.map(
             (mon) =>
-              `${FullMetadataLookup(mon)?.formeName} cannot be moved into ${save.gameNameFull}`
+              `${FullMetadataLookup(mon)?.formName} cannot be moved into ${save.gameNameFull}`
           ),
         },
       })

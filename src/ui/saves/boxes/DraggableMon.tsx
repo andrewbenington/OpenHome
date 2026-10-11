@@ -3,10 +3,7 @@ import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { displayIndexAdder, isBattleFormItem, isMegaStone } from '@openhome-core/pkm/util'
 import { PkmFormSpecifiers } from '@openhome-core/pkm/util/pkmInterface'
 import { FullMetadataLookup } from '@openhome-core/util'
-import {
-  TopRightBadge,
-  TopRightBadgelMon as TopRightBadgeMon,
-} from '@openhome-ui/components/badge/TopRightBadge'
+import { TopRightBadge, TopRightBadgeMon } from '@openhome-ui/components/badge/TopRightBadge'
 import { useDraggingActive } from '@openhome-ui/state-zustand/drag-and-drop/dragStore'
 import { MonWithLocation } from '@openhome-ui/state/saves'
 import { Gender } from '@pkm-rs/pkg'
@@ -82,20 +79,20 @@ const DraggableMon = (props: DraggableMonProps) => {
   })
   const draggingActive = useDraggingActive()
 
-  const formeNumber = useMemo(() => {
-    let formeNumber = mon.formIndex
+  const formNumber = useMemo(() => {
+    let formNumber = mon.formIndex
 
     if (isMegaStone(mon.heldItemIndex)) {
       const megaForStone = FullMetadataLookup(mon)?.megaEvolutions.find(
         (mega) => mega.requiredItemId === mon.heldItemIndex
       )
 
-      if (megaForStone) formeNumber = megaForStone.megaForme.formIndex
+      if (megaForStone) formNumber = megaForStone.megaForm.formIndex
     } else if (isBattleFormItem(mon.nationalDex, mon.heldItemIndex)) {
-      formeNumber = displayIndexAdder(mon.heldItemIndex)(mon.formIndex)
+      formNumber = displayIndexAdder(mon.heldItemIndex)(mon.formIndex)
     }
 
-    return formeNumber
+    return formNumber
   }, [mon])
 
   const topRightIndicatorComponent = useMemo(
@@ -117,7 +114,7 @@ const DraggableMon = (props: DraggableMonProps) => {
     >
       <PokemonIcon
         nationalDex={mon.nationalDex}
-        formIndex={formeNumber}
+        formIndex={formNumber}
         isShiny={showShiny && mon.isShiny()}
         gender={mon.gender}
         isEgg={mon.isEgg}

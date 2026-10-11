@@ -45,7 +45,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
 
   const itemAltText = useMemo(() => {
     if (!monMetadata) return 'pokemon sprite'
-    return `${monMetadata.formeName}${mon.isShiny() ? '-shiny' : ''} sprite`
+    return `${monMetadata.formName}${mon.isShiny() ? '-shiny' : ''} sprite`
   }, [mon, monMetadata])
   const { revertMonAbility } = useSaves()
 
@@ -176,7 +176,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
                 {extraFormDisplayName(mon.extraFormIndex)}
               </span>
             ) : (
-              monMetadata?.formeName
+              monMetadata?.formName
             )}
             <GenderIcon gender={mon.gender} />
           </Flex>

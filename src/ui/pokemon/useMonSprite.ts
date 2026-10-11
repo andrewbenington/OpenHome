@@ -22,7 +22,7 @@ export function findPluginSprite(
     try {
       const spritePath = plugin.getMonSpritePath?.({
         dexNum: mon.nationalDex,
-        formNum: mon.formIndex,
+        formeNum: mon.formIndex, // do not change until plugins v4
         ...mon,
       })
 
@@ -47,7 +47,7 @@ export function getMonSprite(
       (mega) => mega.requiredItemId === mon.heldItemIndex
     )
 
-    if (megaForStone) mon.formIndex = megaForStone.megaForme.formIndex
+    if (megaForStone) mon.formIndex = megaForStone.megaForm.formIndex
   } else if (isBattleFormItem(mon.nationalDex, mon.heldItemIndex)) {
     mon.formIndex = displayIndexAdder(mon.heldItemIndex)(mon.formIndex)
   }
@@ -91,7 +91,7 @@ export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
         (mega) => mega.requiredItemId === mon.heldItemIndex
       )
 
-      if (megaForStone) mon.formIndex = megaForStone.megaForme.formIndex
+      if (megaForStone) mon.formIndex = megaForStone.megaForm.formIndex
     } else if (isBattleFormItem(mon.nationalDex, mon.heldItemIndex)) {
       mon.formIndex = displayIndexAdder(mon.heldItemIndex)(mon.formIndex)
     }

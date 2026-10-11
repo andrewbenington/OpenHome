@@ -77,4 +77,4 @@ def download_all_sprites():
 # scrape_bulbapedia_gen_8()
 download_all_sprites()
 # print(POKEMON_DATA["19"]["forms"][1])
-# print(exclude_forme_gen8(19, POKEMON_DATA["19"]["forms"][1]))
+# print(exclude_form_gen8(19, POKEMON_DATA["19"]["forms"][1]))
