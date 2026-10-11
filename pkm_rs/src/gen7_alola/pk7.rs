@@ -527,7 +527,7 @@ impl Pk7 {
 
     #[wasm_bindgen(getter = nationalDex)]
     pub fn national_dex_js(&self) -> u16 {
-        self.species_and_form.0.get_ndex_wasm()
+        self.species_and_form.0.get_ndex() as u16
     }
 
     #[wasm_bindgen(getter = formIndex)]

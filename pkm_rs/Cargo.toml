@@ -19,7 +19,7 @@ serde-wasm-bindgen = { version = "0.6.5", optional = true }
 pkm_rs_derive = { path = "../pkm_rs_derive" }
 static_assertions = "1.1.0"
 sha2 = "0.11.0"
-rand = { version = "0.10.2", optional = true }
+rand = "0.10.2"
 getrandom = { version = "0.4.3", features = ["wasm_js"] }
 phf = { version = "0.13.1", features = ["macros"] }
 strum = { version = "0.28.0", features = ["derive"]  }
@@ -46,7 +46,7 @@ missing_const_for_fn = "warn"
 
 [features]
 wasm = ["wasm-bindgen", "js-sys", "serde-wasm-bindgen", "getrandom/wasm_js", "pkm_rs_types/wasm", "pkm_rs_resources/wasm"]
-randomize = ["rand", "pkm_rs_types/randomize", "pkm_rs_resources/randomize"]
+randomize = ["pkm_rs_types/randomize", "pkm_rs_resources/randomize"]
 
 [dev-dependencies]
 assert-json-diff = "2.0.2"

@@ -641,8 +641,8 @@ impl SpeciesMetadata {
     }
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Default, PartialEq, Eq, Clone, Copy, Serialize)]
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct SpeciesForm {
     national_dex: NationalDex,
     form_index: u16,

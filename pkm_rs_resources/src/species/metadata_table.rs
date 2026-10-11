@@ -14,7 +14,7 @@ pub mod gen9_za;
 
 use std::marker::PhantomData;
 
-use pkm_rs_types::{NationalDex, PkmType, Stats8, StatsPreSplit, pkl_file::PklFileData};
+use pkm_rs_types::{NationalDex, PkmType, Stats8, StatsPreSplit, form, pkl_file::PklFileData};
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
@@ -25,28 +25,23 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "wasm")]
 use tsify::Tsify;
 
-use crate::{
-    ExpectLog,
-    levelup::{LearnsetFileReader, LearnsetReader, LevelupLearnsetReader},
-    metadata_source::MetadataSource,
-    species::{
-        form,
-        metadata_table::{
-            gen1::{METADATA_TABLE_RB, METADATA_TABLE_YELLOW},
-            gen2::{METADATA_TABLE_CRYSTAL, METADATA_TABLE_GS},
-            gen3::{METADATA_TABLE_EMERALD, METADATA_TABLE_FRLG, METADATA_TABLE_RS},
-            gen4::{METADATA_TABLE_DP, METADATA_TABLE_HGSS, METADATA_TABLE_PT},
-            gen5::{METADATA_TABLE_B2W2, METADATA_TABLE_BW},
-            gen6::{METADATA_TABLE_ORAS, METADATA_TABLE_XY},
-            gen7_alola::{METADATA_TABLE_SM, METADATA_TABLE_USUM},
-            gen7_lgpe::METADATA_TABLE_LGPE,
-            gen8_bdsp::METADATA_TABLE_BDSP,
-            gen8_la::METADATA_TABLE_LA,
-            gen8_swsh::METADATA_TABLE_SWSH,
-            gen9_sv::METADATA_TABLE_SV,
-            gen9_za::METADATA_TABLE_LZA,
-        },
-    },
+use crate::ExpectLog;
+use crate::levelup::{LearnsetFileReader, LearnsetReader, LevelupLearnsetReader};
+use crate::metadata_source::MetadataSource;
+use crate::species::metadata_table::{
+    gen1::{METADATA_TABLE_RB, METADATA_TABLE_YELLOW},
+    gen2::{METADATA_TABLE_CRYSTAL, METADATA_TABLE_GS},
+    gen3::{METADATA_TABLE_EMERALD, METADATA_TABLE_FRLG, METADATA_TABLE_RS},
+    gen4::{METADATA_TABLE_DP, METADATA_TABLE_HGSS, METADATA_TABLE_PT},
+    gen5::{METADATA_TABLE_B2W2, METADATA_TABLE_BW},
+    gen6::{METADATA_TABLE_ORAS, METADATA_TABLE_XY},
+    gen7_alola::{METADATA_TABLE_SM, METADATA_TABLE_USUM},
+    gen7_lgpe::METADATA_TABLE_LGPE,
+    gen8_bdsp::METADATA_TABLE_BDSP,
+    gen8_la::METADATA_TABLE_LA,
+    gen8_swsh::METADATA_TABLE_SWSH,
+    gen9_sv::METADATA_TABLE_SV,
+    gen9_za::METADATA_TABLE_LZA,
 };
 
 pub trait PersonalInfo: Sized + std::panic::RefUnwindSafe + std::panic::UnwindSafe {

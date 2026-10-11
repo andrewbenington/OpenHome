@@ -1,5 +1,10 @@
-use crate::{ohpkm::OhpkmV2, traits::HasSpeciesAndForm, util::unown_form_from_pid_gen3};
+use crate::ohpkm::OhpkmV2;
+use crate::traits::HasSpeciesAndForm;
+use crate::util::unown_form_from_pid_gen3;
 use pkm_rs_resources::natures::NatureIndex;
+use pkm_rs_resources::natures::WithNature;
+use pkm_rs_resources::species::SpeciesForm;
+use pkm_rs_types::Gender;
 use pkm_rs_types::NationalDex;
 
 use serde::{Deserialize, Serialize};
@@ -19,53 +24,59 @@ pub enum NatureStrategy {
 }
 
 impl NatureStrategy {
-    fn relevant_nature(&self, mon: &OhpkmV2) -> NatureIndex {
+    fn relevant_nature(&self, fields: &impl WithNature) -> NatureIndex {
         match self {
-            NatureStrategy::KeepOriginalNature => mon.nature(),
-            NatureStrategy::KeepMintNature => mon.mint_nature(),
+            NatureStrategy::KeepOriginalNature => fields.nature(),
+            NatureStrategy::KeepMintNature => fields.mint_nature().unwrap_or(fields.nature()),
         }
     }
 
-    fn is_satisfied(&self, pid: u32, mon: &OhpkmV2) -> bool {
-        NatureIndex::new_from_modulo(pid) == self.relevant_nature(mon)
+    fn is_satisfied(&self, pid: u32, fields: &impl WithNature) -> bool {
+        NatureIndex::new_from_modulo(pid) == self.relevant_nature(fields)
     }
 }
 
 #[cfg_attr(feature = "wasm", derive(Tsify))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
-pub enum ShinyStrategy {
+pub enum ShinyOdds {
     #[default]
-    KeepShiny8192,
-    KeepShiny4096,
+    Odds8192,
+    Odds4096,
 }
 
-impl ShinyStrategy {
+impl ShinyOdds {
     const fn xor_threshold(self) -> u16 {
         match self {
-            ShinyStrategy::KeepShiny8192 => 8,
-            ShinyStrategy::KeepShiny4096 => 16,
+            ShinyOdds::Odds8192 => 8,
+            ShinyOdds::Odds4096 => 16,
         }
     }
 
-    fn is_satisfied(&self, pid: u32, mon: &OhpkmV2) -> bool {
-        let xor_value = pkm_rs_types::shiny_xor_value(pid, mon.trainer_id(), mon.secret_id());
+    const fn is_satisfied(&self, pid: u32, fields: &PidGenerationParameters) -> bool {
+        let xor_value = pkm_rs_types::shiny_xor_value(pid, fields.trainer_id, fields.secret_id);
         let pid_is_shiny = xor_value < self.xor_threshold();
 
-        pid_is_shiny == mon.is_shiny()
+        pid_is_shiny == fields.is_shiny
     }
 }
 
 #[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "wasm", derive(Tsify, Serialize, Deserialize))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 pub struct PidModificationStrategy {
     pub nature: Option<NatureStrategy>,
     pub keep_gender: bool,
-    pub shiny: Option<ShinyStrategy>,
+    pub shiny: Option<ShinyOdds>,
     pub keep_unown_letter: bool,
 }
 
+use rand::Rng;
+use rand::SeedableRng;
+use rand::rngs::StdRng;
+
 impl PidModificationStrategy {
-    fn find_inconsistencies(&self, pid: u32, mon: &OhpkmV2) -> Vec<DerivedField> {
+    fn find_mon_inconsistencies(&self, pid: u32, mon: &OhpkmV2) -> Vec<DerivedField> {
         let mut inconsistencies = Vec::<DerivedField>::new();
         if self.keep_gender && mon.get_form_metadata().gender_from_pid(pid) != mon.gender() {
             inconsistencies.push(DerivedField::Gender);
@@ -78,7 +89,7 @@ impl PidModificationStrategy {
         }
 
         if let Some(shiny_strategy) = self.shiny
-            && !shiny_strategy.is_satisfied(pid, mon)
+            && !shiny_strategy.is_satisfied(pid, &mon.into())
         {
             inconsistencies.push(DerivedField::Shiny);
         }
@@ -93,14 +104,14 @@ impl PidModificationStrategy {
         inconsistencies
     }
 
-    pub fn get_modified_pid(&self, mon: &OhpkmV2) -> u32 {
+    pub fn modify_pid_to_match_fields(&self, mon: &OhpkmV2) -> u32 {
         let trainer_id = mon.trainer_id();
         let secret_id = mon.secret_id();
 
         let mut new_pid = mon.personality_value();
 
         for i in 0..u16::MAX {
-            let inconsistencies = self.find_inconsistencies(new_pid, mon);
+            let inconsistencies = self.find_mon_inconsistencies(new_pid, mon);
             if inconsistencies.is_empty() {
                 return new_pid;
             }
@@ -117,6 +128,78 @@ impl PidModificationStrategy {
 
         mon.personality_value()
     }
+
+    fn find_field_inconsistencies(
+        &self,
+        pid: u32,
+        fields: &PidGenerationParameters,
+    ) -> Vec<DerivedField> {
+        let mut inconsistencies = Vec::<DerivedField>::new();
+        if self.keep_gender
+            && fields.gender.is_some_and(|gender| {
+                gender != fields.species_form.get_form_metadata().gender_from_pid(pid)
+            })
+        {
+            inconsistencies.push(DerivedField::Gender);
+        }
+
+        if let Some(nature_strategy) = self.nature
+            && let Some(nature) = fields.nature
+            && !nature_strategy.is_satisfied(pid, &nature)
+        {
+            inconsistencies.push(DerivedField::Nature);
+        }
+
+        if let Some(shiny_strategy) = self.shiny
+            && !shiny_strategy.is_satisfied(pid, fields)
+        {
+            inconsistencies.push(DerivedField::Shiny);
+        }
+        let (national_dex, form_index) = fields.species_form.split();
+
+        if self.keep_unown_letter
+            && national_dex == NationalDex::Unown
+            && unown_form_from_pid_gen3(pid) as u16 != form_index
+        {
+            inconsistencies.push(DerivedField::UnownLetter);
+        }
+
+        inconsistencies
+    }
+
+    pub fn generate_pid_matching_fields(&self, fields: impl Into<PidGenerationParameters>) -> u32 {
+        let parameters: PidGenerationParameters = fields.into();
+        let PidGenerationParameters {
+            trainer_id,
+            secret_id,
+            is_shiny,
+            ..
+        } = &parameters;
+
+        let tid_sid_seed: u32 = (*trainer_id as u32) << 16 | *secret_id as u32;
+        let tid_sid_seed: u64 = (tid_sid_seed as u64) << 32 | (tid_sid_seed as u64);
+        let rng = &mut StdRng::seed_from_u64(tid_sid_seed);
+
+        let mut personality_value = rng.next_u32();
+
+        for i in 0..u16::MAX {
+            let inconsistencies = self.find_field_inconsistencies(personality_value, &parameters);
+            if inconsistencies.is_empty() {
+                return personality_value;
+            }
+
+            let (mut pid_upper, mut pid_lower) = pkm_rs_types::pid_upper_lower(personality_value);
+            pid_lower ^= i;
+
+            if *is_shiny {
+                pid_upper = trainer_id ^ secret_id ^ pid_lower
+            }
+
+            personality_value = ((pid_upper as u32) << 16) | (pid_lower as u32);
+        }
+
+        personality_value
+    }
 }
 
 impl Default for PidModificationStrategy {
@@ -124,15 +207,95 @@ impl Default for PidModificationStrategy {
         Self {
             nature: Some(NatureStrategy::default()),
             keep_gender: true,
-            shiny: Some(ShinyStrategy::default()),
+            shiny: Some(ShinyOdds::default()),
             keep_unown_letter: true,
         }
     }
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = generatePk3CompatiblePid))]
-pub fn generate_pk3_compatible_pid(mon: &OhpkmV2) -> u32 {
-    PidModificationStrategy::default().get_modified_pid(mon)
+#[derive(Debug, Clone, Copy)]
+pub struct PidGenerationParameters {
+    pub species_form: SpeciesForm,
+    pub nature: Option<NatureIndex>,
+    pub gender: Option<Gender>,
+    pub is_shiny: bool,
+    pub unown_letter: Option<u8>,
+    pub trainer_id: u16,
+    pub secret_id: u16,
+}
+
+pub fn generate_pk3_compatible_pid(
+    parameters: &PidGenerationParameters,
+    strategy: &PidModificationStrategy,
+) -> u32 {
+    strategy.generate_pid_matching_fields(*parameters)
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+#[derive(Debug, Clone, Copy)]
+pub struct PidGenerationParametersJs {
+    pub national_dex: u16,
+    pub form_index: u16,
+    pub nature: Option<NatureIndex>,
+    pub gender: Option<Gender>,
+    pub is_shiny: bool,
+    pub unown_letter: Option<u8>,
+    pub trainer_id: u16,
+    pub secret_id: u16,
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+#[allow(clippy::missing_const_for_fn, clippy::too_many_arguments)]
+impl PidGenerationParametersJs {
+    pub fn new(
+        national_dex: u16,
+        form_index: u16,
+        nature: Option<NatureIndex>,
+        gender: Option<Gender>,
+        is_shiny: bool,
+        unown_letter: Option<u8>,
+        trainer_id: u16,
+        secret_id: u16,
+    ) -> Self {
+        Self {
+            national_dex,
+            form_index,
+            nature,
+            gender,
+            is_shiny,
+            unown_letter,
+            trainer_id,
+            secret_id,
+        }
+    }
+}
+
+#[cfg(feature = "wasm")]
+impl TryFrom<PidGenerationParametersJs> for PidGenerationParameters {
+    type Error = crate::result::Error;
+
+    fn try_from(value: PidGenerationParametersJs) -> Result<Self, Self::Error> {
+        Ok(Self {
+            species_form: SpeciesForm::new(value.national_dex, value.form_index)?,
+            nature: value.nature,
+            gender: value.gender,
+            is_shiny: value.is_shiny,
+            unown_letter: value.unown_letter,
+            trainer_id: value.trainer_id,
+            secret_id: value.secret_id,
+        })
+    }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_name = generatePk3CompatiblePid)]
+pub fn generate_pk3_compatible_pid_wasm(
+    parameters: PidGenerationParametersJs,
+    strategy: PidModificationStrategy,
+) -> Result<u32, crate::result::Error> {
+    Ok(strategy.generate_pid_matching_fields(PidGenerationParameters::try_from(parameters)?))
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -161,11 +324,11 @@ mod tests {
         let mon = tests::pkm_from_file::<OhpkmV2>(&path)?.0;
 
         let strategy = PidModificationStrategy {
-            shiny: Some(ShinyStrategy::KeepShiny8192),
+            shiny: Some(ShinyOdds::Odds8192),
             ..Default::default()
         };
 
-        let new_pid = strategy.get_modified_pid(&mon);
+        let new_pid = strategy.modify_pid_to_match_fields(&mon);
 
         assert!(pkm_rs_types::shiny_xor_value(new_pid, mon.trainer_id(), mon.secret_id()) < 8);
 
@@ -181,12 +344,12 @@ mod tests {
         let mon = tests::pkm_from_file::<OhpkmV2>(&path)?.0;
 
         let strategy = PidModificationStrategy {
-            shiny: Some(ShinyStrategy::KeepShiny4096),
+            shiny: Some(ShinyOdds::Odds4096),
             nature: None, // Gen 5 doesn't use the PID for nature generation, so this won't match
             ..Default::default()
         };
 
-        let new_pid = strategy.get_modified_pid(&mon);
+        let new_pid = strategy.modify_pid_to_match_fields(&mon);
 
         assert_eq!(mon.personality_value(), new_pid);
 
@@ -205,7 +368,7 @@ mod tests {
             ..Default::default()
         };
 
-        let new_pid = strategy.get_modified_pid(&mon);
+        let new_pid = strategy.modify_pid_to_match_fields(&mon);
 
         let modest = NatureIndex::new_js(15);
         assert_eq!(NatureIndex::new_from_modulo(new_pid), modest);
@@ -225,7 +388,7 @@ mod tests {
             ..Default::default()
         };
 
-        let new_pid = strategy.get_modified_pid(&mon);
+        let new_pid = strategy.modify_pid_to_match_fields(&mon);
 
         let mild = NatureIndex::new_js(16);
         assert_eq!(NatureIndex::new_from_modulo(new_pid), mild);
@@ -239,13 +402,13 @@ mod tests {
         let mon = tests::pkm_from_file::<OhpkmV2>(&path)?.0;
 
         let strategy = PidModificationStrategy {
-            shiny: Some(ShinyStrategy::KeepShiny8192),
+            shiny: Some(ShinyOdds::Odds8192),
             nature: Some(NatureStrategy::KeepMintNature),
             keep_gender: true,
             ..Default::default()
         };
 
-        let new_pid = strategy.get_modified_pid(&mon);
+        let new_pid = strategy.modify_pid_to_match_fields(&mon);
 
         assert!(pkm_rs_types::shiny_xor_value(new_pid, mon.trainer_id(), mon.secret_id()) < 8);
         assert_eq!(NatureIndex::new_from_modulo(new_pid), mon.nature());
@@ -263,13 +426,13 @@ mod tests {
         let mon = tests::pkm_from_file::<OhpkmV2>(&path)?.0;
 
         let strategy = PidModificationStrategy {
-            shiny: Some(ShinyStrategy::KeepShiny8192),
+            shiny: Some(ShinyOdds::Odds8192),
             nature: Some(NatureStrategy::KeepMintNature),
             keep_gender: true,
             ..Default::default()
         };
 
-        let new_pid = strategy.get_modified_pid(&mon);
+        let new_pid = strategy.modify_pid_to_match_fields(&mon);
 
         assert!(pkm_rs_types::shiny_xor_value(new_pid, mon.trainer_id(), mon.secret_id()) >= 8);
         assert_eq!(NatureIndex::new_from_modulo(new_pid), mon.nature());

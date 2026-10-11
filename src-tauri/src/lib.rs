@@ -13,10 +13,11 @@ mod version;
 
 use crate::data_controller::ToDataController;
 use crate::synced_state::AllSyncedState;
-use openhome_core::convert_strategies::ConvertStrategies;
+use openhome_core::convert_strategies::{ConvertStrategies, NamedStrategy};
 use openhome_core::lookup::LookupState;
 use openhome_core::ohpkm_store::OhpkmBytesStore;
 use openhome_core::{Error, Result};
+use pkm_rs::convert_strategy::ShinyOdds;
 use pkm_rs::ohpkm::OhpkmV2;
 use std::env;
 use tauri::Manager;
@@ -129,12 +130,6 @@ pub fn run() {
                 }
             };
 
-            lookup_state.with_recalculated(
-                ohpkm_store
-                    .all_entries()
-                    .filter_map(|(_, bytes)| OhpkmV2::from_bytes(bytes).ok()),
-            );
-
             let conversion_settings = match ConvertStrategies::load(&controller) {
                 Ok(settings) => settings,
                 Err(err) => {
@@ -144,6 +139,18 @@ pub fn run() {
                     std::process::exit(1);
                 }
             };
+
+            lookup_state.with_recalculated(
+                ohpkm_store
+                    .all_entries()
+                    .filter_map(|(_, bytes)| OhpkmV2::from_bytes(bytes).ok()),
+                &conversion_settings
+                    .get_default()
+                    .map(NamedStrategy::inner)
+                    .copied()
+                    .unwrap_or_default()
+                    .pid_strategy(ShinyOdds::Odds8192),
+            );
 
             let synced_state =
                 AllSyncedState::from_states(lookup_state, ohpkm_store, conversion_settings);

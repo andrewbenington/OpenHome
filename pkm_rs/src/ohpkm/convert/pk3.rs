@@ -4,7 +4,7 @@ use pkm_rs_resources::{items::ItemGen3, lookup};
 use pkm_rs_types::{AbilityNumber, Generation, PokeDate, SimpleAbilityNumber, Stats16Le};
 
 use super::OhpkmConvert;
-use crate::convert_strategy::{ConvertStrategy, PidModificationStrategy, PkmConverter};
+use crate::convert_strategy::{ConvertStrategy, PkmConverter, ShinyOdds};
 use crate::gen3::{Gen3PokemonIndex, PK3_MAX_ABILITY, Pk3};
 use crate::ohpkm::OhpkmV2;
 use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
@@ -120,7 +120,7 @@ impl OhpkmConvert for Pk3 {
         }
 
         let personality_value = if ohpkm.game_of_origin().generation() != Generation::G3 {
-            PidModificationStrategy::default().get_modified_pid(ohpkm)
+            converter.personality_value(ohpkm, ShinyOdds::Odds8192)
         } else if ohpkm.pid_bit_flipped_for_shiny() {
             personality_value::flip_most_significant_bit(ohpkm.personality_value())
         } else {
