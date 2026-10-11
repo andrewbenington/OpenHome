@@ -36,8 +36,7 @@ impl NatureStrategy {
     }
 }
 
-#[cfg_attr(feature = "wasm", derive(Tsify))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub enum ShinyOdds {
     #[default]
@@ -232,9 +231,7 @@ pub fn generate_pk3_compatible_pid(
 }
 
 #[cfg(feature = "wasm")]
-#[derive(Tsify, Serialize, Deserialize)]
-#[tsify(into_wasm_abi, from_wasm_abi)]
-#[serde(rename_all = "camelCase")]
+#[wasm_bindgen]
 #[derive(Debug, Clone, Copy)]
 pub struct PidGenerationParametersJs {
     pub national_dex: u16,
@@ -245,6 +242,32 @@ pub struct PidGenerationParametersJs {
     pub unown_letter: Option<u8>,
     pub trainer_id: u16,
     pub secret_id: u16,
+}
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+#[allow(clippy::missing_const_for_fn, clippy::too_many_arguments)]
+impl PidGenerationParametersJs {
+    pub fn new(
+        national_dex: u16,
+        form_index: u16,
+        nature: Option<NatureIndex>,
+        gender: Option<Gender>,
+        is_shiny: bool,
+        unown_letter: Option<u8>,
+        trainer_id: u16,
+        secret_id: u16,
+    ) -> Self {
+        Self {
+            national_dex,
+            form_index,
+            nature,
+            gender,
+            is_shiny,
+            unown_letter,
+            trainer_id,
+            secret_id,
+        }
+    }
 }
 
 #[cfg(feature = "wasm")]

@@ -2092,11 +2092,6 @@ impl OhpkmV2 {
         self.regenerate_openhome_id();
     }
 
-    #[wasm_bindgen(getter = gen345Identifier)]
-    pub fn gen_345_id_js(&self, strategy: &PidModificationStrategy) -> String {
-        self.gen_345_id(strategy)
-    }
-
     #[wasm_bindgen(getter = personalityValue)]
     pub fn personality_value_js(&self) -> u32 {
         self.personality_value()

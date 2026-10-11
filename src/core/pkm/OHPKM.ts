@@ -34,7 +34,7 @@ import {
   Ball,
   BinaryGender,
   Gender,
-  generatePk3CompatiblePid,
+  getDefaultConvertStrategy,
   Item,
   Language,
   Lookup,
@@ -46,6 +46,7 @@ import {
   PokeDate,
   Pokerus,
   ShinyLeaves,
+  ShinyOdds,
   SpeciesForm,
   SpeciesLookup,
   swshTrIndexByMoveId,
@@ -59,6 +60,7 @@ import dayjs, { Dayjs } from 'dayjs'
 import Prando from 'prando'
 import { OhpkmV2 as OhpkmV2Wasm } from '../../../pkm_rs/pkg'
 import { PluginIdentifier, SAV } from '../save/interfaces'
+import { PkmConverter } from './conversion/converter'
 import { isEvolution } from './Lookup'
 import {
   adjustMovePPBetweenFormats,
@@ -1085,7 +1087,8 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   generatePk3CompatiblePid(): number {
-    return generatePk3CompatiblePid(OhpkmV2Wasm.fromByteVectorFixingErrors(this.toByteArray()))
+    const converter = new PkmConverter('PK3', getDefaultConvertStrategy())
+    return converter.personalityValue(this, ShinyOdds.Odds8192)
   }
 }
 

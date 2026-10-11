@@ -1,16 +1,17 @@
 use super::{ConvertStrategy, MetDataStrategy};
-use crate::convert_strategy::ShinyOdds;
+use crate::convert_strategy::{PidGenerationParameters, ShinyOdds};
 use crate::format::PkmFormat;
 use crate::location::{Location, MetData};
 use crate::ohpkm::OhpkmV2;
 
+#[cfg(feature = "wasm")]
+use crate::convert_strategy::personality_value::PidGenerationParametersJs;
 use pkm_rs_resources::lookup;
 use pkm_rs_types::Ivs;
 #[cfg(feature = "wasm")]
-use wasm_bindgen::prelude::*;
-
-#[cfg(feature = "wasm")]
 use pkm_rs_types::{OriginGame, Stats16Le};
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct PkmConverter {
@@ -124,10 +125,14 @@ impl PkmConverter {
         }
     }
 
-    pub fn personality_value(&self, ohpkm: &OhpkmV2, shiny_odds: ShinyOdds) -> u32 {
+    pub fn personality_value(
+        &self,
+        fields: impl Into<PidGenerationParameters>,
+        shiny_odds: ShinyOdds,
+    ) -> u32 {
         self.strategy
             .pid_strategy(shiny_odds)
-            .generate_pid_matching_fields(ohpkm)
+            .generate_pid_matching_fields(fields)
     }
 }
 
@@ -141,28 +146,37 @@ impl PkmConverter {
     }
 
     #[wasm_bindgen(js_name = "nickname")]
-    pub fn nickname_js(&self, ohpkm: &OhpkmV2) -> String {
+    pub fn nickname_wasm(&self, ohpkm: &OhpkmV2) -> String {
         self.nickname(ohpkm)
     }
 
     #[wasm_bindgen(js_name = "metData")]
-    pub fn met_data_js(&self, ohpkm: &OhpkmV2) -> MetData {
+    pub fn met_data_wasm(&self, ohpkm: &OhpkmV2) -> MetData {
         self.met_data(ohpkm)
     }
 
     #[wasm_bindgen(js_name = "metLocationIndexDiamondPearl")]
-    pub fn met_location_index_diamond_pearl_js(&self, ohpkm: &OhpkmV2) -> u16 {
+    pub fn met_location_index_diamond_pearl_wasm(&self, ohpkm: &OhpkmV2) -> u16 {
         self.met_location_index_diamond_pearl(ohpkm)
     }
 
     #[wasm_bindgen(js_name = "metLocationIndexPlatinumHgss")]
-    pub fn met_location_index_platinum_hgss_js(&self, ohpkm: &OhpkmV2) -> u16 {
+    pub fn met_location_index_platinum_hgss_wasm(&self, ohpkm: &OhpkmV2) -> u16 {
         self.met_location_index_platinum_hgss(ohpkm)
     }
 
     #[wasm_bindgen(js_name = "ivs")]
-    pub fn ivs_js(&self, ohpkm: &OhpkmV2) -> Stats16Le {
+    pub fn ivs_wasm(&self, ohpkm: &OhpkmV2) -> Stats16Le {
         self.ivs(ohpkm).into()
+    }
+
+    #[wasm_bindgen(js_name = "personalityValue")]
+    pub fn personality_value_wasm(
+        &self,
+        fields: PidGenerationParametersJs,
+        shiny_odds: ShinyOdds,
+    ) -> crate::result::Result<u32> {
+        Ok(self.personality_value(PidGenerationParameters::try_from(fields)?, shiny_odds))
     }
 }
 
