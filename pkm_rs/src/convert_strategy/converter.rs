@@ -180,9 +180,12 @@ impl PkmConverter {
     pub fn personality_value_wasm(
         &self,
         fields: PidGenerationParametersJs,
-        shiny_odds: ShinyOdds,
-    ) -> crate::result::Result<u32> {
-        Ok(self.personality_value(PidGenerationParameters::try_from(fields)?, shiny_odds))
+        shiny_odds: Ts<ShinyOdds>,
+    ) -> JsResult<u32> {
+        Ok(self.personality_value(
+            PidGenerationParameters::try_from(fields)?,
+            shiny_odds.to_rust()?,
+        ))
     }
 }
 

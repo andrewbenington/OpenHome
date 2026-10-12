@@ -1,4 +1,6 @@
 use crate::ohpkm::OhpkmV2;
+#[cfg(feature = "wasm")]
+use crate::result::JsResult;
 use crate::traits::HasSpeciesAndForm;
 use crate::util::unown_form_from_pid_gen3;
 use pkm_rs_resources::natures::NatureIndex;
@@ -10,12 +12,13 @@ use pkm_rs_types::NationalDex;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "wasm")]
+use tsify::Ts;
+#[cfg(feature = "wasm")]
 use tsify::Tsify;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
 #[cfg_attr(feature = "wasm", derive(Tsify))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize, specta::Type)]
 pub enum NatureStrategy {
     KeepOriginalNature,
@@ -37,7 +40,6 @@ impl NatureStrategy {
 }
 
 #[cfg_attr(feature = "wasm", derive(Tsify))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub enum ShinyOdds {
     #[default]
@@ -63,7 +65,6 @@ impl ShinyOdds {
 
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "wasm", derive(Tsify, Serialize, Deserialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 pub struct PidModificationStrategy {
     pub nature: Option<NatureStrategy>,
     pub keep_gender: bool,
@@ -293,9 +294,11 @@ impl TryFrom<PidGenerationParametersJs> for PidGenerationParameters {
 #[wasm_bindgen(js_name = generatePk3CompatiblePid)]
 pub fn generate_pk3_compatible_pid_wasm(
     parameters: PidGenerationParametersJs,
-    strategy: PidModificationStrategy,
-) -> Result<u32, crate::result::Error> {
-    Ok(strategy.generate_pid_matching_fields(PidGenerationParameters::try_from(parameters)?))
+    strategy: Ts<PidModificationStrategy>,
+) -> JsResult<u32> {
+    Ok(strategy
+        .to_rust()?
+        .generate_pid_matching_fields(PidGenerationParameters::try_from(parameters)?))
 }
 
 #[derive(Debug, Clone, Copy)]
