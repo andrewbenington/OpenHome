@@ -646,7 +646,6 @@ impl Geolocation {
 }
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Clone, Copy, Default, Serialize)]
 pub struct Geolocations(

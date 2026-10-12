@@ -58,7 +58,7 @@ export interface AllPKMFields {
   gameOfOrigin: number
   gameOfOriginBattle?: number
   gender?: Gender
-  geolocations?: Geolocations
+  readonly geolocations?: Geolocations
   gvs?: types.Stats
   handlerAffection?: number
   handlerFriendship?: number

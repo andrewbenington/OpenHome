@@ -8,7 +8,6 @@ import {
   ContestStats,
   ConvertStrategies,
   ConvertStrategy,
-  Geolocations,
   HyperTraining,
   Item,
   MarkingsSixShapesColors,
@@ -355,9 +354,6 @@ export default class PK7 {
 
   get geolocations() {
     return this.inner.geolocations
-  }
-  set geolocations(value: Geolocations) {
-    this.inner.geolocations = value
   }
 
   get handlerFriendship() {

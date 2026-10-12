@@ -41,6 +41,8 @@ use strum_macros::Display;
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
+#[cfg(feature = "wasm")]
+use tsify::Ts;
 
 #[cfg(feature = "wasm")]
 use super::JsResult;
@@ -3078,15 +3080,18 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = geolocations)]
-    pub fn geolocations_js(&self) -> Option<Geolocations> {
-        Some(self.gen67_data?.geolocations)
+    pub fn geolocations_js(&self) -> Result<Option<Ts<Geolocations>>> {
+        Ok(self
+            .gen67_data
+            .map(|gen67_data| Ts::from_rust(&gen67_data.geolocations))
+            .transpose()?)
     }
 
     #[wasm_bindgen(setter = geolocations)]
-    pub fn set_geolocations_js(&mut self, value: Option<Geolocations>) {
+    pub fn set_geolocations_js(&mut self, value: Option<Ts<Geolocations>>) -> Result<()> {
         match value {
             Some(geolocations) => {
-                self.gen67_data.get_or_insert_default().geolocations = geolocations
+                self.gen67_data.get_or_insert_default().geolocations = geolocations.to_rust()?;
             }
             None => {
                 if let Some(gen67_data) = &mut self.gen67_data {
@@ -3094,6 +3099,8 @@ impl OhpkmV2 {
                 }
             }
         }
+
+        Ok(())
     }
 
     #[wasm_bindgen(getter = resortEventStatus)]

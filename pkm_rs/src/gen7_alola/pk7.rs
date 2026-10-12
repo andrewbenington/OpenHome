@@ -23,6 +23,7 @@ use pkm_rs_types::{
 use pkm_rs_types::{Gender, Geolocations, PokeDate, TrainerMemory};
 use serde::Serialize;
 
+use tsify::Ts;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -81,6 +82,7 @@ pub struct Pk7 {
     pub handler_name: SizedUtf16String<26>,
     pub handler_gender: BinaryGender,
     pub is_current_handler: bool,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub geolocations: Geolocations,
     pub handler_friendship: u8,
     pub handler_affection: u8,
@@ -583,6 +585,11 @@ impl Pk7 {
     #[wasm_bindgen(js_name = recalculateStats)]
     pub fn recalculate_stats_js(&mut self) {
         self.recalculate_stats()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn geolocations(&self) -> Result<Ts<Geolocations>> {
+        Ok(Ts::from_rust(&self.geolocations)?)
     }
 }
 
