@@ -6,7 +6,7 @@ use crate::gen3::Gen3PokemonIndex;
 use crate::gen3::pk3_buffer::{Pk3BufferMut, Pk3BufferRef};
 #[cfg(feature = "wasm")]
 use crate::ohpkm::{OhpkmConvert, OhpkmV2};
-use crate::result::{Error, Result};
+use crate::result::{Error, JsResult, Result};
 #[cfg(feature = "wasm")]
 use crate::strings::Gen3String;
 use crate::strings::{Gen3Encoding, Gen3NicknameString, Gen3TrainerString};
@@ -36,6 +36,8 @@ use pkm_rs_types::{
 use pkm_rs_types::{Gender, Ivs};
 use serde::{Serialize, Serializer};
 
+#[cfg(feature = "wasm")]
+use tsify::Ts;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -352,26 +354,23 @@ impl HasSpeciesAndForm for Pk3 {
 #[allow(clippy::missing_const_for_fn)]
 impl Pk3 {
     #[wasm_bindgen(js_name = fromOhpkmBytes)]
-    pub fn from_ohpkm_bytes(
-        bytes: Vec<u8>,
-        strategy: ConvertStrategy,
-    ) -> core::result::Result<Pk3, JsValue> {
-        let ohpkm = OhpkmV2::from_bytes(&bytes).map_err(JsValue::from)?;
-        Pk3::from_ohpkm(&ohpkm, strategy).map_err(JsValue::from)
+    pub fn from_ohpkm_bytes(bytes: Vec<u8>, strategy: Ts<ConvertStrategy>) -> JsResult<Self> {
+        let ohpkm = OhpkmV2::from_bytes(&bytes)?;
+        Ok(Self::from_ohpkm(&ohpkm, strategy.to_rust()?)?)
     }
 
     #[wasm_bindgen(js_name = fromBytes)]
-    pub fn from_byte_vector(bytes: Vec<u8>) -> core::result::Result<Pk3, JsValue> {
-        Pk3::from_bytes(&bytes).map_err(JsValue::from)
+    pub fn from_byte_vector(bytes: Vec<u8>) -> core::result::Result<Self, JsValue> {
+        Self::from_bytes(&bytes).map_err(JsValue::from)
     }
 
     #[wasm_bindgen(js_name = fromEncryptedBytes)]
-    pub fn take_from_encrypted_bytes(mut bytes: Box<[u8]>) -> core::result::Result<Pk3, JsValue> {
-        Pk3::from_encrypted_bytes(&mut bytes).map_err(JsValue::from)
+    pub fn take_from_encrypted_bytes(mut bytes: Box<[u8]>) -> core::result::Result<Self, JsValue> {
+        Self::from_encrypted_bytes(&mut bytes).map_err(JsValue::from)
     }
 
     #[wasm_bindgen(js_name = fromSlotBytes)]
-    pub fn from_slot_bytes_js(bytes: Box<[u8]>) -> core::result::Result<Option<Pk3>, JsValue> {
+    pub fn from_slot_bytes_js(bytes: Box<[u8]>) -> core::result::Result<Option<Self>, JsValue> {
         Self::from_slot_bytes(bytes).map_err(JsValue::from)
     }
 

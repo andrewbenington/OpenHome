@@ -6,6 +6,8 @@ use crate::ohpkm::OhpkmV2;
 
 #[cfg(feature = "wasm")]
 use crate::convert_strategy::personality_value::PidGenerationParametersJs;
+#[cfg(feature = "wasm")]
+use crate::result::JsResult;
 use pkm_rs_resources::lookup;
 use pkm_rs_types::Ivs;
 #[cfg(feature = "wasm")]
@@ -141,8 +143,11 @@ impl PkmConverter {
 #[allow(clippy::missing_const_for_fn)]
 impl PkmConverter {
     #[wasm_bindgen(constructor)]
-    pub fn new_wasm(dest_pkm_format: PkmFormat, strategy: ConvertStrategy) -> Self {
-        Self::new(dest_pkm_format, strategy)
+    pub fn new_wasm(
+        dest_pkm_format: PkmFormat,
+        strategy: tsify::Ts<ConvertStrategy>,
+    ) -> JsResult<Self> {
+        Ok(Self::new(dest_pkm_format, strategy.to_rust()?))
     }
 
     #[wasm_bindgen(js_name = "nickname")]

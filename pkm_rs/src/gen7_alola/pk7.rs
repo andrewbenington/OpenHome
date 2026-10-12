@@ -2,6 +2,9 @@ use super::Pk7Buffer;
 use super::pk7_buffer::Pk7BufferMut;
 use super::{Pk7AbilityIndex, Pk7SpeciesAndForm};
 use crate::checksum::{Checksum, RefreshChecksum};
+use crate::convert_strategy::ConvertStrategy;
+#[cfg(feature = "wasm")]
+use crate::result::JsResult;
 use crate::result::{Error, Result};
 use crate::traits::ModernEvs;
 use crate::traits::{HasSpeciesAndForm, PkmBytes};
@@ -412,22 +415,19 @@ impl HasSpeciesAndForm for Pk7 {
 #[allow(clippy::missing_const_for_fn)]
 impl Pk7 {
     #[wasm_bindgen(js_name = fromOhpkmBytes)]
-    pub fn from_ohpkm_bytes(
-        bytes: Vec<u8>,
-        strategy: crate::convert_strategy::ConvertStrategy,
-    ) -> core::result::Result<Pk7, JsValue> {
-        let ohpkm = OhpkmV2::from_bytes(&bytes).map_err(JsValue::from)?;
-        Pk7::from_ohpkm(&ohpkm, strategy).map_err(JsValue::from)
+    pub fn from_ohpkm_bytes(bytes: Vec<u8>, strategy: Ts<ConvertStrategy>) -> JsResult<Self> {
+        let ohpkm = OhpkmV2::from_bytes(&bytes)?;
+        Ok(Self::from_ohpkm(&ohpkm, strategy.to_rust()?)?)
     }
 
     #[wasm_bindgen(js_name = fromDecryptedBytes)]
-    pub fn from_bytes_js(bytes: Box<[u8]>) -> core::result::Result<Pk7, JsValue> {
-        Pk7::from_bytes(&bytes).map_err(JsValue::from)
+    pub fn from_bytes_js(bytes: Box<[u8]>) -> core::result::Result<Self, JsValue> {
+        Self::from_bytes(&bytes).map_err(JsValue::from)
     }
 
     #[wasm_bindgen(js_name = fromEncryptedBytes)]
-    pub fn take_from_encrypted_bytes(bytes: Box<[u8]>) -> core::result::Result<Pk7, JsValue> {
-        Pk7::from_encrypted_bytes(bytes).map_err(JsValue::from)
+    pub fn take_from_encrypted_bytes(bytes: Box<[u8]>) -> core::result::Result<Self, JsValue> {
+        Self::from_encrypted_bytes(bytes).map_err(JsValue::from)
     }
 
     #[wasm_bindgen(js_name = toBytes)]

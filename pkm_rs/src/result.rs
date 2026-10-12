@@ -13,6 +13,8 @@ use std::rc::Rc;
 use std::string::FromUtf8Error;
 
 #[cfg(feature = "wasm")]
+use wasm_bindgen::JsError;
+#[cfg(feature = "wasm")]
 use wasm_bindgen::JsValue;
 
 #[derive(Debug)]
@@ -339,3 +341,18 @@ impl From<SwishError> for Error {
         Self::SwishCrypto(value)
     }
 }
+
+#[cfg(feature = "wasm")]
+pub type JsResult<T> = core::result::Result<T, JsError>;
+#[cfg(feature = "wasm")]
+pub type TsResult<T> = JsResult<tsify::Ts<T>>;
+
+#[cfg(feature = "wasm")]
+pub trait TryIntoTs: tsify::Tsify + Sized + serde::Serialize {
+    fn try_into_ts(&self) -> TsResult<Self> {
+        Ok(self.into_ts()?)
+    }
+}
+
+#[cfg(feature = "wasm")]
+impl<T> TryIntoTs for T where T: tsify::Tsify + Sized + serde::Serialize {}

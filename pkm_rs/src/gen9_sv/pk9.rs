@@ -4,7 +4,7 @@ use super::{Pk9AbilityIndex, Pk9SpeciesAndForm};
 use crate::checksum::RefreshChecksum;
 use crate::gen9_sv::pokemon_index::SvPokemonIndex;
 use crate::gen9_sv::{MAX_RIBBON_SV, TM_FLAG_BYTE_LENGTH_BASE, TM_FLAG_BYTE_LENGTH_DLC};
-use crate::result::{Error, Result};
+use crate::result::{Error, JsResult, Result};
 use crate::traits::ModernEvs;
 use crate::traits::{HasSpeciesAndForm, PkmBytes};
 
@@ -416,20 +416,20 @@ impl Pk9 {
     #[wasm_bindgen(js_name = fromOhpkmBytes)]
     pub fn from_ohpkm_bytes(
         bytes: Vec<u8>,
-        strategy: ConvertStrategy,
-    ) -> core::result::Result<Pk9, JsValue> {
-        let ohpkm = OhpkmV2::from_bytes(&bytes).map_err(JsValue::from)?;
-        Pk9::from_ohpkm(&ohpkm, strategy).map_err(JsValue::from)
+        strategy: tsify::Ts<ConvertStrategy>,
+    ) -> JsResult<Self> {
+        let ohpkm = OhpkmV2::from_bytes(&bytes)?;
+        Ok(Self::from_ohpkm(&ohpkm, strategy.to_rust()?)?)
     }
 
     #[wasm_bindgen(js_name = fromBytes)]
-    pub fn from_byte_vector(bytes: Vec<u8>) -> core::result::Result<Pk9, JsValue> {
-        Pk9::from_bytes(&bytes).map_err(JsValue::from)
+    pub fn from_byte_vector(bytes: Vec<u8>) -> core::result::Result<Self, JsValue> {
+        Self::from_bytes(&bytes).map_err(JsValue::from)
     }
 
     #[wasm_bindgen(js_name = fromEncryptedBytes)]
-    pub fn take_from_encrypted_bytes(bytes: Box<[u8]>) -> core::result::Result<Pk9, JsValue> {
-        Pk9::from_encrypted_bytes(bytes).map_err(JsValue::from)
+    pub fn take_from_encrypted_bytes(bytes: Box<[u8]>) -> core::result::Result<Self, JsValue> {
+        Self::from_encrypted_bytes(bytes).map_err(JsValue::from)
     }
 
     #[wasm_bindgen(js_name = toBytes)]

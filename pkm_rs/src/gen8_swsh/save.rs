@@ -1,6 +1,7 @@
 use super::save_blocks::{BoxBlock, MyStatusBlock, SwShBlocks};
 use super::{BOX_COLS, BOX_ROWS, BoxName, MAX_BOX_COUNT, Pk8, Pk8Buffer};
 use crate::checksum::RefreshChecksum;
+use crate::convert_strategy::ConvertStrategy;
 use crate::encryption::swish_crypto;
 use crate::gen8_swsh::{BoxIndex, BoxSlot};
 use crate::result::{Error, Result};
@@ -11,6 +12,7 @@ use pkm_rs_types::BoundViolated;
 use pkm_rs_types::OriginGame;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{BinaryGender, Language};
+use tsify::Ts;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -212,9 +214,9 @@ impl SwordShieldSave {
     pub fn convert_ohpkm_wasm(
         &self,
         ohpkm: crate::ohpkm::OhpkmV2,
-        strategy: crate::convert_strategy::ConvertStrategy,
+        strategy: Ts<ConvertStrategy>,
     ) -> Result<Pk8> {
-        self.convert_ohpkm(ohpkm, strategy)
+        self.convert_ohpkm(ohpkm, strategy.to_rust()?)
     }
 
     #[wasm_bindgen(js_name = fromBytes)]

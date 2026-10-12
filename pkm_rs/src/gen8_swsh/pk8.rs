@@ -2,7 +2,7 @@ use super::Pk8Buffer;
 use super::pk8_buffer::Pk8BufferMut;
 use super::{Pk8AbilityIndex, Pk8SpeciesAndForm};
 use crate::checksum::{Checksum, RefreshChecksum};
-use crate::result::{Error, Result};
+use crate::result::{Error, JsResult, Result};
 use crate::traits::ModernEvs;
 use crate::traits::{HasSpeciesAndForm, PkmBytes};
 
@@ -23,6 +23,7 @@ use pkm_rs_types::{
 use pkm_rs_types::{Gender, PokeDate, TrainerMemory};
 use serde::Serialize;
 
+use tsify::Ts;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -393,22 +394,19 @@ impl HasSpeciesAndForm for Pk8 {
 #[allow(clippy::missing_const_for_fn)]
 impl Pk8 {
     #[wasm_bindgen(js_name = fromOhpkmBytes)]
-    pub fn from_ohpkm_bytes(
-        bytes: Vec<u8>,
-        strategy: ConvertStrategy,
-    ) -> core::result::Result<Pk8, JsValue> {
-        let ohpkm = OhpkmV2::from_bytes(&bytes).map_err(JsValue::from)?;
-        Pk8::from_ohpkm(&ohpkm, strategy).map_err(JsValue::from)
+    pub fn from_ohpkm_bytes(bytes: Vec<u8>, strategy: Ts<ConvertStrategy>) -> JsResult<Self> {
+        let ohpkm = OhpkmV2::from_bytes(&bytes)?;
+        Ok(Self::from_ohpkm(&ohpkm, strategy.to_rust()?)?)
     }
 
     #[wasm_bindgen(js_name = fromBytes)]
-    pub fn from_byte_vector(bytes: Vec<u8>) -> core::result::Result<Pk8, JsValue> {
-        Pk8::from_bytes(&bytes).map_err(JsValue::from)
+    pub fn from_byte_vector(bytes: Vec<u8>) -> core::result::Result<Self, JsValue> {
+        Self::from_bytes(&bytes).map_err(JsValue::from)
     }
 
     #[wasm_bindgen(js_name = fromEncryptedBytes)]
-    pub fn take_from_encrypted_bytes(bytes: Box<[u8]>) -> core::result::Result<Pk8, JsValue> {
-        Pk8::from_encrypted_bytes(bytes).map_err(JsValue::from)
+    pub fn take_from_encrypted_bytes(bytes: Box<[u8]>) -> core::result::Result<Self, JsValue> {
+        Self::from_encrypted_bytes(bytes).map_err(JsValue::from)
     }
 
     #[wasm_bindgen(js_name = toBytes)]
