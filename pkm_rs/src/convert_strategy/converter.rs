@@ -12,6 +12,7 @@ use pkm_rs_resources::lookup;
 use pkm_rs_types::Ivs;
 #[cfg(feature = "wasm")]
 use pkm_rs_types::{OriginGame, Stats16Le};
+use tsify::Ts;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -144,10 +145,10 @@ impl PkmConverter {
 impl PkmConverter {
     #[wasm_bindgen(constructor)]
     pub fn new_wasm(
-        dest_pkm_format: PkmFormat,
-        strategy: tsify::Ts<ConvertStrategy>,
+        dest_pkm_format: Ts<PkmFormat>,
+        strategy: Ts<ConvertStrategy>,
     ) -> JsResult<Self> {
-        Ok(Self::new(dest_pkm_format, strategy.to_rust()?))
+        Ok(Self::new(dest_pkm_format.to_rust()?, strategy.to_rust()?))
     }
 
     #[wasm_bindgen(js_name = "nickname")]
