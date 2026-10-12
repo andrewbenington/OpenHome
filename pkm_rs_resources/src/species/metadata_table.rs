@@ -14,6 +14,9 @@ pub mod gen9_za;
 
 use std::marker::PhantomData;
 
+use pkm_rs_types::TryIntoTs;
+#[cfg(feature = "wasm")]
+use pkm_rs_types::TsResult;
 use pkm_rs_types::{NationalDex, PkmType, Stats8, StatsPreSplit, form, pkl_file::PklFileData};
 
 #[cfg(feature = "wasm")]
@@ -283,7 +286,8 @@ impl MetadataTableReader {
     }
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
 impl MetadataTableReader {
     #[cfg_attr(feature = "wasm", wasm_bindgen)]
     pub fn type1(&self) -> PkmType {
@@ -296,8 +300,8 @@ impl MetadataTableReader {
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "baseStats"))]
-    pub fn get_base_stats_wasm(&self) -> BaseStats {
-        self.get_base_stats()
+    pub fn get_base_stats_wasm(&self) -> TsResult<BaseStats> {
+        self.get_base_stats().try_into_ts()
     }
 }
 
@@ -325,7 +329,6 @@ pub fn current_metadata_reader(national_dex: u16, form_index: u16) -> MetadataTa
 }
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Serialize, Deserialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BaseStats {
     PreSplit(StatsPreSplit),

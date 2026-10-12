@@ -18,13 +18,15 @@ use strum_macros::{Display, EnumString};
 use pkm_rs_types::randomize::Randomize;
 #[cfg(feature = "randomize")]
 use rand::RngExt;
+#[cfg(feature = "wasm")]
+use tsify::Ts;
 
 #[cfg(feature = "wasm")]
 use crate::species::metadata_table::current_base_stats;
 #[cfg(feature = "wasm")]
-use pkm_rs_types::Stat;
-#[cfg(feature = "wasm")]
 use pkm_rs_types::{Gender, Stats16Le};
+#[cfg(feature = "wasm")]
+use pkm_rs_types::{JsResult, Stat};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -534,8 +536,14 @@ impl FormMetadata {
     }
 
     #[wasm_bindgen(js_name = baseStatsFrom)]
-    pub fn get_base_stats_from_js(&self, source: MetadataSource) -> Option<BaseStats> {
-        self.get_base_stats_from(source)
+    pub fn get_base_stats_from_js(
+        &self,
+        source: MetadataSource,
+    ) -> JsResult<Option<Ts<BaseStats>>> {
+        Ok(self
+            .get_base_stats_from(source)
+            .map(|stats| Ts::from_rust(&stats))
+            .transpose()?)
     }
 
     #[wasm_bindgen(js_name = getBaseStat)]
