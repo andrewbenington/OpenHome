@@ -4,7 +4,6 @@ use serde::Serialize;
 use tsify::Tsify;
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Serialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
 #[derive(Debug, Clone)]
 pub struct StringOption {
     pub default: &'static str,
@@ -12,14 +11,12 @@ pub struct StringOption {
 }
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Serialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
 #[derive(Debug, Clone, Copy)]
 pub struct BoolOption {
     pub default: bool,
 }
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Serialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
 #[derive(Debug, Clone, Copy)]
 pub struct NumberOption {
     pub default: f64,
@@ -28,7 +25,6 @@ pub struct NumberOption {
 }
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Serialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
 #[derive(Debug, Clone)]
 pub enum SettingType {
     String(StringOption),
