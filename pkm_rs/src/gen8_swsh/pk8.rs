@@ -2,7 +2,7 @@ use super::Pk8Buffer;
 use super::pk8_buffer::Pk8BufferMut;
 use super::{Pk8AbilityIndex, Pk8SpeciesAndForm};
 use crate::checksum::{Checksum, RefreshChecksum};
-use crate::result::{Error, JsResult, Result};
+use crate::result::{Error, Result};
 use crate::traits::ModernEvs;
 use crate::traits::{HasSpeciesAndForm, PkmBytes};
 
@@ -17,7 +17,7 @@ use pkm_rs_resources::species::{FormMetadata, SpeciesForm, SpeciesMetadata};
 use pkm_rs_resources::stats;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
-    AbilityNumber, BinaryGender, ContestStats, FlagSet, HyperTraining, Ivs, Language,
+    AbilityNumber, BinaryGender, ContestStats, FlagSet, HyperTraining, Ivs, JsResult, Language,
     MarkingsSixShapesColors, OriginGame, Pokerus, Stats8, Stats16Le,
 };
 use pkm_rs_types::{Gender, PokeDate, TrainerMemory};

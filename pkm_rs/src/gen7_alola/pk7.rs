@@ -4,7 +4,7 @@ use super::{Pk7AbilityIndex, Pk7SpeciesAndForm};
 use crate::checksum::{Checksum, RefreshChecksum};
 use crate::convert_strategy::ConvertStrategy;
 #[cfg(feature = "wasm")]
-use crate::result::JsResult;
+use pkm_rs_types::JsResult;
 use crate::result::{Error, Result};
 use crate::traits::ModernEvs;
 use crate::traits::{HasSpeciesAndForm, PkmBytes};

@@ -1,12 +1,12 @@
 use crate::ohpkm::OhpkmV2;
-#[cfg(feature = "wasm")]
-use crate::result::JsResult;
 use crate::traits::HasSpeciesAndForm;
 use crate::util::unown_form_from_pid_gen3;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::natures::WithNature;
 use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_types::Gender;
+#[cfg(feature = "wasm")]
+use pkm_rs_types::JsResult;
 use pkm_rs_types::NationalDex;
 
 use serde::{Deserialize, Serialize};

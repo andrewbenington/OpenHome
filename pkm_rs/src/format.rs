@@ -2,9 +2,9 @@ use super::location::{LinkTradeIndex, Location};
 use crate::location::{self, MetData};
 use crate::ohpkm::OhpkmV2;
 #[cfg(feature = "wasm")]
-use crate::result::JsResult;
+use pkm_rs_types::JsResult;
 #[cfg(feature = "wasm")]
-use crate::result::TryIntoTs;
+use pkm_rs_types::TryIntoTs;
 
 use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_types::{Generation, OriginGame};

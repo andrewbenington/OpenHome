@@ -4,7 +4,7 @@ use super::{Pk9AbilityIndex, Pk9SpeciesAndForm};
 use crate::checksum::RefreshChecksum;
 use crate::gen9_sv::pokemon_index::SvPokemonIndex;
 use crate::gen9_sv::{MAX_RIBBON_SV, TM_FLAG_BYTE_LENGTH_BASE, TM_FLAG_BYTE_LENGTH_DLC};
-use crate::result::{Error, JsResult, Result};
+use crate::result::{Error, Result};
 use crate::traits::ModernEvs;
 use crate::traits::{HasSpeciesAndForm, PkmBytes};
 
@@ -19,7 +19,7 @@ use pkm_rs_resources::species::{FormMetadata, SpeciesForm, SpeciesMetadata};
 use pkm_rs_resources::stats;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
-    AbilityNumber, BinaryGender, ContestStats, FlagSet, HyperTraining, Ivs, Language,
+    AbilityNumber, BinaryGender, ContestStats, FlagSet, HyperTraining, Ivs, JsResult, Language,
     MarkingsSixShapesColors, OriginGame, Stats8, Stats16Le, TeraType,
 };
 use pkm_rs_types::{Gender, PokeDate, TrainerMemory};

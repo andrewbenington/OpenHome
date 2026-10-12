@@ -13,7 +13,7 @@ use tsify::{Ts, Tsify};
 use wasm_bindgen::{JsValue, convert::*, describe::*, prelude::*};
 
 #[cfg(feature = "wasm")]
-use crate::result::JsResult;
+use pkm_rs_types::JsResult;
 
 const TERMINATOR: u8 = 0xff;
 

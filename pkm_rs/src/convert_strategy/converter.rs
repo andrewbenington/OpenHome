@@ -4,14 +4,16 @@ use crate::format::PkmFormat;
 use crate::location::{Location, MetData};
 use crate::ohpkm::OhpkmV2;
 
+use pkm_rs_resources::lookup;
+use pkm_rs_types::Ivs;
+
 #[cfg(feature = "wasm")]
 use crate::convert_strategy::personality_value::PidGenerationParametersJs;
 #[cfg(feature = "wasm")]
-use crate::result::JsResult;
-use pkm_rs_resources::lookup;
-use pkm_rs_types::Ivs;
+use pkm_rs_types::JsResult;
 #[cfg(feature = "wasm")]
 use pkm_rs_types::{OriginGame, Stats16Le};
+#[cfg(feature = "wasm")]
 use tsify::Ts;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;

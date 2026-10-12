@@ -7,7 +7,7 @@ use wasm_bindgen::prelude::*;
 use crate::bytes::{Reader, Writer};
 use crate::result::Error;
 #[cfg(feature = "wasm")]
-use crate::result::{JsResult, TryIntoTs, TsResult};
+use pkm_rs_types::{JsResult, TryIntoTs, TsResult};
 const PAD_LENGTH: usize = 127;
 
 const STATIC_XOR_PAD: [u8; PAD_LENGTH] = [

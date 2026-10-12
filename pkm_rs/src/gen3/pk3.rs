@@ -6,7 +6,7 @@ use crate::gen3::Gen3PokemonIndex;
 use crate::gen3::pk3_buffer::{Pk3BufferMut, Pk3BufferRef};
 #[cfg(feature = "wasm")]
 use crate::ohpkm::{OhpkmConvert, OhpkmV2};
-use crate::result::{Error, JsResult, Result};
+use crate::result::{Error, Result};
 #[cfg(feature = "wasm")]
 use crate::strings::Gen3String;
 use crate::strings::{Gen3Encoding, Gen3NicknameString, Gen3TrainerString};
@@ -30,8 +30,8 @@ use pkm_rs_types::AbilityNumber;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 use pkm_rs_types::{
-    BinaryGender, ContestStats, Language, MarkingsFourShapes, NationalDex, OriginGame, Pokerus,
-    SimpleAbilityNumber, Stats8, Stats16Le,
+    BinaryGender, ContestStats, JsResult, Language, MarkingsFourShapes, NationalDex, OriginGame,
+    Pokerus, SimpleAbilityNumber, Stats8, Stats16Le,
 };
 use pkm_rs_types::{Gender, Ivs};
 use serde::{Serialize, Serializer};

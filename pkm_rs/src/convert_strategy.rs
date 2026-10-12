@@ -12,9 +12,9 @@ use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 
 #[cfg(feature = "wasm")]
-use crate::result::TryIntoTs;
+use pkm_rs_types::TryIntoTs;
 #[cfg(feature = "wasm")]
-use crate::result::{JsResult, TsResult};
+use pkm_rs_types::{JsResult, TsResult};
 #[cfg(feature = "wasm")]
 use std::collections::HashMap;
 #[cfg(feature = "wasm")]
