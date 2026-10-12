@@ -24,7 +24,6 @@ pub use personality_value::{
 };
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Serialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
 #[derive(Debug, Clone, PartialEq)]
 pub enum SettingValue {
     String(String),
