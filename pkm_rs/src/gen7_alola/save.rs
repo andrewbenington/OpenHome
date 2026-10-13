@@ -14,6 +14,7 @@ use pkm_rs_types::strings::SizedUtf16String;
 
 use serde::Serialize;
 
+use tsify::Ts;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -316,9 +317,9 @@ impl Gen7AlolaSave {
     pub fn convert_ohpkm_wasm(
         &self,
         ohpkm: crate::ohpkm::OhpkmV2,
-        strategy: crate::convert_strategy::ConvertStrategy,
+        strategy: Ts<crate::convert_strategy::ConvertStrategy>,
     ) -> Result<Pk7> {
-        self.convert_ohpkm(ohpkm, strategy)
+        self.convert_ohpkm(ohpkm, strategy.to_rust()?)
     }
 
     #[wasm_bindgen(js_name = fromBytes)]

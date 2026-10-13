@@ -8,13 +8,17 @@ pub use personality_value::ShinyOdds;
 
 mod option;
 
+use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 
-use serde::{Deserialize, Serialize};
+#[cfg(feature = "wasm")]
+use pkm_rs_types::TryIntoTs;
+#[cfg(feature = "wasm")]
+use pkm_rs_types::{JsResult, TsResult};
 #[cfg(feature = "wasm")]
 use std::collections::HashMap;
 #[cfg(feature = "wasm")]
-use tsify::Tsify;
+use tsify::{Ts, Tsify};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -24,7 +28,6 @@ pub use personality_value::{
 };
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Serialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
 #[derive(Debug, Clone, PartialEq)]
 pub enum SettingValue {
     String(String),
@@ -47,7 +50,6 @@ impl SettingType {
 // Subcategory keys are just &'static str at runtime; the "category.key"
 // convention is enforced by construction rather than the type system.
 #[cfg_attr(feature = "wasm", derive(Tsify))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, specta::Type)]
 pub enum ConvertOption {
     #[serde(rename = "nickname__capitalization", alias = "nickname.capitalization")]
@@ -122,7 +124,6 @@ pub const fn settings_schema() -> &'static [(ConvertOption, SettingType)] {
 
 #[cfg(feature = "wasm")]
 #[cfg_attr(feature = "wasm", derive(Tsify, Serialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
 #[derive(Debug, Clone)]
 pub struct SettingsSchemaWrapper {
     settings_schema: HashMap<ConvertOption, SettingType>,
@@ -130,7 +131,7 @@ pub struct SettingsSchemaWrapper {
 
 #[cfg(feature = "wasm")]
 #[wasm_bindgen(js_name = "getConvertSettingsSchema")]
-pub fn settings_schema_js() -> SettingsSchemaWrapper {
+pub fn settings_schema_js() -> TsResult<SettingsSchemaWrapper> {
     let settings: HashMap<ConvertOption, SettingType> = settings_schema()
         .iter()
         .map(|(k, v)| (*k, v.clone()))
@@ -138,12 +139,12 @@ pub fn settings_schema_js() -> SettingsSchemaWrapper {
     SettingsSchemaWrapper {
         settings_schema: settings,
     }
+    .try_into_ts()
 }
 
 // ── ConvertStrategy ────────────────────────────────────────────────────────────
 
 #[cfg_attr(feature = "wasm", derive(Tsify))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, specta::Type)]
 pub struct ConvertStrategy {
     #[serde(rename = "nickname__capitalization")]
@@ -187,9 +188,10 @@ impl Default for ConvertStrategy {
     }
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getDefaultConvertStrategy"))]
-pub fn default_convert_strategy() -> ConvertStrategy {
-    ConvertStrategy::default()
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_name = "getDefaultConvertStrategy")]
+pub fn default_convert_strategy() -> TsResult<ConvertStrategy> {
+    ConvertStrategy::default().try_into_ts()
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
@@ -200,13 +202,13 @@ pub struct ConvertStrategies;
 #[allow(clippy::missing_const_for_fn)]
 impl ConvertStrategies {
     #[wasm_bindgen(js_name = "getDefault")]
-    pub fn default_strategy() -> ConvertStrategy {
+    pub fn default_strategy() -> TsResult<ConvertStrategy> {
         default_convert_strategy()
     }
 
     #[wasm_bindgen(js_name = "getCategoryName")]
-    pub fn get_category_name(identifier: ConvertOption) -> String {
-        match identifier {
+    pub fn get_category_name(identifier: Ts<ConvertOption>) -> JsResult<String> {
+        Ok(match identifier.to_rust()? {
             ConvertOption::NicknameCapitalization => String::from("Nickname"),
             ConvertOption::MetDataOriginAndLocation => String::from("Met data"),
             ConvertOption::MaxIvIfHyperTrained => String::from("IVs"),
@@ -214,12 +216,12 @@ impl ConvertStrategies {
             | ConvertOption::PreservePidGender
             | ConvertOption::PreservePidNature
             | ConvertOption::PreservePidUnownForm => String::from("Personality value"),
-        }
+        })
     }
 
     #[wasm_bindgen(js_name = "getSettingName")]
-    pub fn get_setting_name(identifier: ConvertOption) -> String {
-        match identifier {
+    pub fn get_setting_name(identifier: Ts<ConvertOption>) -> JsResult<String> {
+        Ok(match identifier.to_rust()? {
             ConvertOption::NicknameCapitalization => String::from("Capitalization"),
             ConvertOption::MetDataOriginAndLocation => String::from("Original Game + Met Location"),
             ConvertOption::MaxIvIfHyperTrained => {
@@ -237,12 +239,12 @@ impl ConvertStrategies {
             ConvertOption::PreservePidUnownForm => {
                 String::from("Alter PID to preserve Unown form (gen 3-5)")
             }
-        }
+        })
     }
 
     #[wasm_bindgen(js_name = "getDescription")]
-    pub fn get_description(identifier: ConvertOption) -> String {
-        match identifier {
+    pub fn get_description(identifier: Ts<ConvertOption>) -> JsResult<String> {
+        Ok(match identifier.to_rust()? {
             ConvertOption::NicknameCapitalization => String::from(
                 "Decides how unnicknamed Pokémon are capitalized.
                     \"GameDefault\" uses the original game's capitalization,
@@ -269,14 +271,13 @@ impl ConvertStrategies {
             ConvertOption::PreservePidUnownForm => String::from(
                 "Decides how a personality value is altered to preserve a Pokémon's form if the species is Unown."
             ),
-        }
+        })
     }
 }
 
 // ── Enums ─────────────────────────────────────────────────────────────────────
 
 #[cfg_attr(feature = "wasm", derive(Tsify))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize, specta::Type)]
 pub enum NicknameCapitalization {
     #[default]
@@ -285,7 +286,6 @@ pub enum NicknameCapitalization {
 }
 
 #[cfg_attr(feature = "wasm", derive(Tsify))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize, specta::Type)]
 pub enum MetDataStrategy {
     UseLocationNameMatch,

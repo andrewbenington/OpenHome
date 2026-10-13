@@ -10,7 +10,7 @@ checksum = "fe438c63458706e03479442743baae6c88256498e6431708f6dfc520a26515d3"
 
 [[package]]
 name = "OpenHome"
-version = "1.18.0"
+version = "1.18.1"
 dependencies = [
  "base64 0.23.1",
  "bytes",
@@ -2767,7 +2767,7 @@ dependencies = [
 
 [[package]]
 name = "openhome_core"
-version = "1.18.0"
+version = "1.18.1"
 dependencies = [
  "arbitrary-int",
  "base64 0.23.1",
@@ -2967,7 +2967,7 @@ checksum = "19f132c84eca552bf34cab8ec81f1c1dcc229b811638f9d283dceabe58c5569e"
 
 [[package]]
 name = "pkm_rs"
-version = "1.18.0"
+version = "1.18.1"
 dependencies = [
  "aes",
  "arbitrary-int",
@@ -3004,7 +3004,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_derive"
-version = "1.18.0"
+version = "1.18.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3013,7 +3013,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_resources"
-version = "1.18.0"
+version = "1.18.1"
 dependencies = [
  "arbitrary-int",
  "getrandom 0.4.3",
@@ -3035,7 +3035,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_types"
-version = "1.18.0"
+version = "1.18.1"
 dependencies = [
  "arbitrary-int",
  "chrono",
@@ -5174,9 +5174,9 @@ checksum = "e421abadd41a4225275504ea4d6566923418b7f05506fbc9c0fe86ba7396114b"
 
 [[package]]
 name = "tsify"
-version = "0.5.6"
+version = "0.5.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8ec5505497c87f1c050b4392d3f11b49a04537fcb9dc0da57bc0af168a6331f2"
+checksum = "ea3af6b48c5c5624f7eb3c2f578d1335fadac433321980cae0063e8eb0acaa44"
 dependencies = [
  "gloo-utils",
  "serde",
@@ -5188,9 +5188,9 @@ dependencies = [
 
 [[package]]
 name = "tsify-macros"
-version = "0.5.6"
+version = "0.5.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9fc2c44dc9fe4baf55b88e032621b7a11b215a1f0a7de8d0aa04367207d915bc"
+checksum = "ef1e2e93369379d0a527c7d6632b58c55d52db7a106d8afbde3b354f3a57a9f1"
 dependencies = [
  "proc-macro2",
  "quote",

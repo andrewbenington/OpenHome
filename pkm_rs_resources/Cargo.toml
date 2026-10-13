@@ -1,6 +1,6 @@
 [package]
 name = "pkm_rs_resources"
-version = "1.18.0"
+version = "1.18.1"
 edition = "2024"
 description = "Resource data and associated types for the pkm_rs crate"
 repository = "https://github.com/andrewbenington/OpenHome"
@@ -20,7 +20,7 @@ strum = { version = "0.28.0", features=["derive"] }
 strum_macros = "0.28.0"
 rand = { version = "0.10.2", optional = true }
 arbitrary-int = "2.2.0"
-tsify = "=0.5.6"
+tsify = { version = "0.5.8", features = [ "js" ] }
 specta = { version = "=2.0.0-rc.22", features = [ "serde_json", "derive" ], optional = true }
 num_enum = "0.7.6"
 

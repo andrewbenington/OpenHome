@@ -1,6 +1,10 @@
 use super::location::{LinkTradeIndex, Location};
 use crate::location::{self, MetData};
 use crate::ohpkm::OhpkmV2;
+#[cfg(feature = "wasm")]
+use pkm_rs_types::JsResult;
+#[cfg(feature = "wasm")]
+use pkm_rs_types::TryIntoTs;
 
 use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_types::{Generation, OriginGame};
@@ -12,12 +16,11 @@ use strum::EnumIter;
 #[cfg(feature = "wasm")]
 use strum::IntoEnumIterator;
 #[cfg(feature = "wasm")]
-use tsify::Tsify;
+use tsify::{Ts, Tsify};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Serialize, Deserialize, EnumIter))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PkmFormat {
     PK1,
@@ -980,8 +983,8 @@ impl PkmFormat {
 
 #[cfg(feature = "wasm")]
 #[wasm_bindgen(js_name = "formatMatchesOrigin")]
-pub fn format_matches_origin(format: PkmFormat, origin: OriginGame) -> bool {
-    format.matches_origin(origin)
+pub fn format_matches_origin(format: Ts<PkmFormat>, origin: OriginGame) -> JsResult<bool> {
+    Ok(format.to_rust()?.matches_origin(origin))
 }
 
 #[cfg(feature = "wasm")]
@@ -993,12 +996,14 @@ pub struct PkmFormats;
 #[cfg(feature = "wasm")]
 impl PkmFormats {
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getMetadataSource"))]
-    pub fn metadata_source_wasm(value: PkmFormat) -> MetadataSource {
-        value.metadata_source()
+    pub fn metadata_source_wasm(value: Ts<PkmFormat>) -> JsResult<MetadataSource> {
+        Ok(value.to_rust()?.metadata_source())
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen)]
-    pub fn all() -> Vec<PkmFormat> {
-        PkmFormat::iter().collect()
+    pub fn all() -> Vec<Ts<PkmFormat>> {
+        PkmFormat::iter()
+            .filter_map(|fmt| fmt.try_into_ts().ok())
+            .collect()
     }
 }

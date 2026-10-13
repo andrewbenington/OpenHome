@@ -1,6 +1,8 @@
 use super::save_blocks::{BoxBlock, MyStatusBlock, SwordShieldBlocks};
 use super::{BOX_COLS, BOX_ROWS, BoxName, MAX_BOX_COUNT, Pk8, Pk8Buffer};
 use crate::checksum::RefreshChecksum;
+use crate::convert_strategy::ConvertStrategy;
+use crate::encryption::swish_crypto;
 use crate::encryption::swish_crypto::{self, NumericBlock, SwishBlocks};
 #[cfg(feature = "wasm")]
 use crate::gen8_swsh::save_blocks::SwShBlockKey;
@@ -16,6 +18,7 @@ use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{BinaryGender, Language};
 #[cfg(feature = "wasm")]
 use pkm_rs_types::{BoundViolated, NationalDex};
+use tsify::Ts;
 
 use tsify::Tsify;
 #[cfg(feature = "wasm")]
@@ -288,9 +291,9 @@ impl SwordShieldSave {
     pub fn convert_ohpkm_wasm(
         &self,
         ohpkm: crate::ohpkm::OhpkmV2,
-        strategy: crate::convert_strategy::ConvertStrategy,
+        strategy: Ts<ConvertStrategy>,
     ) -> Result<Pk8> {
-        self.convert_ohpkm(ohpkm, strategy)
+        self.convert_ohpkm(ohpkm, strategy.to_rust()?)
     }
 
     #[wasm_bindgen(js_name = fromBytes)]
@@ -500,7 +503,7 @@ mod tests {
     fn block_count_is_expected() -> std::result::Result<(), Box<dyn std::error::Error>> {
         let save_path = Path::new("gen8-swsh").join("sword");
         let save_bytes = tests::save_bytes_from_file(&save_path)?;
-        let block_vec = swish_crypto::decrypt_blocks(save_bytes.into_boxed_slice())?;
+        let block_vec = swish_crypto::decrypt_blocks(&mut save_bytes)?;
 
         let mut original_blocks_by_key: HashMap<u32, swish_crypto::Block> = HashMap::new();
         for block in &block_vec {
@@ -516,7 +519,8 @@ mod tests {
     fn blocks_identical_after_serde() -> std::result::Result<(), Box<dyn std::error::Error>> {
         let save_path = Path::new("gen8-swsh").join("sword");
         let save_bytes = tests::save_bytes_from_file(&save_path)?;
-        let block_vec = swish_crypto::decrypt_blocks(save_bytes.clone().into_boxed_slice())?;
+        let block_bytes = save_bytes.clone(); // decryption is done in place, so decrypting the same buffer twice will mess it up
+        let block_vec = swish_crypto::decrypt_blocks(&mut block_bytes)?;
 
         let mut original_blocks_by_key: HashMap<u32, swish_crypto::Block> = HashMap::new();
         for block in &block_vec {
@@ -527,7 +531,7 @@ mod tests {
 
         let after_serialized_bytes = save.prepare_bytes_for_saving();
 
-        let block_vec = swish_crypto::decrypt_blocks(after_serialized_bytes.into_boxed_slice())?;
+        let block_vec = swish_crypto::decrypt_blocks(&mut after_serialized_bytes.clo())?;
         for block in &block_vec {
             let key = block.key();
             let Some(original_block) = original_blocks_by_key.get(&key) else {

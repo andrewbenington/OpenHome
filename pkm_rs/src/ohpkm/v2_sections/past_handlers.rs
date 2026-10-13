@@ -9,13 +9,19 @@ use crate::sectioned_data::DataSection;
 use crate::traits::{OhpkmByte, OhpkmBytes};
 
 use pkm_rs_resources::metadata_source::MetadataSource;
+#[cfg(feature = "wasm")]
+use pkm_rs_types::JsResult;
 use pkm_rs_types::strings::SizedUtf16String;
-use pkm_rs_types::{BinaryGender, Gender, Language, OriginGame, TrainerData, TrainerMemory};
+use pkm_rs_types::{
+    BinaryGender, Gender, Language, OriginGame, TrainerData, TrainerMemory, TryIntoTs, TsResult,
+};
 use serde::Serialize;
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 
+#[cfg(feature = "wasm")]
+use tsify::Ts;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -30,6 +36,7 @@ pub struct PastHandlerDataV2 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub name: SizedUtf16String<26>,
     pub friendship: u8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub memory: TrainerMemory,
     pub affection: u8,
     pub gender: BinaryGender,
@@ -155,31 +162,36 @@ impl PastHandlerDataV2 {
         self.secret_id = NonZeroU16::new(value)
     }
 
+    #[wasm_bindgen(getter = memory)]
+    pub fn memory_wasm(&self) -> TsResult<TrainerMemory> {
+        self.memory.try_into_ts()
+    }
+
     #[wasm_bindgen(constructor)]
     pub fn new(
         id: Option<u16>,
         secret_id: Option<u16>,
         name: String,
         friendship: u8,
-        memory: Option<TrainerMemory>,
+        memory: Option<Ts<TrainerMemory>>,
         affection: u8,
         gender: BinaryGender,
         language: Language,
         origin_game: Option<OriginGame>,
         origin_plugin: Option<String>,
-    ) -> Self {
-        Self {
+    ) -> JsResult<Self> {
+        Ok(Self {
             id: id.and_then(NonZeroU16::new),
             secret_id: secret_id.and_then(NonZeroU16::new),
             name: name.into(),
             friendship,
-            memory: memory.unwrap_or_default(),
+            memory: memory.map(|m| m.to_rust()).transpose()?.unwrap_or_default(),
             affection,
             gender,
             language,
             origin_game,
             origin_plugin,
-        }
+        })
     }
 }
 

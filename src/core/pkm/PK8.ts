@@ -3,17 +3,14 @@ import { ModernRibbons } from '@openhome-core/resources'
 import { movesFromSwshTrFlags } from '@openhome-core/resources/moves/flags'
 import { getFlag, setFlag } from '@openhome-core/util'
 import { Errorable, Option, R } from '@openhome-core/util/functional'
-import { FourMoves, PKMDate, Stats } from '@openhome-core/util/types'
+import { FourMoves, PKMDate } from '@openhome-core/util/types'
 import {
   AbilityIndex,
   BinaryGender,
-  ContestStats,
   ConvertStrategies,
   ConvertStrategy,
-  HyperTraining,
   Item,
   Language,
-  MarkingsSixShapesColors,
   MetadataSummaryLookup,
   ModernRibbon,
   NatureIndex,
@@ -23,7 +20,6 @@ import {
   Pokerus,
   SpeciesLookup,
   swshTrIndexByMoveId,
-  TrainerMemory,
 } from '@pkm-rs/pkg'
 import { PkmConstructorOptions } from './PKM'
 import { convertPokeDate, convertPokeDateOptional } from './wasm/convert'
@@ -149,9 +145,6 @@ export default class PK8 {
   get markings() {
     return this.inner.markings
   }
-  set markings(value: MarkingsSixShapesColors) {
-    this.inner.markings = value
-  }
 
   get personalityValue() {
     return this.inner.personality_value
@@ -195,15 +188,9 @@ export default class PK8 {
   get evs() {
     return this.inner.evs
   }
-  set evs(value: Stats) {
-    this.inner.evs = value
-  }
 
   get contest() {
     return this.inner.contest
-  }
-  set contest(value: ContestStats) {
-    this.inner.contest = value
   }
 
   get pokerusByte() {
@@ -315,9 +302,6 @@ export default class PK8 {
 
   get ivs() {
     return this.inner.ivs
-  }
-  set ivs(value: Stats) {
-    this.inner.ivs = value
   }
 
   get isEgg() {
@@ -459,10 +443,7 @@ export default class PK8 {
   }
 
   get hyperTraining() {
-    return this.inner.hyper_training
-  }
-  set hyperTraining(value: HyperTraining) {
-    this.inner.hyper_training = value
+    return this.inner.hyperTraining
   }
 
   get gameOfOrigin() {
@@ -519,17 +500,11 @@ export default class PK8 {
   }
 
   get handlerMemory() {
-    return this.inner.handler_memory
-  }
-  set handlerMemory(value: TrainerMemory) {
-    this.inner.handler_memory = value
+    return this.inner.handlerMemory
   }
 
   get trainerMemory() {
-    return this.inner.trainer_memory
-  }
-  set trainerMemory(value: TrainerMemory) {
-    this.inner.trainer_memory = value
+    return this.inner.trainerMemory
   }
 
   get trainerGender() {
@@ -589,9 +564,9 @@ export default class PK8 {
     return this.inner.calculateStats()
   }
 
-  // stored stats
-  public get stats() {
-    return this.inner.stats
+  // wasm recalculates stats anyways
+  get stats() {
+    return this.getStats()
   }
 
   public get abilityName() {
