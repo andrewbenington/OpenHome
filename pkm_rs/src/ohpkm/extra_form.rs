@@ -1,21 +1,11 @@
 use pkm_rs_resources::ExpectLog;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::metadata_source::MetadataSource;
-use pkm_rs_resources::species::EggGroup;
-use pkm_rs_resources::species::FormMetadata;
-use pkm_rs_resources::species::GenderRatio;
-use pkm_rs_resources::species::MegaEvolutionMetadata;
-use pkm_rs_resources::species::SpeciesForm;
-use pkm_rs_resources::species::SpeciesMetadata;
 use pkm_rs_resources::species::metadata_table::types_lookup;
-use pkm_rs_types::AbilityNumber;
-use pkm_rs_types::GameSetting;
-use pkm_rs_types::Generation;
-use pkm_rs_types::JsResult;
-use pkm_rs_types::TeraType;
-use pkm_rs_types::TryIntoTs;
-use pkm_rs_types::TsResult;
-use pkm_rs_types::{NationalDex, PkmType};
+use pkm_rs_resources::species::{
+    EggGroup, FormMetadata, GenderRatio, MegaEvolutionMetadata, SpeciesForm, SpeciesMetadata,
+};
+use pkm_rs_types::{AbilityNumber, GameSetting, Generation, NationalDex, PkmType, TeraType};
 use serde::Serialize;
 use strum::EnumIter;
 use strum::IntoEnumIterator;
@@ -23,7 +13,8 @@ use strum::IntoEnumIterator;
 #[cfg(feature = "wasm")]
 use pkm_rs_resources::species::metadata_table::current_base_stats;
 #[cfg(feature = "wasm")]
-use pkm_rs_types::{Gender, Stats16Le};
+use pkm_rs_types::{Gender, JsResult, Stats16Le, TryIntoTs, TsResult};
+#[cfg(feature = "wasm")]
 use tsify::Ts;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
