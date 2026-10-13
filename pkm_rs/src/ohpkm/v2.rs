@@ -29,33 +29,35 @@ use pkm_rs_resources::natures::{NatureIndex, WithNature};
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_resources::species::SpeciesMetadata;
+#[cfg(feature = "wasm")]
+use pkm_rs_types::TsResult;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, FlagSet, Gender, Geolocations, HyperTraining, Ivs,
     Language, MarkingsSixShapesColors, OriginGame, PkmType, PokeDate, Pokerus, ShinyLeaves, Stats8,
-    Stats16Le, StatsPreSplit, TeraType, TrainerData, TrainerMemory,
+    Stats16Le, StatsPreSplit, TeraType, TrainerData, TrainerMemory, TryIntoTs,
 };
 use pkm_rs_types::{Dvs, NationalDex};
 use serde::Serialize;
 use strum_macros::Display;
 
+#[cfg(feature = "wasm")]
+use pkm_rs_resources::abilities::AbilityIndexWasm;
+#[cfg(feature = "wasm")]
+use pkm_rs_types::JsResult;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 #[cfg(feature = "wasm")]
 use tsify::Ts;
-
 #[cfg(feature = "wasm")]
-use super::JsResult;
+use wasm_bindgen::prelude::*;
+
 #[cfg(feature = "wasm")]
 use crate::gen9_lza::{LZA_BASE_TM_BYTES, LZA_DLC_TM_BYTES};
 #[cfg(feature = "wasm")]
 use crate::gen9_sv;
 #[cfg(feature = "wasm")]
 use crate::ohpkm::v2_sections::{MonTag, pkm_bytes};
-#[cfg(feature = "wasm")]
-use pkm_rs_resources::abilities::AbilityIndexWasm;
-#[cfg(feature = "wasm")]
-use wasm_bindgen::prelude::*;
 
 const MAGIC_NUMBER: u32 = 0x57575757;
 const CURRENT_VERSION: u16 = 2;
@@ -2004,7 +2006,7 @@ impl OhpkmV2 {
     #[wasm_bindgen(constructor)]
     pub fn from_byte_vector(bytes: &[u8]) -> JsResult<Self> {
         if !bytes.is_empty() {
-            Self::from_bytes(bytes).map_err(|e| JsValue::from_str(&e.to_string()))
+            Ok(Self::from_bytes(bytes)?)
         } else {
             Ok(Self::default())
         }
@@ -2032,7 +2034,7 @@ impl OhpkmV2 {
         Ok(OhpkmV1::from_bytes(&bytes).map(OhpkmV2::from_v1)?)
     }
 
-    pub fn get_section_bytes(&self) -> JsResult<js_sys::Object> {
+    pub fn get_section_bytes(&self) -> std::result::Result<js_sys::Object, JsValue> {
         let obj = js_sys::Object::new();
 
         // destructure here to give an error when adding a new section (force handling)
@@ -2194,13 +2196,15 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = markings)]
-    pub fn markings_js(&self) -> MarkingsSixShapesColors {
-        self.markings()
+    pub fn markings_js(&self) -> TsResult<MarkingsSixShapesColors> {
+        self.markings().try_into_ts()
     }
 
     #[wasm_bindgen(setter = markings)]
-    pub fn set_markings_js(&mut self, v: &MarkingsSixShapesColors) {
-        self.set_markings(v);
+    pub fn set_markings_js(&mut self, v: Ts<MarkingsSixShapesColors>) -> JsResult<()> {
+        self.set_markings(&v.to_rust()?);
+
+        Ok(())
     }
 
     #[wasm_bindgen(getter = nature)]
@@ -2404,12 +2408,14 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = handlerMemory)]
-    pub fn handler_memory_js(&self) -> TrainerMemory {
-        self.handler_memory()
+    pub fn handler_memory_js(&self) -> TsResult<TrainerMemory> {
+        self.handler_memory().try_into_ts()
     }
     #[wasm_bindgen(setter = handlerMemory)]
-    pub fn set_handler_memory_js(&mut self, v: &TrainerMemory) {
-        self.set_handler_memory(v);
+    pub fn set_handler_memory_js(&mut self, v: Ts<TrainerMemory>) -> JsResult<()> {
+        self.set_handler_memory(&v.to_rust()?);
+
+        Ok(())
     }
 
     #[wasm_bindgen(getter = handlerAffection)]
@@ -2522,12 +2528,14 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = trainerMemory)]
-    pub fn trainer_memory_js(&self) -> TrainerMemory {
-        self.trainer_memory()
+    pub fn trainer_memory_js(&self) -> TsResult<TrainerMemory> {
+        self.trainer_memory().try_into_ts()
     }
     #[wasm_bindgen(setter = trainerMemory)]
-    pub fn set_trainer_memory_js(&mut self, v: &TrainerMemory) {
-        self.set_trainer_memory(v);
+    pub fn set_trainer_memory_js(&mut self, v: Ts<TrainerMemory>) -> JsResult<()> {
+        self.set_trainer_memory(&v.to_rust()?);
+
+        Ok(())
     }
 
     #[wasm_bindgen(getter = trainerAffection)]
@@ -3568,7 +3576,7 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(js_name = getSectionBytes)]
-    pub fn get_section_bytes_js(&self) -> JsResult<js_sys::Object> {
+    pub fn get_section_bytes_js(&self) -> std::result::Result<js_sys::Object, JsValue> {
         let obj = js_sys::Object::new();
 
         js_sys::Reflect::set(
@@ -3819,7 +3827,7 @@ pub struct OriginalDataJs {
 fn add_section_bytes_to_js_object<T: DataSection<ErrorType = Error>>(
     obj: &js_sys::Object,
     section: &Option<T>,
-) -> JsResult<()> {
+) -> std::result::Result<(), JsValue> {
     if let Some(section) = section
         && !section.is_empty()
     {

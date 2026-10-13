@@ -10,7 +10,6 @@ import {
   ConvertStrategy,
   HyperTraining,
   Item,
-  MarkingsSixShapesColors,
   MetadataSummaryLookup,
   NatureIndex,
   OriginGame,
@@ -18,7 +17,6 @@ import {
   PokeDate,
   Pokerus,
   SpeciesLookup,
-  TrainerMemory,
 } from '@pkm-rs/pkg'
 import { PkmConstructorOptions } from './PKM'
 import { modernStatCalc } from './util'
@@ -138,9 +136,6 @@ export default class PK7 {
 
   get markings() {
     return this.inner.markings
-  }
-  set markings(value: MarkingsSixShapesColors) {
-    this.inner.markings = value
   }
 
   get personalityValue() {
@@ -520,17 +515,11 @@ export default class PK7 {
   }
 
   get handlerMemory() {
-    return this.inner.handler_memory
-  }
-  set handlerMemory(value: TrainerMemory) {
-    this.inner.handler_memory = value
+    return this.inner.handlerMemory
   }
 
   get trainerMemory() {
-    return this.inner.trainer_memory
-  }
-  set trainerMemory(value: TrainerMemory) {
-    this.inner.trainer_memory = value
+    return this.inner.trainerMemory
   }
 
   get trainerGender() {

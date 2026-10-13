@@ -16,7 +16,8 @@ use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
-    AbilityNumber, BinaryGender, ContestStats, Generation, NationalDex, Pokerus, Stats8,
+    AbilityNumber, BinaryGender, ContestStats, Generation, NationalDex, Pokerus, Stats8, TryIntoTs,
+    TsResult,
 };
 use pkm_rs_types::{Gender, OriginGame, PokeDate, TrainerMemory};
 use pkm_rs_types::{HyperTraining, MarkingsSixShapesColors};
@@ -57,6 +58,7 @@ pub struct MainDataV2 {
     pub ability_num: AbilityNumber,
     pub favorite: bool,
     pub is_shadow: bool,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub markings: MarkingsSixShapesColors,
     pub nature: NatureIndex,
     pub mint_nature: Option<NatureIndex>,
@@ -90,6 +92,7 @@ pub struct MainDataV2 {
     pub is_current_handler: bool,
     pub handler_id: u16,
     pub handler_friendship: u8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub handler_memory: TrainerMemory,
     pub handler_affection: u8,
     pub handler_gender: BinaryGender,
@@ -105,6 +108,7 @@ pub struct MainDataV2 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub trainer_name: SizedUtf16String<26>,
     pub trainer_friendship: u8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub trainer_memory: TrainerMemory,
     pub trainer_affection: u8,
     pub egg_date: Option<PokeDate>,
@@ -419,6 +423,26 @@ impl MainDataV2 {
         }
 
         errors_found
+    }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+#[allow(clippy::missing_const_for_fn)]
+impl MainDataV2 {
+    #[wasm_bindgen(getter)]
+    pub fn markings_wasm(&self) -> TsResult<MarkingsSixShapesColors> {
+        self.markings.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn trainer_memory_wasm(&self) -> TsResult<TrainerMemory> {
+        self.trainer_memory.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn handler_memory_wasm(&self) -> TsResult<TrainerMemory> {
+        self.handler_memory.try_into_ts()
     }
 }
 

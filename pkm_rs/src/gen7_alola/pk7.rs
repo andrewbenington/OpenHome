@@ -3,11 +3,11 @@ use super::pk7_buffer::Pk7BufferMut;
 use super::{Pk7AbilityIndex, Pk7SpeciesAndForm};
 use crate::checksum::{Checksum, RefreshChecksum};
 use crate::convert_strategy::ConvertStrategy;
-#[cfg(feature = "wasm")]
-use pkm_rs_types::JsResult;
 use crate::result::{Error, Result};
 use crate::traits::ModernEvs;
 use crate::traits::{HasSpeciesAndForm, PkmBytes};
+#[cfg(feature = "wasm")]
+use pkm_rs_types::JsResult;
 
 use pkm_rs_derive::IsShiny4096;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
@@ -21,7 +21,7 @@ use pkm_rs_resources::stats;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, HyperTraining, Ivs, Language,
-    MarkingsSixShapesColors, OriginGame, Pokerus, Stats8, Stats16Le,
+    MarkingsSixShapesColors, OriginGame, Pokerus, Stats8, Stats16Le, TryIntoTs, TsResult,
 };
 use pkm_rs_types::{Gender, Geolocations, PokeDate, TrainerMemory};
 use serde::Serialize;
@@ -54,6 +54,7 @@ pub struct Pk7 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ability_index: Pk7AbilityIndex,
     pub ability_num: AbilityNumber,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub markings: MarkingsSixShapesColors,
     pub personality_value: u32,
     pub nature: NatureIndex,
@@ -89,12 +90,14 @@ pub struct Pk7 {
     pub geolocations: Geolocations,
     pub handler_friendship: u8,
     pub handler_affection: u8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub handler_memory: TrainerMemory,
     pub fullness: u8,
     pub enjoyment: u8,
     pub trainer_name: SizedUtf16String<26>,
     pub trainer_friendship: u8,
     pub trainer_affection: u8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub trainer_memory: TrainerMemory,
     pub egg_date: Option<PokeDate>,
     pub met_date: PokeDate,
@@ -590,6 +593,21 @@ impl Pk7 {
     #[wasm_bindgen(getter)]
     pub fn geolocations(&self) -> Result<Ts<Geolocations>> {
         Ok(Ts::from_rust(&self.geolocations)?)
+    }
+
+    #[wasm_bindgen(getter = markings)]
+    pub fn markings_wasm(&self) -> TsResult<MarkingsSixShapesColors> {
+        self.markings.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = trainerMemory)]
+    pub fn trainer_memory_wasm(&self) -> TsResult<TrainerMemory> {
+        self.trainer_memory.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = handlerMemory)]
+    pub fn handler_memory_wasm(&self) -> TsResult<TrainerMemory> {
+        self.handler_memory.try_into_ts()
     }
 }
 

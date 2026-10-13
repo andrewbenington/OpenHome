@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize, Serializer};
 use strum_macros::{Display, EnumString};
 
 use crate::language::Language;
+use crate::{JsResult, TryIntoTs, TsResult};
 use crate::{OriginGame, strings::SizedUtf16String, util};
 
 #[cfg(feature = "randomize")]
@@ -13,7 +14,7 @@ use pkm_rs_types::randomize::Randomize;
 use rand::{RngExt, random_range};
 
 #[cfg(feature = "wasm")]
-use tsify::Tsify;
+use tsify::{Ts, Tsify};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -505,6 +506,7 @@ pub struct TrainerData {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub name: SizedUtf16String<26>,
     pub friendship: u8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub memory: TrainerMemory,
     pub affection: u8,
     pub gender: BinaryGender,
@@ -522,34 +524,38 @@ impl TrainerData {
         self.name.to_string()
     }
 
+    #[wasm_bindgen(getter)]
+    pub fn memory(&self) -> TsResult<TrainerMemory> {
+        self.memory.try_into_ts()
+    }
+
     #[wasm_bindgen(constructor)]
     pub fn new(
         id: u16,
         secret_id: u16,
         name: String,
         friendship: u8,
-        memory: Option<TrainerMemory>,
+        memory: Option<Ts<TrainerMemory>>,
         affection: u8,
         gender: BinaryGender,
         language: Language,
         origin_game: Option<OriginGame>,
-    ) -> Self {
-        Self {
+    ) -> JsResult<Self> {
+        Ok(Self {
             id,
             secret_id,
             name: name.into(),
             friendship,
-            memory: memory.unwrap_or_default(),
+            memory: memory.map(|m| m.to_rust()).transpose()?.unwrap_or_default(),
             affection,
             gender,
             language,
             origin_game,
-        }
+        })
     }
 }
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Clone, Copy, Default, Serialize, PartialEq, Eq)]
 pub struct TrainerMemory {
@@ -624,7 +630,6 @@ impl TrainerMemory {
 }
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Clone, Copy, Default, Serialize)]
 pub struct Geolocation {
@@ -949,7 +954,6 @@ pub struct InvalidAbilityNumber(pub u3);
 pub struct Pokerus(u8);
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Serialize, Deserialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Clone, Copy, EnumString)]
 pub enum PokerusStatus {
     Uninfected,
@@ -1037,8 +1041,8 @@ impl Pokerus {
     }
 
     #[wasm_bindgen(js_name = status)]
-    pub fn status_wasm(&self) -> PokerusStatus {
-        self.status()
+    pub fn status_wasm(&self) -> TsResult<PokerusStatus> {
+        self.status().try_into_ts()
     }
 
     #[wasm_bindgen(js_name = clone)]

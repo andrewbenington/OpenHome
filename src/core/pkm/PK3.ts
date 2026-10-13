@@ -7,7 +7,6 @@ import {
   ContestStats,
   ConvertStrategies,
   ConvertStrategy,
-  MarkingsFourShapes,
   MetadataSummaryLookup,
   OriginGame,
   Pk3Wasm,
@@ -130,9 +129,6 @@ export default class PK3 implements PKMInterface {
 
   get markings() {
     return this.inner.markings
-  }
-  set markings(value: MarkingsFourShapes) {
-    this.inner.markings = value
   }
 
   get personalityValue() {

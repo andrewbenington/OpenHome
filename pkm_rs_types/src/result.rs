@@ -83,8 +83,11 @@ impl Serialize for Error {
 
 pub type Result<T> = core::result::Result<T, Error>;
 
+// for types T that can be natively converted to JavaScript
 #[cfg(feature = "wasm")]
 pub type JsResult<T> = core::result::Result<T, wasm_bindgen::JsError>;
+
+// for types T that can't be natively converted to JavaScript but implement Tsify
 #[cfg(feature = "wasm")]
 pub type TsResult<T> = JsResult<tsify::Ts<T>>;
 

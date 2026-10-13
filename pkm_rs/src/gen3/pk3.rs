@@ -31,7 +31,7 @@ use pkm_rs_types::AbilityNumber;
 use pkm_rs_types::randomize::Randomize;
 use pkm_rs_types::{
     BinaryGender, ContestStats, JsResult, Language, MarkingsFourShapes, NationalDex, OriginGame,
-    Pokerus, SimpleAbilityNumber, Stats8, Stats16Le,
+    Pokerus, SimpleAbilityNumber, Stats8, Stats16Le, TryIntoTs, TsResult,
 };
 use pkm_rs_types::{Gender, Ivs};
 use serde::{Serialize, Serializer};
@@ -59,6 +59,7 @@ pub struct Pk3 {
     pub is_bad_egg: bool,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ability_num: SimpleAbilityNumber,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub markings: MarkingsFourShapes,
     pub personality_value: u32,
     pub is_fateful_encounter: bool,
@@ -565,6 +566,11 @@ impl Pk3 {
         Ok(serde_json::to_value(self)
             .map_err(|e| Error::Other(e.to_string()))?
             .to_string())
+    }
+
+    #[wasm_bindgen(getter = markings)]
+    pub fn markings_wasm(&self) -> TsResult<MarkingsFourShapes> {
+        self.markings.try_into_ts()
     }
 }
 

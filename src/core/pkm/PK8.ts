@@ -13,7 +13,6 @@ import {
   HyperTraining,
   Item,
   Language,
-  MarkingsSixShapesColors,
   MetadataSummaryLookup,
   ModernRibbon,
   NatureIndex,
@@ -23,7 +22,6 @@ import {
   Pokerus,
   SpeciesLookup,
   swshTrIndexByMoveId,
-  TrainerMemory,
 } from '@pkm-rs/pkg'
 import { PkmConstructorOptions } from './PKM'
 import { convertPokeDate, convertPokeDateOptional } from './wasm/convert'
@@ -144,9 +142,6 @@ export default class PK8 {
 
   get markings() {
     return this.inner.markings
-  }
-  set markings(value: MarkingsSixShapesColors) {
-    this.inner.markings = value
   }
 
   get personalityValue() {
@@ -515,17 +510,11 @@ export default class PK8 {
   }
 
   get handlerMemory() {
-    return this.inner.handler_memory
-  }
-  set handlerMemory(value: TrainerMemory) {
-    this.inner.handler_memory = value
+    return this.inner.handlerMemory
   }
 
   get trainerMemory() {
-    return this.inner.trainer_memory
-  }
-  set trainerMemory(value: TrainerMemory) {
-    this.inner.trainer_memory = value
+    return this.inner.trainerMemory
   }
 
   get trainerGender() {

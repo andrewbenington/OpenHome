@@ -20,7 +20,7 @@ use pkm_rs_resources::stats;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, FlagSet, HyperTraining, Ivs, JsResult, Language,
-    MarkingsSixShapesColors, OriginGame, Stats8, Stats16Le, TeraType,
+    MarkingsSixShapesColors, OriginGame, Stats8, Stats16Le, TeraType, TryIntoTs, TsResult,
 };
 use pkm_rs_types::{Gender, PokeDate, TrainerMemory};
 use serde::Serialize;
@@ -59,6 +59,7 @@ pub struct Pk9 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ability_index: Pk9AbilityIndex,
     pub ability_num: AbilityNumber,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub markings: MarkingsSixShapesColors,
     pub personality_value: u32,
     pub nature: NatureIndex,
@@ -97,6 +98,7 @@ pub struct Pk9 {
     pub is_current_handler: bool,
     pub handler_id: u16,
     pub handler_friendship: u8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub handler_memory: TrainerMemory,
     pub game_of_origin: OriginGame,
     pub game_of_origin_battle: Option<OriginGame>,
@@ -105,6 +107,7 @@ pub struct Pk9 {
     pub language: Language,
     pub trainer_name: SizedUtf16String<26>,
     pub trainer_friendship: u8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub trainer_memory: TrainerMemory,
     pub egg_date: Option<PokeDate>,
     pub met_date: PokeDate,
@@ -632,6 +635,21 @@ impl Pk9 {
     #[wasm_bindgen(js_name = toBoxBytesEncrypted)]
     pub fn to_box_bytes_encrypted_wasm(&self) -> Box<[u8]> {
         self.to_box_bytes_encrypted()
+    }
+
+    #[wasm_bindgen(getter = markings)]
+    pub fn markings_wasm(&self) -> TsResult<MarkingsSixShapesColors> {
+        self.markings.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = trainerMemory)]
+    pub fn trainer_memory_wasm(&self) -> TsResult<TrainerMemory> {
+        self.trainer_memory.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = handlerMemory)]
+    pub fn handler_memory_wasm(&self) -> TsResult<TrainerMemory> {
+        self.handler_memory.try_into_ts()
     }
 }
 
