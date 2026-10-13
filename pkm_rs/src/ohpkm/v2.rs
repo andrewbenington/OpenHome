@@ -2245,21 +2245,25 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = evs)]
-    pub fn evs_js(&self) -> Stats16Le {
-        self.evs().into()
+    pub fn evs_js(&self) -> TsResult<Stats16Le> {
+        Stats16Le::from(self.evs()).try_into_ts()
     }
     #[wasm_bindgen(setter = evs)]
-    pub fn set_evs_js(&mut self, v: Stats16Le) {
-        self.set_evs(&v.try_into().expect("evs should not exceed 255 each"));
+    pub fn set_evs_js(&mut self, v: Ts<Stats16Le>) -> JsResult<()> {
+        self.set_evs(&v.to_rust()?.try_into()?);
+
+        Ok(())
     }
 
     #[wasm_bindgen(getter = contest)]
-    pub fn contest_js(&self) -> ContestStats {
-        self.contest()
+    pub fn contest_js(&self) -> TsResult<ContestStats> {
+        self.contest().try_into_ts()
     }
     #[wasm_bindgen(setter = contest)]
-    pub fn set_contest_js(&mut self, v: &ContestStats) {
-        self.set_contest(v);
+    pub fn set_contest_js(&mut self, v: Ts<ContestStats>) -> JsResult<()> {
+        self.set_contest(&v.to_rust()?);
+
+        Ok(())
     }
 
     #[wasm_bindgen(getter = pokerus)]
@@ -2345,12 +2349,14 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = ivs)]
-    pub fn ivs_js(&self) -> Stats16Le {
-        self.ivs().into()
+    pub fn ivs_js(&self) -> TsResult<Stats16Le> {
+        Stats16Le::from(self.ivs()).try_into_ts()
     }
     #[wasm_bindgen(setter = ivs)]
-    pub fn set_ivs_js(&mut self, v: &Stats16Le) {
-        self.set_ivs(v.to_ivs_capped());
+    pub fn set_ivs_js(&mut self, v: Ts<Stats16Le>) -> JsResult<()> {
+        self.set_ivs(v.to_rust()?.to_ivs_capped());
+
+        Ok(())
     }
 
     #[wasm_bindgen(getter = isEgg)]
@@ -2602,12 +2608,14 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = hyperTraining)]
-    pub fn hyper_training_js(&self) -> HyperTraining {
-        self.main_data.hyper_training
+    pub fn hyper_training_js(&self) -> TsResult<HyperTraining> {
+        self.main_data.hyper_training.try_into_ts()
     }
     #[wasm_bindgen(setter = hyperTraining)]
-    pub fn set_hyper_training_js(&mut self, v: &HyperTraining) {
-        self.main_data.hyper_training = *v;
+    pub fn set_hyper_training_js(&mut self, v: Ts<HyperTraining>) -> JsResult<()> {
+        self.main_data.hyper_training = v.to_rust()?;
+
+        Ok(())
     }
 
     #[wasm_bindgen(getter = trainerGender)]
@@ -2790,12 +2798,14 @@ impl OhpkmV2 {
     // Game Boy
 
     #[wasm_bindgen(getter = dvs)]
-    pub fn dvs_js(&self) -> StatsPreSplit {
-        match self.gameboy_data {
+    pub fn dvs_js(&self) -> TsResult<StatsPreSplit> {
+        let dvs: StatsPreSplit = match self.gameboy_data {
             Some(data) => data.dvs,
             None => GameboyData::from_main_data(&self.main_data).dvs,
         }
-        .into()
+        .into();
+
+        dvs.try_into_ts()
     }
 
     #[wasm_bindgen(getter = metTimeOfDay)]
@@ -2804,29 +2814,35 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = evsG12)]
-    pub fn evs_g12_js(&self) -> Option<StatsPreSplit> {
-        Some(self.gameboy_data?.evs_g12)
+    pub fn evs_g12_js(&self) -> JsResult<Option<Ts<StatsPreSplit>>> {
+        self.gameboy_data
+            .map(|gb_data| gb_data.evs_g12.try_into_ts())
+            .transpose()
     }
 
     #[wasm_bindgen(setter = evsG12)]
-    pub fn update_evs_g12_js(&mut self, value: StatsPreSplit) {
+    pub fn update_evs_g12_js(&mut self, value: Ts<StatsPreSplit>) -> JsResult<()> {
         if let Some(gameboy_data) = &mut self.gameboy_data {
-            gameboy_data.evs_g12 = value
+            gameboy_data.evs_g12 = value.to_rust()?;
         }
+
+        Ok(())
     }
 
     #[wasm_bindgen(js_name = setGameboyData)]
     pub fn set_gameboy_data_js(
         &mut self,
-        dvs: StatsPreSplit,
+        dvs: Ts<StatsPreSplit>,
         met_time_of_day: u8,
-        evs_g12: StatsPreSplit,
-    ) {
+        evs_g12: Ts<StatsPreSplit>,
+    ) -> JsResult<()> {
         self.gameboy_data = Some(GameboyData {
-            dvs: dvs.into(),
+            dvs: dvs.to_rust()?.into(),
             met_time_of_day,
-            evs_g12,
-        })
+            evs_g12: evs_g12.to_rust()?,
+        });
+
+        Ok(())
     }
 
     // Gen 3/4/5
@@ -3131,20 +3147,24 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = avs)]
-    pub fn avs_js(&self) -> Option<Stats16Le> {
-        Some(self.gen67_data?.avs)
+    pub fn avs_js(&self) -> JsResult<Option<Ts<Stats16Le>>> {
+        self.gen67_data
+            .map(|data| data.avs.try_into_ts())
+            .transpose()
     }
 
     #[wasm_bindgen(setter = avs)]
-    pub fn set_avs_js(&mut self, value: Option<Stats16Le>) {
+    pub fn set_avs_js(&mut self, value: Option<Ts<Stats16Le>>) -> JsResult<()> {
         match value {
-            Some(avs) => self.gen67_data.get_or_insert_default().avs = avs,
+            Some(avs) => self.gen67_data.get_or_insert_default().avs = avs.to_rust()?,
             None => {
                 if let Some(gen67_data) = &mut self.gen67_data {
-                    gen67_data.avs = Stats16Le::default()
+                    gen67_data.avs = Stats16Le::default();
                 }
             }
         }
+
+        Ok(())
     }
 
     // Sword/Shield
@@ -3225,23 +3245,26 @@ impl OhpkmV2 {
     // Legends Arceus
 
     #[wasm_bindgen(getter = gvs)]
-    pub fn gvs_js(&self) -> Option<Stats16Le> {
-        Some(self.la_data?.gvs.into())
+    pub fn gvs_js(&self) -> JsResult<Option<Ts<Stats16Le>>> {
+        self.la_data
+            .map(|data| Stats16Le::from(data.gvs).try_into_ts())
+            .transpose()
     }
 
     #[wasm_bindgen(setter = gvs)]
-    pub fn set_gvs_js(&mut self, value: Option<Stats16Le>) {
+    pub fn set_gvs_js(&mut self, value: Option<Ts<Stats16Le>>) -> JsResult<()> {
         match value {
             Some(gvs) => {
-                self.la_data.get_or_insert_default().gvs =
-                    gvs.try_into().expect("gvs should not exceed 9 each")
+                self.la_data.get_or_insert_default().gvs = gvs.to_rust()?.try_into()?;
             }
             None => {
                 if let Some(la_data) = &mut self.la_data {
-                    la_data.gvs = Stats8::default()
+                    la_data.gvs = Stats8::default();
                 }
             }
         }
+
+        Ok(())
     }
 
     #[wasm_bindgen(getter = alphaMove)]
@@ -3422,37 +3445,47 @@ impl OhpkmV2 {
     // Scarlet/Violet
 
     #[wasm_bindgen(getter = teraTypeOriginal)]
-    pub fn tera_type_original_js(&self) -> TeraType {
-        self.sv_data.map(|d| d.tera_type_original).unwrap_or(
-            self.species_and_form()
-                .get_form_metadata()
-                .transferred_tera_type(),
-        )
+    pub fn tera_type_original_js(&self) -> TsResult<TeraType> {
+        self.sv_data
+            .map(|d| d.tera_type_original)
+            .unwrap_or(
+                self.species_and_form()
+                    .get_form_metadata()
+                    .transferred_tera_type(),
+            )
+            .try_into_ts()
     }
 
     #[wasm_bindgen(js_name = setTeraTypeOriginalIf)]
-    pub fn set_tera_type_original_if_js(&mut self, value: Option<TeraType>) {
-        let Some(value) = value else { return };
+    pub fn set_tera_type_original_if_js(&mut self, value: Option<Ts<TeraType>>) -> Result<()> {
+        let Some(value) = value else { return Ok(()) };
 
         self.sv_data
             .get_or_insert(ScarletVioletData::default_generated_tera_type(
                 self.main_data.species_and_form,
             ))
-            .tera_type_original = value
+            .tera_type_original = value.to_rust()?;
+
+        Ok(())
     }
 
     #[wasm_bindgen(getter = teraTypeOverride)]
-    pub fn tera_type_override_js(&self) -> Option<TeraType> {
-        self.sv_data.and_then(|d| d.tera_type_override)
+    pub fn tera_type_override_js(&self) -> JsResult<Option<Ts<TeraType>>> {
+        self.sv_data
+            .and_then(|d| d.tera_type_override)
+            .map(|t| t.try_into_ts())
+            .transpose()
     }
 
     #[wasm_bindgen(setter = teraTypeOverride)]
-    pub fn set_tera_type_override_js(&mut self, value: Option<TeraType>) -> Result<()> {
+    pub fn set_tera_type_override_js(&mut self, value: Option<Ts<TeraType>>) -> Result<()> {
+        let value_rust = value.map(|t| t.to_rust()).transpose()?;
+
         self.sv_data
             .get_or_insert(ScarletVioletData::default_generated_tera_type(
                 self.main_data.species_and_form,
             ))
-            .tera_type_override = value;
+            .tera_type_override = value_rust;
 
         Ok(())
     }

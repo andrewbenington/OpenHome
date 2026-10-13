@@ -1,10 +1,15 @@
+#[cfg(feature = "wasm")]
+use crate::JsResult;
 use crate::{Error, Result};
 
 use serde::Serialize;
 use strum_macros::{Display, EnumString};
+use tsify::Ts;
 
 use crate::Generation;
 
+#[cfg(feature = "wasm")]
+use crate::result::TryIntoTs;
 #[cfg(feature = "wasm")]
 use serde::Deserialize;
 #[cfg(feature = "wasm")]
@@ -18,7 +23,6 @@ use pkm_rs_types::randomize::Randomize;
 #[cfg_attr(feature = "specta", derive(specta::Type))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[cfg_attr(feature = "wasm", derive(Tsify))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(
     Debug, Default, EnumString, Display, Serialize, Deserialize, PartialEq, Eq, Clone, Copy,
 )]
@@ -122,7 +126,7 @@ pub struct PkmTypes;
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 impl PkmTypes {
     #[wasm_bindgen(js_name = "tryFromString")]
-    pub fn try_from_string(s: &str) -> Option<PkmType> {
+    pub fn try_from_string(s: &str) -> JsResult<Option<Ts<PkmType>>> {
         match s {
             "normal" => Some(PkmType::Normal),
             "fighting" => Some(PkmType::Fighting),
@@ -144,12 +148,14 @@ impl PkmTypes {
             "fairy" => Some(PkmType::Fairy),
             _ => None,
         }
+        .map(|t| t.try_into_ts())
+        .transpose()
     }
 
     #[wasm_bindgen(js_name = "toGameboyIndex")]
     #[allow(clippy::missing_const_for_fn)]
-    pub fn to_gameboy_index(t: &PkmType) -> u8 {
-        match t {
+    pub fn to_gameboy_index(t: Ts<PkmType>) -> JsResult<u8> {
+        Ok(match t.to_rust()? {
             PkmType::Normal => 0,
             PkmType::Fighting => 1,
             PkmType::Flying => 2,
@@ -170,7 +176,7 @@ impl PkmTypes {
             PkmType::Dragon => 26,
             PkmType::Dark => 27,
             _ => 0,
-        }
+        })
     }
 
     #[wasm_bindgen(js_name = "toString")]
@@ -203,7 +209,6 @@ const TERA_TYPE_STELLAR: u8 = 0x63;
 
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Serialize, Clone, Copy, PartialEq, Eq)]
 pub enum TeraType {
     Standard(PkmType),

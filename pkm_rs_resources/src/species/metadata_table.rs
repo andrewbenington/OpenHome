@@ -16,9 +16,10 @@ use std::marker::PhantomData;
 
 use pkm_rs_types::TryIntoTs;
 #[cfg(feature = "wasm")]
-use pkm_rs_types::TsResult;
+use pkm_rs_types::{JsResult, TsResult};
 use pkm_rs_types::{NationalDex, PkmType, Stats8, StatsPreSplit, form, pkl_file::PklFileData};
 
+use tsify::Ts;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -290,13 +291,13 @@ impl MetadataTableReader {
 #[wasm_bindgen]
 impl MetadataTableReader {
     #[cfg_attr(feature = "wasm", wasm_bindgen)]
-    pub fn type1(&self) -> PkmType {
-        self.types().0
+    pub fn type1(&self) -> TsResult<PkmType> {
+        self.types().0.try_into_ts()
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen)]
-    pub fn type2(&self) -> Option<PkmType> {
-        self.types().1
+    pub fn type2(&self) -> JsResult<Option<Ts<PkmType>>> {
+        self.types().1.map(|t| t.try_into_ts()).transpose()
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "baseStats"))]

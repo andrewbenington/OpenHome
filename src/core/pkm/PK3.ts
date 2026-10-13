@@ -229,9 +229,6 @@ export default class PK3 implements PKMInterface {
   get ivs() {
     return this.inner.ivs
   }
-  set ivs(value: Stats) {
-    this.inner.ivs = value
-  }
 
   get isEgg() {
     return this.inner.is_egg

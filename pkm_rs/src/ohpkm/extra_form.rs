@@ -11,7 +11,10 @@ use pkm_rs_resources::species::metadata_table::types_lookup;
 use pkm_rs_types::AbilityNumber;
 use pkm_rs_types::GameSetting;
 use pkm_rs_types::Generation;
+use pkm_rs_types::JsResult;
 use pkm_rs_types::TeraType;
+use pkm_rs_types::TryIntoTs;
+use pkm_rs_types::TsResult;
 use pkm_rs_types::{NationalDex, PkmType};
 use serde::Serialize;
 use strum::EnumIter;
@@ -21,6 +24,7 @@ use strum::IntoEnumIterator;
 use pkm_rs_resources::species::metadata_table::current_base_stats;
 #[cfg(feature = "wasm")]
 use pkm_rs_types::{Gender, Stats16Le};
+use tsify::Ts;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -652,12 +656,19 @@ pub fn extra_form_sprite_name(form: ExtraFormIndex) -> Option<String> {
 
 #[cfg(feature = "wasm")]
 #[wasm_bindgen(js_name = "extraFormTypeOverride")]
-pub fn extra_form_type_override(form: ExtraFormIndex) -> Option<Vec<PkmType>> {
-    match form.type_overrides() {
-        Some((t1, Some(t2))) => Some(vec![t1, t2]),
-        Some((t1, None)) => Some(vec![t1]),
+pub fn extra_form_type_override(form: ExtraFormIndex) -> JsResult<Option<Vec<Ts<PkmType>>>> {
+    Ok(match form.type_overrides() {
+        Some((t1, Some(t2))) => {
+            let t1 = t1.try_into_ts()?;
+            let t2 = t2.try_into_ts()?;
+            Some(vec![t1, t2])
+        }
+        Some((t1, None)) => {
+            let t1 = t1.try_into_ts()?;
+            Some(vec![t1])
+        }
         None => None,
-    }
+    })
 }
 
 #[cfg(feature = "wasm")]
@@ -819,6 +830,30 @@ impl ExtraFormMetadata {
         )
     }
 
+    pub fn type_1(&self) -> PkmType {
+        self.types_from_source_or_latest(None).0
+    }
+
+    pub fn type_1_with_source(&self, source: MetadataSource) -> Option<PkmType> {
+        Some(self.types_from_source_or_latest(Some(source)).0)
+    }
+
+    pub fn type_1_index(&self) -> u8 {
+        self.types_from_source_or_latest(None).0 as u8
+    }
+
+    pub fn type_2(&self) -> Option<PkmType> {
+        self.types_from_source_or_latest(None).1
+    }
+
+    pub fn type_2_with_source(&self, source: MetadataSource) -> Option<PkmType> {
+        self.types_from_source_or_latest(Some(source)).1
+    }
+
+    pub fn type_2_index(&self) -> Option<u8> {
+        self.types_from_source_or_latest(None).1.map(|t| t as u8)
+    }
+
     /// Tera Type assigned by Pokémon HOME for the species when not originally
     /// from Scarlet/Violet
     pub fn transferred_tera_type(&self) -> TeraType {
@@ -844,32 +879,41 @@ impl ExtraFormMetadata {
     }
 
     #[wasm_bindgen(getter = type1)]
-    pub fn type_1(&self) -> PkmType {
-        self.types_from_source_or_latest(None).0
+    pub fn type_1_wasm(&self) -> TsResult<PkmType> {
+        self.types_from_source_or_latest(None).0.try_into_ts()
     }
 
     #[wasm_bindgen(js_name = type1WithSource)]
-    pub fn type_1_with_source(&self, source: MetadataSource) -> Option<PkmType> {
-        Some(self.types_from_source_or_latest(Some(source)).0)
+    pub fn type_1_with_source_wasm(&self, source: MetadataSource) -> JsResult<Option<Ts<PkmType>>> {
+        self.types_from_source_or_latest(Some(source))
+            .0
+            .try_into_ts()
+            .map(Some)
     }
 
     #[wasm_bindgen(getter = type1Index)]
-    pub fn type_1_index(&self) -> u8 {
+    pub fn type_1_index_wasm(&self) -> u8 {
         self.types_from_source_or_latest(None).0 as u8
     }
 
     #[wasm_bindgen(getter = type2)]
-    pub fn type_2(&self) -> Option<PkmType> {
-        self.types_from_source_or_latest(None).1
+    pub fn type_2_wasm(&self) -> JsResult<Option<Ts<PkmType>>> {
+        self.types_from_source_or_latest(None)
+            .1
+            .map(|t| t.try_into_ts())
+            .transpose()
     }
 
     #[wasm_bindgen(js_name = type2WithSource)]
-    pub fn type_2_with_source(&self, source: MetadataSource) -> Option<PkmType> {
-        self.types_from_source_or_latest(Some(source)).1
+    pub fn type_2_with_source_wasm(&self, source: MetadataSource) -> JsResult<Option<Ts<PkmType>>> {
+        self.types_from_source_or_latest(Some(source))
+            .1
+            .map(|t| t.try_into_ts())
+            .transpose()
     }
 
     #[wasm_bindgen(getter = type2Index)]
-    pub fn type_2_index(&self) -> Option<u8> {
+    pub fn type_2_index_wasm(&self) -> Option<u8> {
         self.types_from_source_or_latest(None).1.map(|t| t as u8)
     }
 
@@ -927,10 +971,11 @@ impl ExtraFormMetadata {
     }
 
     #[wasm_bindgen(getter = baseStats)]
-    pub fn get_base_stats(&self) -> Stats16Le {
+    pub fn get_base_stats(&self) -> TsResult<Stats16Le> {
         current_base_stats(self.national_dex, self.form_index)
+            .map(Stats16Le::from)
             .unwrap_or_default()
-            .into()
+            .try_into_ts()
     }
 }
 

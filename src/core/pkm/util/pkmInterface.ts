@@ -34,7 +34,7 @@ export interface AllPKMFields {
   canGigantamax?: boolean
   checksum?: number
   consoleRegion?: number
-  contest?: ContestStats
+  readonly contest?: ContestStats
   contestMemoryCount?: number
   country?: number
   // User-defined display color for this Pokemon in boxes (CSS color string)
@@ -70,7 +70,7 @@ export interface AllPKMFields {
   heightScalar?: number
   heldItemIndex: number
   homeTracker?: bigint
-  hyperTraining?: HyperTraining
+  readonly hyperTraining?: HyperTraining
   isAlpha?: boolean
   isCurrentHandler?: boolean
   isEgg?: boolean
@@ -79,7 +79,7 @@ export interface AllPKMFields {
   isNoble?: boolean
   isNsPokemon?: boolean
   isShadow?: boolean
-  ivs?: types.Stats
+  readonly ivs?: types.Stats
   language: Language
   level?: number
   markings?: Markings
@@ -123,8 +123,8 @@ export interface AllPKMFields {
   superTrainingDistFlags?: number
   superTrainingFlags?: number
   tags?: MonTag[]
-  teraTypeOriginal?: TeraType
-  teraTypeOverride?: TeraType
+  readonly teraTypeOriginal?: TeraType
+  readonly teraTypeOverride?: TeraType
   tmFlagsLzaBase?: Uint8Array
   tmFlagsLzaDlc?: Uint8Array
   tmMovesLza?: Move[]

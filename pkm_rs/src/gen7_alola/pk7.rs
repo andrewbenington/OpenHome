@@ -62,6 +62,7 @@ pub struct Pk7 {
     pub gender: Gender,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub evs: Stats8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub contest: ContestStats,
     pub resort_event_status: u8,
     pub pokerus: Pokerus,
@@ -106,6 +107,7 @@ pub struct Pk7 {
     pub ball: Ball,
     pub met_level: u8,
     pub trainer_gender: BinaryGender,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub hyper_training: HyperTraining,
     pub game_of_origin: OriginGame,
     pub country: u8,
@@ -122,6 +124,7 @@ pub struct Pk7 {
     #[cfg_attr(feature = "randomize", randomize(skip))]
     pub current_hp: u16,
     #[cfg_attr(feature = "randomize", randomize(skip))]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub stats: Stats16Le,
 }
 
@@ -424,7 +427,7 @@ impl Pk7 {
     }
 
     #[wasm_bindgen(js_name = fromDecryptedBytes)]
-    pub fn from_bytes_js(bytes: Box<[u8]>) -> core::result::Result<Self, JsValue> {
+    pub fn from_bytes_wasm(bytes: Box<[u8]>) -> core::result::Result<Self, JsValue> {
         Self::from_bytes(&bytes).map_err(JsValue::from)
     }
 
@@ -531,33 +534,23 @@ impl Pk7 {
     }
 
     #[wasm_bindgen(getter = nationalDex)]
-    pub fn national_dex_js(&self) -> u16 {
+    pub fn national_dex_wasm(&self) -> u16 {
         self.species_and_form.0.get_ndex() as u16
     }
 
     #[wasm_bindgen(getter = formIndex)]
-    pub fn form_index_js(&self) -> u16 {
+    pub fn form_index_wasm(&self) -> u16 {
         self.species_and_form.0.get_form_index()
     }
 
     #[wasm_bindgen(getter = evs)]
-    pub fn evs_js(&self) -> Stats16Le {
-        self.evs.into()
-    }
-
-    #[wasm_bindgen(setter = evs)]
-    pub fn set_evs_js(&mut self, v: Stats16Le) {
-        self.evs = v.to_stats8_truncated()
+    pub fn evs_wasm(&self) -> TsResult<Stats16Le> {
+        Stats16Le::from(self.evs).try_into_ts()
     }
 
     #[wasm_bindgen(getter = ivs)]
-    pub fn ivs_js(&self) -> Stats16Le {
-        self.ivs.into()
-    }
-
-    #[wasm_bindgen(setter = ivs)]
-    pub fn set_ivs_js(&mut self, v: Stats16Le) {
-        self.ivs = v.to_ivs_capped()
+    pub fn ivs_wasm(&self) -> TsResult<Stats16Le> {
+        Stats16Le::from(self.ivs).try_into_ts()
     }
 
     #[wasm_bindgen(js_name = toOhpkm)]
@@ -571,22 +564,22 @@ impl Pk7 {
     }
 
     #[wasm_bindgen(js_name = calculateChecksum)]
-    pub fn calculate_checksum_js(&self) -> u16 {
+    pub fn calculate_checksum_wasm(&self) -> u16 {
         self.calculate_checksum()
     }
 
     #[wasm_bindgen(js_name = calculateLevel)]
-    pub fn calculate_level_js(&self) -> u8 {
+    pub fn calculate_level_wasm(&self) -> u8 {
         self.calculate_level()
     }
 
     #[wasm_bindgen(js_name = calculateStats)]
-    pub fn calculate_stats_js(&self) -> Stats16Le {
-        self.calculate_stats()
+    pub fn calculate_stats_wasm(&self) -> TsResult<Stats16Le> {
+        self.calculate_stats().try_into_ts()
     }
 
     #[wasm_bindgen(js_name = recalculateStats)]
-    pub fn recalculate_stats_js(&mut self) {
+    pub fn recalculate_stats_wasm(&mut self) {
         self.recalculate_stats()
     }
 
@@ -608,6 +601,16 @@ impl Pk7 {
     #[wasm_bindgen(getter = handlerMemory)]
     pub fn handler_memory_wasm(&self) -> TsResult<TrainerMemory> {
         self.handler_memory.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = contest)]
+    pub fn contest_stats_wasm(&self) -> TsResult<ContestStats> {
+        self.contest.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = hyperTraining)]
+    pub fn hyper_training_wasm(&self) -> TsResult<HyperTraining> {
+        self.hyper_training.try_into_ts()
     }
 }
 

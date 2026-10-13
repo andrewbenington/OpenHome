@@ -2,14 +2,12 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { ModernRibbons } from '@openhome-core/resources'
 import { movesFromSvTmFlags } from '@openhome-core/resources/moves/flags'
 import { Errorable, Option, R } from '@openhome-core/util/functional'
-import { FourMoves, PKMDate, Stats } from '@openhome-core/util/types'
+import { FourMoves, PKMDate } from '@openhome-core/util/types'
 import {
   AbilityIndex,
   BinaryGender,
-  ContestStats,
   ConvertStrategies,
   ConvertStrategy,
-  HyperTraining,
   Item,
   Language,
   MetadataSummaryLookup,
@@ -180,15 +178,9 @@ export default class PK9 {
   get evs() {
     return this.inner.evs
   }
-  set evs(value: Stats) {
-    this.inner.evs = value
-  }
 
   get contest() {
     return this.inner.contest
-  }
-  set contest(value: ContestStats) {
-    this.inner.contest = value
   }
 
   get contestMemoryCount() {
@@ -294,9 +286,6 @@ export default class PK9 {
   get ivs() {
     return this.inner.ivs
   }
-  set ivs(value: Stats) {
-    this.inner.ivs = value
-  }
 
   get isEgg() {
     return this.inner.is_egg
@@ -314,9 +303,6 @@ export default class PK9 {
 
   get teraTypeOriginal() {
     return this.inner.teraTypeOriginal
-  }
-  set teraTypeOriginal(value: TeraType) {
-    this.inner.teraTypeOriginal = value
   }
 
   get teraTypeOverride() {
@@ -430,10 +416,7 @@ export default class PK9 {
   }
 
   get hyperTraining() {
-    return this.inner.hyper_training
-  }
-  set hyperTraining(value: HyperTraining) {
-    this.inner.hyper_training = value
+    return this.inner.hyperTraining
   }
 
   get gameOfOrigin() {
@@ -527,9 +510,9 @@ export default class PK9 {
     return this.inner.calculateStats()
   }
 
-  // stored stats
+  // wasm recalculates stats anyways
   get stats() {
-    return this.inner.stats
+    return this.getStats()
   }
 
   get abilityName() {

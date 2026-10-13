@@ -25,6 +25,7 @@ use pkm_rs_types::{
 use pkm_rs_types::{Gender, PokeDate, TrainerMemory};
 use serde::Serialize;
 
+use tsify::Ts;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -68,6 +69,7 @@ pub struct Pk9 {
     pub gender: Gender,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub evs: Stats8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub contest: ContestStats,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ribbons: ModernRibbonSet<14, MAX_RIBBON_SV>,
@@ -120,12 +122,14 @@ pub struct Pk9 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub tm_flags_base_game: FlagSet<TM_FLAG_BYTE_LENGTH_BASE>,
     pub home_tracker: Option<u64>,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub hyper_training: HyperTraining,
     #[cfg_attr(feature = "randomize", randomize(skip))]
     pub stat_level: u8,
     #[cfg_attr(feature = "randomize", randomize(skip))]
     pub current_hp: u16,
     #[cfg_attr(feature = "randomize", randomize(skip))]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub stats: Stats16Le,
 }
 
@@ -543,43 +547,30 @@ impl Pk9 {
     }
 
     #[wasm_bindgen(getter = evs)]
-    pub fn evs_wasm(&self) -> Stats16Le {
-        self.evs.into()
-    }
-
-    #[wasm_bindgen(setter = evs)]
-    pub fn set_evs_wasm(&mut self, v: Stats16Le) {
-        self.evs = v.to_stats8_truncated()
+    pub fn evs_wasm(&self) -> TsResult<Stats16Le> {
+        Stats16Le::from(self.evs).try_into_ts()
     }
 
     #[wasm_bindgen(getter = ivs)]
-    pub fn ivs_wasm(&self) -> Stats16Le {
-        self.ivs.into()
-    }
-
-    #[wasm_bindgen(setter = ivs)]
-    pub fn set_ivs_wasm(&mut self, v: Stats16Le) {
-        self.ivs = v.to_ivs_capped()
+    pub fn ivs_wasm(&self) -> TsResult<Stats16Le> {
+        Stats16Le::from(self.ivs).try_into_ts()
     }
 
     #[wasm_bindgen(getter = teraTypeOriginal)]
-    pub fn tera_type_original_wasm(&self) -> TeraType {
-        self.tera_type_original
-    }
-
-    #[wasm_bindgen(setter = teraTypeOriginal)]
-    pub fn set_tera_type_original_wasm(&mut self, v: TeraType) {
-        self.tera_type_original = v
+    pub fn tera_type_original_wasm(&self) -> TsResult<TeraType> {
+        self.tera_type_original.try_into_ts()
     }
 
     #[wasm_bindgen(getter = teraTypeOverride)]
-    pub fn tera_type_override_wasm(&self) -> Option<TeraType> {
-        self.tera_type_override
+    pub fn tera_type_override_wasm(&self) -> JsResult<Option<Ts<TeraType>>> {
+        self.tera_type_override.map(|v| v.try_into_ts()).transpose()
     }
 
     #[wasm_bindgen(setter = teraTypeOverride)]
-    pub fn set_tera_type_override_wasm(&mut self, v: Option<TeraType>) {
-        self.tera_type_override = v
+    pub fn set_tera_type_override_wasm(&mut self, v: Option<Ts<TeraType>>) -> JsResult<()> {
+        self.tera_type_override = v.map(|v| v.to_rust()).transpose()?;
+
+        Ok(())
     }
 
     #[wasm_bindgen(getter = obedienceLevel)]
@@ -623,8 +614,8 @@ impl Pk9 {
     }
 
     #[wasm_bindgen(js_name = calculateStats)]
-    pub fn calculate_stats_wasm(&self) -> Stats16Le {
-        self.calculate_stats()
+    pub fn calculate_stats_wasm(&self) -> TsResult<Stats16Le> {
+        self.calculate_stats().try_into_ts()
     }
 
     #[wasm_bindgen(js_name = recalculateStats)]
@@ -650,6 +641,16 @@ impl Pk9 {
     #[wasm_bindgen(getter = handlerMemory)]
     pub fn handler_memory_wasm(&self) -> TsResult<TrainerMemory> {
         self.handler_memory.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = contest)]
+    pub fn contest_stats_wasm(&self) -> TsResult<ContestStats> {
+        self.contest.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = hyperTraining)]
+    pub fn hyper_training_wasm(&self) -> TsResult<HyperTraining> {
+        self.hyper_training.try_into_ts()
     }
 }
 

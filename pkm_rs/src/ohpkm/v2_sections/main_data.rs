@@ -66,6 +66,7 @@ pub struct MainDataV2 {
     pub gender: Gender,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub evs: Stats8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub contest: ContestStats,
     pub pokerus: Pokerus,
     pub contest_memory_count: u8,
@@ -117,6 +118,7 @@ pub struct MainDataV2 {
     pub egg_location_index: Option<u16>,
     pub met_location_index: u16,
     pub met_level: u8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub hyper_training: HyperTraining,
     pub trainer_gender: BinaryGender,
     pub obedience_level: u8,
@@ -430,6 +432,16 @@ impl MainDataV2 {
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
 impl MainDataV2 {
+    #[wasm_bindgen(getter)]
+    pub fn contest_stats_wasm(&self) -> TsResult<ContestStats> {
+        self.contest.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = hyperTraining)]
+    pub fn hyper_training_wasm(&self) -> TsResult<HyperTraining> {
+        self.hyper_training.try_into_ts()
+    }
+
     #[wasm_bindgen(getter)]
     pub fn markings_wasm(&self) -> TsResult<MarkingsSixShapesColors> {
         self.markings.try_into_ts()

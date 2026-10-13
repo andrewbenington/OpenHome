@@ -5,7 +5,7 @@ use crate::location::{Location, MetData};
 use crate::ohpkm::OhpkmV2;
 
 use pkm_rs_resources::lookup;
-use pkm_rs_types::Ivs;
+use pkm_rs_types::{Ivs, TryIntoTs, TsResult};
 
 #[cfg(feature = "wasm")]
 use crate::convert_strategy::personality_value::PidGenerationParametersJs;
@@ -174,8 +174,8 @@ impl PkmConverter {
     }
 
     #[wasm_bindgen(js_name = "ivs")]
-    pub fn ivs_wasm(&self, ohpkm: &OhpkmV2) -> Stats16Le {
-        self.ivs(ohpkm).into()
+    pub fn ivs_wasm(&self, ohpkm: &OhpkmV2) -> TsResult<Stats16Le> {
+        Stats16Le::from(self.ivs(ohpkm)).try_into_ts()
     }
 
     #[wasm_bindgen(js_name = "personalityValue")]
