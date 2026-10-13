@@ -32,6 +32,7 @@ const NEUROFORCE: u16 = 233;
 pub type Pk7AbilityIndex = AbilityIndexBounded<NEUROFORCE>;
 
 #[derive(Debug, Clone, Copy, Default)]
+#[cfg_attr(feature = "wasm", derive(tsify::Tsify))]
 pub struct Pk7SpeciesAndForm(SpeciesForm);
 
 impl Pk7SpeciesAndForm {

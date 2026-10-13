@@ -1,17 +1,13 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { ModernRibbons } from '@openhome-core/resources'
 import { Errorable, R } from '@openhome-core/util/functional'
-import { FourMoves, PKMDate, Stats } from '@openhome-core/util/types'
+import { FourMoves, PKMDate } from '@openhome-core/util/types'
 import {
   AbilityIndex,
   BinaryGender,
-  ContestStats,
   ConvertStrategies,
   ConvertStrategy,
-  Geolocations,
-  HyperTraining,
   Item,
-  MarkingsSixShapesColors,
   MetadataSummaryLookup,
   NatureIndex,
   OriginGame,
@@ -19,7 +15,6 @@ import {
   PokeDate,
   Pokerus,
   SpeciesLookup,
-  TrainerMemory,
 } from '@pkm-rs/pkg'
 import { PkmConstructorOptions } from './PKM'
 import { modernStatCalc } from './util'
@@ -140,9 +135,6 @@ export default class PK7 {
   get markings() {
     return this.inner.markings
   }
-  set markings(value: MarkingsSixShapesColors) {
-    this.inner.markings = value
-  }
 
   get personalityValue() {
     return this.inner.personality_value
@@ -179,15 +171,9 @@ export default class PK7 {
   get evs() {
     return this.inner.evs
   }
-  set evs(value: Stats) {
-    this.inner.evs = value
-  }
 
   get contest() {
     return this.inner.contest
-  }
-  set contest(value: ContestStats) {
-    this.inner.contest = value
   }
 
   get resortEventStatus() {
@@ -314,9 +300,6 @@ export default class PK7 {
   get ivs() {
     return this.inner.ivs
   }
-  set ivs(value: Stats) {
-    this.inner.ivs = value
-  }
 
   get isEgg() {
     return this.inner.is_egg
@@ -355,9 +338,6 @@ export default class PK7 {
 
   get geolocations() {
     return this.inner.geolocations
-  }
-  set geolocations(value: Geolocations) {
-    this.inner.geolocations = value
   }
 
   get handlerFriendship() {
@@ -457,10 +437,7 @@ export default class PK7 {
   }
 
   get hyperTraining() {
-    return this.inner.hyper_training
-  }
-  set hyperTraining(value: HyperTraining) {
-    this.inner.hyper_training = value
+    return this.inner.hyperTraining
   }
 
   get gameOfOrigin() {
@@ -524,17 +501,11 @@ export default class PK7 {
   }
 
   get handlerMemory() {
-    return this.inner.handler_memory
-  }
-  set handlerMemory(value: TrainerMemory) {
-    this.inner.handler_memory = value
+    return this.inner.handlerMemory
   }
 
   get trainerMemory() {
-    return this.inner.trainer_memory
-  }
-  set trainerMemory(value: TrainerMemory) {
-    this.inner.trainer_memory = value
+    return this.inner.trainerMemory
   }
 
   get trainerGender() {

@@ -314,7 +314,6 @@ impl Stats for Ivs {
 
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[cfg_attr(feature = "wasm", derive(Tsify))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Default, PartialEq, Eq, Clone, Copy, Serialize, Deserialize, Stats)]
 pub struct Stats16Le {
     pub hp: u16,
@@ -440,7 +439,6 @@ fn u16_le_slice_to_u8<const N: usize>(slice: [u16; N]) -> Vec<u8> {
 }
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy, PartialEq, Eq)]
 pub struct HyperTraining {
@@ -514,7 +512,6 @@ impl IntoIterator for HyperTraining {
 }
 
 #[cfg_attr(feature = "wasm", derive(Tsify))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
 pub struct StatsPreSplit {
@@ -821,7 +818,6 @@ const fn dv_to_iv(dv: u16) -> u8 {
 }
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct ContestStats {
