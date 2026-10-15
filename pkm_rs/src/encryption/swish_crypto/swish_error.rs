@@ -5,7 +5,6 @@ use crate::encryption::swish_crypto::{BlockType, ScalarType};
 use crate::result::Error;
 
 #[cfg_attr(feature = "wasm", derive(tsify::Tsify, serde::Serialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
 #[derive(Debug, Error, Clone)]
 pub enum SwishError {
     #[error("swish crypto error: {0}")]
@@ -37,7 +36,6 @@ impl SwishError {
 // Missing Block
 
 #[cfg_attr(feature = "wasm", derive(tsify::Tsify, serde::Serialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
 #[derive(Debug, Error, Clone)]
 #[error("block with key {block_key_display} not found")]
 pub struct MissingBlock {
@@ -53,7 +51,6 @@ impl MissingBlock {
 // Wrong Block Type
 
 #[cfg_attr(feature = "wasm", derive(tsify::Tsify, serde::Serialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
 #[derive(Debug, Error, Clone, Copy)]
 #[error("expected SwishCrypto block of type {expected}, received {actual} (block key {block_key})")]
 pub struct WrongType {
@@ -71,7 +68,6 @@ impl From<WrongType> for Error {
 // Invalid Type ID
 
 #[cfg_attr(feature = "wasm", derive(tsify::Tsify, serde::Serialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
 #[derive(Debug, Error, Clone, Copy)]
 #[error("SwishCrypto block has invalid type id: {0}")]
 pub struct InvalidTypeId(pub u8);
@@ -85,7 +81,6 @@ impl From<InvalidTypeId> for Error {
 // Expected Block Type
 
 #[cfg_attr(feature = "wasm", derive(tsify::Tsify, serde::Serialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
 #[derive(Debug, Clone, Copy, strum::Display)]
 pub enum ExpectedBlockType {
     Object,

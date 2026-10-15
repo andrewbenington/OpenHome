@@ -16,23 +16,23 @@ use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
-    AbilityNumber, BinaryGender, ContestStats, Generation, NationalDex, Pokerus, Stats8, TryIntoTs,
-    TsResult,
+    AbilityNumber, BinaryGender, ContestStats, Generation, NationalDex, Pokerus, Stats8,
 };
 use pkm_rs_types::{Gender, OriginGame, PokeDate, TrainerMemory};
 use pkm_rs_types::{HyperTraining, MarkingsSixShapesColors};
 use pkm_rs_types::{Ivs, Language};
-#[cfg(feature = "randomize")]
-use rand::RngExt;
 use serde::Serialize;
 use std::num::NonZeroU64;
 
 #[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+#[cfg(feature = "randomize")]
+use rand::RngExt;
+#[cfg(feature = "randomize")]
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-#[cfg(feature = "randomize")]
-use pkm_rs_types::randomize::Randomize;
-
+#[cfg(feature = "wasm")]
+use pkm_rs_types::{TryIntoTs, TsResult};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 

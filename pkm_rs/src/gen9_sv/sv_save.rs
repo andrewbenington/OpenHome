@@ -1,6 +1,7 @@
 use super::save_blocks::{BoxData, MyStatusFields, SvBlocks};
 use super::{BOX_COLS, BOX_ROWS, BoxName, MAX_BOX_COUNT, Pk9, Pk9Buffer};
 use crate::checksum::RefreshChecksum;
+use crate::convert_strategy::ConvertStrategy;
 use crate::encryption::swish_crypto::{self, NumericBlock, SwishBlocks};
 use crate::gen9_sv::save_blocks::SvBlockKey;
 use crate::gen9_sv::{BoxIndex, BoxSlot};
@@ -8,10 +9,11 @@ use crate::result::{Error, Result, StdResult};
 use crate::traits::PkmBytes;
 
 #[cfg(feature = "wasm")]
-use pkm_rs_types::BoundViolated;
-use pkm_rs_types::OriginGame;
 use pkm_rs_types::strings::SizedUtf16String;
-use pkm_rs_types::{BinaryGender, Language};
+use pkm_rs_types::{BinaryGender, Language, OriginGame};
+#[cfg(feature = "wasm")]
+use pkm_rs_types::{BoundViolated, JsResult, TryIntoTs, TsResult};
+use tsify::Ts;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -155,10 +157,8 @@ impl ScarletVioletSave {
 
     #[cfg(feature = "wasm")]
     pub fn prepare_bytes_for_saving(&self) -> Vec<u8> {
-        swish_crypto::encrypt_blocks(
-            self.blocks.to_blocks().into_values().collect(),
-            self.byte_length,
-        )
+        let mut blocks: Vec<_> = self.blocks.to_blocks().into_values().collect();
+        swish_crypto::encrypt_blocks(&mut blocks, self.byte_length)
     }
 
     fn convert_ohpkm(
@@ -262,9 +262,9 @@ impl ScarletVioletSave {
     pub fn convert_ohpkm_wasm(
         &self,
         ohpkm: crate::ohpkm::OhpkmV2,
-        strategy: crate::convert_strategy::ConvertStrategy,
-    ) -> Result<Pk9> {
-        self.convert_ohpkm(ohpkm, strategy)
+        strategy: Ts<ConvertStrategy>,
+    ) -> JsResult<Pk9> {
+        Ok(self.convert_ohpkm(ohpkm, strategy.to_rust()?)?)
     }
 
     #[wasm_bindgen(js_name = fromBytes)]
@@ -395,8 +395,8 @@ impl ScarletVioletSave {
     }
 
     #[wasm_bindgen(getter = saveVersion)]
-    pub fn save_version_wasm(&self) -> SvVersion {
-        SvVersion::detect(&self.blocks)
+    pub fn save_version_wasm(&self) -> TsResult<SvVersion> {
+        SvVersion::detect(&self.blocks).try_into_ts()
     }
 }
 
@@ -429,7 +429,6 @@ fn add_u16_hex(
 }
 
 #[cfg_attr(feature = "wasm", derive(Tsify, serde::Serialize, serde::Deserialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Clone, Copy, strum::Display)]
 pub enum SvVersion {
     #[strum(to_string = "Base Game")]
@@ -472,7 +471,9 @@ mod tests {
     fn blocks_identical_after_serde() -> std::result::Result<(), Box<dyn std::error::Error>> {
         let save_path = Path::new("gen9-sv").join("violet");
         let save_bytes = tests::save_bytes_from_file(&save_path)?;
-        let block_vec = swish_crypto::decrypt_blocks(save_bytes.clone().into_boxed_slice())?;
+
+        let mut block_bytes = save_bytes.clone();
+        let block_vec = swish_crypto::decrypt_blocks(&mut block_bytes)?;
 
         let mut original_blocks_by_key: HashMap<u32, swish_crypto::Block> = HashMap::new();
         for block in &block_vec {
@@ -488,7 +489,8 @@ mod tests {
 
         let after_serialized_bytes = save.prepare_bytes_for_saving();
 
-        let block_vec = swish_crypto::decrypt_blocks(after_serialized_bytes.into_boxed_slice())?;
+        let block_vec =
+            swish_crypto::decrypt_blocks(&mut after_serialized_bytes.into_boxed_slice())?;
         for block in &block_vec {
             let key = block.key();
             let Some(original_block) = original_blocks_by_key.get(&key) else {

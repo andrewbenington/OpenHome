@@ -36,7 +36,7 @@ use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, FlagSet, Gender, Geolocations, HyperTraining, Ivs,
     Language, MarkingsSixShapesColors, OriginGame, PkmType, PokeDate, Pokerus, ShinyLeaves, Stats8,
-    Stats16Le, StatsPreSplit, TeraType, TrainerData, TrainerMemory, TryIntoTs,
+    Stats16Le, StatsPreSplit, TeraType, TrainerData, TrainerMemory,
 };
 use pkm_rs_types::{Dvs, NationalDex};
 use serde::Serialize;
@@ -44,10 +44,10 @@ use strum_macros::Display;
 
 #[cfg(feature = "wasm")]
 use pkm_rs_resources::abilities::AbilityIndexWasm;
-#[cfg(feature = "wasm")]
-use pkm_rs_types::JsResult;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
+#[cfg(feature = "wasm")]
+use pkm_rs_types::{JsResult, TryIntoTs};
 #[cfg(feature = "wasm")]
 use tsify::Ts;
 #[cfg(feature = "wasm")]
