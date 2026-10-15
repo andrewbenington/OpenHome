@@ -67,9 +67,12 @@ fn write_blocks(blocks: &mut [Block], size: usize) -> Vec<u8> {
     buffer
 }
 
+// wasm-bindgen will copy bytes to and from the JS ArrayBuffer if this argument is a &mut [u8],
+// which as of now causes certain JS tests to fail as the source buffer is modified. if revisiting
+// this in the future for efficiency, be wary of potential side effects of using a &mmut [u8] from JavaScript.
 #[wasm_bindgen(js_name = decryptBlocks)]
-pub fn decrypt_blocks_wasm(data: &mut [u8]) -> JsResult<Vec<Ts<Block>>> {
-    decrypt_blocks(data)?
+pub fn decrypt_blocks_wasm(mut data: Box<[u8]>) -> JsResult<Vec<Ts<Block>>> {
+    decrypt_blocks(&mut data)?
         .into_iter()
         .try_fold(Vec::new(), |mut blocks, block| {
             block.try_into_ts().map(|ts_block| {
