@@ -14,6 +14,7 @@ use crate::traits::PkmBytes;
 
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{BinaryGender, Language};
+
 #[cfg(feature = "wasm")]
 use pkm_rs_types::{BoundViolated, NationalDex, OriginGame, TryIntoTs, TsResult};
 #[cfg(feature = "wasm")]
