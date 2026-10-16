@@ -91,12 +91,18 @@ impl<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize> PersonalTable<INFO, ENTRY_
         Self(bytes, PhantomData)
     }
 
-    pub fn get_personal_info_by_game_index(&self, game_index: u16) -> INFO {
+    pub fn get_personal_info_by_game_index(&self, game_index: u16) -> Option<INFO> {
         let offset = (game_index as usize) * ENTRY_BYTE_LEN;
-        INFO::from_pkl_bytes(&self.0[offset..offset + ENTRY_BYTE_LEN])
+        if offset < self.0.len() {
+            Some(INFO::from_pkl_bytes(
+                &self.0[offset..offset + ENTRY_BYTE_LEN],
+            ))
+        } else {
+            None
+        }
     }
 
-    pub fn get_base_form_personal_info(&self, national_dex: u16) -> INFO {
+    pub fn get_base_form_personal_info(&self, national_dex: u16) -> Option<INFO> {
         self.get_personal_info_by_game_index(national_dex)
     }
 
@@ -106,12 +112,12 @@ impl<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize> PersonalTable<INFO, ENTRY_
         }
 
         self.get_base_form_personal_info(national_dex)
-            .game_index_for_form(national_dex, form_index)
+            .and_then(|info| info.game_index_for_form(national_dex, form_index))
     }
 
     pub fn get_personal_info(&self, national_dex: u16, form_index: u16) -> Option<INFO> {
         self.get_game_index(national_dex, form_index)
-            .map(|game_index| self.get_personal_info_by_game_index(game_index))
+            .and_then(|game_index| self.get_personal_info_by_game_index(game_index))
     }
 
     fn get_types(&self, national_dex: u16, form_index: u16) -> Option<(PkmType, Option<PkmType>)> {
@@ -185,7 +191,7 @@ impl<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize> GameMetadata<INFO, ENTRY_B
     }
 
     #[cfg(test)]
-    pub fn get_personal_info_by_game_index(&self, game_index: u16) -> INFO {
+    pub fn get_personal_info_by_game_index(&self, game_index: u16) -> Option<INFO> {
         self.personal.get_personal_info_by_game_index(game_index)
     }
 }
@@ -216,9 +222,11 @@ impl<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize> MetadataTable
     fn form_is_present(&self, national_dex: u16, form_index: u16) -> bool {
         self.personal
             .get_personal_info(national_dex, form_index)
-            .unwrap_or(self.personal.get_base_form_personal_info(national_dex))
-            .form_is_present_in_game(national_dex, form_index)
-            && self.get_game_index(national_dex, form_index).is_some()
+            .or(self.personal.get_base_form_personal_info(national_dex))
+            .is_some_and(|info| {
+                info.form_is_present_in_game(national_dex, form_index)
+                    && self.get_game_index(national_dex, form_index).is_some()
+            })
     }
 }
 

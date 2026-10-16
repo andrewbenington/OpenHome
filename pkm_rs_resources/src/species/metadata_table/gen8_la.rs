@@ -171,35 +171,4 @@ mod tests {
 
         Ok(())
     }
-
-    #[test]
-    fn all_mons() {
-        for national_dex in NationalDex::all() {
-            let metadata = crate::species::species_lookup(national_dex as u16).unwrap();
-            for form in metadata.forms {
-                if METADATA_TABLE_LA.form_is_present(national_dex as u16, form.form_index) {
-                    let index =
-                        METADATA_TABLE_LA.get_game_index(national_dex as u16, form.form_index);
-                    println!("{} - {index:?}", form.form_name);
-                }
-            }
-        }
-    }
-
-    #[test]
-    fn hisui_typhlosion() {
-        dbg!(
-            METADATA_TABLE_LA
-                .get_personal_info(NationalDex::Typhlosion as u16, 0)
-                .unwrap()
-                .form_count()
-        );
-        // dbg!(METADATA_TABLE_LA.get_personal_info_by_game_index(966));
-        let maybe_johto_typh = METADATA_TABLE_LA.get_personal_info_by_game_index(157);
-        dbg!(maybe_johto_typh);
-        dbg!(maybe_johto_typh.form_count());
-        dbg!(maybe_johto_typh.forms_offset());
-        dbg!(maybe_johto_typh.stats());
-        dbg!(maybe_johto_typh.game_index_for_form(NationalDex::Typhlosion as u16, 1));
-    }
 }
