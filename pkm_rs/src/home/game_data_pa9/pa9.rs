@@ -14,7 +14,11 @@ use serde::Serialize;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "PkhPa9DataWasm"))]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct HomePa9Data {
     pub scale: u8,

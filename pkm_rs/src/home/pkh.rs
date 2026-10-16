@@ -6,6 +6,7 @@ use super::game_data_pb8::HomePb8Data;
 use super::game_data_pk8::HomePk8Data;
 use super::game_data_pk9::HomePk9Data;
 use crate::result::Result;
+use crate::traits::IsShiny;
 use crate::traits::ModernEvs;
 
 use pkm_rs_types::{Stats8, read_u16_le, read_u32_le, read_u64_le};
@@ -14,7 +15,11 @@ use serde::Serialize;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "PkhWasm"))]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct Pkh {
     // header
@@ -166,5 +171,15 @@ impl Pkh {
 impl ModernEvs for Pkh {
     fn get_evs(&self) -> Stats8 {
         self.core_data.evs
+    }
+}
+
+impl IsShiny for Pkh {
+    fn is_shiny(&self) -> bool {
+        self.core_data.is_shiny()
+    }
+
+    fn is_square_shiny(&self) -> bool {
+        self.core_data.is_square_shiny()
     }
 }
