@@ -8,7 +8,7 @@ const LA_ENTRY_SIZE: usize = 0xB0;
 type GameMetadataLa = GameMetadata<PersonalInfoLa, LA_ENTRY_SIZE>;
 
 pub static METADATA_TABLE_LA: GameMetadataLa =
-    GameMetadataLa::from_binary(LA_PERSONAL_FILE, LA_LEVELUP_PKL);
+    GameMetadataLa::from_binary(LA_PERSONAL_FILE, LA_LEVELUP_PKL, "Legends Arceus");
 
 const LA_MOVE_MASTERY: LevelupLearnsetFileReader =
     LevelupLearnsetFileReader::from_pkl(LA_MASTERY_PKL);
@@ -20,6 +20,8 @@ pub fn get_levelup_mastery(national_dex: u16, form_index: u16) -> Option<Levelup
             .get_game_index(national_dex, form_index)?,
     )
 }
+
+const MAX_NATIONAL_DEX: NationalDex = NationalDex::Enamorus;
 
 #[derive(Debug, Clone, Copy)]
 pub struct PersonalInfoLa([u8; LA_ENTRY_SIZE]);
@@ -44,18 +46,13 @@ impl PersonalInfoLa {
     }
 
     pub fn game_index_for_form(&self, national_dex: u16, form_index: u16) -> Option<u16> {
-        if !self.is_present_in_game() {
-            return None;
-        }
-        if form_index == 0 {
-            return Some(national_dex);
-        }
-        if let Some(forms_offset) = self.forms_offset()
-            && form_index < self.form_count() as u16
-        {
-            Some(forms_offset + form_index - 1)
-        } else {
+        if national_dex > MAX_NATIONAL_DEX as u16 {
             None
+        } else if form_index == 0 {
+            Some(national_dex)
+        } else {
+            self.forms_offset()
+                .map(|forms_offset| forms_offset + form_index - 1)
         }
     }
 
@@ -90,10 +87,22 @@ impl PersonalInfo for PersonalInfoLa {
     fn source_name(&self) -> &'static str {
         "Legends: Arceus"
     }
+
+    fn form_is_present_in_game(&self, national_dex: u16, form_index: u16) -> bool {
+        // I don't like having to go back and reference the whole table, but there is no other way. This is how PKHeX does it too. The table is full of dummy forms that are considered "in the game" just going off the is_present_in_game function
+        self.is_present_in_game()
+            && METADATA_TABLE_LA
+                .get_game_index(national_dex, form_index)
+                .is_some()
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    use pkm_rs_types::form;
+
+    use crate::species::metadata_table::MetadataTable;
+
     use super::*;
 
     #[test]
@@ -101,5 +110,96 @@ mod tests {
         let index = METADATA_TABLE_LA.get_game_index(NationalDex::Pichu as u16, 1);
 
         assert!(index.is_none());
+    }
+
+    type FormIndex = u16;
+
+    #[test]
+    fn supported_pokemon_are_present() -> Result<(), String> {
+        let forms: &'static [(NationalDex, FormIndex)] = &[
+            (NationalDex::Vulpix, form::VULPIX_ALOLA),
+            (NationalDex::Ninetales, form::NINETALES_ALOLA),
+            (NationalDex::Typhlosion, form::TYPHLOSION_HISUI),
+            (NationalDex::Qwilfish, form::QWILFISH_HISUI),
+            (NationalDex::Unown, form::UNOWN_EXCLAMATION),
+            (NationalDex::Unown, form::UNOWN_QUESTION),
+            (NationalDex::Arceus, form::ARCEUS_LEGEND),
+            (NationalDex::Samurott, form::SAMUROTT_HISUI),
+            (NationalDex::Lilligant, form::LILLIGANT_HISUI),
+            (NationalDex::Basculin, form::BASCULIN_WHITE_STRIPE),
+            (NationalDex::Zorua, form::ZORUA_HISUI),
+            (NationalDex::Zoroark, form::ZORUA_HISUI),
+            (NationalDex::Braviary, form::BRAVIARY_HISUI),
+            (NationalDex::Sliggoo, form::SLIGGOO_HISUI),
+            (NationalDex::Goodra, form::GOODRA_HISUI),
+            (NationalDex::Avalugg, form::AVALUGG_HISUI),
+            (NationalDex::Decidueye, form::DECIDUEYE_HISUI),
+            (NationalDex::Enamorus, form::ENAMORUS_INCARNATE),
+        ];
+
+        for (national_dex, form_index) in forms {
+            if !METADATA_TABLE_LA.form_is_present(*national_dex as u16, *form_index) {
+                let metadata = crate::species::metadata_lookup(*national_dex as u16, *form_index);
+                return Err(format!(
+                    "form '{}' should be present in Legends Arceus, but METADATA_TABLE_LA.form_is_present returned false",
+                    metadata.map_or("(unknown form)", |m| m.form_name)
+                ));
+            }
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn unsupported_pokemon_not_present() -> Result<(), String> {
+        let forms: &'static [(NationalDex, FormIndex)] = &[
+            (NationalDex::Ponyta, form::PONYTA_GALAR),
+            (NationalDex::Pichu, form::PICHU_SPIKY_EARED),
+            (NationalDex::Lopunny, form::LOPUNNY_MEGA),
+            (NationalDex::Clefable, form::CLEFABLE_MEGA),
+        ];
+
+        for (national_dex, form_index) in forms {
+            if METADATA_TABLE_LA.form_is_present(*national_dex as u16, *form_index) {
+                let metadata = crate::species::metadata_lookup(*national_dex as u16, *form_index);
+                return Err(format!(
+                    "form '{}' should not be present in Legends Arceus, but METADATA_TABLE_LA.form_is_present returned true",
+                    metadata.map_or("(unknown form)", |m| m.form_name)
+                ));
+            }
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn all_mons() {
+        for national_dex in NationalDex::all() {
+            let metadata = crate::species::species_lookup(national_dex as u16).unwrap();
+            for form in metadata.forms {
+                if METADATA_TABLE_LA.form_is_present(national_dex as u16, form.form_index) {
+                    let index =
+                        METADATA_TABLE_LA.get_game_index(national_dex as u16, form.form_index);
+                    println!("{} - {index:?}", form.form_name);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn hisui_typhlosion() {
+        dbg!(
+            METADATA_TABLE_LA
+                .get_personal_info(NationalDex::Typhlosion as u16, 0)
+                .unwrap()
+                .form_count()
+        );
+        // dbg!(METADATA_TABLE_LA.get_personal_info_by_game_index(966));
+        let maybe_johto_typh = METADATA_TABLE_LA.get_personal_info_by_game_index(157);
+        dbg!(maybe_johto_typh);
+        dbg!(maybe_johto_typh.form_count());
+        dbg!(maybe_johto_typh.forms_offset());
+        dbg!(maybe_johto_typh.stats());
+        dbg!(maybe_johto_typh.game_index_for_form(NationalDex::Typhlosion as u16, 1));
     }
 }
