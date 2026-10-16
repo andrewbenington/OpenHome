@@ -213,12 +213,13 @@ impl<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize> MetadataTable
         self.get_base_stats(national_dex, form_index)
     }
 
-    // fn form_is_present(&self, national_dex: u16, form_index: u16) -> bool {
-    //     self.personal
-    //         .get_personal_info(national_dex, form_index)
-    //         .unwrap_or(self.personal.get_base_form_personal_info(national_dex))
-    //         .form_is_present_in_game(national_dex, form_index)
-    // }
+    fn form_is_present(&self, national_dex: u16, form_index: u16) -> bool {
+        self.personal
+            .get_personal_info(national_dex, form_index)
+            .unwrap_or(self.personal.get_base_form_personal_info(national_dex))
+            .form_is_present_in_game(national_dex, form_index)
+            && self.get_game_index(national_dex, form_index).is_some()
+    }
 }
 
 trait MetadataTable: std::panic::RefUnwindSafe + std::panic::UnwindSafe {
