@@ -1126,4 +1126,8 @@ impl NationalDex {
     pub fn all() -> impl Iterator<Item = NationalDex> {
         enum_iterator::all()
     }
+
+    pub fn try_add(self, value: impl Into<u16>) -> Option<Self> {
+        (self as u16 + value.into()).try_into().ok()
+    }
 }

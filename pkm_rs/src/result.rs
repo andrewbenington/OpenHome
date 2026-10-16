@@ -325,6 +325,7 @@ impl Display for StringErrorSource {
 }
 
 pub type Result<T> = core::result::Result<T, Error>;
+pub type StdResult<T, E> = core::result::Result<T, E>;
 
 #[cfg(feature = "wasm")]
 impl From<Error> for JsValue {

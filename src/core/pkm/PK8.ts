@@ -41,6 +41,10 @@ export default class PK8 {
     }
   }
 
+  dispose() {
+    this.inner.free()
+  }
+
   static getFormat() {
     return 'PK8' as const
   }

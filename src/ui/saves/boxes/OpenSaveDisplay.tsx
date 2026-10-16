@@ -13,6 +13,8 @@ import AttributeRowExpand from '@openhome-ui/components/AttributeRowExpand'
 import { Item, OpenHomeCtxMenu, Submenu } from '@openhome-ui/components/context-menu'
 import PromptDialog from '@openhome-ui/components/dialog/PromptDialog'
 import Fallback from '@openhome-ui/components/Fallback'
+import OhoFlex from '@openhome-ui/components/OhoFlex'
+import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import SearchFields from '@openhome-ui/components/search/SearchFields'
 import PokemonSearchModal from '@openhome-ui/components/search/SearchModal'
 import useDisplayError from '@openhome-ui/hooks/displayError'
@@ -53,17 +55,27 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const [detailsModal, setDetailsModal] = useState(false)
   const { saveIndex } = props
   const { multiSelectState, toggleSelection, isSelected } = useMultiSelect()
+  const [selectedMonNotInBoxes, setSelectedMonNotInBoxes] = useState<PKMInterface>()
 
   const save = useMemo(() => allOpenSaves[saveIndex], [allOpenSaves, saveIndex])
   const displayError = useDisplayError()
 
-  const allSaveMons = save.getAllMons().map((mon) => [mon, save] as const)
+  const allSaveMons = useMemo(() => save.getAllMons().map((mon) => [mon, save] as const), [save])
   const { batchResults: saveOhpkms } = useOhpkmBatchIdLookup(
     allSaveMons
       .map(([mon]) => mon)
       .map(ohpkmStore.getPotentialOhpkmId)
       .filter(filterUndefined)
   )
+
+  // const allSaveMonPotentialIds = useMemo(() => {
+  //   const allMons = save.getAllMons()
+  //   const potentialIds = allMons.map(ohpkmStore.getPotentialOhpkmId).filter(filterUndefined)
+  //   allMons.forEach((mon) => mon.free?.())
+  //   return potentialIds
+  // }, [ohpkmStore.getPotentialOhpkmId, save])
+
+  // const { batchResults: saveOhpkms } = useOhpkmBatchIdLookup(allSaveMonPotentialIds)
 
   const TrackedDataRecovery = useTrackedDataRecovery()
 
@@ -84,6 +96,8 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   } = useBoxNavigator(save, save.currentPCBox, undefined)
 
   const selectedMon = useMemo(() => {
+    if (selectedMonNotInBoxes) return selectedMonNotInBoxes
+
     if (selectedIndex === undefined || selectedIndex >= save.boxSlotCount) {
       return undefined
     }
@@ -97,7 +111,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
     if (!lookupResult) return selectedSlot
 
     return R.dropError(lookupResult) ?? selectedSlot
-  }, [selectedIndex, save, ohpkmStore, saveOhpkms])
+  }, [selectedMonNotInBoxes, selectedIndex, save, ohpkmStore, saveOhpkms])
 
   const attemptImportMons = async (mons: PKMInterface[], location: MonLocation) => {
     const unsupportedMons = mons.filter((mon) => !monSupportedBySave(save, mon))
@@ -305,6 +319,29 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                 </AttributeRow>
               ))}
             </AttributeRowExpand>
+            <OhoFlex.RowCentered>
+              {save.getDisplayPkms().map(
+                ({ mon, description }) =>
+                  mon && (
+                    <AttributeRow label={description} key={description}>
+                      <button
+                        key={description}
+                        onClick={() => {
+                          setDetailsModal(false)
+                          setSelectedMonNotInBoxes(mon)
+                        }}
+                        className="mon-icon-button"
+                      >
+                        <PokemonIcon
+                          nationalDex={mon.nationalDex}
+                          formIndex={mon.formIndex}
+                          style={{ height: '1.75rem', width: '1.75rem' }}
+                        />
+                      </button>
+                    </AttributeRow>
+                  )
+              )}
+            </OhoFlex.RowCentered>
           </Dialog.Content>
         </Dialog.Root>
       </Flex>
@@ -342,7 +379,10 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
         <PokemonDetailsModal
           mon={selectedMon}
           key={`${save.currentPCBox}-${selectedMon?.encryptionConstant ?? selectedMon?.personalityValue ?? JSON.stringify(selectedMon?.dvs)}-${selectedMon?.nickname}`}
-          onClose={() => setSelectedIndex(undefined)}
+          onClose={() => {
+            setSelectedIndex(undefined)
+            setSelectedMonNotInBoxes(undefined)
+          }}
           navigateRight={navigateRight}
           navigateLeft={navigateLeft}
           boxIndicatorProps={
@@ -372,7 +412,7 @@ function SaveHeader({ save, setDetailsModal }: SaveHeaderProps) {
   const backend = useBackend()
 
   const currentBoxMonCount = save.getBoxMonCount(save.currentPCBox)
-  const totalMonCount = save.getAllMons().length
+  const totalMonCount = save.getPcMonCount()
 
   const contextElements = [
     Item.label('Details...').action(() => setDetailsModal(true)),

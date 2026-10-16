@@ -48,6 +48,8 @@ export function pokedexUpdatesFromSave(saveFile: SAV) {
         data,
       })
     }
+
+    mon.free?.()
   }
 
   return pokedexUpdates

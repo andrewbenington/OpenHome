@@ -15,15 +15,15 @@ use pkm_rs_types::randomize::Randomize;
 
 mod pk8;
 mod pk8_buffer;
-mod save;
 mod save_blocks;
+mod swsh_save;
 
 pub(crate) const PKM_DATA_SIZE: usize = 344;
 
 const MAX_BOX_COUNT: u8 = 32;
 const BOX_ROWS: u8 = 5;
 const BOX_COLS: u8 = 6;
-const BOX_SLOTS: u8 = BOX_ROWS * BOX_COLS;
+pub const BOX_SLOTS: u8 = BOX_ROWS * BOX_COLS;
 const BOX_NAME_LENGTH: usize = 34;
 const MAX_ABILITY_INDEX: u16 = 267; // As One (Calyrex Shadow Rider)
 const MAX_RIBBON_SWSH: usize = ModernRibbon::TowerMaster as usize;
