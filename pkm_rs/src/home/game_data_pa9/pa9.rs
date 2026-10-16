@@ -1,25 +1,35 @@
 use super::PkhPa9Buffer;
+#[cfg(feature = "wasm")]
+use crate::gen9_lza::PlusMoveFlags;
 use crate::gen9_lza::{LZA_PLUS_MOVES_0X94_BYTES, LZA_PLUS_MOVES_0XD6_BYTES};
 use crate::gen9_sv::Pk9AbilityIndex;
 use crate::result::{Error, Result};
 
-use pkm_rs_resources::abilities::AbilityIndexBounded;
+use pkm_rs_resources::abilities::{AbilityIndexBounded, AbilityIndexWasm};
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::MoveIndex;
 use pkm_rs_types::{AbilityNumber, FlagSet};
 use serde::Serialize;
 
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
+
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "PkhPa9DataWasm"))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct HomePa9Data {
     pub scale: u8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub moves: [MoveIndex; 4],
     pub is_alpha: bool,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub plus_moves_b: FlagSet<LZA_PLUS_MOVES_0X94_BYTES>,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub plus_moves_c: FlagSet<LZA_PLUS_MOVES_0XD6_BYTES>,
     pub ball: Ball,
     pub egg_location_index: u16,
     pub met_location_index: u16,
     pub obedience_level: u8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ability_index: Pk9AbilityIndex,
     pub ability_num: AbilityNumber,
     // PKHeX has not yet updated GameDataPA9 for MD, so DLC plus move flags are not yet included here.
@@ -53,5 +63,26 @@ impl HomePa9Data {
             super::HOME_PA9_DATA_SIZE => Self::from_buffer(&PkhPa9Buffer::new(bytes)),
             _ => Err(Error::buffer_size(super::HOME_PA9_DATA_SIZE, size)),
         }
+    }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_class = "PkhPa9DataWasm")]
+#[allow(clippy::missing_const_for_fn)]
+impl HomePa9Data {
+    #[wasm_bindgen(getter)]
+    pub fn move_indices(&self) -> Vec<u16> {
+        self.moves.into_iter().map(u16::from).collect()
+    }
+
+    #[wasm_bindgen(getter = plusFlagsLza)]
+    pub fn plus_flags_za_wasm(&self) -> PlusMoveFlags {
+        PlusMoveFlags::from_flag_sets(self.plus_moves_c, self.plus_moves_b)
+    }
+
+    #[wasm_bindgen(getter = abilityIndex)]
+    pub fn ability_index_wasm(&self) -> AbilityIndexWasm {
+        AbilityIndexWasm::try_from(self.ability_index.to_u16())
+            .expect("AbilityIndexWasm should accept any valid ability index")
     }
 }

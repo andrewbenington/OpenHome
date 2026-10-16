@@ -8,14 +8,14 @@ use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     BinaryGender, ContestStats, Gender, HyperTraining, Ivs, Language, MarkingsSixShapesColors,
-    OriginGame, PokeDate, Stats8, TrainerMemory,
+    OriginGame, PokeDate, Stats8, Stats16Le, TrainerMemory,
 };
 use serde::Serialize;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "PkhCoreData"))]
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "PkhCoreDataWasm"))]
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
 pub struct HomeCoreData {
     pub home_tracker: u64,
@@ -60,6 +60,7 @@ pub struct HomeCoreData {
     pub language: Language,
     pub form_argument: u32,
     pub affixed_ribbon: Option<ModernRibbon>,
+    pub trainer_name: SizedUtf16String<26>,
     pub trainer_friendship: u8,
     pub trainer_memory: TrainerMemory,
     pub egg_date: Option<PokeDate>,
@@ -68,7 +69,6 @@ pub struct HomeCoreData {
     pub trainer_gender: BinaryGender,
     pub hyper_training: HyperTraining,
     pub held_item_index: u16,
-    pub trainer_name: SizedUtf16String<26>,
 }
 
 impl HomeCoreData {
@@ -136,5 +136,39 @@ impl HomeCoreData {
             super::HOME_CORE_DATA_SIZE => Self::from_buffer(&PkhCoreBuffer::new(bytes)),
             _ => Err(Error::buffer_size(super::HOME_CORE_DATA_SIZE, size)),
         }
+    }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_class = "PkhCoreDataWasm")]
+#[allow(clippy::missing_const_for_fn)]
+impl HomeCoreData {
+    #[wasm_bindgen(getter = evs)]
+    pub fn evs_wasm(&self) -> Stats16Le {
+        self.evs.into()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn ribbons(&self) -> Vec<String> {
+        self.ribbons
+            .get_ribbons()
+            .iter()
+            .map(|ribbon| ribbon.to_string())
+            .collect()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn ribbon_bytes(&self) -> Vec<u8> {
+        self.ribbons.to_bytes().into_iter().collect()
+    }
+
+    #[wasm_bindgen(getter = ivs)]
+    pub fn ivs_wasm(&self) -> Stats16Le {
+        self.ivs.into()
+    }
+
+    #[wasm_bindgen(setter = ivs)]
+    pub fn set_ivs_wasm(&mut self, v: Stats16Le) {
+        self.ivs = v.to_ivs_capped()
     }
 }

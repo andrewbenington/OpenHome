@@ -2,27 +2,34 @@ use super::PkhPk8Buffer;
 use crate::gen8_swsh::Pk8AbilityIndex;
 use crate::result::{Error, Result};
 
-use pkm_rs_resources::abilities::AbilityIndexBounded;
+use pkm_rs_resources::abilities::{AbilityIndexBounded, AbilityIndexWasm};
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::{MoveIndex, MoveSlots};
 use pkm_rs_types::{AbilityNumber, FlagSet, Pokerus};
 use serde::Serialize;
 
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
+
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "PkhPk8DataWasm"))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct HomePk8Data {
     pub can_gigantamax: bool,
     pub sociability: u8,
     pub moves: MoveSlots,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub relearn_moves: [MoveIndex; 4],
     pub dynamax_level: u8,
     // poke job data goes here but is currently not read in OpenHome at all
     pub fullness: u8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub tr_flags_swsh: FlagSet<14>,
     pub palma: u32,
     pub ball: Ball,
     pub egg_location_index: u16,
     pub met_location_index: u16,
     pub pokerus: Pokerus,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ability_index: Pk8AbilityIndex,
     pub ability_num: AbilityNumber,
 }
@@ -63,5 +70,26 @@ impl HomePk8Data {
             super::HOME_PK8_DATA_SIZE => Self::from_buffer(&PkhPk8Buffer::new(bytes)),
             _ => Err(Error::buffer_size(super::HOME_PK8_DATA_SIZE, size)),
         }
+    }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_class = "PkhPk8DataWasm")]
+#[allow(clippy::missing_const_for_fn)]
+impl HomePk8Data {
+    #[wasm_bindgen(getter)]
+    pub fn relearn_move_indices(&self) -> Vec<u16> {
+        self.relearn_moves.into_iter().map(u16::from).collect()
+    }
+
+    #[wasm_bindgen(getter = trFlags)]
+    pub fn tr_flags_swsh_wasm(&self) -> Vec<u8> {
+        self.tr_flags_swsh.to_bytes().to_vec()
+    }
+
+    #[wasm_bindgen(getter = abilityIndex)]
+    pub fn ability_index_wasm(&self) -> AbilityIndexWasm {
+        AbilityIndexWasm::try_from(self.ability_index.to_u16())
+            .expect("AbilityIndexWasm should accept any valid ability index")
     }
 }

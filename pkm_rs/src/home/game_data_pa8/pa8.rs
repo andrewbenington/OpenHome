@@ -4,11 +4,18 @@ use crate::gen8_swsh::Pk8AbilityIndex;
 use crate::result::{Error, Result};
 
 use pkm_rs_resources::abilities::AbilityIndexBounded;
+use pkm_rs_resources::abilities::AbilityIndexWasm;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::{MoveIndex, MoveSlots};
+#[cfg(feature = "wasm")]
+use pkm_rs_types::Stats16Le;
 use pkm_rs_types::{AbilityNumber, FlagSet, Pokerus, Stats8};
 use serde::Serialize;
 
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
+
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "PkhPa8DataWasm"))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct HomePa8Data {
     pub is_alpha: bool,
@@ -16,16 +23,21 @@ pub struct HomePa8Data {
     pub alpha_move: Option<MoveIndex>,
     pub scale: u8,
     pub moves: MoveSlots,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub relearn_moves: [MoveIndex; 4],
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub gvs: Stats8,
     //pub height_absolute: f32,
     //pub weight_absolute: f32,
     pub ball: Ball,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub tutor_flags_la: FlagSet<MOVE_FLAG_BYTE_LENGTH>,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub master_flags_la: FlagSet<MOVE_FLAG_BYTE_LENGTH>,
     pub egg_location_index: u16, // always set to 0
     pub met_location_index: u16,
     pub pokerus: Pokerus,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ability_index: Pk8AbilityIndex,
     pub ability_num: AbilityNumber,
 }
@@ -67,5 +79,46 @@ impl HomePa8Data {
             super::HOME_PA8_DATA_SIZE => Self::from_buffer(&PkhPa8Buffer::new(bytes)),
             _ => Err(Error::buffer_size(super::HOME_PA8_DATA_SIZE, size)),
         }
+    }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_class = "PkhPa8DataWasm")]
+#[allow(clippy::missing_const_for_fn)]
+impl HomePa8Data {
+    #[wasm_bindgen(getter)]
+    pub fn move_indices(&self) -> Vec<u16> {
+        self.moves.indices()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn move_pp(&self) -> Vec<u8> {
+        self.moves.pp()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn relearn_move_indices(&self) -> Vec<u16> {
+        self.relearn_moves.into_iter().map(u16::from).collect()
+    }
+
+    #[wasm_bindgen(getter = gvs)]
+    pub fn gvs_wasm(&self) -> Stats16Le {
+        self.gvs.into()
+    }
+
+    #[wasm_bindgen(getter = tutorFlags)]
+    pub fn tutor_flags_la_wasm(&self) -> Vec<u8> {
+        self.tutor_flags_la.to_bytes().to_vec()
+    }
+
+    #[wasm_bindgen(getter = masteryFlags)]
+    pub fn master_flags_la_wasm(&self) -> Vec<u8> {
+        self.master_flags_la.to_bytes().to_vec()
+    }
+
+    #[wasm_bindgen(getter = abilityIndex)]
+    pub fn ability_index_wasm(&self) -> AbilityIndexWasm {
+        AbilityIndexWasm::try_from(self.ability_index.to_u16())
+            .expect("AbilityIndexWasm should accept any valid ability index")
     }
 }
