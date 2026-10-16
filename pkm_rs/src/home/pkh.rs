@@ -28,23 +28,17 @@ pub struct Pkh {
     pub core_data: HomeCoreData,
 
     // game data
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub pb7_data: Option<HomePb7Data>,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub pk8_data: Option<HomePk8Data>,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub pa8_data: Option<HomePa8Data>,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub pb8_data: Option<HomePb8Data>,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub pk9_data: Option<HomePk9Data>,
     //pub pc9_data: Option<HomePc9Data>,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub pa9_data: Option<HomePa9Data>,
 }
 
 impl Pkh {
-    pub fn from_bytes(&self, bytes: &[u8]) -> Result<Self> {
+    pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
         let core_data_size = read_u16_le!(bytes, 0x10); // 0xC4
         let game_data_size_offset = 0x12 + core_data_size as usize; // 0xD6
 
@@ -157,6 +151,16 @@ impl Pkh {
     //    counter = offset + super::HOME_PA9_DATA_SIZE + 1;
     //    HomePa9Data::try_from_bytes(&bytes[offset..offset + super::HOME_PA9_DATA_SIZE])
     //}
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_class = "PkhWasm")]
+#[allow(clippy::missing_const_for_fn)]
+impl Pkh {
+    #[wasm_bindgen(js_name = fromBytes)]
+    pub fn from_byte_vector(bytes: Vec<u8>) -> core::result::Result<Pkh, JsValue> {
+        Pkh::from_bytes(&bytes).map_err(JsValue::from)
+    }
 }
 
 impl ModernEvs for Pkh {

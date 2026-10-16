@@ -4,13 +4,13 @@ use crate::result::{Error, Result};
 use pkm_rs_resources::abilities::AbilityIndexWasm;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::{MoveIndex, MoveSlots};
-use pkm_rs_types::{AbilityNumber, Pokerus, Stats8};
+use pkm_rs_types::{AbilityNumber, Pokerus, Stats8, Stats16Le};
 use serde::Serialize;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "PkhPb7Data"))]
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "PkhPb7DataWasm"))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct HomePb7Data {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
@@ -85,5 +85,20 @@ impl HomePb7Data {
             super::HOME_PB7_DATA_SIZE => Self::from_buffer(&PkhPb7Buffer::new(bytes)),
             _ => Err(Error::buffer_size(super::HOME_PB7_DATA_SIZE, size)),
         }
+    }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_class = "PkhPb7DataWasm")]
+#[allow(clippy::missing_const_for_fn)]
+impl HomePb7Data {
+    #[wasm_bindgen(getter = avs)]
+    pub fn avs_wasm(&self) -> Stats16Le {
+        self.avs.into()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn relearn_move_indices(&self) -> Vec<u16> {
+        self.relearn_moves.into_iter().map(u16::from).collect()
     }
 }
