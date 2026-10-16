@@ -1,23 +1,21 @@
+use super::core_data::HomeCoreData;
 use super::game_data_pa8::HomePa8Data;
 use super::game_data_pa9::HomePa9Data;
 use super::game_data_pb7::HomePb7Data;
 use super::game_data_pb8::HomePb8Data;
 use super::game_data_pk8::HomePk8Data;
 use super::game_data_pk9::HomePk9Data;
+use crate::result::Result;
+use crate::traits::ModernEvs;
 
-use pkm_rs_derive::IsShiny4096;
-use pkm_rs_resources::{natures::NatureIndex, ribbons::ModernRibbon};
-use pkm_rs_types::{
-    BinaryGender, ContestStats, Gender, HyperTraining, Ivs, Language, MarkingsSixShapesColors,
-    OriginGame, PokeDate, Stats8, TrainerMemory, strings::SizedUtf16String,
-};
+use pkm_rs_types::{Stats8, read_u16_le, read_u32_le, read_u64_le};
 use serde::Serialize;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "PkhWasm"))]
-#[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
+#[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct Pkh {
     // header
     pub data_version: u16,
@@ -27,51 +25,7 @@ pub struct Pkh {
     pub core_data_size: u16,
     pub game_data_size: u16,
 
-    // core data
-    pub home_tracker: Option<u64>,
-    pub encryption_constant: u32,
-    pub is_bad_egg: bool,
-    //pub species: u32,
-    pub trainer_id: u16,
-    pub secret_id: u16,
-    pub exp: u32,
-    pub is_favorite: bool,
-    pub markings: MarkingsSixShapesColors,
-    pub personality_value: u32,
-    pub nature: NatureIndex,
-    pub mint_nature: NatureIndex,
-    pub is_fateful_encounter: bool,
-    pub gender: Gender,
-    //pub form: u32,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub evs: Stats8,
-    pub contest: ContestStats,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub ivs: Ivs,
-    pub is_nicknamed: bool,
-    pub status_condition: u32,
-    pub handler_gender: BinaryGender,
-    pub handler_language: Option<Language>,
-    pub is_current_handler: bool,
-    pub handler_id: u16,
-    pub handler_friendship: u8,
-    pub handler_memory: TrainerMemory,
-    pub game_of_origin: OriginGame,
-    pub game_of_origin_battle: Option<OriginGame>,
-    pub language: Language,
-    pub form_argument: u32,
-    pub affixed_ribbon: Option<ModernRibbon>,
-    pub trainer_friendship: u8,
-    pub trainer_memory: TrainerMemory,
-    pub egg_date: Option<PokeDate>,
-    pub met_date: PokeDate,
-    pub met_level: u8,
-    pub trainer_gender: BinaryGender,
-    pub hyper_training: HyperTraining,
-    pub held_item_index: u16,
-    pub nickname: SizedUtf16String<26>,
-    pub trainer_name: SizedUtf16String<26>,
-    pub handler_name: SizedUtf16String<26>,
+    pub core_data: HomeCoreData,
 
     // game data
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
@@ -87,4 +41,126 @@ pub struct Pkh {
     //pub pc9_data: Option<HomePc9Data>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub pa9_data: Option<HomePa9Data>,
+}
+
+impl Pkh {
+    pub fn from_bytes(&self, bytes: &[u8]) -> Result<Self> {
+        let core_data_size = read_u16_le!(bytes, 0x10); // 0xC4
+        let game_data_size_offset = 0x12 + core_data_size as usize; // 0xD6
+
+        let mut mon = Pkh {
+            data_version: read_u16_le!(bytes, 0x00),
+            encryption_seed: read_u64_le!(bytes, 0x02),
+            checksum: read_u32_le!(bytes, 0x0C),
+            encoded_data_size: read_u16_le!(bytes, 0x0E),
+            core_data_size,
+            game_data_size: read_u16_le!(bytes, game_data_size_offset),
+            core_data: HomeCoreData::try_from_bytes(&bytes[0x12..game_data_size_offset])?,
+            // initialize game data fields
+            pb7_data: None,
+            pk8_data: None,
+            pa8_data: None,
+            pb8_data: None,
+            pk9_data: None,
+            pa9_data: None,
+        };
+
+        // read game data
+        let mut byte_counter = game_data_size_offset + 2;
+
+        loop {
+            // Crude method of detecting padding that only works because every game data struct is larger than 9 bytes in size
+            // This is unlikely to be a problem in the future, but a better method should still be used here...
+            let eof_check = Some(bytes[byte_counter + 10]);
+            if eof_check.is_none() {
+                break;
+            }
+
+            // https://github.com/kwsch/PKHeX/blob/master/PKHeX.Core/PKM/HOME/HomeGameDataFormat.cs
+            let game_data_type = bytes[byte_counter];
+            match game_data_type {
+                1 => {
+                    mon.pb7_data = HomePb7Data::try_from_bytes(
+                        &bytes[byte_counter..byte_counter + super::HOME_PB7_DATA_SIZE],
+                    )
+                    .ok();
+                    byte_counter = byte_counter + super::HOME_PB7_DATA_SIZE + 1;
+                }
+                2 => {
+                    mon.pk8_data = HomePk8Data::try_from_bytes(
+                        &bytes[byte_counter..byte_counter + super::HOME_PK8_DATA_SIZE],
+                    )
+                    .ok();
+                    byte_counter = byte_counter + super::HOME_PK8_DATA_SIZE + 1;
+                }
+                3 => {
+                    mon.pa8_data = HomePa8Data::try_from_bytes(
+                        &bytes[byte_counter..byte_counter + super::HOME_PA8_DATA_SIZE],
+                    )
+                    .ok();
+                    byte_counter = byte_counter + super::HOME_PA8_DATA_SIZE + 1;
+                }
+                4 => {
+                    mon.pb8_data = HomePb8Data::try_from_bytes(
+                        &bytes[byte_counter..byte_counter + super::HOME_PB8_DATA_SIZE],
+                    )
+                    .ok();
+                    byte_counter = byte_counter + super::HOME_PB8_DATA_SIZE + 1;
+                }
+                5 => {
+                    mon.pk9_data = HomePk9Data::try_from_bytes(
+                        &bytes[byte_counter..byte_counter + super::HOME_PK9_DATA_SIZE],
+                    )
+                    .ok();
+                    byte_counter = byte_counter + super::HOME_PK9_DATA_SIZE + 1;
+                }
+                6 => {
+                    mon.pa9_data = HomePa9Data::try_from_bytes(
+                        &bytes[byte_counter..byte_counter + super::HOME_PA9_DATA_SIZE],
+                    )
+                    .ok();
+                    byte_counter = byte_counter + super::HOME_PA9_DATA_SIZE + 1;
+                }
+                _ => break, // padding that wasn't found by the initial check
+            }
+        }
+
+        Ok(mon)
+    }
+
+    //fn read_pb7_data(bytes: &[u8], offset: usize, mut counter: usize) -> Result<HomePb7Data> {
+    //    counter = offset + super::HOME_PB7_DATA_SIZE + 1;
+    //    HomePb7Data::try_from_bytes(&bytes[offset..offset + super::HOME_PB7_DATA_SIZE])
+    //}
+
+    //fn read_pk8_data(bytes: &[u8], offset: usize, mut counter: usize) -> Result<HomePk8Data> {
+    //    counter = offset + super::HOME_PK8_DATA_SIZE + 1;
+    //    HomePk8Data::try_from_bytes(&bytes[offset..offset + super::HOME_PK8_DATA_SIZE])
+    //}
+
+    //fn read_pa8_data(bytes: &[u8], offset: usize, mut counter: usize) -> Result<HomePa8Data> {
+    //    counter = offset + super::HOME_PA8_DATA_SIZE + 1;
+    //    HomePa8Data::try_from_bytes(&bytes[offset..offset + super::HOME_PA8_DATA_SIZE])
+    //}
+
+    //fn read_pb8_data(bytes: &[u8], offset: usize, mut counter: usize) -> Result<HomePb8Data> {
+    //    counter = offset + super::HOME_PB8_DATA_SIZE + 1;
+    //    HomePb8Data::try_from_bytes(&bytes[offset..offset + super::HOME_PB8_DATA_SIZE])
+    //}
+
+    //fn read_pk9_data(bytes: &[u8], offset: usize, mut counter: usize) -> Result<HomePk9Data> {
+    //    counter = offset + super::HOME_PK9_DATA_SIZE + 1;
+    //    HomePk9Data::try_from_bytes(&bytes[offset..offset + super::HOME_PK9_DATA_SIZE])
+    //}
+
+    //fn read_pa9_data(bytes: &[u8], offset: usize, mut counter: usize) -> Result<HomePa9Data> {
+    //    counter = offset + super::HOME_PA9_DATA_SIZE + 1;
+    //    HomePa9Data::try_from_bytes(&bytes[offset..offset + super::HOME_PA9_DATA_SIZE])
+    //}
+}
+
+impl ModernEvs for Pkh {
+    fn get_evs(&self) -> Stats8 {
+        self.core_data.evs
+    }
 }
