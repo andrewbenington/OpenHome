@@ -57,7 +57,7 @@ pub trait PersonalInfo: Sized + std::panic::RefUnwindSafe + std::panic::UnwindSa
 
     fn types_fallible(&self) -> (Option<PkmType>, Option<PkmType>);
 
-    // gives the game index for this species' form if index form_index if present.
+    // gives the game index for this species' form with index form_index if it is present.
     // base forms are usually in national dex order, so other form game indices
     // need to be found using the base form's personal info entry
     fn game_index_for_form(&self, national_dex: u16, form_index: u16) -> Option<u16>;
