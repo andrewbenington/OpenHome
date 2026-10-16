@@ -9,18 +9,17 @@ import {
   Pk7Wasm,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
-import { Errorable, Option } from '../util/functional'
+import { Result } from '../util/functional'
 import { BoxAndSlot, WasmOfficialSave } from './interfaces'
 import { PathData } from './util/path'
 import { isRestricted } from './util/TransferRestrictions'
 
-export class Gen7AlolaSave extends WasmOfficialSave<PK7, Pk7Wasm, Gen7AlolaSaveRust> {
+export class Gen7AlolaSave extends WasmOfficialSave<Pk7Wasm, PK7, Gen7AlolaSaveRust> {
+  WASM_SAVE_CLASS = Gen7AlolaSaveRust
+
   static pkmType = PK7
   static saveTypeAbbreviation = 'SM/USUM'
   static saveTypeID = 'SM/USUM'
-
-  MAX_BOX_COUNT: number = Gen7AlolaSaveRust.MAX_BOX_COUNT
-  SLOTS_PER_BOX: number = Gen7AlolaSaveRust.SLOTS_PER_BOX
 
   filePath: PathData
   fileCreated?: Date
@@ -32,16 +31,9 @@ export class Gen7AlolaSave extends WasmOfficialSave<PK7, Pk7Wasm, Gen7AlolaSaveR
 
   updatedBoxSlots: BoxAndSlot[] = []
 
-  currentPCBox: number
-
   constructor(path: PathData, bytes: Uint8Array) {
     super(Gen7AlolaSaveRust.fromBytes(bytes))
     this.filePath = path
-    this.currentPCBox = this.inner.currentPcBoxIdx
-  }
-
-  get bytes() {
-    return this.inner.prepareBytesForSaving()
   }
 
   static fileIsSave(bytes: Uint8Array): boolean {
@@ -54,15 +46,7 @@ export class Gen7AlolaSave extends WasmOfficialSave<PK7, Pk7Wasm, Gen7AlolaSaveR
     return Gen7AlolaSaveRust.includesOrigin(origin)
   }
 
-  get boxRows() {
-    return Gen7AlolaSaveRust.BOX_ROWS
-  }
-
-  get boxColumns() {
-    return Gen7AlolaSaveRust.BOX_COLS
-  }
-
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK7> {
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Result<PK7> {
     return PK7.fromOhpkm(ohpkm, strategy)
   }
 
@@ -74,15 +58,7 @@ export class Gen7AlolaSave extends WasmOfficialSave<PK7, Pk7Wasm, Gen7AlolaSaveR
     return itemIndex <= Item.FairyMemory
   }
 
-  setMonAt(boxNum: number, boxSlot: number, mon: Option<PK7>): void {
-    this.inner.setMonAt(boxNum, boxSlot, mon ? mon.inner : undefined)
-  }
-
   monFromWasm(wasmMon: Pk7Wasm): PK7 {
     return PK7.fromWasm(wasmMon)
-  }
-
-  getBoxName(boxIndex: number) {
-    return this.inner.getBoxName(boxIndex)
   }
 }

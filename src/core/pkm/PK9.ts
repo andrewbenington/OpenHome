@@ -585,4 +585,8 @@ export default class PK9 {
       27,
     ]
   }
+
+  free() {
+    this.inner.free()
+  }
 }

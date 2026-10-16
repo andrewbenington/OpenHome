@@ -28,6 +28,8 @@ import { SaveViewMode } from '@openhome-ui/saves/util'
 import { updateStyleForUiScale } from '@openhome-ui/util/style'
 import { Dispatch, Reducer, createContext } from 'react'
 
+const ScarletViolet = ScarletVioletSave
+
 export const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
   G1SAV,
   G1SAVJP,
@@ -46,7 +48,7 @@ export const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
   SwordShieldSave,
   BdspSave,
   LegendsArceusSave,
-  ScarletVioletSave,
+  ScarletViolet,
   LegendsZaSave,
 ]
 const EXTRA_SAVE_TYPES = [G3RRSAV, G3UBSAV, G8LumiSAV, CompassSave]

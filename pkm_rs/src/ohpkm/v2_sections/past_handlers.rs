@@ -12,14 +12,14 @@ use pkm_rs_resources::metadata_source::MetadataSource;
 #[cfg(feature = "wasm")]
 use pkm_rs_types::JsResult;
 use pkm_rs_types::strings::SizedUtf16String;
-use pkm_rs_types::{
-    BinaryGender, Gender, Language, OriginGame, TrainerData, TrainerMemory, TryIntoTs, TsResult,
-};
+use pkm_rs_types::{BinaryGender, Gender, Language, OriginGame, TrainerData, TrainerMemory};
 use serde::Serialize;
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 
+#[cfg(feature = "wasm")]
+use pkm_rs_types::{TryIntoTs, TsResult};
 #[cfg(feature = "wasm")]
 use tsify::Ts;
 #[cfg(feature = "wasm")]

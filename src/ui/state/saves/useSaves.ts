@@ -250,6 +250,8 @@ export function useSaves(): SavesAndBanksManager {
 
           toUpdate[trackedData.openhomeId] = trackedData
         }
+
+        mon.free?.()
       }
 
       await ohpkmStore.insertOrUpdateAll(toUpdate)
