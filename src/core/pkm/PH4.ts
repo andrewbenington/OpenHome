@@ -1,6 +1,10 @@
+import { Errorable, Option, R } from '@openhome-core/util/functional'
+import { FourMoves, PKMDate, Stats } from '@openhome-core/util/types'
 import {
   BinaryGender,
   ContestStats,
+  ConvertStrategies,
+  ConvertStrategy,
   HyperTraining,
   Item,
   Language,
@@ -17,36 +21,45 @@ import {
   PkhPk9DataWasm,
   PkhWasm,
   PokeDate,
+  SpeciesLookup,
   TrainerMemory,
 } from '@pkm-rs/pkg'
 import { OHPKM } from './OHPKM'
-import { Errorable, Option, R } from '@openhome-core/util/functional'
-import { FourMoves, PKMDate, Stats } from '@openhome-core/util/types'
+import { PkmConstructorOptions } from './PKM'
 import { convertPokeDate, convertPokeDateOptional } from './wasm/convert'
 
-export default class PKH {
-  format = 'PKH' as const
+export default class PH4 {
+  format = 'PH4' as const
   inner: PkhWasm
 
-  constructor(arg: PkhWasm) {
-    this.inner = arg
+  constructor(arg: OHPKM | PkhWasm, options: PkmConstructorOptions) {
+    if (arg instanceof PkhWasm) {
+      this.inner = arg
+    } else {
+      const ohpkmBytes = new Uint8Array(arg.toBytes())
+
+      this.inner = PkhWasm.fromOhpkmBytes(
+        ohpkmBytes,
+        options.strategy || ConvertStrategies.getDefault()
+      )
+    }
   }
 
   static getFormat() {
-    return 'PKH' as const
+    return 'PH4' as const
   }
 
-  static fromBytes(buffer: ArrayBuffer): PKH {
+  static fromBytes(buffer: ArrayBuffer): PH4 {
     const byteArray = new Uint8Array(buffer)
-    return PKH.fromWasm(PkhWasm.fromBytes(byteArray))
+    return PH4.fromWasm(PkhWasm.fromBytes(byteArray))
   }
 
-  //static fromOhpkm(ohpkm: OHPKM): Errorable<PKH> {
-  //  return R.tryFrom(() => new PKH(ohpkm))
-  //}
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PH4> {
+    return R.tryFrom(() => new PH4(ohpkm, { strategy }))
+  }
 
-  static fromWasm(pkh: PkhWasm): PKH {
-    return new PKH(pkh)
+  static fromWasm(pkh: PkhWasm): PH4 {
+    return new PH4(pkh, {})
   }
 
   get dataVersion() {
@@ -576,7 +589,7 @@ export default class PKH {
   }
 
   get alphaMove() {
-    return this.inner.pa8_data?.alpha_move
+    return this.inner.pa8_data?.alpha_move?.index
   }
 
   get movesPLA() {
@@ -798,6 +811,39 @@ export default class PKH {
     }
   }
 
+  get moves() {
+    if (this.primaryGameData?.moves.indices) {
+      const moves = Array.from(this.primaryGameData?.moves.indices)
+      if (moves.length !== 4) {
+        throw new Error(`PKH WASM struct has move PP array length of ${moves.length} (expected 4)`)
+      }
+
+      return moves as FourMoves
+    } else {
+      throw new Error('PKH WASM struct has no moves')
+    }
+  }
+
+  get movePP() {
+    const movePP = Array.from(this.primaryGameData?.moves.pp ?? [0, 0, 0, 0])
+    if (movePP.length !== 4) {
+      throw new Error(`PKH WASM struct has move PP array length of ${movePP.length} (expected 4)`)
+    }
+
+    return movePP as FourMoves
+  }
+
+  get movePPUps() {
+    const movePPUps = Array.from(this.primaryGameData?.moves.pp_ups ?? [0, 0, 0, 0])
+    if (movePPUps.length !== 4) {
+      throw new Error(
+        `PKH WASM struct has move PP Up array length of ${movePPUps.length} (expected 4)`
+      )
+    }
+
+    return movePPUps as FourMoves
+  }
+
   get ball() {
     return this.primaryGameData?.ball
   }
@@ -877,6 +923,18 @@ export default class PKH {
     return Item.fromIndex(this.heldItemIndex)?.name ?? 'None'
   }
 
+  toBytes() {
+    return this.inner.toBytes().buffer as ArrayBuffer
+  }
+
+  getLevel() {
+    return this.speciesMetadata?.calculateLevel(this.exp) ?? 1
+  }
+
+  getStats() {
+    return this.inner.calculateStats()
+  }
+
   isShiny() {
     return (
       (this.trainerID ^
@@ -896,6 +954,10 @@ export default class PKH {
     )
   }
 
+  public get speciesMetadata() {
+    return SpeciesLookup(this.nationalDex)
+  }
+
   static maxValidMove() {
     return 920
   }
@@ -904,3 +966,5 @@ export default class PKH {
     return 26
   }
 }
+
+export var PKH = PH4
