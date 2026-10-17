@@ -60,22 +60,13 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const save = useMemo(() => allOpenSaves[saveIndex], [allOpenSaves, saveIndex])
   const displayError = useDisplayError()
 
-  const allSaveMons = useMemo(() => save.getAllMons().map((mon) => [mon, save] as const), [save])
+  const allSaveMons = save.getAllMons().map((mon) => [mon, save] as const)
   const { batchResults: saveOhpkms } = useOhpkmBatchIdLookup(
     allSaveMons
       .map(([mon]) => mon)
       .map(ohpkmStore.getPotentialOhpkmId)
       .filter(filterUndefined)
   )
-
-  // const allSaveMonPotentialIds = useMemo(() => {
-  //   const allMons = save.getAllMons()
-  //   const potentialIds = allMons.map(ohpkmStore.getPotentialOhpkmId).filter(filterUndefined)
-  //   allMons.forEach((mon) => mon.free?.())
-  //   return potentialIds
-  // }, [ohpkmStore.getPotentialOhpkmId, save])
-
-  // const { batchResults: saveOhpkms } = useOhpkmBatchIdLookup(allSaveMonPotentialIds)
 
   const TrackedDataRecovery = useTrackedDataRecovery()
 
