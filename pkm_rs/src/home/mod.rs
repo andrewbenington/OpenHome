@@ -9,9 +9,11 @@ use game_data_pk9::*;
 mod pkh;
 pub use pkh::*;
 mod core_data;
-mod game_data_pa8;
-mod game_data_pa9;
-mod game_data_pb7;
-mod game_data_pb8;
-mod game_data_pk8;
-mod game_data_pk9;
+pub mod game_data_pa8;
+pub mod game_data_pa9;
+pub mod game_data_pb7;
+pub mod game_data_pb8;
+pub mod game_data_pk8;
+pub mod game_data_pk9;
+
+pub(crate) const PH4_PKM_MAX_SIZE: usize = 0x260;

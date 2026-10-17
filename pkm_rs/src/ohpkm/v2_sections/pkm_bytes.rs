@@ -19,7 +19,7 @@ const PB8_SIZE: usize = 344;
 const PK9_SIZE: usize = 344;
 const PA9_SIZE: usize = 344;
 
-const PH4_MAX_SIZE: usize = 0x260;
+const PH4_PKM_MAX_SIZE: usize = 0x260;
 
 const PK3CFRU_PARTY_SIZE: usize = 58;
 const PB8LUMI_SIZE: usize = 344;
@@ -102,7 +102,7 @@ impl From<PkmFormat> for Option<Tag> {
             PkmFormat::PK6 => Some(Tag::Pk6),
             PkmFormat::PK7 => Some(Tag::Pk7),
             PkmFormat::PB7 => Some(Tag::Pb7),
-            PkmFormat::PKH => Some(Tag::Pkh),
+            PkmFormat::PH4 => Some(Tag::Pkh),
             PkmFormat::PK8 => Some(Tag::Pk8),
             PkmFormat::PA8 => Some(Tag::Pa8),
             PkmFormat::PB8 => Some(Tag::Pb8),
@@ -132,7 +132,7 @@ impl Tag {
             Self::Pb8 => PB8_SIZE,
             Self::Pk9 => PK9_SIZE,
             Self::Pa9 => PA9_SIZE,
-            Self::Pkh => PH4_MAX_SIZE,
+            Self::Pkh => PH4_PKM_MAX_SIZE,
 
             Self::Pk3Rr => PK3CFRU_PARTY_SIZE,
             Self::Pk3Ub => PK3CFRU_PARTY_SIZE,
@@ -157,7 +157,7 @@ pub enum StoredPkmBytes {
     Pb8([u8; PB8_SIZE]),
     Pk9([u8; PK9_SIZE]),
     Pa9([u8; PA9_SIZE]),
-    Pkh([u8; PH4_MAX_SIZE]),
+    Pkh([u8; PH4_PKM_MAX_SIZE]),
 
     Pk3Rr([u8; PK3CFRU_PARTY_SIZE]),
     Pk3Ub([u8; PK3CFRU_PARTY_SIZE]),

@@ -37,7 +37,7 @@ pub enum PkmFormat {
     PB8,
     PK9,
     PA9,
-    PKH,
+    PH4,
 
     PK3RR,
     PK3UB,
@@ -69,7 +69,7 @@ impl PkmFormat {
             Self::PB8 => OriginGame::BrilliantDiamond,
             Self::PK9 => OriginGame::Scarlet,
             Self::PA9 => OriginGame::LegendsZa,
-            Self::PKH => OriginGame::Home,
+            Self::PH4 => OriginGame::Home,
             Self::PK3RR | Self::PK3UB => OriginGame::FireRed,
             Self::PB8LUMI => OriginGame::BrilliantDiamond,
             Self::PK9Compass => OriginGame::Scarlet,
@@ -92,7 +92,7 @@ impl PkmFormat {
             Self::PB8 => origin.is_bdsp(),
             Self::PK9 => origin.is_scarlet_violet(),
             Self::PA9 => origin == OriginGame::LegendsZa,
-            Self::PKH => origin == OriginGame::Home,
+            Self::PH4 => origin == OriginGame::Home,
 
             Self::PK3RR | Self::PK3UB | Self::PB8LUMI | Self::PK9Compass => false,
         }
@@ -108,7 +108,7 @@ impl PkmFormat {
             Self::PK6 => Generation::G6,
             Self::PK7 | Self::PB7 => Generation::G7,
             Self::PK8 | Self::PA8 | Self::PB8 => Generation::G8,
-            Self::PK9 | Self::PA9 | Self::PKH => Generation::G9,
+            Self::PK9 | Self::PA9 | Self::PH4 => Generation::G9,
 
             Self::PK3RR | Self::PK3UB => Generation::G3,
             Self::PB8LUMI => Generation::G8,
@@ -126,7 +126,7 @@ impl PkmFormat {
             | Self::PK9
             | Self::PK9Compass
             | Self::PA9
-            | Self::PKH => true,
+            | Self::PH4 => true,
             Self::PK1
             | Self::PK2
             | Self::PK3
@@ -165,7 +165,7 @@ impl PkmFormat {
             | Self::PB8
             | Self::PK9
             | Self::PA9
-            | Self::PKH => LinkTradeIndex::Pkm3dsSwitch as u16,
+            | Self::PH4 => LinkTradeIndex::Pkm3dsSwitch as u16,
 
             Self::PK3RR | Self::PK3UB => LinkTradeIndex::PkmGen3 as u16,
             Self::PB8LUMI | Self::PK9Compass => LinkTradeIndex::Pkm3dsSwitch as u16,
@@ -188,7 +188,7 @@ impl PkmFormat {
             Self::PK7 => origin <= OriginGame::Crystal,
             Self::PB7 => origin.is_lets_go() || origin == OriginGame::Go,
             Self::PK8 => origin <= OriginGame::Shield,
-            Self::PKH | Self::PA8 | Self::PB8 | Self::PK9 | Self::PA9 => {
+            Self::PH4 | Self::PA8 | Self::PB8 | Self::PK9 | Self::PA9 => {
                 origin <= OriginGame::LeafGreenSwitch
             }
             Self::PK3RR => origin.generation() == Generation::G3,
@@ -214,7 +214,7 @@ impl PkmFormat {
 
         match self {
             Self::PK1 | Self::PK2 => origin, // doesn't matter; these games don't store origin
-            Self::PKH => origin,             // all origins are legal in HOME
+            Self::PH4 => origin,             // all origins are legal in HOME
             Self::PK3 | Self::ColoPkm | Self::XdPkm => match origin {
                 FireRedSwitch | Red | Yellow | LetsGoPikachu => FireRed,
                 LeafGreenSwitch | BlueGreen | BlueJpn | LetsGoEevee => LeafGreen,
@@ -374,7 +374,7 @@ impl PkmFormat {
 
     pub const fn location_index_of(&self, location: Location) -> Option<u16> {
         match self {
-            Self::PK1 | Self::PKH => None,
+            Self::PK1 | Self::PH4 => None,
             Self::PK2 => location::gen2::index_of(location),
             Self::PK3 => location::gen3_gba::index_of(location),
             Self::ColoPkm | Self::XdPkm => match location {
@@ -935,7 +935,7 @@ impl PkmFormat {
             | PkmFormat::PK6
             | PkmFormat::PK7
             | PkmFormat::PB7
-            | PkmFormat::PKH
+            | PkmFormat::PH4
             | PkmFormat::PK8
             | PkmFormat::PA8
             | PkmFormat::PB8
@@ -974,7 +974,7 @@ impl PkmFormat {
             Self::PK6 => MetadataSource::XY,
             Self::PK7 => MetadataSource::SunMoon,
             Self::PB7 => MetadataSource::LetsGoPikachuEevee,
-            Self::PK8 | Self::PKH => MetadataSource::SwordShield,
+            Self::PK8 | Self::PH4 => MetadataSource::SwordShield,
             Self::PA8 => MetadataSource::LegendsArceus,
             Self::PB8 => MetadataSource::BrilliantDiamondShiningPearl,
             Self::PK9 => MetadataSource::ScarletViolet,
