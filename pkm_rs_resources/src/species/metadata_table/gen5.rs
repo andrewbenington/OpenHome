@@ -9,12 +9,12 @@ const B2W2_ENTRY_SIZE: usize = 0x4C;
 type GameMetadataBw = GameMetadata<PersonalInfoBw, BW_ENTRY_SIZE>;
 
 pub static METADATA_TABLE_BW: GameMetadataBw =
-    GameMetadataBw::from_binary(BW_PERSONAL_FILE, BW_LEVELUP_PKL);
+    GameMetadataBw::from_binary(BW_PERSONAL_FILE, BW_LEVELUP_PKL, "Black/White");
 
 type GameMetadataB2w2 = GameMetadata<PersonalInfoB2w2, B2W2_ENTRY_SIZE>;
 
 pub static METADATA_TABLE_B2W2: GameMetadataB2w2 =
-    GameMetadataB2w2::from_binary(B2W2_PERSONAL_FILE, B2W2_LEVELUP_PKL);
+    GameMetadataB2w2::from_binary(B2W2_PERSONAL_FILE, B2W2_LEVELUP_PKL, "Black 2/White 2");
 
 #[derive(Debug, Clone, Copy)]
 pub struct PersonalInfoBw([u8; BW_ENTRY_SIZE]);

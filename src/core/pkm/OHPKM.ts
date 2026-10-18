@@ -89,6 +89,8 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       const other = arg
       super(new Uint8Array())
 
+      this.startedTrackingTimestamp = dayjs()
+
       let prng: Prando
 
       if (other.personalityValue !== undefined && other.secretID !== undefined) {

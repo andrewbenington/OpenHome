@@ -8,7 +8,7 @@ pub const SV_ENTRY_SIZE: usize = 0x50;
 type GameMetadataSv = GameMetadata<PersonalInfoSv, SV_ENTRY_SIZE>;
 
 pub static METADATA_TABLE_SV: GameMetadataSv =
-    GameMetadataSv::from_binary(SV_PERSONAL_FILE, SV_LEVELUP_PKL);
+    GameMetadataSv::from_binary(SV_PERSONAL_FILE, SV_LEVELUP_PKL, "Scarlet/Violet");
 
 #[derive(Clone, Copy)]
 pub struct PersonalInfoSv([u8; SV_ENTRY_SIZE]);
@@ -89,6 +89,10 @@ impl PersonalInfo for PersonalInfoSv {
 
     fn source_name(&self) -> &'static str {
         "Scarlet/Violet"
+    }
+
+    fn form_is_present_in_game(&self, _national_dex: u16, _form_index: u16) -> bool {
+        self.is_present_in_game()
     }
 }
 
