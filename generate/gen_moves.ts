@@ -100,13 +100,13 @@ pub use max_pp::get_base_max_pp;
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Clone, Copy, Serialize, PartialEq, Eq)]
-pub struct MoveSlot {
+pub struct MoveSlotWithPp {
     pub move_index: MoveIndex,
     pub pp: u8,
     pub pp_ups: u8,
 }
 
-impl MoveSlot {
+impl MoveSlotWithPp {
     pub const fn new(move_index: MoveIndex, pp: u8, pp_ups: u8) -> Self {
         Self {
             move_index,
@@ -172,7 +172,7 @@ impl MoveSlot {
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Clone, Copy, Serialize)]
-pub struct MoveSlots([MoveSlot; 4]);
+pub struct MoveSlots([MoveSlotWithPp; 4]);
 
 impl MoveSlots {
     pub fn from_bytes<T: Into<usize> + Copy>(
@@ -181,23 +181,23 @@ impl MoveSlots {
         pp_up_storage: PpUpStorage,
     ) -> Self {
         Self([
-            MoveSlot::from_bytes(bytes, offsets, pp_up_storage, 0),
-            MoveSlot::from_bytes(bytes, offsets, pp_up_storage, 1),
-            MoveSlot::from_bytes(bytes, offsets, pp_up_storage, 2),
-            MoveSlot::from_bytes(bytes, offsets, pp_up_storage, 3),
+            MoveSlotWithPp::from_bytes(bytes, offsets, pp_up_storage, 0),
+            MoveSlotWithPp::from_bytes(bytes, offsets, pp_up_storage, 1),
+            MoveSlotWithPp::from_bytes(bytes, offsets, pp_up_storage, 2),
+            MoveSlotWithPp::from_bytes(bytes, offsets, pp_up_storage, 3),
         ])
     }
 
     pub const fn from_arrays(moves: [MoveIndex; 4], pp: [u8; 4], pp_ups: [u8; 4]) -> Self {
         Self([
-            MoveSlot::new(moves[0], pp[0], pp_ups[0]),
-            MoveSlot::new(moves[1], pp[1], pp_ups[1]),
-            MoveSlot::new(moves[2], pp[2], pp_ups[2]),
-            MoveSlot::new(moves[3], pp[3], pp_ups[3]),
+            MoveSlotWithPp::new(moves[0], pp[0], pp_ups[0]),
+            MoveSlotWithPp::new(moves[1], pp[1], pp_ups[1]),
+            MoveSlotWithPp::new(moves[2], pp[2], pp_ups[2]),
+            MoveSlotWithPp::new(moves[3], pp[3], pp_ups[3]),
         ])
     }
 
-    pub fn at(&self, index: arbitrary_int::u2) -> MoveSlot {
+    pub fn at(&self, index: arbitrary_int::u2) -> MoveSlotWithPp {
         self.0[usize::from(index.value())]
     }
 
@@ -213,7 +213,7 @@ impl MoveSlots {
             .for_each(|(i, slot)| slot.write_to_offsets(bytes, offsets, i, pp_up_storage));
     }
 
-    pub fn iter_mut(&mut self) -> std::slice::IterMut<'_, MoveSlot> {
+    pub fn iter_mut(&mut self) -> std::slice::IterMut<'_, MoveSlotWithPp> {
         self.0.iter_mut()
     }
 
@@ -286,8 +286,8 @@ impl MoveSlots {
 }
 
 impl IntoIterator for MoveSlots {
-    type Item = MoveSlot;
-    type IntoIter = std::array::IntoIter<MoveSlot, 4>;
+    type Item = MoveSlotWithPp;
+    type IntoIter = std::array::IntoIter<MoveSlotWithPp, 4>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.0.into_iter()
@@ -295,8 +295,8 @@ impl IntoIterator for MoveSlots {
 }
 
 impl<'a> IntoIterator for &'a MoveSlots {
-    type Item = &'a MoveSlot;
-    type IntoIter = std::slice::Iter<'a, MoveSlot>;
+    type Item = &'a MoveSlotWithPp;
+    type IntoIter = std::slice::Iter<'a, MoveSlotWithPp>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.0.iter()
@@ -304,16 +304,16 @@ impl<'a> IntoIterator for &'a MoveSlots {
 }
 
 impl<'a> IntoIterator for &'a mut MoveSlots {
-    type Item = &'a mut MoveSlot;
-    type IntoIter = std::slice::IterMut<'a, MoveSlot>;
+    type Item = &'a mut MoveSlotWithPp;
+    type IntoIter = std::slice::IterMut<'a, MoveSlotWithPp>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.0.iter_mut()
     }
 }
 
-impl FromIterator<MoveSlot> for MoveSlots {
-    fn from_iter<T: IntoIterator<Item = MoveSlot>>(iter: T) -> Self {
+impl FromIterator<MoveSlotWithPp> for MoveSlots {
+    fn from_iter<T: IntoIterator<Item = MoveSlotWithPp>>(iter: T) -> Self {
         let mut from_iter = iter.into_iter();
         let mut move_slots = Self::default();
 
@@ -327,8 +327,8 @@ impl FromIterator<MoveSlot> for MoveSlots {
     }
 }
 
-impl FromIterator<Option<MoveSlot>> for MoveSlots {
-    fn from_iter<T: IntoIterator<Item = Option<MoveSlot>>>(iter: T) -> Self {
+impl FromIterator<Option<MoveSlotWithPp>> for MoveSlots {
+    fn from_iter<T: IntoIterator<Item = Option<MoveSlotWithPp>>>(iter: T) -> Self {
         let mut from_iter = iter.into_iter();
         let mut move_slots = Self::default();
 
@@ -400,24 +400,53 @@ pub struct MoveDataOffsets<T: Into<usize> = usize> {
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "specta", derive(specta::Type))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
+#[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Copy, Deserialize)]
+pub struct MoveIndexNonEmpty(NonZeroU16);
+
+impl MoveIndexNonEmpty {
+    pub const fn get_metadata(&self) -> &'static MoveMetadata {
+        ALL_MOVES[(self.0.get() - 1) as usize]
+    }
+
+    pub const fn from_u16(value: u16) -> Option<Self> {
+        match NonZeroU16::new(value) {
+            Some(index) => Some(Self(index)),
+            None => None,
+        }
+    }
+
+    pub const fn to_le_bytes(self) -> [u8; 2] {
+        self.0.get().to_le_bytes()
+    }
+
+    pub const fn to_raw(&self) -> u16 {
+        self.0.get()
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, PartialOrd, Ord, Default, PartialEq, Eq, Clone, Copy, Deserialize)]
-pub struct MoveIndex(Option<NonZeroU16>);
+pub struct MoveIndex(Option<MoveIndexNonEmpty>);
 
 impl MoveIndex {
     pub fn get_metadata(&self) -> Option<&'static MoveMetadata> {
-        self.0.map(|idx| ALL_MOVES[(idx.get() - 1) as usize])
+        Some(self.0?.get_metadata())
     }
 
     pub const fn from_u16(value: u16) -> Self {
-        Self(NonZeroU16::new(value))
+        Self(MoveIndexNonEmpty::from_u16(value))
     }
 
     pub const fn from_le_bytes(bytes: [u8; 2]) -> Self {
-        Self(NonZeroU16::new(u16::from_le_bytes(bytes)))
+        Self::from_u16(u16::from_le_bytes(bytes))
     }
 
     pub fn to_le_bytes(self) -> [u8; 2] {
-        self.0.map(NonZeroU16::get).unwrap_or(0u16).to_le_bytes()
+        self.0
+            .map(MoveIndexNonEmpty::to_le_bytes)
+            .unwrap_or_default()
     }
 
     pub const fn empty() -> Self {
@@ -429,7 +458,7 @@ impl MoveIndex {
     }
 
     pub fn to_raw(&self) -> Option<u16> {
-        self.0.map(|index| index.get())
+        Some(self.0?.to_raw())
     }
 }
 
@@ -439,7 +468,7 @@ impl MoveIndex {
 impl MoveIndex {
     #[wasm_bindgen(getter = index)]
     pub fn inner_wasm(&self) -> Option<u16> {
-        self.0.map(NonZeroU16::get)
+        self.to_raw()
     }
 }
 
@@ -457,22 +486,19 @@ impl Serialize for MoveIndex {
 
 impl From<u16> for MoveIndex {
     fn from(value: u16) -> Self {
-        Self(NonZeroU16::try_from(value).ok())
+        Self::from_u16(value)
     }
 }
 
 impl From<MoveIndex> for u16 {
     fn from(val: MoveIndex) -> Self {
-        match val.0 {
-            None => 0,
-            Some(idx) => idx.get(),
-        }
+        val.0.as_ref().map(MoveIndexNonEmpty::to_raw).unwrap_or(0)
     }
 }
-    
+
 impl From<arbitrary_int::u2> for MoveIndex {
     fn from(value: arbitrary_int::u2) -> Self {
-        Self(NonZeroU16::try_from(value.value() as u16).ok())
+        Self::from_u16(value.value() as u16)
     }
 }
 

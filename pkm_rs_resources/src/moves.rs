@@ -23,13 +23,13 @@ pub use max_pp::get_base_max_pp;
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Clone, Copy, Serialize, PartialEq, Eq)]
-pub struct MoveSlot {
+pub struct MoveSlotWithPp {
     pub move_index: MoveIndex,
     pub pp: u8,
     pub pp_ups: u8,
 }
 
-impl MoveSlot {
+impl MoveSlotWithPp {
     pub const fn new(move_index: MoveIndex, pp: u8, pp_ups: u8) -> Self {
         Self {
             move_index,
@@ -95,7 +95,7 @@ impl MoveSlot {
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Clone, Copy, Serialize)]
-pub struct MoveSlots([MoveSlot; 4]);
+pub struct MoveSlots([MoveSlotWithPp; 4]);
 
 impl MoveSlots {
     pub fn from_bytes<T: Into<usize> + Copy>(
@@ -104,23 +104,23 @@ impl MoveSlots {
         pp_up_storage: PpUpStorage,
     ) -> Self {
         Self([
-            MoveSlot::from_bytes(bytes, offsets, pp_up_storage, 0),
-            MoveSlot::from_bytes(bytes, offsets, pp_up_storage, 1),
-            MoveSlot::from_bytes(bytes, offsets, pp_up_storage, 2),
-            MoveSlot::from_bytes(bytes, offsets, pp_up_storage, 3),
+            MoveSlotWithPp::from_bytes(bytes, offsets, pp_up_storage, 0),
+            MoveSlotWithPp::from_bytes(bytes, offsets, pp_up_storage, 1),
+            MoveSlotWithPp::from_bytes(bytes, offsets, pp_up_storage, 2),
+            MoveSlotWithPp::from_bytes(bytes, offsets, pp_up_storage, 3),
         ])
     }
 
     pub const fn from_arrays(moves: [MoveIndex; 4], pp: [u8; 4], pp_ups: [u8; 4]) -> Self {
         Self([
-            MoveSlot::new(moves[0], pp[0], pp_ups[0]),
-            MoveSlot::new(moves[1], pp[1], pp_ups[1]),
-            MoveSlot::new(moves[2], pp[2], pp_ups[2]),
-            MoveSlot::new(moves[3], pp[3], pp_ups[3]),
+            MoveSlotWithPp::new(moves[0], pp[0], pp_ups[0]),
+            MoveSlotWithPp::new(moves[1], pp[1], pp_ups[1]),
+            MoveSlotWithPp::new(moves[2], pp[2], pp_ups[2]),
+            MoveSlotWithPp::new(moves[3], pp[3], pp_ups[3]),
         ])
     }
 
-    pub fn at(&self, index: arbitrary_int::u2) -> MoveSlot {
+    pub fn at(&self, index: arbitrary_int::u2) -> MoveSlotWithPp {
         self.0[usize::from(index.value())]
     }
 
@@ -136,7 +136,7 @@ impl MoveSlots {
             .for_each(|(i, slot)| slot.write_to_offsets(bytes, offsets, i, pp_up_storage));
     }
 
-    pub fn iter_mut(&mut self) -> std::slice::IterMut<'_, MoveSlot> {
+    pub fn iter_mut(&mut self) -> std::slice::IterMut<'_, MoveSlotWithPp> {
         self.0.iter_mut()
     }
 
@@ -209,8 +209,8 @@ impl MoveSlots {
 }
 
 impl IntoIterator for MoveSlots {
-    type Item = MoveSlot;
-    type IntoIter = std::array::IntoIter<MoveSlot, 4>;
+    type Item = MoveSlotWithPp;
+    type IntoIter = std::array::IntoIter<MoveSlotWithPp, 4>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.0.into_iter()
@@ -218,8 +218,8 @@ impl IntoIterator for MoveSlots {
 }
 
 impl<'a> IntoIterator for &'a MoveSlots {
-    type Item = &'a MoveSlot;
-    type IntoIter = std::slice::Iter<'a, MoveSlot>;
+    type Item = &'a MoveSlotWithPp;
+    type IntoIter = std::slice::Iter<'a, MoveSlotWithPp>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.0.iter()
@@ -227,16 +227,16 @@ impl<'a> IntoIterator for &'a MoveSlots {
 }
 
 impl<'a> IntoIterator for &'a mut MoveSlots {
-    type Item = &'a mut MoveSlot;
-    type IntoIter = std::slice::IterMut<'a, MoveSlot>;
+    type Item = &'a mut MoveSlotWithPp;
+    type IntoIter = std::slice::IterMut<'a, MoveSlotWithPp>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.0.iter_mut()
     }
 }
 
-impl FromIterator<MoveSlot> for MoveSlots {
-    fn from_iter<T: IntoIterator<Item = MoveSlot>>(iter: T) -> Self {
+impl FromIterator<MoveSlotWithPp> for MoveSlots {
+    fn from_iter<T: IntoIterator<Item = MoveSlotWithPp>>(iter: T) -> Self {
         let mut from_iter = iter.into_iter();
         let mut move_slots = Self::default();
 
@@ -250,8 +250,8 @@ impl FromIterator<MoveSlot> for MoveSlots {
     }
 }
 
-impl FromIterator<Option<MoveSlot>> for MoveSlots {
-    fn from_iter<T: IntoIterator<Item = Option<MoveSlot>>>(iter: T) -> Self {
+impl FromIterator<Option<MoveSlotWithPp>> for MoveSlots {
+    fn from_iter<T: IntoIterator<Item = Option<MoveSlotWithPp>>>(iter: T) -> Self {
         let mut from_iter = iter.into_iter();
         let mut move_slots = Self::default();
 

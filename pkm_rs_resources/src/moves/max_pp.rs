@@ -1,6 +1,6 @@
 // from PKHeX.Core/Moves
 
-use crate::{metadata_source::MetadataSource, moves::MoveSlot};
+use crate::{metadata_source::MetadataSource, moves::MoveSlotWithPp};
 
 pub fn get_base_max_pp(move_index: u16, source: MetadataSource) -> Option<u8> {
     let by_index_for_source = slice_for_source(source)?;
@@ -28,7 +28,7 @@ fn get_raised_max_pp(move_index: u16, source: MetadataSource, pp_ups: u8) -> Opt
 pub fn adjust_pp_between_games(
     from_source: MetadataSource,
     to_source: MetadataSource,
-    move_slot: MoveSlot,
+    move_slot: MoveSlotWithPp,
 ) -> Option<u8> {
     let index_inner = move_slot.move_index.0?;
     let index_u16 = index_inner.to_raw();

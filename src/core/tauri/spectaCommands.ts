@@ -424,7 +424,8 @@ export type LookupStateStringIds = {
   gen345: Partial<{ [key in string]: string }>
 }
 export type MetDataStrategy = 'UseLocationNameMatch' | 'MaximizeLegality'
-export type MoveIndex = number | null
+export type MoveIndex = MoveIndexNonEmpty | null
+export type MoveIndexNonEmpty = number
 export type NamedStrategy = { name: string; strategy: ConvertStrategy }
 export type NatureIndex = number
 export type NatureStrategy = 'KeepOriginalNature' | 'KeepMintNature'
