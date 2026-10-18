@@ -157,7 +157,7 @@ pub enum StoredPkmBytes {
     Pb8([u8; PB8_SIZE]),
     Pk9([u8; PK9_SIZE]),
     Pa9([u8; PA9_SIZE]),
-    Ph4([u8; PH4_PKM_MAX_SIZE]),
+    Ph4(Box<[u8; PH4_PKM_MAX_SIZE]>),
 
     Pk3Rr([u8; PK3CFRU_PARTY_SIZE]),
     Pk3Ub([u8; PK3CFRU_PARTY_SIZE]),
@@ -168,7 +168,7 @@ pub enum StoredPkmBytes {
 const LENGTH_CHECKED_MESSAGE: &str = "data length checked above";
 
 impl StoredPkmBytes {
-    pub const fn data_as_bytes(&self) -> &[u8] {
+    pub fn data_as_bytes(&self) -> &[u8] {
         let bytes: &[u8] = match self {
             Self::Pk1(bytes) => bytes,
             Self::Pk2(bytes) => bytes,
@@ -179,7 +179,7 @@ impl StoredPkmBytes {
             Self::Pk7(bytes) => bytes,
             Self::Pb7(bytes) => bytes,
             Self::Pk8(bytes) => bytes,
-            Self::Ph4(bytes) => bytes,
+            Self::Ph4(bytes) => bytes.as_ref(),
             Self::Pa8(bytes) => bytes,
             Self::Pb8(bytes) => bytes,
             Self::Pk9(bytes) => bytes,
@@ -240,7 +240,7 @@ impl StoredPkmBytes {
             Tag::Pb8 => Ok(Self::Pb8(copy_to_sized_array(data))),
             Tag::Pk9 => Ok(Self::Pk9(copy_to_sized_array(data))),
             Tag::Pa9 => Ok(Self::Pa9(copy_to_sized_array(data))),
-            Tag::Ph4 => Ok(Self::Ph4(copy_to_sized_array(data))),
+            Tag::Ph4 => Ok(Self::Ph4(Box::new(copy_to_sized_array(data)))),
 
             Tag::Pk3Rr => Ok(Self::Pk3Rr(copy_to_sized_array(data))),
             Tag::Pk3Ub => Ok(Self::Pk3Ub(copy_to_sized_array(data))),
@@ -298,7 +298,7 @@ impl OriginalBackup {
     }
 
     #[cfg(feature = "wasm")]
-    pub const fn data_as_bytes(&self) -> &[u8] {
+    pub fn data_as_bytes(&self) -> &[u8] {
         self.0.data_as_bytes()
     }
 

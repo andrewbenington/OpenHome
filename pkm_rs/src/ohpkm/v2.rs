@@ -1526,7 +1526,7 @@ impl OhpkmV2 {
             .map(|data| data.tagged_bytes().to_owned())
     }
 
-    pub const fn set_original_data_bytes(&mut self, original_bytes: StoredPkmBytes) {
+    pub fn set_original_data_bytes(&mut self, original_bytes: StoredPkmBytes) {
         self.original_data = Some(OriginalBackup::new(original_bytes));
     }
 
