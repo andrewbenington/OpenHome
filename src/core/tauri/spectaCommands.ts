@@ -386,7 +386,7 @@ export type Filter =
   | { isShiny: boolean }
   | { gender: Gender }
   | { level: number }
-  | { move: [number, MoveIndex] }
+  | { move: [number, MoveSlot] }
   | { moveTextPrefixEng: string }
   | { nicknamePrefix: string }
   | { baseEvolution: number }
@@ -424,8 +424,8 @@ export type LookupStateStringIds = {
   gen345: Partial<{ [key in string]: string }>
 }
 export type MetDataStrategy = 'UseLocationNameMatch' | 'MaximizeLegality'
-export type MoveIndex = MoveIndexNonEmpty | null
 export type MoveIndexNonEmpty = number
+export type MoveSlot = MoveIndexNonEmpty | null
 export type NamedStrategy = { name: string; strategy: ConvertStrategy }
 export type NatureIndex = number
 export type NatureStrategy = 'KeepOriginalNature' | 'KeepMintNature'

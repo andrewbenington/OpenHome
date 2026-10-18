@@ -24,13 +24,13 @@ pub use max_pp::get_base_max_pp;
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Clone, Copy, Serialize, PartialEq, Eq)]
 pub struct MoveSlotWithPp {
-    pub move_index: MoveIndex,
+    pub move_index: MoveSlot,
     pub pp: u8,
     pub pp_ups: u8,
 }
 
 impl MoveSlotWithPp {
-    pub const fn new(move_index: MoveIndex, pp: u8, pp_ups: u8) -> Self {
+    pub const fn new(move_index: MoveSlot, pp: u8, pp_ups: u8) -> Self {
         Self {
             move_index,
             pp,
@@ -48,7 +48,7 @@ impl MoveSlotWithPp {
         let pp_offset = offsets.pp.into() + index;
 
         Self {
-            move_index: MoveIndex::from_u16(read_u16_le!(bytes, move_offset)),
+            move_index: MoveSlot::from_u16(read_u16_le!(bytes, move_offset)),
             pp: bytes[pp_offset],
             pp_ups: pp_up_storage.get_pp_ups(bytes, offsets, index),
         }
@@ -111,7 +111,7 @@ impl MoveSlots {
         ])
     }
 
-    pub const fn from_arrays(moves: [MoveIndex; 4], pp: [u8; 4], pp_ups: [u8; 4]) -> Self {
+    pub const fn from_arrays(moves: [MoveSlot; 4], pp: [u8; 4], pp_ups: [u8; 4]) -> Self {
         Self([
             MoveSlotWithPp::new(moves[0], pp[0], pp_ups[0]),
             MoveSlotWithPp::new(moves[1], pp[1], pp_ups[1]),
@@ -180,7 +180,7 @@ impl MoveSlots {
     pub fn set_indices(&mut self, value: &[u16]) {
         self.iter_mut()
             .enumerate()
-            .for_each(|(i, slot)| slot.move_index = MoveIndex::from_u16(value[i]));
+            .for_each(|(i, slot)| slot.move_index = MoveSlot::from_u16(value[i]));
     }
 
     #[wasm_bindgen(getter)]
@@ -351,9 +351,9 @@ impl MoveIndexNonEmpty {
 #[cfg_attr(feature = "specta", derive(specta::Type))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, PartialOrd, Ord, Default, PartialEq, Eq, Clone, Copy, Deserialize)]
-pub struct MoveIndex(Option<MoveIndexNonEmpty>);
+pub struct MoveSlot(Option<MoveIndexNonEmpty>);
 
-impl MoveIndex {
+impl MoveSlot {
     pub fn get_metadata(&self) -> Option<&'static MoveMetadata> {
         Some(self.0?.get_metadata())
     }
@@ -388,14 +388,14 @@ impl MoveIndex {
 #[cfg(feature = "wasm")]
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
-impl MoveIndex {
+impl MoveSlot {
     #[wasm_bindgen(getter = index)]
     pub fn inner_wasm(&self) -> Option<u16> {
         self.to_raw()
     }
 }
 
-impl Serialize for MoveIndex {
+impl Serialize for MoveSlot {
     fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
     where
         S: Serializer,
@@ -407,19 +407,19 @@ impl Serialize for MoveIndex {
     }
 }
 
-impl From<u16> for MoveIndex {
+impl From<u16> for MoveSlot {
     fn from(value: u16) -> Self {
         Self::from_u16(value)
     }
 }
 
-impl From<MoveIndex> for u16 {
-    fn from(val: MoveIndex) -> Self {
+impl From<MoveSlot> for u16 {
+    fn from(val: MoveSlot) -> Self {
         val.0.as_ref().map(MoveIndexNonEmpty::to_raw).unwrap_or(0)
     }
 }
 
-impl From<arbitrary_int::u2> for MoveIndex {
+impl From<arbitrary_int::u2> for MoveSlot {
     fn from(value: arbitrary_int::u2) -> Self {
         Self::from_u16(value.value() as u16)
     }

@@ -1,4 +1,4 @@
-use crate::moves::MoveIndex;
+use crate::moves::MoveSlot;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -17,7 +17,7 @@ const MAX_VAL_BASE_GAME: usize =
 const BASE_GAME_TM_INDEX_BY_MOVE_ID: [u16; MAX_VAL_BASE_GAME + 1] =
     super::index_lookup::build_reverse(MOVE_ID_BY_BASE_GAME_TM_INDEX);
 
-pub const fn move_id_by_base_game_tm_index(index: usize) -> Option<MoveIndex> {
+pub const fn move_id_by_base_game_tm_index(index: usize) -> Option<MoveSlot> {
     super::index_lookup::move_id_by_index(&MOVE_ID_BY_BASE_GAME_TM_INDEX, index)
 }
 
@@ -44,7 +44,7 @@ const MAX_VAL_DLC: usize = super::index_lookup::max_value(&MOVE_ID_BY_DLC_TM_IND
 const DLC_TM_INDEX_BY_MOVE_ID: [u16; MAX_VAL_DLC + 1] =
     super::index_lookup::build_reverse(MOVE_ID_BY_DLC_TM_INDEX);
 
-pub const fn move_id_by_dlc_tm_index(index: usize) -> Option<MoveIndex> {
+pub const fn move_id_by_dlc_tm_index(index: usize) -> Option<MoveSlot> {
     super::index_lookup::move_id_by_index(&MOVE_ID_BY_DLC_TM_INDEX, index)
 }
 
