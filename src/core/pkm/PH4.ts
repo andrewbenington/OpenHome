@@ -1,14 +1,11 @@
 import { Errorable, Option, R } from '@openhome-core/util/functional'
-import { FourMoves, PKMDate, Stats } from '@openhome-core/util/types'
+import { FourMoves, PKMDate } from '@openhome-core/util/types'
 import {
   BinaryGender,
-  ContestStats,
   ConvertStrategies,
   ConvertStrategy,
-  HyperTraining,
   Item,
   Language,
-  MarkingsSixShapesColors,
   ModernRibbon,
   NatureIndex,
   OriginGame,
@@ -20,7 +17,6 @@ import {
   PkhWasm,
   PokeDate,
   SpeciesLookup,
-  TrainerMemory,
 } from '@pkm-rs/pkg'
 import { OHPKM } from './OHPKM'
 import { PkmConstructorOptions } from './PKM'
@@ -156,10 +152,7 @@ export default class PH4 {
   }
 
   get markings() {
-    return this.inner.core_data.markings
-  }
-  set markings(value: MarkingsSixShapesColors) {
-    this.inner.core_data.markings = value
+    return this.inner.markings
   }
 
   get personalityValue() {
@@ -198,20 +191,15 @@ export default class PH4 {
   }
 
   get evs() {
-    return this.inner.core_data.evs
+    return this.inner.evs
   }
 
   get contest() {
-    return this.inner.core_data.contest
-  }
-  set contest(value: ContestStats) {
-    this.inner.core_data.contest = value
+    return this.inner.contest
   }
 
   get ribbons() {
-    return this.inner.core_data.ribbons.map((ribbonName) =>
-      ribbonName.endsWith('Ribbon') ? ribbonName.substring(0, ribbonName.length - 7) : ribbonName
-    )
+    return this.inner.ribbons
   }
 
   get contestMemoryCount() {
@@ -257,10 +245,7 @@ export default class PH4 {
   }
 
   get ivs() {
-    return this.inner.core_data.ivs
-  }
-  set ivs(value: Stats) {
-    this.inner.core_data.ivs = value
+    return this.inner.ivs
   }
 
   get isEgg() {
@@ -317,10 +302,7 @@ export default class PH4 {
   }
 
   get handlerMemory() {
-    return this.inner.core_data.handler_memory
-  }
-  set handlerMemory(value: TrainerMemory) {
-    this.inner.core_data.handler_memory = value
+    return this.inner.handlerMemory
   }
 
   get gameOfOrigin() {
@@ -373,10 +355,7 @@ export default class PH4 {
   }
 
   get trainerMemory() {
-    return this.inner.core_data.trainer_memory
-  }
-  set trainerMemory(value: TrainerMemory) {
-    this.inner.core_data.trainer_memory = value
+    return this.inner.trainerMemory
   }
 
   get eggDate() {
@@ -413,10 +392,7 @@ export default class PH4 {
   }
 
   get hyperTraining() {
-    return this.inner.core_data.hyper_training
-  }
-  set hyperTraining(value: HyperTraining) {
-    this.inner.core_data.hyper_training = value
+    return this.inner.hyperTraining
   }
 
   get heldItemIndex() {
@@ -429,7 +405,7 @@ export default class PH4 {
   // LGPE data
 
   get avs() {
-    return this.inner.pb7_data?.avs
+    return this.inner.avs
   }
 
   get resortEventStatus() {
@@ -474,8 +450,8 @@ export default class PH4 {
   }
 
   get relearnMovesLGPE() {
-    if (this.inner.pb7_data) {
-      const relearnMoves = Array.from(this.inner.pb7_data.relearn_move_indices)
+    if (this.inner.relearnMovesLgpeWasm) {
+      const relearnMoves = Array.from(this.inner.relearnMovesLgpeWasm)
       if (relearnMoves.length !== 4) {
         throw new Error(
           `PKH PB7 WASM struct has relearn move array length of ${relearnMoves.length} (expected 4)`

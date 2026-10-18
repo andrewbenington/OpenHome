@@ -8,7 +8,6 @@ use super::game_data_pk9::HomePk9Data;
 use crate::result::Result;
 use crate::traits::{HasSpeciesAndForm, IsShiny, ModernEvs, PkmBytes};
 
-use pkm_rs_resources::abilities::AbilityIndexWasm;
 use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_resources::species::{FormMetadata, SpeciesMetadata};
 use pkm_rs_resources::stats;
@@ -24,7 +23,9 @@ use crate::convert_strategy::ConvertStrategy;
 #[cfg(feature = "wasm")]
 use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 #[cfg(feature = "wasm")]
-use pkm_rs_types::TeraType;
+use pkm_rs_resources::abilities::AbilityIndexWasm;
+#[cfg(feature = "wasm")]
+use pkm_rs_types::{ContestStats, HyperTraining, MarkingsSixShapesColors, TeraType, TrainerMemory};
 #[cfg(feature = "wasm")]
 use pkm_rs_types::{JsResult, TryIntoTs, TsResult};
 #[cfg(feature = "wasm")]
@@ -285,6 +286,72 @@ impl Pkh {
         };
 
         AbilityIndexWasm::new(ability_index_u16)
+    }
+
+    #[wasm_bindgen(getter = markings)]
+    pub fn markings_wasm(&self) -> TsResult<MarkingsSixShapesColors> {
+        self.core_data.markings.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = evs)]
+    pub fn evs_wasm(&self) -> TsResult<Stats16Le> {
+        Stats16Le::from(self.core_data.evs).try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = ivs)]
+    pub fn ivs_wasm(&self) -> TsResult<Stats16Le> {
+        Stats16Le::from(self.core_data.ivs).try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = contest)]
+    pub fn contest_wasm(&self) -> TsResult<ContestStats> {
+        self.core_data.contest.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = ribbons)]
+    pub fn ribbons_wasm(&self) -> Vec<String> {
+        self.core_data
+            .ribbons
+            .into_iter()
+            .map(|r| {
+                let ribbon_name = r.to_string();
+                if ribbon_name.ends_with(" Ribbon") {
+                    ribbon_name.strip_suffix(" Ribbon").unwrap().to_owned()
+                } else {
+                    ribbon_name
+                }
+            })
+            .collect()
+    }
+
+    #[wasm_bindgen(getter = handlerMemory)]
+    pub fn handler_memory_wasm(&self) -> TsResult<TrainerMemory> {
+        self.core_data.handler_memory.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = trainerMemory)]
+    pub fn trainer_memory_wasm(&self) -> TsResult<TrainerMemory> {
+        self.core_data.trainer_memory.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = hyperTraining)]
+    pub fn hyper_training_wasm(&self) -> TsResult<HyperTraining> {
+        self.core_data.hyper_training.try_into_ts()
+    }
+
+    // Lets Go Pikachu/Eevee
+
+    #[wasm_bindgen(getter = relearnMovesLgpeWasm)]
+    pub fn relearn_move_indices_js(&self) -> Option<Vec<u16>> {
+        self.pb7_data
+            .map(|data| data.relearn_moves.into_iter().map(u16::from).collect())
+    }
+
+    #[wasm_bindgen(getter = avs)]
+    pub fn avs_js(&self) -> JsResult<Option<Ts<Stats16Le>>> {
+        self.pb7_data
+            .map(|data| Stats16Le::from(data.avs).try_into_ts())
+            .transpose()
     }
 
     // Legends Arceus
