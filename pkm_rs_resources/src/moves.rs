@@ -324,9 +324,9 @@ pub struct MoveDataOffsets<T: Into<usize> = usize> {
 #[cfg_attr(feature = "specta", derive(specta::Type))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Copy, Deserialize)]
-pub struct MoveIndexNonEmpty(NonZeroU16);
+pub struct MoveIndex(NonZeroU16);
 
-impl MoveIndexNonEmpty {
+impl MoveIndex {
     pub const fn get_metadata(&self) -> &'static MoveMetadata {
         ALL_MOVES[(self.0.get() - 1) as usize]
     }
@@ -351,7 +351,7 @@ impl MoveIndexNonEmpty {
 #[cfg_attr(feature = "specta", derive(specta::Type))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, PartialOrd, Ord, Default, PartialEq, Eq, Clone, Copy, Deserialize)]
-pub struct MoveSlot(Option<MoveIndexNonEmpty>);
+pub struct MoveSlot(Option<MoveIndex>);
 
 impl MoveSlot {
     pub fn get_metadata(&self) -> Option<&'static MoveMetadata> {
@@ -359,7 +359,7 @@ impl MoveSlot {
     }
 
     pub const fn from_u16(value: u16) -> Self {
-        Self(MoveIndexNonEmpty::from_u16(value))
+        Self(MoveIndex::from_u16(value))
     }
 
     pub const fn from_le_bytes(bytes: [u8; 2]) -> Self {
@@ -367,9 +367,7 @@ impl MoveSlot {
     }
 
     pub fn to_le_bytes(self) -> [u8; 2] {
-        self.0
-            .map(MoveIndexNonEmpty::to_le_bytes)
-            .unwrap_or_default()
+        self.0.map(MoveIndex::to_le_bytes).unwrap_or_default()
     }
 
     pub const fn empty() -> Self {
@@ -415,7 +413,7 @@ impl From<u16> for MoveSlot {
 
 impl From<MoveSlot> for u16 {
     fn from(val: MoveSlot) -> Self {
-        val.0.as_ref().map(MoveIndexNonEmpty::to_raw).unwrap_or(0)
+        val.0.as_ref().map(MoveIndex::to_raw).unwrap_or(0)
     }
 }
 
