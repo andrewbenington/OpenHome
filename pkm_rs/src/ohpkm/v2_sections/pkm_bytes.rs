@@ -142,7 +142,7 @@ impl Tag {
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Display, Debug)]
+#[derive(Clone, PartialEq, Eq, Hash, Display, Debug)]
 pub enum StoredPkmBytes {
     Pk1([u8; PK1_PARTY_SIZE]),
     Pk2([u8; PK2_PARTY_SIZE]),
@@ -269,7 +269,7 @@ impl StoredPkmBytes {
         Self::new(tag, &bytes[2..])
     }
 
-    pub fn to_bytes(self) -> Vec<u8> {
+    pub fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = Vec::with_capacity(2 + self.tag().data_size());
         bytes.extend_from_slice(&self.tag().to_le_bytes());
         bytes.extend_from_slice(self.data_as_bytes());
@@ -284,7 +284,7 @@ fn copy_to_sized_array<const N: usize>(slice: &[u8]) -> [u8; N] {
     arr
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct OriginalBackup(StoredPkmBytes);
 
 impl OriginalBackup {
@@ -318,37 +318,7 @@ impl DataSection for OriginalBackup {
     }
 
     fn to_bytes(&self) -> Vec<u8> {
-        self.0.to_bytes()
-    }
-
-    fn is_empty(&self) -> bool {
-        // if this section exists, it should always have data, so it is never empty
-        false
-    }
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct UnconvertedPkm(StoredPkmBytes);
-
-#[cfg(feature = "wasm")]
-impl UnconvertedPkm {
-    pub const fn new(pkm_bytes: StoredPkmBytes) -> Self {
-        Self(pkm_bytes)
-    }
-}
-
-impl DataSection for UnconvertedPkm {
-    type TagType = OhpkmSectionTag;
-    const TAG: Self::TagType = OhpkmSectionTag::UnconvertedPkm;
-
-    type ErrorType = Error;
-
-    fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Ok(Self(StoredPkmBytes::from_bytes(bytes)?))
-    }
-
-    fn to_bytes(&self) -> Vec<u8> {
-        self.0.to_bytes()
+        self.0.clone().to_bytes()
     }
 
     fn is_empty(&self) -> bool {
