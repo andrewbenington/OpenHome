@@ -13,7 +13,7 @@ use pkm_rs_derive::IsShiny4096;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::metadata_source::MetadataSource;
-use pkm_rs_resources::moves::{MoveIndex, MoveSlots};
+use pkm_rs_resources::moves::{MoveSlot, MoveSlots};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
 use pkm_rs_resources::species::{FormMetadata, SpeciesForm, SpeciesMetadata};
@@ -77,7 +77,7 @@ pub struct Pk7 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub moves: MoveSlots,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub relearn_moves: [MoveIndex; 4],
+    pub relearn_moves: [MoveSlot; 4],
     pub secret_super_training_unlocked: bool,
     pub secret_super_training_complete: bool,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
@@ -491,10 +491,10 @@ impl Pk7 {
     #[wasm_bindgen(setter)]
     pub fn set_relearn_move_indices(&mut self, value: Vec<u16>) {
         self.relearn_moves = [
-            MoveIndex::from(value[0]),
-            MoveIndex::from(value[1]),
-            MoveIndex::from(value[2]),
-            MoveIndex::from(value[3]),
+            MoveSlot::from(value[0]),
+            MoveSlot::from(value[1]),
+            MoveSlot::from(value[2]),
+            MoveSlot::from(value[3]),
         ]
     }
 
