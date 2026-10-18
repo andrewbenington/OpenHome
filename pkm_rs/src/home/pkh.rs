@@ -81,7 +81,7 @@ impl Pkh {
             pa9_data: None,
         };
 
-        // read game data
+        // read game data header
         let mut byte_counter = game_data_size_offset + 2;
 
         loop {
@@ -94,6 +94,7 @@ impl Pkh {
 
             // https://github.com/kwsch/PKHeX/blob/master/PKHeX.Core/PKM/HOME/HomeGameDataFormat.cs
             let game_data_type = bytes[byte_counter];
+            byte_counter += 3; // read game data
             match game_data_type {
                 1 => {
                     mon.pb7_data = HomePb7Data::try_from_bytes(
