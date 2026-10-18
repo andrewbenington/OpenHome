@@ -1,4 +1,4 @@
-use crate::moves::MoveSlot;
+use crate::moves::MoveIndex;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
@@ -26,7 +26,7 @@ const MAX_VAL_BLOCK_0XD6: usize =
 const PLUS_MOVE_INDEX_BY_MOVE_ID_BLOCK_0XD6: [u16; MAX_VAL_BLOCK_0XD6 + 1] =
     super::index_lookup::build_reverse(MOVE_ID_BY_PLUS_MOVE_INDEX_BLOCK_0XD6);
 
-pub const fn move_id_by_lza_plus_move_index_block_0xd6(index: usize) -> Option<MoveSlot> {
+pub const fn move_id_by_lza_plus_move_index_block_0xd6(index: usize) -> Option<MoveIndex> {
     super::index_lookup::move_id_by_index(&MOVE_ID_BY_PLUS_MOVE_INDEX_BLOCK_0XD6, index)
 }
 
@@ -62,7 +62,7 @@ const MAX_VAL_BLOCK_0X94: usize =
 const PLUS_MOVE_INDEX_BY_MOVE_ID_BLOCK_0X94: [u16; MAX_VAL_BLOCK_0X94 + 1] =
     super::index_lookup::build_reverse(MOVE_ID_BY_PLUS_MOVE_INDEX_BLOCK_0X94);
 
-pub const fn move_id_by_plus_move_index_block_0x94(index: usize) -> Option<MoveSlot> {
+pub const fn move_id_by_plus_move_index_block_0x94(index: usize) -> Option<MoveIndex> {
     super::index_lookup::move_id_by_index(&MOVE_ID_BY_PLUS_MOVE_INDEX_BLOCK_0X94, index)
 }
 

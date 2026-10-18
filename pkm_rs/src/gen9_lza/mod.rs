@@ -1,5 +1,5 @@
 use pkm_rs_resources::{
-    moves::{MoveSlot, lza_plus},
+    moves::{MoveIndex, lza_plus},
     species::SpeciesForm,
 };
 use pkm_rs_types::FlagSet;
@@ -103,7 +103,7 @@ impl PlusMoveFlags {
         }
     }
 
-    pub fn get_move_ids(&self) -> Vec<MoveSlot> {
+    pub fn get_move_ids(&self) -> Vec<MoveIndex> {
         self.block_0xd6
             .get_flags()
             .into_iter()
@@ -147,7 +147,7 @@ impl PlusMoveFlags {
     pub fn get_move_ids_wasm(&self) -> Vec<u16> {
         self.get_move_ids()
             .into_iter()
-            .filter_map(|id| id.to_raw())
+            .map(|id| id.to_raw())
             .collect()
     }
 

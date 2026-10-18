@@ -1,4 +1,4 @@
-use crate::moves::MoveSlot;
+use crate::moves::MoveIndex;
 
 pub(crate) const fn max_value(values: &[u16]) -> u16 {
     let mut max = 0u16;
@@ -17,14 +17,14 @@ const NOT_FOUND: u16 = u16::MAX;
 pub(crate) const fn move_id_by_index(
     move_id_lookup_by_index: &[u16],
     index: usize,
-) -> Option<MoveSlot> {
+) -> Option<MoveIndex> {
     if index >= move_id_lookup_by_index.len() {
         return None;
     };
 
     match move_id_lookup_by_index[index] {
         NOT_FOUND => None,
-        move_id => Some(MoveSlot::from_u16(move_id)),
+        move_id => MoveIndex::from_u16(move_id),
     }
 }
 
@@ -32,7 +32,7 @@ pub(crate) const fn move_id_by_index(
 pub(crate) fn move_id_by_index_wasm(move_id_lookup_by_index: &[u16], index: usize) -> Option<u16> {
     move_id_by_index(move_id_lookup_by_index, index)
         .as_ref()
-        .and_then(MoveSlot::to_raw)
+        .map(MoveIndex::to_raw)
 }
 
 pub(crate) const fn index_by_move_id(index_by_move_id: &[u16], move_id: u16) -> Option<u16> {

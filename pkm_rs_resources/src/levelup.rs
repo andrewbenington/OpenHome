@@ -1,4 +1,4 @@
-use crate::moves::MoveSlot;
+use crate::moves::MoveIndex;
 
 use pkm_rs_types::pkl_file::PklFileData;
 
@@ -29,15 +29,13 @@ impl LevelupLearnsetFileReader {
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct LevelupLearnsetMove {
-    pub(crate) move_id: MoveSlot,
+    pub(crate) move_id: MoveIndex,
     pub(crate) level: u8,
 }
 
 impl LevelupLearnsetMove {
-    pub fn move_id_raw(&self) -> u16 {
-        self.move_id
-            .to_raw()
-            .expect("levelup learnset move has a valid id")
+    pub const fn move_id_raw(&self) -> u16 {
+        self.move_id.to_raw()
     }
 
     pub const fn get_level(&self) -> u8 {
@@ -78,7 +76,7 @@ impl LevelupLearnsetReader {
 
         let moves_span_size = (self.move_count()) * 2;
         let move_indices_raw = u8_slice_to_u16_le(&self.0[..moves_span_size]);
-        let move_id = MoveSlot::from_u16(move_indices_raw[index]);
+        let move_id = MoveIndex::from_u16(move_indices_raw[index])?;
 
         let levels = &self.0[moves_span_size..];
         let level = levels[index];
@@ -130,7 +128,7 @@ pub enum LearnsetCondition {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct LearnsetMove {
-    pub(crate) move_id: MoveSlot,
+    pub(crate) move_id: MoveIndex,
     pub(crate) condition: LearnsetCondition,
 }
 
@@ -139,8 +137,8 @@ impl LearnsetMove {
         self.condition
     }
 
-    pub fn move_id_raw(&self) -> u16 {
-        self.move_id.to_raw().expect("learnset move has a valid id")
+    pub const fn move_id_raw(&self) -> u16 {
+        self.move_id.to_raw()
     }
 }
 
@@ -167,7 +165,7 @@ pub struct LearnsetMoveJs {
 impl From<LearnsetMove> for LearnsetMoveJs {
     fn from(value: LearnsetMove) -> Self {
         Self {
-            move_id: value.move_id.into(),
+            move_id: value.move_id.to_raw(),
             is_evolution: matches!(value.condition, LearnsetCondition::Evolution),
             level: match value.condition {
                 LearnsetCondition::LevelUp(level) => Some(level),

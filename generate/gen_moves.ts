@@ -424,6 +424,15 @@ impl MoveIndex {
     }
 }
 
+impl Serialize for MoveIndex {
+    fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_str(self.get_metadata().name)
+    }
+}
+
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "specta", derive(specta::Type))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
@@ -477,10 +486,10 @@ impl Serialize for MoveSlot {
     where
         S: Serializer,
     {
-        serializer.serialize_str(match self.get_metadata() {
-            None => "<empty>",
-            Some(metadata) => metadata.name,
-        })
+        match self.0 {
+            None => "<empty>".serialize(serializer),
+            Some(index) => index.serialize(serializer),
+        }
     }
 }
 

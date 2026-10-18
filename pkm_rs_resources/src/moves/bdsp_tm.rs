@@ -1,4 +1,4 @@
-use crate::moves::MoveSlot;
+use crate::moves::MoveIndex;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -16,7 +16,7 @@ const MAX_VAL: usize = super::index_lookup::max_value(&MOVE_ID_BY_TM_INDEX) as u
 const TM_INDEX_BY_MOVE_ID: [u16; MAX_VAL + 1] =
     super::index_lookup::build_reverse(MOVE_ID_BY_TM_INDEX);
 
-pub const fn move_id_by_tm_index(index: usize) -> Option<MoveSlot> {
+pub const fn move_id_by_tm_index(index: usize) -> Option<MoveIndex> {
     super::index_lookup::move_id_by_index(&MOVE_ID_BY_TM_INDEX, index)
 }
 
