@@ -67,6 +67,9 @@ pub enum Error {
     },
     #[cfg(feature = "wasm")]
     SwishCrypto(SwishError),
+    Tsify {
+        source: Rc<tsify::Error>,
+    },
     Other(String),
 }
 
@@ -177,6 +180,7 @@ impl Display for Error {
             Self::StringDecode { source } => format!("String decode error: {source}"),
             #[cfg(feature = "wasm")]
             Self::SwishCrypto(error) => error.to_string(),
+            Self::Tsify { source } => format!("Error transforming type at wasm boundary: {source}"),
             Self::Other(msg) => msg.clone(),
         };
 
@@ -192,6 +196,7 @@ impl std::error::Error for Error {
                 source: Some(source),
                 ..
             } => Some(source.as_ref()),
+            Self::Tsify { source } => Some(source.as_ref()),
             _ => None,
         }
     }
@@ -221,6 +226,14 @@ impl From<sectioned_data::Error> for Error {
 impl From<pkm_rs_types::InvalidAbilityNumber> for Error {
     fn from(value: InvalidAbilityNumber) -> Self {
         Self::AbilityNumber(value)
+    }
+}
+
+impl From<tsify::Error> for Error {
+    fn from(value: tsify::Error) -> Self {
+        Self::Tsify {
+            source: Rc::new(value),
+        }
     }
 }
 
@@ -312,6 +325,7 @@ impl Display for StringErrorSource {
 }
 
 pub type Result<T> = core::result::Result<T, Error>;
+pub type StdResult<T, E> = core::result::Result<T, E>;
 
 #[cfg(feature = "wasm")]
 impl From<Error> for JsValue {

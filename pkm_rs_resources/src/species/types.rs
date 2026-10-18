@@ -10,7 +10,9 @@ use crate::species::metadata_table::{
 use crate::species::metadata_table::{levelup_learnset_lookup, types_lookup};
 use crate::{Error, Result, abilities::AbilityIndexWasm, metadata_source::MetadataSource};
 use crate::{abilities::AbilityIndexBounded, levelup::LearnsetMoveJs};
-use pkm_rs_types::{AbilityNumber, GameSetting, Generation, NationalDex, PkmType, TeraType};
+use pkm_rs_types::{
+    AbilityNumber, GameSetting, Generation, NationalDex, PkmType, TeraType, TryIntoTs,
+};
 use serde::Serialize;
 use strum_macros::{Display, EnumString};
 
@@ -18,13 +20,15 @@ use strum_macros::{Display, EnumString};
 use pkm_rs_types::randomize::Randomize;
 #[cfg(feature = "randomize")]
 use rand::RngExt;
+#[cfg(feature = "wasm")]
+use tsify::Ts;
 
 #[cfg(feature = "wasm")]
 use crate::species::metadata_table::current_base_stats;
 #[cfg(feature = "wasm")]
-use pkm_rs_types::Stat;
+use pkm_rs_types::{Gender, Stats16Le, TsResult};
 #[cfg(feature = "wasm")]
-use pkm_rs_types::{Gender, Stats16Le};
+use pkm_rs_types::{JsResult, Stat};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -389,6 +393,30 @@ impl FormMetadata {
         ))
     }
 
+    pub fn type_1(&self) -> PkmType {
+        self.types_from_source_or_latest(None).0
+    }
+
+    pub fn type_1_with_source(&self, source: MetadataSource) -> Option<PkmType> {
+        Some(self.types_from_source_or_latest(Some(source)).0)
+    }
+
+    pub fn type_1_index(&self) -> u8 {
+        self.types_from_source_or_latest(None).0 as u8
+    }
+
+    pub fn type_2(&self) -> Option<PkmType> {
+        self.types_from_source_or_latest(None).1
+    }
+
+    pub fn type_2_with_source(&self, source: MetadataSource) -> Option<PkmType> {
+        self.types_from_source_or_latest(Some(source)).1
+    }
+
+    pub fn type_2_index(&self) -> Option<u8> {
+        self.types_from_source_or_latest(None).1.map(|t| t as u8)
+    }
+
     /// Tera Type assigned by Pokémon HOME for the species when not originally
     /// from Scarlet/Violet
     pub fn transferred_tera_type(&self) -> TeraType {
@@ -414,32 +442,41 @@ impl FormMetadata {
     }
 
     #[wasm_bindgen(getter = type1)]
-    pub fn type_1(&self) -> PkmType {
-        self.types_from_source_or_latest(None).0
+    pub fn type_1_wasm(&self) -> TsResult<PkmType> {
+        self.types_from_source_or_latest(None).0.try_into_ts()
     }
 
     #[wasm_bindgen(js_name = type1WithSource)]
-    pub fn type_1_with_source(&self, source: MetadataSource) -> Option<PkmType> {
-        Some(self.types_from_source_or_latest(Some(source)).0)
+    pub fn type_1_with_source_wasm(&self, source: MetadataSource) -> JsResult<Option<Ts<PkmType>>> {
+        self.types_from_source_or_latest(Some(source))
+            .0
+            .try_into_ts()
+            .map(Some)
     }
 
     #[wasm_bindgen(getter = type1Index)]
-    pub fn type_1_index(&self) -> u8 {
+    pub fn type_1_index_wasm(&self) -> u8 {
         self.types_from_source_or_latest(None).0 as u8
     }
 
     #[wasm_bindgen(getter = type2)]
-    pub fn type_2(&self) -> Option<PkmType> {
-        self.types_from_source_or_latest(None).1
+    pub fn type_2_wasm(&self) -> JsResult<Option<Ts<PkmType>>> {
+        self.types_from_source_or_latest(None)
+            .1
+            .map(|t| t.try_into_ts())
+            .transpose()
     }
 
     #[wasm_bindgen(js_name = type2WithSource)]
-    pub fn type_2_with_source(&self, source: MetadataSource) -> Option<PkmType> {
-        self.types_from_source_or_latest(Some(source)).1
+    pub fn type_2_with_source_wasm(&self, source: MetadataSource) -> JsResult<Option<Ts<PkmType>>> {
+        self.types_from_source_or_latest(Some(source))
+            .1
+            .map(|t| t.try_into_ts())
+            .transpose()
     }
 
     #[wasm_bindgen(getter = type2Index)]
-    pub fn type_2_index(&self) -> Option<u8> {
+    pub fn type_2_index_wasm(&self) -> Option<u8> {
         self.types_from_source_or_latest(None).1.map(|t| t as u8)
     }
 
@@ -527,28 +564,35 @@ impl FormMetadata {
     }
 
     #[wasm_bindgen(getter = baseStats)]
-    pub fn get_base_stats(&self) -> Stats16Le {
+    pub fn get_base_stats(&self) -> TsResult<Stats16Le> {
         current_base_stats(self.national_dex, self.form_index)
             .map(Stats16Le::from)
             .unwrap_or_default()
+            .try_into_ts()
     }
 
     #[wasm_bindgen(js_name = baseStatsFrom)]
-    pub fn get_base_stats_from_js(&self, source: MetadataSource) -> Option<BaseStats> {
-        self.get_base_stats_from(source)
+    pub fn get_base_stats_from_js(
+        &self,
+        source: MetadataSource,
+    ) -> JsResult<Option<Ts<BaseStats>>> {
+        Ok(self
+            .get_base_stats_from(source)
+            .map(|stats| Ts::from_rust(&stats))
+            .transpose()?)
     }
 
     #[wasm_bindgen(js_name = getBaseStat)]
-    pub fn get_base_stat(&self, stat: Stat) -> u16 {
-        let base_stats = self.get_base_stats();
-        match stat {
+    pub fn get_base_stat(&self, stat: Stat) -> JsResult<u16> {
+        let base_stats = self.get_base_stats()?.to_rust()?;
+        Ok(match stat {
             Stat::Hp => base_stats.hp,
             Stat::Attack => base_stats.atk,
             Stat::Defense => base_stats.def,
             Stat::SpAttack => base_stats.spa,
             Stat::SpDefense => base_stats.spd,
             Stat::Speed => base_stats.spe,
-        }
+        })
     }
 
     #[wasm_bindgen(js_name = getMegaBaseForm)]

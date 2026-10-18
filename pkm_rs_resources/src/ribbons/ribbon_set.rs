@@ -149,6 +149,15 @@ impl<const N: usize, RIBBON: Ribbon, const MAX: usize> Default for RibbonSet<N, 
     }
 }
 
+impl<const N: usize, RIBBON: Ribbon, const MAX: usize> IntoIterator for RibbonSet<N, RIBBON, MAX> {
+    type Item = RIBBON;
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.get_ribbons().into_iter()
+    }
+}
+
 impl<const N: usize, RIBBON: Ribbon, const MAX: usize> FromIterator<RIBBON>
     for RibbonSet<N, RIBBON, MAX>
 {

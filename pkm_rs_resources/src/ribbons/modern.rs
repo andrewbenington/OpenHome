@@ -20,6 +20,7 @@ pub type ModernRibbonSet<const N: usize, const MAX: usize = { ModernRibbon::Part
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Serialize, PartialEq, Eq, Clone, Copy, PartialOrd, Ord)]
+#[repr(usize)]
 pub enum ModernRibbon {
     KalosChampion,
     Gen3Champion,

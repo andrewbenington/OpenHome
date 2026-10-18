@@ -10,7 +10,7 @@ use crate::util;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::lookup;
-use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots, PpUpStorage};
+use pkm_rs_resources::moves::{MoveDataOffsets, MoveSlot, MoveSlots, PpUpStorage};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesForm;
@@ -21,17 +21,18 @@ use pkm_rs_types::{
 use pkm_rs_types::{Gender, OriginGame, PokeDate, TrainerMemory};
 use pkm_rs_types::{HyperTraining, MarkingsSixShapesColors};
 use pkm_rs_types::{Ivs, Language};
-#[cfg(feature = "randomize")]
-use rand::RngExt;
 use serde::Serialize;
 use std::num::NonZeroU64;
 
 #[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+#[cfg(feature = "randomize")]
+use rand::RngExt;
+#[cfg(feature = "randomize")]
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-#[cfg(feature = "randomize")]
-use pkm_rs_types::randomize::Randomize;
-
+#[cfg(feature = "wasm")]
+use pkm_rs_types::{TryIntoTs, TsResult};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -57,6 +58,7 @@ pub struct MainDataV2 {
     pub ability_num: AbilityNumber,
     pub favorite: bool,
     pub is_shadow: bool,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub markings: MarkingsSixShapesColors,
     pub nature: NatureIndex,
     pub mint_nature: Option<NatureIndex>,
@@ -64,6 +66,7 @@ pub struct MainDataV2 {
     pub gender: Gender,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub evs: Stats8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub contest: ContestStats,
     pub pokerus: Pokerus,
     pub contest_memory_count: u8,
@@ -79,7 +82,7 @@ pub struct MainDataV2 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub nickname: SizedUtf16String<26>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub relearn_moves: [MoveIndex; 4],
+    pub relearn_moves: [MoveSlot; 4],
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ivs: Ivs,
     pub is_egg: bool,
@@ -90,6 +93,7 @@ pub struct MainDataV2 {
     pub is_current_handler: bool,
     pub handler_id: u16,
     pub handler_friendship: u8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub handler_memory: TrainerMemory,
     pub handler_affection: u8,
     pub handler_gender: BinaryGender,
@@ -105,6 +109,7 @@ pub struct MainDataV2 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub trainer_name: SizedUtf16String<26>,
     pub trainer_friendship: u8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub trainer_memory: TrainerMemory,
     pub trainer_affection: u8,
     pub egg_date: Option<PokeDate>,
@@ -113,6 +118,7 @@ pub struct MainDataV2 {
     pub egg_location_index: Option<u16>,
     pub met_location_index: u16,
     pub met_level: u8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub hyper_training: HyperTraining,
     pub trainer_gender: BinaryGender,
     pub obedience_level: u8,
@@ -422,6 +428,36 @@ impl MainDataV2 {
     }
 }
 
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+#[allow(clippy::missing_const_for_fn)]
+impl MainDataV2 {
+    #[wasm_bindgen(getter)]
+    pub fn contest_stats_wasm(&self) -> TsResult<ContestStats> {
+        self.contest.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = hyperTraining)]
+    pub fn hyper_training_wasm(&self) -> TsResult<HyperTraining> {
+        self.hyper_training.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn markings_wasm(&self) -> TsResult<MarkingsSixShapesColors> {
+        self.markings.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn trainer_memory_wasm(&self) -> TsResult<TrainerMemory> {
+        self.trainer_memory.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn handler_memory_wasm(&self) -> TsResult<TrainerMemory> {
+        self.handler_memory.try_into_ts()
+    }
+}
+
 fn is_prevo_species_name(species_and_form: &SpeciesForm, name: &str, language: Language) -> bool {
     species_and_form
         .all_preevolutions()
@@ -508,10 +544,10 @@ impl DataSection for MainDataV2 {
             )),
             met_location_index: u16::from_le_bytes(bytes[131..133].try_into().unwrap()),
             relearn_moves: [
-                MoveIndex::from(u16::from_le_bytes(bytes[138..140].try_into().unwrap())),
-                MoveIndex::from(u16::from_le_bytes(bytes[140..142].try_into().unwrap())),
-                MoveIndex::from(u16::from_le_bytes(bytes[142..144].try_into().unwrap())),
-                MoveIndex::from(u16::from_le_bytes(bytes[144..146].try_into().unwrap())),
+                MoveSlot::from(u16::from_le_bytes(bytes[138..140].try_into().unwrap())),
+                MoveSlot::from(u16::from_le_bytes(bytes[140..142].try_into().unwrap())),
+                MoveSlot::from(u16::from_le_bytes(bytes[142..144].try_into().unwrap())),
+                MoveSlot::from(u16::from_le_bytes(bytes[144..146].try_into().unwrap())),
             ],
             ivs: Ivs::from_30_bits(bytes[148..152].try_into().unwrap()),
             is_egg: util::get_flag(bytes, 148, 30),
@@ -771,10 +807,10 @@ impl Randomize for MainDataV2 {
             moves: MoveSlots::randomized(rng),
             nickname: SizedUtf16String::randomized(rng),
             relearn_moves: [
-                MoveIndex::randomized(rng),
-                MoveIndex::randomized(rng),
-                MoveIndex::randomized(rng),
-                MoveIndex::randomized(rng),
+                MoveSlot::randomized(rng),
+                MoveSlot::randomized(rng),
+                MoveSlot::randomized(rng),
+                MoveSlot::randomized(rng),
             ],
             ivs: Ivs::randomized(rng),
             is_egg: bool::randomized(rng),

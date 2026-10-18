@@ -4,12 +4,17 @@ use crate::format::PkmFormat;
 use crate::location::{Location, MetData};
 use crate::ohpkm::OhpkmV2;
 
-#[cfg(feature = "wasm")]
-use crate::convert_strategy::personality_value::PidGenerationParametersJs;
 use pkm_rs_resources::lookup;
 use pkm_rs_types::Ivs;
+
+#[cfg(feature = "wasm")]
+use crate::convert_strategy::personality_value::PidGenerationParametersJs;
+#[cfg(feature = "wasm")]
+use pkm_rs_types::{JsResult, TryIntoTs, TsResult};
 #[cfg(feature = "wasm")]
 use pkm_rs_types::{OriginGame, Stats16Le};
+#[cfg(feature = "wasm")]
+use tsify::Ts;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -141,8 +146,11 @@ impl PkmConverter {
 #[allow(clippy::missing_const_for_fn)]
 impl PkmConverter {
     #[wasm_bindgen(constructor)]
-    pub fn new_wasm(dest_pkm_format: PkmFormat, strategy: ConvertStrategy) -> Self {
-        Self::new(dest_pkm_format, strategy)
+    pub fn new_wasm(
+        dest_pkm_format: Ts<PkmFormat>,
+        strategy: Ts<ConvertStrategy>,
+    ) -> JsResult<Self> {
+        Ok(Self::new(dest_pkm_format.to_rust()?, strategy.to_rust()?))
     }
 
     #[wasm_bindgen(js_name = "nickname")]
@@ -166,17 +174,20 @@ impl PkmConverter {
     }
 
     #[wasm_bindgen(js_name = "ivs")]
-    pub fn ivs_wasm(&self, ohpkm: &OhpkmV2) -> Stats16Le {
-        self.ivs(ohpkm).into()
+    pub fn ivs_wasm(&self, ohpkm: &OhpkmV2) -> TsResult<Stats16Le> {
+        Stats16Le::from(self.ivs(ohpkm)).try_into_ts()
     }
 
     #[wasm_bindgen(js_name = "personalityValue")]
     pub fn personality_value_wasm(
         &self,
         fields: PidGenerationParametersJs,
-        shiny_odds: ShinyOdds,
-    ) -> crate::result::Result<u32> {
-        Ok(self.personality_value(PidGenerationParameters::try_from(fields)?, shiny_odds))
+        shiny_odds: Ts<ShinyOdds>,
+    ) -> JsResult<u32> {
+        Ok(self.personality_value(
+            PidGenerationParameters::try_from(fields)?,
+            shiny_odds.to_rust()?,
+        ))
     }
 }
 

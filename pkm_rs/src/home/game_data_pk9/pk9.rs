@@ -5,7 +5,7 @@ use crate::result::{Error, Result};
 
 use pkm_rs_resources::abilities::{AbilityIndexBounded, AbilityIndexWasm};
 use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::moves::{MoveIndex, MoveSlots};
+use pkm_rs_resources::moves::{MoveSlot, MoveSlots};
 use pkm_rs_types::{AbilityNumber, FlagSet, TeraType};
 use serde::Serialize;
 
@@ -22,8 +22,10 @@ pub struct HomePk9Data {
     pub scale: u8,
     pub moves: MoveSlots,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub relearn_moves: [MoveIndex; 4],
+    pub relearn_moves: [MoveSlot; 4],
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub tera_type_original: TeraType,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub tera_type_override: Option<TeraType>,
     pub ball: Ball,
     pub egg_location_index: u16,

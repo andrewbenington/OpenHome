@@ -2,15 +2,18 @@ use super::Pk7Buffer;
 use super::pk7_buffer::Pk7BufferMut;
 use super::{Pk7AbilityIndex, Pk7SpeciesAndForm};
 use crate::checksum::{Checksum, RefreshChecksum};
+use crate::convert_strategy::ConvertStrategy;
 use crate::result::{Error, Result};
 use crate::traits::ModernEvs;
 use crate::traits::{HasSpeciesAndForm, PkmBytes};
+#[cfg(feature = "wasm")]
+use pkm_rs_types::JsResult;
 
 use pkm_rs_derive::IsShiny4096;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::metadata_source::MetadataSource;
-use pkm_rs_resources::moves::{MoveIndex, MoveSlots};
+use pkm_rs_resources::moves::{MoveSlot, MoveSlots};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
 use pkm_rs_resources::species::{FormMetadata, SpeciesForm, SpeciesMetadata};
@@ -18,11 +21,12 @@ use pkm_rs_resources::stats;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, HyperTraining, Ivs, Language,
-    MarkingsSixShapesColors, OriginGame, Pokerus, Stats8, Stats16Le,
+    MarkingsSixShapesColors, OriginGame, Pokerus, Stats8, Stats16Le, TryIntoTs, TsResult,
 };
 use pkm_rs_types::{Gender, Geolocations, PokeDate, TrainerMemory};
 use serde::Serialize;
 
+use tsify::Ts;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -50,6 +54,7 @@ pub struct Pk7 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ability_index: Pk7AbilityIndex,
     pub ability_num: AbilityNumber,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub markings: MarkingsSixShapesColors,
     pub personality_value: u32,
     pub nature: NatureIndex,
@@ -57,6 +62,7 @@ pub struct Pk7 {
     pub gender: Gender,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub evs: Stats8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub contest: ContestStats,
     pub resort_event_status: u8,
     pub pokerus: Pokerus,
@@ -71,7 +77,7 @@ pub struct Pk7 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub moves: MoveSlots,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub relearn_moves: [MoveIndex; 4],
+    pub relearn_moves: [MoveSlot; 4],
     pub secret_super_training_unlocked: bool,
     pub secret_super_training_complete: bool,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
@@ -81,15 +87,18 @@ pub struct Pk7 {
     pub handler_name: SizedUtf16String<26>,
     pub handler_gender: BinaryGender,
     pub is_current_handler: bool,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub geolocations: Geolocations,
     pub handler_friendship: u8,
     pub handler_affection: u8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub handler_memory: TrainerMemory,
     pub fullness: u8,
     pub enjoyment: u8,
     pub trainer_name: SizedUtf16String<26>,
     pub trainer_friendship: u8,
     pub trainer_affection: u8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub trainer_memory: TrainerMemory,
     pub egg_date: Option<PokeDate>,
     pub met_date: PokeDate,
@@ -98,6 +107,7 @@ pub struct Pk7 {
     pub ball: Ball,
     pub met_level: u8,
     pub trainer_gender: BinaryGender,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub hyper_training: HyperTraining,
     pub game_of_origin: OriginGame,
     pub country: u8,
@@ -114,6 +124,7 @@ pub struct Pk7 {
     #[cfg_attr(feature = "randomize", randomize(skip))]
     pub current_hp: u16,
     #[cfg_attr(feature = "randomize", randomize(skip))]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub stats: Stats16Le,
 }
 
@@ -410,22 +421,19 @@ impl HasSpeciesAndForm for Pk7 {
 #[allow(clippy::missing_const_for_fn)]
 impl Pk7 {
     #[wasm_bindgen(js_name = fromOhpkmBytes)]
-    pub fn from_ohpkm_bytes(
-        bytes: Vec<u8>,
-        strategy: crate::convert_strategy::ConvertStrategy,
-    ) -> core::result::Result<Pk7, JsValue> {
-        let ohpkm = OhpkmV2::from_bytes(&bytes).map_err(JsValue::from)?;
-        Pk7::from_ohpkm(&ohpkm, strategy).map_err(JsValue::from)
+    pub fn from_ohpkm_bytes(bytes: Vec<u8>, strategy: Ts<ConvertStrategy>) -> JsResult<Self> {
+        let ohpkm = OhpkmV2::from_bytes(&bytes)?;
+        Ok(Self::from_ohpkm(&ohpkm, strategy.to_rust()?)?)
     }
 
     #[wasm_bindgen(js_name = fromDecryptedBytes)]
-    pub fn from_bytes_js(bytes: Box<[u8]>) -> core::result::Result<Pk7, JsValue> {
-        Pk7::from_bytes(&bytes).map_err(JsValue::from)
+    pub fn from_bytes_wasm(bytes: Box<[u8]>) -> core::result::Result<Self, JsValue> {
+        Self::from_bytes(&bytes).map_err(JsValue::from)
     }
 
     #[wasm_bindgen(js_name = fromEncryptedBytes)]
-    pub fn take_from_encrypted_bytes(bytes: Box<[u8]>) -> core::result::Result<Pk7, JsValue> {
-        Pk7::from_encrypted_bytes(bytes).map_err(JsValue::from)
+    pub fn take_from_encrypted_bytes(bytes: Box<[u8]>) -> core::result::Result<Self, JsValue> {
+        Self::from_encrypted_bytes(bytes).map_err(JsValue::from)
     }
 
     #[wasm_bindgen(js_name = toBytes)]
@@ -483,10 +491,10 @@ impl Pk7 {
     #[wasm_bindgen(setter)]
     pub fn set_relearn_move_indices(&mut self, value: Vec<u16>) {
         self.relearn_moves = [
-            MoveIndex::from(value[0]),
-            MoveIndex::from(value[1]),
-            MoveIndex::from(value[2]),
-            MoveIndex::from(value[3]),
+            MoveSlot::from(value[0]),
+            MoveSlot::from(value[1]),
+            MoveSlot::from(value[2]),
+            MoveSlot::from(value[3]),
         ]
     }
 
@@ -526,33 +534,23 @@ impl Pk7 {
     }
 
     #[wasm_bindgen(getter = nationalDex)]
-    pub fn national_dex_js(&self) -> u16 {
+    pub fn national_dex_wasm(&self) -> u16 {
         self.species_and_form.0.get_ndex() as u16
     }
 
     #[wasm_bindgen(getter = formIndex)]
-    pub fn form_index_js(&self) -> u16 {
+    pub fn form_index_wasm(&self) -> u16 {
         self.species_and_form.0.get_form_index()
     }
 
     #[wasm_bindgen(getter = evs)]
-    pub fn evs_js(&self) -> Stats16Le {
-        self.evs.into()
-    }
-
-    #[wasm_bindgen(setter = evs)]
-    pub fn set_evs_js(&mut self, v: Stats16Le) {
-        self.evs = v.to_stats8_truncated()
+    pub fn evs_wasm(&self) -> TsResult<Stats16Le> {
+        Stats16Le::from(self.evs).try_into_ts()
     }
 
     #[wasm_bindgen(getter = ivs)]
-    pub fn ivs_js(&self) -> Stats16Le {
-        self.ivs.into()
-    }
-
-    #[wasm_bindgen(setter = ivs)]
-    pub fn set_ivs_js(&mut self, v: Stats16Le) {
-        self.ivs = v.to_ivs_capped()
+    pub fn ivs_wasm(&self) -> TsResult<Stats16Le> {
+        Stats16Le::from(self.ivs).try_into_ts()
     }
 
     #[wasm_bindgen(js_name = toOhpkm)]
@@ -566,23 +564,53 @@ impl Pk7 {
     }
 
     #[wasm_bindgen(js_name = calculateChecksum)]
-    pub fn calculate_checksum_js(&self) -> u16 {
+    pub fn calculate_checksum_wasm(&self) -> u16 {
         self.calculate_checksum()
     }
 
     #[wasm_bindgen(js_name = calculateLevel)]
-    pub fn calculate_level_js(&self) -> u8 {
+    pub fn calculate_level_wasm(&self) -> u8 {
         self.calculate_level()
     }
 
     #[wasm_bindgen(js_name = calculateStats)]
-    pub fn calculate_stats_js(&self) -> Stats16Le {
-        self.calculate_stats()
+    pub fn calculate_stats_wasm(&self) -> TsResult<Stats16Le> {
+        self.calculate_stats().try_into_ts()
     }
 
     #[wasm_bindgen(js_name = recalculateStats)]
-    pub fn recalculate_stats_js(&mut self) {
+    pub fn recalculate_stats_wasm(&mut self) {
         self.recalculate_stats()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn geolocations(&self) -> Result<Ts<Geolocations>> {
+        Ok(Ts::from_rust(&self.geolocations)?)
+    }
+
+    #[wasm_bindgen(getter = markings)]
+    pub fn markings_wasm(&self) -> TsResult<MarkingsSixShapesColors> {
+        self.markings.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = trainerMemory)]
+    pub fn trainer_memory_wasm(&self) -> TsResult<TrainerMemory> {
+        self.trainer_memory.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = handlerMemory)]
+    pub fn handler_memory_wasm(&self) -> TsResult<TrainerMemory> {
+        self.handler_memory.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = contest)]
+    pub fn contest_stats_wasm(&self) -> TsResult<ContestStats> {
+        self.contest.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = hyperTraining)]
+    pub fn hyper_training_wasm(&self) -> TsResult<HyperTraining> {
+        self.hyper_training.try_into_ts()
     }
 }
 

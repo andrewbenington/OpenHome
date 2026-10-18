@@ -4,7 +4,7 @@ use crate::result::{Error, Result};
 
 use pkm_rs_resources::abilities::{AbilityIndexBounded, AbilityIndexWasm};
 use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::moves::{MoveIndex, MoveSlots};
+use pkm_rs_resources::moves::{MoveSlot, MoveSlots};
 use pkm_rs_types::{AbilityNumber, FlagSet, Pokerus};
 use serde::Serialize;
 
@@ -22,7 +22,7 @@ pub struct HomePk8Data {
     pub sociability: u8,
     pub moves: MoveSlots,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub relearn_moves: [MoveIndex; 4],
+    pub relearn_moves: [MoveSlot; 4],
     pub dynamax_level: u8,
     // poke job data goes here but is currently not read in OpenHome at all
     pub fullness: u8,

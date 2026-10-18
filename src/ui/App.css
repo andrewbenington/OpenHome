@@ -4,6 +4,7 @@
   --font-weight-normal: var(--primitive-font-weight-normal);
   --font-weight-medium: var(--primitive-font-weight-medium);
   --base-font-size: 14px;
+  --footer-height: 1.6rem;
 
   font-size: var(--base-font-size);
   font-family: var(--font-sans);

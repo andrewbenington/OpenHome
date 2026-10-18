@@ -22,13 +22,16 @@ use crate::traits::{HasSpeciesAndForm, IsShiny, PkmBytes};
 
 #[cfg(feature = "wasm")]
 use arrayref::array_ref;
+use num_enum::{IntoPrimitive, TryFromPrimitive};
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::moves::{MoveIndex, MoveSlots, la_tutor, lza_tm, sv_tm, swsh_tr};
+use pkm_rs_resources::moves::{MoveIndex, MoveSlot, MoveSlots, la_tutor, lza_tm, sv_tm, swsh_tr};
 use pkm_rs_resources::natures::{NatureIndex, WithNature};
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_resources::species::SpeciesMetadata;
+#[cfg(feature = "wasm")]
+use pkm_rs_types::TsResult;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, FlagSet, Gender, Geolocations, HyperTraining, Ivs,
@@ -39,21 +42,23 @@ use pkm_rs_types::{Dvs, NationalDex};
 use serde::Serialize;
 use strum_macros::Display;
 
+#[cfg(feature = "wasm")]
+use pkm_rs_resources::abilities::AbilityIndexWasm;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
-
 #[cfg(feature = "wasm")]
-use super::JsResult;
+use pkm_rs_types::{JsResult, TryIntoTs};
+#[cfg(feature = "wasm")]
+use tsify::Ts;
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
+
 #[cfg(feature = "wasm")]
 use crate::gen9_lza::{LZA_BASE_TM_BYTES, LZA_DLC_TM_BYTES};
 #[cfg(feature = "wasm")]
 use crate::gen9_sv;
 #[cfg(feature = "wasm")]
 use crate::ohpkm::v2_sections::{MonTag, pkm_bytes};
-#[cfg(feature = "wasm")]
-use pkm_rs_resources::abilities::AbilityIndexWasm;
-#[cfg(feature = "wasm")]
-use wasm_bindgen::prelude::*;
 
 const MAGIC_NUMBER: u32 = 0x57575757;
 const CURRENT_VERSION: u16 = 2;
@@ -115,7 +120,7 @@ fn rgb_to_display_color(rgb: [u8; 3]) -> String {
     format!("#{:02x}{:02x}{:02x}", rgb[0], rgb[1], rgb[2])
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Display)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Display, IntoPrimitive, TryFromPrimitive)]
 #[repr(u16)]
 pub enum OhpkmSectionTag {
     MainData = 0x00,
@@ -141,31 +146,6 @@ pub enum OhpkmSectionTag {
 }
 
 impl OhpkmSectionTag {
-    pub const fn new(tag: u16) -> Option<Self> {
-        match tag {
-            0x00 => Some(Self::MainData),
-            0x01 => Some(Self::GameboyData),
-            0x02 => Some(Self::Gen45Data),
-            0x03 => Some(Self::Gen67Data),
-            0x04 => Some(Self::SwordShield),
-            0x05 => Some(Self::BdspTmFlags),
-            0x06 => Some(Self::LegendsArceus),
-            0x07 => Some(Self::ScarletViolet),
-            0x11 => Some(Self::LegendsZa),
-            #[allow(deprecated)]
-            0x08 => Some(Self::PastHandlerV1),
-            0x09 => Some(Self::PluginData),
-            0x0A => Some(Self::Notes),
-            0x0B => Some(Self::MostRecentSave),
-            0x0C => Some(Self::Tag),
-            0x0D => Some(Self::OriginalBackup),
-            //  UNUSED:  0x0E,
-            0x0F => Some(Self::PastHandlerV2),
-            0x10 => Some(Self::LearnedMoves),
-            _ => None,
-        }
-    }
-
     // The minimum guaranteed size of the section's data after being serialized to bytes. This number should never increase,
     // because that would break the ability to read older OHPKM files. If new fields are added to a section, they should be added
     // after the existing fields, and the new fields should be either optional or default to a specific value. If neither of these
@@ -199,7 +179,7 @@ impl OhpkmSectionTag {
 
 impl SectionTag for OhpkmSectionTag {
     fn from_index(index: u16) -> Option<Self> {
-        Self::new(index)
+        Self::try_from(index).ok()
     }
 
     fn min_size(&self) -> usize {
@@ -779,11 +759,11 @@ impl OhpkmV2 {
         self.main_data.moves = value;
     }
 
-    pub const fn relearn_moves(&self) -> [MoveIndex; 4] {
+    pub const fn relearn_moves(&self) -> [MoveSlot; 4] {
         self.main_data.relearn_moves
     }
 
-    pub const fn set_relearn_moves(&mut self, value: [MoveIndex; 4]) {
+    pub const fn set_relearn_moves(&mut self, value: [MoveSlot; 4]) {
         self.main_data.relearn_moves = value;
     }
 
@@ -1893,7 +1873,7 @@ impl OhpkmV2 {
     pub fn sync_learned_moves(&mut self) {
         let mut learned_moves = self.learned_moves.take().unwrap_or_default();
 
-        learned_moves.add_moves(
+        learned_moves.add_from_slots(
             self.moves()
                 .into_iter()
                 .map(|move_data| move_data.move_index),
@@ -1943,7 +1923,7 @@ impl OhpkmV2 {
             learned_moves.add_moves(lza_data.plus_moves.get_move_ids());
         };
 
-        learned_moves.add_moves(self.main_data.relearn_moves);
+        learned_moves.add_from_slots(self.main_data.relearn_moves);
 
         if learned_moves.count() > 0 {
             self.learned_moves = Some(learned_moves);
@@ -1994,7 +1974,7 @@ impl OhpkmV2 {
     #[wasm_bindgen(constructor)]
     pub fn from_byte_vector(bytes: &[u8]) -> JsResult<Self> {
         if !bytes.is_empty() {
-            Self::from_bytes(bytes).map_err(|e| JsValue::from_str(&e.to_string()))
+            Ok(Self::from_bytes(bytes)?)
         } else {
             Ok(Self::default())
         }
@@ -2022,7 +2002,7 @@ impl OhpkmV2 {
         Ok(OhpkmV1::from_bytes(&bytes).map(OhpkmV2::from_v1)?)
     }
 
-    pub fn get_section_bytes(&self) -> JsResult<js_sys::Object> {
+    pub fn get_section_bytes(&self) -> std::result::Result<js_sys::Object, JsValue> {
         let obj = js_sys::Object::new();
 
         // destructure here to give an error when adding a new section (force handling)
@@ -2182,13 +2162,15 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = markings)]
-    pub fn markings_js(&self) -> MarkingsSixShapesColors {
-        self.markings()
+    pub fn markings_js(&self) -> TsResult<MarkingsSixShapesColors> {
+        self.markings().try_into_ts()
     }
 
     #[wasm_bindgen(setter = markings)]
-    pub fn set_markings_js(&mut self, v: &MarkingsSixShapesColors) {
-        self.set_markings(v);
+    pub fn set_markings_js(&mut self, v: Ts<MarkingsSixShapesColors>) -> JsResult<()> {
+        self.set_markings(&v.to_rust()?);
+
+        Ok(())
     }
 
     #[wasm_bindgen(getter = nature)]
@@ -2229,21 +2211,25 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = evs)]
-    pub fn evs_js(&self) -> Stats16Le {
-        self.evs().into()
+    pub fn evs_js(&self) -> TsResult<Stats16Le> {
+        Stats16Le::from(self.evs()).try_into_ts()
     }
     #[wasm_bindgen(setter = evs)]
-    pub fn set_evs_js(&mut self, v: Stats16Le) {
-        self.set_evs(&v.try_into().expect("evs should not exceed 255 each"));
+    pub fn set_evs_js(&mut self, v: Ts<Stats16Le>) -> JsResult<()> {
+        self.set_evs(&v.to_rust()?.try_into()?);
+
+        Ok(())
     }
 
     #[wasm_bindgen(getter = contest)]
-    pub fn contest_js(&self) -> ContestStats {
-        self.contest()
+    pub fn contest_js(&self) -> TsResult<ContestStats> {
+        self.contest().try_into_ts()
     }
     #[wasm_bindgen(setter = contest)]
-    pub fn set_contest_js(&mut self, v: &ContestStats) {
-        self.set_contest(v);
+    pub fn set_contest_js(&mut self, v: Ts<ContestStats>) -> JsResult<()> {
+        self.set_contest(&v.to_rust()?);
+
+        Ok(())
     }
 
     #[wasm_bindgen(getter = pokerus)]
@@ -2329,12 +2315,14 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = ivs)]
-    pub fn ivs_js(&self) -> Stats16Le {
-        self.ivs().into()
+    pub fn ivs_js(&self) -> TsResult<Stats16Le> {
+        Stats16Le::from(self.ivs()).try_into_ts()
     }
     #[wasm_bindgen(setter = ivs)]
-    pub fn set_ivs_js(&mut self, v: &Stats16Le) {
-        self.set_ivs(v.to_ivs_capped());
+    pub fn set_ivs_js(&mut self, v: Ts<Stats16Le>) -> JsResult<()> {
+        self.set_ivs(v.to_rust()?.to_ivs_capped());
+
+        Ok(())
     }
 
     #[wasm_bindgen(getter = isEgg)]
@@ -2392,12 +2380,14 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = handlerMemory)]
-    pub fn handler_memory_js(&self) -> TrainerMemory {
-        self.handler_memory()
+    pub fn handler_memory_js(&self) -> TsResult<TrainerMemory> {
+        self.handler_memory().try_into_ts()
     }
     #[wasm_bindgen(setter = handlerMemory)]
-    pub fn set_handler_memory_js(&mut self, v: &TrainerMemory) {
-        self.set_handler_memory(v);
+    pub fn set_handler_memory_js(&mut self, v: Ts<TrainerMemory>) -> JsResult<()> {
+        self.set_handler_memory(&v.to_rust()?);
+
+        Ok(())
     }
 
     #[wasm_bindgen(getter = handlerAffection)]
@@ -2510,12 +2500,14 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = trainerMemory)]
-    pub fn trainer_memory_js(&self) -> TrainerMemory {
-        self.trainer_memory()
+    pub fn trainer_memory_js(&self) -> TsResult<TrainerMemory> {
+        self.trainer_memory().try_into_ts()
     }
     #[wasm_bindgen(setter = trainerMemory)]
-    pub fn set_trainer_memory_js(&mut self, v: &TrainerMemory) {
-        self.set_trainer_memory(v);
+    pub fn set_trainer_memory_js(&mut self, v: Ts<TrainerMemory>) -> JsResult<()> {
+        self.set_trainer_memory(&v.to_rust()?);
+
+        Ok(())
     }
 
     #[wasm_bindgen(getter = trainerAffection)]
@@ -2582,12 +2574,14 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = hyperTraining)]
-    pub fn hyper_training_js(&self) -> HyperTraining {
-        self.main_data.hyper_training
+    pub fn hyper_training_js(&self) -> TsResult<HyperTraining> {
+        self.main_data.hyper_training.try_into_ts()
     }
     #[wasm_bindgen(setter = hyperTraining)]
-    pub fn set_hyper_training_js(&mut self, v: &HyperTraining) {
-        self.main_data.hyper_training = *v;
+    pub fn set_hyper_training_js(&mut self, v: Ts<HyperTraining>) -> JsResult<()> {
+        self.main_data.hyper_training = v.to_rust()?;
+
+        Ok(())
     }
 
     #[wasm_bindgen(getter = trainerGender)]
@@ -2680,10 +2674,10 @@ impl OhpkmV2 {
     #[wasm_bindgen(setter = relearnMovesWasm)]
     pub fn set_relearn_move_indices_js(&mut self, value: &[u16]) {
         self.main_data.relearn_moves = [
-            MoveIndex::from(value[0]),
-            MoveIndex::from(value[1]),
-            MoveIndex::from(value[2]),
-            MoveIndex::from(value[3]),
+            MoveSlot::from(value[0]),
+            MoveSlot::from(value[1]),
+            MoveSlot::from(value[2]),
+            MoveSlot::from(value[3]),
         ]
     }
 
@@ -2695,7 +2689,7 @@ impl OhpkmV2 {
                 moves
                     .all_ordered()
                     .iter()
-                    .filter_map(MoveIndex::to_raw)
+                    .map(MoveIndex::to_raw)
                     .map(|id| id as usize)
                     .collect()
             })
@@ -2770,12 +2764,14 @@ impl OhpkmV2 {
     // Game Boy
 
     #[wasm_bindgen(getter = dvs)]
-    pub fn dvs_js(&self) -> StatsPreSplit {
-        match self.gameboy_data {
+    pub fn dvs_js(&self) -> TsResult<StatsPreSplit> {
+        let dvs: StatsPreSplit = match self.gameboy_data {
             Some(data) => data.dvs,
             None => GameboyData::from_main_data(&self.main_data).dvs,
         }
-        .into()
+        .into();
+
+        dvs.try_into_ts()
     }
 
     #[wasm_bindgen(getter = metTimeOfDay)]
@@ -2784,29 +2780,35 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = evsG12)]
-    pub fn evs_g12_js(&self) -> Option<StatsPreSplit> {
-        Some(self.gameboy_data?.evs_g12)
+    pub fn evs_g12_js(&self) -> JsResult<Option<Ts<StatsPreSplit>>> {
+        self.gameboy_data
+            .map(|gb_data| gb_data.evs_g12.try_into_ts())
+            .transpose()
     }
 
     #[wasm_bindgen(setter = evsG12)]
-    pub fn update_evs_g12_js(&mut self, value: StatsPreSplit) {
+    pub fn update_evs_g12_js(&mut self, value: Ts<StatsPreSplit>) -> JsResult<()> {
         if let Some(gameboy_data) = &mut self.gameboy_data {
-            gameboy_data.evs_g12 = value
+            gameboy_data.evs_g12 = value.to_rust()?;
         }
+
+        Ok(())
     }
 
     #[wasm_bindgen(js_name = setGameboyData)]
     pub fn set_gameboy_data_js(
         &mut self,
-        dvs: StatsPreSplit,
+        dvs: Ts<StatsPreSplit>,
         met_time_of_day: u8,
-        evs_g12: StatsPreSplit,
-    ) {
+        evs_g12: Ts<StatsPreSplit>,
+    ) -> JsResult<()> {
         self.gameboy_data = Some(GameboyData {
-            dvs: dvs.into(),
+            dvs: dvs.to_rust()?.into(),
             met_time_of_day,
-            evs_g12,
-        })
+            evs_g12: evs_g12.to_rust()?,
+        });
+
+        Ok(())
     }
 
     // Gen 3/4/5
@@ -3068,15 +3070,18 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = geolocations)]
-    pub fn geolocations_js(&self) -> Option<Geolocations> {
-        Some(self.gen67_data?.geolocations)
+    pub fn geolocations_js(&self) -> Result<Option<Ts<Geolocations>>> {
+        Ok(self
+            .gen67_data
+            .map(|gen67_data| Ts::from_rust(&gen67_data.geolocations))
+            .transpose()?)
     }
 
     #[wasm_bindgen(setter = geolocations)]
-    pub fn set_geolocations_js(&mut self, value: Option<Geolocations>) {
+    pub fn set_geolocations_js(&mut self, value: Option<Ts<Geolocations>>) -> Result<()> {
         match value {
             Some(geolocations) => {
-                self.gen67_data.get_or_insert_default().geolocations = geolocations
+                self.gen67_data.get_or_insert_default().geolocations = geolocations.to_rust()?;
             }
             None => {
                 if let Some(gen67_data) = &mut self.gen67_data {
@@ -3084,6 +3089,8 @@ impl OhpkmV2 {
                 }
             }
         }
+
+        Ok(())
     }
 
     #[wasm_bindgen(getter = resortEventStatus)]
@@ -3106,20 +3113,24 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = avs)]
-    pub fn avs_js(&self) -> Option<Stats16Le> {
-        Some(self.gen67_data?.avs)
+    pub fn avs_js(&self) -> JsResult<Option<Ts<Stats16Le>>> {
+        self.gen67_data
+            .map(|data| data.avs.try_into_ts())
+            .transpose()
     }
 
     #[wasm_bindgen(setter = avs)]
-    pub fn set_avs_js(&mut self, value: Option<Stats16Le>) {
+    pub fn set_avs_js(&mut self, value: Option<Ts<Stats16Le>>) -> JsResult<()> {
         match value {
-            Some(avs) => self.gen67_data.get_or_insert_default().avs = avs,
+            Some(avs) => self.gen67_data.get_or_insert_default().avs = avs.to_rust()?,
             None => {
                 if let Some(gen67_data) = &mut self.gen67_data {
-                    gen67_data.avs = Stats16Le::default()
+                    gen67_data.avs = Stats16Le::default();
                 }
             }
         }
+
+        Ok(())
     }
 
     // Sword/Shield
@@ -3200,23 +3211,26 @@ impl OhpkmV2 {
     // Legends Arceus
 
     #[wasm_bindgen(getter = gvs)]
-    pub fn gvs_js(&self) -> Option<Stats16Le> {
-        Some(self.la_data?.gvs.into())
+    pub fn gvs_js(&self) -> JsResult<Option<Ts<Stats16Le>>> {
+        self.la_data
+            .map(|data| Stats16Le::from(data.gvs).try_into_ts())
+            .transpose()
     }
 
     #[wasm_bindgen(setter = gvs)]
-    pub fn set_gvs_js(&mut self, value: Option<Stats16Le>) {
+    pub fn set_gvs_js(&mut self, value: Option<Ts<Stats16Le>>) -> JsResult<()> {
         match value {
             Some(gvs) => {
-                self.la_data.get_or_insert_default().gvs =
-                    gvs.try_into().expect("gvs should not exceed 9 each")
+                self.la_data.get_or_insert_default().gvs = gvs.to_rust()?.try_into()?;
             }
             None => {
                 if let Some(la_data) = &mut self.la_data {
-                    la_data.gvs = Stats8::default()
+                    la_data.gvs = Stats8::default();
                 }
             }
         }
+
+        Ok(())
     }
 
     #[wasm_bindgen(getter = alphaMove)]
@@ -3397,37 +3411,47 @@ impl OhpkmV2 {
     // Scarlet/Violet
 
     #[wasm_bindgen(getter = teraTypeOriginal)]
-    pub fn tera_type_original_js(&self) -> TeraType {
-        self.sv_data.map(|d| d.tera_type_original).unwrap_or(
-            self.species_and_form()
-                .get_form_metadata()
-                .transferred_tera_type(),
-        )
+    pub fn tera_type_original_js(&self) -> TsResult<TeraType> {
+        self.sv_data
+            .map(|d| d.tera_type_original)
+            .unwrap_or(
+                self.species_and_form()
+                    .get_form_metadata()
+                    .transferred_tera_type(),
+            )
+            .try_into_ts()
     }
 
     #[wasm_bindgen(js_name = setTeraTypeOriginalIf)]
-    pub fn set_tera_type_original_if_js(&mut self, value: Option<TeraType>) {
-        let Some(value) = value else { return };
+    pub fn set_tera_type_original_if_js(&mut self, value: Option<Ts<TeraType>>) -> Result<()> {
+        let Some(value) = value else { return Ok(()) };
 
         self.sv_data
             .get_or_insert(ScarletVioletData::default_generated_tera_type(
                 self.main_data.species_and_form,
             ))
-            .tera_type_original = value
+            .tera_type_original = value.to_rust()?;
+
+        Ok(())
     }
 
     #[wasm_bindgen(getter = teraTypeOverride)]
-    pub fn tera_type_override_js(&self) -> Option<TeraType> {
-        self.sv_data.and_then(|d| d.tera_type_override)
+    pub fn tera_type_override_js(&self) -> JsResult<Option<Ts<TeraType>>> {
+        self.sv_data
+            .and_then(|d| d.tera_type_override)
+            .map(|t| t.try_into_ts())
+            .transpose()
     }
 
     #[wasm_bindgen(setter = teraTypeOverride)]
-    pub fn set_tera_type_override_js(&mut self, value: Option<TeraType>) -> Result<()> {
+    pub fn set_tera_type_override_js(&mut self, value: Option<Ts<TeraType>>) -> Result<()> {
+        let value_rust = value.map(|t| t.to_rust()).transpose()?;
+
         self.sv_data
             .get_or_insert(ScarletVioletData::default_generated_tera_type(
                 self.main_data.species_and_form,
             ))
-            .tera_type_override = value;
+            .tera_type_override = value_rust;
 
         Ok(())
     }
@@ -3551,7 +3575,7 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(js_name = getSectionBytes)]
-    pub fn get_section_bytes_js(&self) -> JsResult<js_sys::Object> {
+    pub fn get_section_bytes_js(&self) -> std::result::Result<js_sys::Object, JsValue> {
         let obj = js_sys::Object::new();
 
         js_sys::Reflect::set(
@@ -3788,7 +3812,7 @@ pub struct OriginalDataJs {
 fn add_section_bytes_to_js_object<T: DataSection<ErrorType = Error>>(
     obj: &js_sys::Object,
     section: &Option<T>,
-) -> JsResult<()> {
+) -> std::result::Result<(), JsValue> {
     if let Some(section) = section
         && !section.is_empty()
     {
