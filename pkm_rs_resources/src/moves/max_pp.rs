@@ -31,7 +31,7 @@ pub fn adjust_pp_between_games(
     move_slot: MoveSlot,
 ) -> Option<u8> {
     let index_inner = move_slot.move_index.0?;
-    let index_u16 = index_inner.get();
+    let index_u16 = index_inner.to_raw();
 
     let from_source_max_pp = get_raised_max_pp(index_u16, from_source, move_slot.pp_ups)?;
     let to_source_max_pp = get_raised_max_pp(index_u16, to_source, move_slot.pp_ups)?;

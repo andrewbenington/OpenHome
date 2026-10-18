@@ -323,24 +323,53 @@ pub struct MoveDataOffsets<T: Into<usize> = usize> {
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "specta", derive(specta::Type))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
+#[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Copy, Deserialize)]
+pub struct MoveIndexNonEmpty(NonZeroU16);
+
+impl MoveIndexNonEmpty {
+    pub const fn get_metadata(&self) -> &'static MoveMetadata {
+        ALL_MOVES[(self.0.get() - 1) as usize]
+    }
+
+    pub const fn from_u16(value: u16) -> Option<Self> {
+        match NonZeroU16::new(value) {
+            Some(index) => Some(Self(index)),
+            None => None,
+        }
+    }
+
+    pub const fn to_le_bytes(self) -> [u8; 2] {
+        self.0.get().to_le_bytes()
+    }
+
+    pub const fn to_raw(&self) -> u16 {
+        self.0.get()
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, PartialOrd, Ord, Default, PartialEq, Eq, Clone, Copy, Deserialize)]
-pub struct MoveIndex(Option<NonZeroU16>);
+pub struct MoveIndex(Option<MoveIndexNonEmpty>);
 
 impl MoveIndex {
     pub fn get_metadata(&self) -> Option<&'static MoveMetadata> {
-        self.0.map(|idx| ALL_MOVES[(idx.get() - 1) as usize])
+        Some(self.0?.get_metadata())
     }
 
     pub const fn from_u16(value: u16) -> Self {
-        Self(NonZeroU16::new(value))
+        Self(MoveIndexNonEmpty::from_u16(value))
     }
 
     pub const fn from_le_bytes(bytes: [u8; 2]) -> Self {
-        Self(NonZeroU16::new(u16::from_le_bytes(bytes)))
+        Self::from_u16(u16::from_le_bytes(bytes))
     }
 
     pub fn to_le_bytes(self) -> [u8; 2] {
-        self.0.map(NonZeroU16::get).unwrap_or(0u16).to_le_bytes()
+        self.0
+            .map(MoveIndexNonEmpty::to_le_bytes)
+            .unwrap_or_default()
     }
 
     pub const fn empty() -> Self {
@@ -352,7 +381,7 @@ impl MoveIndex {
     }
 
     pub fn to_raw(&self) -> Option<u16> {
-        self.0.map(|index| index.get())
+        Some(self.0?.to_raw())
     }
 }
 
@@ -362,7 +391,7 @@ impl MoveIndex {
 impl MoveIndex {
     #[wasm_bindgen(getter = index)]
     pub fn inner_wasm(&self) -> Option<u16> {
-        self.0.map(NonZeroU16::get)
+        self.to_raw()
     }
 }
 
@@ -380,22 +409,19 @@ impl Serialize for MoveIndex {
 
 impl From<u16> for MoveIndex {
     fn from(value: u16) -> Self {
-        Self(NonZeroU16::try_from(value).ok())
+        Self::from_u16(value)
     }
 }
 
 impl From<MoveIndex> for u16 {
     fn from(val: MoveIndex) -> Self {
-        match val.0 {
-            None => 0,
-            Some(idx) => idx.get(),
-        }
+        val.0.as_ref().map(MoveIndexNonEmpty::to_raw).unwrap_or(0)
     }
 }
 
 impl From<arbitrary_int::u2> for MoveIndex {
     fn from(value: arbitrary_int::u2) -> Self {
-        Self(NonZeroU16::try_from(value.value() as u16).ok())
+        Self::from_u16(value.value() as u16)
     }
 }
 
