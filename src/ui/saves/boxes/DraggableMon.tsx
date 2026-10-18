@@ -72,7 +72,7 @@ const DraggableMon = (props: DraggableMonProps) => {
         mon.formIndex
       )?.megaEvolutions.find((mega) => mega.requiredItemId === mon.heldItemIndex)
 
-      if (megaForStone) formeNumber = megaForStone.megaForme.formIndex
+      if (megaForStone) formeNumber = megaForStone.megaForm.formIndex
     } else if (isBattleFormeItem(mon.nationalDex, mon.heldItemIndex)) {
       formeNumber = displayIndexAdder(mon.heldItemIndex)(mon.formIndex)
     }

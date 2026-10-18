@@ -75,7 +75,8 @@ export default function OhoButton(props: OhoButtonProps) {
     <Button
       size="1"
       color={color}
-      type={buttonType(radixType)}
+      // @ts-expect-error Radix UI is no longer maintained, this is likely an issue with the library
+      type={radixType}
       variant={variant}
       loading={loading}
       disabled={disabled}
@@ -112,13 +113,13 @@ function buttonColor(buttonType: OhoButtonType): RadixColor {
   }
 }
 
-function buttonType(buttonType: OhoButtonType): 'submit' | 'reset' | 'button' | undefined {
+function buttonType(buttonType: OhoButtonType) {
   switch (buttonType) {
     case 'add':
     case 'destructive':
-      return 'submit'
+      return 'submit' as const
     case 'clear':
-      return 'reset'
+      return 'reset' as const
     default:
       return undefined
   }

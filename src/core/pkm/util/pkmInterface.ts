@@ -85,7 +85,7 @@ export interface AllPKMFields {
   level?: number
   markings?: Markings
   masterFlagsLA?: Uint8Array
-  megaForme?: number
+  megaForm?: number
   metDate?: types.PKMDate | undefined
   metLevel?: number
   metLocationIndex?: number

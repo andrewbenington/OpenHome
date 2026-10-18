@@ -96,7 +96,7 @@ export default class PB7 {
   stats: types.Stats
   cp: number
   isMega: number
-  megaForme: number
+  megaForm: number
   trainerGender: BinaryGender
   originalBytes?: ArrayBuffer
 
@@ -196,7 +196,7 @@ export default class PB7 {
       this.stats = types.readStatsFromBytesU16(dataView, 0xf2)
       this.cp = dataView.getUint16(0xfe, true)
       this.isMega = dataView.getUint8(0x100)
-      this.megaForme = dataView.getUint8(0x101)
+      this.megaForm = dataView.getUint8(0x101)
       this.trainerGender = byteLogic.getGenderFlag(dataView, 0xdd, 7)
     } else {
       const other = arg
@@ -283,7 +283,7 @@ export default class PB7 {
       this.dirtLocation = 0
       this.cp = 0
       this.isMega = 0
-      this.megaForme = 0
+      this.megaForm = 0
       this.trainerGender = other.trainerGender
     }
 
@@ -382,7 +382,7 @@ export default class PB7 {
     types.writeStatsToBytesU16(dataView, 0xf2, this.stats)
     dataView.setUint16(0xfe, this.cp, true)
     dataView.setUint8(0x100, this.isMega)
-    dataView.setUint8(0x101, this.megaForme)
+    dataView.setUint8(0x101, this.megaForm)
     byteLogic.setGenderFlag(dataView, 0xdd, 7, this.trainerGender)
     return buffer
   }

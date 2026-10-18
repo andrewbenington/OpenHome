@@ -76,7 +76,7 @@ export const getPokemonSpritePathInner = (
       (mega) => mega.requiredItemId === mon.heldItemIndex
     )
 
-    if (megaForStone) mon.formIndex = megaForStone.megaForme.formIndex
+    if (megaForStone) mon.formIndex = megaForStone.megaForm.formIndex
   } else if (isBattleFormeItem(mon.nationalDex, mon.heldItemIndex)) {
     mon.formIndex = displayIndexAdder(mon.heldItemIndex)(mon.formIndex)
   }

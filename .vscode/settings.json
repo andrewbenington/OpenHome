@@ -8,7 +8,7 @@
     }
   },
   "[javascript]": {
-    "editor.defaultFormatter": "alphatr.oxc-vscode-enhance"
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",

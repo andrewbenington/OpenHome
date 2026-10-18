@@ -47,7 +47,7 @@ export function getMonSprite(
       (mega) => mega.requiredItemId === mon.heldItemIndex
     )
 
-    if (megaForStone) mon.formIndex = megaForStone.megaForme.formIndex
+    if (megaForStone) mon.formIndex = megaForStone.megaForm.formIndex
   } else if (isBattleFormeItem(mon.nationalDex, mon.heldItemIndex)) {
     mon.formIndex = displayIndexAdder(mon.heldItemIndex)(mon.formIndex)
   }
@@ -94,7 +94,7 @@ export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
         modifiedMon.formIndex
       )?.megaEvolutions.find((mega) => mega.requiredItemId === modifiedMon.heldItemIndex)
 
-      if (megaForStone) modifiedMon.formIndex = megaForStone.megaForme.formIndex
+      if (megaForStone) modifiedMon.formIndex = megaForStone.megaForm.formIndex
     } else if (isBattleFormeItem(modifiedMon.nationalDex, modifiedMon.heldItemIndex)) {
       modifiedMon.formIndex = displayIndexAdder(modifiedMon.heldItemIndex)(modifiedMon.formIndex)
     }

@@ -568,7 +568,7 @@ impl FormMetadata {
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Clone, Copy)]
 pub struct MegaEvolutionMetadata {
-    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = megaForme))]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = megaForm))]
     pub mega_form: SpeciesForm,
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = requiredItemId))]
     pub required_item_id: Option<u16>,
