@@ -1,7 +1,7 @@
 pub use crate::ohpkm::OhpkmV2;
 pub use pkm_rs_resources::abilities::ABILITY_MAX;
 use pkm_rs_resources::species::{FormMetadata, SpeciesMetadata};
-use pkm_rs_resources::{moves::MoveIndex, species::SpeciesForm};
+use pkm_rs_resources::{moves::MoveSlot, species::SpeciesForm};
 use serde::Serialize;
 
 use crate::result::Result;
@@ -61,6 +61,6 @@ pub trait PkmBytes: Sized {
 
 pub trait PkmBase {
     fn species_and_form(&self) -> Result<SpeciesForm>;
-    fn get_move_slots(&self) -> [Result<MoveIndex>; 4];
-    fn set_move_slots(&self, move_slots: [Result<MoveIndex>; 4]);
+    fn get_move_slots(&self) -> [Result<MoveSlot>; 4];
+    fn set_move_slots(&self, move_slots: [Result<MoveSlot>; 4]);
 }

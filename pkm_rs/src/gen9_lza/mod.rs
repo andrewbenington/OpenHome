@@ -157,7 +157,7 @@ impl PlusMoveFlags {
     pub fn get_move_ids_wasm(&self) -> Vec<u16> {
         self.get_move_ids()
             .into_iter()
-            .filter_map(|id| id.to_raw())
+            .map(|id| id.to_raw())
             .collect()
     }
 

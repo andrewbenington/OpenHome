@@ -1,6 +1,6 @@
 use pkm_rs::ohpkm::OhpkmV2;
 use pkm_rs::traits::HasSpeciesAndForm;
-use pkm_rs_resources::moves::MoveIndex;
+use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_types::{Gender, PkmType};
 
@@ -75,7 +75,7 @@ pub enum Filter {
     IsShiny(bool),
     Gender(Gender),
     Level(u8),
-    Move(u8, MoveIndex),
+    Move(u8, MoveSlot),
     MoveTextPrefixEng(String),
     NicknamePrefix(String),
     BaseEvolution(u16),

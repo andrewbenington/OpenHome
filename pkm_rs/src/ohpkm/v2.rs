@@ -25,7 +25,7 @@ use arrayref::array_ref;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::moves::{MoveIndex, MoveSlots, la_tutor, lza_tm, sv_tm, swsh_tr};
+use pkm_rs_resources::moves::{MoveIndex, MoveSlot, MoveSlots, la_tutor, lza_tm, sv_tm, swsh_tr};
 use pkm_rs_resources::natures::{NatureIndex, WithNature};
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesForm;
@@ -759,11 +759,11 @@ impl OhpkmV2 {
         self.main_data.moves = value;
     }
 
-    pub const fn relearn_moves(&self) -> [MoveIndex; 4] {
+    pub const fn relearn_moves(&self) -> [MoveSlot; 4] {
         self.main_data.relearn_moves
     }
 
-    pub const fn set_relearn_moves(&mut self, value: [MoveIndex; 4]) {
+    pub const fn set_relearn_moves(&mut self, value: [MoveSlot; 4]) {
         self.main_data.relearn_moves = value;
     }
 
@@ -1873,7 +1873,7 @@ impl OhpkmV2 {
     pub fn sync_learned_moves(&mut self) {
         let mut learned_moves = self.learned_moves.take().unwrap_or_default();
 
-        learned_moves.add_moves(
+        learned_moves.add_from_slots(
             self.moves()
                 .into_iter()
                 .map(|move_data| move_data.move_index),
@@ -1923,7 +1923,7 @@ impl OhpkmV2 {
             learned_moves.add_moves(lza_data.plus_moves.get_move_ids());
         };
 
-        learned_moves.add_moves(self.main_data.relearn_moves);
+        learned_moves.add_from_slots(self.main_data.relearn_moves);
 
         if learned_moves.count() > 0 {
             self.learned_moves = Some(learned_moves);
@@ -2674,10 +2674,10 @@ impl OhpkmV2 {
     #[wasm_bindgen(setter = relearnMovesWasm)]
     pub fn set_relearn_move_indices_js(&mut self, value: &[u16]) {
         self.main_data.relearn_moves = [
-            MoveIndex::from(value[0]),
-            MoveIndex::from(value[1]),
-            MoveIndex::from(value[2]),
-            MoveIndex::from(value[3]),
+            MoveSlot::from(value[0]),
+            MoveSlot::from(value[1]),
+            MoveSlot::from(value[2]),
+            MoveSlot::from(value[3]),
         ]
     }
 
@@ -2689,7 +2689,7 @@ impl OhpkmV2 {
                 moves
                     .all_ordered()
                     .iter()
-                    .filter_map(MoveIndex::to_raw)
+                    .map(MoveIndex::to_raw)
                     .map(|id| id as usize)
                     .collect()
             })
