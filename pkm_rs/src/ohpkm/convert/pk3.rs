@@ -111,7 +111,7 @@ impl OhpkmConvert for Pk3 {
         // if the nickname has been otherwise unchanged, use a copy of the original data's nickname
         // to preserve trash bytes
         if let Some(StoredPkmBytes::Pk3(original_bytes)) = ohpkm.original_data_bytes()
-            && let Ok(original_pk3) = Pk3::try_from_bytes(&original_bytes)
+            && let Ok(original_pk3) = Pk3::try_from_bytes(original_bytes.as_ref())
             && original_pk3
                 .nickname
                 .identical_until_terminator(&nickname_gen3)
@@ -205,16 +205,14 @@ impl OhpkmConvert for Pk3 {
                 })
                 .map(StoredPkmBytes::Pk3);
         }
-        bytes
-            .try_into()
-            .map_err(|_| {
-                Error::buffer_size_with_source(
-                    "Pk3::OhpkmConvert::bytes_to_stored",
-                    gen3::PARTY_SIZE,
-                    bytes.len(),
-                )
-            })
-            .map(StoredPkmBytes::Pk3)
+        Box::new(bytes.as_array().ok_or(Error::buffer_size_with_source(
+            "Pk3::OhpkmConvert::bytes_to_stored",
+            gen3::PARTY_SIZE,
+            bytes.len(),
+        )))
+        .copied()
+        .map(Box::new)
+        .map(StoredPkmBytes::Pk3)
     }
 }
 

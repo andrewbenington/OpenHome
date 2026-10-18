@@ -220,15 +220,13 @@ impl OhpkmConvert for Pk7 {
                 })
                 .map(StoredPkmBytes::Pk7);
         }
-        bytes
-            .try_into()
-            .map_err(|_| {
-                Error::buffer_size_with_source(
-                    "Pk7::OhpkmConvert::bytes_to_stored",
-                    gen7_alola::PARTY_SIZE,
-                    bytes.len(),
-                )
-            })
-            .map(StoredPkmBytes::Pk7)
+        Box::new(bytes.as_array().ok_or(Error::buffer_size_with_source(
+            "Pk7::OhpkmConvert::bytes_to_stored",
+            gen7_alola::PARTY_SIZE,
+            bytes.len(),
+        )))
+        .copied()
+        .map(Box::new)
+        .map(StoredPkmBytes::Pk7)
     }
 }

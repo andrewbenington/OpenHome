@@ -185,15 +185,13 @@ impl OhpkmConvert for Pkh {
     }
 
     fn bytes_to_stored(bytes: &[u8]) -> Result<StoredPkmBytes> {
-        bytes
-            .try_into()
-            .map_err(|_| {
-                Error::buffer_size_with_source(
-                    "Pkh::OhpkmConvert::bytes_to_stored",
-                    home::PH4_PKM_MAX_SIZE,
-                    bytes.len(),
-                )
-            })
-            .map(StoredPkmBytes::Pk9)
+        Box::new(bytes.as_array().ok_or(Error::buffer_size_with_source(
+            "Pkh::OhpkmConvert::bytes_to_stored",
+            home::PH4_PKM_MAX_SIZE,
+            bytes.len(),
+        )))
+        .copied()
+        .map(Box::new)
+        .map(StoredPkmBytes::Pk9)
     }
 }
