@@ -368,7 +368,7 @@ export function useOhpkmStore() {
       case 'PK9':
       case 'PK9Compass':
       case 'PA9':
-      case 'PKH': {
+      case 'PH4': {
         return tryCalculateIdentifier(mon)
       }
       default:
