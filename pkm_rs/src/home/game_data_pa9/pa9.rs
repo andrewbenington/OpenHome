@@ -7,7 +7,7 @@ use crate::result::{Error, Result};
 
 use pkm_rs_resources::abilities::{AbilityIndexBounded, AbilityIndexWasm};
 use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::moves::MoveIndex;
+use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_types::{AbilityNumber, FlagSet};
 use serde::Serialize;
 
@@ -23,7 +23,7 @@ use pkm_rs_types::randomize::Randomize;
 pub struct HomePa9Data {
     pub scale: u8,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub moves: [MoveIndex; 4],
+    pub moves: [MoveSlot; 4],
     pub is_alpha: bool,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub plus_moves_b: FlagSet<LZA_PLUS_MOVES_0X94_BYTES>,

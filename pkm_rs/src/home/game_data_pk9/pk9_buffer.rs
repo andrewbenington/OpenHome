@@ -4,7 +4,7 @@ use crate::gen9_sv::{TM_FLAG_BYTE_LENGTH_BASE, TM_FLAG_BYTE_LENGTH_DLC};
 use crate::result::Result;
 use pkm_rs_resources::abilities::AbilityIndexWasm;
 use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots, PpUpStorage};
+use pkm_rs_resources::moves::{MoveDataOffsets, MoveSlot, MoveSlots, PpUpStorage};
 use pkm_rs_types::{AbilityNumber, read_u16_le};
 
 const MOVE_DATA_OFFSETS: MoveDataOffsets = MoveDataOffsets {
@@ -145,8 +145,8 @@ impl<S: AsRef<[u8]>> PkhPk9Buffer<S> {
         self.bytes()[off..off + 2].try_into().unwrap()
     }
 
-    pub fn relearn_move(&self, idx: usize) -> MoveIndex {
-        MoveIndex::from_le_bytes(self.relearn_move_raw(idx))
+    pub fn relearn_move(&self, idx: usize) -> MoveSlot {
+        MoveSlot::from_le_bytes(self.relearn_move_raw(idx))
     }
 
     pub fn tera_type_original(&self) -> u8 {

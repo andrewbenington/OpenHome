@@ -4,7 +4,7 @@ use crate::result::{Error, Result};
 
 use pkm_rs_resources::abilities::{AbilityIndexBounded, AbilityIndexWasm};
 use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::moves::{MoveIndex, MoveSlots};
+use pkm_rs_resources::moves::{MoveSlot, MoveSlots};
 use pkm_rs_types::{AbilityNumber, FlagSet, Pokerus};
 use serde::Serialize;
 
@@ -20,7 +20,7 @@ use pkm_rs_types::randomize::Randomize;
 pub struct HomePb8Data {
     pub moves: MoveSlots,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub relearn_moves: [MoveIndex; 4],
+    pub relearn_moves: [MoveSlot; 4],
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub tm_flags_bdsp: FlagSet<14>,
     pub ball: Ball,

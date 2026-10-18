@@ -4,7 +4,7 @@ use crate::result::Result;
 use crate::util;
 use pkm_rs_resources::abilities::AbilityIndexWasm;
 use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::moves::MoveIndex;
+use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_types::{AbilityNumber, read_u16_le};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -133,12 +133,12 @@ impl<S: AsRef<[u8]>> PkhPa9Buffer<S> {
         self.get_u8(Offset::Scale)
     }
 
-    pub fn moves_raw(&self) -> [MoveIndex; 4] {
-        let mut combined = [MoveIndex::empty(); 4];
-        combined[0] = MoveIndex::from_u16(self.get_u16_le(Offset::Moves));
-        combined[1] = MoveIndex::from_u16(read_u16_le!(self.bytes(), Offset::Moves as usize + 2));
-        combined[2] = MoveIndex::from_u16(read_u16_le!(self.bytes(), Offset::Moves as usize + 4));
-        combined[3] = MoveIndex::from_u16(read_u16_le!(self.bytes(), Offset::Moves as usize + 6));
+    pub fn moves_raw(&self) -> [MoveSlot; 4] {
+        let mut combined = [MoveSlot::empty(); 4];
+        combined[0] = MoveSlot::from_u16(self.get_u16_le(Offset::Moves));
+        combined[1] = MoveSlot::from_u16(read_u16_le!(self.bytes(), Offset::Moves as usize + 2));
+        combined[2] = MoveSlot::from_u16(read_u16_le!(self.bytes(), Offset::Moves as usize + 4));
+        combined[3] = MoveSlot::from_u16(read_u16_le!(self.bytes(), Offset::Moves as usize + 6));
         combined
     }
 

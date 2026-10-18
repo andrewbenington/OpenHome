@@ -3,7 +3,7 @@ use crate::bytes::AsBytes;
 use crate::result::Result;
 use pkm_rs_resources::abilities::AbilityIndexWasm;
 use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots, PpUpStorage};
+use pkm_rs_resources::moves::{MoveDataOffsets, MoveSlot, MoveSlots, PpUpStorage};
 use pkm_rs_types::{AbilityNumber, Pokerus, Stats8, read_u16_le, read_u32_le};
 
 const MOVE_DATA_OFFSETS: MoveDataOffsets = MoveDataOffsets {
@@ -168,8 +168,8 @@ impl<S: AsRef<[u8]>> PkhPb7Buffer<S> {
         self.bytes()[off..off + 2].try_into().unwrap()
     }
 
-    pub fn relearn_move(&self, idx: usize) -> MoveIndex {
-        MoveIndex::from_le_bytes(self.relearn_move_raw(idx))
+    pub fn relearn_move(&self, idx: usize) -> MoveSlot {
+        MoveSlot::from_le_bytes(self.relearn_move_raw(idx))
     }
 
     // HeightAbsolute and WeightAbsolute are calculated from the mon's height/weight and species data.
