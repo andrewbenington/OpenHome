@@ -57,12 +57,16 @@ pub trait PersonalInfo: Sized + std::panic::RefUnwindSafe + std::panic::UnwindSa
 
     fn types_fallible(&self) -> (Option<PkmType>, Option<PkmType>);
 
-    // gives the game index for this species' form of index form_index if present.
+    // gives the game index for this species' form with index form_index if it is present.
     // base forms are usually in national dex order, so other form game indices
     // need to be found using the base form's personal info entry
     fn game_index_for_form(&self, national_dex: u16, form_index: u16) -> Option<u16>;
 
     fn source_name(&self) -> &'static str;
+
+    fn form_is_present_in_game(&self, national_dex: u16, form_index: u16) -> bool {
+        self.game_index_for_form(national_dex, form_index).is_some()
+    }
 }
 
 fn format_bad_type_error(
@@ -87,12 +91,18 @@ impl<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize> PersonalTable<INFO, ENTRY_
         Self(bytes, PhantomData)
     }
 
-    pub fn get_personal_info_by_game_index(&self, game_index: u16) -> INFO {
+    pub fn get_personal_info_by_game_index(&self, game_index: u16) -> Option<INFO> {
         let offset = (game_index as usize) * ENTRY_BYTE_LEN;
-        INFO::from_pkl_bytes(&self.0[offset..offset + ENTRY_BYTE_LEN])
+        if offset < self.0.len() {
+            Some(INFO::from_pkl_bytes(
+                &self.0[offset..offset + ENTRY_BYTE_LEN],
+            ))
+        } else {
+            None
+        }
     }
 
-    pub fn get_base_form_personal_info(&self, national_dex: u16) -> INFO {
+    pub fn get_base_form_personal_info(&self, national_dex: u16) -> Option<INFO> {
         self.get_personal_info_by_game_index(national_dex)
     }
 
@@ -102,12 +112,12 @@ impl<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize> PersonalTable<INFO, ENTRY_
         }
 
         self.get_base_form_personal_info(national_dex)
-            .game_index_for_form(national_dex, form_index)
+            .and_then(|info| info.game_index_for_form(national_dex, form_index))
     }
 
     pub fn get_personal_info(&self, national_dex: u16, form_index: u16) -> Option<INFO> {
         self.get_game_index(national_dex, form_index)
-            .map(|game_index| self.get_personal_info_by_game_index(game_index))
+            .and_then(|game_index| self.get_personal_info_by_game_index(game_index))
     }
 
     fn get_types(&self, national_dex: u16, form_index: u16) -> Option<(PkmType, Option<PkmType>)> {
@@ -142,16 +152,19 @@ impl<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize> PersonalTable<INFO, ENTRY_
 pub struct GameMetadata<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize> {
     personal: PersonalTable<INFO, ENTRY_BYTE_LEN>,
     learnsets: LearnsetFileReader,
+    filename: &'static str,
 }
 
 impl<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize> GameMetadata<INFO, ENTRY_BYTE_LEN> {
     pub const fn from_binary(
         personal_file: &'static [u8],
         levelup_file: PklFileData<'static>,
+        filename: &'static str,
     ) -> Self {
         Self {
             personal: PersonalTable::<INFO, ENTRY_BYTE_LEN>::from_pkl_bytes(personal_file),
             learnsets: LearnsetFileReader::from_pkl(levelup_file),
+            filename,
         }
     }
 
@@ -171,11 +184,25 @@ impl<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize> GameMetadata<INFO, ENTRY_B
     fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats> {
         self.personal.get_base_stats(national_dex, form_index)
     }
+
+    #[cfg(test)]
+    pub fn get_personal_info(&self, national_dex: u16, form_index: u16) -> Option<INFO> {
+        self.personal.get_personal_info(national_dex, form_index)
+    }
+
+    #[cfg(test)]
+    pub fn get_personal_info_by_game_index(&self, game_index: u16) -> Option<INFO> {
+        self.personal.get_personal_info_by_game_index(game_index)
+    }
 }
 
 impl<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize> MetadataTable
     for GameMetadata<INFO, ENTRY_BYTE_LEN>
 {
+    fn get_name(&self) -> &'static str {
+        self.filename
+    }
+
     fn get_types(&self, national_dex: u16, form_index: u16) -> Option<(PkmType, Option<PkmType>)> {
         self.get_types(national_dex, form_index)
     }
@@ -191,9 +218,21 @@ impl<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize> MetadataTable
     fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats> {
         self.get_base_stats(national_dex, form_index)
     }
+
+    fn form_is_present(&self, national_dex: u16, form_index: u16) -> bool {
+        self.personal
+            .get_personal_info(national_dex, form_index)
+            .or(self.personal.get_base_form_personal_info(national_dex))
+            .is_some_and(|info| {
+                info.form_is_present_in_game(national_dex, form_index)
+                    && self.get_game_index(national_dex, form_index).is_some()
+            })
+    }
 }
 
 trait MetadataTable: std::panic::RefUnwindSafe + std::panic::UnwindSafe {
+    fn get_name(&self) -> &'static str;
+
     fn get_types(&self, national_dex: u16, form_index: u16) -> Option<(PkmType, Option<PkmType>)>;
 
     fn get_game_index(&self, national_dex: u16, form_index: u16) -> Option<u16>;
@@ -212,6 +251,10 @@ where
     T: std::ops::Deref<Target = U> + std::panic::RefUnwindSafe + std::panic::UnwindSafe,
     U: MetadataTable + ?Sized + 'static,
 {
+    fn get_name(&self) -> &'static str {
+        (**self).get_name()
+    }
+
     fn get_types(&self, national_dex: u16, form_index: u16) -> Option<(PkmType, Option<PkmType>)> {
         (**self).get_types(national_dex, form_index)
     }
@@ -259,31 +302,51 @@ impl MetadataTableReader {
     pub fn get_types(&self) -> (PkmType, Option<PkmType>) {
         self.inner
             .get_types(self.national_dex, self.form_index)
-            .expect_log(READER_SHOULD_BE_VALID)
+            .expect_log(format!(
+                "{}: {}",
+                READER_SHOULD_BE_VALID,
+                self.inner.get_name(),
+            ))
     }
 
     pub fn get_game_index(&self) -> u16 {
         self.inner
             .get_game_index(self.national_dex, self.form_index)
-            .expect_log(READER_SHOULD_BE_VALID)
+            .expect_log(format!(
+                "{}: {}",
+                READER_SHOULD_BE_VALID,
+                self.inner.get_name(),
+            ))
     }
 
     pub fn get_levelup_learnset(&self) -> LearnsetReader {
         self.inner
             .get_levelup_learnset(self.national_dex, self.form_index)
-            .expect_log(READER_SHOULD_BE_VALID)
+            .expect_log(format!(
+                "{}: {}",
+                READER_SHOULD_BE_VALID,
+                self.inner.get_name(),
+            ))
     }
 
     pub fn get_base_stats(&self) -> BaseStats {
         self.inner
             .get_base_stats(self.national_dex, self.form_index)
-            .expect_log(READER_SHOULD_BE_VALID)
+            .expect_log(format!(
+                "{}: {}",
+                READER_SHOULD_BE_VALID,
+                self.inner.get_name(),
+            ))
     }
 
     pub fn types(&self) -> (PkmType, Option<PkmType>) {
         self.inner
             .get_types(self.national_dex, self.form_index)
-            .expect_log(READER_SHOULD_BE_VALID)
+            .expect_log(format!(
+                "{}: {}",
+                READER_SHOULD_BE_VALID,
+                self.inner.get_name(),
+            ))
     }
 }
 
