@@ -138,11 +138,11 @@ generate: gen-wasm gen-tauri-commands
 .PHONY: gen-wasm
 gen-wasm:
 # 	@node generate/gen_ribbons.ts
-# 	@ts-node generate/gen_abilities.ts
-	@ts-node generate/gen_abilities.ts
-	@ts-node generate/gen_items.ts
-	@ts-node generate/gen_moves.ts
-	@ts-node generate/gen_species_data.ts
+# 	@node generate/gen_abilities.ts
+	@node generate/gen_abilities.ts
+	@node generate/gen_items.ts
+	@node generate/gen_moves.ts
+	@node generate/gen_species_data.ts
 	@cd pkm_rs_resources && cargo fmt
 
 .PHONY: gen-tauri-commands
