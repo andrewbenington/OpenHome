@@ -8,6 +8,7 @@ use super::game_data_pk9::HomePk9Data;
 use crate::result::Result;
 use crate::traits::{HasSpeciesAndForm, IsShiny, ModernEvs, PkmBytes};
 
+use pkm_rs_resources::abilities::AbilityIndexWasm;
 use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_resources::species::{FormMetadata, SpeciesMetadata};
 use pkm_rs_resources::stats;
@@ -22,6 +23,12 @@ use wasm_bindgen::prelude::*;
 use crate::convert_strategy::ConvertStrategy;
 #[cfg(feature = "wasm")]
 use crate::ohpkm::{OhpkmConvert, OhpkmV2};
+#[cfg(feature = "wasm")]
+use pkm_rs_types::TeraType;
+#[cfg(feature = "wasm")]
+use pkm_rs_types::{JsResult, TryIntoTs, TsResult};
+#[cfg(feature = "wasm")]
+use tsify::Ts;
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
@@ -235,10 +242,12 @@ impl Pkh {
     #[wasm_bindgen(js_name = fromOhpkmBytes)]
     pub fn from_ohpkm_bytes(
         bytes: Vec<u8>,
-        strategy: ConvertStrategy,
-    ) -> core::result::Result<Pkh, JsValue> {
-        let ohpkm = OhpkmV2::from_bytes(&bytes).map_err(JsValue::from)?;
-        Pkh::from_ohpkm(&ohpkm, strategy).map_err(JsValue::from)
+        strategy: tsify::Ts<ConvertStrategy>,
+    ) -> JsResult<Self> {
+        Ok(Pkh::from_ohpkm(
+            &OhpkmV2::from_bytes(&bytes)?,
+            strategy.to_rust()?,
+        )?)
     }
 
     #[wasm_bindgen(js_name = fromBytes)]
@@ -252,8 +261,91 @@ impl Pkh {
     }
 
     #[wasm_bindgen(js_name = calculateStats)]
-    pub fn calculate_stats_wasm(&self) -> Stats16Le {
-        self.calculate_stats()
+    pub fn calculate_stats_wasm(&self) -> TsResult<Stats16Le> {
+        self.calculate_stats().try_into_ts()
+    }
+
+    // Core data
+
+    #[wasm_bindgen(getter = abilityIndex)]
+    pub fn ability_index_wasm(&self) -> Option<AbilityIndexWasm> {
+        let ability_index_u16 = match self.get_origin_game_data() {
+            GameData::Pb7(Some(home_pb7_data)) => return Some(home_pb7_data.ability_index),
+            GameData::Pk8(Some(home_pk8_data)) => home_pk8_data.ability_index.to_u16(),
+            GameData::Pa8(Some(home_pa8_data)) => home_pa8_data.ability_index.to_u16(),
+            GameData::Pb8(Some(home_pb8_data)) => home_pb8_data.ability_index.to_u16(),
+            GameData::Pk9(Some(home_pk9_data)) => home_pk9_data.ability_index.to_u16(),
+            GameData::Pa9(Some(home_pa9_data)) => home_pa9_data.ability_index.to_u16(),
+            GameData::Pb7(None)
+            | GameData::Pk8(None)
+            | GameData::Pa8(None)
+            | GameData::Pb8(None)
+            | GameData::Pk9(None)
+            | GameData::Pa9(None) => 0,
+        };
+
+        AbilityIndexWasm::new(ability_index_u16)
+    }
+
+    // Legends Arceus
+
+    #[wasm_bindgen(getter = gvs)]
+    pub fn gvs_wasm(&self) -> JsResult<Option<Ts<Stats16Le>>> {
+        self.pa8_data
+            .map(|data| Stats16Le::from(data.gvs).try_into_ts())
+            .transpose()
+    }
+
+    #[wasm_bindgen(getter = alphaMove)]
+    pub fn alpha_move_wasm(&self) -> Option<u16> {
+        self.pa8_data?.alpha_move?.to_raw()
+    }
+
+    #[wasm_bindgen(getter = movesLa)]
+    pub fn move_flags_la_wasm(&self) -> Option<Vec<u16>> {
+        Some(self.pa8_data?.moves.indices())
+    }
+
+    #[wasm_bindgen(getter = movePpLa)]
+    pub fn move_pp_wasm(&self) -> Option<Vec<u8>> {
+        Some(self.pa8_data?.moves.pp())
+    }
+
+    #[wasm_bindgen(getter = tutorFlagsLa)]
+    pub fn tutor_flags_la_wasm(&self) -> Option<Vec<u8>> {
+        Some(self.pa8_data?.tutor_flags_la.bytes().copied().collect())
+    }
+
+    #[wasm_bindgen(getter = masterFlagsLa)]
+    pub fn master_flags_la_wasm(&self) -> Option<Vec<u8>> {
+        Some(self.pa8_data?.master_flags_la.bytes().copied().collect())
+    }
+
+    #[wasm_bindgen(getter = isNoble)]
+    pub fn is_noble_wasm(&self) -> Option<bool> {
+        Some(self.pa8_data?.is_noble)
+    }
+
+    #[wasm_bindgen(getter = isAlpha)]
+    pub fn is_alpha_wasm(&self) -> Option<bool> {
+        Some(self.pa8_data?.is_alpha)
+    }
+
+    // Scarlet/Violet
+
+    #[wasm_bindgen(getter = teraTypeOriginal)]
+    pub fn tera_type_original_wasm(&self) -> JsResult<Option<Ts<TeraType>>> {
+        self.pk9_data
+            .map(|d| d.tera_type_original.try_into_ts())
+            .transpose()
+    }
+
+    #[wasm_bindgen(getter = teraTypeOverride)]
+    pub fn tera_type_override_wasm(&self) -> JsResult<Option<Ts<TeraType>>> {
+        self.pk9_data
+            .and_then(|d| d.tera_type_override)
+            .map(|t| t.try_into_ts())
+            .transpose()
     }
 }
 

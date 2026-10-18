@@ -23,7 +23,9 @@ pub struct HomePk9Data {
     pub moves: MoveSlots,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub relearn_moves: [MoveIndex; 4],
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub tera_type_original: TeraType,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub tera_type_override: Option<TeraType>,
     pub ball: Ball,
     pub egg_location_index: u16,

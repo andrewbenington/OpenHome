@@ -13,10 +13,8 @@ import {
   NatureIndex,
   OriginGame,
   OriginGames,
-  PkhPa8DataWasm,
   PkhPa9DataWasm,
   PkhPb7DataWasm,
-  PkhPb8DataWasm,
   PkhPk8DataWasm,
   PkhPk9DataWasm,
   PkhWasm,
@@ -593,8 +591,8 @@ export default class PH4 {
   }
 
   get movesPLA() {
-    if (this.inner.pa8_data) {
-      const moves = Array.from(this.inner.pa8_data.move_indices)
+    if (this.inner.movesLa) {
+      const moves = Array.from(this.inner.movesLa)
       if (moves.length !== 4) {
         throw new Error(`PKH PA8 WASM struct has move array length of ${moves.length} (expected 4)`)
       }
@@ -604,8 +602,8 @@ export default class PH4 {
   }
 
   get movePpPLA() {
-    if (this.inner.pa8_data) {
-      const movePP = Array.from(this.inner.pa8_data.move_pp)
+    if (this.inner.movePpLa) {
+      const movePP = Array.from(this.inner.movePpLa)
       if (movePP.length !== 4) {
         throw new Error(
           `PKH PA8 WASM struct has move PP array length of ${movePP.length} (expected 4)`
@@ -616,29 +614,16 @@ export default class PH4 {
     }
   }
 
-  get relearnMovesPLA() {
-    if (this.inner.pa8_data) {
-      const relearnMoves = Array.from(this.inner.pa8_data.relearn_move_indices)
-      if (relearnMoves.length !== 4) {
-        throw new Error(
-          `PKH PA8 WASM struct has relearn move array length of ${relearnMoves.length} (expected 4)`
-        )
-      }
-
-      return relearnMoves as FourMoves
-    }
-  }
-
   get gvs() {
-    return this.inner.pa8_data?.gvs
+    return this.inner.gvs
   }
 
   get tutorFlagsPLA() {
-    return this.inner.pa8_data?.tutorFlags
+    return this.inner.tutorFlagsLa
   }
 
   get masteryFlagsPLA() {
-    return this.inner.pa8_data?.masteryFlags
+    return this.inner.masterFlagsLa
   }
 
   // BDSP data
@@ -750,11 +735,11 @@ export default class PH4 {
   }
 
   get teraTypeOriginal() {
-    return this.inner.pk9_data?.tera_type_original
+    return this.inner.teraTypeOriginal
   }
 
   get teraTypeOverride() {
-    return this.inner.pk9_data?.tera_type_override
+    return this.inner.teraTypeOverride
   }
 
   get tmFlagsSVBaseGame() {
@@ -857,17 +842,7 @@ export default class PH4 {
   }
 
   get ability() {
-    if (
-      this.primaryGameData instanceof PkhPk8DataWasm ||
-      this.primaryGameData instanceof PkhPa8DataWasm ||
-      this.primaryGameData instanceof PkhPb8DataWasm ||
-      this.primaryGameData instanceof PkhPk9DataWasm ||
-      this.primaryGameData instanceof PkhPa9DataWasm
-    ) {
-      return this.primaryGameData.abilityIndex
-    } else if (this.primaryGameData instanceof PkhPb7DataWasm) {
-      return this.primaryGameData.ability_index
-    }
+    return this.inner.abilityIndex
   }
 
   get abilityNum() {

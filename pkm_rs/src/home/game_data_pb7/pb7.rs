@@ -4,7 +4,7 @@ use crate::result::{Error, Result};
 use pkm_rs_resources::abilities::AbilityIndexWasm;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::{MoveIndex, MoveSlots};
-use pkm_rs_types::{AbilityNumber, Pokerus, Stats8, Stats16Le};
+use pkm_rs_types::{AbilityNumber, Pokerus, Stats8};
 use serde::Serialize;
 
 #[cfg(feature = "wasm")]
@@ -92,17 +92,17 @@ impl HomePb7Data {
     }
 }
 
-#[cfg(feature = "wasm")]
-#[wasm_bindgen(js_class = "PkhPb7DataWasm")]
-#[allow(clippy::missing_const_for_fn)]
-impl HomePb7Data {
-    #[wasm_bindgen(getter = avs)]
-    pub fn avs_wasm(&self) -> Stats16Le {
-        self.avs.into()
-    }
+// #[cfg(feature = "wasm")]
+// #[wasm_bindgen(js_class = "PkhPb7DataWasm")]
+// #[allow(clippy::missing_const_for_fn)]
+// impl HomePb7Data {
+//     #[wasm_bindgen(getter = avs)]
+//     pub fn avs_wasm(&self) -> Stats16Le {
+//         self.avs.into()
+//     }
 
-    #[wasm_bindgen(getter)]
-    pub fn relearn_move_indices(&self) -> Vec<u16> {
-        self.relearn_moves.into_iter().map(u16::from).collect()
-    }
-}
+//     #[wasm_bindgen(getter)]
+//     pub fn relearn_move_indices(&self) -> Vec<u16> {
+//         self.relearn_moves.into_iter().map(u16::from).collect()
+//     }
+// }

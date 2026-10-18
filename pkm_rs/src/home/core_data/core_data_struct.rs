@@ -8,7 +8,7 @@ use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     BinaryGender, ContestStats, Gender, HyperTraining, Ivs, Language, MarkingsSixShapesColors,
-    OriginGame, PokeDate, Stats8, Stats16Le, TrainerMemory,
+    OriginGame, PokeDate, Stats8, TrainerMemory,
 };
 use serde::Serialize;
 
@@ -30,6 +30,7 @@ pub struct HomeCoreData {
     pub secret_id: u16,
     pub exp: u32,
     pub is_favorite: bool,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub markings: MarkingsSixShapesColors,
     pub personality_value: u32,
     pub nature: NatureIndex,
@@ -38,6 +39,7 @@ pub struct HomeCoreData {
     pub gender: Gender,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub evs: Stats8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub contest: ContestStats,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ribbons: ModernRibbonSet<16>,
@@ -58,6 +60,7 @@ pub struct HomeCoreData {
     pub is_current_handler: bool,
     pub handler_id: u16,
     pub handler_friendship: u8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub handler_memory: TrainerMemory,
     pub game_of_origin: OriginGame,
     pub game_of_origin_battle: Option<OriginGame>,
@@ -66,11 +69,13 @@ pub struct HomeCoreData {
     pub affixed_ribbon: Option<ModernRibbon>,
     pub trainer_name: SizedUtf16String<26>,
     pub trainer_friendship: u8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub trainer_memory: TrainerMemory,
     pub egg_date: Option<PokeDate>,
     pub met_date: PokeDate,
     pub met_level: u8,
     pub trainer_gender: BinaryGender,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub hyper_training: HyperTraining,
     pub held_item_index: u16,
 }
@@ -143,36 +148,36 @@ impl HomeCoreData {
     }
 }
 
-#[cfg(feature = "wasm")]
-#[wasm_bindgen(js_class = "PkhCoreDataWasm")]
-#[allow(clippy::missing_const_for_fn)]
-impl HomeCoreData {
-    #[wasm_bindgen(getter = evs)]
-    pub fn evs_wasm(&self) -> Stats16Le {
-        self.evs.into()
-    }
+// #[cfg(feature = "wasm")]
+// #[wasm_bindgen(js_class = "PkhCoreDataWasm")]
+// #[allow(clippy::missing_const_for_fn)]
+// impl HomeCoreData {
+//     #[wasm_bindgen(getter = evs)]
+//     pub fn evs_wasm(&self) -> Stats16Le {
+//         self.evs.into()
+//     }
 
-    #[wasm_bindgen(getter)]
-    pub fn ribbons(&self) -> Vec<String> {
-        self.ribbons
-            .get_ribbons()
-            .iter()
-            .map(|ribbon| ribbon.to_string())
-            .collect()
-    }
+//     #[wasm_bindgen(getter)]
+//     pub fn ribbons(&self) -> Vec<String> {
+//         self.ribbons
+//             .get_ribbons()
+//             .iter()
+//             .map(|ribbon| ribbon.to_string())
+//             .collect()
+//     }
 
-    #[wasm_bindgen(getter)]
-    pub fn ribbon_bytes(&self) -> Vec<u8> {
-        self.ribbons.to_bytes().into_iter().collect()
-    }
+//     #[wasm_bindgen(getter)]
+//     pub fn ribbon_bytes(&self) -> Vec<u8> {
+//         self.ribbons.to_bytes().into_iter().collect()
+//     }
 
-    #[wasm_bindgen(getter = ivs)]
-    pub fn ivs_wasm(&self) -> Stats16Le {
-        self.ivs.into()
-    }
+//     #[wasm_bindgen(getter = ivs)]
+//     pub fn ivs_wasm(&self) -> Stats16Le {
+//         self.ivs.into()
+//     }
 
-    #[wasm_bindgen(setter = ivs)]
-    pub fn set_ivs_wasm(&mut self, v: Stats16Le) {
-        self.ivs = v.to_ivs_capped()
-    }
-}
+//     #[wasm_bindgen(setter = ivs)]
+//     pub fn set_ivs_wasm(&mut self, v: Stats16Le) {
+//         self.ivs = v.to_ivs_capped()
+//     }
+// }
