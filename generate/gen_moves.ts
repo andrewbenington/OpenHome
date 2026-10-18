@@ -466,6 +466,10 @@ impl MoveSlot {
         self.0.is_none()
     }
 
+    pub const fn index(&self) -> Option<MoveIndex> {
+        self.0
+    }
+
     pub fn to_raw(&self) -> Option<u16> {
         Some(self.0?.to_raw())
     }
