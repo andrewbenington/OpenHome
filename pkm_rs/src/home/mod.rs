@@ -16,4 +16,4 @@ pub mod game_data_pb8;
 pub mod game_data_pk8;
 pub mod game_data_pk9;
 
-pub(crate) const PH4_PKM_MAX_SIZE: usize = 0x260;
+pub(crate) const PH4_PKM_MAX_SIZE: usize = 0x2A6;

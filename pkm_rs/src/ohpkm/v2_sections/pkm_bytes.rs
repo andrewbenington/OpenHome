@@ -19,7 +19,7 @@ const PB8_SIZE: usize = 344;
 const PK9_SIZE: usize = 344;
 const PA9_SIZE: usize = 344;
 
-const PH4_PKM_MAX_SIZE: usize = 0x260;
+const PH4_PKM_MAX_SIZE: usize = 0x2A6;
 
 const PK3CFRU_PARTY_SIZE: usize = 58;
 const PB8LUMI_SIZE: usize = 344;

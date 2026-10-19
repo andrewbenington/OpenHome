@@ -93,9 +93,8 @@ impl Pkh {
         let mut byte_counter = game_data_size_offset + 2;
 
         loop {
-            // Crude method of detecting padding that only works because end of file padding is no larger than 6 bytes in size
-            // This is unlikely to be a problem in the future, but a better method should still be used here...
-            let eof_check = Some(bytes[byte_counter + 6]);
+            // Game sizes are no smaller than 25 bytes in size, and padding is only to the nearest 0x10.
+            let eof_check = bytes.get(byte_counter + 16);
             if eof_check.is_none() {
                 break;
             }
@@ -109,44 +108,50 @@ impl Pkh {
                         &bytes[byte_counter..byte_counter + super::HOME_PB7_DATA_SIZE],
                     )
                     .ok();
-                    byte_counter = byte_counter + super::HOME_PB7_DATA_SIZE + 1;
+                    byte_counter += super::HOME_PB7_DATA_SIZE;
                 }
                 2 => {
                     mon.pk8_data = HomePk8Data::try_from_bytes(
                         &bytes[byte_counter..byte_counter + super::HOME_PK8_DATA_SIZE],
                     )
                     .ok();
-                    byte_counter = byte_counter + super::HOME_PK8_DATA_SIZE + 1;
+                    byte_counter += super::HOME_PK8_DATA_SIZE;
                 }
                 3 => {
                     mon.pa8_data = HomePa8Data::try_from_bytes(
                         &bytes[byte_counter..byte_counter + super::HOME_PA8_DATA_SIZE],
                     )
                     .ok();
-                    byte_counter = byte_counter + super::HOME_PA8_DATA_SIZE + 1;
+                    byte_counter += super::HOME_PA8_DATA_SIZE;
                 }
                 4 => {
                     mon.pb8_data = HomePb8Data::try_from_bytes(
                         &bytes[byte_counter..byte_counter + super::HOME_PB8_DATA_SIZE],
                     )
                     .ok();
-                    byte_counter = byte_counter + super::HOME_PB8_DATA_SIZE + 1;
+                    byte_counter += super::HOME_PB8_DATA_SIZE;
                 }
                 5 => {
                     mon.pk9_data = HomePk9Data::try_from_bytes(
                         &bytes[byte_counter..byte_counter + super::HOME_PK9_DATA_SIZE],
                     )
                     .ok();
-                    byte_counter = byte_counter + super::HOME_PK9_DATA_SIZE + 1;
+                    byte_counter += super::HOME_PK9_DATA_SIZE;
                 }
-                6 => {
+                6 => todo!(
+                    "This PKM has visited Champions. Champions data is currently not supported."
+                ),
+                7 => {
                     mon.pa9_data = HomePa9Data::try_from_bytes(
                         &bytes[byte_counter..byte_counter + super::HOME_PA9_DATA_SIZE],
                     )
                     .ok();
-                    byte_counter = byte_counter + super::HOME_PA9_DATA_SIZE + 1;
+                    byte_counter += super::HOME_PA9_DATA_SIZE + 1;
                 }
-                _ => break, // padding that wasn't found by the initial check
+                _ => {
+                    crate::log!("PKH WARNING: Invalid game or padding found");
+                    continue;
+                }
             }
         }
 

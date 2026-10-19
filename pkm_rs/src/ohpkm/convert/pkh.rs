@@ -192,6 +192,6 @@ impl OhpkmConvert for Pkh {
         )))
         .copied()
         .map(Box::new)
-        .map(StoredPkmBytes::Pk9)
+        .map(StoredPkmBytes::Ph4)
     }
 }
