@@ -785,9 +785,8 @@ export default class PH4 {
       }
 
       return moves as FourMoves
-    } else {
-      throw new Error('PKH WASM struct has no moves')
     }
+    throw new Error('PKH WASM struct has no moves')
   }
 
   get movePP() {
