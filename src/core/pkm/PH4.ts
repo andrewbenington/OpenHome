@@ -15,6 +15,7 @@ import {
   PkhPk8DataWasm,
   PkhPk9DataWasm,
   PkhWasm,
+  PlusMoveFlags,
   PokeDate,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
@@ -739,8 +740,8 @@ export default class PH4 {
     }
   }
 
-  get plusMovesLza() {
-    return this.inner.pa9_data?.plusFlagsLza.getMoveIds() ?? []
+  get plusMoveFlags() {
+    return this.inner.pa9_data?.plusFlagsLza ?? PlusMoveFlags.empty()
   }
 
   // Shared game data
@@ -762,21 +763,23 @@ export default class PH4 {
     } else if (this.inner.pa8_data && this.gameOfOrigin === OriginGame.LegendsArceus) {
       return this.inner.pa8_data
     } else if (this.inner.pb8_data && OriginGames.isBdsp(this.gameOfOrigin)) {
-      this.inner.pb8_data
+      return this.inner.pb8_data
     } else if (this.inner.pk9_data && OriginGames.isScarletViolet(this.gameOfOrigin)) {
-      this.inner.pk9_data
+      return this.inner.pk9_data
     } else if (this.inner.pa9_data && this.gameOfOrigin === OriginGame.LegendsZa) {
-      this.inner.pa9_data
+      return this.inner.pa9_data
     } else {
       return this.inner.pk8_data
     }
   }
 
   get moves() {
-    if (this.primaryGameData?.moves.indices) {
+    if (this.primaryGameData instanceof PkhPa9DataWasm) {
+      return this.movesLza
+    } else if (this.primaryGameData?.moves) {
       const moves = Array.from(this.primaryGameData?.moves.indices)
       if (moves.length !== 4) {
-        throw new Error(`PKH WASM struct has move PP array length of ${moves.length} (expected 4)`)
+        throw new Error(`PKH WASM struct has move length of ${moves.length} (expected 4)`)
       }
 
       return moves as FourMoves
@@ -786,6 +789,9 @@ export default class PH4 {
   }
 
   get movePP() {
+    if (this.primaryGameData instanceof PkhPa9DataWasm) {
+      return [0, 0, 0, 0]
+    }
     const movePP = Array.from(this.primaryGameData?.moves.pp ?? [0, 0, 0, 0])
     if (movePP.length !== 4) {
       throw new Error(`PKH WASM struct has move PP array length of ${movePP.length} (expected 4)`)
@@ -795,6 +801,9 @@ export default class PH4 {
   }
 
   get movePPUps() {
+    if (this.primaryGameData instanceof PkhPa9DataWasm) {
+      return [0, 0, 0, 0]
+    }
     const movePPUps = Array.from(this.primaryGameData?.moves.pp_ups ?? [0, 0, 0, 0])
     if (movePPUps.length !== 4) {
       throw new Error(

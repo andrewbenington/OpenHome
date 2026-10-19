@@ -93,7 +93,7 @@ impl Pkh {
         let mut byte_counter = game_data_size_offset + 2;
 
         loop {
-            // Game sizes are no smaller than 25 bytes in size, and padding is only to the nearest 0x10.
+            // Game data is no smaller than 25 bytes in size, and padding is only to the nearest 0x10.
             let eof_check = bytes.get(byte_counter + 16);
             if eof_check.is_none() {
                 break;
@@ -138,19 +138,20 @@ impl Pkh {
                     .ok();
                     byte_counter += super::HOME_PK9_DATA_SIZE;
                 }
-                6 => todo!(
-                    "This PKM has visited Champions. Champions data is currently not supported."
-                ),
+                6 => {
+                    // this contains Champions data, which is merely tracking information:
+                    // https://github.com/kwsch/PKHeX/blob/master/PKHeX.Core/PKM/HOME/GameDataPC9.cs
+                    byte_counter += 0x19;
+                }
                 7 => {
                     mon.pa9_data = HomePa9Data::try_from_bytes(
                         &bytes[byte_counter..byte_counter + super::HOME_PA9_DATA_SIZE],
                     )
                     .ok();
-                    byte_counter += super::HOME_PA9_DATA_SIZE + 1;
+                    byte_counter += super::HOME_PA9_DATA_SIZE;
                 }
                 _ => {
-                    crate::log!("PKH WARNING: Invalid game or padding found");
-                    continue;
+                    panic!("Invalid byte read as game type");
                 }
             }
         }
