@@ -775,7 +775,9 @@ export default class PH4 {
 
   get moves() {
     if (this.primaryGameData instanceof PkhPa9DataWasm) {
-      return this.movesLza
+      if (this.movesLza) {
+        return this.movesLza
+      }
     } else if (this.primaryGameData?.moves) {
       const moves = Array.from(this.primaryGameData?.moves.indices)
       if (moves.length !== 4) {
@@ -790,7 +792,7 @@ export default class PH4 {
 
   get movePP() {
     if (this.primaryGameData instanceof PkhPa9DataWasm) {
-      return Array.from([0, 0, 0, 0])
+      return Array.from([0, 0, 0, 0]) as FourMoves
     }
     const movePP = Array.from(this.primaryGameData?.moves.pp ?? [0, 0, 0, 0])
     if (movePP.length !== 4) {
@@ -802,7 +804,7 @@ export default class PH4 {
 
   get movePPUps() {
     if (this.primaryGameData instanceof PkhPa9DataWasm) {
-      return Array.from([0, 0, 0, 0])
+      return Array.from([0, 0, 0, 0]) as FourMoves
     }
     const movePPUps = Array.from(this.primaryGameData?.moves.pp_ups ?? [0, 0, 0, 0])
     if (movePPUps.length !== 4) {
