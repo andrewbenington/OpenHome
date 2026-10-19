@@ -40,7 +40,7 @@ export default class PA9 {
   static getFormat() {
     return 'PA9' as const
   }
-  format: 'PA9' = 'PA9'
+  format = 'PA9' as const
   static getBoxSize() {
     return 344
   }
@@ -154,9 +154,10 @@ export default class PA9 {
       this.weightScalar = dataView.getUint8(0x49)
       this.scale = dataView.getUint8(0x4a)
 
-      const plusMovesBlockC = new Uint8Array(buffer).slice(0xd6, 0xf7)
-      const plusMovesBlockB = new Uint8Array(buffer).slice(0x60, 0x6c)
-      this.plusMoveFlags = PlusMoveFlags.fromByteBlocks(plusMovesBlockC, plusMovesBlockB)
+      const plusMovesBlock0xD6 = new Uint8Array(buffer).slice(0xd6, 0xf7)
+      const plusMovesBlock0x94 = new Uint8Array(buffer).slice(0x94, 0x94 + 0xc)
+
+      this.plusMoveFlags = PlusMoveFlags.fromByteBlocks(plusMovesBlock0xD6, plusMovesBlock0x94)
 
       this.nickname = stringLogic.utf16BytesToString(buffer, 0x58, 12)
       this.moves = [
@@ -424,8 +425,8 @@ export default class PA9 {
     )
     new Uint8Array(buffer).set(new Uint8Array(this.tmFlagsLzaDlc.slice(0, LZA_DLC_TM_BYTES)), 0x4b)
 
-    new Uint8Array(buffer).set(new Uint8Array(this.plusMoveFlags.toBlockCBytes()), 0xd6)
-    new Uint8Array(buffer).set(new Uint8Array(this.plusMoveFlags.toBlockBBytes()), 0x94)
+    new Uint8Array(buffer).set(new Uint8Array(this.plusMoveFlags.toBlock0xD6Bytes()), 0xd6)
+    new Uint8Array(buffer).set(new Uint8Array(this.plusMoveFlags.toBlock0x94Bytes()), 0x94)
     byteLogic.setFlagIndexes(
       dataView,
       0x34,

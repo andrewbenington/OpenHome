@@ -1,15 +1,51 @@
-import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { Move } from '@openhome-core/resources'
+import { PluginIdentifier } from '@openhome-core/save/interfaces'
+import * as types from '@openhome-core/util/types'
 import { TopRightBadgeType } from '@openhome-ui/hooks/monDisplay'
 import { BallsImageList } from '@openhome-ui/images/items'
-import { StatsPreSplit } from '@pkm-rs/pkg/pkm_rs'
+import { Gender, HyperTraining, PlusMoveFlags, StatsPreSplit } from '@pkm-rs/pkg/pkm_rs'
 import GenderIcon from '../pokemon/GenderIcon'
 import Badge from './Badge'
 import './Badge.css'
 
 type TopRightBadgeProps = {
-  mon: PKMInterface
+  mon: TopRightBadgeMon
   badgeType: TopRightBadgeType
+}
+
+export type TopRightBadgeMon = {
+  heldItemIndex: number
+  nickname: string
+  pluginOrigin?: PluginIdentifier
+  gameOfOrigin: number
+  ball?: number
+
+  evs?: types.Stats
+  evsG12?: StatsPreSplit
+  ivs?: types.Stats
+  hyperTraining?: HyperTraining
+
+  canGigantamax?: boolean
+  gender?: Gender
+  isAlpha?: boolean
+  isNsPokemon?: boolean
+
+  getLevel: () => number
+  isShiny: () => boolean
+
+  plusMoveFlags?: PlusMoveFlags
+  tmMovesLza?: Move[]
+  tmMovesSv?: Move[]
+  tmMovesSVDLC?: Move[]
+  trMovesSwSh?: Move[]
+  tutorMovesLa?: Move[]
+
+  pokerusByte?: number
+  ribbons?: string[]
+
+  openhomeId?: OhpkmIdentifier
 }
 
 const EV_STAT_MAX = 252
@@ -83,21 +119,21 @@ export function TopRightBadge({ mon, badgeType }: TopRightBadgeProps) {
   }
 }
 
-function hasDvs(mon: PKMInterface): mon is PKMInterface & { dvs: StatsPreSplit } {
-  return mon.dvs !== undefined
+function hasDvs(mon: TopRightBadgeMon): mon is TopRightBadgeMon & { dvs: StatsPreSplit } {
+  return (mon as any).dvs !== undefined
 }
 
-function getIvsPercent(mon: PKMInterface): number {
+function getIvsPercent(mon: TopRightBadgeMon): number {
   const ivsTotal = Object.values(mon.ivs ?? {}).reduce((p, c) => p + c, 0)
   return Math.round((ivsTotal / (6 * 31)) * 100)
 }
 
-function getDvsPercent(mon: PKMInterface & { dvs: StatsPreSplit }): number {
+function getDvsPercent(mon: TopRightBadgeMon & { dvs: StatsPreSplit }): number {
   const dvsTotal = Object.values(mon.dvs).reduce((p, c) => p + c, 0)
   return Math.round((dvsTotal / (5 * 15)) * 100)
 }
 
-function getPerfectIvsCount(mon: PKMInterface): number {
+function getPerfectIvsCount(mon: TopRightBadgeMon): number {
   if (!mon.ivs) return 0
   return Object.values(mon.ivs).filter((iv) => iv === 31).length
 }

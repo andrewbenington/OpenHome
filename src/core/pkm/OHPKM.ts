@@ -17,7 +17,6 @@ import {
   getFlag,
   getHeightCalculated,
   getWeightCalculated,
-  runningInTest,
   setFlag,
 } from '@openhome-core/util'
 import { intersection, Option, unique } from '@openhome-core/util/functional'
@@ -36,12 +35,14 @@ import {
   BinaryGender,
   Gender,
   generatePk3CompatiblePid,
+  getDefaultConvertStrategy,
   Item,
   Language,
   Lookup,
   MetadataSummaryLookup,
   NatureIndex,
   OriginGames,
+  PidGenerationParametersJs,
   PkmFormat,
   PlusMoveFlags,
   PokeDate,
@@ -60,6 +61,7 @@ import dayjs, { Dayjs } from 'dayjs'
 import Prando from 'prando'
 import { OhpkmV2 as OhpkmV2Wasm } from '../../../pkm_rs/pkg'
 import { PluginIdentifier, SAV } from '../save/interfaces'
+import { PkmConverter } from './conversion/converter'
 import { isEvolution } from './Lookup'
 import {
   adjustMovePPBetweenFormats,
@@ -76,7 +78,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   static getFormat() {
     return 'OHPKM'
   }
-  format: 'OHPKM' = 'OHPKM'
+  format = 'OHPKM' as const
 
   private constructor(arg: Uint8Array | AllPKMFields) {
     if (arg instanceof Uint8Array) {
@@ -86,6 +88,8 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     } else {
       const other = arg
       super(new Uint8Array())
+
+      this.startedTrackingTimestamp = dayjs()
 
       let prng: Prando
 
@@ -115,8 +119,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
             .concat(`${hp}~${atk}~${def}~${spc}~${spe}`)
             .concat(other.trainerID.toString())
         )
-
-        this.personalityValue = prng.nextInt(0, 0xffffffff)
       } else {
         prng = new Prando(other.trainerName.concat(other.trainerID.toString()))
       }
@@ -169,7 +171,21 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
           Gender.Genderless
         this.nature = other.nature ?? NatureIndex.newFromModulo(other.exp)
 
-        this.personalityValue = this.generatePk3CompatiblePid()
+        this.personalityValue = generatePk3CompatiblePid(
+          PidGenerationParametersJs.new(
+            other.nationalDex,
+            other.formIndex,
+            other.nature,
+            other.gender,
+            other.isShiny(),
+            other.formIndex,
+            other.trainerID,
+            other.secretID
+          ),
+          new PkmConverter(other.format, getDefaultConvertStrategy()).pidModificationStrategy(
+            'Odds8192'
+          )
+        )
       } else {
         this.abilityNum = other.abilityNum ?? 0
         this.gender =
@@ -190,14 +206,23 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.ball = other.ball !== undefined ? other.ball : Ball.Poke
       this.markings = markingsSixShapesWithColorFromOther(other.markings)
 
-      this.metLocationIndex = other.metLocationIndex ?? 0
+      if (
+        // handle FRLG (Switch) met location
+        ['PB8', 'PA8', 'PA9'].includes(other.format) &&
+        OriginGames.isFrlgSwitch(other.gameOfOrigin) &&
+        other.metLocationIndex === 30007
+      ) {
+        this.metLocationIndex = 254
+      } else {
+        this.metLocationIndex = other.metLocationIndex ?? 0
+      }
+
       this.metLevel = other.metLevel ?? 0
 
       if (other.dvs && other.evsG12) {
         this.setGameboyData(other.dvs, other.metTimeOfDay ?? 0, other.evsG12)
       }
 
-      this.metLocationIndex = other.metLocationIndex ?? 0
       this.ability =
         other.ability ??
         getAbilityFromNumber(this.nationalDex, this.formIndex, this.abilityNum) ??
@@ -644,12 +669,12 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     this.tradeToSaveWasm(save.origin)
 
     const isOriginalSave = this.isFrom(save)
-    if (!runningInTest()) {
-      console.debug(
-        { isOriginalSave, ohpkm_id: this.openhomeId, event: 'trade_to_save' },
-        'Traded Pokémon to save file'
-      )
-    }
+    // if (!runningInTest()) {
+    //   console.debug(
+    //     { isOriginalSave, ohpkm_id: this.openhomeId, event: 'trade_to_save' },
+    //     'Traded Pokémon to save file'
+    //   )
+    // }
 
     this.isCurrentHandler = !isOriginalSave
     if (isOriginalSave) {
@@ -1063,6 +1088,8 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.obedienceLevel = other.obedienceLevel
     }
 
+    this.populateLearnedMoves()
+
     return updates
   }
 
@@ -1075,7 +1102,8 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   generatePk3CompatiblePid(): number {
-    return generatePk3CompatiblePid(OhpkmV2Wasm.fromByteVectorFixingErrors(this.toByteArray()))
+    const converter = new PkmConverter('PK3', getDefaultConvertStrategy())
+    return converter.personalityValue(this, 'Odds8192')
   }
 }
 

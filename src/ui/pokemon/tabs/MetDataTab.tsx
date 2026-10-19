@@ -26,12 +26,15 @@ const MetDataTab = (props: { mon: PKMInterface }) => {
     }
     return `Egg received on ${mon.eggDate.month}/${mon.eggDate.day}/${
       mon.eggDate.year
-    } ${getLocationString(mon.gameOfOrigin, mon.eggLocationIndex, mon.format, Language.English, true)}.` // todo: i18n
+    } ${getLocationString(mon.gameOfOrigin, mon.eggLocationIndex, Language.English, true)}.` // todo: i18n
   }, [mon])
 
   const metMessage = useMemo(() => {
-    if (!mon.metLocationIndex) {
-      return 'Met location unknown.'
+    if (
+      !mon.metLocationIndex ||
+      (OriginGames.isBdsp(mon.gameOfOrigin) && mon.metLocationIndex === 65535) // BDSP Egg
+    ) {
+      return 'Met location unknown.' // todo: i18n
     }
 
     let message = 'Met'

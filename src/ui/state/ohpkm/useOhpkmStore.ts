@@ -2,10 +2,10 @@ import useBackend from '@openhome-core/backend/useBackend'
 import { getMoveMaxPP } from '@openhome-core/pkm'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import {
-  getMonFileIdentifier,
   getMonGen12Identifier,
   getMonGen345Identifier,
   OhpkmIdentifier,
+  tryCalculateIdentifier,
 } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
@@ -63,6 +63,7 @@ function createOhpkmStore(capacity: number) {
       globalListeners.add(cb)
       return () => globalListeners.delete(cb)
     },
+    reset: () => cache.reset(),
   }
 }
 
@@ -103,6 +104,7 @@ export function useOhpkmStore() {
       .lookupOhpkmById(id)
       .then(R.mapErr(() => IdentifierNotPresent(id)))
       .then(R.flatMap((ohpkm) => (ohpkm ? R.Ok(ohpkm) : R.Err(IdentifierNotPresent(id)))))
+      .then(R.peek((ohpkm) => ohpkmCache.set(ohpkm.openhomeId, ohpkm)))
   }
 
   function tryLoadBatch(ids: OhpkmIdentifier[]): NowOrLater<OhpkmBatchLookupResults> {
@@ -372,7 +374,7 @@ export function useOhpkmStore() {
       case 'PK9':
       case 'PK9Compass':
       case 'PA9': {
-        return getMonFileIdentifier(mon)
+        return tryCalculateIdentifier(mon)
       }
       default:
         expectExhaustive(mon.format, `unrecognized format: ${mon.format}`)
@@ -464,6 +466,10 @@ export function useOhpkmStore() {
       .await()
   }
 
+  function clearCache() {
+    ohpkmCache.reset()
+  }
+
   return {
     getById,
     tryLoadFromId,
@@ -493,6 +499,7 @@ export function useOhpkmStore() {
     syncOhpkmIfTracked,
 
     scanFullStoreAndFixHandlers,
+    clearCache,
   }
 }
 

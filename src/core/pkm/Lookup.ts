@@ -6,41 +6,44 @@ import {
   readGameBoyStringFromBytes,
   utf16StringToGen12,
 } from '@openhome-core/util/stringConversion'
-import { PKMFormeRef } from '@openhome-core/util/types'
+import { PKMFormRef } from '@openhome-core/util/types'
 import { Language, MetadataSummaryLookup, OpenHomeId, OriginGame, OriginGames } from '@pkm-rs/pkg'
 
 export type OhpkmIdentifier = string
 
 function hasPersonalityValue(
-  mon: PKMInterface
-): mon is PKMInterface & { personalityValue: number } {
+  mon: PkmMaybeIdentifiable
+): mon is PkmMaybeIdentifiable & { personalityValue: number } {
   return mon.personalityValue !== undefined
 }
 
-export const getMonFileIdentifier = (mon: PKMInterface): OhpkmIdentifier | undefined => {
+export const tryCalculateIdentifier = (mon: PkmMaybeIdentifiable): Option<OhpkmIdentifier> => {
   if (mon instanceof OHPKM) {
     return mon.openhomeId
   }
   if (!hasPersonalityValue(mon)) {
     return undefined
   }
-  return getHomeIdentifier(mon)
+  return calculateIdentifier(mon)
 }
 
-type HomeIdentifierDerivableMon = {
+export type PkmMaybeIdentifiable = {
   nationalDex: number
   formIndex: number
   trainerID: number
   secretID: number
-  personalityValue: number
+  personalityValue?: number
   gameOfOrigin: OriginGame
 }
+
+// excludes gameboy formats and any others without PIDs + game of origins + TID/SIDs
+export type PkmCalculatableId = Required<PkmMaybeIdentifiable>
 
 const bytesToString = (value: number, numBytes: number) => {
   return value.toString(16).padStart(numBytes * 2, '0')
 }
 
-function getHomeIdentifier(mon: HomeIdentifierDerivableMon): OhpkmIdentifier {
+function calculateIdentifier(mon: PkmCalculatableId): OhpkmIdentifier {
   const baseEvolution = getBaseEvolution(mon.nationalDex, mon.formIndex)
 
   if (!baseEvolution) {
@@ -107,6 +110,7 @@ export const getMonGen345Identifier = (
     } else if (mon.personalityValue !== undefined) {
       pk3CompatiblePID = mon.personalityValue
     } else {
+      console.error(mon)
       return undefined
     }
 
@@ -122,17 +126,18 @@ export const getMonGen345Identifier = (
   } catch (error) {
     console.error(`getMonGen345Identifier: ${error}`)
   }
+  console.error('uhhh', mon)
   return undefined
 }
 
-export function isEvolution(prevo: PKMFormeRef, possibleEvo: PKMFormeRef): boolean {
-  const prevoForme = MetadataSummaryLookup(prevo.nationalDex, prevo.formIndex)
-  const possibleEvoForme = MetadataSummaryLookup(possibleEvo.nationalDex, possibleEvo.formIndex)
+export function isEvolution(prevo: PKMFormRef, possibleEvo: PKMFormRef): boolean {
+  const prevoForm = MetadataSummaryLookup(prevo.nationalDex, prevo.formIndex)
+  const possibleEvoForm = MetadataSummaryLookup(possibleEvo.nationalDex, possibleEvo.formIndex)
 
-  if (!prevoForme || !possibleEvoForme) return false
+  if (!prevoForm || !possibleEvoForm) return false
 
   if (
-    prevoForme.evolutions.some(
+    prevoForm.evolutions.some(
       (evo) =>
         evo.nationalDex === possibleEvo.nationalDex && evo.formIndex === possibleEvo.formIndex
     )
@@ -140,7 +145,7 @@ export function isEvolution(prevo: PKMFormeRef, possibleEvo: PKMFormeRef): boole
     return true
   }
 
-  for (const evo of prevoForme.evolutions) {
+  for (const evo of prevoForm.evolutions) {
     if (isEvolution(prevo, { nationalDex: evo.nationalDex, formIndex: evo.formIndex })) {
       return true
     }

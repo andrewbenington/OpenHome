@@ -12,19 +12,20 @@ use pkm_rs_derive::IsShiny4096;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::metadata_source::MetadataSource;
-use pkm_rs_resources::moves::{MoveIndex, MoveSlots};
+use pkm_rs_resources::moves::{MoveSlot, MoveSlots};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
 use pkm_rs_resources::species::{FormMetadata, SpeciesForm, SpeciesMetadata};
 use pkm_rs_resources::stats;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
-    AbilityNumber, BinaryGender, ContestStats, FlagSet, HyperTraining, Ivs, Language,
-    MarkingsSixShapesColors, OriginGame, Stats8, Stats16Le, TeraType,
+    AbilityNumber, BinaryGender, ContestStats, FlagSet, HyperTraining, Ivs, JsResult, Language,
+    MarkingsSixShapesColors, OriginGame, Stats8, Stats16Le, TeraType, TryIntoTs, TsResult,
 };
 use pkm_rs_types::{Gender, PokeDate, TrainerMemory};
 use serde::Serialize;
 
+use tsify::Ts;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -59,6 +60,7 @@ pub struct Pk9 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ability_index: Pk9AbilityIndex,
     pub ability_num: AbilityNumber,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub markings: MarkingsSixShapesColors,
     pub personality_value: u32,
     pub nature: NatureIndex,
@@ -67,6 +69,7 @@ pub struct Pk9 {
     pub gender: Gender,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub evs: Stats8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub contest: ContestStats,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ribbons: ModernRibbonSet<14, MAX_RIBBON_SV>,
@@ -81,7 +84,7 @@ pub struct Pk9 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub moves: MoveSlots,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub relearn_moves: [MoveIndex; 4],
+    pub relearn_moves: [MoveSlot; 4],
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ivs: Ivs,
     pub is_egg: bool,
@@ -97,6 +100,7 @@ pub struct Pk9 {
     pub is_current_handler: bool,
     pub handler_id: u16,
     pub handler_friendship: u8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub handler_memory: TrainerMemory,
     pub game_of_origin: OriginGame,
     pub game_of_origin_battle: Option<OriginGame>,
@@ -105,6 +109,7 @@ pub struct Pk9 {
     pub language: Language,
     pub trainer_name: SizedUtf16String<26>,
     pub trainer_friendship: u8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub trainer_memory: TrainerMemory,
     pub egg_date: Option<PokeDate>,
     pub met_date: PokeDate,
@@ -117,12 +122,14 @@ pub struct Pk9 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub tm_flags_base_game: FlagSet<TM_FLAG_BYTE_LENGTH_BASE>,
     pub home_tracker: Option<u64>,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub hyper_training: HyperTraining,
     #[cfg_attr(feature = "randomize", randomize(skip))]
     pub stat_level: u8,
     #[cfg_attr(feature = "randomize", randomize(skip))]
     pub current_hp: u16,
     #[cfg_attr(feature = "randomize", randomize(skip))]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub stats: Stats16Le,
 }
 
@@ -242,7 +249,7 @@ impl Pk9 {
             SvPokemonIndex::from_species_and_form(self.species_and_form.0)
                 .expect("Pk9 has SV-compatible species/form"),
         );
-        buf.set_form_index(self.species_and_form.0.get_forme_index());
+        buf.set_form_index(self.species_and_form.0.get_form_index());
         buf.set_held_item_index(self.held_item_index);
         buf.set_trainer_id(self.trainer_id);
         buf.set_secret_id(self.secret_id);
@@ -327,7 +334,7 @@ impl Pk9 {
     }
 
     pub fn from_encrypted_bytes(mut bytes: Box<[u8]>) -> Result<Self> {
-        Self::from_buffer(Pk9Buffer::new_mut(&mut bytes).decrypted())
+        Self::from_buffer(&Pk9Buffer::new_mut(&mut bytes).decrypted())
     }
 
     pub fn to_box_bytes_encrypted(self) -> Box<[u8]> {
@@ -398,13 +405,13 @@ impl HasSpeciesAndForm for Pk9 {
         self.species_and_form.0.get_species_metadata()
     }
 
-    fn get_forme_metadata(&self) -> &'static FormMetadata {
-        self.species_and_form.0.get_forme_metadata()
+    fn get_form_metadata(&self) -> &'static FormMetadata {
+        self.species_and_form.0.get_form_metadata()
     }
 
     fn calculate_level(&self) -> u8 {
         self.get_species_metadata()
-            .level_up_type
+            .experience_growth
             .calculate_level(self.exp)
     }
 }
@@ -416,20 +423,20 @@ impl Pk9 {
     #[wasm_bindgen(js_name = fromOhpkmBytes)]
     pub fn from_ohpkm_bytes(
         bytes: Vec<u8>,
-        strategy: ConvertStrategy,
-    ) -> core::result::Result<Pk9, JsValue> {
-        let ohpkm = OhpkmV2::from_bytes(&bytes).map_err(JsValue::from)?;
-        Pk9::from_ohpkm(&ohpkm, strategy).map_err(JsValue::from)
+        strategy: tsify::Ts<ConvertStrategy>,
+    ) -> JsResult<Self> {
+        let ohpkm = OhpkmV2::from_bytes(&bytes)?;
+        Ok(Self::from_ohpkm(&ohpkm, strategy.to_rust()?)?)
     }
 
     #[wasm_bindgen(js_name = fromBytes)]
-    pub fn from_byte_vector(bytes: Vec<u8>) -> core::result::Result<Pk9, JsValue> {
-        Pk9::from_bytes(&bytes).map_err(JsValue::from)
+    pub fn from_byte_vector(bytes: Vec<u8>) -> core::result::Result<Self, JsValue> {
+        Self::from_bytes(&bytes).map_err(JsValue::from)
     }
 
     #[wasm_bindgen(js_name = fromEncryptedBytes)]
-    pub fn take_from_encrypted_bytes(bytes: Box<[u8]>) -> core::result::Result<Pk9, JsValue> {
-        Pk9::from_encrypted_bytes(bytes).map_err(JsValue::from)
+    pub fn take_from_encrypted_bytes(bytes: Box<[u8]>) -> core::result::Result<Self, JsValue> {
+        Self::from_encrypted_bytes(bytes).map_err(JsValue::from)
     }
 
     #[wasm_bindgen(js_name = toBytes)]
@@ -487,10 +494,10 @@ impl Pk9 {
     #[wasm_bindgen(setter)]
     pub fn set_relearn_move_indices(&mut self, value: Vec<u16>) {
         self.relearn_moves = [
-            MoveIndex::from(value[0]),
-            MoveIndex::from(value[1]),
-            MoveIndex::from(value[2]),
-            MoveIndex::from(value[3]),
+            MoveSlot::from(value[0]),
+            MoveSlot::from(value[1]),
+            MoveSlot::from(value[2]),
+            MoveSlot::from(value[3]),
         ]
     }
 
@@ -531,52 +538,39 @@ impl Pk9 {
 
     #[wasm_bindgen(getter = nationalDex)]
     pub fn national_dex_wasm(&self) -> u16 {
-        self.species_and_form.0.get_ndex_wasm()
+        self.species_and_form.0.get_ndex() as u16
     }
 
     #[wasm_bindgen(getter = formIndex)]
     pub fn form_index_wasm(&self) -> u16 {
-        self.species_and_form.0.get_forme_index()
+        self.species_and_form.0.get_form_index()
     }
 
     #[wasm_bindgen(getter = evs)]
-    pub fn evs_wasm(&self) -> Stats16Le {
-        self.evs.into()
-    }
-
-    #[wasm_bindgen(setter = evs)]
-    pub fn set_evs_wasm(&mut self, v: Stats16Le) {
-        self.evs = v.to_stats8_truncated()
+    pub fn evs_wasm(&self) -> TsResult<Stats16Le> {
+        Stats16Le::from(self.evs).try_into_ts()
     }
 
     #[wasm_bindgen(getter = ivs)]
-    pub fn ivs_wasm(&self) -> Stats16Le {
-        self.ivs.into()
-    }
-
-    #[wasm_bindgen(setter = ivs)]
-    pub fn set_ivs_wasm(&mut self, v: Stats16Le) {
-        self.ivs = v.to_ivs_capped()
+    pub fn ivs_wasm(&self) -> TsResult<Stats16Le> {
+        Stats16Le::from(self.ivs).try_into_ts()
     }
 
     #[wasm_bindgen(getter = teraTypeOriginal)]
-    pub fn tera_type_original_wasm(&self) -> TeraType {
-        self.tera_type_original
-    }
-
-    #[wasm_bindgen(setter = teraTypeOriginal)]
-    pub fn set_tera_type_original_wasm(&mut self, v: TeraType) {
-        self.tera_type_original = v
+    pub fn tera_type_original_wasm(&self) -> TsResult<TeraType> {
+        self.tera_type_original.try_into_ts()
     }
 
     #[wasm_bindgen(getter = teraTypeOverride)]
-    pub fn tera_type_override_wasm(&self) -> Option<TeraType> {
-        self.tera_type_override
+    pub fn tera_type_override_wasm(&self) -> JsResult<Option<Ts<TeraType>>> {
+        self.tera_type_override.map(|v| v.try_into_ts()).transpose()
     }
 
     #[wasm_bindgen(setter = teraTypeOverride)]
-    pub fn set_tera_type_override_wasm(&mut self, v: Option<TeraType>) {
-        self.tera_type_override = v
+    pub fn set_tera_type_override_wasm(&mut self, v: Option<Ts<TeraType>>) -> JsResult<()> {
+        self.tera_type_override = v.map(|v| v.to_rust()).transpose()?;
+
+        Ok(())
     }
 
     #[wasm_bindgen(getter = obedienceLevel)]
@@ -620,8 +614,8 @@ impl Pk9 {
     }
 
     #[wasm_bindgen(js_name = calculateStats)]
-    pub fn calculate_stats_wasm(&self) -> Stats16Le {
-        self.calculate_stats()
+    pub fn calculate_stats_wasm(&self) -> TsResult<Stats16Le> {
+        self.calculate_stats().try_into_ts()
     }
 
     #[wasm_bindgen(js_name = recalculateStats)]
@@ -632,6 +626,31 @@ impl Pk9 {
     #[wasm_bindgen(js_name = toBoxBytesEncrypted)]
     pub fn to_box_bytes_encrypted_wasm(&self) -> Box<[u8]> {
         self.to_box_bytes_encrypted()
+    }
+
+    #[wasm_bindgen(getter = markings)]
+    pub fn markings_wasm(&self) -> TsResult<MarkingsSixShapesColors> {
+        self.markings.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = trainerMemory)]
+    pub fn trainer_memory_wasm(&self) -> TsResult<TrainerMemory> {
+        self.trainer_memory.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = handlerMemory)]
+    pub fn handler_memory_wasm(&self) -> TsResult<TrainerMemory> {
+        self.handler_memory.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = contest)]
+    pub fn contest_stats_wasm(&self) -> TsResult<ContestStats> {
+        self.contest.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = hyperTraining)]
+    pub fn hyper_training_wasm(&self) -> TsResult<HyperTraining> {
+        self.hyper_training.try_into_ts()
     }
 }
 
@@ -669,7 +688,7 @@ impl crate::tests::PkhexJson for Pk9 {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::Pk9;
     use crate::checksum::Checksum;
     use crate::convert_strategy::ConvertStrategy;
@@ -713,7 +732,7 @@ mod test {
     }
 
     #[test]
-    fn compare_pkhex_wasmon() -> TestResult<()> {
+    fn compare_pkhex_wasm() -> TestResult<()> {
         tests::compare_pkhex_json_all_in_dir::<Pk9>(&PathBuf::from("pk9"))
     }
 

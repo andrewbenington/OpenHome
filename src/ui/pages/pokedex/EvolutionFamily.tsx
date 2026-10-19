@@ -5,8 +5,9 @@ import { Pokedex } from '@openhome-ui/util/pokedex'
 import { MetadataSummaryLookup, SpeciesForm } from '@pkm-rs/pkg'
 import { Flex } from '@radix-ui/themes'
 import { Responsive } from '@radix-ui/themes/props'
+import { CSSProperties } from 'react'
 import TooltipPokemonIcon from './TooltipPokemonIcon'
-import { getFormeStatus } from './util'
+import { getFormPokedexData } from './util'
 
 const MONS_WITH_NON_EVOLVABLE_FORMS = [
   NationalDex.Floette,
@@ -20,15 +21,11 @@ export type EvolutionFamilyProps = {
   pokedex: Pokedex
   height?: Responsive<string>
   onClick?: (nationalDex: number, formeNumber: number) => void
+  style?: CSSProperties
 }
 
-export default function EvolutionFamily({
-  nationalDex,
-  formNumber: formIndex,
-  pokedex,
-  height,
-  onClick,
-}: EvolutionFamilyProps) {
+export default function EvolutionFamily(props: EvolutionFamilyProps) {
+  const { nationalDex, formNumber: formIndex, pokedex, height, onClick } = props
   let baseEvolution = getBaseEvolution(nationalDex, formIndex)
 
   if (MONS_WITH_NON_EVOLVABLE_FORMS.includes(nationalDex)) {
@@ -58,6 +55,7 @@ export default function EvolutionFamily({
       justify="center"
       align="center"
       overflow="auto"
+      style={props.style}
     >
       {baseEvolutionForms
         .filter((form) => !form.isMega)
@@ -75,9 +73,9 @@ export default function EvolutionFamily({
 }
 
 function EvolutionLine({ nationalDex, formNumber, pokedex, onClick }: EvolutionFamilyProps) {
-  const formeMetadata = MetadataSummaryLookup(nationalDex, formNumber)
-  const evolutions = formeMetadata?.evolutions ?? []
-  const megaForms = formeMetadata?.megaEvolutions ?? []
+  const formMetadata = MetadataSummaryLookup(nationalDex, formNumber)
+  const evolutions = formMetadata?.evolutions ?? []
+  const megaForms = formMetadata?.megaEvolutions ?? []
 
   if (evolutions.length === 8) {
     return (
@@ -104,8 +102,11 @@ function EvolutionLine({ nationalDex, formNumber, pokedex, onClick }: EvolutionF
         <TooltipPokemonIcon
           nationalDex={nationalDex}
           formIndex={formNumber}
-          silhouette={!getFormeStatus(pokedex, nationalDex, formNumber)?.includes('Caught')}
+          silhouette={
+            !getFormPokedexData(pokedex, nationalDex, formNumber)?.level.includes('Caught')
+          }
           onClick={() => onClick?.(nationalDex, formNumber)}
+          style={{ width: '3rem', height: '3rem' }}
         />
         <Flex direction="column" gap="2">
           {evolutions.slice(4).map((evo, i) => (
@@ -135,8 +136,9 @@ function EvolutionLine({ nationalDex, formNumber, pokedex, onClick }: EvolutionF
       <TooltipPokemonIcon
         nationalDex={nationalDex}
         formIndex={formNumber}
-        silhouette={!getFormeStatus(pokedex, nationalDex, formNumber)?.includes('Caught')}
+        silhouette={!getFormPokedexData(pokedex, nationalDex, formNumber)?.level.includes('Caught')}
         onClick={() => onClick?.(nationalDex, formNumber)}
+        style={{ width: '3rem', height: '3rem' }}
       />
       {!MetadataSummaryLookup(nationalDex, formNumber)?.regional && megaForms.length > 0 && (
         <Flex direction="column" gap="2">
@@ -153,7 +155,11 @@ function EvolutionLine({ nationalDex, formNumber, pokedex, onClick }: EvolutionF
                 nationalDex={nationalDex}
                 formIndex={mega.megaForm.formIndex}
                 silhouette={
-                  !getFormeStatus(pokedex, nationalDex, mega.megaForm.formIndex)?.includes('Caught')
+                  !getFormPokedexData(
+                    pokedex,
+                    nationalDex,
+                    mega.megaForm.formIndex
+                  )?.level.includes('Caught')
                 }
                 onClick={() => onClick?.(nationalDex, mega.megaForm.formIndex)}
               />

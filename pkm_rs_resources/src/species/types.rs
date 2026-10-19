@@ -10,7 +10,9 @@ use crate::species::metadata_table::{
 use crate::species::metadata_table::{levelup_learnset_lookup, types_lookup};
 use crate::{Error, Result, abilities::AbilityIndexWasm, metadata_source::MetadataSource};
 use crate::{abilities::AbilityIndexBounded, levelup::LearnsetMoveJs};
-use pkm_rs_types::{AbilityNumber, GameSetting, Generation, NationalDex, PkmType, TeraType};
+use pkm_rs_types::{
+    AbilityNumber, GameSetting, Generation, NationalDex, PkmType, TeraType, TryIntoTs,
+};
 use serde::Serialize;
 use strum_macros::{Display, EnumString};
 
@@ -18,13 +20,15 @@ use strum_macros::{Display, EnumString};
 use pkm_rs_types::randomize::Randomize;
 #[cfg(feature = "randomize")]
 use rand::RngExt;
+#[cfg(feature = "wasm")]
+use tsify::Ts;
 
 #[cfg(feature = "wasm")]
 use crate::species::metadata_table::current_base_stats;
 #[cfg(feature = "wasm")]
-use pkm_rs_types::Stat;
+use pkm_rs_types::{Gender, Stats16Le, TsResult};
 #[cfg(feature = "wasm")]
-use pkm_rs_types::{Gender, Stats16Le};
+use pkm_rs_types::{JsResult, Stat};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -33,12 +37,18 @@ use wasm_bindgen::prelude::*;
 pub enum GenderRatio {
     #[default]
     Genderless,
+    #[strum(serialize = "All Male")]
     AllMale,
+    #[strum(serialize = "All Female")]
     AllFemale,
     Equal,
+    #[strum(serialize = "7 Female : 1 Male")]
     M1ToF7,
+    #[strum(serialize = "3 Female : 1 Male")]
     M1ToF3,
+    #[strum(serialize = "3 Male : 1 Female")]
     M3ToF1,
+    #[strum(serialize = "7 Male : 1 Female")]
     M7ToF1,
 }
 
@@ -114,17 +124,19 @@ impl GenderRatio {
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Default, EnumString, Display, PartialEq, Eq, Clone, Copy)]
-pub enum LevelUpType {
+pub enum ExperienceGrowth {
     #[default]
+    #[strum(serialize = "Medium Fast")]
     MediumFast,
     Erratic,
     Fluctuating,
+    #[strum(serialize = "Medium Slow")]
     MediumSlow,
     Fast,
     Slow,
 }
 
-impl LevelUpType {
+impl ExperienceGrowth {
     pub fn calculate_level(&self, exp: u32) -> u8 {
         self.get_thresholds()
             .iter()
@@ -141,7 +153,7 @@ impl LevelUpType {
 
     const fn get_thresholds(&self) -> [u32; 100] {
         match self {
-            LevelUpType::MediumFast => [
+            ExperienceGrowth::MediumFast => [
                 0, 8, 27, 64, 125, 216, 343, 512, 729, 1000, 1331, 1728, 2197, 2744, 3375, 4096,
                 4913, 5832, 6859, 8000, 9261, 10648, 12167, 13824, 15625, 17576, 19683, 21952,
                 24389, 27000, 29791, 32768, 35937, 39304, 42875, 46656, 50653, 54872, 59319, 64000,
@@ -152,7 +164,7 @@ impl LevelUpType {
                 551368, 571787, 592704, 614125, 636056, 658503, 681472, 704969, 729000, 753571,
                 778688, 804357, 830584, 857375, 884736, 912673, 941192, 970299, 1000000,
             ],
-            LevelUpType::Erratic => [
+            ExperienceGrowth::Erratic => [
                 0, 15, 52, 122, 237, 406, 637, 942, 1326, 1800, 2369, 3041, 3822, 4719, 5737, 6881,
                 8155, 9564, 11111, 12800, 14632, 16610, 18737, 21012, 23437, 26012, 28737, 31610,
                 34632, 37800, 41111, 44564, 48155, 51881, 55737, 59719, 63822, 68041, 72369, 76800,
@@ -163,7 +175,7 @@ impl LevelUpType {
                 400293, 411686, 423190, 433572, 445239, 457001, 467489, 479378, 491346, 501878,
                 513934, 526049, 536557, 548720, 560922, 571333, 583539, 591882, 600000,
             ],
-            LevelUpType::Fluctuating => [
+            ExperienceGrowth::Fluctuating => [
                 0, 4, 13, 32, 65, 112, 178, 276, 393, 540, 745, 967, 1230, 1591, 1957, 2457, 3046,
                 3732, 4526, 5440, 6482, 7666, 9003, 10506, 12187, 14060, 16140, 18439, 20974,
                 23760, 26811, 30146, 33780, 37731, 42017, 46656, 50653, 55969, 60505, 66560, 71677,
@@ -174,7 +186,7 @@ impl LevelUpType {
                 834809, 877201, 908905, 954084, 987754, 1035837, 1071552, 1122660, 1160499,
                 1214753, 1254796, 1312322, 1354652, 1415577, 1460276, 1524731, 1571884, 1640000,
             ],
-            LevelUpType::MediumSlow => [
+            ExperienceGrowth::MediumSlow => [
                 0, 9, 57, 96, 135, 179, 236, 314, 419, 560, 742, 973, 1261, 1612, 2035, 2535, 3120,
                 3798, 4575, 5460, 6458, 7577, 8825, 10208, 11735, 13411, 15244, 17242, 19411,
                 21760, 24294, 27021, 29949, 33084, 36435, 40007, 43808, 47846, 52127, 56660, 61450,
@@ -185,7 +197,7 @@ impl LevelUpType {
                 590969, 613664, 636935, 660787, 685228, 710266, 735907, 762160, 789030, 816525,
                 844653, 873420, 902835, 932903, 963632, 995030, 1027103, 1059860,
             ],
-            LevelUpType::Fast => [
+            ExperienceGrowth::Fast => [
                 0, 6, 21, 51, 100, 172, 274, 409, 583, 800, 1064, 1382, 1757, 2195, 2700, 3276,
                 3930, 4665, 5487, 6400, 7408, 8518, 9733, 11059, 12500, 14060, 15746, 17561, 19511,
                 21600, 23832, 26214, 28749, 31443, 34300, 37324, 40522, 43897, 47455, 51200, 55136,
@@ -196,7 +208,7 @@ impl LevelUpType {
                 457429, 474163, 491300, 508844, 526802, 545177, 563975, 583200, 602856, 622950,
                 643485, 664467, 685900, 707788, 730138, 752953, 776239, 800000,
             ],
-            LevelUpType::Slow => [
+            ExperienceGrowth::Slow => [
                 0, 10, 33, 80, 156, 270, 428, 640, 911, 1250, 1663, 2160, 2746, 3430, 4218, 5120,
                 6141, 7290, 8573, 10000, 11576, 13310, 15208, 17280, 19531, 21970, 24603, 27440,
                 30486, 33750, 37238, 40960, 44921, 49130, 53593, 58320, 63316, 68590, 74148, 80000,
@@ -217,19 +229,24 @@ impl LevelUpType {
 pub enum EggGroup {
     Monster,
     Fairy,
+    #[strum(serialize = "Human-like")]
     HumanLike,
     Field,
     Flying,
     Dragon,
     Bug,
+    #[strum(serialize = "Water 1")]
     Water1,
+    #[strum(serialize = "Water 2")]
     Water2,
+    #[strum(serialize = "Water 3")]
     Water3,
     Grass,
     Amorphous,
     Mineral,
     Ditto,
     #[default]
+    #[strum(serialize = "No Eggs Discovered")]
     NoEggsDiscovered,
 }
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
@@ -315,12 +332,12 @@ pub struct FormMetadata {
 }
 
 impl FormMetadata {
-    pub const fn forme_ref(&self) -> SpeciesForm {
+    pub const fn species_form(&self) -> SpeciesForm {
         unsafe { SpeciesForm::unchecked_form(self.national_dex, self.form_index) }
     }
 
     pub const fn species_metadata(&self) -> &SpeciesMetadata {
-        self.forme_ref().get_species_metadata()
+        self.species_form().get_species_metadata()
     }
 
     pub fn get_ability(&self, ability_num: AbilityNumber) -> AbilityIndexBounded {
@@ -333,23 +350,27 @@ impl FormMetadata {
 
     pub fn get_base_evolution(&self) -> SpeciesForm {
         match self.pre_evolution {
-            None => self.forme_ref(),
-            Some(forme_ref) => forme_ref.get_base_evolution(),
+            None => self.species_form(),
+            Some(species_form) => species_form.get_base_evolution(),
         }
     }
 
     pub fn is_evolution_of(&self, other: &FormMetadata) -> bool {
         other.evolutions.iter().any(|other_evo| {
-            *other_evo == self.forme_ref() || self.is_evolution_of(other_evo.get_forme_metadata())
+            *other_evo == self.species_form() || self.is_evolution_of(other_evo.get_form_metadata())
         })
     }
 
     #[cfg(feature = "wasm")]
-    fn is_mega_forme_of(&self, other: &FormMetadata) -> bool {
+    fn is_mega_form_of(&self, other: &FormMetadata) -> bool {
         other
             .mega_evolution_data
             .iter()
             .any(|mega| mega.mega_form.form_index == self.form_index)
+    }
+
+    pub const fn is_totem_form(&self) -> bool {
+        crate::variants::is_acquirable_totem_form(self.species_form())
     }
 
     #[cfg(feature = "wasm")]
@@ -370,6 +391,30 @@ impl FormMetadata {
             "no types found for nat dex {} form {}",
             self.national_dex, self.form_index
         ))
+    }
+
+    pub fn type_1(&self) -> PkmType {
+        self.types_from_source_or_latest(None).0
+    }
+
+    pub fn type_1_with_source(&self, source: MetadataSource) -> Option<PkmType> {
+        Some(self.types_from_source_or_latest(Some(source)).0)
+    }
+
+    pub fn type_1_index(&self) -> u8 {
+        self.types_from_source_or_latest(None).0 as u8
+    }
+
+    pub fn type_2(&self) -> Option<PkmType> {
+        self.types_from_source_or_latest(None).1
+    }
+
+    pub fn type_2_with_source(&self, source: MetadataSource) -> Option<PkmType> {
+        self.types_from_source_or_latest(Some(source)).1
+    }
+
+    pub fn type_2_index(&self) -> Option<u8> {
+        self.types_from_source_or_latest(None).1.map(|t| t as u8)
     }
 
     /// Tera Type assigned by Pokémon HOME for the species when not originally
@@ -397,33 +442,47 @@ impl FormMetadata {
     }
 
     #[wasm_bindgen(getter = type1)]
-    pub fn type_1(&self) -> PkmType {
-        self.types_from_source_or_latest(None).0
+    pub fn type_1_wasm(&self) -> TsResult<PkmType> {
+        self.types_from_source_or_latest(None).0.try_into_ts()
     }
 
     #[wasm_bindgen(js_name = type1WithSource)]
-    pub fn type_1_with_source(&self, source: MetadataSource) -> Option<PkmType> {
-        Some(self.types_from_source_or_latest(Some(source)).0)
+    pub fn type_1_with_source_wasm(&self, source: MetadataSource) -> JsResult<Option<Ts<PkmType>>> {
+        self.types_from_source_or_latest(Some(source))
+            .0
+            .try_into_ts()
+            .map(Some)
     }
 
     #[wasm_bindgen(getter = type1Index)]
-    pub fn type_1_index(&self) -> u8 {
+    pub fn type_1_index_wasm(&self) -> u8 {
         self.types_from_source_or_latest(None).0 as u8
     }
 
     #[wasm_bindgen(getter = type2)]
-    pub fn type_2(&self) -> Option<PkmType> {
-        self.types_from_source_or_latest(None).1
+    pub fn type_2_wasm(&self) -> JsResult<Option<Ts<PkmType>>> {
+        self.types_from_source_or_latest(None)
+            .1
+            .map(|t| t.try_into_ts())
+            .transpose()
     }
 
     #[wasm_bindgen(js_name = type2WithSource)]
-    pub fn type_2_with_source(&self, source: MetadataSource) -> Option<PkmType> {
-        self.types_from_source_or_latest(Some(source)).1
+    pub fn type_2_with_source_wasm(&self, source: MetadataSource) -> JsResult<Option<Ts<PkmType>>> {
+        self.types_from_source_or_latest(Some(source))
+            .1
+            .map(|t| t.try_into_ts())
+            .transpose()
     }
 
     #[wasm_bindgen(getter = type2Index)]
-    pub fn type_2_index(&self) -> Option<u8> {
+    pub fn type_2_index_wasm(&self) -> Option<u8> {
         self.types_from_source_or_latest(None).1.map(|t| t as u8)
+    }
+
+    #[wasm_bindgen(getter = genderRatioDisplay)]
+    pub fn gender_ratio_display(&self) -> String {
+        self.gender_ratio.to_string()
     }
 
     #[wasm_bindgen(getter)]
@@ -464,7 +523,7 @@ impl FormMetadata {
         self.evolutions.to_vec()
     }
 
-    #[wasm_bindgen(getter = formeName)]
+    #[wasm_bindgen(getter = formName)]
     pub fn form_name(&self) -> String {
         self.form_name.to_owned()
     }
@@ -505,32 +564,39 @@ impl FormMetadata {
     }
 
     #[wasm_bindgen(getter = baseStats)]
-    pub fn get_base_stats(&self) -> Stats16Le {
+    pub fn get_base_stats(&self) -> TsResult<Stats16Le> {
         current_base_stats(self.national_dex, self.form_index)
             .map(Stats16Le::from)
             .unwrap_or_default()
+            .try_into_ts()
     }
 
     #[wasm_bindgen(js_name = baseStatsFrom)]
-    pub fn get_base_stats_from_js(&self, source: MetadataSource) -> Option<BaseStats> {
-        self.get_base_stats_from(source)
+    pub fn get_base_stats_from_js(
+        &self,
+        source: MetadataSource,
+    ) -> JsResult<Option<Ts<BaseStats>>> {
+        Ok(self
+            .get_base_stats_from(source)
+            .map(|stats| Ts::from_rust(&stats))
+            .transpose()?)
     }
 
     #[wasm_bindgen(js_name = getBaseStat)]
-    pub fn get_base_stat(&self, stat: Stat) -> u16 {
-        let base_stats = self.get_base_stats();
-        match stat {
+    pub fn get_base_stat(&self, stat: Stat) -> JsResult<u16> {
+        let base_stats = self.get_base_stats()?.to_rust()?;
+        Ok(match stat {
             Stat::Hp => base_stats.hp,
             Stat::Attack => base_stats.atk,
             Stat::Defense => base_stats.def,
             Stat::SpAttack => base_stats.spa,
             Stat::SpDefense => base_stats.spd,
             Stat::Speed => base_stats.spe,
-        }
+        })
     }
 
     #[wasm_bindgen(js_name = getMegaBaseForm)]
-    pub fn get_mega_base_forme(&self) -> Option<FormMetadata> {
+    pub fn get_mega_base_form(&self) -> Option<FormMetadata> {
         if !self.is_mega {
             return None;
         }
@@ -538,14 +604,14 @@ impl FormMetadata {
         self.species_metadata()
             .forms
             .iter()
-            .find(|other| self.is_mega_forme_of(other))
+            .find(|other| self.is_mega_form_of(other))
             .cloned()
     }
 
     #[wasm_bindgen(js_name = levelUpLearnset)]
     pub fn level_up_learnset(&self, source: Option<MetadataSource>) -> Option<Vec<LearnsetMoveJs>> {
         Some(
-            self.forme_ref()
+            self.species_form()
                 .get_levelup_learnset(source)?
                 .all_moves()
                 .into_iter()
@@ -556,12 +622,12 @@ impl FormMetadata {
 
     #[wasm_bindgen(js_name = moveMasteryLa)]
     pub fn move_mastery_la(&self) -> Option<Vec<LevelupLearnsetMove>> {
-        Some(self.forme_ref().get_move_mastery_la()?.all_moves())
+        Some(self.species_form().get_move_mastery_la()?.all_moves())
     }
 
     #[wasm_bindgen(js_name = plusMovesLza)]
     pub fn plus_moves_lza(&self) -> Option<Vec<LevelupLearnsetMove>> {
-        Some(self.forme_ref().get_plus_moves_lza()?.all_moves())
+        Some(self.species_form().get_plus_moves_lza()?.all_moves())
     }
 }
 
@@ -580,13 +646,13 @@ pub struct SpeciesMetadata {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub national_dex: NationalDex,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub level_up_type: LevelUpType,
+    pub experience_growth: ExperienceGrowth,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub forms: &'static [FormMetadata],
 }
 
 impl SpeciesMetadata {
-    pub const fn get_forme(&self, form_index: usize) -> Option<&'static FormMetadata> {
+    pub const fn get_form(&self, form_index: usize) -> Option<&'static FormMetadata> {
         if form_index < self.forms.len() {
             Some(&self.forms[form_index])
         } else {
@@ -610,17 +676,17 @@ impl SpeciesMetadata {
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = calculateLevel))]
     pub fn calculate_level(&self, exp: u32) -> u8 {
-        self.level_up_type.calculate_level(exp)
+        self.experience_growth.calculate_level(exp)
     }
 
-    #[cfg_attr(feature = "wasm", wasm_bindgen(getter = levelUpType))]
-    pub fn level_up_type(&self) -> String {
-        self.level_up_type.to_string()
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter = experienceGrowth))]
+    pub fn experience_growth(&self) -> String {
+        self.experience_growth.to_string()
     }
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Default, PartialEq, Eq, Clone, Copy, Serialize)]
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct SpeciesForm {
     national_dex: NationalDex,
     form_index: u16,
@@ -628,17 +694,17 @@ pub struct SpeciesForm {
 
 impl SpeciesForm {
     pub fn new(national_dex: u16, form_index: u16) -> Result<SpeciesForm> {
-        let valid_ndex = NationalDex::new(national_dex)?;
+        let national_dex = NationalDex::new(national_dex)?;
 
-        if valid_ndex.get_species_metadata().forms.len() <= form_index as usize {
+        if national_dex.get_species_metadata().forms.len() <= form_index as usize {
             return Err(Error::FormIndex {
-                national_dex: valid_ndex,
+                national_dex,
                 form_index,
             });
         }
 
         Ok(SpeciesForm {
-            national_dex: valid_ndex,
+            national_dex,
             form_index,
         })
     }
@@ -686,28 +752,46 @@ impl SpeciesForm {
     }
 
     pub fn get_base_evolution(&self) -> SpeciesForm {
-        match self.get_forme_metadata().pre_evolution {
+        match self.get_form_metadata().pre_evolution {
             None => *self,
-            Some(forme_ref) => forme_ref.get_base_evolution(),
+            Some(species_form) => species_form.get_base_evolution(),
         }
     }
 
-    pub fn get_prevos(&self) -> Vec<SpeciesForm> {
-        let mut prevos = Vec::new();
-        let mut current = *self;
-        while let Some(forme_ref) = current.get_forme_metadata().pre_evolution {
-            prevos.push(forme_ref);
-            current = forme_ref;
-        }
-        prevos
+    pub fn all_evolutions(&self) -> impl Iterator<Item = SpeciesForm> {
+        Evolutions::not_including(*self)
+    }
+
+    pub fn and_all_evolutions(&self) -> impl Iterator<Item = SpeciesForm> {
+        Evolutions::including(*self)
+    }
+
+    pub fn all_preevolutions(&self) -> impl Iterator<Item = SpeciesForm> {
+        Preevolutions::not_including(*self)
+    }
+
+    pub fn and_all_preevolutions(&self) -> impl Iterator<Item = SpeciesForm> {
+        Preevolutions::including(*self)
+    }
+
+    pub fn is_or_evolves_into(&self, other: SpeciesForm) -> bool {
+        self.and_all_evolutions().any(|v| v == other)
+    }
+
+    pub fn is_or_evolves_from(&self, other: SpeciesForm) -> bool {
+        self.and_all_preevolutions().any(|v| v == other)
     }
 
     pub const fn get_ndex(&self) -> NationalDex {
         self.national_dex
     }
 
-    pub const fn get_forme_index(&self) -> u16 {
+    pub const fn get_form_index(&self) -> u16 {
         self.form_index
+    }
+
+    pub const fn split(&self) -> (NationalDex, u16) {
+        (self.national_dex, self.form_index)
     }
 
     pub fn get_levelup_learnset(&self, source: Option<MetadataSource>) -> Option<LearnsetReader> {
@@ -726,7 +810,7 @@ impl SpeciesForm {
         super::get_ndex_species_metadata(self.national_dex)
     }
 
-    pub const fn get_forme_metadata(&self) -> &'static FormMetadata {
+    pub const fn get_form_metadata(&self) -> &'static FormMetadata {
         &self.get_species_metadata().forms[self.form_index as usize]
     }
 
@@ -746,6 +830,81 @@ impl SpeciesForm {
     }
 }
 
+pub trait BaseForm {
+    fn base_form(&self) -> SpeciesForm;
+}
+
+impl BaseForm for NationalDex {
+    fn base_form(&self) -> SpeciesForm {
+        SpeciesForm::base_form(*self)
+    }
+}
+
+#[derive(Debug, Default, PartialEq, Eq, Clone)]
+pub struct Evolutions {
+    queue: Vec<SpeciesForm>,
+}
+
+impl Evolutions {
+    pub fn including(first: SpeciesForm) -> Self {
+        Self { queue: vec![first] }
+    }
+
+    pub fn not_including(first: SpeciesForm) -> Self {
+        Self {
+            queue: first.get_form_metadata().evolutions(),
+        }
+    }
+}
+
+impl Iterator for Evolutions {
+    type Item = SpeciesForm;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let current = self.queue.pop()?;
+
+        self.queue
+            .append(&mut current.get_form_metadata().evolutions());
+
+        Some(current)
+    }
+}
+
+#[derive(Debug, Default, PartialEq, Eq, Clone)]
+pub struct Preevolutions {
+    queue: Vec<SpeciesForm>,
+}
+
+impl Preevolutions {
+    pub fn including(first: SpeciesForm) -> Self {
+        Self { queue: vec![first] }
+    }
+
+    pub fn not_including(first: SpeciesForm) -> Self {
+        Self {
+            queue: first
+                .get_form_metadata()
+                .pre_evolution
+                .into_iter()
+                .collect(),
+        }
+    }
+}
+
+impl Iterator for Preevolutions {
+    type Item = SpeciesForm;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let current = self.queue.pop()?;
+
+        if let Some(prevo) = current.get_form_metadata().pre_evolution {
+            self.queue.push(prevo);
+        }
+
+        Some(current)
+    }
+}
+
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
 #[cfg(feature = "wasm")]
@@ -761,7 +920,7 @@ impl SpeciesForm {
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter = formIndex))]
-    pub fn get_forme_index_wasm(&self) -> u16 {
+    pub fn get_form_index_wasm(&self) -> u16 {
         self.form_index
     }
 
@@ -771,8 +930,8 @@ impl SpeciesForm {
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = getMetadata))]
-    pub fn get_forme_metadata_js(&self) -> FormMetadata {
-        self.get_forme_metadata().clone()
+    pub fn get_form_metadata_js(&self) -> FormMetadata {
+        self.get_form_metadata().clone()
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = tryNew))]
@@ -786,8 +945,8 @@ impl Randomize for SpeciesForm {
     fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
         let national_dex = NationalDex::randomized(rng);
         println!("randomized ndex: {}", national_dex);
-        let forme_count = national_dex.get_species_metadata().forms().len();
-        let form_index = rng.random_range(0..forme_count) as u16;
+        let form_count = national_dex.get_species_metadata().forms().len();
+        let form_index = rng.random_range(0..form_count) as u16;
         println!("randomized form: {}", form_index);
 
         Self {
@@ -799,12 +958,38 @@ impl Randomize for SpeciesForm {
 
 #[cfg(test)]
 mod tests {
-    use crate::species::LevelUpType;
+    use crate::species::ExperienceGrowth;
 
     #[test]
     fn slow_level_expected() {
-        assert_eq!(LevelUpType::Slow.get_min_exp_for_level(1), 0);
-        assert_eq!(LevelUpType::Slow.get_min_exp_for_level(63), 312558);
-        assert_eq!(LevelUpType::Slow.calculate_level(317341), 63);
+        assert_eq!(ExperienceGrowth::Slow.get_min_exp_for_level(1), 0);
+        assert_eq!(ExperienceGrowth::Slow.get_min_exp_for_level(63), 312558);
+        assert_eq!(ExperienceGrowth::Slow.calculate_level(317341), 63);
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use pkm_rs_types::NationalDex;
+
+    use crate::species::SpeciesForm;
+
+    const ROGGENROLA: SpeciesForm = SpeciesForm::base_form(NationalDex::Roggenrola);
+    const BOLDORE: SpeciesForm = SpeciesForm::base_form(NationalDex::Boldore);
+    const GIGALITH: SpeciesForm = SpeciesForm::base_form(NationalDex::Gigalith);
+
+    #[test]
+    fn evolution_relationships() {
+        assert!(BOLDORE.is_or_evolves_into(BOLDORE));
+        assert!(ROGGENROLA.is_or_evolves_into(BOLDORE));
+        assert!(!BOLDORE.is_or_evolves_into(ROGGENROLA));
+        assert!(!GIGALITH.is_or_evolves_into(ROGGENROLA));
+        assert!(ROGGENROLA.is_or_evolves_into(GIGALITH));
+
+        assert!(BOLDORE.is_or_evolves_from(BOLDORE));
+        assert!(!ROGGENROLA.is_or_evolves_from(BOLDORE));
+        assert!(BOLDORE.is_or_evolves_from(ROGGENROLA));
+        assert!(GIGALITH.is_or_evolves_from(ROGGENROLA));
+        assert!(!ROGGENROLA.is_or_evolves_from(GIGALITH));
     }
 }

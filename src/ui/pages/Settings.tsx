@@ -40,6 +40,11 @@ export default function SettingsPage() {
           display: 'PKM Conversion',
           component: <PKMConversion />,
         },
+        {
+          route: 'developer',
+          display: 'Developer',
+          component: <DeveloperSettings />,
+        },
       ]}
     />
   )
@@ -159,6 +164,31 @@ function GeneralSettings() {
               />
             </Flex>
           </Flex>
+        </div>
+      </div>
+    </ContentCard>
+  )
+}
+
+function DeveloperSettings() {
+  const { developerSettings, setDeveloperFlag } = useSettings()
+
+  return (
+    <ContentCard>
+      <div className="settings-content-inner">
+        <div>
+          <GroupHeader name="Debug" />
+          <div className="single-setting-container">
+            <span className="settings-checkbox-flex">
+              <p>Show Move IDs</p>
+              <input
+                type="checkbox"
+                onChange={(e) => setDeveloperFlag('show_move_ids', e.target.checked)}
+                checked={developerSettings.flags.includes('show_move_ids')}
+              />
+            </span>
+            <p className="setting-description">Show internal move ID numbers with moves</p>
+          </div>
         </div>
       </div>
     </ContentCard>

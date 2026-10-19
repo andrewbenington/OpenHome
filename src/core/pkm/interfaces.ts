@@ -1,6 +1,6 @@
 import { PKM, RomHackPKM } from '@openhome-core/pkm/PKM'
 import { Stats } from '@openhome-core/util/types'
-import { FormMetadata, SpeciesMetadata, StatsPreSplit } from '@pkm-rs/pkg'
+import { SpeciesMetadata, StatsPreSplit } from '@pkm-rs/pkg'
 import { PluginIdentifier } from '../save/interfaces'
 import { AllPKMFields } from './util/pkmInterface'
 
@@ -16,15 +16,8 @@ export interface PluginPKMInterface extends PKMInterface {
 
 export type PKMInterface = AllPKMFields & {
   getStats(): Stats | StatsPreSplit
-  // Corresponding save's plugin_identifier
-  pluginIdentifier?: PluginIdentifier
   // If met in a plugin save, this will be the save's plugin_identifier. otherwise this is empty
-  pluginOrigin?: PluginIdentifier // why are there two of these??
-  isFakemon?: boolean
   selectColor?: string
-  // User-defined display color for this Pokemon in boxes (CSS color string)
-  displayColor?: string
-  metadata?: FormMetadata
   speciesMetadata?: SpeciesMetadata
 }
 

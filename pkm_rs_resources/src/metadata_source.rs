@@ -78,7 +78,10 @@ impl MetadataSource {
 
             OriginGame::Sapphire | OriginGame::Ruby => Some(Self::RubySapphire),
             OriginGame::Emerald => Some(Self::Emerald),
-            OriginGame::FireRed | OriginGame::LeafGreen => Some(Self::FireRedLeafGreen),
+            OriginGame::FireRed
+            | OriginGame::LeafGreen
+            | OriginGame::FireRedSwitch
+            | OriginGame::LeafGreenSwitch => Some(Self::FireRedLeafGreen),
             OriginGame::ColosseumXd => None,
 
             OriginGame::Diamond | OriginGame::Pearl => Some(Self::DiamondPearl),
@@ -116,7 +119,10 @@ impl MetadataSource {
             | OriginGame::Invalid18
             | OriginGame::Invalid19
             | OriginGame::Invalid28
-            | OriginGame::Invalid29 => None,
+            | OriginGame::Invalid29
+            | OriginGame::Invalid53
+            | OriginGame::Invalid54
+            | OriginGame::Invalid55 => None,
         }
     }
 
@@ -128,7 +134,12 @@ impl MetadataSource {
             Self::Crystal => vec![OriginGame::Crystal],
             Self::RubySapphire => vec![OriginGame::Ruby, OriginGame::Sapphire],
             Self::Emerald => vec![OriginGame::Emerald],
-            Self::FireRedLeafGreen => vec![OriginGame::FireRed, OriginGame::LeafGreen],
+            Self::FireRedLeafGreen => vec![
+                OriginGame::FireRed,
+                OriginGame::LeafGreen,
+                OriginGame::FireRedSwitch,
+                OriginGame::LeafGreenSwitch,
+            ],
             Self::DiamondPearl => vec![OriginGame::Diamond, OriginGame::Pearl],
             Self::Platinum => vec![OriginGame::Platinum],
             Self::HeartGoldSoulSilver => vec![OriginGame::HeartGold, OriginGame::SoulSilver],
@@ -180,7 +191,7 @@ impl MetadataSource {
         species::metadata_table::source_has_form_metadata(
             *self,
             species_form.get_ndex() as u16,
-            species_form.get_forme_index(),
+            species_form.get_form_index(),
         )
     }
 }
@@ -208,6 +219,21 @@ impl MetadataSources {
         species::metadata_table::source_has_form_metadata(source, national_dex, form_index)
     }
 
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "defaultOriginGame"))]
+    pub fn first_origin_game(source: MetadataSource) -> OriginGame {
+        source.first_origin_game()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "originMark"))]
+    pub fn origin_mark(source: MetadataSource) -> Option<OriginMark> {
+        source.first_origin_game().mark()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "originGamesFor"))]
+    pub fn all_origin_games(source: MetadataSource) -> Vec<OriginGame> {
+        source.all_origin_games()
+    }
+
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "supportedGameOrigins"))]
     pub fn supported_game_origins(national_dex: u16, form_index: u16) -> Vec<OriginGame> {
         MetadataSource::iter()
@@ -217,10 +243,9 @@ impl MetadataSources {
             .flat_map(MetadataSource::all_origin_games)
             .collect()
     }
-}
 
-#[cfg(feature = "wasm")]
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "allMetadataSources"))]
-pub fn all_metadata_sources() -> Vec<MetadataSource> {
-    MetadataSource::iter().collect()
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "all"))]
+    pub fn all_metadata_sources() -> Vec<MetadataSource> {
+        MetadataSource::iter().collect()
+    }
 }

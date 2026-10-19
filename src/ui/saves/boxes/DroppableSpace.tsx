@@ -1,4 +1,4 @@
-import { useDroppable } from '@dnd-kit/core'
+import { useDroppable } from '@dnd-kit/react'
 import { MonLocation } from '@openhome-ui/state/saves'
 import { cssClass } from '@openhome-ui/util/style'
 import { CSSProperties, ReactNode, useEffect, useEffectEvent } from 'react'
@@ -37,7 +37,7 @@ const DroppableSpace = ({
   children,
   style,
 }: DroppableSpaceProps) => {
-  const { isOver, setNodeRef } = useDroppable({
+  const { isDropTarget, ref } = useDroppable({
     id: dropID ?? '',
     data: dropData,
     disabled: disabled || !dropID,
@@ -46,22 +46,22 @@ const DroppableSpace = ({
   const onNotOverEvent = useEffectEvent(() => onNotOver?.())
 
   useEffect(() => {
-    if (isOver) {
+    if (isDropTarget) {
       onOverEvent()
     } else {
       onNotOverEvent()
     }
-  }, [isOver])
+  }, [isDropTarget])
 
   return (
     <div
       className={cssClass('droppable-space').with(className).build()}
       style={{
         ...getBackgroundDetails(disabled),
-        outlineColor: isOver ? 'var(--accent-8)' : 'transparent',
+        outlineColor: isDropTarget ? 'var(--accent-8)' : 'transparent',
         ...style,
       }}
-      ref={setNodeRef}
+      ref={ref}
     >
       {children}
     </div>

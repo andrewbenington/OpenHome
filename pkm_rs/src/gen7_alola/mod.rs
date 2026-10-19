@@ -32,6 +32,7 @@ const NEUROFORCE: u16 = 233;
 pub type Pk7AbilityIndex = AbilityIndexBounded<NEUROFORCE>;
 
 #[derive(Debug, Clone, Copy, Default)]
+#[cfg_attr(feature = "wasm", derive(tsify::Tsify))]
 pub struct Pk7SpeciesAndForm(SpeciesForm);
 
 impl Pk7SpeciesAndForm {
@@ -39,7 +40,7 @@ impl Pk7SpeciesAndForm {
         if source_has_form_metadata(
             MetadataSource::UltraSunUltraMoon,
             species_and_form.get_ndex() as u16,
-            species_and_form.get_forme_index(),
+            species_and_form.get_form_index(),
         ) {
             Some(Self(species_and_form))
         } else {

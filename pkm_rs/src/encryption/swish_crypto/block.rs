@@ -1,11 +1,13 @@
 // PKHeX reference implementation: PKHeX.Core/Saves/Encryption/SwishCrypto/SwishCrypto.cs
 
+use crate::bytes::{Reader, Writer};
+use crate::encryption::swish_crypto::{ExpectedBlockType, InvalidTypeId, SwishError, WrongType};
+
+use tsify::Ts;
 use wasm_bindgen::prelude::*;
 
-use crate::{
-    bytes::{Reader, Writer},
-    result::Error,
-};
+#[cfg(feature = "wasm")]
+use pkm_rs_types::{JsResult, TryIntoTs, TsResult};
 const PAD_LENGTH: usize = 127;
 
 const STATIC_XOR_PAD: [u8; PAD_LENGTH] = [
@@ -20,14 +22,14 @@ const STATIC_XOR_PAD: [u8; PAD_LENGTH] = [
 ];
 
 // with compiler optimizations the iterator is erased completely (at least on x86)
-fn crypt_static_xor_pad_bytes(data: &[u8]) -> Vec<u8> {
-    data.iter()
+fn crypt_static_xor_pad_bytes_in_place(data: &mut [u8]) {
+    data.iter_mut()
         .zip(STATIC_XOR_PAD.iter().cycle())
-        .map(|(val, pad)| val ^ pad)
+        .map(|(val, pad)| *val ^= pad)
         .collect()
 }
 
-fn read_blocks(data: &[u8]) -> Result<Vec<Block>, InvalidTypeId> {
+fn read_blocks(data: &[u8]) -> Result<Vec<Block>, SwishError> {
     let mut result = Vec::<Block>::new();
     let mut reader = Reader::new(data);
 
@@ -38,21 +40,20 @@ fn read_blocks(data: &[u8]) -> Result<Vec<Block>, InvalidTypeId> {
     Ok(result)
 }
 
-#[wasm_bindgen(js_name = decryptBlocks)]
-pub fn decrypt_blocks(data: &[u8]) -> Result<Vec<Block>, InvalidTypeId> {
-    let data_before_hash = &data[..data.len() - super::HASH_SIZE];
-    let data_after_xor = crypt_static_xor_pad_bytes(data_before_hash);
+pub fn decrypt_blocks(data: &mut [u8]) -> Result<Vec<Block>, SwishError> {
+    let data_length = data.len();
+    let data_before_hash = &mut data[..data_length - super::HASH_SIZE];
+    crypt_static_xor_pad_bytes_in_place(data_before_hash);
 
-    read_blocks(&data_after_xor)
+    read_blocks(data_before_hash)
 }
 
-#[wasm_bindgen(js_name = writeBlock)]
 pub fn write_block(block: &Block, bytes: &mut [u8], offset: usize) -> usize {
     let mut writer = Writer::at(bytes, offset);
     block.write_encrypted(&mut writer)
 }
 
-fn write_blocks(blocks: &[Block], size: usize) -> Vec<u8> {
+fn write_blocks(blocks: &mut [Block], size: usize) -> Vec<u8> {
     let mut buffer = vec![0u8; size];
     let mut writer = Writer::new(&mut buffer);
 
@@ -66,9 +67,29 @@ fn write_blocks(blocks: &[Block], size: usize) -> Vec<u8> {
     buffer
 }
 
-pub fn encrypt_blocks(blocks: &[Block], size: usize) -> Vec<u8> {
-    let encrypted_blocks = write_blocks(blocks, size);
-    let mut encrypted_bytes = crypt_static_xor_pad_bytes(&encrypted_blocks);
+// wasm-bindgen will copy bytes to and from the JS ArrayBuffer if this argument is a &mut [u8],
+// which as of now causes certain JS tests to fail as the source buffer is modified. if revisiting
+// this in the future for efficiency, be wary of potential side effects of using a &mmut [u8] from JavaScript.
+#[wasm_bindgen(js_name = decryptBlocks)]
+pub fn decrypt_blocks_wasm(mut data: Box<[u8]>) -> JsResult<Vec<Ts<Block>>> {
+    decrypt_blocks(&mut data)?
+        .into_iter()
+        .try_fold(Vec::new(), |mut blocks, block| {
+            block.try_into_ts().map(|ts_block| {
+                blocks.push(ts_block);
+                blocks
+            })
+        })
+}
+
+#[wasm_bindgen(js_name = writeBlock)]
+pub fn write_block_wasm(block: Ts<Block>, bytes: &mut [u8], offset: usize) -> JsResult<usize> {
+    Ok(write_block(&block.to_rust()?, bytes, offset))
+}
+
+pub fn encrypt_blocks(blocks: &mut [Block], size: usize) -> Vec<u8> {
+    let mut encrypted_bytes = write_blocks(blocks, size);
+    crypt_static_xor_pad_bytes_in_place(&mut encrypted_bytes);
 
     let hash = super::hash::compute_hash(&encrypted_bytes);
     encrypted_bytes.extend_from_slice(&hash);
@@ -76,32 +97,46 @@ pub fn encrypt_blocks(blocks: &[Block], size: usize) -> Vec<u8> {
     encrypted_bytes
 }
 
+#[cfg(feature = "wasm")]
 #[wasm_bindgen(js_name = encryptBlocks)]
-pub fn encrypt_blocks_js(blocks: Box<[Block]>, size: usize) -> Vec<u8> {
-    encrypt_blocks(&blocks, size)
+pub fn encrypt_blocks_js(blocks: Box<[Ts<Block>]>, size: usize) -> JsResult<Vec<u8>> {
+    Ok(encrypt_blocks(
+        &mut blocks
+            .into_iter()
+            .try_fold(Vec::new(), |mut blocks, ts_block| {
+                ts_block.to_rust().map(|block| {
+                    blocks.push(block);
+                    blocks
+                })
+            })?,
+        size,
+    ))
 }
 
 #[cfg_attr(
     feature = "wasm",
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
 )]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Clone, Hash)]
+#[cfg_attr(feature = "wasm", tsify(large_number_types_as_bigints))]
 pub struct Block {
     key: u32,
     data: BlockData,
 }
 
 impl Block {
-    pub const fn new(key: u32, data: BlockData) -> Self {
-        Self { key, data }
+    pub fn new(key: impl Into<u32>, data: BlockData) -> Self {
+        Self {
+            key: key.into(),
+            data,
+        }
     }
 
     pub const fn key(&self) -> u32 {
         self.key
     }
 
-    fn read_encrypted(reader: &mut Reader) -> Result<Self, InvalidTypeId> {
+    fn read_encrypted(reader: &mut Reader) -> Result<Self, SwishError> {
         let key = reader.read_u32();
 
         let mut crypto_state = SwishCrypto::new(key);
@@ -117,10 +152,7 @@ impl Block {
                     *byte ^= crypto_state.next_u8();
                 }
 
-                BlockData::Value {
-                    dataype: numeric_type,
-                    bytes: payload_bytes,
-                }
+                BlockData::Value(numeric_type.block_from_bytes(&payload_bytes)?)
             }
             BlockType::Object => {
                 let byte_count = (reader.read_u32() ^ crypto_state.next_32()) as usize;
@@ -175,7 +207,7 @@ impl Block {
             BlockData::Bool(..) => &Vec::new(),
             BlockData::Object(ObjectBlock { bytes }) => bytes,
             BlockData::Array(ArrayBlock { bytes, .. }) => bytes,
-            BlockData::Value { bytes, .. } => bytes,
+            BlockData::Value(numeric_value) => &numeric_value.to_le_bytes(),
         };
 
         for byte in payload {
@@ -185,81 +217,42 @@ impl Block {
         writer.current_offset()
     }
 
-    pub fn into_object_data(self) -> std::result::Result<ObjectBlock, WrongBlockType> {
+    pub fn into_numeric_data(self) -> std::result::Result<NumericBlock, SwishError> {
         let Block { key, data } = self;
-        let block_type = data.block_type();
-        match data {
-            BlockData::Object(object_data) => Ok(object_data),
-            _ => Err(WrongBlockType {
+        if let BlockData::Value(numeric_block) = data {
+            Ok(numeric_block)
+        } else {
+            Err(SwishError::BlockType(WrongType {
                 block_key: key,
-                expected: BlockType::Object,
-                actual: block_type,
-            }),
+                expected: ExpectedBlockType::Numeric,
+                actual: data.block_type(),
+            }))
         }
     }
 
-    pub fn into_array_data(self) -> std::result::Result<ArrayBlock, WrongBlockType> {
+    pub fn into_object_data(self) -> std::result::Result<ObjectBlock, SwishError> {
         let Block { key, data } = self;
-        let block_type = data.block_type();
+        match data {
+            BlockData::Object(object_data) => Ok(object_data),
+            _ => Err(SwishError::BlockType(WrongType {
+                block_key: key,
+                expected: ExpectedBlockType::Object,
+                actual: data.block_type(),
+            }))?,
+        }
+    }
+
+    pub fn into_array_data(self) -> std::result::Result<ArrayBlock, SwishError> {
+        let Block { key, data } = self;
         if let BlockData::Array(array_data) = data {
             Ok(array_data)
         } else {
-            Err(WrongBlockType {
+            Err(SwishError::BlockType(WrongType {
                 block_key: key,
-                expected: BlockType::Array,
-                actual: block_type,
-            })
+                expected: ExpectedBlockType::Array,
+                actual: data.block_type(),
+            }))
         }
-    }
-}
-
-#[cfg_attr(feature = "wasm", derive(tsify::Tsify, serde::Serialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
-#[derive(Debug)]
-pub struct WrongBlockType {
-    block_key: u32,
-    expected: BlockType,
-    actual: BlockType,
-}
-
-impl std::fmt::Display for WrongBlockType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "expected SwishCrypto block of type {}, received {}",
-            self.expected, self.actual
-        )
-    }
-}
-
-impl std::error::Error for WrongBlockType {}
-
-impl From<WrongBlockType> for Error {
-    fn from(value: WrongBlockType) -> Self {
-        let message = format!("block with key {}", value.block_key);
-        Error::build_save(message, Some(Box::new(value)))
-    }
-}
-
-#[cfg_attr(feature = "wasm", derive(tsify::Tsify, serde::Serialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
-#[derive(Debug)]
-pub struct InvalidTypeId(u8);
-
-impl std::fmt::Display for InvalidTypeId {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&format!(
-            "swish crypto block has invalid type id: {}",
-            self.0
-        ))
-    }
-}
-
-impl std::error::Error for InvalidTypeId {}
-
-impl From<InvalidTypeId> for Error {
-    fn from(value: InvalidTypeId) -> Self {
-        Error::build_save("Invalid block type id".to_owned(), Some(Box::new(value)))
     }
 }
 
@@ -267,7 +260,6 @@ impl From<InvalidTypeId> for Error {
     feature = "wasm",
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
 )]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Clone, Copy, PartialEq, Eq, Debug, Hash, strum::Display)]
 pub enum BoolType {
     Bool1,
@@ -346,24 +338,181 @@ impl NumericType {
             Self::Float64 => 8,
         }
     }
+
+    pub fn block_from_bytes(self, bytes: &[u8]) -> Result<NumericBlock, SwishError> {
+        Ok(match self {
+            Self::UInt8 => {
+                NumericBlock::UInt8(u8::from_le_bytes(numtype_try_into_array(self, bytes)?))
+            }
+            Self::UInt16 => {
+                NumericBlock::UInt16(u16::from_le_bytes(numtype_try_into_array(self, bytes)?))
+            }
+            Self::UInt32 => {
+                NumericBlock::UInt32(u32::from_le_bytes(numtype_try_into_array(self, bytes)?))
+            }
+            Self::UInt64 => {
+                NumericBlock::UInt64(u64::from_le_bytes(numtype_try_into_array(self, bytes)?))
+            }
+            Self::Int8 => {
+                NumericBlock::Int8(i8::from_le_bytes(numtype_try_into_array(self, bytes)?))
+            }
+            Self::Int16 => {
+                NumericBlock::Int16(i16::from_le_bytes(numtype_try_into_array(self, bytes)?))
+            }
+            Self::Int32 => {
+                NumericBlock::Int32(i32::from_le_bytes(numtype_try_into_array(self, bytes)?))
+            }
+            Self::Int64 => {
+                NumericBlock::Int64(i64::from_le_bytes(numtype_try_into_array(self, bytes)?))
+            }
+            Self::Float32 => {
+                NumericBlock::Float32(f32::from_le_bytes(numtype_try_into_array(self, bytes)?))
+            }
+            Self::Float64 => {
+                NumericBlock::Float64(f64::from_le_bytes(numtype_try_into_array(self, bytes)?))
+            }
+        })
+    }
+}
+
+fn numtype_try_into_array<const N: usize>(
+    numtype: NumericType,
+    bytes: &[u8],
+) -> Result<[u8; N], SwishError> {
+    bytes.try_into().or(Err(SwishError::expected_bytes::<N>(
+        numtype.to_string(),
+        bytes.len(),
+    )))
+}
+
+#[cfg(feature = "wasm")]
+#[allow(clippy::missing_const_for_fn)]
+#[wasm_bindgen(js_name = "blockDataType")]
+pub fn block_data_type(data: Ts<BlockData>) -> TsResult<BlockType> {
+    data.to_rust()?.block_type().try_into_ts()
+}
+
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    serde::Serialize,
+    serde::Deserialize,
+    tsify::Tsify,
+    strum::Display,
+)]
+#[cfg_attr(feature = "wasm", tsify(large_number_types_as_bigints))]
+pub enum NumericBlock {
+    UInt8(u8),
+    UInt16(u16),
+    UInt32(u32),
+    UInt64(u64),
+
+    Int8(i8),
+    Int16(i16),
+    Int32(i32),
+    Int64(i64),
+
+    Float32(f32),
+    Float64(f64),
+}
+
+impl NumericBlock {
+    pub fn to_le_bytes(self) -> Vec<u8> {
+        match self {
+            Self::UInt8(value) => value.to_le_bytes().to_vec(),
+            Self::UInt16(value) => value.to_le_bytes().to_vec(),
+            Self::UInt32(value) => value.to_le_bytes().to_vec(),
+            Self::UInt64(value) => value.to_le_bytes().to_vec(),
+            Self::Int8(value) => value.to_le_bytes().to_vec(),
+            Self::Int16(value) => value.to_le_bytes().to_vec(),
+            Self::Int32(value) => value.to_le_bytes().to_vec(),
+            Self::Int64(value) => value.to_le_bytes().to_vec(),
+            Self::Float32(value) => value.to_le_bytes().to_vec(),
+            Self::Float64(value) => value.to_le_bytes().to_vec(),
+        }
+    }
+
+    pub const fn id(&self) -> u8 {
+        match self {
+            Self::UInt8(_) => 8,
+            Self::UInt16(_) => 9,
+            Self::UInt32(_) => 10,
+            Self::UInt64(_) => 11,
+
+            Self::Int8(_) => 12,
+            Self::Int16(_) => 13,
+            Self::Int32(_) => 14,
+            Self::Int64(_) => 15,
+
+            Self::Float32(_) => 16,
+            Self::Float64(_) => 17,
+        }
+    }
+
+    pub const fn byte_size(&self) -> usize {
+        match self {
+            Self::UInt8(_) => 1,
+            Self::UInt16(_) => 2,
+            Self::UInt32(_) => 4,
+            Self::UInt64(_) => 8,
+
+            Self::Int8(_) => 1,
+            Self::Int16(_) => 2,
+            Self::Int32(_) => 4,
+            Self::Int64(_) => 8,
+
+            Self::Float32(_) => 4,
+            Self::Float64(_) => 8,
+        }
+    }
+
+    pub const fn inner_type(&self) -> NumericType {
+        match self {
+            Self::UInt8(_) => NumericType::UInt8,
+            Self::UInt16(_) => NumericType::UInt16,
+            Self::UInt32(_) => NumericType::UInt32,
+            Self::UInt64(_) => NumericType::UInt64,
+            Self::Int8(_) => NumericType::Int8,
+            Self::Int16(_) => NumericType::Int16,
+            Self::Int32(_) => NumericType::Int32,
+            Self::Int64(_) => NumericType::Int64,
+            Self::Float32(_) => NumericType::Float32,
+            Self::Float64(_) => NumericType::Float64,
+        }
+    }
+}
+
+impl std::hash::Hash for NumericBlock {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        core::mem::discriminant(self).hash(state);
+        match self {
+            NumericBlock::UInt8(value) => value.hash(state),
+            NumericBlock::UInt16(value) => value.hash(state),
+            NumericBlock::UInt32(value) => value.hash(state),
+            NumericBlock::UInt64(value) => value.hash(state),
+            NumericBlock::Int8(value) => value.hash(state),
+            NumericBlock::Int16(value) => value.hash(state),
+            NumericBlock::Int32(value) => value.hash(state),
+            NumericBlock::Int64(value) => value.hash(state),
+            NumericBlock::Float32(value) => value.to_le_bytes().hash(state),
+            NumericBlock::Float64(value) => value.to_le_bytes().hash(state),
+        }
+    }
 }
 
 #[cfg_attr(
     feature = "wasm",
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
 )]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Clone, Hash)]
+#[cfg_attr(feature = "wasm", tsify(large_number_types_as_bigints))]
 pub enum BlockData {
     Bool(BoolType),
     Object(ObjectBlock),
     Array(ArrayBlock),
-    Value {
-        dataype: NumericType,
-        #[serde(with = "serde_bytes")]
-        #[tsify(type = "Uint8Array<ArrayBuffer>")]
-        bytes: Vec<u8>,
-    },
+    Value(NumericBlock),
 }
 
 impl BlockData {
@@ -380,8 +529,8 @@ impl BlockData {
             BlockData::Bool(bool_type) => BlockType::Scalar(ScalarType::Bool(*bool_type)),
             BlockData::Object(_) => BlockType::Object,
             BlockData::Array(_) => BlockType::Array,
-            BlockData::Value { dataype, bytes: _ } => {
-                BlockType::Scalar(ScalarType::Numeric(*dataype))
+            BlockData::Value(numeric_value) => {
+                BlockType::Scalar(ScalarType::Numeric(numeric_value.inner_type()))
             }
         }
     }
@@ -391,7 +540,7 @@ impl BlockData {
             Self::Object { .. } => 4,
             Self::Array { .. } => 5,
             Self::Bool(bool_type) => bool_type.id(),
-            Self::Value { dataype, .. } => dataype.id(),
+            Self::Value(numeric_value) => numeric_value.id(),
         }
     }
 }
@@ -400,7 +549,6 @@ impl BlockData {
     feature = "wasm",
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
 )]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Clone, Hash)]
 pub struct ObjectBlock {
     #[serde(with = "serde_bytes")]
@@ -409,6 +557,10 @@ pub struct ObjectBlock {
 }
 
 impl ObjectBlock {
+    pub const fn new(bytes: Vec<u8>) -> Self {
+        Self { bytes }
+    }
+
     pub fn bytes(&self) -> &[u8] {
         &self.bytes
     }
@@ -422,7 +574,6 @@ impl ObjectBlock {
     feature = "wasm",
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
 )]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Clone, Hash)]
 pub struct ArrayBlock {
     #[serde(with = "serde_bytes")]
@@ -434,10 +585,6 @@ pub struct ArrayBlock {
 impl ArrayBlock {
     pub fn bytes(&self) -> &[u8] {
         &self.bytes
-    }
-
-    pub fn bytes_mut(&mut self) -> &mut [u8] {
-        &mut self.bytes
     }
 }
 
@@ -499,7 +646,7 @@ const fn xor_shift_advance(state: u32) -> u32 {
     tsify::Tsify,
     strum::Display,
 )]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
+#[cfg_attr(feature = "wasm", tsify(large_number_types_as_bigints))]
 pub enum BlockType {
     Object,
     Array,
@@ -531,8 +678,8 @@ impl TryFrom<u8> for BlockType {
 #[cfg(feature = "wasm")]
 #[wasm_bindgen(js_name = blockTypeIndex)]
 #[allow(clippy::missing_const_for_fn)]
-pub fn block_type_index(type_id: BlockType) -> u8 {
-    type_id.id()
+pub fn block_type_index(type_id: Ts<BlockType>) -> JsResult<u8> {
+    Ok(type_id.to_rust()?.id())
 }
 
 #[derive(
@@ -547,7 +694,7 @@ pub fn block_type_index(type_id: BlockType) -> u8 {
     Hash,
     strum::Display,
 )]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
+#[cfg_attr(feature = "wasm", tsify(large_number_types_as_bigints))]
 pub enum ScalarType {
     Bool(BoolType),
     Numeric(NumericType),
@@ -557,14 +704,14 @@ impl ScalarType {
     pub const fn id(&self) -> u8 {
         match self {
             Self::Bool(bool_type) => bool_type.id(),
-            Self::Numeric(numeric_type) => numeric_type.id(),
+            Self::Numeric(inner_type) => inner_type.id(),
         }
     }
 
     pub const fn byte_size(&self) -> usize {
         match self {
             Self::Bool(..) => 1,
-            Self::Numeric(numeric_type) => numeric_type.byte_size(),
+            Self::Numeric(inner_type) => inner_type.byte_size(),
         }
     }
 }
@@ -572,15 +719,15 @@ impl ScalarType {
 #[cfg(feature = "wasm")]
 #[wasm_bindgen(js_name = scalarTypeSize)]
 #[allow(clippy::missing_const_for_fn)]
-pub fn scalar_type_size(type_id: ScalarType) -> usize {
-    type_id.byte_size()
+pub fn scalar_type_size(type_id: Ts<ScalarType>) -> JsResult<usize> {
+    Ok(type_id.to_rust()?.byte_size())
 }
 
 #[cfg(feature = "wasm")]
 #[wasm_bindgen(js_name = scalarTypeIndex)]
 #[allow(clippy::missing_const_for_fn)]
-pub fn scalar_type_index(type_id: ScalarType) -> u8 {
-    type_id.id()
+pub fn scalar_type_index(type_id: Ts<ScalarType>) -> JsResult<u8> {
+    Ok(type_id.to_rust()?.id())
 }
 
 impl TryFrom<u8> for ScalarType {

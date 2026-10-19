@@ -3,10 +3,10 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import {
   Gen12Identifier,
   Gen345Identifier,
-  getMonFileIdentifier,
   getMonGen12Identifier,
   getMonGen345Identifier,
   OhpkmIdentifier,
+  tryCalculateIdentifier,
 } from '@openhome-core/pkm/Lookup'
 import {
   BDSP_TRANSFER_RESTRICTIONS,
@@ -221,11 +221,12 @@ export function useManageTracked() {
       }
 
       const save = result.data
+      const allSaveMons = save.getAllMons()
       const loadedMons = await ohpkmStore.tryLoadBatch(
-        save.getAllMons().map(ohpkmStore.getPotentialOhpkmId).filter(filterUndefined)
+        allSaveMons.map(ohpkmStore.getPotentialOhpkmId).filter(filterUndefined)
       )
 
-      for (const saveMon of save.getAllMons()) {
+      for (const saveMon of allSaveMons) {
         const saveMonId = ohpkmStore.getPotentialOhpkmId(saveMon)
 
         if (saveMonId === undefined || foundMonIds.has(saveMonId) || hasHomeLocation(saveMonId)) {
@@ -239,6 +240,7 @@ export function useManageTracked() {
             toUpdate[trackedMon.openhomeId] = trackedMon
             foundMonIds.add(saveMonId)
           })
+        saveMon.free?.()
       }
     }
 
@@ -288,14 +290,14 @@ export type FindingSavesForAllState =
 
 function monPossiblySupported(
   nationalDex: number,
-  formeNumber: number,
+  formNumber: number,
   saveRef: SaveRef,
   extraFormIndex?: ExtraFormIndex
 ) {
   if (saveRef.game === null) return false
 
   function isSupported(restrictions: TransferRestrictions) {
-    return !isRestricted(restrictions, nationalDex, formeNumber, extraFormIndex)
+    return !isRestricted(restrictions, nationalDex, formNumber, extraFormIndex)
   }
 
   if (saveRef.pluginIdentifier === 'radical_red') {
@@ -340,7 +342,7 @@ function searchSaveForMon(save: SAV, id: OhpkmIdentifier): Option<SaveSearchResu
   for (const boxIndex of range(save.getBoxCount())) {
     for (const boxSlot of range(save.boxSlotCount)) {
       const mon = save.getMonAt(boxIndex, boxSlot)
-      if (mon && getMonFileIdentifier(mon) === id) {
+      if (mon && tryCalculateIdentifier(mon) === id) {
         return {
           match: mon,
           location: { box: boxIndex, boxSlot },

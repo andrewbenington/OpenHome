@@ -10,7 +10,7 @@ import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import { ClearIcon, ErrorIcon } from '@openhome-ui/components/Icons'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { Typeahead } from '@openhome-ui/components/typeahead'
-import PokemonDetailsModal from '@openhome-ui/pokemon-details/PokemonDetailsModal'
+import PokemonDetailsModal from '@openhome-ui/pokemon/PokemonDetailsModal'
 import SavesModal from '@openhome-ui/saves/SavesModal'
 import { getDetailsOfficialSave, getDetailsPluginSave } from '@openhome-ui/saves/util'
 import useOhpkmBatchIdLookup from '@openhome-ui/state/ohpkm/useOhpkmIdBatchLookup'
@@ -72,7 +72,7 @@ export default function SortPokemon() {
     .map(
       R.match(
         (mon: OHPKM) => ({ mon, color: OPENHOME_COLOR, isHome: true }),
-        (_) => undefined
+        () => undefined
       )
     )
     .filter(filterUndefined)
@@ -419,7 +419,7 @@ function TransferToSaveButton(props: TransferToSaveButtonProps) {
         <b>{save.name}</b>
         <p>(TID {save.displayID})</p>
         <div style={{ flex: 1 }} />
-        <Badge.Game withName originGame={save.origin} plugin={save.pluginIdentifier} />
+        <Badge.Game withNameAbbr originGame={save.origin} plugin={save.pluginIdentifier} />
       </Flex>
     </Button>
   )

@@ -1,4 +1,5 @@
 import { PK5 } from '@openhome-core/pkm'
+import * as encryption from '@openhome-core/pkm/util/encryption'
 import { CRC16_CCITT } from '@openhome-core/save/encryption/Encryption'
 import { readGen5StringFromBytes } from '@openhome-core/util'
 import {
@@ -9,6 +10,7 @@ import {
 import { Errorable, Option, unique } from '@openhome-core/util/functional'
 import { BinaryGender, ConvertStrategy, ExtraFormIndex, Language, OriginGame } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
+import { gen45EmptySlotBytes } from './G4SAV'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { hasDesmumeFooter, LookupType } from './util'
 import { PathData } from './util/path'
@@ -112,6 +114,11 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
     }
   }
 
+  static emptySlotBytes(): Uint8Array<ArrayBuffer> {
+    const shuffledBytes = encryption.shuffleBlocksGen45(gen45EmptySlotBytes().buffer)
+    return new Uint8Array(encryption.decryptByteArrayGen45(shuffledBytes))
+  }
+
   updateBoxChecksum = (boxIndex: number) => {
     // const oldChecksum = bytesToUint16LittleEndian(
     //   this.bytes,
@@ -161,7 +168,7 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
           console.error(e)
         }
       } else {
-        this.bytes.set(new Uint8Array(136), writeIndex)
+        this.bytes.set(G5SAV.emptySlotBytes(), writeIndex)
       }
     })
     unique(this.updatedBoxSlots.map((coords) => coords.box)).forEach((boxIndex) =>
@@ -176,7 +183,7 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
 
   abstract supportsMon(
     nationalDex: number,
-    formeNumber: number,
+    formNumber: number,
     extraFormIndex?: ExtraFormIndex
   ): boolean
 

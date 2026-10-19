@@ -1,3 +1,5 @@
+#[cfg(feature = "wasm")]
+use crate::encryption::swish_crypto::SwishError;
 use crate::sectioned_data;
 
 use pkm_rs_resources::abilities::ABILITY_MAX;
@@ -63,6 +65,11 @@ pub enum Error {
     StringDecode {
         source: StringErrorSource,
     },
+    #[cfg(feature = "wasm")]
+    SwishCrypto(SwishError),
+    Tsify {
+        source: Rc<tsify::Error>,
+    },
     Other(String),
 }
 
@@ -77,7 +84,7 @@ impl Error {
     pub const fn form_index(species_and_form: SpeciesForm) -> Self {
         Self::FormIndex {
             national_dex: species_and_form.get_ndex(),
-            form_index: species_and_form.get_forme_index(),
+            form_index: species_and_form.get_form_index(),
         }
     }
 
@@ -171,6 +178,9 @@ impl Display for Error {
                 format!("Invalid tag value {value} for tag type {tag_type}")
             }
             Self::StringDecode { source } => format!("String decode error: {source}"),
+            #[cfg(feature = "wasm")]
+            Self::SwishCrypto(error) => error.to_string(),
+            Self::Tsify { source } => format!("Error transforming type at wasm boundary: {source}"),
             Self::Other(msg) => msg.clone(),
         };
 
@@ -186,6 +196,7 @@ impl std::error::Error for Error {
                 source: Some(source),
                 ..
             } => Some(source.as_ref()),
+            Self::Tsify { source } => Some(source.as_ref()),
             _ => None,
         }
     }
@@ -215,6 +226,14 @@ impl From<sectioned_data::Error> for Error {
 impl From<pkm_rs_types::InvalidAbilityNumber> for Error {
     fn from(value: InvalidAbilityNumber) -> Self {
         Self::AbilityNumber(value)
+    }
+}
+
+impl From<tsify::Error> for Error {
+    fn from(value: tsify::Error) -> Self {
+        Self::Tsify {
+            source: Rc::new(value),
+        }
     }
 }
 
@@ -306,10 +325,18 @@ impl Display for StringErrorSource {
 }
 
 pub type Result<T> = core::result::Result<T, Error>;
+pub type StdResult<T, E> = core::result::Result<T, E>;
 
 #[cfg(feature = "wasm")]
 impl From<Error> for JsValue {
     fn from(value: Error) -> Self {
         value.to_string().into()
+    }
+}
+
+#[cfg(feature = "wasm")]
+impl From<SwishError> for Error {
+    fn from(value: SwishError) -> Self {
+        Self::SwishCrypto(value)
     }
 }

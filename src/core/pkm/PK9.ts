@@ -2,17 +2,14 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { ModernRibbons } from '@openhome-core/resources'
 import { movesFromSvTmFlags } from '@openhome-core/resources/moves/flags'
 import { Errorable, Option, R } from '@openhome-core/util/functional'
-import { FourMoves, PKMDate, Stats } from '@openhome-core/util/types'
+import { FourMoves, PKMDate } from '@openhome-core/util/types'
 import {
   AbilityIndex,
   BinaryGender,
-  ContestStats,
   ConvertStrategies,
   ConvertStrategy,
-  HyperTraining,
   Item,
   Language,
-  MarkingsSixShapesColors,
   MetadataSummaryLookup,
   ModernRibbon,
   NatureIndex,
@@ -22,7 +19,6 @@ import {
   PokeDate,
   SpeciesLookup,
   TeraType,
-  TrainerMemory,
 } from '@pkm-rs/pkg'
 import { PkmConstructorOptions } from './PKM'
 import * as encryption from './util/encryption'
@@ -139,9 +135,6 @@ export default class PK9 {
   get markings() {
     return this.inner.markings
   }
-  set markings(value: MarkingsSixShapesColors) {
-    this.inner.markings = value
-  }
 
   get personalityValue() {
     return this.inner.personality_value
@@ -185,15 +178,9 @@ export default class PK9 {
   get evs() {
     return this.inner.evs
   }
-  set evs(value: Stats) {
-    this.inner.evs = value
-  }
 
   get contest() {
     return this.inner.contest
-  }
-  set contest(value: ContestStats) {
-    this.inner.contest = value
   }
 
   get contestMemoryCount() {
@@ -299,9 +286,6 @@ export default class PK9 {
   get ivs() {
     return this.inner.ivs
   }
-  set ivs(value: Stats) {
-    this.inner.ivs = value
-  }
 
   get isEgg() {
     return this.inner.is_egg
@@ -319,9 +303,6 @@ export default class PK9 {
 
   get teraTypeOriginal() {
     return this.inner.teraTypeOriginal
-  }
-  set teraTypeOriginal(value: TeraType) {
-    this.inner.teraTypeOriginal = value
   }
 
   get teraTypeOverride() {
@@ -435,10 +416,7 @@ export default class PK9 {
   }
 
   get hyperTraining() {
-    return this.inner.hyper_training
-  }
-  set hyperTraining(value: HyperTraining) {
-    this.inner.hyper_training = value
+    return this.inner.hyperTraining
   }
 
   get gameOfOrigin() {
@@ -495,17 +473,11 @@ export default class PK9 {
   }
 
   get handlerMemory() {
-    return this.inner.handler_memory
-  }
-  set handlerMemory(value: TrainerMemory) {
-    this.inner.handler_memory = value
+    return this.inner.handlerMemory
   }
 
   get trainerMemory() {
-    return this.inner.trainer_memory
-  }
-  set trainerMemory(value: TrainerMemory) {
-    this.inner.trainer_memory = value
+    return this.inner.trainerMemory
   }
 
   get trainerGender() {
@@ -538,9 +510,9 @@ export default class PK9 {
     return this.inner.calculateStats()
   }
 
-  // stored stats
+  // wasm recalculates stats anyways
   get stats() {
-    return this.inner.stats
+    return this.getStats()
   }
 
   get abilityName() {
@@ -612,5 +584,9 @@ export default class PK9 {
       1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
       27,
     ]
+  }
+
+  free() {
+    this.inner.free()
   }
 }

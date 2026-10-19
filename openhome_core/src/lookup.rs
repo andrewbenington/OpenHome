@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use pkm_rs::convert_strategy::PidModificationStrategy;
 use pkm_rs::ohpkm::{OhpkmV2, OpenHomeId};
 use serde::{Deserialize, Serialize};
 
@@ -20,7 +21,7 @@ pub struct LookupState {
 }
 
 impl LookupState {
-    pub fn load_from_storage(data_controller: &impl DataController) -> Result<Self> {
+    pub fn load(data_controller: &impl DataController) -> Result<Self> {
         Ok(Self {
             gen_12: data_controller
                 .read_or_create_default_json_file(DataDir::Storage, GEN12_FILENAME)?,
@@ -62,9 +63,14 @@ impl LookupState {
         }
     }
 
-    pub fn with_recalculated(&mut self, ohpkms: impl IntoIterator<Item = OhpkmV2>) {
+    pub fn with_recalculated(
+        &mut self,
+        ohpkms: impl IntoIterator<Item = OhpkmV2>,
+        strategy: &PidModificationStrategy,
+    ) {
         for ohpkm in ohpkms {
-            self.gen_345.insert(ohpkm.gen_345_id(), ohpkm.openhome_id());
+            self.gen_345
+                .insert(ohpkm.gen_345_id(strategy), ohpkm.openhome_id());
         }
     }
 

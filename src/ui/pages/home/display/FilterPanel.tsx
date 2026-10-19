@@ -160,19 +160,19 @@ export default function FilterPanel() {
           <Typeahead
             uniqueFieldId="form"
             options={[...currentMon.forms]}
-            getOptionString={(opt) => opt.formeName}
+            getOptionString={(opt) => opt.formName}
             getOptionUniqueID={(opt) => opt.formIndex.toString()}
             value={
-              filter.formeNumber !== undefined ? currentMon.forms[filter.formeNumber] : undefined
+              filter.formNumber !== undefined ? currentMon.forms[filter.formNumber] : undefined
             }
             placeholder="Form"
-            onChange={(option) => setFilter({ formeNumber: option?.formIndex })}
-            getIconComponent={(currentForme) =>
+            onChange={(option) => setFilter({ formNumber: option?.formIndex })}
+            getIconComponent={(currentForm) =>
               filter.nationalDex &&
-              currentForme && (
+              currentForm && (
                 <PokemonIcon
                   nationalDex={filter.nationalDex}
-                  formIndex={currentForme.formIndex}
+                  formIndex={currentForm.formIndex}
                   style={{ width: ICON_SIZE, height: ICON_SIZE }}
                 />
               )

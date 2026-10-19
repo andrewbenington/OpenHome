@@ -47,7 +47,7 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
   // Static metadata
   static saveTypeAbbreviation = 'LUMI'
   static saveTypeName = 'Pokémon Luminescent Platinum'
-  static saveTypeID = 'luminescent_platinum'
+  static saveTypeID = 'luminescent_platinum' as const
   static pkmType = PB8LUMI
   static boxSizeBytes = PB8LUMI.getBoxSize() * 30
   static transferRestrictions: TransferRestrictions = LP_TRANSFER_RESTRICTIONS
@@ -256,8 +256,8 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
     return toBase64(this.calculateChecksumBytes())
   }
 
-  supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
-    return !isRestricted(LP_TRANSFER_RESTRICTIONS, nationalDex, formeNumber, extraFormIndex)
+  supportsMon(nationalDex: number, formNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    return !isRestricted(LP_TRANSFER_RESTRICTIONS, nationalDex, formNumber, extraFormIndex)
   }
 
   supportsItem(itemIndex: number) {

@@ -10,7 +10,7 @@ import MessageRibbon from '@openhome-ui/components/MessageRibbon'
 import OhoButton from '@openhome-ui/components/OhoButton'
 import SideTabNavigation from '@openhome-ui/components/side-tabs/SideTabNavigation'
 import useDisplayError from '@openhome-ui/hooks/displayError'
-import PokemonDetailsModal from '@openhome-ui/pokemon-details/PokemonDetailsModal'
+import PokemonDetailsModal from '@openhome-ui/pokemon/PokemonDetailsModal'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { SaveError, saveErrorMessage, saveErrorTitle, useSaves } from '@openhome-ui/state/saves'
 import { Button, DropdownMenu, Flex } from '@radix-ui/themes'
@@ -270,7 +270,7 @@ function ForOneStateBody(props: ForOneStateBodyProps) {
             <Badge.Game
               originGame={state.save.origin}
               plugin={state.save.pluginIdentifier}
-              withName
+              withNameAbbr
             />
           </Flex>
           <Flex gap="1" align="center">
@@ -365,7 +365,7 @@ function ForAllStateBody(props: ForAllStateBodyProps) {
             <Badge.Game
               originGame={state.currentSaveRef.game}
               plugin={state.currentSaveRef.pluginIdentifier}
-              withName
+              withNameAbbr
             />
           </Flex>
           <Flex gap="1" align="center">

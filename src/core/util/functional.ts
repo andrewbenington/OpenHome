@@ -72,6 +72,13 @@ function map<T, E, U>(transform: Mapper<T, U>): (result: Result<T, E>) => Result
   return (result) => (isOk(result) ? buildOk(transform(result.data)) : result)
 }
 
+function peek<T, E>(onOk: (value: T) => void): (result: Result<T, E>) => Result<T, E> {
+  return (result) => {
+    if (isOk(result)) onOk(result.data)
+    return result
+  }
+}
+
 function mapErr<T, E, U>(transform: Mapper<E, U>): (result: Result<T, E>) => Result<T, U> {
   return (result) => (isErr(result) ? buildErr(transform(result.error)) : result)
 }
@@ -153,6 +160,7 @@ export type Ok<T> = {
 }
 
 export type Result<T, E = string> = Ok<T> | Err<E>
+export type ErrorOf<R extends Result<unknown, unknown>> = R extends Err<infer E> ? E : never
 
 export function isResult<T, V>(v: object): v is Result<T, V> {
   return (
@@ -233,6 +241,7 @@ export class PromisedResultBox<T, E = string> {
 export const R = {
   match,
   map,
+  peek,
   mapErr,
   peekErr,
   mapOr,
@@ -324,7 +333,10 @@ export class ResultBox<T, E> {
   }
 
   peekErr(onErr: (error: E) => void) {
-    return peekErr(onErr)(this.r)
+    if (isErr(this.r)) {
+      onErr(this.r.error)
+    }
+    return this
   }
 
   orElse(ifErr: T) {

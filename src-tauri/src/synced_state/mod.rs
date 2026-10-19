@@ -63,9 +63,23 @@ impl<State: SyncedState> SyncedStateWrapper<State> {
 }
 
 pub struct AllSyncedStateInner {
-    pub lookups: SyncedStateWrapper<LookupState>,
-    pub ohpkm_store: SyncedStateWrapper<OhpkmBytesStore>,
-    pub convert_strategies: SyncedStateWrapper<ConvertStrategies>,
+    lookups: SyncedStateWrapper<LookupState>,
+    ohpkm_store: SyncedStateWrapper<OhpkmBytesStore>,
+    convert_strategies: SyncedStateWrapper<ConvertStrategies>,
+}
+
+impl AllSyncedStateInner {
+    pub fn from_states(
+        lookups: LookupState,
+        ohpkm_store: OhpkmBytesStore,
+        convert_strategies: ConvertStrategies,
+    ) -> Self {
+        Self {
+            lookups: SyncedStateWrapper(lookups),
+            ohpkm_store: SyncedStateWrapper(ohpkm_store),
+            convert_strategies: SyncedStateWrapper(convert_strategies),
+        }
+    }
 }
 
 pub struct AllSyncedState(pub Mutex<AllSyncedStateInner>);
@@ -76,11 +90,11 @@ impl AllSyncedState {
         ohpkm_store: OhpkmBytesStore,
         convert_strategies: ConvertStrategies,
     ) -> Self {
-        Self(Mutex::new(AllSyncedStateInner {
-            lookups: SyncedStateWrapper(lookups),
-            ohpkm_store: SyncedStateWrapper(ohpkm_store),
-            convert_strategies: SyncedStateWrapper(convert_strategies),
-        }))
+        Self(Mutex::new(AllSyncedStateInner::from_states(
+            lookups,
+            ohpkm_store,
+            convert_strategies,
+        )))
     }
 
     pub fn clone_lookups(&self) -> Result<LookupState> {
@@ -180,6 +194,19 @@ impl AllSyncedState {
                 )));
             }
         }
+
+        Ok(())
+    }
+
+    pub fn for_each_ohpkm_stored<F: FnMut(&OpenHomeId, &[u8])>(
+        &self,
+        mut callback: F,
+    ) -> Result<()> {
+        self.lock()?
+            .ohpkm_store
+            .0
+            .all_entries()
+            .for_each(|(id, bytes)| callback(id, bytes.as_ref()));
 
         Ok(())
     }

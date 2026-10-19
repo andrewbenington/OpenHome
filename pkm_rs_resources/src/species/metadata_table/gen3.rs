@@ -9,13 +9,13 @@ const GEN3_ENTRY_SIZE: usize = 0x1C;
 type GameMetadataGen3 = GameMetadata<PersonalInfoGen3, GEN3_ENTRY_SIZE>;
 
 pub static METADATA_TABLE_RS: GameMetadataGen3 =
-    GameMetadataGen3::from_binary(RS_PERSONAL_FILE, RS_LEVELUP_PKL);
+    GameMetadataGen3::from_binary(RS_PERSONAL_FILE, RS_LEVELUP_PKL, "Ruby/Sapphire");
 
 pub static METADATA_TABLE_FRLG: GameMetadataGen3 =
-    GameMetadataGen3::from_binary(FRLG_PERSONAL_FILE, FRLG_LEVELUP_PKL);
+    GameMetadataGen3::from_binary(FRLG_PERSONAL_FILE, FRLG_LEVELUP_PKL, "FireRed/LeafGreen");
 
 pub static METADATA_TABLE_EMERALD: GameMetadataGen3 =
-    GameMetadataGen3::from_binary(EMERALD_PERSONAL_FILE, EMERALD_LEVELUP_PKL);
+    GameMetadataGen3::from_binary(EMERALD_PERSONAL_FILE, EMERALD_LEVELUP_PKL, "Emerald");
 
 #[derive(Debug, Clone, Copy)]
 pub struct PersonalInfoGen3([u8; GEN3_ENTRY_SIZE]);
