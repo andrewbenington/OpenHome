@@ -790,7 +790,7 @@ export default class PH4 {
 
   get movePP() {
     if (this.primaryGameData instanceof PkhPa9DataWasm) {
-      return [0, 0, 0, 0]
+      return Array.from([0, 0, 0, 0])
     }
     const movePP = Array.from(this.primaryGameData?.moves.pp ?? [0, 0, 0, 0])
     if (movePP.length !== 4) {
@@ -802,7 +802,7 @@ export default class PH4 {
 
   get movePPUps() {
     if (this.primaryGameData instanceof PkhPa9DataWasm) {
-      return [0, 0, 0, 0]
+      return Array.from([0, 0, 0, 0])
     }
     const movePPUps = Array.from(this.primaryGameData?.moves.pp_ups ?? [0, 0, 0, 0])
     if (movePPUps.length !== 4) {
