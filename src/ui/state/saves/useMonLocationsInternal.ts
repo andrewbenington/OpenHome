@@ -123,7 +123,7 @@ export function useMonLocationsInternal() {
 
         return null
       })
-      .get()
+      .await()
   }
 
   async function moveSaveMonToHome(
@@ -147,7 +147,7 @@ export function useMonLocationsInternal() {
 
         return null
       })
-      .get()
+      .await()
   }
 
   const getMonAtLocation = async (location: MonLocation): Promise<Option<PKMInterface>> => {
@@ -195,12 +195,14 @@ export function useMonLocationsInternal() {
         )
       : PromisedResultBox.ok(undefined)
 
-    return await convertedSourceMon.then((convertedMon) => {
-      const displacedMon = destSave.getMonAt(dest.box, dest.boxSlot)
-      destSave.setMonAt(dest.box, dest.boxSlot, convertedMon)
-      destSave.updatedBoxSlots.push({ box: dest.box, boxSlot: dest.boxSlot })
-      return displacedMon
-    })
+    return await convertedSourceMon
+      .map((convertedMon) => {
+        const displacedMon = destSave.getMonAt(dest.box, dest.boxSlot)
+        destSave.setMonAt(dest.box, dest.boxSlot, convertedMon)
+        destSave.updatedBoxSlots.push({ box: dest.box, boxSlot: dest.boxSlot })
+        return displacedMon
+      })
+      .ok()
   }
 
   function moveOhpkmToSave(
@@ -218,8 +220,8 @@ export function useMonLocationsInternal() {
 
     return R.after(ohpkmStore.tryLoadFromId(identifier))
       .catch(({ identifier }) => `Could not move Pokémon with id ${identifier}: OHPKM data missing`)
-      .map((ohpkm) => ohpkmStore.updateAndConvertForSave(ohpkm, save))
-      .then((convertedForSave) => {
+      .flatMap((ohpkm) => ohpkmStore.updateAndConvertForSave(ohpkm, save))
+      .map((convertedForSave) => {
         // remember the mon that was present before we update that slot
         const displacedMon = save.getMonAt(dest.box, dest.boxSlot)
 

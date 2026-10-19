@@ -24,7 +24,7 @@ export default function MissingOhpkmIdPrompt(props: MissingOhpkmIdPromptProps) {
     Language.English
   )
 
-  let actions: PromptDialogAction[] = location
+  const actions: PromptDialogAction[] = location
     ? [
         {
           uniqueLabel: 'Clear this slot',

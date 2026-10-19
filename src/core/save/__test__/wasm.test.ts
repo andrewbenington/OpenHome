@@ -13,7 +13,7 @@ export function saveTestFilePath(...pathElements: string[]): string {
 describe('gen 8 save files', () => {
   test('sword/shield memory allocation is under 9Kb', async () => {
     const wasm = await initializeWasm()
-    let savePath = saveTestFilePath('sword')
+    const savePath = saveTestFilePath('sword')
 
     const swordSaveBytes = new Uint8Array(readFileSync(savePath))
 
@@ -29,7 +29,7 @@ describe('gen 8 save files', () => {
 
   test('sword/shield free() -> realloc reuses memory', async () => {
     const wasm = await initializeWasm()
-    let savePath = saveTestFilePath('sword')
+    const savePath = saveTestFilePath('sword')
 
     const swordSaveBytes = new Uint8Array(readFileSync(savePath))
 
@@ -45,7 +45,7 @@ describe('gen 8 save files', () => {
 
   test("pkm memory allocation doesn't leak sword/shield", async () => {
     const wasm = await initializeWasm()
-    let savePath = saveTestFilePath('sword')
+    const savePath = saveTestFilePath('sword')
 
     const swordSaveBytes = new Uint8Array(readFileSync(savePath))
 
@@ -61,7 +61,7 @@ describe('gen 8 save files', () => {
 
   test("pkm memory allocation doesn't leak legends arceus", async () => {
     const wasm = await initializeWasm()
-    let savePath = saveTestFilePath('legendsarceus')
+    const savePath = saveTestFilePath('legendsarceus')
 
     const swordSaveBytes = new Uint8Array(readFileSync(savePath))
 

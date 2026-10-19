@@ -360,7 +360,7 @@ function SingleBoxMonDisplay() {
             // if underlying data changes but this key doesn't, the box cell will be stale and may not display the correct species
             const uniqueKey = identifier ?? `${currentBoxIndex}-${index}`
 
-            let monNowOrLater: Option<PKMInterface> = undefined
+            const monNowOrLater: Option<PKMInterface> = undefined
 
             // if (monPromise && !isThenable(monPromise) && isResult(monPromise)) {
             //   if (R.isOk(monPromise)) {
