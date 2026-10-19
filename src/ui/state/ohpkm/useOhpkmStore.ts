@@ -306,7 +306,14 @@ export function useOhpkmStore() {
     const ohpkm = sourceSave ? OHPKM.fromMonInSave(mon, sourceSave) : OHPKM.fromMonUnknownSave(mon)
     ohpkm.startedTrackingTimestamp = dayjs()
 
-    backend.log('INFO', `Starting to track ${mon.nickname} (${ohpkm.openhomeId})`)
+    backend
+      .log('INFO', `Starting to track ${mon.nickname} (${ohpkm.openhomeId})`)
+      .catch((error) =>
+        displayError('Error Logging Event', [
+          `When trying to log event "Starting to track ${mon.nickname} (${ohpkm.openhomeId})", an error was encountered:`,
+          String(error),
+        ])
+      )
 
     if (destSave) {
       handleLookupsUpdate(ohpkm, destSave)
@@ -382,7 +389,7 @@ export function useOhpkmStore() {
     sourceSave: Option<SAV>,
     destSave: Option<SAV>
   ) {
-    return (await loadIfTracked(mon)) ?? (await startTrackingNewMon(mon, sourceSave, destSave))
+    return (await loadIfTracked(mon)) ?? startTrackingNewMon(mon, sourceSave, destSave)
   }
 
   async function monOrOhpkmIfTracked<P extends PKMInterface>(mon: P): Promise<OHPKM | P> {

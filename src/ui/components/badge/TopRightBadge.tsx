@@ -84,7 +84,7 @@ export function TopRightBadge({ mon, badgeType }: TopRightBadgeProps) {
 }
 
 function hasDvs(mon: PKMInterface): mon is PKMInterface & { dvs: StatsPreSplit } {
-  return (mon as any).dvs !== undefined
+  return mon.dvs !== undefined
 }
 
 function getIvsPercent(mon: PKMInterface): number {

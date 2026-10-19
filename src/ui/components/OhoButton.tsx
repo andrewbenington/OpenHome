@@ -1,6 +1,7 @@
+import { Option } from '@openhome-core/util/functional'
 import { RadixColor } from '@openhome-ui/util/color'
 import { Button, Tooltip, type ButtonProps } from '@radix-ui/themes'
-import { useMemo } from 'react'
+import { MouseEvent, MouseEventHandler, useMemo, useState } from 'react'
 import { AddIcon, RemoveIcon } from './Icons'
 
 export type OhoButtonType =
@@ -10,6 +11,7 @@ export type OhoButtonProps = Omit<ButtonProps, 'type'> & {
   type?: OhoButtonType
   disabledMessage?: string
   noPaddingX?: boolean
+  onClickAsync?: (e: MouseEvent) => Promise<void>
 }
 
 export default function OhoButton(props: OhoButtonProps) {
@@ -17,12 +19,11 @@ export default function OhoButton(props: OhoButtonProps) {
     disabledMessage,
     style,
     children,
-    loading,
-    disabled: disabledProp,
-    variant: variantProp,
     noPaddingX,
+    onClick: onClickProp,
     ...buttonProps
   } = props
+  const [onClickAsyncLoading, setOnClickAsyncLoading] = useState(false)
 
   const color = buttonColor(props.type)
 
@@ -55,7 +56,7 @@ export default function OhoButton(props: OhoButtonProps) {
   }, [props.type])
 
   const variant = useMemo(() => {
-    if (variantProp) return variantProp
+    if (props.variant) return props.variant
     switch (props.type) {
       case 'add':
       case 'submit':
@@ -67,9 +68,20 @@ export default function OhoButton(props: OhoButtonProps) {
       default:
         return 'surface'
     }
-  }, [props.type, variantProp])
+  }, [props.type, props.variant])
 
-  const disabled = loading || disabledProp || Boolean(disabledMessage)
+  const loading = props.loading || onClickAsyncLoading
+  const disabled = loading || props.disabled || Boolean(disabledMessage)
+
+  const onClick: Option<MouseEventHandler<HTMLButtonElement>> = props.onClickAsync
+    ? (e: MouseEvent<HTMLButtonElement>) => {
+        setOnClickAsyncLoading(true)
+        props
+          .onClickAsync?.(e)
+          .catch(console.error)
+          .finally(() => setOnClickAsyncLoading(false))
+      }
+    : onClickProp
 
   const button = (
     <Button
@@ -88,6 +100,7 @@ export default function OhoButton(props: OhoButtonProps) {
         aspectRatio: noPaddingX ? '1' : undefined,
         ...style,
       }}
+      onClick={onClick}
       {...buttonProps}
     >
       {children ?? defaultText}

@@ -1264,7 +1264,7 @@ function deepEqual(first?: object, second?: object): boolean {
   return first === second
 }
 
-type IndexableObject = object & Record<string, any>
+type IndexableObject = object & Record<string, unknown>
 
 function objectsEqual(object1: IndexableObject, object2: IndexableObject) {
   if (object1 === null || object2 === null) {

@@ -5,6 +5,7 @@ import { R } from '@openhome-core/util/functional'
 import { numericSorter, SortableColumn, stringSorter } from '@openhome-core/util/sort'
 import Badge from '@openhome-ui/components/badge/Badge'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
+import OhoButton from '@openhome-ui/components/OhoButton'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
@@ -53,7 +54,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
     if (error || suggestions) return
     backend.findSuggestedSaves().then(
       R.match(
-        async (possibleSaves) => {
+        (possibleSaves) => {
           const allPaths = (possibleSaves.citra ?? [])
             .concat(possibleSaves.open_emu ?? [])
             .concat(possibleSaves.desmume ?? [])
@@ -66,20 +67,21 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
             setSuggestions(saveSuggestions)
           }
         },
-        async (err) => handleError('Error getting suggested saves', err)
-      )
+        (err) => handleError('Error getting suggested saves', err)
+      ),
+      (err) => handleError('Error getting suggested saves', err)
     )
   }, [backend, error, handleError, loadSaveData, suggestions])
 
   suggestions?.forEach((suggestion, i) => {
     if (!isLoaded(suggestion)) {
-      suggestion.loadingSave.then((loaded) => {
-        suggestions[i] = {
-          save: loaded,
-          filePath: suggestions[i].filePath,
-        }
-        setSuggestions([...suggestions])
-      })
+      suggestion.loadingSave.then(
+        (loaded) => {
+          suggestions[i] = { save: loaded, filePath: suggestions[i].filePath }
+          setSuggestions([...suggestions])
+        },
+        (err) => handleError('Error loading suggested saves', err)
+      )
     }
   })
 
@@ -107,17 +109,17 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
         }
 
         return (
-          <button
+          <OhoButton
             className="save-grid-button"
-            onClick={(e) => {
+            onClickAsync={async (e) => {
               e.preventDefault()
-              onOpen(suggestion.filePath)
+              await onOpen(suggestion.filePath)
             }}
             disabled={openSavePaths.has(suggestion.filePath.raw)}
             title={openSavePaths.has(suggestion.filePath.raw) ? 'Save is already open' : undefined}
           >
             Open
-          </button>
+          </OhoButton>
         )
       },
       cellClass: 'centered-cell',

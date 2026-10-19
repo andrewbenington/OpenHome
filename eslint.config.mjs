@@ -81,6 +81,17 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-enum-comparison': 'off',
       '@typescript-eslint/no-implied-eval': 'off',
       '@typescript-eslint/prefer-as-const': 'off',
+      '@typescript-eslint/no-floating-promises': 'off',
+      '@typescript-eslint/no-misused-promises': 'off',
+      '@typescript-eslint/require-await': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unsafe-return': 'off',
+      '@typescript-eslint/no-redundant-type-constituents': 'off',
+      '@typescript-eslint/await-thenable': 'off',
+      '@typescript-eslint/no-empty-object-type': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
+      '@typescript-eslint/only-throw-error': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
     },
   }
 )

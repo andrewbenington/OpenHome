@@ -2,6 +2,7 @@ import useBackend from '@openhome-core/backend/useBackend'
 import { SaveRef } from '@openhome-core/util/types'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
+import OhoButton from '@openhome-ui/components/OhoButton'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { OriginGame, OriginGames } from '@pkm-rs/pkg'
 import { Badge, Flex, Spinner } from '@radix-ui/themes'
@@ -42,7 +43,7 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
   return (
     <OpenHomeCtxMenu elements={buildRecentSaveContextElements(save, backend, onRemove)}>
       <div style={{ position: 'relative' }}>
-        <button
+        <OhoButton
           className={classNames('save-card', grayscaleIf(!save.valid))}
           style={{
             width: size,
@@ -51,9 +52,10 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
             backgroundSize: isBoxartGame ? size : size * 0.9,
             backgroundColor,
           }}
-          onClick={async () => {
+          onClickAsync={async () => {
             setLoading(true)
-            onOpen()
+            await onOpen()
+            setLoading(false)
           }}
           disabled={!save.valid || loading}
         >
@@ -99,7 +101,7 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
           ) : (
             <div />
           )}
-        </button>
+        </OhoButton>
         {!save.valid && (
           <div className="save-grid-error-button-container">
             <button

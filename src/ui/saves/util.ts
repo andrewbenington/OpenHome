@@ -126,7 +126,7 @@ export function useOpenHomeBoxNavigator() {
       if (!result) return false
 
       if (isThenable(result)) {
-        result.then(setSelectedMon)
+        result.then(setSelectedMon).catch(console.error)
       } else {
         setSelectedMon(result)
       }

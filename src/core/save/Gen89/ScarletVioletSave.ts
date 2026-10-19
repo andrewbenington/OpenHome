@@ -93,7 +93,10 @@ export class ScarletVioletSave extends Gen8Gen9Save<PK9> {
       throw Error(`Missing block ${blockName}`)
     }
     if (type && !blockIsType(block, type)) {
-      throw Error(`Block ${blockName} is type ${JSON.stringify(block.data)} (expected ${type})`)
+      throw Error(
+        // eslint-disable-next-line @typescript-eslint/no-base-to-string
+        `Block ${blockName} is type ${JSON.stringify(block.data)} (expected ${type.toString()})`
+      )
     }
     return block as T
   }

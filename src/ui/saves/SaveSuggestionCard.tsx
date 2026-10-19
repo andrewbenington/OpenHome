@@ -43,7 +43,8 @@ export default function SaveSuggestionCard(props: SaveSuggestionCardProps) {
         (err) => {
           if (!error) setError(err)
         }
-      )
+      ),
+      (e) => setError(String(e))
     )
   }
 

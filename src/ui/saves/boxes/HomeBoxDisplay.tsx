@@ -396,9 +396,9 @@ function SingleBoxMonDisplay() {
                 dragID={`home_${currentBoxIndex}_${index}`}
                 location={location}
                 openhomeId={identifier}
-                onDrop={(importedMons) => {
+                onDrop={async (importedMons) => {
                   if (importedMons) {
-                    importMonsToLocation(importedMons, location)
+                    await importMonsToLocation(importedMons, location)
                   }
                 }}
                 // don't allow a swap with a pokémon not supported by the source save

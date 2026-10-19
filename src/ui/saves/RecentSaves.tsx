@@ -43,8 +43,8 @@ export default function RecentSaves(props: RecentSavesProps) {
     [savesAndBanks.allOpenSaves]
   )
 
-  const getRecentSaves = useCallback(() => {
-    backend.getRecentSaves().then(
+  const getRecentSaves = useCallback(async () => {
+    await backend.getRecentSaves().then(
       R.match(
         (recents) => {
           const extraSaveIdentifiers = getEnabledSaveTypes()
@@ -72,8 +72,9 @@ export default function RecentSaves(props: RecentSavesProps) {
       backend.removeRecentSave(path).then(
         R.match(
           async () => getRecentSaves(),
-          async (err) => {
+          (err) => {
             displayError('Could Not Remove Save', err)
+            return Promise.resolve()
           }
         )
       ),
@@ -83,7 +84,7 @@ export default function RecentSaves(props: RecentSavesProps) {
   const getRecentSavesEvent = useEffectEvent(getRecentSaves)
 
   useEffect(() => {
-    getRecentSavesEvent()
+    void getRecentSavesEvent()
   }, [])
 
   const columns: SortableColumn<SaveRef>[] = [
@@ -95,11 +96,11 @@ export default function RecentSaves(props: RecentSavesProps) {
         params.row.valid ? (
           <OhoButton
             className="save-grid-button"
-            onClick={async (e) => {
+            onClickAsync={async (e) => {
               e.preventDefault()
               setSavePathLoading(params.row.filePath.raw)
               await new Promise((r) => setTimeout(r, 0))
-              onOpen(params.row.filePath)
+              await onOpen(params.row.filePath)
             }}
             loading={savePathLoading !== undefined}
             disabled={params.row.filePath.raw in openSavePaths}
@@ -206,7 +207,7 @@ export default function RecentSaves(props: RecentSavesProps) {
         const justify = typeof rendered === 'string' ? 'start' : 'center'
         return (
           <OpenHomeCtxMenu
-            key={`save-row-${value.filePath}`}
+            key={`save-row-${value.filePath.raw}`}
             elements={recentSaveContextElements(value)}
           >
             <Flex height="100%" align="center" justify={justify} width="100%">
@@ -220,7 +221,7 @@ export default function RecentSaves(props: RecentSavesProps) {
         const justify = typeof value === 'string' ? 'start' : 'center'
         return (
           <OpenHomeCtxMenu
-            key={`save-row-${value.filePath}`}
+            key={`save-row-${value.filePath.raw}`}
             elements={recentSaveContextElements(value)}
           >
             <Flex height="100%" align="center" justify={justify} width="100%">

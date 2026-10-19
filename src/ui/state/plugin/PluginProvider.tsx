@@ -51,7 +51,7 @@ function usePlugins() {
             pluginDispatch({ type: 'register_plugins', payload: loadedPlugins })
             pluginDispatch({ type: 'set_loaded', payload: true })
           },
-          // eslint-disable-next-line @typescript-eslint/require-await
+
           async (err) => {
             pluginDispatch({ type: 'set_loaded', payload: true })
             displayError('Error Getting Installed Plugins', err)
@@ -122,7 +122,7 @@ function usePlugins() {
               pluginDispatch({ type: 'set_loaded', payload: true })
             })
           },
-          // eslint-disable-next-line @typescript-eslint/require-await
+
           async (err) => {
             pluginDispatch({ type: 'set_loaded', payload: true })
             displayError('Error Getting Installed Plugins', err)
