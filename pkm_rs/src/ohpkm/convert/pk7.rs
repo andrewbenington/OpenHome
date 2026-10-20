@@ -118,11 +118,9 @@ impl OhpkmConvert for Pk7 {
                         form_metadata
                             .get_ability(AbilityNumber::First)
                             .change_bound()
-                            .ok_or(Error::AbilityIndex {
-                                ability_index: form_metadata
-                                    .get_ability(AbilityNumber::First)
-                                    .to_u16(),
-                            })?,
+                            .ok_or(Error::AbilityIndex(
+                                form_metadata.get_ability(AbilityNumber::First).to_u16(),
+                            ))?,
                     ),
             ),
             ability_num: ohpkm.ability_num(),

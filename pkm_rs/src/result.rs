@@ -124,6 +124,10 @@ impl Error {
         Self::Other(String::from(message))
     }
 
+    pub fn tsify(source: tsify::Error) -> Self {
+        Self::Tsify(Rc::new(source))
+    }
+
     pub const fn plugin_origin(error: FromUtf8Error) -> Self {
         Self::StringDecode(StringErrorSource::PluginOrigin(error))
     }
@@ -135,6 +139,12 @@ impl Serialize for Error {
         S: Serializer,
     {
         serializer.serialize_str(&self.to_string())
+    }
+}
+
+impl From<tsify::Error> for Error {
+    fn from(value: tsify::Error) -> Self {
+        Self::Tsify(Rc::new(value))
     }
 }
 
