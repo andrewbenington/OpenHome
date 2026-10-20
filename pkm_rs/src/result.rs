@@ -2,10 +2,8 @@
 use crate::encryption::swish_crypto::SwishError;
 use crate::sectioned_data;
 
-use pkm_rs_resources::abilities::ABILITY_MAX;
-use pkm_rs_resources::lookup;
-use pkm_rs_resources::species::{GetSpeciesMetadata, SpeciesForm};
-use pkm_rs_types::{InvalidAbilityNumber, Language, NationalDex};
+use pkm_rs_resources::species::SpeciesForm;
+use pkm_rs_types::{InvalidAbilityNumber, NationalDex};
 
 use serde::{Serialize, Serializer};
 use std::fmt::Display;
@@ -22,54 +20,72 @@ pub enum MoveErrorKind {
     NameNotFound(String),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, thiserror::Error)]
 pub enum Error {
-    PkmRsResources(pkm_rs_resources::Error),
-    PkmRsTypes(pkm_rs_types::Error),
-    SectionedData(sectioned_data::Error),
+    #[error(transparent)]
+    PkmRsResources(#[from] pkm_rs_resources::Error),
+    #[error(transparent)]
+    PkmRsTypes(#[from] pkm_rs_types::Error),
+    #[error(transparent)]
+    SectionedData(#[from] sectioned_data::Error),
+    #[error("Invalid box index: {0}")]
     BoxIndex(u8),
+    #[error("Invalid box slot: {0}")]
     BoxSlot(u8),
+    #[error(
+        "expected buffer size of {expected}, but received {received} (from: {requirement_source:?})"
+    )]
     BufferSize {
         requirement_source: Option<String>,
         expected: usize,
         received: usize,
     },
+    #[error("Error opening save: {context}")]
     BuildSave {
         context: String,
+        #[source]
         source: Option<Rc<dyn core::error::Error>>,
     },
+    #[error(
+        "Invalid National Dex number {value} (converting from {converting_from} index number; must be between 1 and {}",
+        NationalDex::MAX
+    )]
     NationalDex {
         value: u16,
-        source: PokemonIndexType,
+        converting_from: PokemonIndexType,
     },
+    #[error("Invalid {converting_from} index number {value}")]
     PokemonGameIndex {
         value: u16,
-        source: PokemonIndexType,
+        converting_from: PokemonIndexType,
     },
+    #[error(
+        "Invalid form index {form_index} for national dex {national_dex} (must be <= {form_index})"
+    )]
     FormIndex {
         national_dex: NationalDex,
         form_index: u16,
     },
-    AbilityIndex {
-        ability_index: u16,
-    },
-    AbilityNumber(InvalidAbilityNumber),
+    #[error("Invalid ability index {0} (must be between 1 and 3)")]
+    AbilityIndex(u16),
+    #[error(transparent)]
+    AbilityNumber(#[from] InvalidAbilityNumber),
+    #[error("error reading field {field}: {source}")]
     FieldError {
         field: &'static str,
+        #[source]
         source: Rc<dyn std::error::Error>,
     },
-    TagError {
-        tag_type: &'static str,
-        value: u16,
-    },
-    StringDecode {
-        source: StringErrorSource,
-    },
+    #[error("Invalid tag value {value} for tag type {tag_type}")]
+    TagError { tag_type: &'static str, value: u16 },
+    #[error(transparent)]
+    StringDecode(#[from] StringErrorSource),
     #[cfg(feature = "wasm")]
-    SwishCrypto(SwishError),
-    Tsify {
-        source: Rc<tsify::Error>,
-    },
+    #[error(transparent)]
+    SwishCrypto(#[from] SwishError),
+    #[error(transparent)]
+    Tsify(#[from] Rc<tsify::Error>),
+    #[error("other error: {0}")]
     Other(String),
 }
 
@@ -108,132 +124,12 @@ impl Error {
         Self::Other(String::from(message))
     }
 
+    pub fn tsify(source: tsify::Error) -> Self {
+        Self::Tsify(Rc::new(source))
+    }
+
     pub const fn plugin_origin(error: FromUtf8Error) -> Self {
-        Self::StringDecode {
-            source: StringErrorSource::PluginOrigin(error),
-        }
-    }
-}
-
-impl Display for Error {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let message = match self {
-            Self::PkmRsResources(err) => err.to_string(),
-            Self::PkmRsTypes(err) => err.to_string(),
-            Self::SectionedData(err) => err.to_string(),
-            Self::BoxIndex(index) => format!("Invalid box index: {index}"),
-            Self::BoxSlot(slot) => format!("Invalid box slot: {slot}"),
-            Self::BufferSize {
-                requirement_source,
-                expected,
-                received,
-            } => match requirement_source {
-                Some(source) => format!(
-                    "{source} requires a buffer of length {expected}, but actual length is {received}"
-                ),
-                None => format!(
-                    "Buffer of length {expected} was expected, but actual length is {received}"
-                ),
-            },
-            Self::BuildSave { context, source } => match source {
-                Some(source) => format!("Error opening save: {context}; original error: {source}"),
-                None => format!("Error opening save: {context}"),
-            },
-            Self::NationalDex {
-                value: national_dex,
-                source,
-            } => {
-                format!(
-                    "Invalid National Dex number {national_dex} (source: {source}; must be between 1 and {}",
-                    NationalDex::MAX
-                )
-            }
-            Self::PokemonGameIndex {
-                value: national_dex,
-                source,
-            } => {
-                format!("Invalid {source} index number {national_dex}")
-            }
-            Self::FormIndex {
-                national_dex,
-                form_index,
-            } => {
-                let species_metadata = national_dex.get_species_metadata();
-                format!(
-                    "Invalid form index {form_index} for national dex {} (must be <= {})",
-                    lookup::species_name(*national_dex, Language::English),
-                    species_metadata.forms.len()
-                )
-            }
-            Self::AbilityIndex { ability_index } => format!(
-                "Invalid ability index {ability_index} (must be between 1 and {ABILITY_MAX}"
-            ),
-            Self::AbilityNumber(InvalidAbilityNumber(num)) => {
-                format!("Invalid ability number {num} (must be between 1 and 3)")
-            }
-            Self::FieldError { field, source } => {
-                format!("Self reading field {field}: {source}")
-            }
-            Self::TagError { tag_type, value } => {
-                format!("Invalid tag value {value} for tag type {tag_type}")
-            }
-            Self::StringDecode { source } => format!("String decode error: {source}"),
-            #[cfg(feature = "wasm")]
-            Self::SwishCrypto(error) => error.to_string(),
-            Self::Tsify { source } => format!("Error transforming type at wasm boundary: {source}"),
-            Self::Other(msg) => msg.clone(),
-        };
-
-        f.write_str(&message)
-    }
-}
-
-impl std::error::Error for Error {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        match self {
-            Self::FieldError { source, .. } => Some(source.as_ref()),
-            Self::BuildSave {
-                source: Some(source),
-                ..
-            } => Some(source.as_ref()),
-            Self::Tsify { source } => Some(source.as_ref()),
-            _ => None,
-        }
-    }
-}
-
-impl From<pkm_rs_resources::Error> for Error {
-    fn from(value: pkm_rs_resources::Error) -> Self {
-        match value {
-            pkm_rs_resources::Error::PkmRsTypes(err) => Self::PkmRsTypes(err),
-            _ => Self::PkmRsResources(value),
-        }
-    }
-}
-
-impl From<pkm_rs_types::Error> for Error {
-    fn from(value: pkm_rs_types::Error) -> Self {
-        Self::PkmRsTypes(value)
-    }
-}
-
-impl From<sectioned_data::Error> for Error {
-    fn from(value: sectioned_data::Error) -> Self {
-        Self::SectionedData(value)
-    }
-}
-
-impl From<pkm_rs_types::InvalidAbilityNumber> for Error {
-    fn from(value: InvalidAbilityNumber) -> Self {
-        Self::AbilityNumber(value)
-    }
-}
-
-impl From<tsify::Error> for Error {
-    fn from(value: tsify::Error) -> Self {
-        Self::Tsify {
-            source: Rc::new(value),
-        }
+        Self::StringDecode(StringErrorSource::PluginOrigin(error))
     }
 }
 
@@ -243,6 +139,12 @@ impl Serialize for Error {
         S: Serializer,
     {
         serializer.serialize_str(&self.to_string())
+    }
+}
+
+impl From<tsify::Error> for Error {
+    fn from(value: tsify::Error) -> Self {
+        Self::Tsify(Rc::new(value))
     }
 }
 
@@ -300,28 +202,14 @@ impl Display for MoveErrorSource {
     }
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone, thiserror::Error)]
 pub enum StringErrorSource {
-    #[default]
-    Other,
-    PluginOrigin(FromUtf8Error),
-    Notes(FromUtf8Error),
-    MostRecentSaveFilePath(FromUtf8Error),
-}
-
-impl Display for StringErrorSource {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::Other => f.write_str("other"),
-            Self::PluginOrigin(utf_error) => {
-                f.write_fmt(format_args!("OHPKM plugin origin: {utf_error}"))
-            }
-            Self::Notes(utf_error) => f.write_fmt(format_args!("OHPKM notes: {utf_error}")),
-            Self::MostRecentSaveFilePath(utf_error) => f.write_fmt(format_args!(
-                "OHPKM most recent save file path: {utf_error}"
-            )),
-        }
-    }
+    #[error("corrupted plugin origin: {0}")]
+    PluginOrigin(#[from] FromUtf8Error),
+    #[error("corrupted OHPKM notes: {0}")]
+    Notes(#[source] FromUtf8Error),
+    #[error("OHPKM-stored most recent save path: {0}")]
+    MostRecentSaveFilePath(#[source] FromUtf8Error),
 }
 
 pub type Result<T> = core::result::Result<T, Error>;
@@ -331,12 +219,5 @@ pub type StdResult<T, E> = core::result::Result<T, E>;
 impl From<Error> for JsValue {
     fn from(value: Error) -> Self {
         value.to_string().into()
-    }
-}
-
-#[cfg(feature = "wasm")]
-impl From<SwishError> for Error {
-    fn from(value: SwishError) -> Self {
-        Self::SwishCrypto(value)
     }
 }

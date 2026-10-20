@@ -365,7 +365,7 @@ impl From<InvalidGen3PokemonIndex> for Error {
     fn from(error: InvalidGen3PokemonIndex) -> Self {
         Error::NationalDex {
             value: error.0,
-            source: PokemonIndexType::Gen3,
+            converting_from: PokemonIndexType::Gen3,
         }
     }
 }
