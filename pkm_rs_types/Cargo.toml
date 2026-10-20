@@ -26,6 +26,7 @@ pastey = "0.2.3"
 specta = { version = "=2.0.0-rc.22", features = [ "serde_json", "derive" ], optional = true }
 enum-iterator = "2.3.0"
 zerocopy = { version = "0.8.61", features = ["derive"] }
+thiserror = "2.0.21"
 
 [lib]
 name = "pkm_rs_types"

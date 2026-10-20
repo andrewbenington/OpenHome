@@ -76,10 +76,8 @@ impl DataSection for MostRecentSave {
         let game = OriginGame::from(bytes[4]);
         let trainer_name = SizedUtf16String::<26>::from_bytes(bytes[5..=30].try_into().unwrap());
 
-        let file_path =
-            String::from_utf8(bytes[31..].to_vec()).map_err(|e| Error::StringDecode {
-                source: StringErrorSource::MostRecentSaveFilePath(e),
-            })?;
+        let file_path = String::from_utf8(bytes[31..].to_vec())
+            .map_err(|e| Error::StringDecode(StringErrorSource::MostRecentSaveFilePath(e)))?;
 
         Ok(Self {
             trainer_id,
@@ -186,9 +184,7 @@ impl DataSection for Notes {
 
         String::from_utf8(bytes.to_vec())
             .map(Notes)
-            .map_err(|e| Error::StringDecode {
-                source: StringErrorSource::Notes(e),
-            })
+            .map_err(|arg0: std::string::FromUtf8Error| Error::from(StringErrorSource::from(arg0)))
     }
 
     fn to_bytes(&self) -> Vec<u8> {
