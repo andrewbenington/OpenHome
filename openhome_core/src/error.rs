@@ -9,7 +9,7 @@ type SourceError = Box<dyn std::error::Error + 'static>;
 
 #[derive(Debug, Error)]
 pub enum Error {
-    #[error("{0}")]
+    #[error(transparent)]
     PkmRs(#[from] pkm_rs::result::Error),
     #[error("Could not access the OpenHome data directory: {0}")]
     DataFolderAccess(#[from] SourceError),
@@ -113,10 +113,6 @@ impl Error {
         Self::FileWrite(ErroredFile::new(path, Some(source)))
     }
 
-    pub fn file_write_no_path<E: std::error::Error + 'static>(source: E) -> Self {
-        Self::FileWrite(ErroredFile::no_path(source))
-    }
-
     pub fn outdated_version(last_opened: Version, this_version: Version) -> Self {
         Self::OutdatedVersion {
             last_opened,
@@ -183,8 +179,6 @@ pub type Result<T> = core::result::Result<T, Error>;
 pub enum ErroredFile {
     #[error("location: {0:?}")]
     PathOnly(PathBuf),
-    #[error("{0}")]
-    SourceOnly(#[source] SourceError),
     #[error("{0}; location: {1:?}")]
     SourceAndPath(#[source] SourceError, PathBuf),
 }
@@ -199,9 +193,5 @@ impl ErroredFile {
             Some(source) => Self::SourceAndPath(Box::new(source), path_buf),
             None => Self::PathOnly(path_buf),
         }
-    }
-
-    pub fn no_path<E: std::error::Error + 'static>(source: E) -> Self {
-        Self::SourceOnly(Box::new(source))
     }
 }
