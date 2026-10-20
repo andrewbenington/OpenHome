@@ -112,16 +112,12 @@ impl OhpkmConvert for Pk7 {
             exp: ohpkm.exp(),
             ability_index: ohpkm.ability_index().change_bound().unwrap_or(
                 form_metadata
-                    .get_ability(ohpkm.ability_num())
-                    .change_bound()
-                    .unwrap_or(
-                        form_metadata
-                            .get_ability(AbilityNumber::First)
-                            .change_bound()
-                            .ok_or(Error::AbilityIndex(
-                                form_metadata.get_ability(AbilityNumber::First).to_u16(),
-                            ))?,
-                    ),
+                    .ability_bounded(ohpkm.ability_num())
+                    .unwrap_or(form_metadata.ability_bounded(AbilityNumber::First).ok_or(
+                        Error::AbilityIndex(
+                            form_metadata.get_ability(AbilityNumber::First).to_u16(),
+                        ),
+                    )?),
             ),
             ability_num: ohpkm.ability_num(),
             markings: ohpkm.markings(),

@@ -348,7 +348,7 @@ impl FormMetadata {
         }
     }
 
-    pub fn get_ability_if_under<const NEW_MAX: u16>(
+    pub fn ability_bounded<const NEW_MAX: u16>(
         &self,
         ability_num: AbilityNumber,
     ) -> Option<AbilityIndexBounded<NEW_MAX>> {
