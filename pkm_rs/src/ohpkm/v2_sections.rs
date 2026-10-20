@@ -2,13 +2,11 @@ use crate::ohpkm::v2::OhpkmSectionTag;
 use crate::result::{Error, Result, StringErrorSource};
 use crate::sectioned_data::DataSection;
 
+use arrayref::array_ref;
 use pkm_rs_types::OriginGame;
 use pkm_rs_types::strings::SizedUtf16String;
 use serde::Deserialize;
 use serde::Serialize;
-
-#[cfg(feature = "randomize")]
-use pkm_rs_types::randomize::Randomize;
 
 mod gameboy_data;
 mod gen45_data;
@@ -29,10 +27,14 @@ pub(crate) use gen67_data::Gen67Data;
 pub(crate) use learned_moves::LearnedMoves;
 pub(crate) use main_data::MainDataV2;
 pub(crate) use past_handlers::PastHandlerDataV2;
+
 pub use past_handlers::UnknownHandlerSave;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
+
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
 
 pub(crate) fn bytes_are_empty(bytes: &[u8]) -> bool {
     bytes.iter().all(|b| *b == 0)
@@ -67,14 +69,13 @@ impl DataSection for MostRecentSave {
     const TAG: Self::TagType = OhpkmSectionTag::MostRecentSave;
 
     type ErrorType = Error;
-
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
         Self::ensure_buffer_size(bytes);
 
-        let trainer_id = u16::from_le_bytes(bytes[0..=1].try_into().unwrap());
-        let secret_id = u16::from_le_bytes(bytes[2..=3].try_into().unwrap());
+        let trainer_id = u16::from_le_bytes(*array_ref![bytes, 0, 2]);
+        let secret_id = u16::from_le_bytes(*array_ref![bytes, 2, 2]);
         let game = OriginGame::from(bytes[4]);
-        let trainer_name = SizedUtf16String::<26>::from_bytes(bytes[5..=30].try_into().unwrap());
+        let trainer_name = SizedUtf16String::<26>::from_bytes(*array_ref![bytes, 5, 26]);
 
         let file_path = String::from_utf8(bytes[31..].to_vec())
             .map_err(StringErrorSource::MostRecentSaveFilePath)?;
@@ -87,7 +88,6 @@ impl DataSection for MostRecentSave {
             file_path,
         })
     }
-
     fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = Vec::new();
 
