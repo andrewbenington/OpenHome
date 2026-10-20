@@ -1,60 +1,76 @@
 use std::path::Path;
-use std::{fmt::Display, path::PathBuf};
+use std::path::PathBuf;
+use thiserror::Error;
 
 use semver::Version;
 use serde::{Serialize, Serializer};
 
 type SourceError = Box<dyn std::error::Error + 'static>;
 
-#[derive(Debug)]
+#[derive(Debug, Error)]
 pub enum Error {
-    PkmRs {
-        source: pkm_rs::result::Error,
-    },
-    DataFolderAccess {
-        source: SourceError,
-    },
+    #[error("{0}")]
+    PkmRs(#[from] pkm_rs::result::Error),
+    #[error("Could not access the OpenHome data directory: {0}")]
+    DataFolderAccess(#[from] SourceError),
+    #[error("File could not be accessed at '{path:?}': ({source})")]
     FileAccess {
         path: PathBuf,
+        #[source]
         source: SourceError,
     },
+    #[error("File could not be downloaded: '{url}' ({source})")]
     FileDownload {
         url: String,
+        #[source]
         source: SourceError,
     },
+    #[error("File is malformed or corrupted at '{path:?}': {source:?}")]
     FileMalformed {
         path: PathBuf,
+        #[source]
         source: SourceError,
     },
-    FileWrite(FileContext),
-    FileWrites(Vec<(PathBuf, SourceError)>),
-    FileMissing {
-        path: PathBuf,
-    },
+    #[error("File could not be written: {0}")]
+    FileWrite(#[from] ErroredFile),
+    #[error("File could not be written: {0:?}")]
+    FileWrites(Vec<ErroredFile>),
+    #[error("File does not exist: '{path:?}'")]
+    FileMissing { path: PathBuf },
+    #[error("OpenHome encountered fatal synchronization error")]
     MutexFailure,
+    #[error(
+        "OpenHome attempted to open a second transaction without closing the first. The application may need to be restarted"
+    )]
     TransactionOpen,
+    #[error("UNEXPECTED CONDITION - {context}{}'", source.as_ref().map(|msg| format!(": {msg}")).unwrap_or_default())]
     UnexpectedCondition {
         context: String,
         source: Option<SourceError>,
     },
+    #[error("Could not access app window: {source:?}")]
     WindowAccess {
+        #[source]
         source: Option<SourceError>,
     },
+    #[error(
+        "Last used version ({last_opened}) is newer than this version ({this_version}). Using this version may corrupt your data. Please use version {last_opened} or later"
+    )]
     OutdatedVersion {
         last_opened: Version,
         this_version: Version,
     },
+    #[error("{context}: {source:?}")]
     Other {
         context: String,
+        #[source]
         source: Option<SourceError>,
     },
 }
 
 impl Error {
     pub fn data_folder<E: std::error::Error + 'static>(source: E) -> Self {
-        Self::DataFolderAccess {
-            source: Box::new(source),
-        }
+        Self::DataFolderAccess(Box::new(source))
     }
 
     pub fn file_access<P, E: std::error::Error + 'static>(path: &P, source: E) -> Self
@@ -94,11 +110,11 @@ impl Error {
     where
         P: AsRef<Path>,
     {
-        Self::FileWrite(FileContext::new(path, Some(source)))
+        Self::FileWrite(ErroredFile::new(path, Some(source)))
     }
 
     pub fn file_write_no_path<E: std::error::Error + 'static>(source: E) -> Self {
-        Self::FileWrite(FileContext::no_path(source))
+        Self::FileWrite(ErroredFile::no_path(source))
     }
 
     pub fn outdated_version(last_opened: Version, this_version: Version) -> Self {
@@ -140,93 +156,12 @@ impl Error {
     }
 }
 
-impl Display for Error {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let message = match self {
-            Self::PkmRs { source } => source.to_string(),
-            Self::DataFolderAccess { source } => {
-                format!("Could not access app data directory: {source}")
-            }
-            Self::FileAccess { path, source } => format!(
-                "File could not be accessed: '{}' ({source})",
-                path.to_string_lossy()
-            ),
-            Self::FileDownload { url, source } => {
-                format!("File could not be downloaded: '{url}' ({source})")
-            }
-            Self::FileMalformed { path, source } => format!(
-                "File is malformed or corrupted: '{}' ({source})",
-                path.to_string_lossy()
-            ),
-            Self::FileWrite(context) => format!("File could not be written: {context}"),
-            Self::FileWrites(errors) => {
-                let mut msg = format!("{} file write errors:", errors.len());
-
-                errors.iter().for_each(|(path, source)| {
-                    msg.push_str(&format!(
-                        "\nFile could not be written: '{}' ({source})",
-                        path.to_string_lossy()
-                    ))
-                });
-
-                msg
-            }
-            Self::FileMissing { path } => {
-                format!("File does not exist: '{}'", path.to_string_lossy())
-            }
-            Self::MutexFailure => "Application encountered fatal synchronization error".to_owned(),
-            Self::TransactionOpen => {
-                "Attempting to open new transaction when one exists".to_owned()
-            }
-            Self::WindowAccess { source } => match source {
-                Some(source) => format!("Could not access app window: {source}"),
-                None => "Could not access app window".to_owned(),
-            },
-            Self::OutdatedVersion {
-                last_opened,
-                this_version,
-            } => format!(
-                "Last used version ({last_opened}) is newer than this version ({this_version}). Using this version may corrupt your data. Please use version {last_opened} or later."
-            ),
-            Self::Other { context, source } => match source {
-                Some(source) => format!("{context}: {source}"),
-                None => context.clone(),
-            },
-            Self::UnexpectedCondition { context, source } => {
-                let source_str = source
-                    .as_ref()
-                    .map(|msg| format!(": {msg}"))
-                    .unwrap_or_default();
-                format!("UNEXPECTED CONDITION - {context}{source_str}'")
-            }
-        };
-
-        f.write_str(&message)
-    }
-}
-
 impl Serialize for Error {
     fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
         serializer.serialize_str(&self.to_string())
-    }
-}
-
-impl std::error::Error for Error {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        match self {
-            Self::DataFolderAccess { source }
-            | Self::FileAccess { source, .. }
-            | Self::FileDownload { source, .. }
-            | Self::FileMalformed { source, .. } => Some(source.as_ref()),
-            Self::FileWrite(context) => context.source.as_deref(),
-
-            Self::WindowAccess { source } | Self::Other { source, .. } => source.as_deref(),
-
-            _ => None,
-        }
     }
 }
 
@@ -242,49 +177,31 @@ impl From<Error> for String {
     }
 }
 
-impl From<pkm_rs::result::Error> for Error {
-    fn from(value: pkm_rs::result::Error) -> Self {
-        Self::PkmRs { source: value }
-    }
-}
-
 pub type Result<T> = core::result::Result<T, Error>;
 
-#[derive(Debug)]
-pub struct FileContext {
-    path: Option<PathBuf>,
-    source: Option<SourceError>,
+#[derive(Debug, thiserror::Error)]
+pub enum ErroredFile {
+    #[error("location: {0:?}")]
+    PathOnly(PathBuf),
+    #[error("{0}")]
+    SourceOnly(#[source] SourceError),
+    #[error("{0}; location: {1:?}")]
+    SourceAndPath(#[source] SourceError, PathBuf),
 }
 
-impl FileContext {
+impl ErroredFile {
     pub fn new<P, E: std::error::Error + 'static>(path: &P, source: Option<E>) -> Self
     where
         P: AsRef<Path>,
     {
-        Self {
-            path: Some(path.as_ref().to_path_buf()),
-            source: match source {
-                Some(e) => Some(Box::new(e)),
-                None => None,
-            },
+        let path_buf = path.as_ref().to_path_buf();
+        match source {
+            Some(source) => Self::SourceAndPath(Box::new(source), path_buf),
+            None => Self::PathOnly(path_buf),
         }
     }
 
     pub fn no_path<E: std::error::Error + 'static>(source: E) -> Self {
-        Self {
-            path: None,
-            source: Some(Box::new(source)),
-        }
-    }
-}
-
-impl Display for FileContext {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match (&self.source, &self.path) {
-            (None, None) => f.write_str("(no context provided)"),
-            (None, Some(path)) => write!(f, "location: {path:?}"),
-            (Some(source), None) => write!(f, "{source}"),
-            (Some(source), Some(path)) => write!(f, "{source}; location: {path:?}"),
-        }
+        Self::SourceOnly(Box::new(source))
     }
 }
