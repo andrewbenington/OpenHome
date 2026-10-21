@@ -66,6 +66,8 @@ pub enum Error {
         #[source]
         source: Option<SourceError>,
     },
+    #[error("error reading {0}: {1}")]
+    MissingEnvVar(&'static str, #[source] std::env::VarError),
 }
 
 impl Error {
@@ -134,14 +136,14 @@ impl Error {
         }
     }
 
-    pub fn unexpeted_condition(context: String) -> Self {
+    pub fn unexpected_condition(context: String) -> Self {
         Self::UnexpectedCondition {
             context,
             source: None,
         }
     }
 
-    pub fn unexpeted_condition_with_source<E: std::error::Error + 'static>(
+    pub fn unexpected_condition_with_source<E: std::error::Error + 'static>(
         context: String,
         source: E,
     ) -> Self {
@@ -149,6 +151,10 @@ impl Error {
             context,
             source: Some(Box::new(source)),
         }
+    }
+
+    pub fn missing_env_var(var: &'static str, source: std::env::VarError) -> Self {
+        Self::MissingEnvVar(var, source)
     }
 }
 

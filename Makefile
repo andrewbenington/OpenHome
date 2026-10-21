@@ -173,3 +173,11 @@ schema:
 .PHONY: git-fix-pnpm
 git-fix-pnpm:
 	@pnpm i --merge-git-branch-lockfiles
+
+.PHONY: .
+.:
+	pnpm tauri build --release
+
+.PHONY: start-release
+start-release:
+	@./target/release/OpenHome

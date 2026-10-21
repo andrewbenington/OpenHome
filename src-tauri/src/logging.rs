@@ -8,12 +8,19 @@ use chrono::{DateTime, NaiveDate, Utc};
 use openhome_core::data_controller::{DataController, DataDir};
 use serde::Serialize;
 use tauri::AppHandle;
+
+#[cfg(not(feature = "uitest"))]
 use tracing::Subscriber;
+#[cfg(not(feature = "uitest"))]
 use tracing_subscriber::EnvFilter;
+#[cfg(not(feature = "uitest"))]
 use tracing_subscriber::fmt::format::FmtSpan;
+#[cfg(not(feature = "uitest"))]
 use tracing_subscriber::layer::SubscriberExt;
+#[cfg(not(feature = "uitest"))]
 use tracing_subscriber::util::SubscriberInitExt;
 
+#[cfg(not(feature = "uitest"))]
 pub fn init_logging<F>(log_dir: &std::path::Path, callback: Option<F>)
 where
     F: Fn(NewLogNotification) + Send + Sync + 'static,
@@ -397,12 +404,14 @@ impl Display for FrontendLogError {
     }
 }
 
+#[cfg(not(feature = "uitest"))]
 #[derive(serde::Serialize, Clone, Copy)]
 pub struct NewLogNotification {
     level: LogLevel,
     timestamp_unix: i64,
 }
 
+#[cfg(not(feature = "uitest"))]
 impl NewLogNotification {
     pub fn now(level: &tracing::Level) -> Self {
         Self {
@@ -412,10 +421,12 @@ impl NewLogNotification {
     }
 }
 
+#[cfg(not(feature = "uitest"))]
 struct LogNotificationCallback<F>(F)
 where
     F: Fn(NewLogNotification) + Send + Sync + 'static;
 
+#[cfg(not(feature = "uitest"))]
 impl<S, F> tracing_subscriber::Layer<S> for LogNotificationCallback<F>
 where
     S: Subscriber,

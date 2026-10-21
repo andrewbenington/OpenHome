@@ -6,6 +6,7 @@ import { FullMetadataLookup } from '@openhome-core/util'
 import { TopRightBadge, TopRightBadgeMon } from '@openhome-ui/components/badge/TopRightBadge'
 import { useDraggingActive } from '@openhome-ui/state-zustand/drag-and-drop/dragStore'
 import { MonWithLocation } from '@openhome-ui/state/saves'
+import { cssClass } from '@openhome-ui/util/style'
 import { Gender } from '@pkm-rs/pkg'
 import { CSSProperties, useMemo } from 'react'
 import PokemonIcon from '../../components/PokemonIcon'
@@ -25,6 +26,7 @@ const getBackgroundDetails = (disabled?: boolean) => {
 }
 
 interface DraggableMonProps {
+  className?: string
   onClick: () => void
   disabled?: boolean
   mon: DraggableMonData
@@ -60,6 +62,7 @@ export type DraggableMonData = PkmFormSpecifiers &
 
 const DraggableMon = (props: DraggableMonProps) => {
   const {
+    className,
     onClick,
     disabled,
     mon,
@@ -104,7 +107,7 @@ const DraggableMon = (props: DraggableMonProps) => {
 
   return (
     <div
-      className="fill-parent flex-centered"
+      className={cssClass('fill-parent flex-centered draggable-mon').with(className).build()}
       ref={ref}
       style={{
         ...getBackgroundDetails(),

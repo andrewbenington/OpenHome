@@ -12,7 +12,8 @@
     "module": "ESNext",
     "skipLibCheck": true,
     "types": [
-      "node"
+      "node",
+      "mocha",
     ],
     "paths": {
       "@openhome-ui/*": [
@@ -31,7 +32,10 @@
         "./pkm_rs"
       ]
     },
-    "typeRoots": ["./src/types", "./node_modules/@types"],
+    "typeRoots": [
+      "./src/types",
+      "./node_modules/@types"
+    ],
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
@@ -51,5 +55,6 @@
     "src/types/pkm-resources-types.d.ts",
     "scripts",
     "__mocks__",
+    "test"
   ],
 }
