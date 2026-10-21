@@ -8,7 +8,7 @@ use crate::util;
 use arbitrary_int::{u3, u7};
 use pkm_rs_resources::abilities::AbilityIndexWasm;
 use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots, PpUpStorage};
+use pkm_rs_resources::moves::{MoveDataOffsets, MoveSlot, MoveSlots, PpUpStorage};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
 use pkm_rs_resources::species::SpeciesForm;
@@ -382,8 +382,8 @@ impl<S: AsRef<[u8]>> Pk8Buffer<S> {
         self.bytes()[off..off + 2].try_into().unwrap()
     }
 
-    pub fn relearn_move(&self, idx: usize) -> MoveIndex {
-        MoveIndex::from_le_bytes(self.relearn_move_raw(idx))
+    pub fn relearn_move(&self, idx: usize) -> MoveSlot {
+        MoveSlot::from_le_bytes(self.relearn_move_raw(idx))
     }
 
     fn ivs_egg_nicknamed_raw(&self) -> [u8; 4] {
@@ -830,7 +830,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk8Buffer<S> {
         self.bytes_mut()[off..off + 2].copy_from_slice(&v);
     }
 
-    pub fn set_relearn_move(&mut self, idx: usize, v: MoveIndex) {
+    pub fn set_relearn_move(&mut self, idx: usize, v: MoveSlot) {
         self.set_relearn_move_raw(idx, v.to_le_bytes());
     }
 

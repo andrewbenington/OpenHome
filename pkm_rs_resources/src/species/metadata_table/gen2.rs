@@ -9,10 +9,10 @@ const GEN2_ENTRY_SIZE: usize = 0x20;
 type GameMetadataGen2 = GameMetadata<PersonalInfoGen2, GEN2_ENTRY_SIZE>;
 
 pub static METADATA_TABLE_GS: GameMetadataGen2 =
-    GameMetadataGen2::from_binary(GS_PERSONAL_FILE, GS_LEVELUP_PKL);
+    GameMetadataGen2::from_binary(GS_PERSONAL_FILE, GS_LEVELUP_PKL, "Gold/Silver");
 
 pub static METADATA_TABLE_CRYSTAL: GameMetadataGen2 =
-    GameMetadataGen2::from_binary(CRYSTAL_PERSONAL_FILE, CRYSTAL_LEVELUP_PKL);
+    GameMetadataGen2::from_binary(CRYSTAL_PERSONAL_FILE, CRYSTAL_LEVELUP_PKL, "Crystal");
 
 #[derive(Debug, Clone, Copy)]
 pub struct PersonalInfoGen2(&'static [u8]);

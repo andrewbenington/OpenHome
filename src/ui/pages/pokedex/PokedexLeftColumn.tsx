@@ -154,7 +154,9 @@ export default function PokedexLeftColumn(props: PokedexDetailsProps) {
             </div>
             <div className="pokedex-caption">{formMetadata.formName}</div>
             <OhoFlex.RowCentered align="center" p="2" minHeight="3.25rem">
-              {formMetadata.isBattleOnly ? null : variantBadges}
+              {formMetadata.isBattleOnly || isExtraFormMetadata(formMetadata)
+                ? null
+                : variantBadges}
             </OhoFlex.RowCentered>
           </Flex>
         </Card>

@@ -9,13 +9,13 @@ const GEN4_ENTRY_SIZE: usize = 0x2C;
 type GameMetadataGen4 = GameMetadata<PersonalInfoGen4, GEN4_ENTRY_SIZE>;
 
 pub static METADATA_TABLE_DP: GameMetadataGen4 =
-    GameMetadataGen4::from_binary(DP_PERSONAL_FILE, DP_LEVELUP_PKL);
+    GameMetadataGen4::from_binary(DP_PERSONAL_FILE, DP_LEVELUP_PKL, "Diamond/Pearl");
 
 pub static METADATA_TABLE_PT: GameMetadataGen4 =
-    GameMetadataGen4::from_binary(PT_PERSONAL_FILE, PT_LEVELUP_PKL);
+    GameMetadataGen4::from_binary(PT_PERSONAL_FILE, PT_LEVELUP_PKL, "Platinum");
 
 pub static METADATA_TABLE_HGSS: GameMetadataGen4 =
-    GameMetadataGen4::from_binary(HGSS_PERSONAL_FILE, HGSS_LEVELUP_PKL);
+    GameMetadataGen4::from_binary(HGSS_PERSONAL_FILE, HGSS_LEVELUP_PKL, "HeartGold/SoulSilver");
 
 #[derive(Debug, Clone, Copy)]
 pub struct PersonalInfoGen4([u8; GEN4_ENTRY_SIZE]);
@@ -76,7 +76,7 @@ impl PersonalInfoGen4 {
         };
         match national_dex {
             NationalDex::Pichu => form_index <= form::PICHU_SPIKY_EARED,
-            NationalDex::Unown => form_index <= form::UNOWN_QUESTION,
+            NationalDex::Unown => form_index <= form::UNOWN_EXCLAMATION,
             NationalDex::Castform => form_index <= form::CASTFORM_SNOWY,
             NationalDex::Deoxys => form_index <= form::DEOXYS_SPEED,
             NationalDex::Burmy => form_index <= form::BURMY_TRASH,
