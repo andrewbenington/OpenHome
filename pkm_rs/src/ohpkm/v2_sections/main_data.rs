@@ -10,7 +10,7 @@ use crate::util;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::lookup;
-use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots, PpUpStorage};
+use pkm_rs_resources::moves::{MoveDataOffsets, MoveSlot, MoveSlots, PpUpStorage};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesForm;
@@ -82,7 +82,7 @@ pub struct MainDataV2 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub nickname: SizedUtf16String<26>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub relearn_moves: [MoveIndex; 4],
+    pub relearn_moves: [MoveSlot; 4],
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ivs: Ivs,
     pub is_egg: bool,
@@ -544,10 +544,10 @@ impl DataSection for MainDataV2 {
             )),
             met_location_index: u16::from_le_bytes(bytes[131..133].try_into().unwrap()),
             relearn_moves: [
-                MoveIndex::from(u16::from_le_bytes(bytes[138..140].try_into().unwrap())),
-                MoveIndex::from(u16::from_le_bytes(bytes[140..142].try_into().unwrap())),
-                MoveIndex::from(u16::from_le_bytes(bytes[142..144].try_into().unwrap())),
-                MoveIndex::from(u16::from_le_bytes(bytes[144..146].try_into().unwrap())),
+                MoveSlot::from(u16::from_le_bytes(bytes[138..140].try_into().unwrap())),
+                MoveSlot::from(u16::from_le_bytes(bytes[140..142].try_into().unwrap())),
+                MoveSlot::from(u16::from_le_bytes(bytes[142..144].try_into().unwrap())),
+                MoveSlot::from(u16::from_le_bytes(bytes[144..146].try_into().unwrap())),
             ],
             ivs: Ivs::from_30_bits(bytes[148..152].try_into().unwrap()),
             is_egg: util::get_flag(bytes, 148, 30),
@@ -807,10 +807,10 @@ impl Randomize for MainDataV2 {
             moves: MoveSlots::randomized(rng),
             nickname: SizedUtf16String::randomized(rng),
             relearn_moves: [
-                MoveIndex::randomized(rng),
-                MoveIndex::randomized(rng),
-                MoveIndex::randomized(rng),
-                MoveIndex::randomized(rng),
+                MoveSlot::randomized(rng),
+                MoveSlot::randomized(rng),
+                MoveSlot::randomized(rng),
+                MoveSlot::randomized(rng),
             ],
             ivs: Ivs::randomized(rng),
             is_egg: bool::randomized(rng),

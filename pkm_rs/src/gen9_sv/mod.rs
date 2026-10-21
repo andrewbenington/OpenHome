@@ -64,7 +64,7 @@ pub(crate) type BoxName = SizedUtf16String<BOX_NAME_LENGTH>;
 pub struct Pk9SpeciesAndForm(SpeciesForm);
 
 impl Pk9SpeciesAndForm {
-    fn try_new(species_and_form: SpeciesForm) -> Option<Self> {
+    fn if_allowed(species_and_form: SpeciesForm) -> Option<Self> {
         if source_has_form_metadata(
             MetadataSource::ScarletViolet,
             species_and_form.get_ndex() as u16,
@@ -94,7 +94,7 @@ impl serde::Serialize for Pk9SpeciesAndForm {
 impl Randomize for Pk9SpeciesAndForm {
     fn randomized<R: rand::prelude::Rng>(rng: &mut R) -> Self {
         loop {
-            if let Some(randomized) = Self::try_new(SpeciesForm::randomized(rng)) {
+            if let Some(randomized) = Self::if_allowed(SpeciesForm::randomized(rng)) {
                 return randomized;
             }
         }
@@ -105,7 +105,7 @@ impl TryFrom<SpeciesForm> for Pk9SpeciesAndForm {
     type Error = Error;
 
     fn try_from(value: SpeciesForm) -> std::result::Result<Self, Self::Error> {
-        Self::try_new(value).ok_or(Error::other(&format!(
+        Self::if_allowed(value).ok_or(Error::other(&format!(
             "invalid species form for pk9: {}/{}",
             value.get_ndex(),
             value.get_form_index()

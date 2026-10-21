@@ -2802,6 +2802,7 @@ dependencies = [
  "serde_json",
  "specta",
  "strum",
+ "thiserror 2.0.21",
  "tokio",
  "tracing",
  "uuid",
@@ -3050,6 +3051,7 @@ dependencies = [
  "static_assertions",
  "strum",
  "strum_macros",
+ "thiserror 2.0.21",
  "tsify",
  "wasm-bindgen",
 ]
@@ -3073,6 +3075,7 @@ dependencies = [
  "static_assertions",
  "strum",
  "strum_macros",
+ "thiserror 2.0.21",
  "time",
  "tsify",
  "wasm-bindgen",

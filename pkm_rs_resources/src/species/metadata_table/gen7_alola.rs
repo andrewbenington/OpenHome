@@ -8,10 +8,13 @@ const GEN7_ALOLA_ENTRY_SIZE: usize = 0x54;
 type GameMetadataGen7Alola = GameMetadata<PersonalInfoGen7Alola, GEN7_ALOLA_ENTRY_SIZE>;
 
 pub static METADATA_TABLE_SM: GameMetadataGen7Alola =
-    GameMetadataGen7Alola::from_binary(SM_PERSONAL_FILE, SM_LEVELUP_PKL);
+    GameMetadataGen7Alola::from_binary(SM_PERSONAL_FILE, SM_LEVELUP_PKL, "Sun/Moon");
 
-pub static METADATA_TABLE_USUM: GameMetadataGen7Alola =
-    GameMetadataGen7Alola::from_binary(USUM_PERSONAL_FILE, USUM_LEVELUP_PKL);
+pub static METADATA_TABLE_USUM: GameMetadataGen7Alola = GameMetadataGen7Alola::from_binary(
+    USUM_PERSONAL_FILE,
+    USUM_LEVELUP_PKL,
+    "Ultra Sun/Ultra Moon",
+);
 
 #[derive(Debug, Clone, Copy)]
 pub struct PersonalInfoGen7Alola([u8; GEN7_ALOLA_ENTRY_SIZE]);
@@ -80,6 +83,8 @@ impl PersonalInfo for PersonalInfoGen7Alola {
 mod tests {
     use pkm_rs_types::NationalDex;
 
+    use crate::species::metadata_table::MetadataTable;
+
     use super::*;
 
     #[test]
@@ -89,5 +94,10 @@ mod tests {
             metadata.get_game_index(NationalDex::Urshifu as u16, 0),
             None
         );
+    }
+
+    #[test]
+    fn spiky_pichu_not_present() {
+        assert!(!METADATA_TABLE_SM.form_is_present(NationalDex::Pichu as u16, 1));
     }
 }

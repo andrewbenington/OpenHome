@@ -23,6 +23,7 @@ arbitrary-int = "2.2.0"
 tsify = { version = "0.5.8", features = [ "js" ] }
 specta = { version = "=2.0.0-rc.22", features = [ "serde_json", "derive" ], optional = true }
 num_enum = "0.7.6"
+thiserror = "2.0.21"
 
 
 [lib]

@@ -946,7 +946,8 @@ impl TryFrom<u3> for AbilityNumber {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, thiserror::Error)]
+#[error("invalid ability number: {0}")]
 pub struct InvalidAbilityNumber(pub u3);
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]

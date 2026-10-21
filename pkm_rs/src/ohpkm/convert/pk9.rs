@@ -127,20 +127,14 @@ impl OhpkmConvert for Pk9 {
 
         let ability_index = if let Some(current_ability) = ohpkm.ability_index().change_bound() {
             current_ability
-        } else if let Some(ability_from_num) = form_metadata
-            .get_ability(ohpkm.ability_num())
-            .change_bound()
-        {
-            ability_from_num
-        } else if let Some(first_ability) = form_metadata
-            .get_ability(AbilityNumber::First)
-            .change_bound()
-        {
-            first_ability
+        } else if let Some(bound_checked) = form_metadata.ability_bounded(ohpkm.ability_num()) {
+            bound_checked
+        } else if let Some(fallback) = form_metadata.ability_bounded(AbilityNumber::First) {
+            fallback
         } else {
-            return Err(Error::AbilityIndex {
-                ability_index: form_metadata.get_ability(AbilityNumber::First).to_u16(),
-            });
+            return Err(Error::AbilityIndex(
+                form_metadata.get_ability(AbilityNumber::First).to_u16(),
+            ));
         };
 
         let mut mon =

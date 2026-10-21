@@ -12,7 +12,7 @@ use crate::data_controller::ToDataController;
 use openhome_core::convert_strategies::ConvertStrategies;
 use openhome_core::data_controller;
 use openhome_core::lookup::LookupState;
-use openhome_core::ohpkm_store::OhpkmBytesStore;
+use openhome_core::ohpkm_store::{OhpkmBytesStore, OhpkmStoreResult};
 use openhome_core::{Error, Result};
 
 pub mod convert_strategies;
@@ -132,7 +132,7 @@ impl AllSyncedState {
     pub fn ohpkm_lookup_batch(
         &self,
         ids: &[OpenHomeId],
-    ) -> Result<HashMap<OpenHomeId, Result<OhpkmV2>>> {
+    ) -> Result<HashMap<OpenHomeId, OhpkmStoreResult<OhpkmV2>>> {
         Ok(self.lock()?.ohpkm_store.0.lookup_batch(ids))
     }
 

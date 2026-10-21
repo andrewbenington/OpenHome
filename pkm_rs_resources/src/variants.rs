@@ -212,3 +212,24 @@ pub fn can_be_ns_pokemon(species_form: SpeciesForm) -> bool {
 pub fn can_be_ns_pokemon_wasm(national_dex: NationalDex, form_index: u16) -> bool {
     SpeciesForm::new_valid_ndex(national_dex, form_index).is_ok_and(can_be_ns_pokemon)
 }
+
+#[cfg(test)]
+mod tests {
+    use pkm_rs_types::{NationalDex, form};
+
+    use crate::{species::SpeciesForm, variants::can_be_alpha};
+
+    #[test]
+    fn galar_ponyta_cant_be_alpha() {
+        assert!(!can_be_alpha(
+            SpeciesForm::new_valid_ndex(NationalDex::Ponyta, form::PONYTA_GALAR).unwrap()
+        ))
+    }
+
+    #[test]
+    fn arceus_forms_cant_be_alpha() {
+        assert!(!can_be_alpha(
+            SpeciesForm::new_valid_ndex(NationalDex::Arceus, form::ARCEUS_LEGEND).unwrap()
+        ))
+    }
+}
