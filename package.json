@@ -40,7 +40,7 @@
     "clippy": "cargo clippy --all-targets --all-features --profile test -- -Dwarnings",
     "typecheck": "tsgo",
     "build": "pnpm wasm-compile && pnpm vite build",
-    "build-no-bundle": "pnpm tauri build --no-bundle --config src-tauri/tauri.uitest.conf.json -- --features=uitest",
+    "ui-test-build": "pnpm tauri build --no-bundle --config src-tauri/tauri.uitest.conf.json -- --features=uitest",
     "dev": "pnpm wasm-compile-dev && pnpm vite",
     "tauri": "tauri",
     "test-cargo": "cargo nextest run --workspace --all-features --no-fail-fast",
