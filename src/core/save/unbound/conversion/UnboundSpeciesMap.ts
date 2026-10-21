@@ -1,12 +1,14 @@
-import { ExtraFormIndex } from '@pkm-rs/pkg'
+import { ExtraFormIndex, NationalDex } from '@pkm-rs/pkg'
 import {
   CfruSpeciesAndForm,
+  fromGen3CRFUPokemonIndex,
   makeExtraFormToGameMap,
   makeNationalDexToGameMap,
+  toGen3CRFUPokemonIndex,
 } from '../../cfru/conversion/util'
 
 export const UnboundToNationalDexMap: Record<string, CfruSpeciesAndForm | null> = {
-  '0': null, // Egg (not found)
+  '0': { nationalDex: 0, formIndex: 0 },
   '1': { nationalDex: 1, formIndex: 0 }, // Bulbasaur
   '2': { nationalDex: 2, formIndex: 0 }, // Ivysaur
   '3': { nationalDex: 3, formIndex: 0 }, // Venusaur
@@ -1304,3 +1306,24 @@ export const UnboundToNationalDexMap: Record<string, CfruSpeciesAndForm | null> 
 
 export const NationalDexToUnboundMap = makeNationalDexToGameMap(UnboundToNationalDexMap)
 export const ExtraFormToUnboundMap = makeExtraFormToGameMap(UnboundToNationalDexMap)
+
+export function toUnboundPokemonIndex(
+  nationalDex: number,
+  formIndex: number,
+  extraFormIndex?: number
+) {
+  if (nationalDex === NationalDex.Unown) {
+    formIndex = 0
+  }
+  return extraFormIndex
+    ? ExtraFormToUnboundMap.get(extraFormIndex)
+    : toGen3CRFUPokemonIndex(nationalDex, formIndex, NationalDexToUnboundMap)
+}
+
+export function unboundIndexLookup(unboundIndex: number): CfruSpeciesAndForm {
+  // previous versions of OpenHome incorrectly used separate ids for Unown forms, so this will catch and fix those
+  if (unboundIndex >= 413 && unboundIndex <= 439) {
+    return { nationalDex: NationalDex.Unown, formIndex: unboundIndex - 413 }
+  }
+  return fromGen3CRFUPokemonIndex(unboundIndex, UnboundToNationalDexMap, 'Pokémon Unbound')
+}

@@ -1,11 +1,14 @@
-import { MonFormat } from '@openhome-core/pkm/interfaces'
+import { MonFormat, PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Stats } from '@openhome-core/util/types'
 import {
   ConvertStrategies,
   ConvertStrategy,
   MetData,
+  PidGenerationParametersJs,
+  PidModificationStrategy,
   PkmConverter as PkmConverterWasm,
+  ShinyOdds,
 } from '@pkm-rs/pkg'
 
 export class PkmConverter {
@@ -37,5 +40,29 @@ export class PkmConverter {
 
   metLocationIndexPlatinumHgss(ohpkm: OHPKM): number {
     return this._inner.metLocationIndexPlatinumHgss(ohpkm)
+  }
+
+  pidModificationStrategy(shinyOdds: ShinyOdds): PidModificationStrategy {
+    return {
+      shiny: shinyOdds,
+      nature: this.strategy.personalityValue__preserveNature,
+      keep_unown_letter: this.strategy.personalityValue__preserveUnownForm,
+      keep_gender: this.strategy.personalityValue__preserveGender,
+    }
+  }
+
+  personalityValue(mon: PKMInterface, shinyOdds: ShinyOdds) {
+    const parameters = PidGenerationParametersJs.new(
+      mon.nationalDex,
+      mon.formIndex,
+      mon.nature,
+      mon.gender,
+      mon.isShiny(),
+      mon.formIndex,
+      mon.trainerID,
+      mon.secretID
+    )
+
+    return this._inner.personalityValue(parameters, shinyOdds)
   }
 }

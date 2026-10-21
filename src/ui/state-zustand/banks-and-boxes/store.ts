@@ -7,7 +7,7 @@ import {
   SimpleOpenHomeBox,
   StoredBankData,
 } from '@openhome-core/save/util/storage'
-import { Option, partitionResults, R, range, Result } from '@openhome-core/util/functional'
+import { $R, Option, partitionResults, R, range, Result } from '@openhome-core/util/functional'
 import { numericSorter } from '@openhome-core/util/sort'
 import { IdentifierNotPresentError, useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { createContext, useCallback, useContext } from 'react'
@@ -31,14 +31,26 @@ type ReverseLookup = Map<OhpkmIdentifier, BankBoxCoordinates>
 
 export type LocationsByIdentifier = Record<OhpkmIdentifier, BankBoxCoordinates>
 
-export interface BanksAndBoxesState {
-  reloadStore: () => Promise<void>
-
+type BanksAndBoxesState = {
   banks: SimpleOpenHomeBank[]
   currentBankIndex: number
   currentBoxIndex: number
   updatedBoxSlots: BankBoxCoordinates[]
   reverseLookup: ReverseLookup
+}
+
+function banksAndBoxesStateFromStored(stored: StoredBankData): BanksAndBoxesState {
+  return {
+    banks: stored.banks,
+    currentBankIndex: stored.current_bank,
+    currentBoxIndex: stored.banks.at(stored.current_bank)?.current_box ?? 0,
+    updatedBoxSlots: [],
+    reverseLookup: buildReverseLookup(stored),
+  }
+}
+
+export type BanksAndBoxesController = BanksAndBoxesState & {
+  reloadStore: () => Promise<void>
 
   getCurrentBank: () => SimpleOpenHomeBank
   getCurrentBankName: () => string
@@ -54,6 +66,7 @@ export interface BanksAndBoxesState {
   getAtLocation: (location: BankBoxCoordinates) => Option<OhpkmIdentifier>
   locationIsEmpty: (location: BankBoxCoordinates) => boolean
   setAtLocation: (location: BankBoxCoordinates, contents: OhpkmIdentifier) => void
+  swapLocations: (location1: BankBoxCoordinates, location2: BankBoxCoordinates) => void
   clearAtLocation: (location: BankBoxCoordinates) => void
   setBoxNameCurrentBank: (boxIndex: number, boxName: Option<string>) => void
   deleteBoxCurrentBank: (boxId: string) => void
@@ -75,11 +88,11 @@ export interface BanksAndBoxesState {
 
 export const createBanksAndBoxesStore = (
   stored: StoredBankData,
-  reloadStored: () => Promise<void>
+  loadStored: () => Promise<Result<StoredBankData>>
 ) =>
-  create<BanksAndBoxesState>()(
-    immer<BanksAndBoxesState>((set, readonlyState) => {
-      const requireBank = <T extends BanksAndBoxesState>(
+  create<BanksAndBoxesController>()(
+    immer<BanksAndBoxesController>((set, readonlyState) => {
+      const requireBank = <T extends BanksAndBoxesController>(
         state: T,
         bankIndex: number
       ): T['banks'][number] => {
@@ -90,7 +103,7 @@ export const createBanksAndBoxesStore = (
         return bank
       }
 
-      const requireBox = <T extends BanksAndBoxesState>(
+      const requireBox = <T extends BanksAndBoxesController>(
         state: T,
         location: Omit<BankBoxCoordinates, 'boxSlot'>
       ) => {
@@ -101,12 +114,22 @@ export const createBanksAndBoxesStore = (
         return box
       }
 
-      const requireBoxCurrentBank = <T extends BanksAndBoxesState>(state: T, boxIndex: number) => {
+      const requireBoxCurrentBank = <T extends BanksAndBoxesController>(
+        state: T,
+        boxIndex: number
+      ) => {
         return requireBox(state, { bank: state.currentBankIndex, box: boxIndex })
       }
 
       return {
-        reloadStore: reloadStored,
+        reloadStore: async () => {
+          $R(await loadStored()).match(
+            (banks) => set(banksAndBoxesStateFromStored(banks)),
+            (err) => {
+              throw new Error(err)
+            }
+          )
+        },
         banks: stored.banks,
         currentBankIndex: stored.current_bank,
         currentBoxIndex: stored.banks[stored.current_bank].current_box,
@@ -166,8 +189,37 @@ export const createBanksAndBoxesStore = (
         locationIsEmpty: (location: BankBoxCoordinates): boolean => {
           return readonlyState().getAtLocation(location) === undefined
         },
+        swapLocations: (location1: BankBoxCoordinates, location2: BankBoxCoordinates) =>
+          set((state) => {
+            const box1 = requireBox(state, location1)
+            const slot1Contents = box1.identifiers.get(location1.boxSlot)
+            const box2 = requireBox(state, location2)
+            const slot2Contents = box2.identifiers.get(location2.boxSlot)
+
+            if (slot2Contents) {
+              box1.identifiers.set(location1.boxSlot, slot2Contents)
+              state.reverseLookup.set(slot2Contents, location1)
+            } else {
+              box1.identifiers.delete(location1.boxSlot)
+            }
+
+            if (slot1Contents) {
+              box2.identifiers.set(location2.boxSlot, slot1Contents)
+              state.reverseLookup.set(slot1Contents, location2)
+            } else {
+              box2.identifiers.delete(location2.boxSlot)
+            }
+
+            state.updatedBoxSlots.push(location1, location2)
+          }),
         setAtLocation: (location: BankBoxCoordinates, identifier: OhpkmIdentifier) =>
           set((state) => {
+            const existingLocation = state.reverseLookup.get(identifier)
+            // if this mon is already in a home box, first clear that slot to ensure no duplicates
+            if (existingLocation) {
+              requireBox(state, existingLocation).identifiers.delete(existingLocation.boxSlot)
+            }
+
             requireBox(state, location).identifiers.set(location.boxSlot, identifier)
             state.reverseLookup.set(identifier, location)
             state.updatedBoxSlots.push(location)
@@ -274,12 +326,12 @@ export const createBanksAndBoxesStore = (
           )?.[0]
         },
       }
-    }) as StateCreator<BanksAndBoxesState, [], []>
+    }) as StateCreator<BanksAndBoxesController, [], []>
   )
 
 // when called using a mutable state (via immer), mutations to the returned value
 // will be preserved by immer
-function currentBankMutable<T extends BanksAndBoxesState>(state: T): T['banks'][number] {
+function currentBankMutable<T extends BanksAndBoxesController>(state: T): T['banks'][number] {
   return state.banks[state.currentBankIndex]
 }
 
@@ -317,7 +369,7 @@ function boxMapFromOrdered(boxesInOrder: SimpleOpenHomeBox[]): BoxMap {
 }
 
 function buildNewBank(
-  state: BanksAndBoxesState,
+  state: BanksAndBoxesController,
   name: string | null,
   boxCount: number
 ): SimpleOpenHomeBank {
@@ -481,6 +533,7 @@ export function useBanksAndBoxes() {
   const homeLocationIsEmpty = withSelectors.use.locationIsEmpty()
   const clearAtHomeLocation = withSelectors.use.clearAtLocation()
   const setAtHomeLocation = withSelectors.use.setAtLocation()
+  const swapHomeLocations = withSelectors.use.swapLocations()
   const findHomeLocation = withSelectors.use.findHomeLocation()
   const hasHomeLocation = withSelectors.use.hasHomeLocation()
 
@@ -629,6 +682,7 @@ export function useBanksAndBoxes() {
     homeLocationIsEmpty,
     clearAtHomeLocation,
     setAtHomeLocation,
+    swapHomeLocations,
     findHomeLocation,
     hasHomeLocation,
 

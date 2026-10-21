@@ -1,6 +1,6 @@
 use pkm_rs::ohpkm::OhpkmV2;
 use pkm_rs::traits::HasSpeciesAndForm;
-use pkm_rs_resources::moves::MoveIndex;
+use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_types::{Gender, PkmType};
 
@@ -75,7 +75,7 @@ pub enum Filter {
     IsShiny(bool),
     Gender(Gender),
     Level(u8),
-    Move(u8, MoveIndex),
+    Move(u8, MoveSlot),
     MoveTextPrefixEng(String),
     NicknamePrefix(String),
     BaseEvolution(u16),
@@ -88,9 +88,7 @@ impl Filter {
             Self::BaseEvolution(base_evo_ndex) => {
                 ohpkm.species_and_form().get_base_evolution().get_ndex() == *base_evo_ndex
             }
-            Self::FormIndex(form_index) => {
-                ohpkm.species_and_form().get_forme_index() == *form_index
-            }
+            Self::FormIndex(form_index) => ohpkm.species_and_form().get_form_index() == *form_index,
             Self::HasType(pkm_type) => {
                 ohpkm.type1() == *pkm_type || ohpkm.type2().is_some_and(|t2| t2 == *pkm_type)
             }

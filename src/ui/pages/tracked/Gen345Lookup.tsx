@@ -65,7 +65,7 @@ export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
         <Badge.Game
           originGame={value.homeMon?.gameOfOrigin}
           plugin={value.homeMon?.pluginOrigin as PluginIdentifier}
-          withName
+          withNameAbbr
         />
       ),
       getFilterValue: (val) =>

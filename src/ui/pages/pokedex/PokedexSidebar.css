@@ -3,7 +3,7 @@
   width: var(--sidebar-width);
   padding: var(--padding-x) var(--padding-x) 0 var(--padding-x);
   box-sizing: border-box;
-  height: calc(100% - 2 * var(--padding-radius-sm-lg));
+  height: 100%;
   background-color: var(--color-panel);
   box-shadow:
     rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset,
@@ -50,7 +50,7 @@
 }
 
 .pokedex-sidebar-button-selected {
-  background-color: var(--accent-10);
+  background-color: var(--accent-10) !important; /* to take priority over the "caught" color */
   color: white;
   font-weight: bold;
 }

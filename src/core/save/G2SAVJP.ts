@@ -1,5 +1,5 @@
 import { PK2 } from '@openhome-core/pkm'
-import { EXCLAMATION } from '@openhome-core/resources/consts/Forms'
+import { UNOWN_EXCLAMATION } from '@openhome-core/resources/consts/Forms'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { GEN2_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import { Errorable, Option, unique } from '@openhome-core/util/functional'
@@ -233,11 +233,11 @@ export class G2SAVJP extends OfficialSAV<PK2> {
     return PK2.fromOhpkm(ohpkm, strategy)
   }
 
-  supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+  supportsMon(nationalDex: number, formNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
     if (extraFormIndex !== undefined) return false
     return (
-      (nationalDex <= NationalDex.Celebi && formeNumber === 0) ||
-      (nationalDex === NationalDex.Unown && formeNumber < EXCLAMATION)
+      (nationalDex <= NationalDex.Celebi && formNumber === 0) ||
+      (nationalDex === NationalDex.Unown && formNumber < UNOWN_EXCLAMATION)
     )
   }
 

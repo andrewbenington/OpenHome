@@ -1,6 +1,6 @@
 // import userEvent from '@testing-library/user-event'
 import { SimpleOpenHomeBox, StoredBankData } from '@openhome-core/save/util/storage'
-import { range } from '@openhome-core/util/functional'
+import { R, range } from '@openhome-core/util/functional'
 import { v4 as UuidV4 } from 'uuid'
 import { assert, describe, expect, test } from 'vitest'
 import { BoxMap, createBanksAndBoxesStore } from './store'
@@ -28,7 +28,7 @@ function buildTestStoredState(): StoredBankData {
 }
 
 function buildTestStore() {
-  return createBanksAndBoxesStore(buildTestStoredState(), async () => {})
+  return createBanksAndBoxesStore(buildTestStoredState(), async () => R.Ok(buildTestStoredState()))
 }
 
 function assertIndicesMatchKeys(boxMap: BoxMap) {

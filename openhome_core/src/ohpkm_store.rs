@@ -1,14 +1,15 @@
 use crate::data_controller::{DataController, DataDir, MONS_V2_DIR};
 use crate::error::{Error, Result};
-use crate::search;
 use crate::util;
+use crate::{ErroredFile, search};
 use base64::prelude::*;
 use pkm_rs::ohpkm::OpenHomeId;
 use pkm_rs::ohpkm::{OhpkmV2, UnknownHandlerSave};
+use pkm_rs::result::StdResult;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::num::NonZeroU64;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::time::{Duration, UNIX_EPOCH};
 use std::{collections::HashMap, fs};
 use tracing::warn;
@@ -70,12 +71,12 @@ impl OhpkmBytesStore {
     }
 
     fn write_to_directory(data: &Self, path: &Path) -> Result<()> {
-        let mut errors: Vec<(PathBuf, Box<dyn std::error::Error>)> = Vec::new();
+        let mut errors: Vec<ErroredFile> = Vec::new();
         data.0.iter().for_each(|(identifier, bytes)| {
-            let filename = format!("{identifier}.ohpkm");
-            let file_path = path.join(filename);
+            let file_path = path.join(format!("{identifier}.ohpkm"));
+
             if let Err(err) = fs::write(&file_path, bytes) {
-                errors.push((file_path, Box::new(err)));
+                errors.push(ErroredFile::SourceAndPath(Box::new(err), file_path));
             };
         });
 
@@ -86,7 +87,7 @@ impl OhpkmBytesStore {
         }
     }
 
-    pub fn load_from_mons_v2(data_controller: &impl DataController) -> Result<Self> {
+    pub fn load(data_controller: &impl DataController) -> Result<Self> {
         let mons_v2_dir = data_controller.absolute_path(DataDir::Storage, MONS_V2_DIR)?;
         Self::load_from_directory(&mons_v2_dir)
     }
@@ -156,18 +157,18 @@ impl OhpkmBytesStore {
             .transpose()?)
     }
 
-    pub fn lookup_batch(&self, identifiers: &[OpenHomeId]) -> HashMap<OpenHomeId, Result<OhpkmV2>> {
-        identifiers
-            .iter()
-            .filter_map(|&identifier| {
-                self.0.get(&identifier).map(|bytes| {
-                    (
-                        identifier,
-                        OhpkmV2::from_bytes(bytes).map_err(|source| Error::PkmRs { source }),
-                    )
-                })
-            })
-            .collect()
+    pub fn lookup_batch(
+        &self,
+        identifiers: &[OpenHomeId],
+    ) -> HashMap<OpenHomeId, OhpkmStoreResult<OhpkmV2>> {
+        let mut out = HashMap::with_capacity(identifiers.len());
+        for &id in identifiers {
+            out.entry(id).or_insert_with(|| match self.0.get(&id) {
+                Some(bytes) => OhpkmV2::from_bytes(bytes).map_err(OhpkmStoreError::MalformedData),
+                None => Err(OhpkmStoreError::Missing(id)),
+            });
+        }
+        out
     }
 
     pub fn includes(&self, identifier: &OpenHomeId) -> bool {
@@ -186,3 +187,12 @@ impl OhpkmBytesStore {
         self.0.iter()
     }
 }
+
+#[derive(Debug, thiserror::Error)]
+#[error("No OHPKM data found for identifier '{0}'")]
+pub enum OhpkmStoreError {
+    Missing(OpenHomeId),
+    MalformedData(#[source] pkm_rs::result::Error),
+}
+
+pub type OhpkmStoreResult<T> = StdResult<T, OhpkmStoreError>;

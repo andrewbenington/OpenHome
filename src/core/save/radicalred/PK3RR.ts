@@ -10,19 +10,20 @@ import { radicalRedIndexLookup, toRadicalRedPokemonIndex } from './conversion/sp
 const CHILLET_INDEX = 1375
 
 const VALID_MOVE_INDICES_RR = Object.values(RRToNationalMap).filter((index) => index > 0)
+const FORMAT = 'PK3RR' as const
 
 export default class PK3RR extends PK3CFRU implements PluginPKMInterface {
-  format: 'PK3RR' = 'PK3RR'
+  format = FORMAT
   pluginIdentifier: PluginIdentifier = 'radical_red'
 
   selectColor = '#660000'
 
   static getFormat() {
-    return 'PK3RR' as const
+    return FORMAT
   }
 
   getMonFormat(): PkmFormat {
-    return 'PK3RR' as const
+    return FORMAT
   }
 
   get heldItemIndex(): number {

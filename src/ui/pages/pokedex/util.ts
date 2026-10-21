@@ -1,37 +1,39 @@
-import { Pokedex, PokedexStatus } from '@openhome-ui/util/pokedex'
+import { FormEntry } from '@openhome-core/tauri/spectaCommands'
+import { Option } from '@openhome-core/util/functional'
+import { Pokedex, PokedexLevel } from '@openhome-ui/util/pokedex'
 import { ExtraFormMetadata, FormMetadata, Language, Lookup, SpeciesMetadata } from '@pkm-rs/pkg'
 
-export function getHighestFormeStatus(
+export function getHighestFormStatus(
   pokedex: Pokedex,
   species: SpeciesMetadata
-): [number, PokedexStatus | undefined] {
+): [number, PokedexLevel | undefined] {
   if (!(species.nationalDex in pokedex.byDexNumber)) return [0, undefined]
 
-  let maxStatusForme = 0
-  let maxStatus: PokedexStatus = 'Seen'
+  let maxStatusForm = 0
+  let maxStatus: PokedexLevel = 'Seen'
 
-  for (const [formIndex, status] of Object.entries(
-    pokedex.byDexNumber[species.nationalDex].formes
+  for (const [formIndex, dexEntry] of Object.entries(
+    pokedex.byDexNumber[species.nationalDex]?.forms ?? {}
   )) {
-    if (StatusIndices[status] > StatusIndices[maxStatus]) {
-      maxStatusForme = parseInt(formIndex)
-      maxStatus = status
+    if (dexEntry && StatusIndices[dexEntry.level] > StatusIndices[maxStatus]) {
+      maxStatusForm = parseInt(formIndex)
+      maxStatus = dexEntry.level
     }
   }
 
-  return [maxStatusForme, maxStatus]
+  return [maxStatusForm, maxStatus]
 }
 
-export function getFormeStatus(
+export function getFormPokedexData(
   pokedex: Pokedex,
   nationalDex: number,
   formIndex: number
-): PokedexStatus | undefined {
+): Option<FormEntry> {
   if (!(nationalDex in pokedex.byDexNumber)) return undefined
-  return pokedex.byDexNumber[nationalDex].formes[formIndex]
+  return pokedex.byDexNumber[nationalDex]?.forms[formIndex]
 }
 
-export const StatusIndices: Record<PokedexStatus, number> = {
+export const StatusIndices: Record<PokedexLevel, number> = {
   Seen: 0,
   Caught: 1,
   ShinyCaught: 2,
@@ -47,14 +49,14 @@ export function getPokedexSummary(
   const name =
     form.formIndex === 0 && !isExtraForm
       ? Lookup.speciesName(species.nationalDex, Language.English)
-      : form.formeName
-  const formeType =
+      : form.formName
+  const formType =
     form.formIndex === 0 ? getBaseFormDescriptor(species) : form.isMega ? 'Mega Evolution' : 'form'
   let text = isExtraForm
     ? `${name} is a ${types} extra form.`
-    : `${name} is a ${types} ${formeType} introduced in Generation ${form.introducedGen}.`
+    : `${name} is a ${types} ${formType} introduced in Generation ${form.introducedGen}.`
 
-  if (form.formeName === 'Basculin-White-Striped') {
+  if (form.formName === 'Basculin-White-Striped') {
     text += ` It is sometimes considered a regional form from the ${form.regional} region.`
   } else if (form.regional) {
     text += ` It is a regional form from the ${form.regional} region.`

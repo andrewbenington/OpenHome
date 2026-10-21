@@ -7,7 +7,7 @@ const SWSH_ENTRY_SIZE: usize = 0xB0;
 type GameMetadataSwsh = GameMetadata<PersonalInfoSwsh, SWSH_ENTRY_SIZE>;
 
 pub static METADATA_TABLE_SWSH: GameMetadataSwsh =
-    GameMetadataSwsh::from_binary(SWSH_PERSONAL_FILE, SWSH_LEVELUP_PKL);
+    GameMetadataSwsh::from_binary(SWSH_PERSONAL_FILE, SWSH_LEVELUP_PKL, "Sword/Shield");
 
 #[derive(Debug, Clone, Copy)]
 pub struct PersonalInfoSwsh(&'static [u8]);
@@ -77,5 +77,9 @@ impl PersonalInfo for PersonalInfoSwsh {
 
     fn source_name(&self) -> &'static str {
         "Sword/Shield"
+    }
+
+    fn form_is_present_in_game(&self, _national_dex: u16, _form_index: u16) -> bool {
+        self.is_present_in_game()
     }
 }

@@ -22,24 +22,31 @@ pub use pk9::*;
 mod pk9_buffer;
 #[cfg(feature = "wasm")]
 mod pokemon_index;
-// mod save;
-// mod save_blocks;
+#[cfg(feature = "wasm")]
+mod save_blocks;
+#[cfg(feature = "wasm")]
+mod sv_save;
 
+#[cfg(feature = "wasm")]
+use pkm_rs_types::strings::SizedUtf16String;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
 #[cfg(feature = "wasm")]
 pub(crate) const PKM_DATA_SIZE: usize = 344;
 
-#[cfg(test)]
+#[cfg(any(test, feature = "wasm"))]
 const MAX_BOX_COUNT: u8 = 32;
-#[cfg(test)]
+
+#[cfg(any(test, feature = "wasm"))]
 const BOX_ROWS: u8 = 5;
-#[cfg(test)]
+#[cfg(any(test, feature = "wasm"))]
 const BOX_COLS: u8 = 6;
-#[cfg(test)]
-const BOX_SLOTS: u8 = BOX_ROWS * BOX_COLS;
-// const BOX_NAME_LENGTH: usize = 34;
+
+#[cfg(any(test, feature = "wasm"))]
+pub(crate) const BOX_SLOTS: u8 = BOX_ROWS * BOX_COLS;
+#[cfg(feature = "wasm")]
+pub(crate) const BOX_NAME_LENGTH: usize = 34;
 const MAX_ABILITY_INDEX: u16 = 310; // Poison Puppeteer
 
 #[cfg(feature = "wasm")]
@@ -50,17 +57,18 @@ pub const TM_FLAG_BYTE_LENGTH_DLC: usize = 13;
 
 pub type Pk9AbilityIndex = AbilityIndexBounded<MAX_ABILITY_INDEX>;
 
-// type BoxName = SizedUtf16String<BOX_NAME_LENGTH>;
+#[cfg(feature = "wasm")]
+pub(crate) type BoxName = SizedUtf16String<BOX_NAME_LENGTH>;
 
 #[derive(Debug, Clone, Copy, Default)]
 pub struct Pk9SpeciesAndForm(SpeciesForm);
 
 impl Pk9SpeciesAndForm {
-    fn try_new(species_and_form: SpeciesForm) -> Option<Self> {
+    fn if_allowed(species_and_form: SpeciesForm) -> Option<Self> {
         if source_has_form_metadata(
             MetadataSource::ScarletViolet,
             species_and_form.get_ndex() as u16,
-            species_and_form.get_forme_index(),
+            species_and_form.get_form_index(),
         ) {
             Some(Self(species_and_form))
         } else {
@@ -86,7 +94,7 @@ impl serde::Serialize for Pk9SpeciesAndForm {
 impl Randomize for Pk9SpeciesAndForm {
     fn randomized<R: rand::prelude::Rng>(rng: &mut R) -> Self {
         loop {
-            if let Some(randomized) = Self::try_new(SpeciesForm::randomized(rng)) {
+            if let Some(randomized) = Self::if_allowed(SpeciesForm::randomized(rng)) {
                 return randomized;
             }
         }
@@ -97,10 +105,10 @@ impl TryFrom<SpeciesForm> for Pk9SpeciesAndForm {
     type Error = Error;
 
     fn try_from(value: SpeciesForm) -> std::result::Result<Self, Self::Error> {
-        Self::try_new(value).ok_or(Error::other(&format!(
+        Self::if_allowed(value).ok_or(Error::other(&format!(
             "invalid species form for pk9: {}/{}",
             value.get_ndex(),
-            value.get_forme_index()
+            value.get_form_index()
         )))
     }
 }
@@ -122,14 +130,14 @@ pub fn empty_box_slot_bytes() -> Box<[u8]> {
     bytes
 }
 
-#[cfg(test)]
-type BoxIndex = pkm_rs_types::BoundedU8<{ MAX_BOX_COUNT - 1 }>;
+#[cfg(any(test, feature = "wasm"))]
+pub(crate) type BoxIndex = pkm_rs_types::BoundedU8<{ MAX_BOX_COUNT - 1 }>;
+
+#[cfg(any(test, feature = "wasm"))]
+pub(crate) type BoxSlot = pkm_rs_types::BoundedU8<{ BOX_SLOTS - 1 }>;
 
 #[cfg(test)]
-type BoxSlot = pkm_rs_types::BoundedU8<{ BOX_SLOTS - 1 }>;
-
-#[cfg(test)]
-mod test {
+mod tests {
     use super::{BOX_SLOTS, BoxIndex, BoxSlot, MAX_BOX_COUNT};
     use crate::result::{Error, Result};
 

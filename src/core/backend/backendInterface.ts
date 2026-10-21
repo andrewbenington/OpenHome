@@ -93,6 +93,7 @@ export default interface BackendInterface {
   /* past gen identifier lookups */
   loadPokedex: () => Promise<Errorable<Pokedex>>
   registerInPokedex: (updates: PokedexUpdate[]) => Promise<Errorable<null>>
+  syncPokedex: () => Promise<Errorable<null>>
 
   /* openhome banks/boxes */
   loadHomeBanks: () => Promise<Errorable<StoredBankData>>

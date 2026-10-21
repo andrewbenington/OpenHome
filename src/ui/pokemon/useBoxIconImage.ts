@@ -3,19 +3,22 @@ import { LGE_STARTER, SPIKY_EAR } from '@openhome-core/resources//consts/Forms'
 import { NationalDex } from '@openhome-core/resources//consts/NationalDex'
 import { CHAMPS_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
+import { FullMetadataLookup } from '@openhome-core/util'
 import { R, Result } from '@openhome-core/util/functional'
 import { BoxIconSpriteType } from '@openhome-ui/hooks/monDisplay'
 import {
-  getPokemonSpritePath,
-  getPokemonSpritePathInner,
+  getPokemonSpritePathFromSource,
   getSpriteName,
+  HomeBoxSprites,
+  HomeSprites,
 } from '@openhome-ui/images/pokemon'
 import { MonSpriteData } from '@openhome-ui/state/plugin/reducer'
-import { ExtraFormIndex, extraFormSpriteName, MetadataSummaryLookup } from '@pkm-rs/pkg'
+import { ExtraFormIndex, extraFormSpriteName } from '@pkm-rs/pkg'
 
 export const FormsUsingImages: Map<number, number[]> = new Map([
-  [NationalDex.Eevee, [LGE_STARTER]], // Starter Eevee
-  [NationalDex.Pichu, [SPIKY_EAR]], // Spiky-eared Pichu
+  [NationalDex.Eevee, [LGE_STARTER]],
+  [NationalDex.Pichu, [SPIKY_EAR]],
+
   // Megas not in Champions
   [NationalDex.Heatran, [1]],
   [NationalDex.Darkrai, [1]],
@@ -41,7 +44,7 @@ export function boxIconImagePath(
 ): Result<string, string> {
   const shinyFolder = mon.isShiny ? 'shiny/' : ''
   if (spriteType === 'home') {
-    return R.Ok(getPokemonSpritePath(mon, 'OHPKM'))
+    return R.Ok(getPokemonSpritePathFromSource(mon, HomeSprites))
   }
 
   if (mon.extraFormIndex && ExtraFormsUsingImages.has(mon.extraFormIndex)) {
@@ -49,16 +52,23 @@ export function boxIconImagePath(
     return R.Ok(`icons/box/${extraFormSprite}.webp`)
   }
 
-  const metadata = MetadataSummaryLookup(mon.nationalDex, mon.formIndex)
+  const metadata = FullMetadataLookup(mon)
   if (!metadata) {
-    return R.Err(`invalid species data: ndex ${mon.nationalDex}/form ${mon.formIndex}`)
+    return R.Err(
+      `invalid species data: ndex ${mon.nationalDex}/form ${mon.formIndex}/extra form ${mon.extraFormIndex}`
+    )
   }
 
-  const { formeName, sprite } = metadata
+  const { formName, sprite } = metadata
 
   if (
-    !isRestricted(CHAMPS_TRANSFER_RESTRICTIONS, mon.nationalDex, mon.formIndex) &&
-    !formeName?.includes('Battle Bond')
+    !isRestricted(
+      CHAMPS_TRANSFER_RESTRICTIONS,
+      mon.nationalDex,
+      mon.formIndex,
+      mon.extraFormIndex
+    ) &&
+    !formName?.includes('Battle Bond')
   ) {
     const female =
       mon.isFemale &&
@@ -78,5 +88,5 @@ export function boxIconImagePath(
     return R.Ok(`icons/box/${getSpriteName(monWithoutGender)}.webp`)
   }
 
-  return R.Ok(getPokemonSpritePathInner(monWithoutGender, 'box-home', 'webp'))
+  return R.Ok(getPokemonSpritePathFromSource(monWithoutGender, HomeBoxSprites))
 }

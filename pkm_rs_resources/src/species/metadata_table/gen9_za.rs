@@ -8,7 +8,7 @@ const LZA_ENTRY_SIZE: usize = 0x50;
 type GameMetadataLza = GameMetadata<PersonalInfoLza, LZA_ENTRY_SIZE>;
 
 pub static METADATA_TABLE_LZA: GameMetadataLza =
-    GameMetadataLza::from_binary(LZA_PERSONAL_FILE, LZA_LEVELUP_PKL);
+    GameMetadataLza::from_binary(LZA_PERSONAL_FILE, LZA_LEVELUP_PKL, "Legends Z-A");
 
 const LZA_PLUS_MOVE_MASTERY: LevelupLearnsetFileReader =
     LevelupLearnsetFileReader::from_pkl(LZA_PLUS_MOVES_PKL);
@@ -91,5 +91,9 @@ impl PersonalInfo for PersonalInfoLza {
 
     fn source_name(&self) -> &'static str {
         "Legends: Z-A"
+    }
+
+    fn form_is_present_in_game(&self, _national_dex: u16, _form_index: u16) -> bool {
+        self.is_present_in_game()
     }
 }

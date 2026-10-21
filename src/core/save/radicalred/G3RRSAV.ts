@@ -41,8 +41,8 @@ export class G3RRSAV extends G3CFRUSAV<PK3RR> {
     return PK3RR.fromOhpkm(ohpkm, strategy)
   }
 
-  supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
-    return !isRestricted(RR_TRANSFER_RESTRICTIONS, nationalDex, formeNumber, extraFormIndex)
+  supportsMon(nationalDex: number, formNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    return !isRestricted(RR_TRANSFER_RESTRICTIONS, nationalDex, formNumber, extraFormIndex)
   }
 
   supportsItem(itemIndex: number) {
@@ -79,7 +79,7 @@ export class G3RRSAV extends G3CFRUSAV<PK3RR> {
   }
 
   static getPluginIdentifier() {
-    return 'radical_red'
+    return 'radical_red' as const
   }
 
   getSlotMetadata = (boxNum: number, boxSlot: number): SlotMetadata => {

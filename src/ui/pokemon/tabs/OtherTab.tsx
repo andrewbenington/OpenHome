@@ -1,9 +1,9 @@
 import { PK3, PK4, PK5 } from '@openhome-core/pkm'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import {
-  getMonFileIdentifier,
   getMonGen12Identifier,
   getMonGen345Identifier,
+  tryCalculateIdentifier,
 } from '@openhome-core/pkm/Lookup'
 import { getLocationStringOrOrigin } from '@openhome-core/pkm/MetLocation'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
@@ -11,9 +11,10 @@ import {
   getHiddenPowerGen2,
   getHiddenPowerPower,
   getHiddenPowerType,
+  PkmOrOhpkmFormat,
 } from '@openhome-core/pkm/util'
 import { AllPKMFields } from '@openhome-core/pkm/util/pkmInterface'
-import { Moves } from '@openhome-core/resources'
+import { Move, Moves } from '@openhome-core/resources'
 import { Countries } from '@openhome-core/resources/consts/Countries'
 import { EncounterTypes } from '@openhome-core/resources/consts/EncounterTypes'
 import { SWEETS } from '@openhome-core/resources/consts/Forms'
@@ -26,8 +27,11 @@ import {
   SWSH_TRANSFER_RESTRICTIONS_CT,
   USUM_TRANSFER_RESTRICTIONS,
 } from '@openhome-core/resources/consts/TransferRestrictions'
+import { PluginIdentifier } from '@openhome-core/save/interfaces'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { getDisplayID, getHeightCalculated, getWeightCalculated } from '@openhome-core/util'
+import * as types from '@openhome-core/util/types'
+import { FourMoves, Stats } from '@openhome-core/util/types'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import AttributeRowExpand from '@openhome-ui/components/AttributeRowExpand'
 import DebugOnly from '@openhome-ui/components/DebugOnly'
@@ -35,13 +39,26 @@ import DynamaxLevel from '@openhome-ui/components/pokemon/DynamaxLevel'
 import GenderIcon from '@openhome-ui/components/pokemon/GenderIcon'
 import ShinyLeavesDisplay from '@openhome-ui/components/pokemon/ShinyLeaves'
 import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
-import { Generation, Language, OriginGames, Pokerus, StatsPreSplit, TeraType } from '@pkm-rs/pkg'
+import {
+  BinaryGender,
+  ExtraFormIndex,
+  Generation,
+  Geolocations,
+  Language,
+  OriginGames,
+  PlusMoveFlags,
+  Pokerus,
+  ShinyLeaves,
+  StatsPreSplit,
+  TeraType,
+  TrainerMemory,
+} from '@pkm-rs/pkg'
 import { Flex } from '@radix-ui/themes'
 
 const HECTOGRAMS_TO_POUNDS = 0.2204623
 const CENTIMETERS_TO_INCHES = 0.3937008
 
-const OtherDisplay = (props: { mon: PKMInterface }) => {
+const OtherDisplay = (props: { mon: OtherDisplayPkmData }) => {
   const { mon } = props
 
   const heightCalculated = getHeightCalculated(mon)
@@ -77,7 +94,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
           </AttributeRow>
         )}
         <AttributeRow label="OpenHome ID">
-          <code>{getMonFileIdentifier(mon)}</code>
+          <code>{tryCalculateIdentifier(mon)}</code>
         </AttributeRow>
         <AttributeRow label="Origin Game" value={OriginGames.gameNameFull(mon.gameOfOrigin)} />
         <AttributeRow
@@ -362,18 +379,9 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
           mon.extraFormIndex
         ) &&
           mon.dynamaxLevel !== undefined && (
-            <>
-              <AttributeRow label="Dynamax">
-                <DynamaxLevel level={mon.dynamaxLevel} />
-              </AttributeRow>
-              <AttributeRow label="Can Gigantimax" value={mon.canGigantamax ? 'true' : 'false'} />
-              {mon.isShiny() && (
-                <AttributeRow
-                  label="SwSh Shiny Type"
-                  value={mon.isSquareShiny() ? 'Square' : 'Star'}
-                />
-              )}
-            </>
+            <AttributeRow label="Dynamax">
+              <DynamaxLevel level={mon.dynamaxLevel} />
+            </AttributeRow>
           )}
         {!isRestricted(
           SV_TRANSFER_RESTRICTIONS_ID,
@@ -578,4 +586,78 @@ function u32Display(val: number) {
 
 function hexStrLittleEndian(val: number, digits: number) {
   return '0x' + val.toString(16).toUpperCase().padStart(digits, '0')
+}
+
+export type OtherDisplayPkmData = {
+  format: PkmOrOhpkmFormat
+  abilityNum?: number
+  checksum?: number
+  nationalDex: number
+  dynamaxLevel?: number
+  eggDate?: types.PKMDate | undefined
+  eggLocationIndex?: number
+  encounterType?: number
+  encryptionConstant?: number
+  exp: number
+  extraFormIndex?: ExtraFormIndex
+  favorite?: boolean
+  formArgument?: number
+  formIndex: number
+  gameOfOrigin: number
+  geolocations?: Geolocations
+  handlerAffection?: number
+  handlerFriendship?: number
+  handlerGender?: BinaryGender
+  handlerID?: number
+  handlerLanguage?: number
+  handlerMemory?: TrainerMemory
+  handlerName?: string
+  heightScalar?: number
+  heldItemIndex: number
+  isCurrentHandler?: boolean
+  isEgg?: boolean
+  isNicknamed?: boolean
+  isShadow?: boolean
+  language: Language
+  level?: number
+  metLocationIndex?: number
+  metTimeOfDay?: number
+  movePP: FourMoves
+  movePPUps: FourMoves
+  moves: FourMoves
+  nickname: string
+  obedienceLevel?: number
+  personalityValue?: number
+  pluginOrigin?: PluginIdentifier
+  pokerusByte?: number
+  relearnMoves?: FourMoves
+  scale?: number
+  secretID: number
+  shinyLeaves?: ShinyLeaves
+  teraTypeOriginal?: TeraType
+  teraTypeOverride?: TeraType
+  tmMovesLza?: Move[]
+  plusMoveFlags?: PlusMoveFlags
+  tmMovesSv?: Move[]
+  tmMovesSVDLC?: Move[]
+  trMovesSwSh?: Move[]
+  trainerAffection?: number
+  trainerFriendship?: number
+  trainerGender: BinaryGender
+  trainerID: number
+  trainerMemory?: TrainerMemory
+  trainerName: string
+  tutorMovesLa?: Move[]
+  weightScalar?: number
+  heightAbsolute?: number
+  weightAbsolute?: number
+  heldItemName: string
+  getLevel: () => number
+  calculateChecksum?: () => number
+  isShiny: () => boolean
+  isSquareShiny: () => boolean
+
+  toBytes: ((_options?: types.ToBytesOptions) => ArrayBuffer) | (() => ArrayBuffer)
+  extraDisplayFields?: () => Record<string, string | number | boolean>
+  getStats(): Stats | StatsPreSplit
 }

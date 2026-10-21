@@ -1,6 +1,6 @@
 [package]
 name = "pkm_rs_types"
-version = "1.18.0-rc.3"
+version = "1.18.1"
 edition = "2024"
 description = "Types and helper code for the pkm_rs crate"
 repository = "https://github.com/andrewbenington/OpenHome"
@@ -19,12 +19,14 @@ strum_macros = "0.28.0"
 time = "0.3.55"
 arbitrary-int = "2.2.0"
 rand = { version = "0.10.2", optional = true }
-tsify = "=0.5.6"
+tsify = { version = "0.5.8", features = [ "js" ] }
 num_enum = "0.7.6"
 chrono = "0.4.45"
 pastey = "0.2.3"
 specta = { version = "=2.0.0-rc.22", features = [ "serde_json", "derive" ], optional = true }
 enum-iterator = "2.3.0"
+zerocopy = { version = "0.8.61", features = ["derive"] }
+thiserror = "2.0.21"
 
 [lib]
 name = "pkm_rs_types"

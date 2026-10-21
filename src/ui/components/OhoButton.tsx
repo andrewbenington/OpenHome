@@ -1,6 +1,7 @@
+import { isThenable } from '@openhome-core/util/promise'
 import { RadixColor } from '@openhome-ui/util/color'
 import { Button, Tooltip, type ButtonProps } from '@radix-ui/themes'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { AddIcon, RemoveIcon } from './Icons'
 
 export type OhoButtonType =
@@ -24,6 +25,8 @@ export default function OhoButton(props: OhoButtonProps) {
     noPaddingX,
     ...buttonProps
   } = props
+
+  const [asyncOnClickLoading, setAsyncOnClickLoading] = useState(false)
 
   const color: RadixColor | undefined = useMemo(() => {
     switch (ohoButtonType) {
@@ -95,13 +98,21 @@ export default function OhoButton(props: OhoButtonProps) {
 
   const disabled = loading || disabledProp || Boolean(disabledMessage)
 
+  function onClick(e: React.MouseEvent<HTMLButtonElement>) {
+    const result = props.onClick?.(e)
+    if (isThenable(result)) {
+      setAsyncOnClickLoading(true)
+      result.then(() => setAsyncOnClickLoading(false))
+    }
+  }
+
   const button = (
     <Button
       size="1"
       color={color}
       type={radixType}
       variant={variant}
-      loading={loading}
+      loading={loading || asyncOnClickLoading}
       disabled={disabled}
       style={{
         minWidth: noPaddingX ? '0rem' : '4rem',
@@ -112,6 +123,7 @@ export default function OhoButton(props: OhoButtonProps) {
         ...style,
       }}
       {...buttonProps}
+      onClick={onClick}
     >
       {children ?? defaultText}
       {icon}

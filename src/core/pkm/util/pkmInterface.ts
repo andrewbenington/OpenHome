@@ -34,11 +34,11 @@ export interface AllPKMFields {
   canGigantamax?: boolean
   checksum?: number
   consoleRegion?: number
-  contest?: ContestStats
+  readonly contest?: ContestStats
   contestMemoryCount?: number
   country?: number
-  currentHP?: number
-  nationalDex: number
+  // User-defined display color for this Pokemon in boxes (CSS color string)
+  displayColor?: string
   dvs?: StatsPreSplit
   dynamaxLevel?: number
   eggDate?: types.PKMDate | undefined
@@ -58,7 +58,7 @@ export interface AllPKMFields {
   gameOfOrigin: number
   gameOfOriginBattle?: number
   gender?: Gender
-  geolocations?: Geolocations
+  readonly geolocations?: Geolocations
   gvs?: types.Stats
   handlerAffection?: number
   handlerFriendship?: number
@@ -70,22 +70,20 @@ export interface AllPKMFields {
   heightScalar?: number
   heldItemIndex: number
   homeTracker?: bigint
-  hyperTraining?: HyperTraining
+  readonly hyperTraining?: HyperTraining
   isAlpha?: boolean
   isCurrentHandler?: boolean
   isEgg?: boolean
   isFatefulEncounter?: boolean
-  isMega?: number
   isNicknamed?: boolean
   isNoble?: boolean
   isNsPokemon?: boolean
   isShadow?: boolean
-  ivs?: types.Stats
+  readonly ivs?: types.Stats
   language: Language
   level?: number
   markings?: Markings
   masterFlagsLA?: Uint8Array
-  megaForme?: number
   metDate?: types.PKMDate | undefined
   metLevel?: number
   metLocationIndex?: number
@@ -94,10 +92,11 @@ export interface AllPKMFields {
   movePP: FourMoves
   movePPUps: FourMoves
   moves: FourMoves
+  nationalDex: number
   nature?: NatureIndex
+  notes?: string
   nickname: string
   obedienceLevel?: number
-  palma?: number
   performance?: number
   personalityValue?: number
   // pluginIdentifier is the plugin identifier corresponding to the PKM format, regardless of if the Pokémon was originally from that game
@@ -115,7 +114,6 @@ export interface AllPKMFields {
   secretID: number
   secretSuperTrainingComplete?: boolean
   secretSuperTrainingUnlocked?: boolean
-  shadowID?: number
   shinyLeaves?: ShinyLeaves
   sociability?: number
   statLevel?: number
@@ -125,8 +123,8 @@ export interface AllPKMFields {
   superTrainingDistFlags?: number
   superTrainingFlags?: number
   tags?: MonTag[]
-  teraTypeOriginal?: TeraType
-  teraTypeOverride?: TeraType
+  readonly teraTypeOriginal?: TeraType
+  readonly teraTypeOverride?: TeraType
   tmFlagsLzaBase?: Uint8Array
   tmFlagsLzaDlc?: Uint8Array
   tmMovesLza?: Move[]
@@ -147,14 +145,10 @@ export interface AllPKMFields {
   trainingBagHits?: number
   tutorFlagsLA?: Uint8Array
   tutorMovesLa?: Move[]
-  type1?: number
-  type2?: number
   unknownA0?: number
   unknownF3?: number
   weightScalar?: number
-  heightAbsolute?: number
   heightDeviation?: number
-  weightAbsolute?: number
   weightDeviation?: number
   heldItemName: string
   getLevel: () => number
@@ -169,4 +163,35 @@ export interface AllPKMFields {
 
   toBytes: ((_options?: types.ToBytesOptions) => ArrayBuffer) | (() => ArrayBuffer)
   extraDisplayFields?: () => Record<string, string | number | boolean>
+  free?: () => void
+}
+
+export type FormatPkm = { format: PkmOrOhpkmFormat }
+
+export type PkmFormSpecifiers = {
+  nationalDex: number
+  formIndex: number
+  extraFormIndex?: ExtraFormIndex
+}
+
+export type FormSpecifiersForFormat = PkmFormSpecifiers & FormatPkm
+
+export type DisplayDataOhpkm = {
+  tags?: MonTag[]
+  notes?: string
+  displayColor?: string
+}
+
+export type ContestDataPkm = {
+  contest?: ContestStats
+}
+
+export type FourMovesPkm = {
+  movePP: FourMoves
+  movePPUps: FourMoves
+  moves: FourMoves
+}
+
+export type LevelPkm = {
+  getLevel: () => number
 }

@@ -6,7 +6,7 @@ import { cssClass } from '@openhome-ui/util/style'
 import { all_species_data, FormMetadata, Language, Lookup, SpeciesMetadata } from '@pkm-rs/pkg'
 import { CSSProperties, useEffect, useMemo, useRef } from 'react'
 import './PokedexSidebar.css'
-import { getHighestFormeStatus, StatusIndices } from './util'
+import { getHighestFormStatus, StatusIndices } from './util'
 
 export type PokedexSidebarProps = {
   filter?: string
@@ -21,7 +21,7 @@ export default function PokedexSidebar(props: PokedexSidebarProps) {
     filter,
     selectedSpecies,
     setSelectedSpecies,
-    setSelectedForm: setSelectedForme,
+    setSelectedForm: setSelectedForm,
     pokedex,
   } = props
 
@@ -66,12 +66,12 @@ export default function PokedexSidebar(props: PokedexSidebarProps) {
             species={filteredSpecies[virtualRow.index]}
             onClick={() => {
               setSelectedSpecies(filteredSpecies[virtualRow.index])
-              const [caughtFormeIndex] = getHighestFormeStatus(
+              const [caughtFormIndex] = getHighestFormStatus(
                 pokedex,
                 filteredSpecies[virtualRow.index]
               )
 
-              setSelectedForme(filteredSpecies[virtualRow.index].forms[caughtFormeIndex])
+              setSelectedForm(filteredSpecies[virtualRow.index].forms[caughtFormIndex])
               virtualizer.scrollToIndex(virtualRow.index, { behavior: 'smooth', align: 'center' })
             }}
             selected={
@@ -99,7 +99,7 @@ type PokedexTabProps = {
 
 function PokedexSidebarButton({ pokedex, species, onClick, selected, style }: PokedexTabProps) {
   const [formIndex, maxStatus] = useMemo(() => {
-    return getHighestFormeStatus(pokedex, species)
+    return getHighestFormStatus(pokedex, species)
   }, [pokedex, species])
 
   const isSeen = maxStatus && StatusIndices[maxStatus] >= StatusIndices.Seen

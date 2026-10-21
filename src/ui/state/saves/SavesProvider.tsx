@@ -8,7 +8,16 @@ import PromptDialog from '@openhome-ui/components/dialog/PromptDialog'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { Button, Callout, Flex } from '@radix-ui/themes'
-import { ReactNode, useCallback, useContext, useEffect, useReducer, useRef, useState } from 'react'
+import {
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useEffectEvent,
+  useReducer,
+  useRef,
+  useState,
+} from 'react'
 import { useNavigate } from 'react-router'
 import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import { useConvertStrategies } from '../convert-strategies'
@@ -32,6 +41,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
   const [openSavesState, openSavesDispatch] = useReducer(openSavesReducer, {
     monsToRelease: [],
     openSaves: {},
+    pendingMonLocations: [],
   })
   const { defaultConvertStrategy } = useConvertStrategies()
   const disambiguationResolver = useRef<Option<SaveTypeCallback>>(undefined)
@@ -177,6 +187,8 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     }
   }, [backend, itemBagState.loaded, itemBagState.error, bagDispatch])
 
+  const clearOhpkmCache = useEffectEvent(ohpkmStore.clearCache)
+
   useEffect(() => {
     // returns a function to stop listening
     const stopListening = backend.onMenuEvents({
@@ -184,6 +196,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       reset: () => {
         openSavesDispatch({ type: 'clear_mons_to_release' })
         reloadBankStore()
+        clearOhpkmCache()
         openSavesDispatch({ type: 'close_all_saves' })
       },
     })

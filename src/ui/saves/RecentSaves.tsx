@@ -129,7 +129,7 @@ export default function RecentSaves(props: RecentSavesProps) {
           <Badge.Game
             originGame={value.game ?? undefined}
             plugin={value.pluginIdentifier as PluginIdentifier}
-            withName
+            withNameAbbr
             tooltip={value.filePath.raw}
           />
         </div>

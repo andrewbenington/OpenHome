@@ -65,7 +65,7 @@ public static class Pk7Object
             met_level = pk.MetLevel,
             trainer_gender = Util.FormatGender(pk.OriginalTrainerGender),
             hyper_training = Util.HyperTrainingData(pk),
-            game_of_origin = strings.gamelist.GetValue((int)pk.Version),
+            game_of_origin = Util.FormatGame(pk.Version, strings),
             country = pk.Country,
             region = pk.Region,
             console_region = pk.ConsoleRegion,

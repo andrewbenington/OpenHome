@@ -1,8 +1,9 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { PkmFormSpecifiers } from '@openhome-core/pkm/util/pkmInterface'
 import { Errorable } from '@openhome-core/util/functional'
 import { ConvertStrategy, ExtraFormIndex, OriginGame, PkmFormat } from '@pkm-rs/pkg'
-import { PluginSAV, SAV } from '../interfaces'
+import { PluginIdentifier, PluginSAV, SAV } from '../interfaces'
 import { PathData } from './path'
 import { TransferRestrictions } from './TransferRestrictions'
 
@@ -33,16 +34,16 @@ export interface SAVClass<S extends SAV = SAV> {
 
 export interface PluginSaveClass<S extends PluginSAV = PluginSAV> extends SAVClass<S> {
   transferRestrictions: TransferRestrictions
-  getPluginIdentifier: () => string
+  getPluginIdentifier: () => PluginIdentifier
 }
 
 export function supportsMon(
   saveType: SAVClass,
   nationalDex: number,
-  formeNumber: number,
+  formNumber: number,
   extraFormIndex?: ExtraFormIndex
 ): boolean {
-  return saveType.prototype.supportsMon(nationalDex, formeNumber, extraFormIndex)
+  return saveType.prototype.supportsMon(nationalDex, formNumber, extraFormIndex)
 }
 
 export function monSupportedBySaveType(
@@ -53,7 +54,7 @@ export function monSupportedBySaveType(
   return supportsMon(saveType, mon.nationalDex, mon.formIndex, mon.extraFormIndex)
 }
 
-export function monSupportedBySave(save?: SAV, mon?: PKMInterface): boolean {
+export function monSupportedBySave(save?: SAV, mon?: PkmFormSpecifiers): boolean {
   if (!save || !mon) return false
   return save.supportsMon(mon.nationalDex, mon.formIndex, mon.extraFormIndex)
 }

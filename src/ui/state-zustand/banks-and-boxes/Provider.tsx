@@ -4,33 +4,34 @@ import { R } from '@openhome-core/util/functional'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import LoadingIndicator from '@openhome-ui/components/LoadingIndicator'
 import { Callout } from '@radix-ui/themes'
-import { PropsWithChildren, useCallback, useState } from 'react'
+import { PropsWithChildren, useEffect, useState } from 'react'
 import { BanksAndBoxesStoreContext, createBanksAndBoxesStore } from './store'
 
 type InnerProviderProps = {
-  storedBanksAndBoxes: StoredBankData
-  loadAllHomeData: () => Promise<void>
+  initialData: StoredBankData
 } & PropsWithChildren
 
 export default function BanksAndBoxesProvider(props: PropsWithChildren) {
-  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string>()
   const backend = useBackend()
-  const [storedBanksAndBoxes, setStoredBanksAndBoxes] = useState<StoredBankData>()
+  const [initialData, setInitialData] = useState<StoredBankData>()
 
-  const loadAllHomeData = useCallback(async () => {
-    if (error) return
-
-    setLoading(true)
-    await backend.loadHomeBanks().then(
+  useEffect(() => {
+    let cancelled = false
+    backend.loadHomeBanks().then(
       R.match(
-        (banks) => setStoredBanksAndBoxes(banks),
-        (err) => setError(err)
+        (banks) => {
+          if (!cancelled) setInitialData(banks)
+        },
+        (err) => {
+          if (!cancelled) setError(err)
+        }
       )
     )
-
-    setLoading(false)
-  }, [backend, error])
+    return () => {
+      cancelled = true
+    }
+  }, [backend])
 
   if (error) {
     return (
@@ -43,21 +44,17 @@ export default function BanksAndBoxesProvider(props: PropsWithChildren) {
     )
   }
 
-  if (!storedBanksAndBoxes) {
-    if (!loading) {
-      loadAllHomeData()
-    }
+  if (!initialData) {
     return <LoadingIndicator message="Loading OpenHome boxes..." />
   }
 
-  return (
-    <InnerProvider storedBanksAndBoxes={storedBanksAndBoxes} loadAllHomeData={loadAllHomeData}>
-      {props.children}
-    </InnerProvider>
-  )
+  return <InnerProvider initialData={initialData}>{props.children}</InnerProvider>
 }
 
-function InnerProvider({ storedBanksAndBoxes, loadAllHomeData, children }: InnerProviderProps) {
-  const [store] = useState(() => createBanksAndBoxesStore(storedBanksAndBoxes, loadAllHomeData))
+function InnerProvider({ initialData, children }: InnerProviderProps) {
+  const backend = useBackend()
+  const [store] = useState(() =>
+    createBanksAndBoxesStore(initialData, () => backend.loadHomeBanks())
+  )
   return <BanksAndBoxesStoreContext value={store}>{children}</BanksAndBoxesStoreContext>
 }

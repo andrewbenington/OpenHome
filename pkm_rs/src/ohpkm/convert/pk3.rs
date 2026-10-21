@@ -1,10 +1,10 @@
 use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_resources::ribbons::Gen3Ribbon;
 use pkm_rs_resources::{items::ItemGen3, lookup};
-use pkm_rs_types::{AbilityNumber, Generation, PokeDate, Stats16Le};
+use pkm_rs_types::{AbilityNumber, Generation, PokeDate, SimpleAbilityNumber, Stats16Le};
 
 use super::OhpkmConvert;
-use crate::convert_strategy::{ConvertStrategy, PidModificationStrategy, PkmConverter};
+use crate::convert_strategy::{ConvertStrategy, PkmConverter, ShinyOdds};
 use crate::gen3::{Gen3PokemonIndex, PK3_MAX_ABILITY, Pk3};
 use crate::ohpkm::OhpkmV2;
 use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
@@ -15,7 +15,7 @@ use crate::{gen3, ohpkm, util::personality_value};
 
 impl OhpkmConvert for Pk3 {
     fn to_main_data(&self) -> ohpkm::v2_sections::MainDataV2 {
-        let form_metadata = self.get_forme_metadata();
+        let form_metadata = self.get_form_metadata();
 
         let ability_index_unchecked = form_metadata.get_ability(self.ability_num.into());
         let ability_index = if ability_index_unchecked.to_u16() > PK3_MAX_ABILITY {
@@ -120,11 +120,20 @@ impl OhpkmConvert for Pk3 {
         }
 
         let personality_value = if ohpkm.game_of_origin().generation() != Generation::G3 {
-            PidModificationStrategy::default().get_modified_pid(ohpkm)
+            converter.personality_value(ohpkm, ShinyOdds::Odds8192)
         } else if ohpkm.pid_bit_flipped_for_shiny() {
             personality_value::flip_most_significant_bit(ohpkm.personality_value())
         } else {
             ohpkm.personality_value()
+        };
+
+        let form_metadata = ohpkm.get_form_metadata();
+
+        let ability_index_unchecked = form_metadata.get_ability(ohpkm.ability_num());
+        let ability_num = if ability_index_unchecked.to_u16() <= PK3_MAX_ABILITY {
+            SimpleAbilityNumber::from(ohpkm.ability_num())
+        } else {
+            SimpleAbilityNumber::First
         };
 
         let mut mon = Self {
@@ -139,7 +148,7 @@ impl OhpkmConvert for Pk3 {
             exp: ohpkm.exp(),
             has_species_data: true,
             is_bad_egg: false,
-            ability_num: ohpkm.ability_num().into(),
+            ability_num,
             markings: ohpkm.markings().into(),
             personality_value,
             is_fateful_encounter: ohpkm.is_fateful_encounter(),

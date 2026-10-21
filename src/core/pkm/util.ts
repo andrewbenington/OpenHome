@@ -17,6 +17,8 @@ import {
   AbilityNumber,
   calculateStats,
   currentMetadataReader,
+  ExtraFormIndex,
+  extraFormMetadata,
   extraFormTypeOverride,
   FormMetadata,
   metadataReaderFor,
@@ -30,6 +32,7 @@ import {
 } from '@pkm-rs/pkg'
 import Prando from 'prando'
 import { AllPKMs, PKMWithModernEVs, PKMWithModernIVs, PKMWithNature } from './util/interfaces'
+import { FormSpecifiersForFormat, PkmFormSpecifiers } from './util/pkmInterface'
 
 export const getAbilityFromNumber = (
   nationalDex: number,
@@ -91,9 +94,13 @@ export const generateIVs = (prng: Prando) => {
 
 // recursively returns pre-evolution. if provided a mega form, returns the first pre-evolution
 // of the base form.
-export const getBaseEvolution = (nationalDex: number, form?: number) => {
+export const getBaseEvolution = (
+  nationalDex: number,
+  form?: number,
+  extraForm?: ExtraFormIndex
+) => {
   let mon = SpeciesForm.tryNew(nationalDex, form ?? 0)
-  let metadata = mon?.getMetadata()
+  let metadata = extraForm ? extraFormMetadata(extraForm) : mon?.getMetadata()
 
   if (metadata?.isMega) {
     metadata = metadata?.getMegaBaseForm() ?? metadata
@@ -107,7 +114,7 @@ export const getBaseEvolution = (nationalDex: number, form?: number) => {
   return mon
 }
 
-export function baseEvolutionsMatch(mon1: PKMInterface, mon2: PKMInterface): boolean {
+export function baseEvolutionsMatch(mon1: PkmFormSpecifiers, mon2: PkmFormSpecifiers): boolean {
   let baseEvo1 = getBaseEvolution(mon1.nationalDex, mon1.formIndex)
   let baseEvo2 = getBaseEvolution(mon2.nationalDex, mon2.formIndex)
 
@@ -134,7 +141,7 @@ export const getPrevos = (nationalDex: number, formIndex?: number) => {
   return prevos
 }
 
-export const getTypes = (mon: PKMInterface): PkmType[] => {
+export const getTypes = (mon: FormSpecifiersForFormat): PkmType[] => {
   if (mon.extraFormIndex !== undefined) {
     const extraFormTypeIndices: PkmType[] | undefined = extraFormTypeOverride(mon.extraFormIndex)
     if (extraFormTypeIndices) {
@@ -399,15 +406,19 @@ export function isZCrystal(itemIndex: number) {
   )
 }
 
-export function isBattleFormeItem(nationalDex: number, itemIndex?: number) {
-  return (
-    (nationalDex === NationalDex.Necrozma &&
-      (itemIndex === Item.UltranecroziumZ_1 || itemIndex === Item.UltranecroziumZ_2)) ||
-    (nationalDex === NationalDex.Groudon && itemIndex === Item.RedOrb) ||
-    (nationalDex === NationalDex.Kyogre && itemIndex === Item.BlueOrb) ||
-    (nationalDex === NationalDex.Zacian && itemIndex === Item.RustedSword) ||
-    (nationalDex === NationalDex.Zamazenta && itemIndex === Item.RustedShield)
-  )
+export function isBattleFormItem(nationalDex: number, itemIndex?: number) {
+  switch (nationalDex) {
+    case NationalDex.Necrozma:
+      return itemIndex === Item.UltranecroziumZ_1 || itemIndex === Item.UltranecroziumZ_2
+    case NationalDex.Groudon:
+      return itemIndex === Item.RedOrb
+    case NationalDex.Kyogre:
+      return itemIndex === Item.BlueOrb
+    case NationalDex.Zacian:
+      return itemIndex === Item.RustedSword
+    case NationalDex.Zamazenta:
+      return itemIndex === Item.RustedShield
+  }
 }
 
 export function displayIndexAdder(itemIndex?: number) {

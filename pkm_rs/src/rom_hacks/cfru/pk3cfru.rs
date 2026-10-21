@@ -449,13 +449,13 @@ impl<I: CfruSpeciesIndex> IsShiny for Pk3Cfru<I> {
 //         self.try_get_species_and_form().get_species_metadata()
 //     }
 
-//     fn get_forme_metadata(&self) -> &'static FormMetadata {
-//         self.species_and_form.get_forme_metadata()
+//     fn get_form_metadata(&self) -> &'static FormMetadata {
+//         self.species_and_form.get_form_metadata()
 //     }
 
 //     fn calculate_level(&self) -> u8 {
 //         self.get_species_metadata()
-//             .level_up_type
+//             .experience_growth
 //             .calculate_level(self.exp)
 //     }
 // }

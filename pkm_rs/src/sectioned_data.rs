@@ -94,45 +94,25 @@ impl<Tag: SectionTag> SectionMetadata<Tag> {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, thiserror::Error)]
 pub enum Error {
+    #[error("buffer too short for field {field}: expected {expected}, received {received}")]
     BufferTooShort {
         field: String,
         expected: usize,
         received: usize,
     },
+    #[error(
+        "section {section_name} out of bounds at offset {offset}/length {length}/buffer_size {buffer_size}"
+    )]
     SectionOutOfBounds {
         section_name: String,
         offset: SectionOffset,
         length: SectionLength,
         buffer_size: usize,
     },
+    #[error("data has incorrect magic number")]
     BadMagicNumber,
-}
-
-impl Display for Error {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Error::BufferTooShort {
-                field,
-                expected,
-                received,
-            } => write!(
-                f,
-                "buffer too short for field {field}: expected {expected}, received {received}"
-            ),
-            Error::SectionOutOfBounds {
-                section_name,
-                offset,
-                length,
-                buffer_size,
-            } => write!(
-                f,
-                "section {section_name} out of bounds at offset {offset}/length {length}/buffer_size {buffer_size}"
-            ),
-            Error::BadMagicNumber => f.write_str("data has incorrect magic number"),
-        }
-    }
 }
 
 pub type Result<T> = core::result::Result<T, Error>;

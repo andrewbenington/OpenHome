@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize, Serializer};
 use strum_macros::{Display, EnumString};
 
 use crate::language::Language;
+use crate::{JsResult, TryIntoTs, TsResult};
 use crate::{OriginGame, strings::SizedUtf16String, util};
 
 #[cfg(feature = "randomize")]
@@ -13,7 +14,7 @@ use pkm_rs_types::randomize::Randomize;
 use rand::{RngExt, random_range};
 
 #[cfg(feature = "wasm")]
-use tsify::Tsify;
+use tsify::{Ts, Tsify};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -505,6 +506,7 @@ pub struct TrainerData {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub name: SizedUtf16String<26>,
     pub friendship: u8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub memory: TrainerMemory,
     pub affection: u8,
     pub gender: BinaryGender,
@@ -522,34 +524,38 @@ impl TrainerData {
         self.name.to_string()
     }
 
+    #[wasm_bindgen(getter)]
+    pub fn memory(&self) -> TsResult<TrainerMemory> {
+        self.memory.try_into_ts()
+    }
+
     #[wasm_bindgen(constructor)]
     pub fn new(
         id: u16,
         secret_id: u16,
         name: String,
         friendship: u8,
-        memory: Option<TrainerMemory>,
+        memory: Option<Ts<TrainerMemory>>,
         affection: u8,
         gender: BinaryGender,
         language: Language,
         origin_game: Option<OriginGame>,
-    ) -> Self {
-        Self {
+    ) -> JsResult<Self> {
+        Ok(Self {
             id,
             secret_id,
             name: name.into(),
             friendship,
-            memory: memory.unwrap_or_default(),
+            memory: memory.map(|m| m.to_rust()).transpose()?.unwrap_or_default(),
             affection,
             gender,
             language,
             origin_game,
-        }
+        })
     }
 }
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Clone, Copy, Default, Serialize, PartialEq, Eq)]
 pub struct TrainerMemory {
@@ -624,7 +630,6 @@ impl TrainerMemory {
 }
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Clone, Copy, Default, Serialize)]
 pub struct Geolocation {
@@ -646,7 +651,6 @@ impl Geolocation {
 }
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Clone, Copy, Default, Serialize)]
 pub struct Geolocations(
@@ -694,7 +698,8 @@ impl BitSet for u8 {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Default, Debug, Clone, Copy)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
+#[derive(Default, Debug, Clone, Copy, Hash, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ShinyLeaves(u8);
 
 impl ShinyLeaves {
@@ -716,36 +721,56 @@ impl ShinyLeaves {
     pub const fn new_crown() -> Self {
         Self(0b100000)
     }
+
+    pub fn update_from(&mut self, other: &Self) {
+        if !(self.has_crown() || other.has_crown()) {
+            self.0 |= other.0;
+        } else {
+            *self = Self::new_crown();
+        }
+    }
 }
 
 #[cfg(feature = "wasm")]
-impl Serialize for ShinyLeaves {
-    fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+impl std::fmt::Display for ShinyLeaves {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if self.has_crown() {
-            serializer.serialize_str("Crown")
+            f.write_str("Crown")
         } else if self.0 == 0 {
-            serializer.serialize_str("No Leaves")
+            f.write_str("No Leaves")
         } else {
-            let mut leaves = vec![];
+            let needs_comma = &mut false;
+
+            let mut write_separator = |f: &mut std::fmt::Formatter<'_>| {
+                if *needs_comma {
+                    f.write_str(", ")
+                } else {
+                    *needs_comma = true;
+                    Ok(())
+                }
+            };
+
             if self.has_first() {
-                leaves.push("First");
+                write_separator(f)?;
+                f.write_str("First")?;
             }
             if self.has_second() {
-                leaves.push("Second");
+                write_separator(f)?;
+                f.write_str("Second")?;
             }
             if self.has_third() {
-                leaves.push("Third");
+                write_separator(f)?;
+                f.write_str("Third")?;
             }
             if self.has_fourth() {
-                leaves.push("Fourth");
+                write_separator(f)?;
+                f.write_str("Fourth")?;
             }
             if self.has_fifth() {
-                leaves.push("Fifth");
+                write_separator(f)?;
+                f.write_str("Fifth")?;
             }
-            serializer.serialize_str(&leaves.join(", "))
+            Ok(())
         }
     }
 }
@@ -921,7 +946,8 @@ impl TryFrom<u3> for AbilityNumber {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, thiserror::Error)]
+#[error("invalid ability number: {0}")]
 pub struct InvalidAbilityNumber(pub u3);
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
@@ -929,7 +955,6 @@ pub struct InvalidAbilityNumber(pub u3);
 pub struct Pokerus(u8);
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Serialize, Deserialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Clone, Copy, EnumString)]
 pub enum PokerusStatus {
     Uninfected,
@@ -1017,8 +1042,8 @@ impl Pokerus {
     }
 
     #[wasm_bindgen(js_name = status)]
-    pub fn status_wasm(&self) -> PokerusStatus {
-        self.status()
+    pub fn status_wasm(&self) -> TsResult<PokerusStatus> {
+        self.status().try_into_ts()
     }
 
     #[wasm_bindgen(js_name = clone)]
@@ -1108,7 +1133,13 @@ mod tests {
         }
     }
 
-    #[cfg(feature = "wasm")]
+    #[test]
+    fn shiny_leaves_display() {
+        assert_eq!(ShinyLeaves::from_byte(0b0001).to_string(), "First");
+        assert_eq!(ShinyLeaves::from_byte(0b1010).to_string(), "Second, Fourth");
+        assert_eq!(ShinyLeaves::new_crown().to_string(), "Crown");
+    }
+
     #[test]
     fn pokerus_strain() {
         let byte = 0xc4;

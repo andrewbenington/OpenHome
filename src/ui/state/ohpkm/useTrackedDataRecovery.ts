@@ -90,7 +90,7 @@ export default function useTrackedDataRecovery() {
     return ohpkmStore
       .syncOhpkmIfTracked(state.recoveredDataOhpkmId, mon, save)
       .awaitFlatMap(async (updated) => {
-        await savesManager.overwriteMonAtLocation(state.monToRecoverLocation, updated?.openhomeId)
+        await savesManager.overwriteOhpkmAtLocation(state.monToRecoverLocation, updated?.openhomeId)
         if (state.sourceMonOhpkmId) {
           savesManager.releaseMonsById(state.sourceMonOhpkmId)
         }

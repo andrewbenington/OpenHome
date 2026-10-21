@@ -163,6 +163,7 @@ export const TauriBackend: BackendInterface = {
       }))
     ),
   registerInPokedex: Commands.updatePokedex,
+  syncPokedex: Commands.syncPokedex,
 
   /* openhome boxes */
   loadHomeBanks: () => Commands.loadBanks().then(R.map(deserializeBankData)),

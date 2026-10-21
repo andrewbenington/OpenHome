@@ -468,6 +468,40 @@ describe('OHPKM game data sync', () => {
   })
 })
 
+describe('OHPKM sync updates learned moves', () => {
+  const THUNDER_SHOCK = 84
+  const AGILITY = 97
+  const SKULL_BASH = 130
+  const THUNDER = 87
+  const VOLT_TACKLE = 344
+
+  test('Move sync pulls in current moves', () => {
+    const original = OHPKM.defaultWithSpecies(NationalDex.Pikachu, 0)
+    original.moves = [THUNDER_SHOCK, 0, 0, 0]
+
+    original.populateLearnedMoves()
+    expect(Array.from(original.learnedMovesWasm)).toEqual([THUNDER_SHOCK])
+  })
+
+  test('Current moves are added', () => {
+    const original = OHPKM.defaultWithSpecies(NationalDex.Pikachu, 0)
+    original.moves = [84, 0, 0, 0]
+    original.populateLearnedMoves()
+
+    const converted = R.assert(PK9.fromOhpkm(original, ConvertStrategies.getDefault()))
+
+    converted.moves = [SKULL_BASH, AGILITY, THUNDER, VOLT_TACKLE]
+
+    original.syncWithGameData(converted)
+
+    const expected = [THUNDER_SHOCK, SKULL_BASH, AGILITY, THUNDER, VOLT_TACKLE]
+    const actual = Array.from(original.learnedMovesWasm)
+
+    expect(actual).toEqual(expect.arrayContaining(expected))
+    expect(actual).toHaveLength(5)
+  })
+})
+
 describe('OHPKM sync updates SwSh data', () => {
   test('dynamax level', () => {
     const slowbroBytes = new Uint8Array(fs.readFileSync(pkmTestFilePath('ohpkm', 'slowbro.ohpkm')))

@@ -14,10 +14,11 @@ import {
   ConvertStrategy,
   ExtraFormIndex,
   Languages,
+  ObjectBlock,
   OriginGame,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
-import { blockIsType, ObjectBlock, SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
+import { BlockDataFor, blockIsType, SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
 import { emptyPathData, PathData } from '../util/path'
 import { G89BlockName, Gen8Gen9Save } from './Gen8Gen9Save'
 
@@ -43,7 +44,7 @@ export class LegendsZaSave extends Gen8Gen9Save<PA9> {
   constructor(path: PathData, bytes: Uint8Array) {
     super(path, bytes)
 
-    this.trainerBlock = new MyStatus(this.getBlockMust('MyStatus', 'Object'))
+    this.trainerBlock = new MyStatus(this.getBlockDataMust('MyStatus', 'Object').Object)
     this.name = this.trainerBlock.getName()
 
     this.boxes.forEach((box, i) => {
@@ -80,21 +81,21 @@ export class LegendsZaSave extends Gen8Gen9Save<PA9> {
     return this.scBlocks.find((b) => b.key === key)
   }
 
-  getBlockMust<T extends Block = Block>(
+  getBlockDataMust<T extends BlockType>(
     blockName: G89BlockName | keyof typeof BlockKeys,
-    type?: BlockType
-  ): T {
+    type: T
+  ): BlockDataFor<T> {
     const block = this.getBlock(blockName)
 
     if (!block) {
       throw Error(`Missing block ${blockName}`)
     }
-    if (type && !blockIsType(block, type)) {
+    if (!blockIsType(block, type)) {
       throw Error(
         `Block ${blockName} has data ${JSON.stringify(block.data)} (expected ${JSON.stringify(type)})`
       )
     }
-    return block as T
+    return block.data
   }
 
   getMonBoxSizeBytes(): number {
@@ -109,18 +110,13 @@ export class LegendsZaSave extends Gen8Gen9Save<PA9> {
     return BOX_SLOT_GAP_BYTES
   }
 
-  supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+  supportsMon(nationalDex: number, formNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
     const revision = this.scBlocks ? this.getSaveRevision() : 'Mega Dimension'
     switch (revision) {
       case 'Base Game':
-        return !isRestricted(
-          ZA_TRANSFER_RESTRICTIONS_BASE,
-          nationalDex,
-          formeNumber,
-          extraFormIndex
-        )
+        return !isRestricted(ZA_TRANSFER_RESTRICTIONS_BASE, nationalDex, formNumber, extraFormIndex)
       case 'Mega Dimension':
-        return !isRestricted(ZA_TRANSFER_RESTRICTIONS_MD, nationalDex, formeNumber, extraFormIndex)
+        return !isRestricted(ZA_TRANSFER_RESTRICTIONS_MD, nationalDex, formNumber, extraFormIndex)
     }
   }
 
@@ -202,7 +198,7 @@ class MyStatus {
   dataView: DataView<ArrayBuffer>
 
   constructor(scBlock: ObjectBlock) {
-    this.dataView = new DataView(scBlock.data.Object.bytes.buffer)
+    this.dataView = new DataView(scBlock.bytes.buffer)
   }
 
   public getName(): string {

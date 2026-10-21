@@ -336,6 +336,18 @@ impl OpenHomeRibbon {
     }
 }
 
+impl From<ObsoleteRibbon> for OpenHomeRibbon {
+    fn from(value: ObsoleteRibbon) -> Self {
+        Self::Obs(value)
+    }
+}
+
+impl From<ModernRibbon> for OpenHomeRibbon {
+    fn from(value: ModernRibbon) -> Self {
+        Self::Mod(value)
+    }
+}
+
 impl Display for OpenHomeRibbon {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(&match self {
@@ -460,8 +472,11 @@ impl<const MODERN_BYTE_COUNT: usize> OpenHomeRibbonSet<MODERN_BYTE_COUNT> {
         self.obsolete.get_ribbons()
     }
 
-    pub fn includes(&self, ribbon: OpenHomeRibbon) -> bool {
-        match ribbon {
+    pub fn includes<R>(&self, ribbon: R) -> bool
+    where
+        OpenHomeRibbon: From<R>,
+    {
+        match ribbon.into() {
             OpenHomeRibbon::Mod(ribbon) => self.modern.includes(ribbon),
             OpenHomeRibbon::Obs(ribbon) => self.obsolete.get_ribbons().contains(&ribbon),
         }

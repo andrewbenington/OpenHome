@@ -65,7 +65,7 @@ export default function Gen12Lookup({ onSelectMon }: Gen12LookupProps) {
         <Badge.Game
           originGame={value.homeMon?.gameOfOrigin}
           plugin={value.homeMon?.pluginOrigin as PluginIdentifier}
-          withName
+          withNameAbbr
         />
       ),
       getFilterValue: (val) =>

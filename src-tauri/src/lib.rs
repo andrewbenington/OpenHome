@@ -13,10 +13,11 @@ mod version;
 
 use crate::data_controller::ToDataController;
 use crate::synced_state::AllSyncedState;
-use openhome_core::convert_strategies::ConvertStrategies;
+use openhome_core::convert_strategies::{ConvertStrategies, NamedStrategy};
 use openhome_core::lookup::LookupState;
 use openhome_core::ohpkm_store::OhpkmBytesStore;
 use openhome_core::{Error, Result};
+use pkm_rs::convert_strategy::ShinyOdds;
 use pkm_rs::ohpkm::OhpkmV2;
 use std::env;
 use tauri::Manager;
@@ -44,12 +45,13 @@ pub fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
         commands::open_directory,
         commands::open_file_location,
         commands::find_suggested_saves,
-        startup_config::get_data_dir_path,
-        startup_config::change_data_dir,
         commands::load_banks,
         commands::write_banks,
-        state::get_pokedex,
-        state::update_pokedex,
+        commands::get_pokedex,
+        commands::update_pokedex,
+        commands::sync_pokedex,
+        startup_config::get_data_dir_path,
+        startup_config::change_data_dir,
         state::start_transaction,
         state::rollback_transaction,
         state::commit_transaction,
@@ -108,7 +110,7 @@ pub fn run() {
 
             let controller = app.handle().controller();
 
-            let ohpkm_store = match OhpkmBytesStore::load_from_mons_v2(&controller) {
+            let ohpkm_store = match OhpkmBytesStore::load(&controller) {
                 Ok(state) => state,
                 Err(err) => {
                     util::show_error_dialog(app, err, launch_error_msg("OHPKM Load"));
@@ -118,10 +120,20 @@ pub fn run() {
                 }
             };
 
-            let mut lookup_state = match LookupState::load_from_storage(&controller) {
+            let mut lookup_state = match LookupState::load(&controller) {
                 Ok(lookup) => lookup,
                 Err(err) => {
                     util::show_error_dialog(app, err, launch_error_msg("Lookup File"));
+
+                    app.handle().exit(1);
+                    std::process::exit(1);
+                }
+            };
+
+            let conversion_settings = match ConvertStrategies::load(&controller) {
+                Ok(settings) => settings,
+                Err(err) => {
+                    util::show_error_dialog(app, err, launch_error_msg("Conversion Settings"));
 
                     app.handle().exit(1);
                     std::process::exit(1);
@@ -132,23 +144,19 @@ pub fn run() {
                 ohpkm_store
                     .all_entries()
                     .filter_map(|(_, bytes)| OhpkmV2::from_bytes(bytes).ok()),
+                &conversion_settings
+                    .get_default()
+                    .map(NamedStrategy::inner)
+                    .copied()
+                    .unwrap_or_default()
+                    .pid_strategy(ShinyOdds::Odds8192),
             );
-
-            let conversion_settings = match ConvertStrategies::load_from_storage(&controller) {
-                Ok(settings) => settings,
-                Err(err) => {
-                    util::show_error_dialog(app, err, launch_error_msg("Conversion Settings"));
-
-                    app.handle().exit(1);
-                    std::process::exit(1);
-                }
-            };
 
             let synced_state =
                 AllSyncedState::from_states(lookup_state, ohpkm_store, conversion_settings);
             app.manage(synced_state);
 
-            let pokedex_state = match state::PokedexState::load_from_storage(&controller) {
+            let pokedex_state = match openhome_core::PokedexState::load_from_storage(&controller) {
                 Ok(pokedex) => pokedex,
                 Err(err) => {
                     util::show_error_dialog(app, err, launch_error_msg("Pokedex File"));

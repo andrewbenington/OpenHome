@@ -7,7 +7,7 @@ pub(crate) fn try_all_forms(
 ) -> Result<(), String> {
     for national_dex in NationalDex::all() {
         for form in national_dex.get_species_metadata().forms {
-            callback(form.forme_ref())?;
+            callback(form.species_form())?;
         }
     }
     Ok(())
