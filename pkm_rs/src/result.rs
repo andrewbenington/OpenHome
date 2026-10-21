@@ -80,6 +80,8 @@ pub enum Error {
     TagError { tag_type: &'static str, value: u16 },
     #[error(transparent)]
     StringDecode(#[from] StringErrorSource),
+
+
     #[cfg(feature = "wasm")]
     #[error(transparent)]
     SwishCrypto(#[from] SwishError),
