@@ -95,6 +95,8 @@ jobs:
         run: pnpm run wasm-compile-dev
 
       - name: Run Tests
+        env:
+          RUST_BACKTRACE: full
         run: ./scripts/run-ui-tests.sh
 
       - name: Upload Logs
