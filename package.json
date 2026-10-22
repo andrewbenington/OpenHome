@@ -52,8 +52,8 @@
     "wasm-compile": "wasm-pack build --release ./pkm_rs --target web -- --features wasm && node scripts/patch-types.mjs",
     "precommit": "pnpm typecheck && pnpm format && pnpm lint",
     "postinstall": "pnpm wasm-compile-dev",
-    "ui-test": "pnpm ui-test-build && pnpm wdio",
-    "wdio": "UI_TEST_DATA_FOLDER='test-files/openhome' wdio run ./wdio.conf.ts"
+    "ui-test": "./scripts/run-ui-tests.sh",
+    "wdio": "UI_TEST_DATA_FOLDER='ui-tests/ui-tests-data-dir' wdio run ./wdio.conf.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

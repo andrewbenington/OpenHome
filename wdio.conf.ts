@@ -1,6 +1,6 @@
 export const config: WebdriverIO.Config = {
   runner: 'local',
-  specs: ['./test/specs/**/*.spec.ts'],
+  specs: ['./ui-tests/specs/**/*.spec.ts'],
   maxInstances: 1,
 
   // Tauri
