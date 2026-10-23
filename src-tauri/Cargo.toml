@@ -17,9 +17,9 @@ crate-type = ["cdylib", "rlib"]
 tauri-build = { version = "2.6.3", features = [] }
 
 [dependencies]
-pkm_rs = {path = "../pkm_rs"}
-pkm_rs_derive = {path = "../pkm_rs_derive"}
-openhome_core = {path = "../openhome_core", features = ["desktop"] }
+pkm_rs = { path = "../pkm_rs" }
+pkm_rs_derive = { path = "../pkm_rs_derive" }
+openhome_core = { path = "../openhome_core", features = ["desktop"] }
 tauri = { version = "2.11.5", features = ["protocol-asset", "devtools"] }
 tauri-plugin-shell = "2.3.6"
 serde = { version = "1.0.229", features = ["derive"] }
@@ -44,7 +44,7 @@ tracing-subscriber = { version = "0.3.23", features = ["env-filter", "json"] }
 tracing-appender = "0.2.5"
 chrono = { version = "0.4.45", features = ["serde"] }
 tokio = "1.53.1"
-specta = { version = "=2.0.0-rc.22", features = ["chrono", "serde_json", "uuid" ] }
+specta = { version = "=2.0.0-rc.22", features = ["chrono", "serde_json", "uuid"] }
 specta-typescript = "0.0.9"
 tauri-specta = { version = "=2.0.0-rc.21", features = ["derive", "typescript"] }
 pkm_rs_types = { version = "1.18.1", path = "../pkm_rs_types" }

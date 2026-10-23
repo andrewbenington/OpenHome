@@ -1,31 +1,26 @@
 {
-  "productName": "OpenHome",
   "name": "openhome",
   "version": "1.18.1",
+  "private": true,
   "description": "A tool for moving Pokémon between game saves",
   "keywords": [
-    "pokemon",
     "home",
-    "openhome"
+    "openhome",
+    "pokemon"
   ],
   "homepage": "https://github.com/andrewbenington/OpenHome#readme",
   "bugs": {
     "url": "https://github.com/andrewbenington/OpenHome/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/andrewbenington/OpenHome.git"
-  },
-  "packageManager": "pnpm@12.4.1",
-  "engines": {
-    "node": ">=v24.2.0"
   },
   "license": "GPL-3.0-only",
   "author": {
     "name": "Andrew Benington",
     "email": "andrewbenington57@gmail.com"
   },
-  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andrewbenington/OpenHome.git"
+  },
   "workspaces": [
     "packages/*",
     "scripts/*",
@@ -34,7 +29,7 @@
   "main": "./out/main/index.js",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "format": "prettier --write .",
+    "format": "oxfmt",
     "lint": "eslint src --max-warnings 0 --report-unused-disable-directives -c eslint.config.mjs --fix && pnpm clippy",
     "lint:ci": "eslint src --max-warnings 0 --report-unused-disable-directives -c eslint.config.mjs && pnpm clippy",
     "clippy": "cargo clippy --all-targets --all-features --profile test -- -Dwarnings",
@@ -129,6 +124,7 @@
     "expect-webdriverio": "^7.0.1",
     "globby": "^16.2.4",
     "jsdom": "^30.1.3",
+    "oxfmt": "^0.74.0",
     "oxlint": "^1.83.0",
     "oxlint-tsgolint": "^7.0.2002",
     "react-dom": "^19.3.1",
@@ -137,5 +133,10 @@
     "vite": "^8.3.4",
     "vitest": "^5.0.5",
     "webdriverio": "^9.32.0"
-  }
+  },
+  "engines": {
+    "node": ">=v24.2.0"
+  },
+  "packageManager": "pnpm@12.4.1",
+  "productName": "OpenHome"
 }

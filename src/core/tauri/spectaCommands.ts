@@ -399,7 +399,12 @@ export type FormEntry = {
 }
 export type Gender = 'Male' | 'Female' | 'Genderless' | 'Invalid'
 export type JsonValue =
-  null | boolean | number | string | JsonValue[] | Partial<{ [key in string]: JsonValue }>
+  | null
+  | boolean
+  | number
+  | string
+  | JsonValue[]
+  | Partial<{ [key in string]: JsonValue }>
 export type LogEntry = {
   timestamp: string
   level: LogLevel
@@ -522,7 +527,13 @@ export type PluginMetadata = { id: string; name: string; version: string; api_ve
 export type Pokedex = { byDexNumber: Partial<{ [key in number]: PokedexEntry }> }
 export type PokedexEntry = { forms: Partial<{ [key in number]: FormEntry }> }
 export type PokedexFlag =
-  'Male' | 'Female' | 'NsPokemon' | 'Totem' | 'Gigantamax' | 'Alpha' | 'Titan'
+  | 'Male'
+  | 'Female'
+  | 'NsPokemon'
+  | 'Totem'
+  | 'Gigantamax'
+  | 'Alpha'
+  | 'Titan'
 export type PokedexLevel = 'Seen' | 'Caught' | 'ShinyCaught'
 export type PokedexUpdate = { nationalDex: number; formIndex: number; data: FormEntry }
 export type PossibleSaves = { citra: PathData[]; desmume: PathData[]; open_emu: PathData[] }

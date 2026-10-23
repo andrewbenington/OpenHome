@@ -5,7 +5,13 @@ import { MouseEvent, MouseEventHandler, useMemo, useState } from 'react'
 import { AddIcon, RemoveIcon } from './Icons'
 
 export type OhoButtonType =
-  'destructive' | 'add' | 'solid' | 'delete' | 'clear' | 'search' | ButtonProps['type']
+  | 'destructive'
+  | 'add'
+  | 'solid'
+  | 'delete'
+  | 'clear'
+  | 'search'
+  | ButtonProps['type']
 
 export type OhoButtonProps = Omit<ButtonProps, 'type'> & {
   type?: OhoButtonType

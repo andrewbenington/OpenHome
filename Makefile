@@ -80,7 +80,7 @@ ensure-dependencies: ensure-pnpm ensure-wasm-pack ensure-nextest
 .PHONY: set-version
 set-version:
 	@jq --arg new_version "$(VERSION)" '.version = "$(VERSION)"' "src-tauri/tauri.conf.json" > version.tmp.json && mv version.tmp.json src-tauri/tauri.conf.json
-	@npx prettier --write src-tauri/tauri.conf.json
+	@pnpm oxfmt src-tauri/tauri.conf.json
 	@cargo install cargo-edit
 	@cd src-tauri && cargo set-version $(VERSION)
 	@cd pkm_rs && cargo set-version $(VERSION)
@@ -163,7 +163,7 @@ gen-tauri-commands:
 .PHONY: pkhex-json
 pkhex-json:
 	@cd pkhex-json && dotnet run GeneratePkhexJson.cs
-	@npx prettier --write pkhex-json
+	@pnpm oxfmt --write pkhex-json
 
 .PHONY: test-pkhex-json
 test-pkhex-json:
