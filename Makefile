@@ -48,7 +48,7 @@ eslint:
 	@pnpm eslint src/ui/state --max-warnings 0 --report-unused-disable-directives -c eslint.config.mjs
 
 .PHONY: test
-test: ensure-dependencies
+test: ensure-dependencies target/release/OpenHomeUiTesting
 	@pnpm run test
 	@./scripts/run-ui-tests.sh
 
@@ -188,6 +188,13 @@ git-fix-pnpm:
 .:
 	pnpm tauri build --release
 
-.PHONY: start-release
-start-release:
-	@UI_TEST_DATA_FOLDER='ui-tests/ui-tests-data-dir' ./target/release/OpenHome
+.PHONY: run-ui-test-build
+run-ui-test-build:
+	@UI_TEST_DATA_FOLDER='ui-tests/ui-tests-data-dir' ./target/release/OpenHomeUiTesting
+
+rust_files = $(shell find src -type f -name '*.rs')
+ts_files = $(shell find src -type f -name '*.ts')
+tsx_files = $(shell find src -type f -name '*.tsx')
+
+target/release/OpenHomeUiTesting: $(rust_files) $(ts_files) $(tsx_files)
+	@pnpm ui-test-build

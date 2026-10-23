@@ -169,7 +169,7 @@ export function useSaves(): SavesAndBanksManager {
         if (nextIndex < tempSave.boxRows * tempSave.boxColumns) {
           const homeMon = mon instanceof OHPKM ? mon : OHPKM.fromMonInSave(mon, tempSave)
 
-          const converted = ohpkmStore.updateAndConvertForSave(homeMon, tempSave)
+          const converted = await ohpkmStore.updateAndConvertForSave(homeMon, tempSave)
           if (R.isErr(converted)) {
             console.error(converted.error)
             continue
@@ -184,7 +184,7 @@ export function useSaves(): SavesAndBanksManager {
       newState.openSaves[dest.saveIdentifier].save = tempSave
     }
 
-    return newState
+    return { ...newState }
   }
 
   const saveBoxNavigateLeft = (save: SAV) => {

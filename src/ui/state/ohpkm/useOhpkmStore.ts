@@ -195,8 +195,8 @@ export function useOhpkmStore() {
   }
 
   // the async tasks are left to run here because otherwise the box UI lags to wait for them
-  function updateAndConvertForSave<P extends PKMInterface>(ohpkm: OHPKM, save: SAV<P>) {
-    handleLookupsUpdate(ohpkm, save)
+  async function updateAndConvertForSave<P extends PKMInterface>(ohpkm: OHPKM, save: SAV<P>) {
+    await handleLookupsUpdate(ohpkm, save)
       .then(() => insertOrUpdate(ohpkm))
       .then(() => handleLookupsUpdate(ohpkm, save))
       .catch((error) =>
@@ -300,7 +300,7 @@ export function useOhpkmStore() {
     return R.Ok(mon)
   }
 
-  function startTrackingNewMon<P extends PKMInterface>(
+  async function startTrackingNewMon<P extends PKMInterface>(
     mon: P,
     sourceSave: Option<SAV<P>>,
     destSave: Option<SAV>
@@ -316,17 +316,17 @@ export function useOhpkmStore() {
           String(error),
         ])
       )
-
     if (destSave) {
-      handleLookupsUpdate(ohpkm, destSave)
-        .then(() => insertOrUpdate(ohpkm))
-        .catch((error) =>
-          displayError('Error Updating Lookup File for Save', [
-            `When updating the lookup entry for the OHPKM ${ohpkm.openhomeId} (${ohpkm.nickname}), an error was encountered:`,
-            String(error),
-          ])
-        )
+      await handleLookupsUpdate(ohpkm, destSave)
     }
+
+    await insertOrUpdate(ohpkm).catch((error) => {
+      console.error(error)
+      displayError('Error Updating Lookup File for Save', [
+        `When updating the lookup entry for the OHPKM ${ohpkm.openhomeId} (${ohpkm.nickname}), an error was encountered:`,
+        String(error),
+      ])
+    })
 
     return ohpkm
   }
@@ -391,7 +391,7 @@ export function useOhpkmStore() {
     sourceSave: Option<SAV>,
     destSave: Option<SAV>
   ) {
-    return (await loadIfTracked(mon)) ?? startTrackingNewMon(mon, sourceSave, destSave)
+    return (await loadIfTracked(mon)) ?? (await startTrackingNewMon(mon, sourceSave, destSave))
   }
 
   async function monOrOhpkmIfTracked<P extends PKMInterface>(mon: P): Promise<OHPKM | P> {

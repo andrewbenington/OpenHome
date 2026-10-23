@@ -8,7 +8,7 @@ export const config: WebdriverIO.Config = {
     [
       '@wdio/tauri-service',
       {
-        appBinaryPath: './target/release/OpenHome',
+        appBinaryPath: './target/release/OpenHomeUiTesting',
         driverProvider: 'embedded',
         autoInstallTauriDriver: true,
         autoDownloadEdgeDriver: true,
@@ -23,7 +23,7 @@ export const config: WebdriverIO.Config = {
     {
       browserName: 'tauri',
       'tauri:options': {
-        application: './target/release/OpenHome',
+        application: './target/release/OpenHomeUiTesting',
       },
     },
   ],
