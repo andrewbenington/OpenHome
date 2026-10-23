@@ -50,6 +50,7 @@ eslint:
 .PHONY: test
 test: ensure-dependencies
 	@pnpm run test
+	@./scripts/run-ui-tests.sh
 
 .PHONY: check-rs
 check-rs:
