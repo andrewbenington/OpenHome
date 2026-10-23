@@ -71,7 +71,7 @@ const Home = () => {
         {range(savesAndBanks.allOpenSaves.length).map((i) => (
           <OpenSaveDisplay key={`save_display_${i}`} saveIndex={i} />
         ))}
-        <Button onClick={() => setOpenSaveDialog(true)}>
+        <Button id="open-save-button" onClick={() => setOpenSaveDialog(true)}>
           <MdFileOpen />
           Open Save
         </Button>
