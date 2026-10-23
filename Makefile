@@ -180,4 +180,4 @@ git-fix-pnpm:
 
 .PHONY: start-release
 start-release:
-	@./target/release/OpenHome
+	@UI_TEST_DATA_FOLDER='ui-tests/ui-tests-data-dir' ./target/release/OpenHome

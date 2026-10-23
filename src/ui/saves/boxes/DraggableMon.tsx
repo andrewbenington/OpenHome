@@ -107,6 +107,7 @@ const DraggableMon = (props: DraggableMonProps) => {
 
   return (
     <div
+      id={props.dragID}
       className={cssClass('fill-parent flex-centered draggable-mon').with(className).build()}
       ref={ref}
       style={{

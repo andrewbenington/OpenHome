@@ -1,7 +1,7 @@
 import useBackend from '@openhome-core/backend/useBackend'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { SAV } from '@openhome-core/save/interfaces'
+import { SAV, saveToStringIdentifier } from '@openhome-core/save/interfaces'
 import { monSupportedBySave } from '@openhome-core/save/util'
 import { FullMetadataLookup } from '@openhome-core/util'
 import { $R, Option, R, range, Result } from '@openhome-core/util/functional'
@@ -234,7 +234,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                 <BoxCellAsync
                   key={uniqueKey}
                   onClick={() => setSelectedIndex(index)}
-                  dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${index}`}
+                  dragID={`${saveToStringIdentifier(save)}_${save.currentPCBox}_${index}`}
                   location={location}
                   isDisabled={(mon) =>
                     !canSwapWithDragging(mon) || slotMetadata?.isDisabled === true

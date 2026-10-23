@@ -1,1 +1,18 @@
-{"banks":[],"current_bank":0}
+{
+  "banks": [
+    {
+      "id": "35ba8d6d-3228-4cae-bc73-af1601586be6",
+      "name": null,
+      "index": 0,
+      "boxes": [
+        {
+          "id": "7f1f3a9b-7623-441f-8fe8-575cc7bc1a62",
+          "name": null,
+          "index": 0,
+          "identifiers": { "1": "0390-9d8706f3-e7bbd355", "5": "0088-0df315d8-621e7a3b" }
+        }
+      ]
+    }
+  ],
+  "current_bank": 0
+}

@@ -32,7 +32,7 @@ export const config: WebdriverIO.Config = {
   logLevel: 'info',
   bail: 0,
   baseUrl: 'http://localhost:4444',
-  waitforTimeout: 10000,
+  waitforTimeout: 2000,
   connectionRetryTimeout: 90000,
   connectionRetryCount: 3,
 
