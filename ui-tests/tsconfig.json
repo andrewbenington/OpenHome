@@ -1,0 +1,30 @@
+{
+    "compilerOptions": {
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "target": "es2024",
+        "lib": [
+            "es2024",
+            "dom"
+        ],
+        "types": [
+            "node",
+            "mocha",
+        ],
+        "skipLibCheck": true,
+        "noEmit": true,
+        "allowImportingTsExtensions": true,
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noFallthroughCasesInSwitch": true
+    },
+    "extends": "../tsconfig.json",
+    "include": [
+        "specs",
+        "../wdio.conf.ts",
+        "../src"
+    ]
+}

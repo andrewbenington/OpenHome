@@ -159,7 +159,7 @@ impl AllSyncedState {
             ConvertStrategies::ID => {
                 let action: <ConvertStrategies as SyncedState>::Action =
                     serde_json::from_value(action).map_err(|e| {
-                        Error::unexpeted_condition_with_source(
+                        Error::unexpected_condition_with_source(
                             "update_from_frontend: invalid ConvertStrategies action received"
                                 .to_owned(),
                             e,
@@ -170,7 +170,7 @@ impl AllSyncedState {
             LookupState::ID => {
                 let action: <LookupState as SyncedState>::Action = serde_json::from_value(action)
                     .map_err(|e| {
-                    Error::unexpeted_condition_with_source(
+                    Error::unexpected_condition_with_source(
                         "update_from_frontend: invalid LookupState action received".to_owned(),
                         e,
                     )
@@ -180,7 +180,7 @@ impl AllSyncedState {
             OhpkmBytesStore::ID => {
                 let action: <OhpkmBytesStore as SyncedState>::Action =
                     serde_json::from_value(action).map_err(|e| {
-                        Error::unexpeted_condition_with_source(
+                        Error::unexpected_condition_with_source(
                             "update_from_frontend: invalid OhpkmBytesStore action received"
                                 .to_owned(),
                             e,
@@ -189,7 +189,7 @@ impl AllSyncedState {
                 self.lock()?.ohpkm_store.0.update(action);
             }
             _ => {
-                return Err(Error::unexpeted_condition(format!(
+                return Err(Error::unexpected_condition(format!(
                     "update_from_frontend: invalid state identifier received - '{state_identifier}'"
                 )));
             }

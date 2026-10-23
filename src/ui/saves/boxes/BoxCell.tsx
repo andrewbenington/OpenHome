@@ -236,6 +236,7 @@ function BoxCell(props: BoxCellProps) {
           {mon ? (
             <DroppableSpace dropID={dragID} dropData={location} disabled={disabled}>
               <DraggableMon
+                className="draggable-mon"
                 onClick={handleClick}
                 mon={mon}
                 style={{

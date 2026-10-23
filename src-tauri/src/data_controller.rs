@@ -1,9 +1,15 @@
-use crate::startup_config::StartupConfigState;
+use openhome_core::Result;
 use openhome_core::data_controller::DataController;
-use openhome_core::{Error, Result};
 use std::path::PathBuf;
+use std::str::FromStr;
 use tauri::AppHandle;
 
+#[cfg(not(feature = "uitest"))]
+use openhome_core::Error;
+
+#[cfg(not(feature = "uitest"))]
+use crate::startup_config::StartupConfigState;
+#[cfg_attr(feature = "uitest", allow(dead_code))]
 pub struct TauriDataController(tauri::AppHandle);
 impl TauriDataController {
     pub fn new(handle: &tauri::AppHandle) -> Self {
@@ -11,27 +17,7 @@ impl TauriDataController {
     }
 }
 
-impl DataController for &TauriDataController {
-    fn get_data_folder(&self) -> Result<PathBuf> {
-        use tauri::Manager;
-        let data_folder = self
-            .0
-            .path()
-            .app_data_dir()
-            .map_err(|e| Error::other_with_source("Tauri error", e))?;
-        let state = self.0.state::<StartupConfigState>();
-        Ok(state.lock()?.get_data_dir_path().unwrap_or(data_folder))
-    }
-
-    fn get_config_folder(&self) -> Result<PathBuf> {
-        use tauri::Manager;
-        self.0
-            .path()
-            .app_config_dir()
-            .map_err(|e| Error::other_with_source("Tauri error", e))
-    }
-}
-
+#[cfg(not(feature = "uitest"))]
 impl DataController for TauriDataController {
     fn get_data_folder(&self) -> Result<PathBuf> {
         use tauri::Manager;
@@ -50,6 +36,42 @@ impl DataController for TauriDataController {
             .path()
             .app_config_dir()
             .map_err(|e| Error::other_with_source("Tauri error", e))
+    }
+}
+
+use std::env;
+
+#[cfg(feature = "uitest")]
+const UI_TEST_DATA_FOLDER_ENV: &str = "UI_TEST_DATA_FOLDER";
+
+#[cfg(feature = "uitest")]
+impl DataController for TauriDataController {
+    fn get_data_folder(&self) -> Result<PathBuf> {
+        Ok(
+            PathBuf::from_str(&env::var(UI_TEST_DATA_FOLDER_ENV).map_err(|source| {
+                openhome_core::Error::missing_env_var(UI_TEST_DATA_FOLDER_ENV, source)
+            })?)
+            .expect("infallible"),
+        )
+    }
+
+    fn get_config_folder(&self) -> Result<PathBuf> {
+        Ok(
+            PathBuf::from_str(&env::var(UI_TEST_DATA_FOLDER_ENV).map_err(|source| {
+                openhome_core::Error::missing_env_var(UI_TEST_DATA_FOLDER_ENV, source)
+            })?)
+            .expect("infallible"),
+        )
+    }
+}
+
+impl DataController for &TauriDataController {
+    fn get_data_folder(&self) -> Result<PathBuf> {
+        (**self).get_data_folder()
+    }
+
+    fn get_config_folder(&self) -> Result<PathBuf> {
+        (**self).get_config_folder()
     }
 }
 

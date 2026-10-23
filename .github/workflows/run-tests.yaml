@@ -53,3 +53,57 @@ jobs:
 
       - name: Run Tests
         run: pnpm test:ci
+
+  run_ui_tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install PNPM
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: 'pnpm'
+
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target, ./openhome_core -> target, ./pkm_rs -> target, ./pkm_rs_derive -> target, ./pkm_rs_resources -> target, ./pkm_rs_types -> target, . -> target'
+
+      - name: Install binary dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libwebkit2gtk-4.1-dev librsvg2-dev \
+            patchelf xvfb webkit2gtk-driver
+
+      - name: Install wasm-pack and nextest
+        uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-pack,nextest@0.9.140
+
+      - name: Install Dependencies
+        run: pnpm i --frozen-lockfile
+
+      - name: Build WASM
+        run: pnpm run wasm-compile-dev
+
+      - name: Run Tests
+        env:
+          RUST_BACKTRACE: full
+        run: ./scripts/run-ui-tests.sh
+
+      - name: Upload Logs
+        uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: logs
+          path: logs
