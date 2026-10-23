@@ -220,7 +220,7 @@ export function useMonLocationsInternal() {
 
     return R.after(ohpkmStore.tryLoadFromId(identifier))
       .catch(({ identifier }) => `Could not move Pokémon with id ${identifier}: OHPKM data missing`)
-      .flatMap((ohpkm) => ohpkmStore.updateAndConvertForSave(ohpkm, save))
+      .awaitFlatMap(async (ohpkm) => await ohpkmStore.updateAndConvertForSave(ohpkm, save))
       .map((convertedForSave) => {
         // remember the mon that was present before we update that slot
         const displacedMon = save.getMonAt(dest.box, dest.boxSlot)
