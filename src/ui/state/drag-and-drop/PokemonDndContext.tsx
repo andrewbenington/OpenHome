@@ -35,7 +35,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
 
         if (payload.kind === 'item') {
           if (isMonLocation(dest)) {
-            savesAndBanks.giveItemToMon(dest, payload.item)
+            await savesAndBanks.giveItemToMon(dest, payload.item)
           }
           return
         }
@@ -72,11 +72,11 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
           if (multiSelectState.multiSelectEnabled && isSourceSelected) {
             for (const location of selectedLocations) {
               const mon = await savesAndBanks.getMonAtLocation(location)
-              if (mon) savesAndBanks.moveMonItemToBag(location)
+              if (mon) await savesAndBanks.moveMonItemToBag(location)
             }
             clearSelections()
           } else {
-            savesAndBanks.moveMonItemToBag(firstMonWithLocation)
+            await savesAndBanks.moveMonItemToBag(firstMonWithLocation)
           }
         } else if (
           isMonLocation(dest) &&
@@ -157,7 +157,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
                 targetSave &&
                 !targetSave.supportsItem(currMon.heldItemIndex)
               ) {
-                savesAndBanks.moveMonItemToBag(sourceLoc)
+                await savesAndBanks.moveMonItemToBag(sourceLoc)
               }
 
               await savesAndBanks
@@ -177,7 +177,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
               !dest.isHome &&
               !savesAndBanks.saveFromIdentifier(dest.saveIdentifier).supportsItem(mon.heldItemIndex)
             ) {
-              savesAndBanks.moveMonItemToBag(source)
+              await savesAndBanks.moveMonItemToBag(source)
             }
 
             await savesAndBanks

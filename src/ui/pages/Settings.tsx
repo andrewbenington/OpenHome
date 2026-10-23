@@ -57,7 +57,10 @@ function GeneralSettings() {
   const displayError = useDisplayError()
 
   useEffect(() => {
-    backend.getDataDirPath().then(R.match((value) => setDataDirPath(value), console.error))
+    backend
+      .getDataDirPath()
+      .then(R.match((value) => setDataDirPath(value), console.error))
+      .catch(console.error)
   }, [backend, displayError])
 
   return (
@@ -135,13 +138,12 @@ function GeneralSettings() {
                   { uniqueLabel: 'Cancel', action: () => {}, type: 'cancel' },
                   {
                     uniqueLabel: 'Select Directory...',
-                    action: () => {
+                    action: () =>
                       backend
                         .promptChangeDataDir()
                         .then(
                           R.mapErr((err) => displayError('Error switching data directory', err))
-                        )
-                    },
+                        ),
                   },
                 ]}
               />
@@ -153,11 +155,10 @@ function GeneralSettings() {
                   { uniqueLabel: 'Cancel', action: () => {}, type: 'cancel' },
                   {
                     uniqueLabel: 'Select New Directory...',
-                    action: () => {
+                    action: () =>
                       backend
                         .promptMoveDataDir()
-                        .then(R.mapErr((err) => displayError('Error moving data', err)))
-                    },
+                        .then(R.mapErr((err) => displayError('Error moving data', err))),
                     type: 'destructive',
                   },
                 ]}

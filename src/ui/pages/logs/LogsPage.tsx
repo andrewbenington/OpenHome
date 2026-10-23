@@ -126,7 +126,9 @@ export default function LogsPage(props: LogsPageProps) {
                   onOhpkmClick={(identifier) => {
                     const result = ohpkmStore.getById(identifier)
                     if (isThenable(result)) {
-                      result.then(setSelectedMon)
+                      result
+                        .then(setSelectedMon)
+                        .catch((err) => displayError('Error getting OHPKM data', String(err)))
                     } else {
                       setSelectedMon(result)
                     }

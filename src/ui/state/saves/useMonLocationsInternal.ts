@@ -290,7 +290,7 @@ export function useMonLocationsInternal() {
     ohpkmId: Option<OhpkmIdentifier>
   ) => {
     if (!location.isHome) {
-      await moveOhpkmToSave(ohpkmId, location)
+      await moveOhpkmToSave(ohpkmId, location).await()
     } else {
       moveOhpkmToHome(ohpkmId, location)
     }

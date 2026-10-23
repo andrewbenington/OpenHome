@@ -201,7 +201,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       save: () => saveChanges(false),
       reset: async () => {
         openSavesDispatch({ type: 'clear_mons_to_release' })
-        reloadBankStore()
+        await reloadBankStore()
         clearOhpkmCache()
         openSavesDispatch({ type: 'close_all_saves' })
       },

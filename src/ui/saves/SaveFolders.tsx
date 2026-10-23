@@ -38,8 +38,8 @@ export default function SaveFolders() {
 
   useEffect(() => {
     if (error || saveFolders) return
-    refreshFolders()
-  }, [error, refreshFolders, saveFolders])
+    refreshFolders().catch((err) => handleError('Error getting save folders', err))
+  }, [error, refreshFolders, saveFolders, handleError])
 
   const addFolder = useCallback(
     () =>
@@ -69,7 +69,7 @@ export default function SaveFolders() {
         R.match(
           async () => {
             setPendingDirPath(undefined)
-            refreshFolders()
+            await refreshFolders()
           },
           async (err) => handleError('Error saving folder', err)
         )
@@ -120,11 +120,11 @@ export default function SaveFolders() {
       <FolderLabelDialog
         open={!!pendingDirPath}
         onClose={() => setPendingDirPath(undefined)}
-        submitLabel={(label) => {
+        submitLabel={async (label) => {
           if (pendingDirPath) {
-            upsertFolder(pendingDirPath, label).then(() => {
+            await upsertFolder(pendingDirPath, label).then(async () => {
               setPendingDirPath(undefined)
-              refreshFolders()
+              await refreshFolders()
             })
           }
         }}
@@ -136,15 +136,15 @@ export default function SaveFolders() {
 type FolderLabelDialogProps = {
   open: boolean
   onClose: () => void
-  submitLabel: (label: string) => void
+  submitLabel: (label: string) => Promise<void>
 }
 
 function FolderLabelDialog(props: FolderLabelDialogProps) {
   const { open, submitLabel, onClose } = props
   const [label, setLabel] = useState('')
 
-  function onSave() {
-    submitLabel(label)
+  async function onSave() {
+    await submitLabel(label)
     setLabel('')
   }
 

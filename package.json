@@ -30,7 +30,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "format": "oxfmt",
-    "lint": "eslint src --max-warnings 0 --report-unused-disable-directives -c eslint.config.mjs --fix && pnpm clippy",
+    "lint": "oxlint src/* --fix --type-aware --max-warnings 0 && pnpm clippy",
     "lint:ci": "eslint src --max-warnings 0 --report-unused-disable-directives -c eslint.config.mjs && pnpm clippy",
     "clippy": "cargo clippy --all-targets --all-features --profile test -- -Dwarnings",
     "typecheck": "tsgo",

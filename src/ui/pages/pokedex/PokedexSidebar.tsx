@@ -17,13 +17,7 @@ export type PokedexSidebarProps = {
 }
 
 export default function PokedexSidebar(props: PokedexSidebarProps) {
-  const {
-    filter,
-    selectedSpecies,
-    setSelectedSpecies,
-    setSelectedForm: setSelectedForm,
-    pokedex,
-  } = props
+  const { filter, selectedSpecies, setSelectedSpecies, setSelectedForm, pokedex } = props
 
   const ALL_SPECIES_DATA = useMemo(() => all_species_data(), [])
 

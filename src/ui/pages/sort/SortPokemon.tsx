@@ -138,7 +138,7 @@ export default function SortPokemon() {
   }, [savesAndBanks.allOpenSaves, selectedHomeMons])
 
   const transferToSave = useCallback(
-    (targetSave: SAV) => {
+    async (targetSave: SAV) => {
       const currentFailures: string[] = []
 
       for (const item of selectedHomeMons) {
@@ -187,7 +187,7 @@ export default function SortPokemon() {
           boxSlot: destSlot,
         }
 
-        savesAndBanks.moveMon({ ...source, mon }, dest)
+        await savesAndBanks.moveMon({ ...source, mon }, dest)
       }
 
       if (currentFailures.length > 0) {

@@ -94,9 +94,9 @@ export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
         (mega) => mega.requiredItemId === mon.heldItemIndex
       )
 
-      if (megaForStone) mon.formIndex = megaForStone.megaForm.formIndex
+      if (megaForStone) modifiedMon.formIndex = megaForStone.megaForm.formIndex
     } else if (isBattleFormItem(mon.nationalDex, mon.heldItemIndex)) {
-      mon.formIndex = displayIndexAdder(mon.heldItemIndex)(mon.formIndex)
+      modifiedMon.formIndex = displayIndexAdder(mon.heldItemIndex)(mon.formIndex)
     }
 
     const result = getMonSprite(modifiedMon, enabledPlugins)
