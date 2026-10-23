@@ -35,10 +35,11 @@ jobs:
         with:
           workspaces: './src-tauri -> target, ./openhome_core -> target, ./pkm_rs -> target, ./pkm_rs_derive -> target, ./pkm_rs_resources -> target, ./pkm_rs_types -> target, . -> target'
 
-      - name: Install Tauri dependencies
+      - name: Install binary dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+          sudo apt-get install  --no-install-recommends \
+            libwebkit2gtk-4.1-dev librsvg2-dev patchelf
 
       - name: Install wasm-pack and nextest
         uses: taiki-e/install-action@v2
