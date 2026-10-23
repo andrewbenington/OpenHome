@@ -154,6 +154,17 @@ impl Stats8 {
         }
     }
 
+    pub const fn zero() -> Self {
+        Self {
+            hp: 0,
+            atk: 0,
+            def: 0,
+            spa: 0,
+            spd: 0,
+            spe: 0,
+        }
+    }
+
     pub const fn to_bytes(self) -> [u8; 6] {
         [self.hp, self.atk, self.def, self.spe, self.spa, self.spd]
     }
@@ -216,6 +227,10 @@ impl Stats8 {
 pub struct Ivs(Stats8);
 
 impl Ivs {
+    pub const fn zero() -> Self {
+        Self(Stats8::zero())
+    }
+
     pub fn from_30_bits(bytes: [u8; 4]) -> Self {
         let iv_bytes = u32::from_le_bytes(bytes);
         Self(Stats8 {
@@ -573,6 +588,10 @@ impl StatsPreSplit {
 pub struct Dvs(u16);
 
 impl Dvs {
+    pub const fn zero() -> Self {
+        Self(0)
+    }
+
     pub const fn get_hp(&self) -> u16 {
         ((self.get_atk() & 1) << 3)
             | ((self.get_def() & 1) << 2)
@@ -614,15 +633,6 @@ impl Dvs {
         self.0.to_be_bytes()
     }
 
-    pub const fn from_ivs_lossy(ivs: &Ivs) -> Self {
-        Self::from_all(
-            iv_to_dv(ivs.0.atk),
-            iv_to_dv(ivs.0.def),
-            iv_to_dv(ivs.0.spe),
-            iv_to_dv((ivs.0.spa + ivs.0.spd) / 2),
-        )
-    }
-
     pub fn from_ivs(ivs: &Ivs, is_shiny: bool, unown_letter: Option<u16>) -> Self {
         let dvs = if is_shiny {
             let mut atk_dv = (ivs.get_atk() - 1).div_ceil(2);
@@ -643,11 +653,11 @@ impl Dvs {
             })
         } else {
             Dvs::from(StatsPreSplit {
-                hp: (ivs.get_hp() - 1).div_ceil(2),
-                atk: (ivs.get_atk() - 1).div_ceil(2),
-                def: (ivs.get_def() - 1).div_ceil(2),
-                spc: (ivs.get_spa().midpoint(ivs.get_spd()) - 1).div_ceil(2),
-                spe: (ivs.get_spe() - 1).div_ceil(2),
+                hp: iv_to_dv(ivs.get_hp()),
+                atk: iv_to_dv(ivs.get_atk()),
+                def: iv_to_dv(ivs.get_def()),
+                spc: iv_to_dv(ivs.get_spa().midpoint(ivs.get_spd())),
+                spe: iv_to_dv(ivs.get_spe()),
             })
         };
 
@@ -795,24 +805,22 @@ impl Randomize for Dvs {
     }
 }
 
-const IV_MAX: u8 = 31;
+#[cfg(test)]
+const IV_MAX: u16 = 31;
 #[cfg(any(test, feature = "randomize"))]
 const DV_MAX: u16 = 15;
 
-const fn iv_to_dv(iv: u8) -> u16 {
-    match iv {
-        0..=IV_MAX => iv as u16 / 2,
-        _ => 0,
-    }
+const fn iv_to_dv(iv: u16) -> u16 {
+    iv.saturating_sub(1).div_ceil(2)
 }
 
 /// Converts a 0-15 DV value to a 0-31 IV value the same way Pokémon GO mons are treated,
 /// by multiplying by two and adding 1. This way a max DV corresponds to a max IV, with the
 /// side effect of the minimum possible IV from a DV being 1.
 #[cfg(test)]
-const fn dv_to_iv(dv: u16) -> u8 {
+const fn dv_to_iv(dv: u16) -> u16 {
     match dv {
-        0..=DV_MAX => (dv as u8 * 2) + 1,
+        0..=DV_MAX => (dv * 2) + 1,
         _ => 0,
     }
 }
@@ -866,7 +874,7 @@ pub enum ContestStat {
 
 #[cfg(test)]
 mod tests {
-    use crate::stats::{DV_MAX, IV_MAX, dv_to_iv, iv_to_dv};
+    use super::*;
 
     /// Ensures all DVs are identical converting to and from an IV.
     #[test]
@@ -895,8 +903,13 @@ mod tests {
     /// Ensures all valid IVs convert to a DV without panicking.
     #[test]
     fn all_ivs_successfully_convert_to_dvs() {
-        for iv in (1..=IV_MAX).step_by(2) {
+        for iv in (0..=IV_MAX).step_by(2) {
             iv_to_dv(iv);
         }
+    }
+
+    #[test]
+    fn zero_ivs_convert_to_zero_dvs() {
+        assert_eq!(Dvs::from_ivs(&Ivs::zero(), false, None), Dvs::zero());
     }
 }
