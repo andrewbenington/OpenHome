@@ -4,7 +4,7 @@
     "format": "oxfmt",
     "lint": "oxlint . --fix --type-aware --max-warnings 0",
     "lint:ci": "oxlint . --type-aware --report-unused-disable-directives --max-warnings 0 --format githuby",
-    "typecheck": "tsgo"
+    "typecheck": "tsc"
   },
   "dependencies": {
     "better-sqlite3": "^12.4.1",
@@ -13,7 +13,6 @@
   "devDependencies": {
     "@types/better-sqlite3": "^9.6.0",
     "@types/node": "^24.0.14",
-    "@typescript/native-preview": "7.0.0-dev.20260707.2",
-    "typescript": "6.0.3"
+    "typescript": "^7.0.2"
   }
 }
