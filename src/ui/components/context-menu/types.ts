@@ -35,7 +35,7 @@ type ItemData = {
 export class Item implements CtxMenuElementBuilder {
   content: ElementContent
   #action?: () => NowOrLater<unknown>
-  #disabled: boolean = true
+  #disabled: boolean = false
 
   private constructor(content: ElementContent) {
     this.content = content
@@ -54,7 +54,7 @@ export class Item implements CtxMenuElementBuilder {
     return this
   }
 
-  disabled(disabled: boolean): Item {
+  disabledIf(disabled: boolean): Item {
     this.#disabled = disabled
     return this
   }
@@ -216,7 +216,7 @@ export class Submenu implements CtxMenuElementBuilder {
     return this
   }
 
-  disabled(disabled: boolean): Submenu {
+  disabledIf(disabled: boolean): Submenu {
     this.#disabled = disabled
     return this
   }
@@ -271,7 +271,7 @@ export class Checkbox implements CtxMenuElementBuilder {
     return this
   }
 
-  disabled(disabled: boolean): Checkbox {
+  disabledIf(disabled: boolean): Checkbox {
     this.#disabled = disabled
     return this
   }
