@@ -133,7 +133,7 @@
     "webdriverio": "^9.32.0"
   },
   "engines": {
-    "node": ">=v24.2.0"
+    "node": ">=v24.22.1"
   },
   "packageManager": "pnpm@12.4.1",
   "productName": "OpenHome"
