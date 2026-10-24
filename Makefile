@@ -157,8 +157,9 @@ gen-wasm:
 .PHONY: gen-tauri-commands
 gen-tauri-commands:
 	@cargo test --package OpenHome --lib -- tests::export_typescript_bindings --exact --nocapture --include-ignored
-	@npx eslint --fix --no-ignore ./src/core/tauri/spectaCommands.ts --suppress-all
-	@rm eslint-suppressions.json
+	@npx oxlint --fix --fix-suggestions --no-ignore ./src/core/tauri/spectaCommands.ts --suppress-all
+	@rm -f oxlint-suppressions.json
+	@npx oxfmt ./src/core/tauri/spectaCommands.ts
 
 .PHONY: pkhex-json
 pkhex-json:
