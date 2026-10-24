@@ -362,22 +362,6 @@ function SingleBoxMonDisplay() {
 
             const monNowOrLater: Option<PKMInterface> = undefined
 
-            // if (monPromise && !isThenable(monPromise) && isResult(monPromise)) {
-            //   if (R.isOk(monPromise)) {
-            //     monNowOrLater = monPromise.data
-            //   } else {
-            //     const { identifier } = monPromise.error
-            //     console.error(identifier)
-            //     return (
-            //       <MissingOhpkmIdPrompt
-            //         key={uniqueKey}
-            //         openhomeId={identifier}
-            //         location={location}
-            //       />
-            //     )
-            //   }
-            // }
-
             return (
               <BoxCellAsync
                 key={uniqueKey}

@@ -1,5 +1,7 @@
+import { $R } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
 import OhoButton from '@openhome-ui/components/OhoButton'
+import { useTitledErrorDisplay } from '@openhome-ui/hooks/displayError'
 import { usePokedex } from '@openhome-ui/state/pokedex'
 import { Pokedex } from '@openhome-ui/util/pokedex'
 import { cssClass } from '@openhome-ui/util/style'
@@ -40,6 +42,7 @@ export default function PokedexPage() {
   const [filter, setFilter] = useState('')
   const [selectedSpecies, setSelectedSpecies] = useState<SpeciesMetadata>()
   const [selectedForm, setSelectedForm] = useState<FormMetadata | ExtraFormMetadata>()
+  const displayTitledError = useTitledErrorDisplay()
 
   if (!pokedexState.loaded) {
     return <Spinner />
@@ -56,6 +59,8 @@ export default function PokedexPage() {
     Object.keys(pokedex.byDexNumber).filter((v) => parseInt(v) <= NationalDex.Pecharunt)
   ).size
 
+  const displaySyncError = displayTitledError('Error syncing Pokédex')
+
   return (
     <div className="pokedex-page">
       <div className="pokedex-header">
@@ -64,7 +69,11 @@ export default function PokedexPage() {
           variant="classic"
           color="mint"
           style={{ borderRadius: '999px' }}
-          onClick={pokedexState.populatePokedexFromOhpkms}
+          onClickAsync={() =>
+            pokedexState.populatePokedexFromOhpkms().then((result) => {
+              $R(result).peekErr(displaySyncError)
+            }, displaySyncError)
+          }
         >
           Sync
         </OhoButton>
