@@ -23,21 +23,19 @@ export function useDisplayError(): ErrorDisplayFn {
   return displayError
 }
 
-export function useDisplayError2(): ErrorDisplayFn {
+export type TitledErrorFnBuilder = (errorTitle: string) => (error: unknown) => void
+
+export function useTitledErrorDisplay(): TitledErrorFnBuilder {
   const [, dispatchErrorState] = useContext(ErrorContext)
 
-  const displayError = useCallback(
-    (title: string, messages: string | string[], data?: InfoGridData) =>
-      dispatchErrorState({
-        type: 'set_message',
-        payload: {
-          title,
-          messages: typeof messages === 'string' ? [messages] : messages,
-          data,
-        },
-      }),
-    [dispatchErrorState]
-  )
+  const displayTitledError = (errorTitle: string) => (error: unknown) =>
+    dispatchErrorState({
+      type: 'set_message',
+      payload: {
+        title: errorTitle,
+        messages: [String(error)],
+      },
+    })
 
-  return displayError
+  return displayTitledError
 }

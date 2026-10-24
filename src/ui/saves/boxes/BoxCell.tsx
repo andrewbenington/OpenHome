@@ -13,7 +13,7 @@ import {
   Submenu,
 } from '@openhome-ui/components/context-menu'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
-import { useDisplayError } from '@openhome-ui/hooks/displayError'
+import { useDisplayError, useTitledErrorDisplay } from '@openhome-ui/hooks/displayError'
 import { useMonDisplay } from '@openhome-ui/hooks/monDisplay'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
@@ -70,6 +70,8 @@ function BoxCell(props: BoxCellProps) {
   const { filter, topRightIndicator, showItem, showShiny } = useMonDisplay()
   const backend = useBackend()
   const displayError = useDisplayError()
+  const displayTitledError = useTitledErrorDisplay()
+
   const { releaseMonAtLocation, moveMonItemToBag } = useSaves()
   const ohpkmStore = useOhpkmStore()
   const { updateMonTags, updateMonDisplayColor, setMonNickname } = ohpkmStore
@@ -225,10 +227,10 @@ function BoxCell(props: BoxCellProps) {
             borderStyle: borderColor ? 'solid' : undefined,
             ...props.style,
           }}
-          onDrop={async (e) => {
+          onDrop={(e) => {
             e.preventDefault()
             e.stopPropagation()
-            await onDropFromFiles(e.dataTransfer.files)
+            onDropFromFiles(e.dataTransfer.files).catch(displayTitledError('Error importing file'))
           }}
           onMouseEnter={handleMouseEnter}
           title={disabledReason}

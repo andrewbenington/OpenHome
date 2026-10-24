@@ -5,7 +5,7 @@ import { TauriBackend } from '@openhome-core/tauri/backend'
 import { R } from '@openhome-core/util/functional'
 import AppTabs from '@openhome-ui/AppTabs'
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
-import { useDisplayError } from '@openhome-ui/hooks/displayError'
+import { useTitledErrorDisplay } from '@openhome-ui/hooks/displayError'
 import { TransactionStateProvider } from '@openhome-ui/state/app-state'
 import { AppInfoContext, appInfoInitialState, appInfoReducer } from '@openhome-ui/state/appInfo'
 import PokemonDndContext from '@openhome-ui/state/drag-and-drop/PokemonDndContext'
@@ -79,11 +79,11 @@ function AppWithBackend() {
   })
 
   const backend = useBackend()
-  const displayError = useDisplayError()
+  const displayTitledError = useTitledErrorDisplay()
 
   const reloadSettings = useEffectEvent(backend.getSettings)
   const getPlatform = useEffectEvent(backend.getPlatform)
-  const displayErrorEvent = useEffectEvent(displayError)
+  const displayErrorEvent = useEffectEvent(displayTitledError)
 
   // The save listener works if these are separated into effect events, but not
   // if the whole effect function is (including the returned callback). Check
@@ -91,7 +91,7 @@ function AppWithBackend() {
   const onMenuEvent = useEffectEvent(backend.onMenuEvent)
 
   const saveChangesEvent = useEffectEvent(() => {
-    saveChanges().catch((error) => displayError('Error saving changes', String(error)))
+    saveChanges().catch(displayTitledError('Error saving changes'))
   })
 
   useEffect(() => {
@@ -113,7 +113,7 @@ function AppWithBackend() {
       .then(
         R.match(
           (settings) => appInfoDispatch({ type: 'load_settings', payload: settings }),
-          (err) => displayErrorEvent('Error loading settings', err)
+          displayErrorEvent('Error loading settings')
         )
       )
       .catch(console.error)
