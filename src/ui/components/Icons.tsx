@@ -72,7 +72,6 @@ export const ExpandIcon = MdArrowOutward
 
 export const HyperTrainIcon = FaDumbbell
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const AppTabIconsActive = {
   Home: (props: IconBaseProps) => <RiHome2Fill {...props} className="active-tab" />,
   Tracked: (props: IconBaseProps) => <RiCompassFill {...props} className="active-tab" />,
@@ -85,7 +84,6 @@ export const AppTabIconsActive = {
   ComponentDebug: (props: IconBaseProps) => <RiDashboardFill {...props} className="active-tab" />,
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const AppTabIconsInactive: typeof AppTabIconsActive = {
   Home: (props: IconBaseProps) => <RiHome2Line {...props} className="inactive-tab" />,
   Tracked: (props: IconBaseProps) => <RiCompassLine {...props} className="inactive-tab" />,

@@ -350,7 +350,6 @@ pub fn get_all_abilities() -> Vec<AbilityMetadata> {
 
   const filename = 'pkm_rs_resources/src/abilities.rs'
   fs.writeFileSync(filename, output)
-  console.log(`Rust code written to ${filename}`)
 }
 
 main()

@@ -1,11 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",
-  "plugins": [
-    "typescript",
-    "react",
-    "react-perf",
-    "unicorn"
-  ],
+  "plugins": ["typescript", "react", "react-perf", "unicorn"],
   "categories": {
     "correctness": "error"
   },
@@ -13,22 +8,13 @@
     "browser": true,
     "es2022": true
   },
-  "ignorePatterns": [
-    "dist",
-    "node_modules"
-  ],
+  "ignorePatterns": ["dist", "node_modules"],
   "rules": {
     "eqeqeq": "error",
     "no-console": [
       "warn",
       {
-        "allow": [
-          "debug",
-          "info",
-          "warn",
-          "error",
-          "assert"
-        ]
+        "allow": ["debug", "info", "warn", "error", "assert"]
       }
     ],
     "typescript/no-non-null-assertion": "error",

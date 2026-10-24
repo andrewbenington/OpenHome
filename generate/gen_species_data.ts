@@ -41,7 +41,7 @@ export function rustAbilityConstName(index: number, ability: string): string {
 
 type ExperienceGrowth = 'Slow' | 'Medium Slow' | 'Medium Fast' | 'Fast' | 'Erratic' | 'Fluctuating'
 
-type GenderRatio =
+export type GenderRatio =
   | 'Genderless'
   | 'AllMale'
   | 'AllFemale'
@@ -330,7 +330,6 @@ pub fn all_species_data() -> Vec<SpeciesMetadata> {
 
   const filename = 'pkm_rs_resources/src/species/metadata.rs'
   fs.writeFileSync(filename, output)
-  console.log(`Rust code written to ${filename}`)
 }
 
 await main()

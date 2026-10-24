@@ -220,7 +220,6 @@ function patchConsole(backend: BackendInterface) {
   ] as const
 
   for (const [method, level] of levels) {
-    // eslint-disable-next-line no-console
     console[method] = (...args: unknown[]) => {
       if (args?.[0] === 'CONSOLE_ONLY') {
         webConsole[method](...args.slice(1))
@@ -266,7 +265,7 @@ function formatWithPlaceholders(args: unknown[]): string {
 }
 
 function serializeArg(arg: unknown): string {
-  // eslint-disable-next-line @typescript-eslint/no-base-to-string
+  // oxlint-disable-next-line @typescript-eslint/no-base-to-string
   return typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
 }
 
