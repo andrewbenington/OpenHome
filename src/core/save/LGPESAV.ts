@@ -76,11 +76,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
     super()
     this.bytes = bytes
     this.filePath = path
-    this.name = utf16BytesToString(
-      this.bytes.buffer as ArrayBuffer,
-      this.trainerDataOffset + 0x38,
-      0x10
-    )
+    this.name = utf16BytesToString(this.bytes.buffer, this.trainerDataOffset + 0x38, 0x10)
 
     const fullTrainerID = bytesToUint32LittleEndian(this.bytes, this.trainerDataOffset)
 
@@ -93,7 +89,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
 
     this.pokeListHeader = new PokeListHeader(bytes.buffer as ArrayBuffer)
 
-    this.boxes = Array(BOX_COUNT)
+    this.boxes = Array<Box<PB7>>(BOX_COUNT)
     for (let box = 0; box < BOX_COUNT; box++) {
       const boxName = `Box Slots ${box * 30} - ${Math.min((box + 1) * 30 - 1, BOX_SLOTS_TOTAL)}`
 

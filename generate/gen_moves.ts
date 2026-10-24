@@ -548,7 +548,6 @@ pub enum MoveClass {
     '];'
 
   fs.writeFileSync('pkm_rs_resources/src/moves.rs', output)
-  console.log('Rust code written to pkm_rs_resources/src/moves.rs')
 }
 
 await main()

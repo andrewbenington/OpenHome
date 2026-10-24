@@ -19,7 +19,7 @@ import { useNavigate } from 'react-router'
 import './style.css'
 
 export type AllTrackedPokemonProps = {
-  onSelectMon: (openhomeId: OhpkmIdentifier) => void
+  onSelectMon: (openhomeId: OhpkmIdentifier) => Promise<void>
   findSaveForMon: (identifier: string) => Promise<SAV | undefined>
   findSavesForAllMons: () => Promise<void>
 }
@@ -70,14 +70,9 @@ export default function AllTrackedPokemon({
           rowKeyGetter={(row) => row.openhomeId}
           tableRef={tableContainerRef}
           style={{ borderLeft: 'none' }}
-          onCellContextMenu={(props, e) => {
+          onCellContextMenu={(props) => {
             setCtxMenuMonId(props.row.openhomeId)
             setContextMenuBuilders(buildContextElements(props.row))
-            // ooh i hate this, radix please expose your context menu api
-            const menu = document.querySelector('[data-radix-popper-content-wrapper]')
-            if (menu) {
-              ;(menu as HTMLElement).style.transform = `translate(${e.clientX}px, ${e.clientY}px)`
-            }
           }}
           rowClass={(row) =>
             trackedMonsToRelease.includes(row.openhomeId)
@@ -140,9 +135,9 @@ function useContextMenu(
       const actions: CtxMenuElementBuilder[] = [
         Label.mon(mon),
         homeLocation
-          ? Item.label('Jump to Box').action(() => {
+          ? Item.label('Jump to Box').action(async () => {
               switchBoxCurrentBank(homeLocation.box)
-              navigate('/home')
+              await navigate('/home')
             })
           : Item.label('Find Containing Save').action(() => findSaveForMon(mon.openhomeId)),
         Item.label(`Move To Release Area`).action(() => {

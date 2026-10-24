@@ -122,11 +122,11 @@ export function useOpenHomeBoxNavigator() {
 
     const identifier = getCurrentBox().identifiers.get(index)
     if (identifier) {
-      let result = ohpkmStore.getById(identifier)
+      const result = ohpkmStore.getById(identifier)
       if (!result) return false
 
       if (isThenable(result)) {
-        result.then(setSelectedMon)
+        result.then(setSelectedMon).catch(console.error)
       } else {
         setSelectedMon(result)
       }

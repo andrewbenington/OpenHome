@@ -19,7 +19,7 @@ export function BaseBadge(props: BaseBadgeProps) {
 
   const badgeElement = (
     <RadixBadge
-      className={cssClass(`badge badge-size-${props.size ?? '1'}`)
+      className={cssClass(`badge badge-size-${props.size ? JSON.stringify(props.size) : '1'}`)
         .with(className)
         .with('badge-disabled')
         .if(props.inactive) // only disable if activeIf function is provided and false

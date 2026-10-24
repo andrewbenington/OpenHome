@@ -1,31 +1,26 @@
 {
-  "productName": "OpenHome",
   "name": "openhome",
   "version": "1.18.1",
+  "private": true,
   "description": "A tool for moving Pokémon between game saves",
   "keywords": [
-    "pokemon",
     "home",
-    "openhome"
+    "openhome",
+    "pokemon"
   ],
   "homepage": "https://github.com/andrewbenington/OpenHome#readme",
   "bugs": {
     "url": "https://github.com/andrewbenington/OpenHome/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/andrewbenington/OpenHome.git"
-  },
-  "packageManager": "pnpm@12.4.1",
-  "engines": {
-    "node": ">=v24.22.1"
   },
   "license": "GPL-3.0-only",
   "author": {
     "name": "Andrew Benington",
     "email": "andrewbenington57@gmail.com"
   },
-  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andrewbenington/OpenHome.git"
+  },
   "workspaces": [
     "packages/*",
     "scripts/*",
@@ -34,9 +29,9 @@
   "main": "./out/main/index.js",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "format": "prettier --write .",
-    "lint": "eslint src --max-warnings 0 --report-unused-disable-directives -c eslint.config.mjs --fix && pnpm clippy",
-    "lint:ci": "eslint src --max-warnings 0 --report-unused-disable-directives -c eslint.config.mjs && pnpm clippy",
+    "format": "oxfmt",
+    "lint": "oxlint src/* --type-aware --report-unused-disable-directives --max-warnings 0 --fix && pnpm clippy",
+    "lint:ci": "oxlint src/* --type-aware --report-unused-disable-directives --max-warnings 0 --format github && pnpm clippy",
     "clippy": "cargo clippy --all-targets --all-features --profile test -- -Dwarnings",
     "typecheck": "tsgo",
     "build": "pnpm wasm-compile && pnpm vite build",
@@ -88,7 +83,6 @@
   },
   "devDependencies": {
     "@octokit/rest": "^22.0.1",
-    "@stylistic/eslint-plugin": "^5.10.0",
     "@tanstack/react-devtools": "^0.10.13",
     "@tanstack/react-query": "^5.104.5",
     "@tanstack/react-store": "^0.11.2",
@@ -102,8 +96,6 @@
     "@types/node": "^26.6.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "@typescript-eslint/eslint-plugin": "^8.72.0",
-    "@typescript-eslint/parser": "^8.72.0",
     "@typescript/native-preview": "7.0.0-dev.20260707.2",
     "@vitejs/plugin-react": "^6.1.2",
     "@wdio/cli": "^9.32.0",
@@ -118,22 +110,22 @@
     "better-sqlite3": "^13.0.3",
     "camelcase-keys": "^10.0.3",
     "chalk": "^6.0.1",
-    "eslint": "^10.13.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.7",
-    "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^7.1.1",
-    "eslint-plugin-react-refresh": "^0.5.7",
-    "eslint-plugin-unused-imports": "^4.4.1",
     "execa": "^10.2.1",
     "expect-webdriverio": "^7.0.1",
     "globby": "^16.2.4",
     "jsdom": "^30.1.3",
-    "prettier": "^3.9.10",
+    "oxfmt": "^0.74.0",
+    "oxlint": "^1.83.0",
+    "oxlint-tsgolint": "^7.0.2002",
     "react-dom": "^19.3.1",
     "typescript": "6.0.3",
     "vite": "^8.3.5",
     "vitest": "^5.0.5",
     "webdriverio": "^9.32.0"
-  }
+  },
+  "engines": {
+    "node": ">=v24.22.1"
+  },
+  "packageManager": "pnpm@12.4.1",
+  "productName": "OpenHome"
 }

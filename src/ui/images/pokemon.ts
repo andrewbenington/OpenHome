@@ -154,7 +154,7 @@ export const getPokemonSpritePathFromSource = (
       : spriteSource.directory
 
   if (!spriteDirectory) {
-    throw Error(`MISSING: ${spriteSource}`)
+    throw Error(`MISSING: ${JSON.stringify(spriteSource)}`)
   }
 
   return `sprites/${spriteDirectory}/${spriteName}.${spriteSource.extension}`
@@ -177,7 +177,7 @@ const A_ASCII_LOWER = 97
 function getRomHackSpritePath(mon: MonSpriteData) {
   const spriteName = getSpriteName(mon, mon.format)
   const monFormat = mon.format
-  let spriteFolder = getImageSource(mon.format).directory
+  const spriteFolder = getImageSource(mon.format).directory
 
   if (monFormat === 'PK3RR') {
     if (mon.nationalDex === NationalDex.Ursaluna && mon.formIndex === BLOOD_MOON) {

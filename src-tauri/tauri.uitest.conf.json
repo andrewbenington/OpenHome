@@ -9,6 +9,7 @@
     "beforeBuildCommand": "pnpm run build",
     "frontendDist": "../dist"
   },
+  "mainBinaryName": "OpenHomeUiTesting",
   "app": {
     "withGlobalTauri": true,
     "windows": [

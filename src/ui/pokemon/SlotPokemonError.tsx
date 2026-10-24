@@ -18,7 +18,7 @@ export default function SlotPokemonError(props: SlotPokemonErrorProps) {
     setOpen(false)
   }
 
-  let actions: PromptDialogAction[] = [
+  const actions: PromptDialogAction[] = [
     { uniqueLabel: 'Cancel', action: dismissDialog, type: 'cancel' },
   ]
 

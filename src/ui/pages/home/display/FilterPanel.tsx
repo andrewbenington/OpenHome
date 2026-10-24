@@ -82,7 +82,7 @@ const allGenders = [Gender.Male, Gender.Female, Gender.Genderless].map((gender) 
 export default function FilterPanel() {
   const { filter, setFilter, clearFilter } = useMonDisplay()
 
-  const ALL_SPECIES_DATA = useMemo(all_species_data, [])
+  const ALL_SPECIES_DATA = useMemo(() => all_species_data(), [])
 
   const ALL_ABILITIES: SelectOption[] = getAllAbilities()
     .sort(stringSorter((a) => a.name))
@@ -118,7 +118,7 @@ export default function FilterPanel() {
       type: 'z_crystal',
       label: 'Z Crystal',
     },
-    ...ALL_ITEMS.map((item) => ({ type: 'specific_item', ...item }) as ItemOption),
+    ...ALL_ITEMS.map((item) => ({ ...item, type: 'specific_item' as const })),
   ]
 
   const currentMon = useMemo(

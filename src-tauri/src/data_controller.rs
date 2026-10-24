@@ -1,8 +1,10 @@
 use openhome_core::Result;
 use openhome_core::data_controller::DataController;
 use std::path::PathBuf;
-use std::str::FromStr;
 use tauri::AppHandle;
+
+#[cfg(feature = "uitest")]
+use std::str::FromStr;
 
 #[cfg(not(feature = "uitest"))]
 use openhome_core::Error;
@@ -39,6 +41,7 @@ impl DataController for TauriDataController {
     }
 }
 
+#[cfg(feature = "uitest")]
 use std::env;
 
 #[cfg(feature = "uitest")]

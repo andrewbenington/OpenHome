@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { AlertDialog } from './AlertDialog'
+import { Dialog } from './Dialog'
 
 type PromptDialogProps = {
   triggerButton?: string
@@ -35,33 +35,32 @@ export default function PromptDialog(props: PromptDialogProps) {
   }
 
   return (
-    <AlertDialog.Root open={isOpen} onOpenChange={onOpenChange}>
-      {triggerButton && (
-        <AlertDialog.Trigger data-color="theme">{triggerButton}</AlertDialog.Trigger>
-      )}
-      <AlertDialog.Portal>
-        <AlertDialog.Backdrop onClick={() => onOpenChange(false)} />
-        <AlertDialog.Popup>
-          <AlertDialog.Title>{title}</AlertDialog.Title>
-          <AlertDialog.Description>{description}</AlertDialog.Description>
-          <AlertDialog.Actions>
+    <Dialog.Root open={isOpen} onOpenChange={onOpenChange}>
+      {triggerButton && <Dialog.Trigger data-color="theme">{triggerButton}</Dialog.Trigger>}
+      <Dialog.Portal>
+        <Dialog.Backdrop onClick={() => onOpenChange(false)} />
+        <Dialog.Popup>
+          <Dialog.Title>{title}</Dialog.Title>
+          <Dialog.Description>{description}</Dialog.Description>
+          <Dialog.Actions>
             {actions.map(({ uniqueLabel, action, type }) => (
-              <AlertDialog.Close
+              <Dialog.Close
                 key={uniqueLabel}
-                onClick={async () => {
+                onClickAsync={async () => {
                   await action()
                   if (!stateIsControlled) {
                     setIsOpenUncontrolled(false)
                   }
                 }}
-                data-color={type === 'destructive' ? 'red' : type === 'cancel' ? 'grey' : 'theme'}
+                variant="solid"
+                type={type === 'cancel' ? 'clear' : 'destructive'}
               >
                 {uniqueLabel}
-              </AlertDialog.Close>
+              </Dialog.Close>
             ))}
-          </AlertDialog.Actions>
-        </AlertDialog.Popup>
-      </AlertDialog.Portal>
-    </AlertDialog.Root>
+          </Dialog.Actions>
+        </Dialog.Popup>
+      </Dialog.Portal>
+    </Dialog.Root>
   )
 }

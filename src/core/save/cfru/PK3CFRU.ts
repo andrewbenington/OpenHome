@@ -132,7 +132,7 @@ export default abstract class PK3CFRU implements PluginPKMInterface {
 
   constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
     if (arg instanceof ArrayBuffer) {
-      let buffer = arg
+      const buffer = arg
       this.originalBytes = buffer
       const dataView = new DataView(buffer)
 

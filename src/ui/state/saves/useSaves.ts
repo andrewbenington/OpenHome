@@ -32,7 +32,7 @@ import { useMonLocationsInternal } from './useMonLocationsInternal'
 export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'homeData'>> & {
   allOpenSaves: readonly SAV[]
 
-  importMonsToLocation(mons: PKMInterface[], startingAt: MonLocation): Promise<OpenSavesState>
+  importMonsToLocation: (mons: PKMInterface[], startingAt: MonLocation) => Promise<OpenSavesState>
 
   addSave(save: SAV): Promise<Result<SAV, SaveError>>
   buildAndOpenSave: (filePath?: PathData) => Promise<Result<Option<SAV>, SaveError>>
@@ -132,6 +132,7 @@ export function useSaves(): SavesAndBanksManager {
   ): Promise<OpenSavesState> => {
     const addedMons: OHPKM[] = []
     const dest = startingAt
+    const newState = { ...openSavesState }
 
     if (dest.isHome) {
       let nextSlot = dest
@@ -180,10 +181,10 @@ export function useSaves(): SavesAndBanksManager {
         }
       }
 
-      openSavesState.openSaves[dest.saveIdentifier].save = tempSave
+      newState.openSaves[dest.saveIdentifier].save = tempSave
     }
 
-    return { ...openSavesState, openSaves: { ...openSavesState.openSaves } }
+    return { ...newState }
   }
 
   const saveBoxNavigateLeft = (save: SAV) => {

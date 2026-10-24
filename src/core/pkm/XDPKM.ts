@@ -35,7 +35,7 @@ export default class XDPKM {
   static getFormat() {
     return 'XDPKM' as const
   }
-  format: 'XDPKM' = 'XDPKM'
+  format = 'XDPKM' as const
   static getBoxSize() {
     return 196
   }

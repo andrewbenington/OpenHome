@@ -40,8 +40,9 @@ check: wasm-compile
 	@cd generate && pnpm run format
 
 .PHONY: test
-test: ensure-dependencies
+test: ensure-dependencies target/release/OpenHomeUiTesting
 	@pnpm run test
+	@./scripts/run-ui-tests.sh
 
 .PHONY: check-rs
 check-rs:
@@ -71,7 +72,7 @@ ensure-dependencies: ensure-pnpm ensure-wasm-pack ensure-nextest
 .PHONY: set-version
 set-version:
 	@jq --arg new_version "$(VERSION)" '.version = "$(VERSION)"' "src-tauri/tauri.conf.json" > version.tmp.json && mv version.tmp.json src-tauri/tauri.conf.json
-	@npx prettier --write src-tauri/tauri.conf.json
+	@pnpm oxfmt src-tauri/tauri.conf.json
 	@cargo install cargo-edit
 	@cd src-tauri && cargo set-version $(VERSION)
 	@cd pkm_rs && cargo set-version $(VERSION)
@@ -148,12 +149,14 @@ gen-wasm:
 .PHONY: gen-tauri-commands
 gen-tauri-commands:
 	@cargo test --package OpenHome --lib -- tests::export_typescript_bindings --exact --nocapture --include-ignored
-	@npx eslint --fix ./src/core/tauri/spectaCommands.ts
+	@npx oxlint --fix --fix-suggestions --no-ignore ./src/core/tauri/spectaCommands.ts --suppress-all
+	@rm -f oxlint-suppressions.json
+	@npx oxfmt ./src/core/tauri/spectaCommands.ts
 
 .PHONY: pkhex-json
 pkhex-json:
 	@cd pkhex-json && dotnet run GeneratePkhexJson.cs
-	@npx prettier --write pkhex-json
+	@pnpm oxfmt --write pkhex-json
 
 .PHONY: test-pkhex-json
 test-pkhex-json:
@@ -178,6 +181,13 @@ git-fix-pnpm:
 .:
 	pnpm tauri build --release
 
-.PHONY: start-release
-start-release:
-	@UI_TEST_DATA_FOLDER='ui-tests/ui-tests-data-dir' ./target/release/OpenHome
+.PHONY: run-ui-test-build
+run-ui-test-build:
+	@UI_TEST_DATA_FOLDER='ui-tests/ui-tests-data-dir' ./target/release/OpenHomeUiTesting
+
+rust_files = $(shell find src -type f -name '*.rs')
+ts_files = $(shell find src -type f -name '*.ts')
+tsx_files = $(shell find src -type f -name '*.tsx')
+
+target/release/OpenHomeUiTesting: $(rust_files) $(ts_files) $(tsx_files)
+	@pnpm ui-test-build
