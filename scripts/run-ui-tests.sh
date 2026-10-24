@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ ! -f ./target/release/OpenHome ]; then
+if [ ! -f ./target/release/OpenHomeUiTesting ]; then
   echo "test binary not found, building..."
   pnpm ui-test-build || exit 1
 fi
