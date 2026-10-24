@@ -265,7 +265,7 @@ function formatWithPlaceholders(args: unknown[]): string {
 }
 
 function serializeArg(arg: unknown): string {
-  // oxlint-disable-next-line @typescript-eslint/no-base-to-string
+  // oxlint-disable-next-line typescript/no-base-to-string
   return typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
 }
 

@@ -39,14 +39,6 @@ check: wasm-compile
 	@cd generate && pnpm run lint
 	@cd generate && pnpm run format
 
-.PHONY: oxlint
-oxlint:
-	@oxlint src
-
-.PHONY: eslint
-eslint:
-	@pnpm eslint src/ui/state --max-warnings 0 --report-unused-disable-directives -c eslint.config.mjs
-
 .PHONY: test
 test: ensure-dependencies target/release/OpenHomeUiTesting
 	@pnpm run test
