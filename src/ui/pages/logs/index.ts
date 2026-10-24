@@ -3,8 +3,9 @@ import useBackend from '@openhome-core/backend/useBackend'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { R } from '@openhome-core/util/functional'
 import useDebounce from '@openhome-ui/hooks/debounce'
+import useDisplayError from '@openhome-ui/hooks/displayError'
 import dayjs, { Dayjs } from 'dayjs'
-import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useCallback, useEffect, useEffectEvent, useState } from 'react'
 
 export const LOG_LEVELS: readonly LogLevel[] = Object.freeze([
   'ERROR',
@@ -39,6 +40,7 @@ export function useLogController(openhomeIdFilter?: OhpkmIdentifier) {
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string>()
+  const displayError = useDisplayError()
 
   const getLogs = useCallback(
     async (filter: LogFilter, clearExisting?: boolean) => {
@@ -65,9 +67,9 @@ export function useLogController(openhomeIdFilter?: OhpkmIdentifier) {
     [backend, logs, current]
   )
 
-  const clearLogs = useCallback(() => {
+  const clearLogs = useCallback(async () => {
     setLoading(true)
-    backend
+    return await backend
       .clearLogsForRange(current.start, current.end)
       .then(R.mapErr(setError))
       .finally(async () => {
@@ -86,9 +88,11 @@ export function useLogController(openhomeIdFilter?: OhpkmIdentifier) {
     return cleanup
   }, [backend, debouncedGetLogs, current])
 
+  const displayErrorEvent = useEffectEvent(displayError)
+
   useEffect(() => {
     if (logs === undefined) {
-      getLogs(current)
+      getLogs(current).catch((error) => displayErrorEvent('Error getting logs', String(error)))
     }
   }, [getLogs, logs, current])
 

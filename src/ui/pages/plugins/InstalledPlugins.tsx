@@ -42,7 +42,8 @@ function InstalledPluginCard(props: { metadata: OpenHomePlugin; onDelete: (id: s
       R.match(
         (pluginPath) => setIconPath(convertLocalImagePath(`${pluginPath}/icon.png`)),
         (error) => displayErrorEvent('Error Getting Plugin Path', error)
-      )
+      ),
+      (error) => displayErrorEvent('Error Getting Plugin Path', error)
     )
   }, [metadata.id])
 
@@ -57,12 +58,14 @@ function InstalledPluginCard(props: { metadata: OpenHomePlugin; onDelete: (id: s
     await backend.updateSettings(updated).catch(console.error)
   }
 
-  const handleCardClick = () => {
+  const handleCardClick = async () => {
     dispatchAppInfoState({
       type: 'set_plugin_enabled',
       payload: { pluginID: metadata.id, enabled: !enabled },
     })
-    updateSettings({ enabledPlugins: { ...settings.enabledPlugins, [metadata.id]: !enabled } })
+    return await updateSettings({
+      enabledPlugins: { ...settings.enabledPlugins, [metadata.id]: !enabled },
+    })
   }
 
   return (

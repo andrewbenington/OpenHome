@@ -151,10 +151,10 @@ const GBStringDictJpn: { [key: number]: string } = (() => {
   const hiragana =
     'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんっゃゅょ'
 
-  ;[...katakana].forEach((char, i) => {
+  Array.from(katakana).forEach((char, i) => {
     dict[0x80 + i] = char
   })
-  ;[...hiragana].forEach((char, i) => {
+  Array.from(hiragana).forEach((char, i) => {
     dict[0xb1 + i] = char
   })
   for (let i = 0; i < 10; i++) {
