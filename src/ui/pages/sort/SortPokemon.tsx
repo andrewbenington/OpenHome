@@ -8,6 +8,7 @@ import { filterUndefined } from '@openhome-core/util/sort'
 import Badge from '@openhome-ui/components/badge/Badge'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import { ClearIcon, ErrorIcon } from '@openhome-ui/components/Icons'
+import OhoButton from '@openhome-ui/components/OhoButton'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { Typeahead } from '@openhome-ui/components/typeahead'
 import PokemonDetailsModal from '@openhome-ui/pokemon/PokemonDetailsModal'
@@ -362,7 +363,7 @@ export default function SortPokemon() {
                 <TransferToSaveButton
                   key={save.filePath.raw}
                   save={save}
-                  onClick={transferToSave}
+                  onClickAsync={transferToSave}
                 />
               ))}
             </Flex>
@@ -408,19 +409,19 @@ export default function SortPokemon() {
 
 type TransferToSaveButtonProps = {
   save: SAV
-  onClick: (save: SAV) => void
+  onClickAsync: (save: SAV) => Promise<void>
 }
 
 function TransferToSaveButton(props: TransferToSaveButtonProps) {
-  const { save, onClick } = props
+  const { save, onClickAsync } = props
   return (
-    <Button className="transfer-to-save-button" key={save.identifier} onClick={() => onClick(save)}>
+    <OhoButton key={save.identifier} onClickAsync={() => onClickAsync(save)}>
       <Flex direction="row" align="center" width="100%" gap="var(--padding-radius-sm-lg)">
         <b>{save.name}</b>
         <p>(TID {save.displayID})</p>
         <div style={{ flex: 1 }} />
         <Badge.Game withNameAbbr originGame={save.origin} plugin={save.pluginIdentifier} />
       </Flex>
-    </Button>
+    </OhoButton>
   )
 }

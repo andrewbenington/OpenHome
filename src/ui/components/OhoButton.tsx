@@ -16,19 +16,12 @@ export type OhoButtonType =
 export type OhoButtonProps = Omit<ButtonProps, 'type'> & {
   type?: OhoButtonType
   disabledMessage?: string
-  noPaddingX?: boolean
+  iconOnly?: boolean
   onClickAsync?: (e: MouseEvent) => Promise<void>
 }
 
 export default function OhoButton(props: OhoButtonProps) {
-  const {
-    disabledMessage,
-    style,
-    children,
-    noPaddingX,
-    onClick: onClickProp,
-    ...buttonProps
-  } = props
+  const { disabledMessage, style, children, iconOnly, onClick: onClickProp, ...buttonProps } = props
   const [onClickAsyncLoading, setOnClickAsyncLoading] = useState(false)
 
   const color = buttonColor(props.type)
@@ -36,6 +29,7 @@ export default function OhoButton(props: OhoButtonProps) {
   const radixType = buttonType(props.type)
 
   const defaultText = useMemo(() => {
+    if (iconOnly) return undefined
     switch (props.type) {
       case 'add':
         return 'Add'
@@ -48,7 +42,7 @@ export default function OhoButton(props: OhoButtonProps) {
       default:
         return undefined
     }
-  }, [props.type])
+  }, [iconOnly, props.type])
 
   const icon = useMemo(() => {
     switch (props.type) {
@@ -99,11 +93,11 @@ export default function OhoButton(props: OhoButtonProps) {
       loading={loading}
       disabled={disabled}
       style={{
-        minWidth: noPaddingX ? '0rem' : '4rem',
+        minWidth: iconOnly ? '0rem' : '4rem',
         fontSize: buttonProps.size && buttonProps.size !== '1' ? undefined : '0.9rem',
-        paddingLeft: noPaddingX ? 0 : undefined,
-        paddingRight: noPaddingX ? 0 : undefined,
-        aspectRatio: noPaddingX ? '1' : undefined,
+        paddingLeft: iconOnly ? '0px' : undefined,
+        paddingRight: iconOnly ? '0px' : undefined,
+        aspectRatio: iconOnly ? '1' : undefined,
         ...style,
       }}
       onClick={onClick}

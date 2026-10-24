@@ -189,7 +189,8 @@ function ModalContents(props: ModalContentsProps) {
             onChange={setDisplayFormat}
           />
           <OhoButton
-            className="mini-button mini-button-icon-only"
+            className="mini-button"
+            iconOnly
             onClickAsync={async () => {
               displayMonOrFallback.refreshChecksum?.()
               await backend.saveLocalFile(

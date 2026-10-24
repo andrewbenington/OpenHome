@@ -1,9 +1,10 @@
 import useBackend from '@openhome-core/backend/useBackend'
 import { SaveFolder } from '@openhome-core/save/util/storage'
 import { R } from '@openhome-core/util/functional'
-import { AddFolderIcon, RemoveIcon } from '@openhome-ui/components/Icons'
+import { AddFolderIcon } from '@openhome-ui/components/Icons'
+import OhoButton from '@openhome-ui/components/OhoButton'
 import { useDisplayError } from '@openhome-ui/hooks/displayError'
-import { Button, Card, Flex } from '@radix-ui/themes'
+import { Card, Flex } from '@radix-ui/themes'
 import { useCallback, useEffect, useState } from 'react'
 import { Dialog } from '../components/dialog/Dialog'
 
@@ -87,10 +88,10 @@ export default function SaveFolders() {
           marginBottom: 8,
         }}
       >
-        <Button onClick={addFolder} variant="solid">
+        <OhoButton onClickAsync={addFolder} variant="solid" color="red">
           <AddFolderIcon />
           Add Folder
-        </Button>
+        </OhoButton>
       </div>
       <Flex overflowY="auto" height="100%" direction="column" gap="1">
         {saveFolders?.map((folder) => (
@@ -98,21 +99,12 @@ export default function SaveFolders() {
             <Flex direction="row" gap="4" align="center">
               <b>{folder.label ?? folder.path}</b>
               <div style={{ color: '#666' }}>{folder.path}</div>
-              <button
-                style={{
-                  padding: 0,
-                  display: 'grid',
-                  marginLeft: 'auto',
-                  marginTop: 'auto',
-                  marginBottom: 'auto',
-                  backgroundColor: '#aa0000',
-                  height: 'fit-content',
-                  color: 'white',
-                }}
-                onClick={() => removeFolder(folder.path)}
-              >
-                <RemoveIcon />
-              </button>
+              <OhoButton
+                iconOnly
+                variant="solid"
+                type="delete"
+                onClickAsync={() => removeFolder(folder.path)}
+              />
             </Flex>
           </Card>
         ))}
