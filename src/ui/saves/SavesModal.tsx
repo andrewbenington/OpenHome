@@ -2,6 +2,7 @@ import { PathData } from '@openhome-core/save/util/path'
 import { R } from '@openhome-core/util/functional'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import { CardsIcon, GridIcon } from '@openhome-ui/components/Icons'
+import OhoButton from '@openhome-ui/components/OhoButton'
 import SideTabs from '@openhome-ui/components/side-tabs/SideTabs'
 import { AppInfoAction, AppInfoContext } from '@openhome-ui/state/appInfo'
 import { saveErrorMessage, saveErrorTitle, useSaves } from '@openhome-ui/state/saves'
@@ -63,9 +64,15 @@ const SavesModal = (props: SavesModalProps) => {
     >
       <SideTabs.Root defaultValue="recents">
         <SideTabs.TabList>
-          <Button onClick={() => openSaveAndCloseModal()} size="1" style={{ width: '100%' }}>
+          <OhoButton
+            onClickAsync={() => openSaveAndCloseModal()}
+            size="1"
+            style={{ width: '100%' }}
+            variant="solid"
+            color="red"
+          >
             Open File
-          </Button>
+          </OhoButton>
           <SideTabs.Tab value="recents">Recents</SideTabs.Tab>
           <SideTabs.Tab value="suggested">Suggested</SideTabs.Tab>
           <SideTabs.Tab value="folders">Save Folders</SideTabs.Tab>

@@ -149,21 +149,17 @@ function FolderLabelDialog(props: FolderLabelDialogProps) {
   }
 
   return (
-    <Dialog.Container
-      open={open}
-      onOpenChange={(open) => !open && onClose()}
-      style={{
-        padding: 8,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 8,
-      }}
-    >
+    <Dialog.Container open={open} onOpenChange={(open) => !open && onClose()}>
       <Dialog.Title>Set Folder Label</Dialog.Title>
-      <input placeholder="Label" value={label} onChange={(e) => setLabel(e.target.value)} />
+      <input
+        placeholder="Label"
+        value={label}
+        onChange={(e) => setLabel(e.target.value)}
+        style={{ width: '100%' }}
+      />
       <Dialog.Actions>
-        <Dialog.Close onClick={() => setLabel('')}>Cancel</Dialog.Close>
-        <Dialog.Close color="theme" onClick={onSave}>
+        <Dialog.Close>Cancel</Dialog.Close>
+        <Dialog.Close type="submit" onClickAsync={onSave}>
           Save
         </Dialog.Close>
       </Dialog.Actions>

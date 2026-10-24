@@ -275,8 +275,10 @@ function BoxCell(props: BoxCellProps) {
               />
               <Dialog.Actions>
                 <Dialog.Close>Cancel</Dialog.Close>
-                <Dialog.Action onClick={() => setRenameValue('')}>Reset</Dialog.Action>
-                <Dialog.Close color="theme" onClick={confirmRename}>
+                <Dialog.Action type="reset" onClick={() => setRenameValue('')}>
+                  Reset
+                </Dialog.Action>
+                <Dialog.Close type="submit" onClickAsync={confirmRename}>
                   Save
                 </Dialog.Close>
               </Dialog.Actions>

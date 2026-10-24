@@ -38,8 +38,6 @@ export function useConvertStrategies(): ConvertStrategiesController {
         .map(([k, v]) => (v === undefined ? undefined : ([k, v] as [string, NamedStrategy])))
         .filter(filterUndefined),
     })
-
-    throw 'UHOH'
   }
 
   return {
