@@ -35,7 +35,7 @@ check: wasm-compile
 	@pnpm run typecheck
 	@pnpm run lint
 	@pnpm run format
-	@cd generate && pnpm run typecheck
+	@cd generate pnpm run typecheck
 	@cd generate && pnpm run lint
 	@cd generate && pnpm run format
 
@@ -138,8 +138,6 @@ generate: gen-wasm gen-tauri-commands
 
 .PHONY: gen-wasm
 gen-wasm:
-# 	@node generate/gen_ribbons.ts
-# 	@node generate/gen_abilities.ts
 	@node generate/gen_abilities.ts
 	@node generate/gen_items.ts
 	@node generate/gen_moves.ts
