@@ -50,9 +50,7 @@
     "typescript/no-unsafe-enum-comparison": "off",
     "typescript/no-implied-eval": "off",
     "typescript/no-floating-promises": "error",
-
-    // temporarily disabled to address others first:
-    "typescript/no-misused-promises": "off",
+    "typescript/no-misused-promises": "error",
 
     // revisit these in the future:
     "unicorn/no-new-array": "off",

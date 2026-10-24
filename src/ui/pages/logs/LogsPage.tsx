@@ -128,7 +128,7 @@ export default function LogsPage(props: LogsPageProps) {
                     if (isThenable(result)) {
                       result
                         .then(setSelectedMon)
-                        .catch((err) => displayError('Error getting OHPKM data', String(err)))
+                        .catch((err) => displayError('Error getting OHPKM data', err))
                     } else {
                       setSelectedMon(result)
                     }
