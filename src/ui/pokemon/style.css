@@ -11,6 +11,7 @@
   overflow: hidden;
   padding: 0;
   border-radius: var(--border-radius-lg);
+  background: var(--background-gradient);
 }
 
 .modal-arrow {
