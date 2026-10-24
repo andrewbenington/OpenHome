@@ -29,7 +29,7 @@ tauri-plugin-dialog = "2.7.3"
 tauri-plugin-fs = "2.5.2"
 reqwest = { version = "0.13.5", features = [] }
 base64 = "0.23.1"
-zip = "8.6.0"
+zip = "9.0.5"
 static_assertions = "1.1.0"
 sha2 = "0.11.0"
 num = "0.4.3"
@@ -45,7 +45,7 @@ tracing-appender = "0.2.5"
 chrono = { version = "0.4.45", features = ["serde"] }
 tokio = "1.53.1"
 specta = { version = "=2.0.0-rc.22", features = ["chrono", "serde_json", "uuid"] }
-specta-typescript = "0.0.9"
+specta-typescript = "0.0.14"
 tauri-specta = { version = "=2.0.0-rc.21", features = ["derive", "typescript"] }
 pkm_rs_types = { version = "1.18.1", path = "../pkm_rs_types" }
 pkm_rs_resources = { version = "1.18.1", path = "../pkm_rs_resources" }
