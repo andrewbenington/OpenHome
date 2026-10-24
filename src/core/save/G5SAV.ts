@@ -70,7 +70,7 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
     const dataView = new DataView(this.bytes.buffer)
 
     this.filePath = path
-    this.boxes = new Array(G5SAV.BOX_COUNT)
+    this.boxes = Array(G5SAV.BOX_COUNT)
 
     if (bytesToUint32LittleEndian(bytes, 0) === 0xffffffff) {
       this.tooEarlyToOpen = true

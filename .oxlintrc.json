@@ -50,13 +50,13 @@
     "typescript/no-unsafe-enum-comparison": "off",
     "typescript/no-implied-eval": "off",
     "typescript/no-floating-promises": "error",
-    "typescript/no-misused-promises": "error",
+    "typescript/prefer-as-const": "error",
+    "unicorn/no-new-array": "error",
 
     // revisit these in the future:
-    "unicorn/no-new-array": "off",
+    "typescript/no-misused-promises": "off",
     "react/set-state-in-effect": "off",
     "react/refs": "off",
-    "typescript/prefer-as-const": "off",
     "typescript/restrict-template-expressions": "off"
   },
   "options": {

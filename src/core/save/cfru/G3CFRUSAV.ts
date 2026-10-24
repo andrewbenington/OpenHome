@@ -118,7 +118,7 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
       this.currentPCBox = 0
     }
     this.boxNames = []
-    this.boxesWithResults = new Array(boxCount)
+    this.boxesWithResults = Array(boxCount)
     for (let i = 0; i < boxCount; i++) {
       // TODO: More research into where BOX names are located
       this.boxesWithResults[i] = new Box('Box' + (i + 1), BOX_SLOTS)

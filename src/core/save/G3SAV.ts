@@ -117,7 +117,7 @@ export class G3SaveBackup {
 
   currentPCBox: number
 
-  boxesWithResults = new Array<Box<Result<Option<PK3>>>>(14)
+  boxesWithResults = Array<Box<Result<Option<PK3>>>>(14)
 
   firstSectorIndex: number = 0
 

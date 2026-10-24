@@ -33,7 +33,7 @@ export default class PA8 {
   static getFormat() {
     return 'PA8' as const
   }
-  format: 'PA8' = 'PA8'
+  format = 'PA8' as const
   static getBoxSize() {
     return 360
   }

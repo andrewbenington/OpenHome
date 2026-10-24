@@ -89,7 +89,7 @@ export class G2SAV extends OfficialSAV<PK2> {
         ? this.bytes[CURRENT_BOX_OFFSET_C_INTL]
         : this.bytes[CURRENT_BOX_OFFSET_GS_INTL]
 
-    this.boxes = new Array<Box<PK2>>(this.boxOffsets.length)
+    this.boxes = Array(this.boxOffsets.length)
 
     const pokemonPerBox = this.boxRows * this.boxColumns
 

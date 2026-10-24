@@ -103,7 +103,7 @@ export class G1SAVJP extends OfficialSAV<PK1> {
     this.name = readGameBoyStringFromBytes(dataView, TRAINER_NAME_OFFSET, NAME_SIZE, 'Jpn')
 
     this.currentPCBox = this.bytes[CURRENT_BOX_NUM_OFFSET] & 0x7f
-    this.boxes = new Array(NUM_BOXES)
+    this.boxes = Array(NUM_BOXES)
 
     if (this.currentPCBox >= NUM_BOXES) {
       this.invalid = true
