@@ -21,7 +21,7 @@ import {
 import SearchFields from '@openhome-ui/components/search/SearchFields'
 import PokemonSearchModal from '@openhome-ui/components/search/SearchModal'
 import ToggleButton from '@openhome-ui/components/ToggleButton'
-import useDisplayError from '@openhome-ui/hooks/displayError'
+import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import PokemonDetailsModal from '@openhome-ui/pokemon/PokemonDetailsModal'
 import {
   useDragSourceSupportsMon,

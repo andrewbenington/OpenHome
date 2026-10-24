@@ -20,7 +20,7 @@ import {
 import { Flex, RadioGroup, Select, Separator } from '@radix-ui/themes'
 import { ReactNode, useEffect, useState } from 'react'
 import PromptDialog from '../components/dialog/PromptDialog'
-import useDisplayError from '../hooks/displayError'
+import { useDisplayError } from '../hooks/displayError'
 import { ConvertStrategyKey, useConvertStrategies } from '../state/convert-strategies'
 import './Settings.css'
 

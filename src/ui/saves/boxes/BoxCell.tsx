@@ -13,7 +13,7 @@ import {
   Submenu,
 } from '@openhome-ui/components/context-menu'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
-import useDisplayError from '@openhome-ui/hooks/displayError'
+import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import { useMonDisplay } from '@openhome-ui/hooks/monDisplay'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'

@@ -5,7 +5,7 @@ import { TauriBackend } from '@openhome-core/tauri/backend'
 import { R } from '@openhome-core/util/functional'
 import AppTabs from '@openhome-ui/AppTabs'
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
-import useDisplayError from '@openhome-ui/hooks/displayError'
+import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import { TransactionStateProvider } from '@openhome-ui/state/app-state'
 import { AppInfoContext, appInfoInitialState, appInfoReducer } from '@openhome-ui/state/appInfo'
 import PokemonDndContext from '@openhome-ui/state/drag-and-drop/PokemonDndContext'
@@ -90,7 +90,9 @@ function AppWithBackend() {
   // that saving still persists movements after any updates to this.
   const onMenuEvent = useEffectEvent(backend.onMenuEvent)
 
-  const saveChangesEvent = useEffectEvent(saveChanges)
+  const saveChangesEvent = useEffectEvent(() => {
+    saveChanges().catch((error) => displayError('Error saving changes', String(error)))
+  })
 
   useEffect(() => {
     const stopListening = onMenuEvent('save', saveChangesEvent)

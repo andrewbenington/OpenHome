@@ -7,7 +7,7 @@ import { NowOrLater } from '@openhome-core/util/promise'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import PromptDialog from '@openhome-ui/components/dialog/PromptDialog'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
-import useDisplayError from '@openhome-ui/hooks/displayError'
+import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import { Button, Callout, Flex } from '@radix-ui/themes'
 import {
   ReactNode,

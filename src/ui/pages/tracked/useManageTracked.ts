@@ -33,7 +33,7 @@ import { isErr, not, Option, R, range, Result } from '@openhome-core/util/functi
 import { $O } from '@openhome-core/util/option'
 import { filterUndefined } from '@openhome-core/util/sort'
 import { SaveRef } from '@openhome-core/util/types'
-import useDisplayError from '@openhome-ui/hooks/displayError'
+import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import { useBanksAndBoxes } from '@openhome-ui/state-zustand/banks-and-boxes/store'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import { useLookups } from '@openhome-ui/state/lookups'

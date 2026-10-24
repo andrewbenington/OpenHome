@@ -1,6 +1,6 @@
 import useBackend from '@openhome-core/backend/useBackend'
 import { R } from '@openhome-core/util/functional'
-import useDisplayError from '@openhome-ui/hooks/displayError'
+import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import { AppInfoContext, Settings as SettingsType } from '@openhome-ui/state/appInfo'
 import { OpenHomePlugin, PluginContext } from '@openhome-ui/state/plugin/reducer'
 import { Badge, Spinner } from '@radix-ui/themes'

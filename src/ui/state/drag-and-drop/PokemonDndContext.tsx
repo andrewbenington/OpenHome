@@ -5,7 +5,7 @@ import { monSupportedBySave } from '@openhome-core/save/util'
 import { FullMetadataLookup } from '@openhome-core/util'
 import { Option, R } from '@openhome-core/util/functional'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
-import useDisplayError, { ErrorDisplayFn } from '@openhome-ui/hooks/displayError'
+import { ErrorDisplayFn, useDisplayError } from '@openhome-ui/hooks/displayError'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
 import { useDragStore } from '@openhome-ui/state-zustand/drag-and-drop/dragStore'
@@ -34,7 +34,11 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
 
   return (
     <DragDropProvider<DragPayload>
-      onDragEnd={(e) => onDragEnd(e, savesAndBanks, multiSelect, banksAndBoxes, displayError)}
+      onDragEnd={(e) => {
+        onDragEnd(e, savesAndBanks, multiSelect, banksAndBoxes, displayError).catch((error) =>
+          displayError('Error completing drag', error)
+        )
+      }}
       sensors={(defaults) => [
         ...defaults.filter((sensor) => sensor !== PointerSensor),
         PointerSensor.configure({

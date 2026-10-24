@@ -3,7 +3,7 @@ import useBackend from '@openhome-core/backend/useBackend'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { R } from '@openhome-core/util/functional'
 import useDebounce from '@openhome-ui/hooks/debounce'
-import useDisplayError from '@openhome-ui/hooks/displayError'
+import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import dayjs, { Dayjs } from 'dayjs'
 import { Dispatch, SetStateAction, useCallback, useEffect, useEffectEvent, useState } from 'react'
 

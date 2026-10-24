@@ -1,7 +1,7 @@
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { Option } from '@openhome-core/util/functional'
 import { isThenable } from '@openhome-core/util/promise'
-import useDisplayError from '@openhome-ui/hooks/displayError'
+import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import { useEffect, useEffectEvent, useState } from 'react'
 import { OhpkmBatchLookupResults, useOhpkmStore } from './useOhpkmStore'
 

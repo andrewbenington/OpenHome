@@ -14,7 +14,7 @@ import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMen
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import OhoButton from '@openhome-ui/components/OhoButton'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
-import useDisplayError from '@openhome-ui/hooks/displayError'
+import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import { useSaves } from '@openhome-ui/state/saves'
 import { OriginGames } from '@pkm-rs/pkg'

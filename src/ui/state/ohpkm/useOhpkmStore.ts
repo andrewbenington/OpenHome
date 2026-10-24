@@ -16,7 +16,7 @@ import { $R, Option, PromisedResultBox, R, Result } from '@openhome-core/util/fu
 import { LRUCache } from '@openhome-core/util/lruCache'
 import { isThenable, NowOrLater } from '@openhome-core/util/promise'
 import { FourMoves } from '@openhome-core/util/types'
-import useDisplayError from '@openhome-ui/hooks/displayError'
+import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import { Lookup, MarkingsSixShapesColors, ModernRibbon, OriginGames } from '@pkm-rs/pkg/pkm_rs'
 import dayjs from 'dayjs'
 import { useCallback } from 'react'
