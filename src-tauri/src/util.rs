@@ -74,7 +74,16 @@ where
         let mut file = zip_archive.by_index(i).map_err(|err| {
             Error::other_with_source("Failed to extract file from zip archive", err)
         })?;
-        let outpath = Path::new(output_dir).join(file.name());
+
+        let Some(enclosed_name) = file.enclosed_name() else {
+            continue;
+        };
+
+        let Some(filename) = enclosed_name.file_name() else {
+            continue;
+        };
+
+        let outpath = Path::new(output_dir).join(filename);
 
         if file.is_dir() {
             create_directory(&outpath)?;

@@ -60,10 +60,10 @@ function calculateIdentifier(mon: PkmCalculatableId): OhpkmIdentifier {
 
 export type Gen12Identifier = string
 export const getMonGen12Identifier = (mon: PKMInterface): Option<Gen12Identifier> => {
-  let { dvs, ivs } = mon
+  let { dvs } = mon
   if (!dvs) {
-    if (!ivs) return undefined
-    dvs = dvsFromIVs(ivs, mon.isShiny())
+    if (!mon.ivs) return undefined
+    dvs = dvsFromIVs(mon.ivs, mon.isShiny())
   }
 
   // round-trip the OT name through the game's own encoding so the identifier

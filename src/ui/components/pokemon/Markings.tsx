@@ -20,7 +20,7 @@ const getMarkingColorByNumber = (value: MarkingValue) => {
 const MarkingsDisplay = <M extends Markings>(props: MarkingsProps<M>) => {
   const { markings, onUpdate } = props
 
-  const modifiedMarkings = markings
+  const modifiedMarkings = { ...markings }
 
   const cycleMarkingValue =
     onUpdate && markingsHaveColor(modifiedMarkings)

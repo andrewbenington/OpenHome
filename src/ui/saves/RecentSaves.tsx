@@ -1,5 +1,4 @@
 import useBackend from '@openhome-core/backend/useBackend'
-import { PluginIdentifier } from '@openhome-core/save/interfaces'
 import { getPluginIdentifier } from '@openhome-core/save/util'
 import { PathData, splitPath } from '@openhome-core/save/util/path'
 import { R } from '@openhome-core/util/functional'
@@ -15,7 +14,7 @@ import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMen
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import OhoButton from '@openhome-ui/components/OhoButton'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
-import useDisplayError from '@openhome-ui/hooks/displayError'
+import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import { useSaves } from '@openhome-ui/state/saves'
 import { OriginGames } from '@pkm-rs/pkg'
@@ -44,8 +43,8 @@ export default function RecentSaves(props: RecentSavesProps) {
     [savesAndBanks.allOpenSaves]
   )
 
-  const getRecentSaves = useCallback(() => {
-    backend.getRecentSaves().then(
+  const getRecentSaves = useCallback(async () => {
+    await backend.getRecentSaves().then(
       R.match(
         (recents) => {
           const extraSaveIdentifiers = getEnabledSaveTypes()
@@ -73,8 +72,9 @@ export default function RecentSaves(props: RecentSavesProps) {
       backend.removeRecentSave(path).then(
         R.match(
           async () => getRecentSaves(),
-          async (err) => {
+          (err) => {
             displayError('Could Not Remove Save', err)
+            return Promise.resolve()
           }
         )
       ),
@@ -84,7 +84,7 @@ export default function RecentSaves(props: RecentSavesProps) {
   const getRecentSavesEvent = useEffectEvent(getRecentSaves)
 
   useEffect(() => {
-    getRecentSavesEvent()
+    void getRecentSavesEvent()
   }, [])
 
   const columns: SortableColumn<SaveRef>[] = [
@@ -96,11 +96,11 @@ export default function RecentSaves(props: RecentSavesProps) {
         params.row.valid ? (
           <OhoButton
             className="save-grid-button"
-            onClick={async (e) => {
+            onClickAsync={async (e) => {
               e.preventDefault()
               setSavePathLoading(params.row.filePath.raw)
               await new Promise((r) => setTimeout(r, 0))
-              onOpen(params.row.filePath)
+              await onOpen(params.row.filePath)
             }}
             loading={savePathLoading !== undefined}
             disabled={params.row.filePath.raw in openSavePaths}
@@ -128,8 +128,8 @@ export default function RecentSaves(props: RecentSavesProps) {
         <div className="flex-row-centered">
           <Badge.Game
             originGame={value.game ?? undefined}
-            plugin={value.pluginIdentifier as PluginIdentifier}
-            withNameAbbr
+            plugin={value.pluginIdentifier}
+            withName
             tooltip={value.filePath.raw}
           />
         </div>
@@ -207,7 +207,7 @@ export default function RecentSaves(props: RecentSavesProps) {
         const justify = typeof rendered === 'string' ? 'start' : 'center'
         return (
           <OpenHomeCtxMenu
-            key={`save-row-${value.filePath}`}
+            key={`save-row-${value.filePath.raw}`}
             elements={recentSaveContextElements(value)}
           >
             <Flex height="100%" align="center" justify={justify} width="100%">
@@ -221,7 +221,7 @@ export default function RecentSaves(props: RecentSavesProps) {
         const justify = typeof value === 'string' ? 'start' : 'center'
         return (
           <OpenHomeCtxMenu
-            key={`save-row-${value.filePath}`}
+            key={`save-row-${value.filePath.raw}`}
             elements={recentSaveContextElements(value)}
           >
             <Flex height="100%" align="center" justify={justify} width="100%">

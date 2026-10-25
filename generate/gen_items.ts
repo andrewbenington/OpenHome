@@ -54,7 +54,7 @@ pub fn get_all_items() -> Vec<ItemMetadata> {
 
   const filename = 'pkm_rs_resources/src/items/modern.rs'
   fs.writeFileSync(filename, output)
-  console.log(`Rust code written to ${filename}`)
+  console.info(`Rust code written to ${filename}`)
 }
 
 function convertItemPastGen(
@@ -110,7 +110,7 @@ impl ItemGen1 {
 
   const filename = 'pkm_rs_resources/src/items/gen1.rs'
   fs.writeFileSync(filename, output)
-  console.log(`Rust code written to ${filename}`)
+  console.info(`Rust code written to ${filename}`)
 }
 
 async function generateGen2() {
@@ -156,7 +156,7 @@ impl ItemGen2 {
 
   const filename = 'pkm_rs_resources/src/items/gen2.rs'
   fs.writeFileSync(filename, output)
-  console.log(`Rust code written to ${filename}`)
+  console.info(`Rust code written to ${filename}`)
 }
 
 async function generateGen3() {
@@ -215,7 +215,7 @@ impl Randomize for ItemGen3 {
 
   const filename = 'pkm_rs_resources/src/items/gen3.rs'
   fs.writeFileSync(filename, output)
-  console.log(`Rust code written to ${filename}`)
+  console.info(`Rust code written to ${filename}`)
 }
 
 async function generateRadicalRed() {
@@ -252,7 +252,7 @@ impl ItemRadicalRed {
 
   const filename = 'pkm_rs_resources/src/items/radical_red.rs'
   fs.writeFileSync(filename, output)
-  console.log(`Rust code written to ${filename}`)
+  console.info(`Rust code written to ${filename}`)
 }
 
 async function generateUnbound() {
@@ -289,15 +289,8 @@ impl ItemUnbound {
 
   const filename = 'pkm_rs_resources/src/items/unbound.rs'
   fs.writeFileSync(filename, output)
-  console.log(`Rust code written to ${filename}`)
+  console.info(`Rust code written to ${filename}`)
 }
-
-generateModern()
-generateGen1()
-generateGen2()
-generateGen3()
-generateRadicalRed()
-generateUnbound()
 
 async function generateEmeraldExpn() {
   const allItems = await itemEmeraldExpnGetAll(new Database('generate/pkm.db'))
@@ -336,4 +329,13 @@ impl ItemEmeraldExpn {
   console.log(`Rust code written to ${filename}`)
 }
 
-generateEmeraldExpn()
+await Promise.all([
+  generateModern(),
+  generateGen1(),
+  generateGen2(),
+  generateGen3(),
+  generateRadicalRed(),
+  generateUnbound(),
+  generateEmeraldExpn()
+])
+

@@ -8,35 +8,35 @@ repository = "https://github.com/andrewbenington/OpenHome"
 license = "GPL-3.0+"
 
 [dependencies]
-pkm_rs_types = {path = "../pkm_rs_types", features=["wasm"]}
-pkm_rs_resources = {path = "../pkm_rs_resources", features=["wasm"]}
+pkm_rs_types = { path = "../pkm_rs_types", features = ["wasm"] }
+pkm_rs_resources = { path = "../pkm_rs_resources", features = ["wasm"] }
 serde = { version = "1.0.229", features = ["derive"] }
-serde_json = "1.0.151"
+serde_json = "1.0.154"
 num = "0.4.3"
-wasm-bindgen = { version = "0.2.128", optional = true }
-js-sys = { version = "0.3.105", optional = true }
+wasm-bindgen = { version = "0.2.129", optional = true }
+js-sys = { version = "0.3.106", optional = true }
 serde-wasm-bindgen = { version = "0.6.5", optional = true }
 pkm_rs_derive = { path = "../pkm_rs_derive" }
 static_assertions = "1.1.0"
-sha2 = "0.11.0"
-rand = "0.10.2"
+sha2 = "0.11.1"
+rand = "0.10.3"
 getrandom = { version = "0.4.3", features = ["wasm_js"] }
 phf = { version = "0.13.1", features = ["macros"] }
-strum = { version = "0.28.0", features = ["derive"]  }
+strum = { version = "0.28.0", features = ["derive"] }
 strum_macros = "0.28.0"
 console_error_panic_hook = "0.1.7"
 arbitrary-int = "2.2.0"
-tsify = { version = "0.5.8", features = [ "js" ] }
+tsify = { version = "0.5.8", features = ["js"] }
 sha1 = "0.11.0"
 aes = "0.9.3"
-specta = { version = "=2.0.0-rc.22", features = [ "serde_json", "derive" ] }
+specta = { version = "=2.0.0-rc.22", features = ["serde_json", "derive"] }
 serde_bytes = "0.11.19"
 pretty_assertions = "1.4.1"
 pretty-hex = "0.4.2"
 arrayref = "0.3.9"
 thiserror = "2.0.21"
 num_enum = "0.7.6"
-zerocopy = { version = "0.8.61", features = ["derive"] }
+zerocopy = { version = "0.8.63", features = ["derive"] }
 
 [lib]
 name = "pkm_rs"
@@ -47,7 +47,14 @@ crate-type = ["cdylib", "rlib"]
 missing_const_for_fn = "warn"
 
 [features]
-wasm = ["wasm-bindgen", "js-sys", "serde-wasm-bindgen", "getrandom/wasm_js", "pkm_rs_types/wasm", "pkm_rs_resources/wasm"]
+wasm = [
+  "wasm-bindgen",
+  "js-sys",
+  "serde-wasm-bindgen",
+  "getrandom/wasm_js",
+  "pkm_rs_types/wasm",
+  "pkm_rs_resources/wasm",
+]
 randomize = ["pkm_rs_types/randomize", "pkm_rs_resources/randomize"]
 
 [dev-dependencies]

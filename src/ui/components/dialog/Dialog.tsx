@@ -1,4 +1,5 @@
 import { Dialog as BaseUiDialog } from '@base-ui/react/dialog'
+import OhoButton, { OhoButtonProps } from '../OhoButton'
 import styles from './Dialog.module.css'
 
 export type DialogContainerProps = React.ComponentProps<typeof BaseUiDialog.Popup> &
@@ -39,13 +40,15 @@ export const Dialog = {
   Description: (props: React.ComponentProps<typeof BaseUiDialog.Description>) => (
     <BaseUiDialog.Description {...props} />
   ),
-  Close: (
-    props: React.ComponentProps<typeof BaseUiDialog.Close> & { color?: 'destructive' | 'theme' }
-  ) => <BaseUiDialog.Close data-color={props.color} {...props} className={styles.Button} />,
+  Close: (props: OhoButtonProps) => (
+    <BaseUiDialog.Close
+      render={<OhoButton variant="solid" {...props} size={'1'} style={{ height: '1.5rem' }} />}
+    />
+  ),
+  Action: (props: OhoButtonProps) => (
+    <OhoButton variant="solid" {...props} size={'1'} style={{ height: '1.5rem' }} />
+  ),
   Actions: (props: React.HTMLAttributes<HTMLDivElement>) => (
     <div {...props} className={styles.Actions} />
   ),
-  Action: (
-    props: React.HTMLAttributes<HTMLButtonElement> & { color?: 'destructive' | 'theme' }
-  ) => <button data-color={props.color} {...props} className={styles.Button} />,
 }

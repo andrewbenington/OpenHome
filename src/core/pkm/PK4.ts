@@ -38,7 +38,7 @@ export default class PK4 {
   static getFormat() {
     return 'PK4' as const
   }
-  format: 'PK4' = 'PK4'
+  format = 'PK4' as const
   personalityValue: number
   nationalDex: number
   heldItemIndex: number

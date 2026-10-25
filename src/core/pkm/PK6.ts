@@ -36,7 +36,7 @@ export default class PK6 {
   static getFormat() {
     return 'PK6' as const
   }
-  format: 'PK6' = 'PK6'
+  format = 'PK6' as const
   static getBoxSize() {
     return 232
   }

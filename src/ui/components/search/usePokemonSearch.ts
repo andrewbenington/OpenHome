@@ -98,7 +98,7 @@ export function usePokemonSearch(...prefilter: Filter[]): PokemonSearchControlle
   const ohpkmStore = useOhpkmStore()
   const { preloadRowData } = useOhpkmGrid()
 
-  let filters: Filter[] = prefilter ?? []
+  const filters: Filter[] = prefilter ?? []
   if (knownMove) filters.push({ moveTextPrefixEng: knownMove })
   if (nickname) filters.push({ nicknamePrefix: nickname })
   if (originGame) filters.push({ originGame })
@@ -123,7 +123,7 @@ export function usePokemonSearch(...prefilter: Filter[]): PokemonSearchControlle
     if (!lookupResult) return undefined
 
     return isThenable(lookupResult)
-      ? O.after(lookupResult).then(preloadRowData).get()
+      ? O.after(lookupResult).map(preloadRowData).get()
       : preloadRowData(lookupResult)
   }
 

@@ -4,7 +4,7 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { tryCalculateIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { range } from '@openhome-core/util/functional'
-import useDisplayError from '@openhome-ui/hooks/displayError'
+import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import FilterPanel from '@openhome-ui/pages/home/display/FilterPanel'
 import PokemonDetailsModal from '@openhome-ui/pokemon/PokemonDetailsModal'
 import BankHeader from '@openhome-ui/saves/BankHeader'
@@ -71,7 +71,7 @@ const Home = () => {
         {range(savesAndBanks.allOpenSaves.length).map((i) => (
           <OpenSaveDisplay key={`save_display_${i}`} saveIndex={i} />
         ))}
-        <Button onClick={() => setOpenSaveDialog(true)}>
+        <Button id="open-save-button" onClick={() => setOpenSaveDialog(true)}>
           <MdFileOpen />
           Open Save
         </Button>

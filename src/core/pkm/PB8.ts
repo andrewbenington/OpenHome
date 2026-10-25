@@ -32,7 +32,7 @@ export default class PB8 {
   static getFormat() {
     return 'PB8' as const
   }
-  format: 'PB8' = 'PB8'
+  format = 'PB8' as const
   static getBoxSize() {
     return 344
   }

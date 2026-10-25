@@ -1,28 +1,30 @@
 import {
   Tabs as BaseUiTabs,
   TabsIndicatorProps,
-  TabsListProps,
   TabsPanelProps,
   TabsRootProps,
   TabsTabProps,
 } from '@base-ui/react/tabs'
 import { cssClass } from '@openhome-ui/util/style'
-import { CSSProperties } from 'react'
+import type * as React from 'react'
 import './Tabs.css'
 
 type FlexDirection = {
-  direction?: CSSProperties['flexDirection']
+  direction?: React.CSSProperties['flexDirection']
 }
 
 type PropsExtension = {
   className?: string
+  style?: React.CSSProperties
 }
 
+type CustomTabRootProps = Omit<TabsRootProps, 'style'> & PropsExtension
+
 export const Tabs = {
-  Root: (props: TabsRootProps & PropsExtension) => (
+  Root: (props: CustomTabRootProps) => (
     <BaseUiTabs.Root {...props} className={cssClass('Tabs').with(props.className).build()} />
   ),
-  List: (props: TabsListProps & FlexDirection & PropsExtension) => {
+  List: (props: CustomTabRootProps & FlexDirection) => {
     return (
       <BaseUiTabs.List
         {...props}
@@ -31,7 +33,7 @@ export const Tabs = {
       />
     )
   },
-  IconList: (props: TabsListProps & FlexDirection & PropsExtension) => (
+  IconList: (props: CustomTabRootProps & FlexDirection) => (
     <BaseUiTabs.List
       {...props}
       style={{ ...props.style, flexDirection: props.direction }}

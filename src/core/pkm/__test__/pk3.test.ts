@@ -13,10 +13,10 @@ import { initializeWasm } from './init'
 
 beforeAll(initializeWasm)
 
-var blazikenOhpkm: OHPKM
-var blazikenPk3Bytes: Uint8Array
-var blazikenPk3: PK3
-var slowbroOhpkm: OHPKM
+let blazikenOhpkm: OHPKM
+let blazikenPk3Bytes: Uint8Array
+let blazikenPk3: PK3
+let slowbroOhpkm: OHPKM
 
 function pkmTestFilePath(dir: string, filename: string): string {
   return path.join(__dirname, 'pkm-files', dir, filename)

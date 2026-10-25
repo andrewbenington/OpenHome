@@ -405,7 +405,7 @@ function HeaderWithContextMenu<R extends Record<string, unknown>>({
                   setHiddenColumns([...hiddenColumns, col.key])
                 }
               } else {
-                setHiddenColumns([...hiddenColumns.filter((k) => k !== col.key)])
+                setHiddenColumns(hiddenColumns.filter((k) => k !== col.key))
               }
             })
             .handleIsChecked(() => visibleColumnKeys.has(col.key))

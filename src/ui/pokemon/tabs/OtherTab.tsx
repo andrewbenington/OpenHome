@@ -435,12 +435,7 @@ const OtherDisplay = (props: { mon: OtherDisplayPkmData }) => {
           mon.nationalDex,
           mon.formIndex,
           mon.extraFormIndex
-        ) && (
-          <AttributeRow
-            label="Gen 1/2 ID"
-            value={getMonGen12Identifier(mon as PKMInterface & { dvs: StatsPreSplit })}
-          />
-        )}
+        ) && <AttributeRow label="Gen 1/2 ID" value={getMonGen12Identifier(mon)} />}
         {!isRestricted(
           HGSS_TRANSFER_RESTRICTIONS,
           mon.nationalDex,

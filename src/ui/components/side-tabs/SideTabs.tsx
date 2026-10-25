@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import { Option } from '@openhome-core/util/functional'
 import { HTMLAttributes, useContext, useState } from 'react'
 import { useSearchParams } from 'react-router'
