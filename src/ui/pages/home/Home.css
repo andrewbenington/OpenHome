@@ -20,7 +20,8 @@
 }
 
 .save-file-column {
-  padding: var(--padding-radius-sm-lg) 0 var(--padding-radius-sm-lg) var(--padding-radius-sm-lg);
+  padding: var(--padding-radius-sm-lg) 0 var(--padding-radius-sm-lg)
+    var(--padding-radius-sm-lg);
   gap: var(--padding-radius-sm-lg);
   overflow-y: scroll;
   display: flex;
@@ -45,7 +46,6 @@
   min-width: fit-content;
   max-width: fit-content;
   box-sizing: content-box;
-  overflow-y: auto;
 }
 
 .right-column {
@@ -114,7 +114,7 @@
     min-width: 0;
     max-width: none;
     flex: 1;
-    overflow-x: hidden;
+    height: fit-content;
   }
 
   .right-column {

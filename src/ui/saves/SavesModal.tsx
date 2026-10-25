@@ -56,9 +56,9 @@ const SavesModal = (props: SavesModalProps) => {
       onOpenChange={(open) => !open && onClose?.()}
       style={{
         width: '95vw',
-        minWidth: 800,
+        // minWidth: 800,
         height: 'calc(90vh - 32px)',
-        overflow: 'hidden',
+        overflow: 'scroll',
         padding: 0,
       }}
     >

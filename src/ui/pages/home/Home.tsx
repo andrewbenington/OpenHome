@@ -3,6 +3,7 @@ import { bytesToPKM } from '@openhome-core/pkm/FileImport'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { tryCalculateIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { IS_ANDROID } from '@openhome-core/tauri/backend'
 import { range } from '@openhome-core/util/functional'
 import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import FilterPanel from '@openhome-ui/pages/home/display/FilterPanel'
@@ -20,11 +21,10 @@ import DisplayPanel from './display/DisplayPanel'
 import './Home.css'
 import ReleaseArea from './ReleaseArea'
 
-const Home = () => {
+function useHomeController() {
   const backend = useBackend()
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
-  const savesAndBanks = useSaves()
   const displayError = useDisplayError()
 
   useEffect(() => {
@@ -65,6 +65,22 @@ const Home = () => {
     [displayError]
   )
 
+  return { previewFile, selectedMon, setSelectedMon, openSaveDialog, setOpenSaveDialog }
+}
+
+const Home = () => {
+  if (IS_ANDROID) {
+    return <AndroidHome />
+  } else {
+    return <DesktopHome />
+  }
+}
+
+function DesktopHome() {
+  const { previewFile, selectedMon, setSelectedMon, openSaveDialog, setOpenSaveDialog } =
+    useHomeController()
+  const savesAndBanks = useSaves()
+
   return (
     <Flex direction="row" style={{ height: '100%' }}>
       <Flex className="save-file-column">
@@ -82,34 +98,36 @@ const Home = () => {
           <HomeBoxDisplay />
         </Flex>
       </div>
-      <Flex gap="2" className="right-column" direction="column">
-        <Card className="right-column-card">
-          <Tabs.Root className="right-column-tabs" defaultValue="filter">
-            <Tabs.List size="1" className="right-column-tab-list">
-              <Tabs.Trigger value="filter">Filter</Tabs.Trigger>
-              <Tabs.Trigger value="display">Display</Tabs.Trigger>
-              <Tabs.Trigger value="bag">Item Bag</Tabs.Trigger>
-            </Tabs.List>
-            <Tabs.Content value="filter">
-              <FilterPanel />
-            </Tabs.Content>
-            <Tabs.Content value="display" style={{ flexGrow: 1 }}>
-              <DisplayPanel />
-            </Tabs.Content>
-            <Tabs.Content value="bag" style={{ overflow: 'auto' }}>
-              <ItemBag />
-            </Tabs.Content>
-          </Tabs.Root>
-        </Card>
-        <div
-          className="drop-area"
-          onDrop={(e) => e.dataTransfer.files.length && previewFile(e.dataTransfer.files[0])}
-        >
-          <div className="drop-area-text diagonal-clip">Preview</div>
-        </div>
+      {!IS_ANDROID && (
+        <Flex gap="2" className="right-column" direction="column">
+          <Card className="right-column-card">
+            <Tabs.Root className="right-column-tabs" defaultValue="filter">
+              <Tabs.List size="1" className="right-column-tab-list">
+                <Tabs.Trigger value="filter">Filter</Tabs.Trigger>
+                <Tabs.Trigger value="display">Display</Tabs.Trigger>
+                <Tabs.Trigger value="bag">Item Bag</Tabs.Trigger>
+              </Tabs.List>
+              <Tabs.Content value="filter">
+                <FilterPanel />
+              </Tabs.Content>
+              <Tabs.Content value="display" style={{ flexGrow: 1 }}>
+                <DisplayPanel />
+              </Tabs.Content>
+              <Tabs.Content value="bag" style={{ overflow: 'auto' }}>
+                <ItemBag />
+              </Tabs.Content>
+            </Tabs.Root>
+          </Card>
+          <div
+            className="drop-area"
+            onDrop={(e) => e.dataTransfer.files.length && previewFile(e.dataTransfer.files[0])}
+          >
+            <div className="drop-area-text diagonal-clip">Preview</div>
+          </div>
 
-        <ReleaseArea />
-      </Flex>
+          <ReleaseArea />
+        </Flex>
+      )}
       <PokemonDetailsModal
         key={selectedMon ? tryCalculateIdentifier(selectedMon) : ''}
         mon={selectedMon}
@@ -120,4 +138,65 @@ const Home = () => {
   )
 }
 
+function AndroidHome() {
+  const { previewFile, selectedMon, setSelectedMon, openSaveDialog, setOpenSaveDialog } =
+    useHomeController()
+  const savesAndBanks = useSaves()
+
+  return (
+    <Flex direction="row" style={{ width: '100%' }}>
+      <Flex className="save-file-column">
+        {range(savesAndBanks.allOpenSaves.length).map((i) => (
+          <OpenSaveDisplay key={`save_display_${i}`} saveIndex={i} />
+        ))}
+        <Button id="open-save-button" onClick={() => setOpenSaveDialog(true)}>
+          <MdFileOpen />
+          Open Save
+        </Button>
+      </Flex>
+      <div className="home-box-column">
+        <BankHeader />
+        <Flex direction="row" width="100%" height="0" flexGrow="1">
+          <HomeBoxDisplay />
+        </Flex>
+      </div>
+      {!IS_ANDROID && (
+        <Flex gap="2" className="right-column" direction="column">
+          <Card className="right-column-card">
+            <Tabs.Root className="right-column-tabs" defaultValue="filter">
+              <Tabs.List size="1" className="right-column-tab-list">
+                <Tabs.Trigger value="filter">Filter</Tabs.Trigger>
+                <Tabs.Trigger value="display">Display</Tabs.Trigger>
+                <Tabs.Trigger value="bag">Item Bag</Tabs.Trigger>
+              </Tabs.List>
+              <Tabs.Content value="filter">
+                <FilterPanel />
+              </Tabs.Content>
+              <Tabs.Content value="display" style={{ flexGrow: 1 }}>
+                <DisplayPanel />
+              </Tabs.Content>
+              <Tabs.Content value="bag" style={{ overflow: 'auto' }}>
+                <ItemBag />
+              </Tabs.Content>
+            </Tabs.Root>
+          </Card>
+          <div
+            className="drop-area"
+            onDrop={(e) => e.dataTransfer.files.length && previewFile(e.dataTransfer.files[0])}
+          >
+            <div className="drop-area-text diagonal-clip">Preview</div>
+          </div>
+
+          <ReleaseArea />
+        </Flex>
+      )}
+      <PokemonDetailsModal
+        key={selectedMon ? tryCalculateIdentifier(selectedMon) : ''}
+        mon={selectedMon}
+        onClose={() => setSelectedMon(undefined)}
+      />
+      <SavesModal open={openSaveDialog} onClose={() => setOpenSaveDialog(false)} />
+    </Flex>
+  )
+}
 export default Home
