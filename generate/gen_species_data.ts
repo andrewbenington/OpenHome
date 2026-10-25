@@ -39,16 +39,23 @@ export function rustAbilityConstName(index: number, ability: string): string {
   return constName
 }
 
-type LevelUpType = 'Slow' | 'Medium Slow' | 'Medium Fast' | 'Fast' | 'Erratic' | 'Fluctuating'
+type ExperienceGrowth = 'Slow' | 'Medium Slow' | 'Medium Fast' | 'Fast' | 'Erratic' | 'Fluctuating'
 
-type GenderRatio =
-  'Genderless' | 'AllMale' | 'AllFemale' | 'Equal' | 'M1ToF7' | 'M1ToF3' | 'M7ToF1' | 'M3ToF1'
+export type GenderRatio =
+  | 'Genderless'
+  | 'AllMale'
+  | 'AllFemale'
+  | 'Equal'
+  | 'M1ToF7'
+  | 'M1ToF3'
+  | 'M7ToF1'
+  | 'M3ToF1'
 
 type Species = {
   readonly name: string
   readonly nationalDex: number
   readonly forms: readonly Form[]
-  readonly levelUpType: LevelUpType
+  readonly experienceGrowth: ExperienceGrowth
 }
 
 type Form = {
@@ -98,17 +105,6 @@ type SpeciesForm = {
   readonly formIndex: number
 }
 
-function statsToRust(stats: {
-  readonly hp: number
-  readonly atk: number
-  readonly def: number
-  readonly spa: number
-  readonly spd: number
-  readonly spe: number
-}): string {
-  return `Stats16Le::new(${stats.hp}, ${stats.atk}, ${stats.def}, ${stats.spa}, ${stats.spd}, ${stats.spe})`
-}
-
 function SpeciesAndFormToRust(ref: SpeciesForm): string {
   const species = allSpecies[ref.nationalDex - 1]
   return ref.formIndex === 0
@@ -120,16 +116,12 @@ function evolutionsToRust(evos?: readonly SpeciesForm[]): string {
   return `&[${(evos ?? []).map(SpeciesAndFormToRust).join(',')}]`
 }
 
-function optionalToRust<T, S>(value: T | null | undefined, tranformer?: (T) => S): string {
+function optionalToRust<T, S>(value: T | null | undefined, tranformer?: (v: T) => S): string {
   if (value !== undefined && value !== null) {
-    return `Some(${tranformer ? tranformer(value) : value})`
+    return `Some(${tranformer?.(value) ?? value})`
   } else {
     return 'None'
   }
-}
-
-function pkmTypeToRust(pt: string): string {
-  return `PkmType::${pt}`
 }
 
 function eggGroupToRust(eg: string): string {
@@ -138,8 +130,8 @@ function eggGroupToRust(eg: string): string {
   return `EggGroup::${enumName}`
 }
 
-function levelUpTypeToRust(lut: string): string {
-  return `LevelUpType::${lut.split(' ').join('')}`
+function experienceGrowthToRust(lut: string): string {
+  return `ExperienceGrowth::${lut.split(' ').join('')}`
 }
 
 function regionToRust(reg: string): string {
@@ -205,7 +197,7 @@ function convertForm(species: Species, form: Form): string {
 function convertSpecies(species: Species): string {
   return `SpeciesMetadata {
     national_dex: NationalDex::${pascalCase(species.name)},
-    level_up_type: ${levelUpTypeToRust(species.levelUpType)},
+    experience_growth: ${experienceGrowthToRust(species.experienceGrowth)},
     forms: &[${species.forms.map((form) => convertForm(species, form)).join(',')}]
 }`
 }
@@ -214,7 +206,7 @@ function rowToSpecies(row: SpeciesGetAllRow, forms: Form[]): Species {
   return {
     name: row.name,
     nationalDex: row.nationalDex,
-    levelUpType: row.levelUpType,
+    experienceGrowth: row.levelUpType,
     forms: forms,
   }
 }
@@ -281,28 +273,27 @@ async function getAllSpeciesAndForms() {
   const allSpecies: Species[] = []
 
   for (const species of speciesRows) {
-    const formeRows = camelcaseKeys(await formGetByNationalDex(db, species.nationalDex))
+    const formRows = camelcaseKeys(await formGetByNationalDex(db, species.nationalDex))
     const speciesForms: Form[] = []
-    for (const formeRow of formeRows) {
+    for (const formRow of formRows) {
       const evolutions = camelcaseKeys(
         await evolutionsGetByPrevo(db, {
-          prevoNationalDex: formeRow.nationalDex,
-          prevoFormIndex: formeRow.formIndex,
+          prevoNationalDex: formRow.nationalDex,
+          prevoFormIndex: formRow.formIndex,
         })
       )
-      const preEvolution = camelcaseKeys(
-        await evolutionsGetByEvo(db, {
-          evoNationalDex: formeRow.nationalDex,
-          evoFormIndex: formeRow.formIndex,
-        })
-      )
+      const preEvoResult = await evolutionsGetByEvo(db, {
+        evoNationalDex: formRow.nationalDex,
+        evoFormIndex: formRow.formIndex,
+      })
+      const preEvolution = preEvoResult ? camelcaseKeys(preEvoResult) : null
       const megas = camelcaseKeys(
         await megaEvolutionGetByBaseForm(db, {
-          nationalDex: formeRow.nationalDex,
-          baseFormIndex: formeRow.formIndex,
+          nationalDex: formRow.nationalDex,
+          baseFormIndex: formRow.formIndex,
         })
       )
-      speciesForms.push(rowToForm(formeRow, evolutions, preEvolution, megas))
+      speciesForms.push(rowToForm(formRow, evolutions, preEvolution, megas))
     }
     const fullSpecies = rowToSpecies(species, speciesForms)
     allSpecies.push(fullSpecies)
@@ -315,7 +306,7 @@ async function main() {
   let output = `
 use crate::abilities::AbilityIndexBounded;
 use crate::species::{
-    EggGroup, FormMetadata, GenderRatio, LevelUpType, MegaEvolutionMetadata, SpeciesForm, SpeciesMetadata,
+    EggGroup, FormMetadata, GenderRatio, ExperienceGrowth, MegaEvolutionMetadata, SpeciesForm, SpeciesMetadata,
 };
 use pkm_rs_types::{Generation, GameSetting, NationalDex};
 
@@ -339,7 +330,6 @@ pub fn all_species_data() -> Vec<SpeciesMetadata> {
 
   const filename = 'pkm_rs_resources/src/species/metadata.rs'
   fs.writeFileSync(filename, output)
-  console.log(`Rust code written to ${filename}`)
 }
 
 await main()

@@ -12,7 +12,7 @@ import {
   itemUnboundGetAll,
 } from './queries.ts'
 
-function optionalToRust<T, S>(value: T | null | undefined, tranformer?: (T) => S): string {
+function optionalToRust<T, S>(value: T | null | undefined, tranformer?: (v: T) => S): string {
   if (value !== undefined && value !== null) {
     return `Some(${tranformer ? tranformer(value) : value})`
   } else {
@@ -53,7 +53,7 @@ pub fn get_all_items() -> Vec<ItemMetadata> {
 
   const filename = 'pkm_rs_resources/src/items/modern.rs'
   fs.writeFileSync(filename, output)
-  console.log(`Rust code written to ${filename}`)
+  console.info(`Rust code written to ${filename}`)
 }
 
 function convertItemPastGen(
@@ -88,7 +88,7 @@ impl ItemGen1 {
         match modern_index {`
 
   const alreadyProcessed: Set<number> = new Set()
-  for (const item of allItems.toSorted((a, b) => a.modernId - b.modernId)) {
+  for (const item of allItems.toSorted((a, b) => (a.modernId ?? 0) - (b.modernId ?? 0))) {
     if (item.modernId && !alreadyProcessed.has(item.modernId)) {
       output += `
             ${item.modernId} => Self::new(${item.id}),`
@@ -109,7 +109,7 @@ impl ItemGen1 {
 
   const filename = 'pkm_rs_resources/src/items/gen1.rs'
   fs.writeFileSync(filename, output)
-  console.log(`Rust code written to ${filename}`)
+  console.info(`Rust code written to ${filename}`)
 }
 
 async function generateGen2() {
@@ -134,7 +134,7 @@ impl ItemGen2 {
         match modern_index {`
 
   const alreadyProcessed: Set<number> = new Set()
-  for (const item of allItems.toSorted((a, b) => a.modernId - b.modernId)) {
+  for (const item of allItems.toSorted((a, b) => (a.modernId ?? 0) - (b.modernId ?? 0))) {
     if (item.modernId && !alreadyProcessed.has(item.modernId)) {
       output += `
             ${item.modernId} => Self::new(${item.id}),`
@@ -155,7 +155,7 @@ impl ItemGen2 {
 
   const filename = 'pkm_rs_resources/src/items/gen2.rs'
   fs.writeFileSync(filename, output)
-  console.log(`Rust code written to ${filename}`)
+  console.info(`Rust code written to ${filename}`)
 }
 
 async function generateGen3() {
@@ -185,7 +185,7 @@ impl ItemGen3 {
         match modern_index {`
 
   const alreadyProcessed: Set<number> = new Set()
-  for (const item of allItems.toSorted((a, b) => a.modernId - b.modernId)) {
+  for (const item of allItems.toSorted((a, b) => (a.modernId ?? 0) - (b.modernId ?? 0))) {
     if (item.modernId && !alreadyProcessed.has(item.modernId)) {
       output += `
             ${item.modernId} => Self::new(${item.id}),`
@@ -214,7 +214,7 @@ impl Randomize for ItemGen3 {
 
   const filename = 'pkm_rs_resources/src/items/gen3.rs'
   fs.writeFileSync(filename, output)
-  console.log(`Rust code written to ${filename}`)
+  console.info(`Rust code written to ${filename}`)
 }
 
 async function generateRadicalRed() {
@@ -230,7 +230,7 @@ impl ItemRadicalRed {
         match modern_index {`
 
   const alreadyProcessed: Set<number> = new Set()
-  for (const item of allItems.toSorted((a, b) => a.modernId - b.modernId)) {
+  for (const item of allItems.toSorted((a, b) => (a.modernId ?? 0) - (b.modernId ?? 0))) {
     if (item.modernId && !alreadyProcessed.has(item.modernId)) {
       output += `
             ${item.modernId} => Self::new(${item.id}),`
@@ -251,7 +251,7 @@ impl ItemRadicalRed {
 
   const filename = 'pkm_rs_resources/src/items/radical_red.rs'
   fs.writeFileSync(filename, output)
-  console.log(`Rust code written to ${filename}`)
+  console.info(`Rust code written to ${filename}`)
 }
 
 async function generateUnbound() {
@@ -267,7 +267,7 @@ impl ItemUnbound {
         match modern_index {`
 
   const alreadyProcessed: Set<number> = new Set()
-  for (const item of allItems.toSorted((a, b) => a.modernId - b.modernId)) {
+  for (const item of allItems.toSorted((a, b) => (a.modernId ?? 0) - (b.modernId ?? 0))) {
     if (item.modernId && !alreadyProcessed.has(item.modernId)) {
       output += `
             ${item.modernId} => Self::new(${item.id}),`
@@ -288,12 +288,14 @@ impl ItemUnbound {
 
   const filename = 'pkm_rs_resources/src/items/unbound.rs'
   fs.writeFileSync(filename, output)
-  console.log(`Rust code written to ${filename}`)
+  console.info(`Rust code written to ${filename}`)
 }
 
-generateModern()
-generateGen1()
-generateGen2()
-generateGen3()
-generateRadicalRed()
-generateUnbound()
+await Promise.all([
+  generateModern(),
+  generateGen1(),
+  generateGen2(),
+  generateGen3(),
+  generateRadicalRed(),
+  generateUnbound(),
+])

@@ -8,12 +8,15 @@ const ORAS_ENTRY_SIZE: usize = 0x50;
 type GameMetadataXy = GameMetadata<PersonalInfoXy, XY_ENTRY_SIZE>;
 
 pub static METADATA_TABLE_XY: GameMetadataXy =
-    GameMetadataXy::from_binary(XY_PERSONAL_FILE, XY_LEVELUP_PKL);
+    GameMetadataXy::from_binary(XY_PERSONAL_FILE, XY_LEVELUP_PKL, "X/Y");
 
 type GameMetadataOras = GameMetadata<PersonalInfoOras, ORAS_ENTRY_SIZE>;
 
-pub static METADATA_TABLE_ORAS: GameMetadataOras =
-    GameMetadataOras::from_binary(ORAS_PERSONAL_FILE, ORAS_LEVELUP_PKL);
+pub static METADATA_TABLE_ORAS: GameMetadataOras = GameMetadataOras::from_binary(
+    ORAS_PERSONAL_FILE,
+    ORAS_LEVELUP_PKL,
+    "Omega Ruby/Alpha Sapphire",
+);
 
 #[derive(Debug, Clone, Copy)]
 pub struct PersonalInfoXy([u8; XY_ENTRY_SIZE]);

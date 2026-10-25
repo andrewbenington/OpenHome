@@ -1,12 +1,12 @@
 import BackendInterface from '@openhome-core/backend/backendInterface'
 import useBackend from '@openhome-core/backend/useBackend'
-import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
+import { displayIndexAdder, isBattleFormItem, isMegaStone } from '@openhome-core/pkm/util'
+import { FullMetadataLookup } from '@openhome-core/util'
 import { Option, R } from '@openhome-core/util/functional'
-import useDisplayError from '@openhome-ui/hooks/displayError'
+import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getPokemonSpritePath } from '@openhome-ui/images/pokemon'
 import { MonSpriteData, OpenHomePlugin, PluginContext } from '@openhome-ui/state/plugin/reducer'
-import { MetadataSummaryLookup } from '@pkm-rs/pkg'
 import { useContext, useEffect, useState } from 'react'
 
 type PluginSpriteResult = {
@@ -22,7 +22,7 @@ export function findPluginSprite(
     try {
       const spritePath = plugin.getMonSpritePath?.({
         dexNum: mon.nationalDex,
-        formNum: mon.formIndex,
+        formeNum: mon.formIndex, // do not change until plugins v4
         ...mon,
       })
 
@@ -36,19 +36,20 @@ export function findPluginSprite(
 }
 
 export type GetMonSpriteResult =
-  { type: 'default'; path: string } | ({ type: 'plugin' } & PluginSpriteResult)
+  | { type: 'default'; path: string }
+  | ({ type: 'plugin' } & PluginSpriteResult)
 
 export function getMonSprite(
   mon: MonSpriteData,
   enabledPlugins: OpenHomePlugin[]
 ): GetMonSpriteResult {
   if (isMegaStone(mon.heldItemIndex)) {
-    const megaForStone = MetadataSummaryLookup(mon.nationalDex, mon.formIndex)?.megaEvolutions.find(
+    const megaForStone = FullMetadataLookup(mon)?.megaEvolutions.find(
       (mega) => mega.requiredItemId === mon.heldItemIndex
     )
 
-    if (megaForStone) mon.formIndex = megaForStone.megaForme.formIndex
-  } else if (isBattleFormeItem(mon.nationalDex, mon.heldItemIndex)) {
+    if (megaForStone) mon.formIndex = megaForStone.megaForm.formIndex
+  } else if (isBattleFormItem(mon.nationalDex, mon.heldItemIndex)) {
     mon.formIndex = displayIndexAdder(mon.heldItemIndex)(mon.formIndex)
   }
 
@@ -86,18 +87,19 @@ export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
   useEffect(() => {
     if (spriteResult.errorMessage || spriteResult.path) return
 
-    if (isMegaStone(mon.heldItemIndex)) {
-      const megaForStone = MetadataSummaryLookup(
-        mon.nationalDex,
-        mon.formIndex
-      )?.megaEvolutions.find((mega) => mega.requiredItemId === mon.heldItemIndex)
+    const modifiedMon = { ...mon }
 
-      if (megaForStone) mon.formIndex = megaForStone.megaForme.formIndex
-    } else if (isBattleFormeItem(mon.nationalDex, mon.heldItemIndex)) {
-      mon.formIndex = displayIndexAdder(mon.heldItemIndex)(mon.formIndex)
+    if (isMegaStone(mon.heldItemIndex)) {
+      const megaForStone = FullMetadataLookup(mon)?.megaEvolutions.find(
+        (mega) => mega.requiredItemId === mon.heldItemIndex
+      )
+
+      if (megaForStone) modifiedMon.formIndex = megaForStone.megaForm.formIndex
+    } else if (isBattleFormItem(mon.nationalDex, mon.heldItemIndex)) {
+      modifiedMon.formIndex = displayIndexAdder(mon.heldItemIndex)(mon.formIndex)
     }
 
-    const result = getMonSprite(mon, enabledPlugins)
+    const result = getMonSprite(modifiedMon, enabledPlugins)
     switch (result.type) {
       case 'default':
         setSpriteResult({
@@ -107,7 +109,7 @@ export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
         return
       case 'plugin':
         const { plugin, spritePath } = result
-        getPluginSprite(plugin, spritePath, backend).then(setSpriteResult)
+        getPluginSprite(plugin, spritePath, backend).then(setSpriteResult).catch(console.error)
     }
   }, [
     mon.format,

@@ -87,7 +87,7 @@ describe('all home sprites are present', () => {
     const alcremieSpecies = SpeciesLookup(NationalDex.Alcremie)
     assert(alcremieSpecies !== undefined)
 
-    for (let form of alcremieSpecies.forms) {
+    for (const form of alcremieSpecies.forms) {
       for (const sweet of Object.values(SWEETS).filter((s) => typeof s !== 'string')) {
         for (const variant of SPRITE_VARIANTS) {
           const absoluteSpritePath = homeSpriteAbsolutePath(

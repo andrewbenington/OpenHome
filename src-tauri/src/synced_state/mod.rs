@@ -12,7 +12,7 @@ use crate::data_controller::ToDataController;
 use openhome_core::convert_strategies::ConvertStrategies;
 use openhome_core::data_controller;
 use openhome_core::lookup::LookupState;
-use openhome_core::ohpkm_store::OhpkmBytesStore;
+use openhome_core::ohpkm_store::{OhpkmBytesStore, OhpkmStoreResult};
 use openhome_core::{Error, Result};
 
 pub mod convert_strategies;
@@ -132,7 +132,7 @@ impl AllSyncedState {
     pub fn ohpkm_lookup_batch(
         &self,
         ids: &[OpenHomeId],
-    ) -> Result<HashMap<OpenHomeId, Result<OhpkmV2>>> {
+    ) -> Result<HashMap<OpenHomeId, OhpkmStoreResult<OhpkmV2>>> {
         Ok(self.lock()?.ohpkm_store.0.lookup_batch(ids))
     }
 
@@ -159,7 +159,7 @@ impl AllSyncedState {
             ConvertStrategies::ID => {
                 let action: <ConvertStrategies as SyncedState>::Action =
                     serde_json::from_value(action).map_err(|e| {
-                        Error::unexpeted_condition_with_source(
+                        Error::unexpected_condition_with_source(
                             "update_from_frontend: invalid ConvertStrategies action received"
                                 .to_owned(),
                             e,
@@ -170,7 +170,7 @@ impl AllSyncedState {
             LookupState::ID => {
                 let action: <LookupState as SyncedState>::Action = serde_json::from_value(action)
                     .map_err(|e| {
-                    Error::unexpeted_condition_with_source(
+                    Error::unexpected_condition_with_source(
                         "update_from_frontend: invalid LookupState action received".to_owned(),
                         e,
                     )
@@ -180,7 +180,7 @@ impl AllSyncedState {
             OhpkmBytesStore::ID => {
                 let action: <OhpkmBytesStore as SyncedState>::Action =
                     serde_json::from_value(action).map_err(|e| {
-                        Error::unexpeted_condition_with_source(
+                        Error::unexpected_condition_with_source(
                             "update_from_frontend: invalid OhpkmBytesStore action received"
                                 .to_owned(),
                             e,
@@ -189,11 +189,24 @@ impl AllSyncedState {
                 self.lock()?.ohpkm_store.0.update(action);
             }
             _ => {
-                return Err(Error::unexpeted_condition(format!(
+                return Err(Error::unexpected_condition(format!(
                     "update_from_frontend: invalid state identifier received - '{state_identifier}'"
                 )));
             }
         }
+
+        Ok(())
+    }
+
+    pub fn for_each_ohpkm_stored<F: FnMut(&OpenHomeId, &[u8])>(
+        &self,
+        mut callback: F,
+    ) -> Result<()> {
+        self.lock()?
+            .ohpkm_store
+            .0
+            .all_entries()
+            .for_each(|(id, bytes)| callback(id, bytes.as_ref()));
 
         Ok(())
     }

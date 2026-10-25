@@ -2,10 +2,10 @@ import useBackend from '@openhome-core/backend/useBackend'
 import { getMoveMaxPP } from '@openhome-core/pkm'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import {
-  getMonFileIdentifier,
   getMonGen12Identifier,
   getMonGen345Identifier,
   OhpkmIdentifier,
+  tryCalculateIdentifier,
 } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
@@ -16,7 +16,7 @@ import { $R, Option, PromisedResultBox, R, Result } from '@openhome-core/util/fu
 import { LRUCache } from '@openhome-core/util/lruCache'
 import { isThenable, NowOrLater } from '@openhome-core/util/promise'
 import { FourMoves } from '@openhome-core/util/types'
-import useDisplayError from '@openhome-ui/hooks/displayError'
+import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import { Lookup, MarkingsSixShapesColors, ModernRibbon, OriginGames } from '@pkm-rs/pkg/pkm_rs'
 import dayjs from 'dayjs'
 import { useCallback } from 'react'
@@ -195,8 +195,8 @@ export function useOhpkmStore() {
   }
 
   // the async tasks are left to run here because otherwise the box UI lags to wait for them
-  function updateAndConvertForSave<P extends PKMInterface>(ohpkm: OHPKM, save: SAV<P>) {
-    handleLookupsUpdate(ohpkm, save)
+  async function updateAndConvertForSave<P extends PKMInterface>(ohpkm: OHPKM, save: SAV<P>) {
+    await handleLookupsUpdate(ohpkm, save)
       .then(() => insertOrUpdate(ohpkm))
       .then(() => handleLookupsUpdate(ohpkm, save))
       .catch((error) =>
@@ -308,8 +308,14 @@ export function useOhpkmStore() {
     const ohpkm = sourceSave ? OHPKM.fromMonInSave(mon, sourceSave) : OHPKM.fromMonUnknownSave(mon)
     ohpkm.startedTrackingTimestamp = dayjs()
 
-    backend.log('INFO', `Starting to track ${mon.nickname} (${ohpkm.openhomeId})`)
-
+    backend
+      .log('INFO', `Starting to track ${mon.nickname} (${ohpkm.openhomeId})`)
+      .catch((error) =>
+        displayError('Error Logging Event', [
+          `When trying to log event "Starting to track ${mon.nickname} (${ohpkm.openhomeId})", an error was encountered:`,
+          String(error),
+        ])
+      )
     if (destSave) {
       await handleLookupsUpdate(ohpkm, destSave)
     }
@@ -368,7 +374,7 @@ export function useOhpkmStore() {
       case 'PK9':
       case 'PK9Compass':
       case 'PA9': {
-        return getMonFileIdentifier(mon)
+        return tryCalculateIdentifier(mon)
       }
       default:
         expectExhaustive(mon.format, `unrecognized format: ${mon.format}`)
@@ -407,7 +413,7 @@ export function useOhpkmStore() {
     mon: PKMInterface,
     save?: SAV
   ): PromisedResultBox<OHPKM, IdentifierNotPresentError> {
-    return R.after(tryLoadFromId(ohpkmId)).awaitMap(async (trackedData) => {
+    return R.after(tryLoadFromId(ohpkmId)).map((trackedData) => {
       const updates = trackedData.syncWithGameData(mon, save)
 
       if (updates.length > 0) {
@@ -439,23 +445,25 @@ export function useOhpkmStore() {
   }
 
   async function scanFullStoreAndFixHandlers(save: SAV) {
-    return R.after(backend.getOhpkmIdsMatchingUnknownHandler(save)).then(async (ohpkmIds) => {
-      for (const result of (await tryLoadBatch(ohpkmIds)).values()) {
-        await $R(result).match(
-          async (mon) => fixMissingHandlerIfPresent(save, mon),
-          async ({ identifier }) => {
-            return await backend.log(
-              'ERROR',
-              `Could not find OHPKM with identifier ${identifier}`,
-              {
-                ohpkm_id: identifier,
-                event: 'fix_unknown_handler_scan',
-              }
-            )
-          }
-        )
-      }
-    })
+    return R.after(backend.getOhpkmIdsMatchingUnknownHandler(save))
+      .awaitMap(async (ohpkmIds) => {
+        for (const result of (await tryLoadBatch(ohpkmIds)).values()) {
+          await $R(result).match(
+            async (mon) => fixMissingHandlerIfPresent(save, mon),
+            async ({ identifier }) => {
+              return await backend.log(
+                'ERROR',
+                `Could not find OHPKM with identifier ${identifier}`,
+                {
+                  ohpkm_id: identifier,
+                  event: 'fix_unknown_handler_scan',
+                }
+              )
+            }
+          )
+        }
+      })
+      .await()
   }
 
   function clearCache() {

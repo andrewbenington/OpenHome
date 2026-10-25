@@ -9,9 +9,9 @@ export class BW2SAV extends G5SAV {
   static transferRestrictions = BW2_TRANSFER_RESTRICTIONS
   static saveTypeID = 'BW2SAV'
 
-  supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+  supportsMon(nationalDex: number, formNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
     if (extraFormIndex !== undefined) return false
-    return !isRestricted(BW2_TRANSFER_RESTRICTIONS, nationalDex, formeNumber, extraFormIndex)
+    return !isRestricted(BW2_TRANSFER_RESTRICTIONS, nationalDex, formNumber, extraFormIndex)
   }
 
   supportsItem(itemIndex: number) {

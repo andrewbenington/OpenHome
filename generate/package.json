@@ -1,10 +1,18 @@
 {
   "type": "module",
-  "devDependencies": {
-    "@types/node": "^24.0.14"
+  "scripts": {
+    "format": "oxfmt",
+    "lint": "oxlint . --fix --type-aware --max-warnings 0",
+    "lint:ci": "oxlint . --type-aware --report-unused-disable-directives --max-warnings 0 --format githuby",
+    "typecheck": "tsc"
   },
   "dependencies": {
     "better-sqlite3": "^12.4.1",
     "camelcase-keys": "^10.0.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "^24.0.14",
+    "typescript": "^7.0.2"
   }
 }

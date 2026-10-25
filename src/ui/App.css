@@ -4,6 +4,7 @@
   --font-weight-normal: var(--primitive-font-weight-normal);
   --font-weight-medium: var(--primitive-font-weight-medium);
   --base-font-size: 14px;
+  --footer-height: 1.6rem;
 
   font-size: var(--base-font-size);
   font-family: var(--font-sans);
@@ -460,6 +461,9 @@ label {
   width: fit-content;
   transition: none;
   border-radius: var(--border-radius-sm);
+  background-color: var(--gray-a7);
+  box-shadow: none;
+  display: grid;
 
   svg {
     height: 1rem;
@@ -469,6 +473,7 @@ label {
 
 .mini-button-icon-only {
   width: auto;
+  min-width: fit-content !important;
   padding: 0;
 
   display: grid;

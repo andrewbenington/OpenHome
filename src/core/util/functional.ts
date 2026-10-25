@@ -1,3 +1,4 @@
+import { O, PromisedOptionBox } from './option'
 import { isThenable } from './promise'
 
 type PartitionedResults<A, E> = { successes: A[]; failures: E[] }
@@ -166,6 +167,7 @@ export type Ok<T> = {
 }
 
 export type Result<T, E = string> = Ok<T> | Err<E>
+export type ErrorOf<R extends Result<unknown, unknown>> = R extends Err<infer E> ? E : never
 
 export function isResult<T, V>(v: object): v is Result<T, V> {
   return (
@@ -188,7 +190,7 @@ export class PromisedResultBox<T, E = string> {
     return new PromisedResultBox(Promise.resolve(R.Ok(value)))
   }
 
-  then<U>(onOk: OnOk<T, U>): PromisedResultBox<U, E> {
+  map<U>(onOk: OnOk<T, U>): PromisedResultBox<U, E> {
     return R.after(Promise.resolve(this.v).then(map<T, E, U>(onOk)))
   }
 
@@ -218,7 +220,7 @@ export class PromisedResultBox<T, E = string> {
     )
   }
 
-  map<U>(onOk: OnOk<T, Result<U, E>>): PromisedResultBox<U, E> {
+  flatMap<U>(onOk: OnOk<T, Result<U, E>>): PromisedResultBox<U, E> {
     return R.after(
       Promise.resolve(this.v).then((result) =>
         isErr(result) ? Promise.resolve(result) : onOk(result.data)
@@ -226,12 +228,20 @@ export class PromisedResultBox<T, E = string> {
     )
   }
 
-  async get(): Promise<Result<T, E>> {
+  async await(): Promise<Result<T, E>> {
     return this.v
   }
 
   async getBoxed(): Promise<ResultBox<T, E>> {
     return Promise.resolve(this.v).then($R)
+  }
+
+  async ok(): Promise<Option<T>> {
+    return this.await().then((v) => (R.isErr(v) ? undefined : v.data))
+  }
+
+  okBoxed(): PromisedOptionBox<T> {
+    return O.after(this.await().then((v) => (R.isErr(v) ? undefined : v.data)))
   }
 }
 
@@ -331,7 +341,10 @@ export class ResultBox<T, E> {
   }
 
   peekErr(onErr: (error: E) => void) {
-    return peekErr(onErr)(this.r)
+    if (isErr(this.r)) {
+      onErr(this.r.error)
+    }
+    return this
   }
 
   orElse(ifErr: T) {

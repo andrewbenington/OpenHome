@@ -141,4 +141,12 @@ describe('Handler trainers', () => {
     expect(original.handlerFriendship).toBe(0)
     expect(original.isCurrentHandler).toBe(false)
   })
+
+  test('gen 4 empty slot bytes are expected', () => {
+    expect(Array.from(HGSSSAV.emptySlotBytes())).toMatchSnapshot()
+  })
+
+  test('gen 5 empty slot bytes are expected', () => {
+    expect(Array.from(BWSAV.emptySlotBytes())).toMatchSnapshot()
+  })
 })

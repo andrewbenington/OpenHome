@@ -43,7 +43,7 @@ import {
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
 import { Errorable, Option, R } from '../../util/functional'
-import { PluginIdentifier } from '../interfaces'
+import { pluginGameName, PluginIdentifier } from '../interfaces'
 import { CfruSpeciesAndForm } from './conversion/util'
 
 const INTERNAL_ORIGIN_NON_RR = OriginGame.Invalid6
@@ -132,7 +132,7 @@ export default abstract class PK3CFRU implements PluginPKMInterface {
 
   constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
     if (arg instanceof ArrayBuffer) {
-      let buffer = arg
+      const buffer = arg
       this.originalBytes = buffer
       const dataView = new DataView(buffer)
 
@@ -170,8 +170,9 @@ export default abstract class PK3CFRU implements PluginPKMInterface {
       this.extraFormIndex = speciesData.extraFormIndex
 
       if (speciesData.nationalDex < 0) {
-        this.nationalDex = 0
-        this.formIndex = 0
+        throw Error(
+          `Unknown ${pluginGameName(this.getPluginIdentifier())} species index: ${this.internalSpeciesIndex}`
+        )
       } else if (speciesData.nationalDex === NationalDex.Unown) {
         this.nationalDex = NationalDex.Unown
         this.formIndex = unownFormFromPid(this.personalityValue)
@@ -289,7 +290,11 @@ export default abstract class PK3CFRU implements PluginPKMInterface {
         this.internalMetLocationIndex = FIRERED_IN_GAME_TRADE
       }
 
-      this.internalSpeciesIndex = this.monToGameIndex(other.nationalDex, other.formIndex)
+      this.internalSpeciesIndex = this.monToGameIndex(
+        other.nationalDex,
+        other.formIndex,
+        other.extraFormIndex
+      )
 
       if (other.pluginOrigin === this.getPluginIdentifier()) {
         this.pluginOrigin = other.pluginOrigin
@@ -337,7 +342,11 @@ export default abstract class PK3CFRU implements PluginPKMInterface {
   abstract getValidMoveIndices(): number[]
 
   abstract monFromGameIndex(gameIndex: number): CfruSpeciesAndForm
-  abstract monToGameIndex(nationalDexNumber: number, formIndex: number): number
+  abstract monToGameIndex(
+    nationalDexNumber: number,
+    formIndex: number,
+    extraFormIndex: Option<number>
+  ): number
 
   abstract indexIsFakemon(speciesIndex: number): boolean
 
@@ -375,7 +384,11 @@ export default abstract class PK3CFRU implements PluginPKMInterface {
       dataView.setUint16(0x1c, this.pluginForm, true)
     } else {
       const formIndex = this.nationalDex === NationalDex.Unown ? 0 : this.formIndex
-      dataView.setUint16(0x1c, this.monToGameIndex(this.nationalDex, formIndex), true)
+      dataView.setUint16(
+        0x1c,
+        this.monToGameIndex(this.nationalDex, formIndex, this.extraFormIndex),
+        true
+      )
     }
 
     // 30:32 Held Item

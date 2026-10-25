@@ -4,7 +4,7 @@ import { ModernRibbon } from '@pkm-rs/pkg/pkm_rs'
 
 export function formatTitleAndNickname(mon: PKMInterface) {
   return mon.affixedRibbon
-    ? mon.affixedRibbon === ModernRibbon.Partner
+    ? mon.affixedRibbon === (ModernRibbon.Partner as number)
       ? `${mon.trainerName}'s ${mon.nickname}`
       : `${mon.nickname} ${RibbonTitles[mon.affixedRibbon]}`
     : mon.nickname

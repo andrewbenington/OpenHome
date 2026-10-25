@@ -18,7 +18,6 @@ import {
   DAWN_WINGS,
   DUSK_MANE,
   ETERNAL_FLOWER,
-  EXCLAMATION,
   FAIRY,
   FAN,
   FROST,
@@ -30,7 +29,6 @@ import {
   LGP_STARTER,
   MOW,
   ORIGIN,
-  QUESTION,
   RESOLUTE,
   SKY,
   SPIKY_EAR,
@@ -39,6 +37,8 @@ import {
   THERIAN,
   ULTRA,
   UNBOUND,
+  UNOWN_EXCLAMATION,
+  UNOWN_QUESTION,
   WASH,
   WORLD_CAP,
 } from './Forms'
@@ -54,7 +54,7 @@ export const GEN2_TRANSFER_RESTRICTIONS: TransferRestrictions = {
     ...RegionalForms,
     ...CapPikachus,
     [NationalDex.Pichu]: [SPIKY_EAR],
-    [NationalDex.Unown]: [EXCLAMATION, QUESTION],
+    [NationalDex.Unown]: [UNOWN_EXCLAMATION, UNOWN_QUESTION],
   },
 }
 

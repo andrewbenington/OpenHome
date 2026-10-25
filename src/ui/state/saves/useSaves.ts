@@ -2,7 +2,6 @@ import useBackend from '@openhome-core/backend/useBackend'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { displayIndexAdder, isBattleFormeItem } from '@openhome-core/pkm/util'
 import { getSaveRef, SAV, SaveIdentifier } from '@openhome-core/save/interfaces'
 import { SAVClass } from '@openhome-core/save/util'
 import { buildSaveFile, getPossibleSaveTypes } from '@openhome-core/save/util/load'
@@ -17,7 +16,7 @@ import { useConvertStrategies } from '@openhome-ui/state/convert-strategies'
 import { useItemBag } from '@openhome-ui/state/items'
 import { OhpkmStoreData } from '@openhome-ui/state/ohpkm'
 import { IdentifierNotPresentError, useOhpkmStore } from '@openhome-ui/state/ohpkm/useOhpkmStore'
-import { PokedexUpdate } from '@openhome-ui/util/pokedex'
+import { pokedexUpdatesFromSave } from '@openhome-ui/util/pokedex'
 import { Item } from '@pkm-rs/pkg'
 import { useContext, useRef } from 'react'
 import {
@@ -33,7 +32,7 @@ import { useMonLocationsInternal } from './useMonLocationsInternal'
 export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'homeData'>> & {
   allOpenSaves: readonly SAV[]
 
-  importMonsToLocation(mons: PKMInterface[], startingAt: MonLocation): Promise<OpenSavesState>
+  importMonsToLocation: (mons: PKMInterface[], startingAt: MonLocation) => Promise<OpenSavesState>
 
   addSave(save: SAV): Promise<Result<SAV, SaveError>>
   buildAndOpenSave: (filePath?: PathData) => Promise<Result<Option<SAV>, SaveError>>
@@ -133,6 +132,7 @@ export function useSaves(): SavesAndBanksManager {
   ): Promise<OpenSavesState> => {
     const addedMons: OHPKM[] = []
     const dest = startingAt
+    const newState = { ...openSavesState }
 
     if (dest.isHome) {
       let nextSlot = dest
@@ -181,10 +181,10 @@ export function useSaves(): SavesAndBanksManager {
         }
       }
 
-      openSavesState.openSaves[dest.saveIdentifier].save = tempSave
+      newState.openSaves[dest.saveIdentifier].save = tempSave
     }
 
-    return { ...openSavesState, openSaves: { ...openSavesState.openSaves } }
+    return { ...newState }
   }
 
   const saveBoxNavigateLeft = (save: SAV) => {
@@ -210,7 +210,7 @@ export function useSaves(): SavesAndBanksManager {
   const addSave = async (save: SAV): Promise<Result<SAV, SaveError>> => {
     try {
       await backend.addRecentSave(getSaveRef(save))
-      const result = await backend.registerInPokedex(pokedexSeenFromSave(save))
+      const result = await backend.registerInPokedex(pokedexUpdatesFromSave(save))
       if (R.isErr(result)) {
         console.error('Error registering pokedex entries from save:', result.error)
       }
@@ -251,6 +251,8 @@ export function useSaves(): SavesAndBanksManager {
 
           toUpdate[trackedData.openhomeId] = trackedData
         }
+
+        mon.free?.()
       }
 
       await ohpkmStore.insertOrUpdateAll(toUpdate)
@@ -566,26 +568,4 @@ export function saveErrorMessage(error: SaveError): string {
     case 'ALREADY_OPEN':
       return 'The selected save file is already open'
   }
-}
-
-export function pokedexSeenFromSave(saveFile: SAV) {
-  const pokedexUpdates: PokedexUpdate[] = []
-
-  for (const mon of saveFile.getAllMons()) {
-    pokedexUpdates.push({
-      nationalDex: mon.nationalDex,
-      formIndex: mon.formIndex,
-      status: 'Seen',
-    })
-
-    if (isBattleFormeItem(mon.nationalDex, mon.heldItemIndex)) {
-      pokedexUpdates.push({
-        nationalDex: mon.nationalDex,
-        formIndex: displayIndexAdder(mon.heldItemIndex)(mon.formIndex),
-        status: 'Seen',
-      })
-    }
-  }
-
-  return pokedexUpdates
 }

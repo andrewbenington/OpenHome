@@ -41,7 +41,7 @@ public static class Pk3Object
             ball = Util.FormatBall(pk, strings),
             met_level = pk.MetLevel,
             trainer_gender = Util.FormatGender(pk.OriginalTrainerGender),
-            game_of_origin = strings.gamelist.GetValue((int)pk.Version),
+            game_of_origin = Util.FormatGame(pk.Version, strings),
             language = Util.FormatLanguageName(pk.Language),
             status_condition = pk.Status_Condition,
             stat_level = pk.Stat_Level,

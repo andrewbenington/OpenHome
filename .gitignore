@@ -11,6 +11,7 @@ tsconfig.tsbuildinfo
 # testing
 /coverage
 tester.sh
+test-files/openhome/storage/recent_saves.json
 
 # production
 /out

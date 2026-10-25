@@ -1,6 +1,6 @@
 export const SPIKY_EAR = 1
-export const EXCLAMATION = 26
-export const QUESTION = 27
+export const UNOWN_EXCLAMATION = 26
+export const UNOWN_QUESTION = 27
 export const HEAT = 1
 export const WASH = 2
 export const FROST = 3

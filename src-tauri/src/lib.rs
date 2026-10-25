@@ -13,10 +13,11 @@ mod version;
 
 use crate::data_controller::ToDataController;
 use crate::synced_state::AllSyncedState;
-use openhome_core::convert_strategies::ConvertStrategies;
+use openhome_core::convert_strategies::{ConvertStrategies, NamedStrategy};
 use openhome_core::lookup::LookupState;
 use openhome_core::ohpkm_store::OhpkmBytesStore;
 use openhome_core::{Error, Result};
+use pkm_rs::convert_strategy::ShinyOdds;
 use pkm_rs::ohpkm::OhpkmV2;
 use std::env;
 use tauri::Manager;
@@ -45,12 +46,13 @@ pub fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
         commands::open_directory,
         commands::open_file_location,
         commands::find_suggested_saves,
-        startup_config::get_data_dir_path,
-        startup_config::change_data_dir,
         commands::load_banks,
         commands::write_banks,
-        state::get_pokedex,
-        state::update_pokedex,
+        commands::get_pokedex,
+        commands::update_pokedex,
+        commands::sync_pokedex,
+        startup_config::get_data_dir_path,
+        startup_config::change_data_dir,
         state::start_transaction,
         state::rollback_transaction,
         state::commit_transaction,
@@ -90,8 +92,9 @@ pub fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
         startup_config::get_data_dir_path,
         commands::load_banks,
         commands::write_banks,
-        state::get_pokedex,
-        state::update_pokedex,
+        commands::get_pokedex,
+        commands::update_pokedex,
+        commands::sync_pokedex,
         state::start_transaction,
         state::rollback_transaction,
         state::commit_transaction,
@@ -114,21 +117,29 @@ pub fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    let args: Vec<String> = env::args().collect();
+    dbg!(&args);
+    println!("{}", args[0]);
+
     let specta_builder = specta_builder();
 
     let specta_handler = specta_builder.invoke_handler();
 
+    let tauri_builder = tauri::Builder::default();
+
+    #[cfg(feature = "uitest")]
+    let tauri_builder = tauri_builder
+        .plugin(tauri_plugin_wdio_webdriver::init())
+        .plugin(tauri_plugin_wdio::init());
+
     #[cfg(not(mobile))]
-    let builder = tauri::Builder::default()
+    let tauri_builder = tauri_builder
         .plugin(tauri_plugin_window_state::Builder::new().build())
         .on_menu_event(|app_handle, event| {
             menu::handle_menu_event(app_handle, event);
         });
 
-    #[cfg(mobile)]
-    let builder = tauri::Builder::default();
-
-    builder
+    tauri_builder
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_os::init())
@@ -182,12 +193,6 @@ pub fn run() {
                 }
             };
 
-            lookup_state.with_recalculated(
-                ohpkm_store
-                    .all_entries()
-                    .filter_map(|(_, bytes)| OhpkmV2::from_bytes(bytes).ok()),
-            );
-
             let conversion_settings = match ConvertStrategies::load(&controller) {
                 Ok(settings) => settings,
                 Err(err) => {
@@ -198,11 +203,23 @@ pub fn run() {
                 }
             };
 
+            lookup_state.with_recalculated(
+                ohpkm_store
+                    .all_entries()
+                    .filter_map(|(_, bytes)| OhpkmV2::from_bytes(bytes).ok()),
+                &conversion_settings
+                    .get_default()
+                    .map(NamedStrategy::inner)
+                    .copied()
+                    .unwrap_or_default()
+                    .pid_strategy(ShinyOdds::Odds8192),
+            );
+
             let synced_state =
                 AllSyncedState::from_states(lookup_state, ohpkm_store, conversion_settings);
             app.manage(synced_state);
 
-            let pokedex_state = match state::PokedexState::load_from_storage(&controller) {
+            let pokedex_state = match openhome_core::PokedexState::load_from_storage(&controller) {
                 Ok(pokedex) => pokedex,
                 Err(err) => {
                     util::show_error_dialog(app, err, launch_error_msg("Pokedex File"));

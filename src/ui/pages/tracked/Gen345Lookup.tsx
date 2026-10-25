@@ -1,5 +1,4 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { PluginIdentifier } from '@openhome-core/save/interfaces'
 import { isOk } from '@openhome-core/util/functional'
 import {
   filterUndefined,
@@ -64,7 +63,7 @@ export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
       renderValue: (value) => (
         <Badge.Game
           originGame={value.homeMon?.gameOfOrigin}
-          plugin={value.homeMon?.pluginOrigin as PluginIdentifier}
+          plugin={value.homeMon?.pluginOrigin}
           withName
         />
       ),

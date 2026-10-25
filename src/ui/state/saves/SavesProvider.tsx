@@ -1,10 +1,11 @@
 import useBackend from '@openhome-core/backend/useBackend'
 import { SAVClass } from '@openhome-core/save/util'
 import { $R, Option, R, range, Result } from '@openhome-core/util/functional'
+import { NowOrLater } from '@openhome-core/util/promise'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import PromptDialog from '@openhome-ui/components/dialog/PromptDialog'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
-import useDisplayError from '@openhome-ui/hooks/displayError'
+import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import { Button, Callout, Flex } from '@radix-ui/themes'
 import {
   ReactNode,
@@ -35,7 +36,7 @@ export type SavesProviderProps = {
   children: ReactNode
 }
 
-type SaveTypeCallback = (saveType?: SAVClass | PromiseLike<SAVClass>) => void
+type SaveTypeCallback = (saveType?: NowOrLater<SAVClass>) => unknown
 
 export default function SavesProvider({ children }: SavesProviderProps) {
   const backend = useBackend()
@@ -137,7 +138,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
       if (errors.length) {
         displayError('Error Saving', errors)
-        backend.rollbackTransaction()
+        await backend.rollbackTransaction()
         setSaving(false)
         return R.Err(errors.map(BackendSaveError))
       }
@@ -180,16 +181,21 @@ export default function SavesProvider({ children }: SavesProviderProps) {
   // load bag
   useEffect(() => {
     if (!itemBagState.loaded && !itemBagState.error) {
-      backend.loadItemBag().then(
-        R.match(
-          (bagObj) => {
-            bagDispatch({ type: 'load_item_bag', payload: bagObj })
-          },
-          (err) => {
-            bagDispatch({ type: 'set_error', payload: err })
-          }
+      backend
+        .loadItemBag()
+        .then(
+          R.match(
+            (bagObj) => {
+              bagDispatch({ type: 'load_item_bag', payload: bagObj })
+            },
+            (err) => {
+              bagDispatch({ type: 'set_error', payload: err })
+            }
+          )
         )
-      )
+        .catch((err) => {
+          bagDispatch({ type: 'set_error', payload: err })
+        })
     }
   }, [backend, itemBagState.loaded, itemBagState.error, bagDispatch])
 
@@ -199,9 +205,9 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     // returns a function to stop listening
     const stopListening = backend.onMenuEvents({
       save: () => saveChanges(false),
-      reset: () => {
+      reset: async () => {
         openSavesDispatch({ type: 'clear_mons_to_release' })
-        reloadBankStore()
+        await reloadBankStore()
         clearOhpkmCache()
         openSavesDispatch({ type: 'close_all_saves' })
       },
@@ -258,10 +264,10 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       <SaveDisambiguationDialog
         open={Boolean(disambiguationSaveTypes)}
         saveTypes={disambiguationSaveTypes}
-        onSelect={(selected) => {
+        onSelect={async (selected) => {
           setDisambiguationSaveTypes(undefined)
           disambiguationResolver.current?.(selected)
-          navigate('/home')
+          await navigate('/home')
         }}
       />
       <PromptDialog

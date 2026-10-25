@@ -1,5 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
+import { PkmFormSpecifiers } from '@openhome-core/pkm/util/pkmInterface'
 import { SAV, SaveIdentifier, saveToStringIdentifier } from '@openhome-core/save/interfaces'
 import { SAVClass } from '@openhome-core/save/util'
 import { Option, R, Result } from '@openhome-core/util/functional'
@@ -76,8 +77,13 @@ export function saveLocationsEq(first: SaveMonLocation, second: SaveMonLocation)
   )
 }
 
+export type BoxVisibleData = PkmFormSpecifiers & {
+  isShiny: () => boolean
+  heldItemIndex: number
+}
+
 export type MonWithLocation = MonLocation & {
-  mon: PKMInterface
+  mon: BoxVisibleData
 }
 
 export type OpenSavesAction =
@@ -200,6 +206,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
       return { ...state, monsToRelease: [] }
     }
     case 'close_all_saves': {
+      Object.values(state.openSaves).forEach(({ save }) => save.free())
       return { ...state, openSaves: {} }
     }
     case 'add_pending_mon_locations': {
@@ -242,6 +249,6 @@ export const SavesContext = createContext<SavesContextValue>({
   openSavesState: initialState,
   openSavesDispatch: () => {},
   allOpenSaves: [],
-  promptDisambiguation: async () => undefined,
+  promptDisambiguation: async () => Promise.resolve(undefined),
   saveChanges: async () => R.Ok(null),
 })

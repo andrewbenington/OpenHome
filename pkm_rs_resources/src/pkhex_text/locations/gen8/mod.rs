@@ -161,7 +161,8 @@ pub(super) fn location_name(language: Language, index: usize) -> Option<&'static
     match index {
         0..30000 => location_name_swsh_00000(language, index),
         30000..40000 => location_name_swsh_30000(language, index.checked_sub(30000)?),
-        40000..60000 => location_name_swsh_40000(language, index.checked_sub(40000)?),
-        60000.. => location_name_swsh_60000(language, index.checked_sub(60000)?),
+        40000..59996 => location_name_swsh_40000(language, index.checked_sub(40000)?),
+        59996..60001 => location_name_swsh_40000(language, 2),
+        60001.. => location_name_swsh_60000(language, index.checked_sub(60000)?),
     }
 }

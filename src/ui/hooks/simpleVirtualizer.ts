@@ -10,6 +10,7 @@ export default function useSimpleVirtualizer(
     parseFloat(getComputedStyle(document.documentElement).fontSize)
   )
 
+  // oxlint-disable-next-line react/incompatible-library
   const virtualizer = useVirtualizer({
     count,
     getScrollElement: () => scrollRef.current,

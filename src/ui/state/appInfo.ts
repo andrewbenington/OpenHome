@@ -28,6 +28,8 @@ import { SaveViewMode } from '@openhome-ui/saves/util'
 import { updateStyleForUiScale } from '@openhome-ui/util/style'
 import { Dispatch, Reducer, createContext } from 'react'
 
+const ScarletViolet = ScarletVioletSave
+
 export const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
   G1SAV,
   G1SAVJP,
@@ -46,7 +48,7 @@ export const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
   SwordShieldSave,
   BdspSave,
   LegendsArceusSave,
-  ScarletVioletSave,
+  ScarletViolet,
   LegendsZaSave,
 ]
 const EXTRA_SAVE_TYPES = [G3RRSAV, G3UBSAV, G8LumiSAV, CompassSave]
@@ -73,13 +75,17 @@ export const defaultSettings: Settings = {
   saveViewMode: 'card',
   monDisplayState: initialMonDisplayState(),
   appTheme: 'system',
-  tableType: 'rdg',
   zoomLevel: 100,
+  developerSettings: { flags: [] },
 }
 
 export type AppTheme = 'light' | 'dark' | 'system'
 
-export type TableType = 'rdg' | 'tanstack'
+export type DeveloperFlag = 'show_move_ids'
+
+export type DeveloperSettings = {
+  flags: DeveloperFlag[]
+}
 
 export type Settings = {
   enabledSaveTypes: Record<string, boolean>
@@ -88,8 +94,8 @@ export type Settings = {
   saveViewMode: SaveViewMode
   monDisplayState: MonDisplayState
   appTheme: AppTheme
-  tableType: TableType
   zoomLevel: number
+  developerSettings: DeveloperSettings
 }
 
 export type AppInfoState = {
@@ -130,10 +136,6 @@ export type AppInfoAction =
   | {
       type: 'set_app_theme'
       payload: AppTheme
-    }
-  | {
-      type: 'set_table_type'
-      payload: TableType
     }
   | { type: 'set_mon_display_state'; payload: MonDisplayState }
   | {
@@ -210,9 +212,6 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
     }
     case 'set_app_theme': {
       return { ...state, settings: { ...state.settings, appTheme: payload } }
-    }
-    case 'set_table_type': {
-      return { ...state, settings: { ...state.settings, tableType: payload } }
     }
     case 'set_mon_display_state': {
       return { ...state, settings: { ...state.settings, monDisplayState: payload } }

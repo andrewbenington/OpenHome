@@ -31,7 +31,7 @@ export default function UpdateMessageModal() {
         ))}
       </ScrollArea>
       <Dialog.Actions>
-        <Dialog.Close color="theme">Ok</Dialog.Close>
+        <Dialog.Close>Ok</Dialog.Close>
       </Dialog.Actions>
     </Dialog.Container>
   )

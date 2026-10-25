@@ -142,10 +142,9 @@ pub fn handle_updates_get_features(
 
 fn appdata_dir_exists(data_controller: &impl DataController) -> Result<bool> {
     data_controller
-        .absolute_dir_path(DataDir::OpenHomeRoot)
-        .map_err(Error::data_folder)?
+        .absolute_dir_path(DataDir::OpenHomeRoot)?
         .try_exists()
-        .map_err(Error::data_folder)
+        .map_err(|error| Error::DataFolderAccess(Box::new(error)))
 }
 
 #[derive(EnumIter, Clone, Copy, strum::Display, Debug, PartialEq, Eq, Hash, Serialize)]
@@ -184,6 +183,7 @@ pub enum SignificantUpdate {
     V1_17_0,
     V1_17_1,
     V1_18_0,
+    V1_18_1,
 }
 
 impl SignificantUpdate {
@@ -222,7 +222,8 @@ impl SignificantUpdate {
             Self::V1_16_0 => Version::parse("1.16.0"),
             Self::V1_17_0 => Version::parse("1.17.0"),
             Self::V1_17_1 => Version::parse("1.17.1"),
-            Self::V1_18_0 => Version::parse("1.18.0-rc.async-ohpkm-store"),
+            Self::V1_18_0 => Version::parse("1.18.0"),
+            Self::V1_18_1 => Version::parse("1.18.1"),
         }
         .expect("all versions are valid semver")
     }
@@ -396,8 +397,23 @@ impl SignificantUpdate {
                 "Gender differences can be viewed in the Pokédex via a new toggle.",
                 "Box icons can now show Home sprites instead of Home box icons via Settings > General.",
                 "Various missing box icons and Home sprites have been fixed.",
+                "A bug causing markings to display incorrectly has been fixed.",
                 "A bug with gen 4 met levels has been fixed.",
                 "Bugs with Gen 1/2 stat and level calculation have been fixed.",
+                "A bug causing some Pokémon to be missing their ability in Gen 3 been fixed.",
+                "A bug preventing moves from syncing immediately has been fixed.",
+                "A bug causing Pokémon to revert from an extra form has been fixed.",
+            ]),
+            Self::V1_18_1 => Some(vec![
+                "The Pokédex now tracks whether certain Pokémon variants have been tracked: Gigantamax Factor, Alpha Pokémon, Totem Pokémon, Titan Pokémon, and Pokémon formerly owned by N. Icons for these variants will show up under the Pokédex image for appropriate forms.",
+                "The Pokédex now tracks the games in which each form has been caught. Currently this is displayed as Origin Marks colored in for caught mons, and will be used in the future for game-specific Pokédexes.",
+                "Support has been added for the Nintendo Switch versions of FireRed and LeafGreen.",
+                "Issues with DLC plus moves have been fixed for Legends: Z-A Pokémon.",
+                "Issues with Radical Red/Unbound mons not showing up or having incorrect genders has been fixed.",
+                "Some awkwardly worded met locations have been fixed.",
+                "Error indicators will now show when a Pokémon is considered malformed in a PC box for the following save files: Gen 3 (GBA), Radical Red, and Unbound.",
+                "A bug in preserving shininess when going to Gameboy formats has been fixed.",
+                "A bug causing bugged empty slots in Gen 5 games has been fixed.",
             ]),
             _ => None,
         }

@@ -3,10 +3,9 @@ import BackendInterface from '@openhome-core/backend/backendInterface'
 import useBackend from '@openhome-core/backend/useBackend'
 import { TauriBackend } from '@openhome-core/tauri/backend'
 import { R } from '@openhome-core/util/functional'
-import '@openhome-ui/App.css'
 import AppTabs from '@openhome-ui/AppTabs'
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
-import useDisplayError from '@openhome-ui/hooks/displayError'
+import { useTitledErrorDisplay } from '@openhome-ui/hooks/displayError'
 import { TransactionStateProvider } from '@openhome-ui/state/app-state'
 import { AppInfoContext, appInfoInitialState, appInfoReducer } from '@openhome-ui/state/appInfo'
 import PokemonDndContext from '@openhome-ui/state/drag-and-drop/PokemonDndContext'
@@ -20,6 +19,7 @@ import UpdateMessageModal from '@openhome-ui/top-level/UpdateMessageModal'
 import { Flex, Text, Theme } from '@radix-ui/themes'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useCallback, useEffect, useEffectEvent, useReducer, useState } from 'react'
+import './App.css'
 import BanksAndBoxesProvider from './state-zustand/banks-and-boxes/Provider'
 import { useBanksAndBoxes } from './state-zustand/banks-and-boxes/store'
 import ConvertStrategiesProvider from './state/convert-strategies/ConvertStrategiesProvider'
@@ -79,18 +79,20 @@ function AppWithBackend() {
   })
 
   const backend = useBackend()
-  const displayError = useDisplayError()
+  const displayTitledError = useTitledErrorDisplay()
 
   const reloadSettings = useEffectEvent(backend.getSettings)
   const getPlatform = useEffectEvent(backend.getPlatform)
-  const displayErrorEvent = useEffectEvent(displayError)
+  const displayErrorEvent = useEffectEvent(displayTitledError)
 
   // The save listener works if these are separated into effect events, but not
   // if the whole effect function is (including the returned callback). Check
   // that saving still persists movements after any updates to this.
   const onMenuEvent = useEffectEvent(backend.onMenuEvent)
 
-  const saveChangesEvent = useEffectEvent(saveChanges)
+  const saveChangesEvent = useEffectEvent(() => {
+    saveChanges().catch(displayTitledError('Error saving changes'))
+  })
 
   useEffect(() => {
     const stopListening = onMenuEvent('save', saveChangesEvent)
@@ -110,17 +112,18 @@ function AppWithBackend() {
     reloadSettings()
       .then(
         R.match(
-          async (settings) => appInfoDispatch({ type: 'load_settings', payload: settings }),
-          async (err) => displayErrorEvent('Error loading settings', err)
+          (settings) => appInfoDispatch({ type: 'load_settings', payload: settings }),
+          displayErrorEvent('Error loading settings')
         )
       )
+      .catch(console.error)
       .finally(() => setSettingsLoading(false))
   }, [appInfoState.error])
 
   // only on app start
   useEffect(() => {
     if (getPlatform() !== 'windows') return
-    const handler = buildKeyboardHandler(backend)
+    const handler = (e: KeyboardEvent) => void buildKeyboardHandler(backend)(e)
 
     window.addEventListener('keydown', handler)
     return () => {
@@ -217,7 +220,6 @@ function patchConsole(backend: BackendInterface) {
   ] as const
 
   for (const [method, level] of levels) {
-    // eslint-disable-next-line no-console
     console[method] = (...args: unknown[]) => {
       if (args?.[0] === 'CONSOLE_ONLY') {
         webConsole[method](...args.slice(1))
@@ -233,10 +235,10 @@ function patchConsole(backend: BackendInterface) {
       if (args.length > 0 && typeof args[0] === 'object' && args[0] !== null) {
         const context = args[0] as Record<string, unknown>
         context['callsite'] = callsite
-        backend.log(level, serializeArg(args.at(1)), JSON.parse(JSON.stringify(context)))
+        void backend.log(level, serializeArg(args.at(1)), JSON.parse(JSON.stringify(context)))
       } else {
         const message = formatWithPlaceholders(args)
-        backend.log(level, message, { callsite })
+        void backend.log(level, message, { callsite })
       }
     }
   }
@@ -263,34 +265,28 @@ function formatWithPlaceholders(args: unknown[]): string {
 }
 
 function serializeArg(arg: unknown): string {
+  // oxlint-disable-next-line typescript/no-base-to-string
   return typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
 }
 
 function buildKeyboardHandler(backend: BackendInterface) {
-  return (e: KeyboardEvent) => {
+  return async (e: KeyboardEvent) => {
     if (!e.ctrlKey) return
     switch (e.key) {
       case 'o':
-        backend.emitMenuEvent('open')
-        return
+        return backend.emitMenuEvent('open')
       case 's':
-        backend.emitMenuEvent('save')
-        return
+        return backend.emitMenuEvent('save')
       case 't':
-        backend.emitMenuEvent('reset')
-        return
+        return backend.emitMenuEvent('reset')
       case 'd':
-        backend.emitMenuEvent('open-appdata')
-        return
+        return backend.emitMenuEvent('open-appdata')
       case 'q':
-        backend.emitMenuEvent('exit')
-        return
+        return backend.emitMenuEvent('exit')
       case 'u':
-        backend.emitMenuEvent('check-updates')
-        return
+        return backend.emitMenuEvent('check-updates')
       case 'g':
-        backend.emitMenuEvent('visit-github')
-        return
+        return backend.emitMenuEvent('visit-github')
     }
   }
 }

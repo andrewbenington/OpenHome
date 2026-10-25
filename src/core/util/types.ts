@@ -44,7 +44,7 @@ export type LoadSaveResponse = {
   createdDate?: Date
 }
 
-export interface PKMFormeRef {
+export interface PKMFormRef {
   nationalDex: number
   formIndex: number
 }
@@ -53,7 +53,7 @@ export type JSONValue = string | number | boolean | null | undefined | JSONArray
 
 export interface JSONObject extends Record<string, JSONValue> {}
 
-export interface JSONArray extends Array<JSONValue> {}
+export type JSONArray = JSONValue[]
 
 export function displayGender(gender: Gender | BinaryGender): string {
   switch (gender) {

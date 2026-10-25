@@ -25,7 +25,7 @@ export default class PK2 {
   static getFormat() {
     return 'PK2' as const
   }
-  format: 'PK2' = 'PK2'
+  format = 'PK2' as const
   static getBoxSize() {
     return 32
   }
@@ -117,7 +117,7 @@ export default class PK2 {
       if (dataView.byteLength >= 70) {
         this.nickname = stringLogic.readGameBoyStringFromBytes(dataView, 0x3b, 11)
       } else {
-        this.nickname = this.metadata?.formeName ?? ''
+        this.nickname = this.metadata?.formName ?? ''
       }
       this.trainerGender = byteLogic.getGenderFlag(dataView, 0x1e, 7)
     } else {

@@ -1,10 +1,23 @@
-import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { getTypes, isMegaStone, isZCrystal } from '@openhome-core/pkm/util'
-import { Gender, OriginGame, PkmType } from '@pkm-rs/pkg'
+import { DisplayDataOhpkm, FormSpecifiersForFormat } from '@openhome-core/pkm/util/pkmInterface'
+import { Move } from '@openhome-core/resources'
+import { PluginIdentifier } from '@openhome-core/save/interfaces'
+import * as types from '@openhome-core/util/types'
+import {
+  AbilityIndex,
+  Gender,
+  HyperTraining,
+  OriginGame,
+  PkmType,
+  PlusMoveFlags,
+  ShinyLeaves,
+  StatsPreSplit,
+} from '@pkm-rs/pkg'
 
 export interface Filter {
   nationalDex?: number
-  formeNumber?: number
+  formNumber?: number
   heldItem?: number | HeldItemCategory
   gender?: Gender
   ability?: number
@@ -23,17 +36,49 @@ export interface Filter {
 
 export type HeldItemFilter = number | HeldItemCategory
 
-type monData = PKMInterface & {
-  tags?: { label: string }[]
-  displayColor?: string
-  notes?: string
-}
+export type FilterableMon = FormSpecifiersForFormat &
+  DisplayDataOhpkm & {
+    heldItemIndex: number
+    nickname: string
+    pluginOrigin?: PluginIdentifier
+    gameOfOrigin: number
+    ball?: number
 
-export function filterApplies(filter: Filter, mon: monData) {
+    evs?: types.Stats
+    evsG12?: StatsPreSplit
+    ivs?: types.Stats
+    hyperTraining?: HyperTraining
+    ability?: AbilityIndex
+
+    canGigantamax?: boolean
+    gender?: Gender
+    isAlpha?: boolean
+    isEgg?: boolean
+    isNsPokemon?: boolean
+
+    getLevel: () => number
+    isShiny: () => boolean
+    isSquareShiny: () => boolean
+
+    plusMoveFlags?: PlusMoveFlags
+    tmMovesLza?: Move[]
+    tmMovesSv?: Move[]
+    tmMovesSVDLC?: Move[]
+    trMovesSwSh?: Move[]
+    tutorMovesLa?: Move[]
+
+    pokerusByte?: number
+    ribbons?: string[]
+    shinyLeaves?: ShinyLeaves
+
+    openhomeId?: OhpkmIdentifier
+  }
+
+export function filterApplies(filter: Filter, mon: FilterableMon) {
   if (filter.nationalDex && mon.nationalDex !== filter.nationalDex) {
     return false
   }
-  if (filter.formeNumber !== undefined && mon.formIndex !== filter.formeNumber) {
+  if (filter.formNumber !== undefined && mon.formIndex !== filter.formNumber) {
     return false
   }
   if (filter.heldItem !== undefined && !heldItemPassesFilter(mon.heldItemIndex, filter.heldItem)) {
@@ -58,7 +103,7 @@ export function filterApplies(filter: Filter, mon: monData) {
     return false
   }
 
-  if (filter.gameOfOrigin !== undefined && mon.gameOfOrigin !== (filter.gameOfOrigin as number)) {
+  if (filter.gameOfOrigin !== undefined && mon.gameOfOrigin !== filter.gameOfOrigin) {
     return false
   }
   if (filter.ribbon !== undefined) {

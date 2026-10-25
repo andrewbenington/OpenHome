@@ -1,3 +1,4 @@
+use crate::form;
 use crate::util::bit_is_set;
 
 use pkm_rs_derive::Stats;
@@ -153,6 +154,17 @@ impl Stats8 {
         }
     }
 
+    pub const fn zero() -> Self {
+        Self {
+            hp: 0,
+            atk: 0,
+            def: 0,
+            spa: 0,
+            spd: 0,
+            spe: 0,
+        }
+    }
+
     pub const fn to_bytes(self) -> [u8; 6] {
         [self.hp, self.atk, self.def, self.spe, self.spa, self.spd]
     }
@@ -188,35 +200,6 @@ impl Stats8 {
         }
     }
 
-    pub const fn dvs_from_ivs(self, is_shiny: bool) -> StatsPreSplit {
-        if is_shiny {
-            let mut atk_dv = (self.atk - 1).div_ceil(2);
-
-            if (atk_dv & 0b11) == 0b01 {
-                atk_dv += 1
-            } else if atk_dv.is_multiple_of(4) {
-                atk_dv += 2
-            }
-            let hp_dv = (atk_dv & 1) << 3;
-
-            StatsPreSplit {
-                hp: hp_dv as u16,
-                atk: atk_dv as u16,
-                def: 10,
-                spc: 10,
-                spe: 10,
-            }
-        } else {
-            StatsPreSplit {
-                hp: (self.hp - 1).div_ceil(2) as u16,
-                atk: (self.atk - 1).div_ceil(2) as u16,
-                def: (self.def - 1).div_ceil(2) as u16,
-                spc: (self.spa.midpoint(self.spd) - 1).div_ceil(2) as u16,
-                spe: (self.spe - 1).div_ceil(2) as u16,
-            }
-        }
-    }
-
     pub const fn get(&self, stat: Stat) -> u8 {
         match stat {
             Stat::Hp => self.hp,
@@ -244,6 +227,10 @@ impl Stats8 {
 pub struct Ivs(Stats8);
 
 impl Ivs {
+    pub const fn zero() -> Self {
+        Self(Stats8::zero())
+    }
+
     pub fn from_30_bits(bytes: [u8; 4]) -> Self {
         let iv_bytes = u32::from_le_bytes(bytes);
         Self(Stats8 {
@@ -342,7 +329,6 @@ impl Stats for Ivs {
 
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[cfg_attr(feature = "wasm", derive(Tsify))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Default, PartialEq, Eq, Clone, Copy, Serialize, Deserialize, Stats)]
 pub struct Stats16Le {
     pub hp: u16,
@@ -468,7 +454,6 @@ fn u16_le_slice_to_u8<const N: usize>(slice: [u16; N]) -> Vec<u8> {
 }
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy, PartialEq, Eq)]
 pub struct HyperTraining {
@@ -542,7 +527,6 @@ impl IntoIterator for HyperTraining {
 }
 
 #[cfg_attr(feature = "wasm", derive(Tsify))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
 pub struct StatsPreSplit {
@@ -604,6 +588,10 @@ impl StatsPreSplit {
 pub struct Dvs(u16);
 
 impl Dvs {
+    pub const fn zero() -> Self {
+        Self(0)
+    }
+
     pub const fn get_hp(&self) -> u16 {
         ((self.get_atk() & 1) << 3)
             | ((self.get_def() & 1) << 2)
@@ -645,17 +633,53 @@ impl Dvs {
         self.0.to_be_bytes()
     }
 
-    pub const fn from_ivs_lossy(ivs: &Ivs) -> Self {
-        Self::from_all(
-            iv_to_dv(ivs.0.atk),
-            iv_to_dv(ivs.0.def),
-            iv_to_dv(ivs.0.spe),
-            iv_to_dv((ivs.0.spa + ivs.0.spd) / 2),
-        )
+    pub fn from_ivs(ivs: &Ivs, is_shiny: bool, unown_letter: Option<u16>) -> Self {
+        let dvs = if is_shiny {
+            let mut atk_dv = (ivs.get_atk() - 1).div_ceil(2);
+
+            if (atk_dv & 0b11) == 0b01 {
+                atk_dv += 1
+            } else if atk_dv.is_multiple_of(4) {
+                atk_dv += 2
+            }
+            let hp_dv = (atk_dv & 1) << 3;
+
+            Dvs::from(StatsPreSplit {
+                hp: hp_dv,
+                atk: atk_dv,
+                def: 10,
+                spc: 10,
+                spe: 10,
+            })
+        } else {
+            Dvs::from(StatsPreSplit {
+                hp: iv_to_dv(ivs.get_hp()),
+                atk: iv_to_dv(ivs.get_atk()),
+                def: iv_to_dv(ivs.get_def()),
+                spc: iv_to_dv(ivs.get_spa().midpoint(ivs.get_spd())),
+                spe: iv_to_dv(ivs.get_spe()),
+            })
+        };
+
+        if let Some(letter) = unown_letter
+            && (!is_shiny || matches!(letter, form::UNOWN_I | form::UNOWN_V))
+        {
+            dvs.make_unown_letter_if_possible(letter, is_shiny)
+        } else {
+            dvs.make_not_shiny();
+            dvs
+        }
     }
 
-    pub const fn shiny_from_ivs(ivs: &Ivs) -> Self {
-        let mut atk = (ivs.0.atk.saturating_sub(1)).div_ceil(2) as u16;
+    pub const fn shiny(&self) -> bool {
+        self.get_def() == 10
+            && self.get_spe() == 10
+            && self.get_spc() == 10
+            && (self.get_atk() & 0b10 == 0b10) // shiny values are 2, 3, 6, 7, 10, 11, 14 and 15, AKA all values with the second bit set <= 15
+    }
+
+    const fn make_shiny(self) -> Self {
+        let mut atk = (self.get_atk().saturating_sub(1)).div_ceil(2);
         if atk & 0b11 == 0b01 {
             atk += 1;
         } else if atk.is_multiple_of(4) {
@@ -665,15 +689,44 @@ impl Dvs {
         Self::from_all(atk, 10, 10, 10)
     }
 
-    pub const fn to_unown_letter(&self, letter_index: u16) -> Self {
+    const fn make_not_shiny(self) -> Self {
+        if self.shiny() {
+            // change the special DV to be 11 instead of the current value of 10,
+            // ensuring these DVs will not be shiny
+            Self::from_all(self.get_atk(), self.get_def(), self.get_spe(), 11)
+        } else {
+            self
+        }
+    }
+
+    pub const fn unown_letter(&self) -> u16 {
+        let iv_combination_val = (u2_offset_one_bit(self.get_atk()) << 6)
+            + (u2_offset_one_bit(self.get_def()) << 4)
+            + (u2_offset_one_bit(self.get_spe()) << 2)
+            + u2_offset_one_bit(self.get_spc());
+        iv_combination_val / 10
+    }
+
+    const fn make_unown_letter_if_possible(&self, letter_index: u16, is_shiny: bool) -> Self {
         let letter_bits = letter_index * 10;
         let atk = (self.get_atk() & 0b1001) | (((letter_bits >> 6) & 0b11) << 1);
         let def = (self.get_def() & 0b1001) | (((letter_bits >> 4) & 0b11) << 1);
         let spe = (self.get_spe() & 0b1001) | (((letter_bits >> 2) & 0b11) << 1);
         let spc = (self.get_spc() & 0b1001) | ((letter_bits & 0b11) << 1);
 
-        Self::from_all(atk, def, spe, spc)
+        let dvs = Self::from_all(atk, def, spe, spc);
+        if is_shiny {
+            dvs.make_shiny()
+        } else if dvs.shiny() {
+            dvs.make_not_shiny()
+        } else {
+            dvs
+        }
     }
+}
+
+const fn u2_offset_one_bit(value: u16) -> u16 {
+    arbitrary_int::u2::extract_u16(value, 1).value() as u16
 }
 
 #[cfg(feature = "wasm")]
@@ -752,30 +805,27 @@ impl Randomize for Dvs {
     }
 }
 
-const IV_MAX: u8 = 31;
+#[cfg(test)]
+const IV_MAX: u16 = 31;
 #[cfg(any(test, feature = "randomize"))]
 const DV_MAX: u16 = 15;
 
-const fn iv_to_dv(iv: u8) -> u16 {
-    match iv {
-        0..=IV_MAX => iv as u16 / 2,
-        _ => 0,
-    }
+const fn iv_to_dv(iv: u16) -> u16 {
+    iv.saturating_sub(1).div_ceil(2)
 }
 
 /// Converts a 0-15 DV value to a 0-31 IV value the same way Pokémon GO mons are treated,
 /// by multiplying by two and adding 1. This way a max DV corresponds to a max IV, with the
 /// side effect of the minimum possible IV from a DV being 1.
 #[cfg(test)]
-const fn dv_to_iv(dv: u16) -> u8 {
+const fn dv_to_iv(dv: u16) -> u16 {
     match dv {
-        0..=DV_MAX => (dv as u8 * 2) + 1,
+        0..=DV_MAX => (dv * 2) + 1,
         _ => 0,
     }
 }
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct ContestStats {
@@ -824,7 +874,7 @@ pub enum ContestStat {
 
 #[cfg(test)]
 mod tests {
-    use crate::stats::{DV_MAX, IV_MAX, dv_to_iv, iv_to_dv};
+    use super::*;
 
     /// Ensures all DVs are identical converting to and from an IV.
     #[test]
@@ -853,8 +903,13 @@ mod tests {
     /// Ensures all valid IVs convert to a DV without panicking.
     #[test]
     fn all_ivs_successfully_convert_to_dvs() {
-        for iv in (1..=IV_MAX).step_by(2) {
+        for iv in (0..=IV_MAX).step_by(2) {
             iv_to_dv(iv);
         }
+    }
+
+    #[test]
+    fn zero_ivs_convert_to_zero_dvs() {
+        assert_eq!(Dvs::from_ivs(&Ivs::zero(), false, None), Dvs::zero());
     }
 }

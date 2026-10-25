@@ -1,4 +1,4 @@
-import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { PkmFormSpecifiers } from '@openhome-core/pkm/util/pkmInterface'
 import { SAV } from '@openhome-core/save/interfaces'
 import { monSupportedBySave } from '@openhome-core/save/util'
 import { Option } from '@openhome-core/util/functional'
@@ -19,7 +19,7 @@ export function useCanSwapWithDragging(save: SAV) {
   const payload = useDragStore((s) => s.payload)
 
   return useCallback(
-    (displacedMon: Option<PKMInterface>) => {
+    (displacedMon: Option<PkmFormSpecifiers>) => {
       if (!payload) return true
 
       if (payload.kind === 'item') {
@@ -51,7 +51,7 @@ export function useDragSourceSupportsMon() {
   const payload = useDragStore((s) => s.payload)
 
   return useCallback(
-    (mon: PKMInterface) => {
+    (mon: PkmFormSpecifiers) => {
       if (!payload) return true
 
       if (!payload || payload.kind === 'item') return true

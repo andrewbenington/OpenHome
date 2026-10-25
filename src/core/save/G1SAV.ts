@@ -84,7 +84,7 @@ export class G1SAV extends OfficialSAV<PK1> {
     this.name = readGameBoyStringFromBytes(dataView, 0x2598, 11)
 
     this.currentPCBox = this.bytes[this.CURRENT_BOX_NUM_OFFSET] & 0x7f
-    this.boxes = new Array(this.NUM_BOXES)
+    this.boxes = Array(this.NUM_BOXES)
 
     if (this.currentPCBox > this.NUM_BOXES) {
       this.invalid = true
@@ -251,9 +251,9 @@ export class G1SAV extends OfficialSAV<PK1> {
     return PK1.fromOhpkm(ohpkm, strategy)
   }
 
-  supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+  supportsMon(nationalDex: number, formNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
     if (extraFormIndex !== undefined) return false
-    return nationalDex <= NationalDex.Mew && formeNumber === 0
+    return nationalDex <= NationalDex.Mew && formNumber === 0
   }
 
   supportsItem(itemIndex: number) {

@@ -7,7 +7,7 @@ import {
   SimpleOpenHomeBox,
   StoredBankData,
 } from '@openhome-core/save/util/storage'
-import { Option, partitionResults, R, range, Result } from '@openhome-core/util/functional'
+import { $R, Option, partitionResults, R, range, Result } from '@openhome-core/util/functional'
 import { numericSorter } from '@openhome-core/util/sort'
 import { IdentifierNotPresentError, useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { createContext, useCallback, useContext } from 'react'
@@ -31,14 +31,26 @@ type ReverseLookup = Map<OhpkmIdentifier, BankBoxCoordinates>
 
 export type LocationsByIdentifier = Record<OhpkmIdentifier, BankBoxCoordinates>
 
-export interface BanksAndBoxesState {
-  reloadStore: () => Promise<void>
-
+type BanksAndBoxesState = {
   banks: SimpleOpenHomeBank[]
   currentBankIndex: number
   currentBoxIndex: number
   updatedBoxSlots: BankBoxCoordinates[]
   reverseLookup: ReverseLookup
+}
+
+function banksAndBoxesStateFromStored(stored: StoredBankData): BanksAndBoxesState {
+  return {
+    banks: stored.banks,
+    currentBankIndex: stored.current_bank,
+    currentBoxIndex: stored.banks.at(stored.current_bank)?.current_box ?? 0,
+    updatedBoxSlots: [],
+    reverseLookup: buildReverseLookup(stored),
+  }
+}
+
+export type BanksAndBoxesStore = BanksAndBoxesState & {
+  reloadStore: () => Promise<void>
 
   getCurrentBank: () => SimpleOpenHomeBank
   getCurrentBankName: () => string
@@ -76,11 +88,11 @@ export interface BanksAndBoxesState {
 
 export const createBanksAndBoxesStore = (
   stored: StoredBankData,
-  reloadStored: () => Promise<void>
+  loadStored: () => Promise<Result<StoredBankData>>
 ) =>
-  create<BanksAndBoxesState>()(
-    immer<BanksAndBoxesState>((set, readonlyState) => {
-      const requireBank = <T extends BanksAndBoxesState>(
+  create<BanksAndBoxesStore>()(
+    immer<BanksAndBoxesStore>((set, readonlyState) => {
+      const requireBank = <T extends BanksAndBoxesStore>(
         state: T,
         bankIndex: number
       ): T['banks'][number] => {
@@ -91,7 +103,7 @@ export const createBanksAndBoxesStore = (
         return bank
       }
 
-      const requireBox = <T extends BanksAndBoxesState>(
+      const requireBox = <T extends BanksAndBoxesStore>(
         state: T,
         location: Omit<BankBoxCoordinates, 'boxSlot'>
       ) => {
@@ -102,12 +114,19 @@ export const createBanksAndBoxesStore = (
         return box
       }
 
-      const requireBoxCurrentBank = <T extends BanksAndBoxesState>(state: T, boxIndex: number) => {
+      const requireBoxCurrentBank = <T extends BanksAndBoxesStore>(state: T, boxIndex: number) => {
         return requireBox(state, { bank: state.currentBankIndex, box: boxIndex })
       }
 
       return {
-        reloadStore: reloadStored,
+        reloadStore: async () => {
+          $R(await loadStored()).match(
+            (banks) => set(banksAndBoxesStateFromStored(banks)),
+            (err) => {
+              throw new Error(err)
+            }
+          )
+        },
         banks: stored.banks,
         currentBankIndex: stored.current_bank,
         currentBoxIndex: stored.banks[stored.current_bank].current_box,
@@ -304,12 +323,12 @@ export const createBanksAndBoxesStore = (
           )?.[0]
         },
       }
-    }) as StateCreator<BanksAndBoxesState, [], []>
+    }) as StateCreator<BanksAndBoxesStore, [], []>
   )
 
 // when called using a mutable state (via immer), mutations to the returned value
 // will be preserved by immer
-function currentBankMutable<T extends BanksAndBoxesState>(state: T): T['banks'][number] {
+function currentBankMutable<T extends BanksAndBoxesStore>(state: T): T['banks'][number] {
   return state.banks[state.currentBankIndex]
 }
 
@@ -347,7 +366,7 @@ function boxMapFromOrdered(boxesInOrder: SimpleOpenHomeBox[]): BoxMap {
 }
 
 function buildNewBank(
-  state: BanksAndBoxesState,
+  state: BanksAndBoxesStore,
   name: string | null,
   boxCount: number
 ): SimpleOpenHomeBank {
@@ -454,9 +473,9 @@ function removeAllDupes<T extends SimpleOpenHomeBank>(banks: T[]) {
     .forEach((box) => removeBoxDupesInner(alreadyPresent, box))
 }
 
-type BanksAndBoxesStore = ReturnType<typeof createBanksAndBoxesStore>
+type BanksAndBoxesStoreBuilder = ReturnType<typeof createBanksAndBoxesStore>
 
-export const BanksAndBoxesStoreContext = createContext<BanksAndBoxesStore | null>(null)
+export const BanksAndBoxesStoreContext = createContext<BanksAndBoxesStoreBuilder | null>(null)
 
 type WithSelectors<S> = S extends { getState: () => infer T }
   ? S & { use: { [K in keyof T]: () => T[K] } }
@@ -669,3 +688,5 @@ export function useBanksAndBoxes() {
     firstHomeBoxEmptySlot,
   }
 }
+
+export type BanksAndBoxesController = ReturnType<typeof useBanksAndBoxes>

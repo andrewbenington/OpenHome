@@ -1,4 +1,5 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import OhoButton from '@openhome-ui/components/OhoButton'
 import { TagIcon } from '@openhome-ui/components/TagIcon'
 import useDebounce from '@openhome-ui/hooks/debounce'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
@@ -36,8 +37,8 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
 
   const { updateMonDisplayColor, updateMonTags } = useOhpkmStore()
 
-  const debouncedColorUpdate = useDebounce((color: string) => {
-    updateMonDisplayColor(mon.openhomeId, color || undefined)
+  const debouncedColorUpdate = useDebounce(async (color: string) => {
+    await updateMonDisplayColor(mon.openhomeId, color || undefined)
   }, 300)
 
   const handleColorChange = (color: string) => {
@@ -45,32 +46,32 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
     debouncedColorUpdate(color)
   }
 
-  const handlePresetClick = (color: string) => {
+  const handlePresetClick = async (color: string) => {
     setCustomColor(color)
-    updateMonDisplayColor(mon.openhomeId, color)
+    await updateMonDisplayColor(mon.openhomeId, color)
   }
 
-  const handleClearColor = () => {
+  const handleClearColor = async () => {
     setCustomColor('')
-    updateMonDisplayColor(mon.openhomeId, undefined)
+    await updateMonDisplayColor(mon.openhomeId, undefined)
   }
 
-  const handleAddTag = (tag: MonTag) => {
+  const handleAddTag = async (tag: MonTag) => {
     if (tags.some((t) => t.label === tag.label) || tags.length >= 3) return
     const newTags = [...tags, tag]
     setTags(newTags)
-    updateMonTags(mon.openhomeId, newTags)
+    await updateMonTags(mon.openhomeId, newTags)
   }
 
-  const handleRemoveTag = (label: string) => {
+  const handleRemoveTag = async (label: string) => {
     const newTags = tags.filter((tag) => tag.label !== label)
     setTags(newTags)
-    updateMonTags(mon.openhomeId, newTags.length ? newTags : undefined)
+    await updateMonTags(mon.openhomeId, newTags.length ? newTags : undefined)
   }
 
-  const clearAllTags = () => {
+  const clearAllTags = async () => {
     setTags([])
-    updateMonTags(mon.openhomeId, undefined)
+    await updateMonTags(mon.openhomeId, undefined)
   }
 
   return (
@@ -193,19 +194,19 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
                   onChange={(e) => setNewTagColor(e.target.value)}
                   className="display-tab-tag-color-input"
                 />
-                <Button
+                <OhoButton
                   variant="surface"
                   highContrast
                   color="gray"
-                  onClick={() => {
-                    handleAddTag({ label: newTagLabel, color: newTagColor, icon: newTagIcon })
+                  onClickAsync={async () => {
+                    await handleAddTag({ label: newTagLabel, color: newTagColor, icon: newTagIcon })
                     setNewTagLabel('')
                   }}
                   disabled={!newTagLabel || tags.length >= 3}
                   size="1"
                 >
                   Add
-                </Button>
+                </OhoButton>
               </Flex>
             </Flex>
             <Flex direction="row" gap="2" align="center">

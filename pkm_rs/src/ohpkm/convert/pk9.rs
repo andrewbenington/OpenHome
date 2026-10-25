@@ -1,7 +1,6 @@
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::{metadata_source::MetadataSource, ribbons::OpenHomeRibbonSet};
-use pkm_rs_types::FlagSet;
-use pkm_rs_types::{AbilityNumber, Stats16Le};
+use pkm_rs_types::{AbilityNumber, FlagSet, OriginGame, Stats16Le};
 
 use super::OhpkmConvert;
 use crate::convert_strategy::ConvertStrategy;
@@ -88,7 +87,11 @@ impl OhpkmConvert for Pk9 {
             } else {
                 Some(self.egg_location_index)
             },
-            met_location_index: self.met_location_index,
+            met_location_index: if OriginGame::is_frlg_switch(self.game_of_origin) {
+                254
+            } else {
+                self.met_location_index
+            },
             met_level: self.met_level,
             hyper_training: self.hyper_training,
             trainer_gender: self.trainer_gender,
@@ -118,26 +121,20 @@ impl OhpkmConvert for Pk9 {
     }
 
     fn from_ohpkm(ohpkm: &OhpkmV2, strategy: ConvertStrategy) -> Result<Self> {
-        let form_metadata = ohpkm.get_forme_metadata();
+        let form_metadata = ohpkm.get_form_metadata();
         let converter = PkmConverter::new(PkmFormat::PK9, strategy);
         let met_data = converter.met_data(ohpkm);
 
         let ability_index = if let Some(current_ability) = ohpkm.ability_index().change_bound() {
             current_ability
-        } else if let Some(ability_from_num) = form_metadata
-            .get_ability(ohpkm.ability_num())
-            .change_bound()
-        {
-            ability_from_num
-        } else if let Some(first_ability) = form_metadata
-            .get_ability(AbilityNumber::First)
-            .change_bound()
-        {
-            first_ability
+        } else if let Some(bound_checked) = form_metadata.ability_bounded(ohpkm.ability_num()) {
+            bound_checked
+        } else if let Some(fallback) = form_metadata.ability_bounded(AbilityNumber::First) {
+            fallback
         } else {
-            return Err(Error::AbilityIndex {
-                ability_index: form_metadata.get_ability(AbilityNumber::First).to_u16(),
-            });
+            return Err(Error::AbilityIndex(
+                form_metadata.get_ability(AbilityNumber::First).to_u16(),
+            ));
         };
 
         let mut mon =

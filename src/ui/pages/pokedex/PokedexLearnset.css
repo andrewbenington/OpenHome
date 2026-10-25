@@ -1,14 +1,30 @@
-.pokedex-learnset {
+.pokedex-learnset-card {
   display: flex;
   flex-direction: column;
   gap: var(--padding-radius-sm-lg);
-  padding: var(--padding-radius-sm-lg);
+  padding: 1rem;
   overflow: auto;
   box-sizing: border-box;
-  height: calc(100% - 2 * var(--padding-radius-sm-lg));
+  height: fit-content;
+  margin: 0.25rem;
+}
+
+.pokedex-learnset-moves {
+  margin: auto;
+  flex-wrap: wrap;
+  flex-direction: row;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.learnset-move {
+  width: 100%;
 }
 
 .learnset-move-requirement {
-  width: 7rem;
+  width: 9rem;
   font-size: 1.1rem;
+  text-align: right;
+  font-weight: 500;
+  margin-right: 1rem;
 }

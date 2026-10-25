@@ -1,5 +1,5 @@
 import { PK2 } from '@openhome-core/pkm'
-import { EXCLAMATION } from '@openhome-core/resources/consts/Forms'
+import { UNOWN_EXCLAMATION } from '@openhome-core/resources/consts/Forms'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { GEN2_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import { xorChecksum8BitLe } from '@openhome-core/util/byteLogic'
@@ -89,7 +89,7 @@ export class G2SAV extends OfficialSAV<PK2> {
         ? this.bytes[CURRENT_BOX_OFFSET_C_INTL]
         : this.bytes[CURRENT_BOX_OFFSET_GS_INTL]
 
-    this.boxes = new Array<Box<PK2>>(this.boxOffsets.length)
+    this.boxes = Array(this.boxOffsets.length)
 
     const pokemonPerBox = this.boxRows * this.boxColumns
 
@@ -273,11 +273,11 @@ export class G2SAV extends OfficialSAV<PK2> {
     return checksum2 === this.bytes[0x1f0d]
   }
 
-  supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+  supportsMon(nationalDex: number, formNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
     if (extraFormIndex !== undefined) return false
     return (
-      (nationalDex <= NationalDex.Celebi && formeNumber === 0) ||
-      (nationalDex === NationalDex.Unown && formeNumber < EXCLAMATION)
+      (nationalDex <= NationalDex.Celebi && formNumber === 0) ||
+      (nationalDex === NationalDex.Unown && formNumber < UNOWN_EXCLAMATION)
     )
   }
 

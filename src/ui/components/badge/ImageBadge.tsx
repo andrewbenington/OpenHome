@@ -2,15 +2,11 @@ import { Option } from '@openhome-core/util/functional'
 import { colorIsDark } from '@openhome-ui/util/color'
 import { cssClass } from '@openhome-ui/util/style'
 import { IconType } from 'react-icons'
-import { BaseBadge } from './BaseBadge'
+import { BaseBadge, BaseBadgeProps } from './BaseBadge'
 
-export type ImageBadgeProps = {
-  tooltip?: string
+export type ImageBadgeProps = BaseBadgeProps & {
   src?: string | IconType
-  color?: string
-  backgroundColor: string
   label?: string
-  style?: React.CSSProperties
   onClick?: () => void
   showIf?: Option<boolean>
 }
@@ -31,21 +27,16 @@ export function ImageBadge(props: ImageBadgeProps) {
 
   return (
     <BaseBadge
-      className={cssClass('image-badge-with-text').if(label).build()}
+      className={cssClass('image-badge-with-text').if(label).else('badge-icon-only').build()}
       tooltip={tooltip}
-      backgroundColor={backgroundColor}
       color={color}
       style={style}
+      {...props}
     >
       {typeof src === 'string' ? (
-        <img
-          className={filterClass}
-          style={{ maxHeight: '1rem', maxWidth: '1rem' }}
-          draggable={false}
-          src={src}
-        />
+        <img className={filterClass} draggable={false} src={src} />
       ) : src ? (
-        src({ style: { maxHeight: '1rem', maxWidth: '1rem' } })
+        src({ style: {} })
       ) : null}
       {label && <div className={filterClass}>{label}</div>}
     </BaseBadge>
