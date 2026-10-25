@@ -4744,8 +4744,8 @@ dependencies = [
 
 [[package]]
 name = "tauri-plugin-dialog"
-version = "2.7.3"
-source = "git+https://github.com/andrewbenington/plugins-workspace#a7d742d468663e57dbb646838ffabbbfa0ecde4d"
+version = "2.8.3"
+source = "git+https://github.com/andrewbenington/plugins-workspace#495427ddde902f1188f94d17c6e62f05c4a49bf0"
 dependencies = [
  "log",
  "raw-window-handle",
@@ -4761,8 +4761,8 @@ dependencies = [
 
 [[package]]
 name = "tauri-plugin-fs"
-version = "2.5.2"
-source = "git+https://github.com/andrewbenington/plugins-workspace#a7d742d468663e57dbb646838ffabbbfa0ecde4d"
+version = "2.7.1"
+source = "git+https://github.com/andrewbenington/plugins-workspace#495427ddde902f1188f94d17c6e62f05c4a49bf0"
 dependencies = [
  "anyhow",
  "dunce",

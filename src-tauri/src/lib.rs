@@ -117,10 +117,6 @@ pub fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let args: Vec<String> = env::args().collect();
-    dbg!(&args);
-    println!("{}", args[0]);
-
     let specta_builder = specta_builder();
 
     let specta_handler = specta_builder.invoke_handler();
