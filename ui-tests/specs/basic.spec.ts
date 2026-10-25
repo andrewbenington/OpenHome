@@ -1,12 +1,11 @@
-import { initializeWasm } from '@openhome-core/pkm/__test__/init'
-import { G2SAV } from '@openhome-core/save/G2SAV'
-import { saveToStringIdentifier } from '@openhome-core/save/interfaces'
-import { emptyPathData } from '@openhome-core/save/util/path'
-import { browser, expect } from '@wdio/globals'
-import '@wdio/tauri-service' // adds the browser.tauri typings
-import fs from 'node:fs'
-import path from 'node:path'
-import ui from './helpers'
+import { initializeWasm } from '@openhome-core/pkm/__test__/init';
+import { G2SAV } from '@openhome-core/save/G2SAV';
+import { emptyPathData } from '@openhome-core/save/util/path';
+import { browser, expect } from '@wdio/globals';
+import '@wdio/tauri-service'; // adds the browser.tauri typings
+import fs from 'node:fs';
+import path from 'node:path';
+import ui from './helpers';
 
 function saveTestFilePath(...pathElements: string[]): string {
   return path.join(__dirname, '..', 'ui-tests-data-dir', 'test_saves', ...pathElements)
@@ -58,7 +57,6 @@ describe('Accessing a save mon', () => {
   })
 
   it('should drag a Home mon into a save box, where it continues being displayed as OHPKM', async () => {
-    console.log(saveToStringIdentifier(crystalSaveFile))
     await ui.openAnySave()
 
     const homeMon = await ui.homeMonElement(0, 5)
@@ -70,18 +68,5 @@ describe('Accessing a save mon', () => {
     await saveMon.click()
 
     await expect(await ui.getFileTypeSelectValue()).toBe('OHPKM')
-  })
-
-  it('should mock Tauri commands', async () => {
-    // Mock a Tauri command
-    const mock = await browser.tauri.mock('get_state')
-    await mock.mockReturnValue({ id: 1, name: 'Test User' })
-
-    // Execute code that uses the mocked command
-    const user = await browser.tauri.execute(({ core }) => {
-      return core.invoke('get_state')
-    })
-
-    expect(user).toEqual({ id: 1, name: 'Test User' })
   })
 })

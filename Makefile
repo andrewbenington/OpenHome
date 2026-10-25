@@ -39,10 +39,16 @@ check: wasm-compile
 	@cd generate && pnpm run lint
 	@cd generate && pnpm run format
 
-.PHONY: test
-test: ensure-dependencies target/release/OpenHomeUiTesting
+.PHONY: non-ui-test
+non-ui-test:
 	@pnpm run test
+
+.PHONY: ui-test
+ui-test: target/release/OpenHomeUiTesting
 	@./scripts/run-ui-tests.sh
+
+.PHONY: test
+test: ensure-dependencies non-ui-test ui-test
 
 .PHONY: check-rs
 check-rs:
