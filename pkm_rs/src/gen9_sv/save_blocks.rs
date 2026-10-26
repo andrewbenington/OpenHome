@@ -5,7 +5,7 @@ use crate::encryption::swish_crypto::{
     self, Block, BlockData, NumericBlock, ObjectBlock, SwishBlocks, SwishError,
 };
 use crate::gen9_sv::{BoxIndex, BoxSlot, MAX_BOX_COUNT};
-use crate::result::{Result, StdResult};
+use crate::result::{Error, Result, StdResult};
 use crate::traits::PkmBytes;
 use crate::util;
 
@@ -16,7 +16,9 @@ use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{FlagSet, Language};
 use static_assertions::const_assert_eq;
 use strum::{Display, EnumIter, EnumString};
-use zerocopy::{FromBytes, Immutable, IntoBytes, KnownLayout, LittleEndian, TryFromBytes};
+use zerocopy::{
+    FromBytes, Immutable, IntoBytes, KnownLayout, LittleEndian, TryFromBytes, Unaligned,
+};
 
 #[derive(Debug, Clone)]
 pub(super) struct SvBlocks {
@@ -34,14 +36,16 @@ impl SvBlocks {
         let pokemon_boxes = BoxData::read(blocks.try_pop_object(SvBlockKey::Box)?.bytes())?;
         let box_layouts = BoxLayout(blocks.try_pop_array(SvBlockKey::BoxLayout)?);
         let current_box = blocks.try_pop_numeric(SvBlockKey::CurrentBox)?;
-        let items = ItemInventoryBlock(Box::new(ItemInventory::default()));
+        let item_inventory =
+            vec_into_box::<ItemInventory>(blocks.try_pop_object(SvBlockKey::Item)?.into_bytes())
+                .map_err(|_| Error::other("failed to transmute items block"))?;
 
         Ok(Self {
             my_status,
             pokemon_boxes,
             box_layouts,
             current_box,
-            items,
+            items: ItemInventoryBlock(item_inventory),
             other_blocks: blocks,
         })
     }
@@ -306,7 +310,7 @@ pub struct ItemDataTs {
 #[derive(Debug, Clone, Default)]
 pub struct ItemInventoryBlock(pub(crate) Box<ItemInventory>); // boxed to not overflow the stack
 
-#[derive(Debug, Clone, FromBytes, IntoBytes, KnownLayout, Immutable)]
+#[derive(Debug, Clone, FromBytes, IntoBytes, KnownLayout, Immutable, Unaligned)]
 #[repr(C, packed)]
 pub struct ItemInventory {
     pub items: [ItemData; ITEM_INVENTORY_MAX_COUNT],
@@ -347,3 +351,25 @@ impl Default for ItemInventory {
 }
 
 const_assert_eq!(std::mem::size_of::<ItemInventory>(), ITEM_INVENTORY_SIZE);
+
+/// Reinterprets an owned byte buffer as a `Box<T>` without copying.
+/// Returns the original Vec if the length doesn't match exactly.
+pub fn vec_into_box<T>(v: Vec<u8>) -> StdResult<Box<T>, Vec<u8>>
+where
+    T: FromBytes + Unaligned,
+{
+    if v.len() != size_of::<T>() {
+        return Err(v);
+    }
+
+    // Shrinks capacity to len. This is a no-op (no realloc) if cap == len already.
+    let boxed: Box<[u8]> = v.into_boxed_slice();
+    let ptr: *mut T = Box::into_raw(boxed).cast::<T>();
+
+    // SAFETY:
+    // - The allocation has layout (size = len = size_of::<T>(), align = 1),
+    //   which is exactly Layout::new::<T>() because T: Unaligned.
+    // - T: FromBytes means every initialized byte pattern is a valid T.
+    // - Ownership is transferred; the Box<[u8]> was consumed by into_raw.
+    Ok(unsafe { Box::from_raw(ptr) })
+}

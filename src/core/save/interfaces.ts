@@ -6,6 +6,7 @@ import {
   BinaryGender,
   ConvertStrategy,
   ExtraFormIndex,
+  ItemDataTs,
   Language,
   OriginGame,
   OriginGames,
@@ -92,6 +93,7 @@ interface BaseSAV<P extends PKMInterface = PKMInterface> {
   getDisplayData(): Record<string, string | number | undefined> | undefined
   getDisplayPkms(): DisplayPkm<P>[]
   convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<P>
+  itemInventory(): Option<ItemDataTs[]>
 
   free?: () => void
 }
@@ -213,6 +215,10 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
     return this.boxes[boxNum]?.name
   }
 
+  itemInventory(): Option<ItemDataTs[]> {
+    return undefined
+  }
+
   free() {}
 }
 
@@ -325,6 +331,10 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
 
   get boxSlotCount(): number {
     return this.boxRows * this.boxColumns
+  }
+
+  itemInventory(): Option<ItemDataTs[]> {
+    return undefined
   }
 
   free() {}

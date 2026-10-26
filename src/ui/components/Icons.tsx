@@ -22,6 +22,7 @@ import {
   MdMoreVert,
   MdOutlineTextSnippet,
   MdSelectAll,
+  MdStar,
   MdTextSnippet,
 } from 'react-icons/md'
 import {
@@ -58,6 +59,7 @@ export const ArrowRightIcon = MdArrowForward
 export const ArrowLeftRightIcon = MdCompareArrows
 export const DropdownArrowIcon = MdArrowDropDown
 export const FilterIcon = MdFilterListAlt
+export const FavoriteIcon = MdStar
 
 export const ExpandArrowIcon = MdArrowForwardIos
 
