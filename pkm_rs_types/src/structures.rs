@@ -157,7 +157,18 @@ impl From<BinaryGender> for Gender {
 }
 
 #[cfg_attr(feature = "randomize", derive(Randomize))]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    // zerocopy::FromBytes,
+    // zerocopy::IntoBytes,
+    // zerocopy::KnownLayout,
+    // zerocopy::Immutable,
+)]
+// #[repr(C)]
 pub struct FlagSet<const N: usize, FLAG: Copy + Into<usize> = usize> {
     _marker: core::marker::PhantomData<FLAG>,
     raw: [u8; N],

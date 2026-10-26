@@ -3,7 +3,9 @@ use super::{BOX_COLS, BOX_ROWS, BoxName, MAX_BOX_COUNT, Pk9, Pk9Buffer};
 use crate::checksum::RefreshChecksum;
 use crate::convert_strategy::ConvertStrategy;
 use crate::encryption::swish_crypto::{self, NumericBlock, SwishBlocks};
-use crate::gen9_sv::save_blocks::SvBlockKey;
+#[cfg(feature = "wasm")]
+use crate::gen9_sv::save_blocks::{ItemData, ItemDataTs};
+use crate::gen9_sv::save_blocks::{ItemInventoryBlock, SvBlockKey};
 use crate::gen9_sv::{BoxIndex, BoxSlot};
 use crate::result::{Error, Result, StdResult};
 use crate::traits::PkmBytes;
@@ -33,6 +35,8 @@ pub struct ScarletVioletSave {
 impl ScarletVioletSave {
     pub fn from_bytes(bytes: Box<[u8]>) -> Result<Self> {
         let byte_length = bytes.len();
+        crate::log!("{:?}", ItemData::default());
+        crate::log!("{:?}", ItemInventoryBlock::default());
         if byte_length < SAVE_SIZE_BYTES_MIN {
             return Err(Error::buffer_size_with_source(
                 "scarlet/violet save file min",
@@ -350,6 +354,17 @@ impl ScarletVioletSave {
     #[wasm_bindgen(js_name = fileIsSave)]
     pub fn file_is_save_wasm(bytes: &[u8]) -> bool {
         Self::is_save(bytes)
+    }
+
+    #[wasm_bindgen(getter = itemInventory)]
+    pub fn item_inventory_wasm(&self) -> Vec<Ts<ItemDataTs>> {
+        self.blocks
+            .items
+            .0
+            .all()
+            .enumerate()
+            .filter_map(|(index, item)| item.to_ts(index as u16).into_ts().ok())
+            .collect()
     }
 
     #[wasm_bindgen(js_name = prepareBytesForSaving)]
