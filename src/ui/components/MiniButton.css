@@ -1,0 +1,32 @@
+.mini-button {
+  padding: var(--padding-radius-xs-sm);
+  aspect-ratio: 1;
+  height: var(--height-mini-button);
+  width: fit-content;
+  transition: none;
+  border-radius: var(--border-radius-sm);
+  background-color: var(--gray-a7);
+  box-shadow: none;
+  display: grid;
+
+  svg {
+    height: 1rem;
+    width: 1rem;
+  }
+
+  img {
+    height: 1.25rem;
+    width: 1.25rem;
+    filter: brightness(0) invert(0.9);
+  }
+}
+
+.mini-button-icon-only {
+  width: auto;
+  min-width: fit-content !important;
+  padding: 0;
+
+  display: grid;
+  align-items: center;
+  justify-content: center;
+}

@@ -35,8 +35,6 @@ pub struct ScarletVioletSave {
 impl ScarletVioletSave {
     pub fn from_bytes(bytes: Box<[u8]>) -> Result<Self> {
         let byte_length = bytes.len();
-        crate::log!("{:?}", ItemData::default());
-        crate::log!("{:?}", ItemInventoryBlock::default());
         if byte_length < SAVE_SIZE_BYTES_MIN {
             return Err(Error::buffer_size_with_source(
                 "scarlet/violet save file min",

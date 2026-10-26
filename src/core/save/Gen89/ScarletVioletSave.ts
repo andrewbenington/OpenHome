@@ -92,7 +92,6 @@ export class ScarletVioletSave extends WasmOfficialSave<Pk9Wasm, PK9, ScarletVio
   }
 
   getDisplayData() {
-    console.dir(this.inner.itemInventory)
     return {
       ...this.inner.getDisplayData(),
       // items: this.inner.itemInventory
@@ -103,6 +102,10 @@ export class ScarletVioletSave extends WasmOfficialSave<Pk9Wasm, PK9, ScarletVio
       //   .map((item) => `${item.name}: ${item.count} ${item.is_new ? 'N' : '_'}`)
       //   .join('/n'),
     }
+  }
+
+  itemInventory() {
+    return this.inner.itemInventory
   }
 
   getDisplayPkms() {
