@@ -25,6 +25,10 @@ impl<Key: SwishKey> SwishBlocks<Key> {
         self.0.contains_key(&key.value())
     }
 
+    pub fn has_raw_key(&self, key: u32) -> bool {
+        self.0.contains_key(&key)
+    }
+
     fn try_pop_block(&mut self, key: Key) -> StdResult<Block, SwishError> {
         let key_u32: u32 = key.value();
         Ok(self
