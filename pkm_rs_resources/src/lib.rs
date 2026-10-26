@@ -83,3 +83,9 @@ impl<T, E: std::error::Error> ExpectLog<T> for std::result::Result<T, E> {
         }
     }
 }
+
+// #[cfg(target_arch = "wasm32")]
+// #[wasm_bindgen(start, js_name = pkmRsResourcesInit)]
+// pub fn init() {
+//     console_error_panic_hook::set_once();
+// }
