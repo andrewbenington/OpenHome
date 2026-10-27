@@ -93,7 +93,8 @@ interface BaseSAV<P extends PKMInterface = PKMInterface> {
   getDisplayData(): Record<string, string | number | undefined> | undefined
   getDisplayPkms(): DisplayPkm<P>[]
   convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<P>
-  itemInventory(): Option<ItemDataTs[]>
+  getItemInventory?: () => ItemDataTs[]
+  updateItemData?: (itemData: ItemDataTs) => void
 
   free?: () => void
 }
@@ -121,6 +122,8 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   abstract supportsItem(itemIndex: number): boolean
   abstract prepareForSaving(): void
   abstract convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<P>
+  getItemInventory?: () => ItemDataTs[]
+  updateItemData?: (itemData: ItemDataTs) => void
 
   prepareWriter(): SaveWriter {
     this.prepareForSaving()
@@ -215,10 +218,6 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
     return this.boxes[boxNum]?.name
   }
 
-  itemInventory(): Option<ItemDataTs[]> {
-    return undefined
-  }
-
   free() {}
 }
 
@@ -251,6 +250,8 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   abstract getSlotMetadata?: ((boxNum: number, boxSlot: number) => SlotMetadata) | undefined
   abstract prepareForSaving(): void
   abstract convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<P>
+  getItemInventory?: () => ItemDataTs[]
+  updateItemData?: (itemData: ItemDataTs) => void
 
   prepareWriter(): SaveWriter {
     this.prepareForSaving()
@@ -331,10 +332,6 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
 
   get boxSlotCount(): number {
     return this.boxRows * this.boxColumns
-  }
-
-  itemInventory(): Option<ItemDataTs[]> {
-    return undefined
   }
 
   free() {}

@@ -4,15 +4,14 @@ use crate::checksum::RefreshChecksum;
 use crate::convert_strategy::ConvertStrategy;
 use crate::encryption::swish_crypto::{self, NumericBlock, SwishBlocks};
 #[cfg(feature = "wasm")]
-use crate::gen9_sv::save_blocks::{ItemData, ItemDataTs};
-use crate::gen9_sv::save_blocks::{ItemInventoryBlock, SvBlockKey};
+use crate::gen9_sv::save_blocks::{ItemDataTs, SvBlockKey};
 use crate::gen9_sv::{BoxIndex, BoxSlot};
 use crate::result::{Error, Result, StdResult};
 use crate::traits::PkmBytes;
+use pkm_rs_types::{BinaryGender, Language, OriginGame};
 
 #[cfg(feature = "wasm")]
 use pkm_rs_types::strings::SizedUtf16String;
-use pkm_rs_types::{BinaryGender, Language, OriginGame};
 #[cfg(feature = "wasm")]
 use pkm_rs_types::{BoundViolated, JsResult, TryIntoTs, TsResult};
 use tsify::Ts;
@@ -354,7 +353,7 @@ impl ScarletVioletSave {
         Self::is_save(bytes)
     }
 
-    #[wasm_bindgen(getter = itemInventory)]
+    #[wasm_bindgen(js_name = getItemInventory)]
     pub fn item_inventory_wasm(&self) -> Vec<Ts<ItemDataTs>> {
         self.blocks
             .items
@@ -363,6 +362,21 @@ impl ScarletVioletSave {
             .enumerate()
             .filter_map(|(index, item)| item.to_ts(index as u16).into_ts().ok())
             .collect()
+    }
+
+    #[wasm_bindgen(js_name = "updateItemData")]
+    pub fn update_item_inventory_wasm(&mut self, v: Ts<ItemDataTs>) -> JsResult<()> {
+        let data = v.to_rust()?;
+        self.blocks
+            .items
+            .get_mut(data.index as usize)
+            .ok_or(Error::Other(format!(
+                "Invalid item index provided to updateItemData: {}",
+                data.index
+            )))?
+            .update_from_ts(data);
+
+        Ok(())
     }
 
     #[wasm_bindgen(js_name = prepareBytesForSaving)]
