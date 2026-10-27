@@ -1,0 +1,56 @@
+.save-items-display {
+  overflow: hidden;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  box-sizing: border-box;
+}
+
+.items-modal {
+  max-height: 100vh;
+  overflow-y: hidden;
+
+  --content-height: 34rem;
+
+  width: fit-content;
+  max-width: 80vw;
+  width: 50rem;
+
+  overflow: hidden;
+  padding: 0;
+  border-radius: var(--border-radius-lg);
+  background: var(--background-gradient);
+  box-sizing: border-box;
+}
+
+.item-transfer-card {
+  background-color: var(--color-sidebar);
+  padding: var(--padding-radius-sm-lg);
+  box-shadow:
+    rgba(0, 0, 0, 0.3) 0px 3px 12px,
+    rgba(0, 0, 0, 0.23) 0px 3px 6px;
+  z-index: 1;
+  display: grid;
+  align-items: center;
+  grid-template-columns: 4fr 1fr 1fr 2fr;
+}
+
+.item-scroller {
+  width: 100%;
+  height: 30rem;
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  overscroll-behavior: none;
+  padding: var(--padding-radius-sm-lg);
+  box-sizing: border-box;
+
+  .item-row {
+    position: relative;
+  }
+}
+
+.scroller-wrapper {
+  height: 100%;
+}

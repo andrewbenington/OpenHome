@@ -1,4 +1,5 @@
 import { Flex, type FlexProps } from '@radix-ui/themes'
+import './OhoFlex.css'
 
 type OhoFlexProps = {} & FlexProps
 
@@ -16,6 +17,10 @@ function RowCentered(props: OhoFlexProps) {
 
 function Row(props: OhoFlexProps) {
   return <Flex direction="row" align="center" gap="2" {...props} />
+}
+
+function RowEqualSized(props: OhoFlexProps) {
+  return <Flex className="flex-equal-size" direction="row" align="center" gap="2" {...props} />
 }
 
 function RowEnd(props: OhoFlexProps) {
@@ -44,6 +49,7 @@ const OhoFlex = {
   RowFullHeight,
   Row,
   RowEnd,
+  RowEqualSized,
   ColStart,
   ColCentered,
   ColFullHeight,

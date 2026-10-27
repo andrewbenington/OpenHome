@@ -1,53 +1,72 @@
 import { Option } from '@openhome-core/util/functional'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import Fallback from '@openhome-ui/components/Fallback'
-import { FavoriteIcon } from '@openhome-ui/components/Icons'
+import LabelledInput from '@openhome-ui/components/input/LabelledInput'
 import OhoFlex from '@openhome-ui/components/OhoFlex'
 import useSimpleVirtualizer from '@openhome-ui/hooks/simpleVirtualizer'
-import { getPublicImageURL } from '@openhome-ui/images/images'
-import { getItemIconPath } from '@openhome-ui/images/items'
-import { cssClass } from '@openhome-ui/util/style'
 import { Item, ItemDataTs } from '@pkm-rs/pkg'
-import { Card, Grid, Inset, Separator, VisuallyHidden } from '@radix-ui/themes'
+import { Card, VisuallyHidden } from '@radix-ui/themes'
 import { useRef, useState } from 'react'
+import { ItemRow } from './ItemRow'
 import './SaveItemsDisplay.css'
+import { TitledCard } from './TitledCard'
 
 interface SaveItemsDisplayProps {
   items: ItemDataTs[]
 }
 
-function SaveItemsDisplay(props: SaveItemsDisplayProps) {
+export function SaveItemsDisplay(props: SaveItemsDisplayProps) {
   const { items } = props
   const parentRef = useRef(null)
   const [saveItemSelected, setSaveItemSelected] = useState<Option<number>>(undefined)
 
   const filteredItems = items.filter((item) => item.is_obtained)
+  const saveSelected = saveItemSelected
+    ? items.find((item) => item.index === saveItemSelected)
+    : undefined
 
   return (
     <div ref={parentRef} className="save-items-display">
-      <div className="pokemon-modal-card titled-card">
-        <OhoFlex.RowStart className="titled-card-header">
-          <h3 className="titled-card-title">Save File</h3>
-        </OhoFlex.RowStart>
-        <Inset side="x" p="0" mx="-2">
-          <Separator />
-        </Inset>
-        <div className="titled-card-content scroller-wrapper">
+      <OhoFlex.RowEqualSized gridColumn="1 / span 2" gap="1" mx="1" mt="1">
+        <TitledCard title="Save File" side="left">
           <SaveItemsScroller
             items={filteredItems}
             selectedIndex={saveItemSelected}
             onClick={(index) => setSaveItemSelected(saveItemSelected === index ? undefined : index)}
           />
+        </TitledCard>
+        <TitledCard title="OpenHome Item Bag" side="right">
+          <SaveItemsScroller
+            items={filteredItems}
+            selectedIndex={saveItemSelected}
+            onClick={(index) => setSaveItemSelected(saveItemSelected === index ? undefined : index)}
+          />
+        </TitledCard>
+      </OhoFlex.RowEqualSized>
+      <div className="item-transfer-card" style={{ gridColumn: '1 / span 2' }}>
+        <div>
+          <h3>Save File</h3>
+          <Card
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              padding: 'var(--padding-radius-sm-lg)',
+            }}
+          >
+            <OhoFlex.RowEnd>
+              <p style={{ width: '200%' }}>
+                {saveSelected?.index ? Item.fromIndex(saveSelected?.index)?.name : ''}
+              </p>
+              <p>×</p>
+              <LabelledInput.Int
+                key={saveSelected?.index}
+                value={saveSelected?.count ?? 0}
+                onChange={console.info}
+              />
+            </OhoFlex.RowEnd>
+          </Card>
         </div>
       </div>
-
-      <SaveItemsScroller
-        items={filteredItems}
-        selectedIndex={saveItemSelected}
-        onClick={(index) => setSaveItemSelected(saveItemSelected === index ? undefined : index)}
-      />
-      <Card>Save</Card>
-      <Card>Save</Card>
     </div>
   )
 }
@@ -70,52 +89,18 @@ function SaveItemsScroller(props: SaveItemsScrollerProps) {
 
   return (
     <div ref={parentRef} className="item-scroller">
-      {virtualizer.getVirtualItems().map((virtualRow) => (
-        <ItemRow
-          key={String(virtualRow.index)}
-          itemData={items[virtualRow.index]}
-          selected={props.selectedIndex === virtualRow.index}
-          onClick={() => props.onClick?.(virtualRow.index)}
-        />
-      ))}
+      {virtualizer.getVirtualItems().map((virtualRow) => {
+        const item = items[virtualRow.index]
+        return (
+          <ItemRow
+            key={item.index}
+            itemData={item}
+            selected={props.selectedIndex === item.index}
+            onClick={() => props.onClick?.(item.index)}
+          />
+        )
+      })}
     </div>
-  )
-}
-
-export interface ItemRowProps {
-  itemData: ItemDataTs
-  selected: boolean
-  onClick?: () => void
-}
-
-function ItemRow({ itemData, selected, onClick }: ItemRowProps) {
-  const item = Item.fromIndex(itemData.index)
-  return (
-    <Grid
-      className={cssClass('item-row').with('item-row-selected').if(selected).build()}
-      onClick={onClick}
-    >
-      {item ? (
-        <img
-          className="fill-parent"
-          src={getPublicImageURL(getItemIconPath(item.index))}
-          alt={item.name}
-          title={item.name}
-          draggable={false}
-        />
-      ) : (
-        <img
-          src="/items/index/0000.png"
-          alt=""
-          aria-hidden
-          draggable={false}
-          style={{ opacity: 0 }}
-        />
-      )}
-      <div>{item?.name}</div>
-      {itemData.is_favorite ? <FavoriteIcon /> : <div />}
-      <div className="item-count">x{itemData.count}</div>
-    </Grid>
   )
 }
 
