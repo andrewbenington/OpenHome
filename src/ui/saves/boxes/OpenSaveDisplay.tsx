@@ -320,6 +320,8 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
       {saveItemData !== undefined && (
         <SaveItemsModal
           items={saveItemData}
+          source1={save.origin}
+          source2={'OpenHome'}
           isOpen={openModal === 'items'}
           onClose={() => {
             if (openModal === 'items') {

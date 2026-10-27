@@ -19,6 +19,13 @@ export function ItemIcon(props: ItemIconProps) {
       {...props}
     />
   ) : (
-    <img src="/items/index/0000.png" alt="" aria-hidden draggable={false} style={{ opacity: 0 }} />
+    <img
+      src="/items/index/0000.png"
+      alt=""
+      aria-hidden
+      draggable={false}
+      style={{ opacity: 0, ...props.style }}
+      {...props}
+    />
   )
 }

@@ -39,6 +39,10 @@ function ColFullHeight(props: OhoFlexProps) {
   return <Flex direction="column" height="100%" gap="2" {...props} />
 }
 
+function ColFullWidth(props: OhoFlexProps) {
+  return <Flex direction="column" width="100%" gap="2" {...props} />
+}
+
 function Spacer() {
   return <div style={{ flex: 1, width: 0 }} />
 }
@@ -53,6 +57,7 @@ const OhoFlex = {
   ColStart,
   ColCentered,
   ColFullHeight,
+  ColFullWidth,
   Spacer,
 }
 
