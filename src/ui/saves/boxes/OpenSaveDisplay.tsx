@@ -21,6 +21,7 @@ import { getPublicImageURL } from '@openhome-ui/images/images'
 import PokemonDetailsModal from '@openhome-ui/pokemon/PokemonDetailsModal'
 import { useCanSwapWithDragging } from '@openhome-ui/state-zustand/drag-and-drop/dragStore'
 import { ErrorContext } from '@openhome-ui/state/error'
+import { useItemBag } from '@openhome-ui/state/items'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import useOhpkmBatchIdLookup from '@openhome-ui/state/ohpkm/useOhpkmIdBatchLookup'
 import useTrackedDataRecovery from '@openhome-ui/state/ohpkm/useTrackedDataRecovery'
@@ -60,6 +61,8 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const { saveIndex } = props
   const { multiSelectState, toggleSelection, isSelected } = useMultiSelect()
   const [selectedMonNotInBoxes, setSelectedMonNotInBoxes] = useState<PKMInterface>()
+
+  const openhomeItemBag = useItemBag()
 
   const save = useMemo(() => allOpenSaves[saveIndex], [allOpenSaves, saveIndex])
   const displayError = useDisplayError()
@@ -319,8 +322,17 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
       />
       {saveItemData !== undefined && (
         <SaveItemsModal
-          items={saveItemData}
+          source1Items={saveItemData}
           source1={save.origin}
+          source2Items={Object.entries(openhomeItemBag.itemCounts)
+            .map(([indexStr, count]) => ({
+              index: parseInt(indexStr),
+              count,
+              pouch: 0,
+              isObtained: true,
+              isFavorite: false,
+            }))
+            .filter((item) => item.index !== 0)}
           source2={'OpenHome'}
           isOpen={openModal === 'items'}
           onClose={() => {
