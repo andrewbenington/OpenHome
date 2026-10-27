@@ -18,14 +18,14 @@
   box-shadow: rgba(218, 215, 215, 0.105) 0px 1px 2px inset !important;
   display: flex;
 
-  h3 {
+  > * {
     background-color: var(--color-panel);
     margin-bottom: -1px;
   }
 }
 
 .titled-card-title-left {
-  h3 {
+  > * {
     margin-right: auto;
     clip-path: polygon(
       0% 0%,
@@ -34,13 +34,13 @@
       calc(100% - var(--diagonal-length)) 0%,
       100% 0%
     );
-    padding: var(--padding-radius-xs-sm) var(--space-from-diagonal)
+    padding: var(--padding-radius-sm-lg) var(--space-from-diagonal)
       var(--padding-radius-xs-sm) var(--padding-radius-sm-lg);
   }
 }
 
 .titled-card-title-right {
-  h3 {
+  > * {
     margin-left: auto;
     clip-path: polygon(
       var(--diagonal-length) 0%,
@@ -49,7 +49,7 @@
       100% 0%,
       100% 0%
     );
-    padding: var(--padding-radius-xs-sm) var(--padding-radius-sm-lg)
+    padding: var(--padding-radius-sm-lg) var(--padding-radius-sm-lg)
       var(--padding-radius-xs-sm) var(--space-from-diagonal);
     border-top-right-radius: var(--border-radius-xs);
   }

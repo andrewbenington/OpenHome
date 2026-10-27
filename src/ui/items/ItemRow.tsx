@@ -8,14 +8,18 @@ import './ItemRow.css'
 export interface ItemRowProps {
   itemData: ItemDataTs
   selected: boolean
+  inactive: boolean
   onClick?: () => void
 }
 
-export function ItemRow({ itemData, selected, onClick }: ItemRowProps) {
+export function ItemRow({ itemData, selected, inactive, onClick }: ItemRowProps) {
   const item = Item.fromIndex(itemData.index)
   return (
     <Grid
-      className={cssClass('item-row').with('item-row-selected').if(selected).build()}
+      className={cssClass('item-row')
+        .with(`item-row-selected-${inactive ? 'inactive' : 'active'}`)
+        .if(selected)
+        .build()}
       onClick={onClick}
     >
       <ItemIcon item={item} />

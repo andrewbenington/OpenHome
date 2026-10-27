@@ -10,6 +10,7 @@ import {
   MdArrowForward,
   MdArrowForwardIos,
   MdArrowOutward,
+  MdArrowUpward,
   MdCheckCircle,
   MdClear,
   MdCompareArrows,
@@ -56,6 +57,7 @@ export const CardsIcon = IoGrid
 
 export const ArrowLeftIcon = MdArrowBack
 export const ArrowRightIcon = MdArrowForward
+export const ArrowUpIcon = MdArrowUpward
 export const ArrowLeftRightIcon = MdCompareArrows
 export const DropdownArrowIcon = MdArrowDropDown
 export const FilterIcon = MdFilterListAlt

@@ -32,7 +32,7 @@
   z-index: 1;
   display: grid;
   align-items: center;
-  grid-template-columns: 4fr 1fr 1fr 2fr;
+  grid-template-columns: 1fr 1fr;
 }
 
 .item-scroller {

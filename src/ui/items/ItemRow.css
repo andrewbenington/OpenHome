@@ -29,7 +29,12 @@
   }
 }
 
-.item-row-selected {
+.item-row-selected-active {
   background-color: var(--focus-6);
+  font-weight: bold;
+}
+
+.item-row-selected-inactive {
+  background-color: var(--gray-6);
   font-weight: bold;
 }
