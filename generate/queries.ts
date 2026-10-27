@@ -273,7 +273,19 @@ SELECT
 FROM
   item_unbound`
 
+export const itemEmeraldExpnGetAllQuery = `-- name: ItemEmeraldExpnGetAll :many
+SELECT
+  id, modern_id, name
+FROM
+  item_emerald_expn`
+
 export interface ItemUnboundGetAllRow {
+  id: number
+  modernId: number | null
+  name: any
+}
+
+export interface ItemEmeraldExpnGetAllRow {
   id: number
   modernId: number | null
   name: any
@@ -283,4 +295,10 @@ export async function itemUnboundGetAll(database: Database): Promise<ItemUnbound
   const stmt = database.prepare(itemUnboundGetAllQuery)
   const result = stmt.all()
   return camelcaseKeys(result) as ItemUnboundGetAllRow[]
+}
+
+export async function itemEmeraldExpnGetAll(database: Database): Promise<ItemEmeraldExpnGetAllRow[]> {
+  const stmt = database.prepare(itemEmeraldExpnGetAllQuery)
+  const result = await stmt.all()
+  return camelcaseKeys(result) as ItemEmeraldExpnGetAllRow[]
 }

@@ -27,6 +27,7 @@ import { MonDisplayState } from '@openhome-ui/hooks/monDisplay'
 import { SaveViewMode } from '@openhome-ui/saves/util'
 import { updateStyleForUiScale } from '@openhome-ui/util/style'
 import { Dispatch, Reducer, createContext } from 'react'
+// import { G3EmeraldExpnSave } from '@openhome-core/save/emerald_expn/G3EmeraldExpnSave.ts'
 
 const ScarletViolet = ScarletVioletSave
 
@@ -51,7 +52,7 @@ export const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
   ScarletViolet,
   LegendsZaSave,
 ]
-const EXTRA_SAVE_TYPES = [G3RRSAV, G3UBSAV, G8LumiSAV, CompassSave]
+const EXTRA_SAVE_TYPES = [G3RRSAV, G3UBSAV, G8LumiSAV, CompassSave, G3EmeraldExpnSave]
 
 function initialMonDisplayState(): MonDisplayState {
   return {
@@ -68,7 +69,8 @@ function initialMonDisplayState(): MonDisplayState {
 
 export const defaultSettings: Settings = {
   enabledSaveTypes: Object.fromEntries(
-    [...OFFICIAL_SAVE_TYPES, ...EXTRA_SAVE_TYPES].map((savetype) => [savetype.saveTypeID, true])
+    [...OFFICIAL_SAVE_TYPES, ...EXTRA_SAVE_TYPES].map(
+      (savetype) => [savetype.saveTypeID, true])
   ),
   enabledPlugins: {},
   saveCardSize: 180,
