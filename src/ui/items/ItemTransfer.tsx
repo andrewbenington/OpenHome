@@ -12,10 +12,10 @@ import { Card, VisuallyHidden } from '@radix-ui/themes'
 import { useRef, useState } from 'react'
 import { ItemIcon } from './ItemIcon'
 import { ItemRow } from './ItemRow'
-import './SaveItemsDisplay.css'
+import './ItemTransfer.css'
 import { TitledCard } from './TitledCard'
 
-interface SaveItemsDisplayProps {
+interface ItemTransferProps {
   items: ItemDataTs[]
   source1: OriginGame | 'OpenHome'
   source2: OriginGame | 'OpenHome'
@@ -30,7 +30,7 @@ function useSource(items: ItemDataTs[]) {
   return { item, items, selection, setSelection }
 }
 
-export function SaveItemsDisplay(props: SaveItemsDisplayProps) {
+export function ItemTransfer(props: ItemTransferProps) {
   const { items } = props
   const parentRef = useRef(null)
   const [selectedSource, setSelectedSource] = useState<Option<Source>>()
@@ -88,7 +88,7 @@ function ItemTransferCard(props: ItemTransferCardProps) {
       size="2"
       color="red"
       variant="classic"
-      style={{ fontWeight: 'bold', margin: 'auto', height: '2.5rem', width: '12rem' }}
+      style={{ fontWeight: 'bold', height: '2.5rem', width: '12rem' }}
     >
       {props.side === 'left' && <ArrowUpIcon />}
       Send Items
@@ -97,17 +97,10 @@ function ItemTransferCard(props: ItemTransferCardProps) {
   )
 
   return (
-    <div
-      className="item-transfer-card"
-      style={{ gridColumn: '1 / span 2', flexDirection: 'row-reverse' }}
-    >
+    <div className="item-transfer-card">
       {props.side === 'left' && button}
-      <Card
-        style={{
-          padding: 'var(--padding-radius-sm-lg)',
-        }}
-      >
-        <OhoFlex.Row justify={props.side === 'left' ? 'start' : 'end'} gap="3">
+      <Card style={{ padding: 'var(--padding-radius-sm-lg)', flex: 1 }}>
+        <OhoFlex.Row justify={props.side === 'left' ? 'end' : 'start'} gap="3">
           <ItemIcon item={sourceItem} style={{ width: '1.25rem', height: '1.25rem' }} />
           <p>{sourceItem?.name}</p>
           <p>×</p>
@@ -184,7 +177,7 @@ export function SaveItemsModal(props: SaveItemsModalProps) {
             <Dialog.Description>Detailed information about the selected Pokémon</Dialog.Description>
           </VisuallyHidden>
           <Fallback>
-            <SaveItemsDisplay items={props.items} source1={props.source1} source2={props.source2} />
+            <ItemTransfer items={props.items} source1={props.source1} source2={props.source2} />
           </Fallback>
         </Dialog.Popup>
       </Dialog.Portal>

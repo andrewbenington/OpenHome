@@ -10,6 +10,7 @@ import { Result } from '@openhome-core/util/functional'
 import {
   ConvertStrategy,
   ExtraFormIndex,
+  ItemDataTs,
   OriginGame,
   Pk9Wasm,
   ScarletVioletSaveRust,
@@ -104,10 +105,9 @@ export class ScarletVioletSave extends WasmOfficialSave<Pk9Wasm, PK9, ScarletVio
     }
   }
 
-  itemInventory() {
-    return this.inner.itemInventory
-  }
+  getItemInventory = () => this.inner.getItemInventory()
 
+  updateItemData = (itemData: ItemDataTs) => this.inner.updateItemData(itemData)
   getDisplayPkms() {
     const rideLegend = this.inner.getRideLegend()
     return rideLegend ? [{ mon: PK9.fromWasm(rideLegend), description: 'Ride Legendary' }] : []

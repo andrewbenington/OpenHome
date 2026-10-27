@@ -30,9 +30,11 @@
     rgba(0, 0, 0, 0.3) 0px 3px 12px,
     rgba(0, 0, 0, 0.23) 0px 3px 6px;
   z-index: 1;
-  display: grid;
+  display: flex;
   align-items: center;
-  grid-template-columns: 1fr 1fr;
+  flex-direction: row;
+  grid-column: 1 / span 2;
+  gap: 0.5rem;
 }
 
 .item-scroller {

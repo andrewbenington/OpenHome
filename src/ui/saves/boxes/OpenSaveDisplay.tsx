@@ -29,7 +29,7 @@ import { colorIsDark } from '@openhome-ui/util/color'
 import { Button, Flex, Grid, Separator } from '@radix-ui/themes'
 import { useContext, useMemo, useState } from 'react'
 import { MdClose } from 'react-icons/md'
-import { SaveItemsModal } from '../../items/SaveItemsDisplay'
+import { SaveItemsModal } from '../../items/ItemTransfer'
 import useMultiSelect from '../../state/drag-and-drop/useMultiSelect'
 import { cssClass } from '../../util/style'
 import { SaveDetailsModal } from '../SaveDetailsModal'
@@ -183,7 +183,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
       return { save, mon, openhomeId, pendingMon }
     })
 
-  const saveItemData = save.itemInventory()
+  const saveItemData = save.getItemInventory?.()
 
   return save && save.currentPCBox !== undefined ? (
     <>
@@ -411,7 +411,7 @@ function SaveHeader({ save, openModal }: SaveHeaderProps) {
           </div>
           {save?.name}
           <OhoFlex.RowEnd gap="var(--padding-radius-sm-lg)">
-            {save.itemInventory() && (
+            {save.getItemInventory && (
               <MiniButton
                 onClick={() => openModal('items')}
                 imageSrc={getPublicImageURL('items/index/0000.png')}

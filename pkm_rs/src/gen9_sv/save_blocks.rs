@@ -1,4 +1,5 @@
 use std::collections::BTreeMap;
+use std::ops::{Deref, DerefMut};
 
 use super::{BOX_NAME_LENGTH, BOX_SLOTS, BoxName, Pk9};
 use crate::encryption::swish_crypto::{
@@ -11,7 +12,6 @@ use crate::util;
 
 use arrayref::array_ref;
 use num_enum::{IntoPrimitive, TryFromPrimitive, TryFromPrimitiveError};
-use pkm_rs_resources::items::Item;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{FlagSet, Language};
 use static_assertions::const_assert_eq;
@@ -291,6 +291,29 @@ impl ItemData {
             is_favorite: self.get_flag(ItemIs::Favorite),
         }
     }
+
+    pub fn mark_as_obtained(&mut self) {
+        let already_obtained = self.get_flag(ItemIs::Obtained);
+        self.set_flag(ItemIs::Obtained, true);
+        self.set_flag(ItemIs::New, already_obtained);
+    }
+
+    pub fn update_count(&mut self, updated: i32) {
+        let prev_count = self.count.get();
+        if prev_count < 0 {
+            return;
+        }
+
+        self.count.set(updated);
+        if updated > 0 {
+            self.mark_as_obtained();
+        }
+    }
+
+    pub fn update_from_ts(&mut self, update: ItemDataTs) {
+        self.update_count(i32::try_from(update.count).unwrap_or(i32::MAX));
+        self.set_flag(ItemIs::Favorite, update.is_favorite);
+    }
 }
 
 #[cfg_attr(
@@ -299,16 +322,30 @@ impl ItemData {
 )]
 #[derive(Debug, Clone)]
 pub struct ItemDataTs {
-    index: u16,
-    pouch: u32,
-    count: u32,
-    is_new: bool,
-    is_obtained: bool,
-    is_favorite: bool,
+    pub index: u16,
+    pub pouch: u32,
+    pub count: u32,
+    pub is_new: bool,
+    pub is_obtained: bool,
+    pub is_favorite: bool,
 }
 
 #[derive(Debug, Clone, Default)]
 pub struct ItemInventoryBlock(pub(crate) Box<ItemInventory>); // boxed to not overflow the stack
+
+impl Deref for ItemInventoryBlock {
+    type Target = Box<ItemInventory>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl DerefMut for ItemInventoryBlock {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
 
 #[derive(Debug, Clone, FromBytes, IntoBytes, KnownLayout, Immutable, Unaligned)]
 #[repr(C, packed)]
@@ -317,12 +354,12 @@ pub struct ItemInventory {
 }
 
 impl ItemInventory {
-    pub fn get_item_data(&self, item_index: usize) -> Option<ItemData> {
-        self.items.get(item_index).copied()
-    }
-
     pub fn all(&self) -> impl Iterator<Item = ItemData> {
         (0..ITEM_INVENTORY_MAX_COUNT).map(|index| self.items[index])
+    }
+
+    pub fn get_mut(&mut self, index: usize) -> Option<&mut ItemData> {
+        self.items.get_mut(index)
     }
 
     fn into_block(self) -> swish_crypto::Block {
@@ -330,15 +367,6 @@ impl ItemInventory {
             SvBlockKey::Item,
             swish_crypto::BlockData::Object(ObjectBlock::new(self.as_bytes().to_vec())),
         )
-    }
-
-    pub fn read(bytes: &[u8]) -> StdResult<Self, SwishError> {
-        Ok(Self::default())
-        // Self::try_read_from_bytes(bytes).or(Err(SwishError::ByteLength {
-        //     context: "ItemInventory".to_owned(),
-        //     expected: size_of::<Self>(),
-        //     actual: bytes.len(),
-        // }))
     }
 }
 
