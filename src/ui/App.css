@@ -144,6 +144,8 @@
 
   --ohpkm-cell-border-color: var(--primitive-teal-450);
 
+  --color-panel-nested: rgb(201, 220, 203);
+
   .radix-themes {
     --color-panel: var(--primitive-teal-100);
     --color-bar: var(--color-panel);
