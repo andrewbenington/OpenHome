@@ -12,7 +12,7 @@
 
 .titled-card-title {
   --diagonal-length: 0.5rem;
-  --space-from-diagonal: 1.25rem;
+  --space-from-diagonal: 1rem;
   background-color: rgba(136, 135, 135, 0.45);
 
   box-shadow: rgba(218, 215, 215, 0.105) 0px 1px 2px inset !important;
@@ -35,7 +35,7 @@
       100% 0%
     );
     padding: var(--padding-radius-sm-lg) var(--space-from-diagonal)
-      var(--padding-radius-xs-sm) var(--padding-radius-sm-lg);
+      var(--padding-radius-sm-lg) var(--padding-radius-sm-lg);
   }
 }
 
@@ -50,7 +50,7 @@
       100% 0%
     );
     padding: var(--padding-radius-sm-lg) var(--padding-radius-sm-lg)
-      var(--padding-radius-xs-sm) var(--space-from-diagonal);
+      var(--padding-radius-sm-lg) var(--space-from-diagonal);
     border-top-right-radius: var(--border-radius-xs);
   }
 }

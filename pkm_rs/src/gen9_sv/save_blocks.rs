@@ -321,6 +321,7 @@ impl ItemData {
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
 )]
 #[derive(Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct ItemDataTs {
     pub index: u16,
     pub pouch: u32,
