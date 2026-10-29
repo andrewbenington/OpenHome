@@ -1,4 +1,4 @@
-import { Item } from '@pkm-rs/pkg'
+import { Item, SvItemStorage } from '@pkm-rs/pkg'
 
 const BallIcons: { [key: string]: string } = {
   Master: 'items/index/0001.png',
@@ -84,27 +84,11 @@ export const BallsImageList = [
 const SharedItemSpritePrefixes = ['Data Card', 'Lost Satchel', 'Old Verse', 'Lost Satchel']
 
 export const getItemIconPath = (item: number): string => {
-  if (
-    (item > 1057 && item < 1074) ||
-    (item > 1639 && item < 1651) ||
-    (item > 1651 && item < 1678) ||
-    (item > 1786 && item < 1808) ||
-    (item > 1843 && item < 1857) ||
-    (item > 1946 && item < 2160) ||
-    (item > 2231 && item < 2344) ||
-    (item > 2345 && item < 2401) ||
-    (item > 2416 && item < 2479) ||
-    (item > 2483 && item < 2522)
-  ) {
-    return `items/index/0000.png`
-  }
-
-  const PICNIC_SET = 2311
-  const BLUE_POKE_BALL_PICK = 2342
-  const PINK_BOTTLE = 2348
-  const YELLOW_DISH = 2400
-
   const itemName = Item.fromIndex(item)?.name ?? 'None'
+
+  if (!itemName || itemName === '???') {
+    return 'icons/no-icon.png'
+  }
   if (item > 0) {
     if (itemName.startsWith('HM') || (itemName.startsWith('TM') && itemName.charAt(2) !== 'V')) {
       return 'items/tm/normal.png'
@@ -115,10 +99,11 @@ export const getItemIconPath = (item: number): string => {
     if (itemName.startsWith('★')) {
       return 'items/shared/dynamax-crystal.png'
     }
-    if (
-      (item >= PICNIC_SET && item <= BLUE_POKE_BALL_PICK) ||
-      (item >= PINK_BOTTLE && item <= YELLOW_DISH)
-    ) {
+    const svPouch = SvItemStorage.pouchForItem(item)
+    if (svPouch === 'Materials') {
+      return 'items/shared/tm-material.png'
+    }
+    if (svPouch === 'Picnic') {
       return 'items/shared/picnic-set.png'
     }
     for (let i = 0; i < SharedItemSpritePrefixes.length; i++) {
@@ -130,7 +115,7 @@ export const getItemIconPath = (item: number): string => {
     }
     return `items/index/${item.toString().padStart(4, '0')}.png`
   }
-  return `items/index/0000.png`
+  return 'icons/no-icon.png'
 }
 
 export const getBallIconPath = (ball: number): string => {

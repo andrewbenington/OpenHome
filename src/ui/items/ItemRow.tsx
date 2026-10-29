@@ -20,7 +20,6 @@ export interface ItemRowProps {
   itemData: ItemData
   database: ItemTransferDatabase
   selected: boolean
-  disallowed: boolean
   inactive: boolean
   otherText?: string
   onClick?: () => void
@@ -36,7 +35,7 @@ export function ItemRow(props: ItemRowProps) {
         .with(`item-row-selected-${inactive ? 'inactive' : 'active'}`)
         .if(selected)
         .with('item-row-disallowed')
-        .if(props.disallowed)
+        .if(database.availability(itemData.index) !== 'Obtainable')
         .build()}
       onClick={onClick}
       style={props.style}
