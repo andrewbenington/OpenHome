@@ -6,6 +6,7 @@ use crate::encryption::swish_crypto::{
     self, Block, BlockData, NumericBlock, ObjectBlock, SwishBlocks, SwishError,
 };
 use crate::gen9_sv::{BoxIndex, BoxSlot, MAX_BOX_COUNT};
+// use crate::items::SvItemStorage;
 use crate::result::{Error, Result, StdResult};
 use crate::traits::PkmBytes;
 use crate::util;
@@ -51,28 +52,45 @@ impl SvBlocks {
     }
 
     pub fn to_blocks(&self) -> BTreeMap<u32, Block> {
-        let Self {
-            my_status,
-            pokemon_boxes,
-            box_layouts,
-            current_box,
-            items,
-            other_blocks,
-        } = self.clone();
+        crate::log!("to_blocks");
+        crate::log!("{:?}", self.items);
+        // let Self {
+        //     my_status,
+        //     pokemon_boxes,
+        //     box_layouts,
+        //     current_box,
+        //     items,
+        //     other_blocks,
+        // } = self.clone();
 
-        // the game will read the file fine if the blocks aren't sorted, but PKHeX expects them to be in key order.
-        // an iterator from a btree will preserve key order.
-        let mut all_blocks = other_blocks.into_inner();
+        // crate::log!("cloned");
+        // // the game will read the file fine if the blocks aren't sorted, but PKHeX expects them to be in key order.
+        // // an iterator from a btree will preserve key order.
+        // let mut all_blocks = other_blocks.into_inner();
+        // crate::log!("intoed inner");
+        // for block in [
+        //     my_status.into_block(),
+        //     pokemon_boxes.into_block(),
+        //     box_layouts.into_block(),
+        //     items.0.into_block(),
+        //     Block::new(SvBlockKey::CurrentBox, BlockData::Value(current_box)),
+        // ] {
+        //     crate::log!("writing block: {:x}", block.key());
+        //     all_blocks.insert(block.key(), block);
+        // }
+
+        // all_blocks
+
+        let mut all_blocks = self.other_blocks.clone().into_inner();
         for block in [
-            my_status.into_block(),
-            pokemon_boxes.into_block(),
-            box_layouts.into_block(),
-            items.0.into_block(),
-            Block::new(SvBlockKey::CurrentBox, BlockData::Value(current_box)),
+            self.my_status.to_block(),
+            self.pokemon_boxes.to_block(),
+            self.box_layouts.to_block(),
+            self.items.0.to_block(),
+            Block::new(SvBlockKey::CurrentBox, BlockData::Value(self.current_box)),
         ] {
             all_blocks.insert(block.key(), block);
         }
-
         all_blocks
     }
 }
@@ -132,7 +150,7 @@ pub struct MyStatusFields {
 impl MyStatusFields {
     pub const NAME_BYTE_LENGTH: usize = 26;
 
-    pub fn into_block(self) -> swish_crypto::Block {
+    pub fn to_block(&self) -> swish_crypto::Block {
         swish_crypto::Block::new(
             SvBlockKey::MyStatus,
             swish_crypto::BlockData::Object(ObjectBlock::new(self.as_bytes().to_vec())),
@@ -177,7 +195,7 @@ impl BoxData {
         &mut self.0.boxes[box_index.to_usize()][box_slot.to_usize()]
     }
 
-    fn into_block(self) -> swish_crypto::Block {
+    fn to_block(&self) -> swish_crypto::Block {
         swish_crypto::Block::new(
             SvBlockKey::Box,
             swish_crypto::BlockData::Object(ObjectBlock::new(self.as_bytes().to_vec())),
@@ -226,16 +244,16 @@ impl BoxLayout {
         }
     }
 
-    fn into_block(self) -> swish_crypto::Block {
+    fn to_block(&self) -> swish_crypto::Block {
         swish_crypto::Block::new(
             SvBlockKey::BoxLayout,
-            swish_crypto::BlockData::Array(self.0),
+            swish_crypto::BlockData::Array(self.0.clone()),
         )
     }
 }
 
 const ITEM_INVENTORY_MAX_COUNT: usize = 3000;
-const ITEM_INVENTORY_SIZE: usize = 3000 * std::mem::size_of::<ItemData>();
+const ITEM_INVENTORY_SIZE: usize = 3000 * std::mem::size_of::<ItemDataSv>();
 
 #[derive(Debug, Clone, Copy, IntoBytes, TryFromPrimitive, KnownLayout, Immutable)]
 #[repr(u8)]
@@ -261,14 +279,14 @@ impl TryFrom<usize> for ItemIs {
 
 #[derive(Debug, Clone, Copy, Default, FromBytes, IntoBytes, KnownLayout, Immutable)]
 #[repr(C, packed)]
-pub struct ItemData {
+pub struct ItemDataSv {
     pub pouch: zerocopy::U32<LittleEndian>,
     pub count: zerocopy::I32<LittleEndian>,
     flags: [u8; 4],
     _padding: [u8; 4],
 }
 
-impl ItemData {
+impl ItemDataSv {
     pub fn get_count(&self) -> u32 {
         self.count.get().max(0) as u32
     }
@@ -292,13 +310,13 @@ impl ItemData {
         }
     }
 
-    pub fn mark_as_obtained(&mut self) {
+    fn mark_as_obtained(&mut self) {
         let already_obtained = self.get_flag(ItemIs::Obtained);
         self.set_flag(ItemIs::Obtained, true);
         self.set_flag(ItemIs::New, already_obtained);
     }
 
-    pub fn update_count(&mut self, updated: i32) {
+    fn update_count(&mut self, updated: i32) {
         let prev_count = self.count.get();
         if prev_count < 0 {
             return;
@@ -310,12 +328,16 @@ impl ItemData {
         }
     }
 
-    pub fn update_from_ts(&mut self, update: ItemDataTs) {
+    fn update_from_ts(&mut self, update: ItemDataTs) {
         self.update_count(i32::try_from(update.count).unwrap_or(i32::MAX));
         self.set_flag(ItemIs::Favorite, update.is_favorite);
+        // self.pouch.set(
+        //     SvItemStorage::pouch_for(update.index)
+        //         .map(u32::from)
+        //         .unwrap_or(0),
+        // )
     }
 }
-
 #[cfg_attr(
     feature = "wasm",
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
@@ -351,30 +373,49 @@ impl DerefMut for ItemInventoryBlock {
 #[derive(Debug, Clone, FromBytes, IntoBytes, KnownLayout, Immutable, Unaligned)]
 #[repr(C, packed)]
 pub struct ItemInventory {
-    pub items: [ItemData; ITEM_INVENTORY_MAX_COUNT],
+    pub items: [ItemDataSv; ITEM_INVENTORY_MAX_COUNT],
 }
 
 impl ItemInventory {
-    pub fn all(&self) -> impl Iterator<Item = ItemData> {
+    pub fn all(&self) -> impl Iterator<Item = ItemDataSv> {
         (0..ITEM_INVENTORY_MAX_COUNT).map(|index| self.items[index])
     }
 
-    pub fn get_mut(&mut self, index: usize) -> Option<&mut ItemData> {
-        self.items.get_mut(index)
-    }
-
-    fn into_block(self) -> swish_crypto::Block {
+    fn to_block(&self) -> swish_crypto::Block {
+        crate::log!("defaulting");
+        Self::default().as_bytes().to_vec();
+        crate::log!("intoing block");
         swish_crypto::Block::new(
             SvBlockKey::Item,
             swish_crypto::BlockData::Object(ObjectBlock::new(self.as_bytes().to_vec())),
         )
+    }
+
+    const fn empty(&self) -> ItemDataSv {
+        self.items[0]
+    }
+
+    const fn clear_item(&mut self, index: usize) {
+        if index < ITEM_INVENTORY_MAX_COUNT {
+            self.items[index] = self.empty()
+        }
+    }
+
+    #[cfg(feature = "wasm")]
+    pub fn update_item_from_ts(&mut self, data: ItemDataTs) {
+        let index = data.index as usize;
+        if data.count == 0 {
+            self.clear_item(index);
+        } else {
+            self.items[data.index as usize].update_from_ts(data);
+        }
     }
 }
 
 impl Default for ItemInventory {
     fn default() -> Self {
         Self {
-            items: [ItemData::default(); ITEM_INVENTORY_MAX_COUNT],
+            items: [ItemDataSv::default(); ITEM_INVENTORY_MAX_COUNT],
         }
     }
 }

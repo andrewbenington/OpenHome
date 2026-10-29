@@ -56,3 +56,10 @@
 .scroller-wrapper {
   height: 100%;
 }
+
+.select-item-message {
+  opacity: 0.8;
+  font-family: monospace;
+  text-transform: uppercase;
+  font-style: italic;
+}

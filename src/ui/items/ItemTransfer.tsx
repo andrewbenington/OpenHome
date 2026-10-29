@@ -11,56 +11,64 @@ import { Item, OriginGame } from '@pkm-rs/pkg'
 import { Card, VisuallyHidden } from '@radix-ui/themes'
 import { useRef, useState } from 'react'
 import { ItemIcon } from './ItemIcon'
-import { ItemData, ItemRow } from './ItemRow'
+import { ItemRow } from './ItemRow'
 import './ItemTransfer.css'
 import { TitledCard } from './TitledCard'
+import { ItemTransferDatabase, ItemTransferSource } from './transferSource'
 
 interface ItemTransferProps {
-  source1Items: ItemData[]
-  source2Items: ItemData[]
-  source1: OriginGame | 'OpenHome'
-  source2: OriginGame | 'OpenHome'
+  source1: ItemTransferSource
+  source2: ItemTransferSource
 }
 
 type Source = 'source1' | 'source2'
+const NO_POUCH = 4294967295
 
-function useSource(items: ItemData[]) {
+function useSourceController(source: ItemTransferSource) {
   const [selection, setSelection] = useState<Option<number>>(undefined)
+  const items = source.getItemData()
+  // .filter((item) => !(item.pouch === NO_POUCH && item.count === 0))
   const item = selection ? items.find((item) => item.index === selection) : undefined
 
-  return { item, items, selection, setSelection }
+  const database: ItemTransferDatabase = ScarletVioletItemTransfer
+
+  return { item, items, selection, setSelection, source, database }
 }
 
 export function ItemTransfer(props: ItemTransferProps) {
-  const { source1Items, source2Items } = props
+  const { source1, source2 } = props
   const parentRef = useRef(null)
   const [selectedSourceId, setSelectedSourceId] = useState<Option<Source>>()
 
-  const source1 = useSource(source1Items.filter((item) => item.isObtained))
-  const source2 = useSource(source2Items.filter((item) => item.isObtained))
+  const source1Controller = useSourceController(source1)
+  const source2Controller = useSourceController(source2)
 
-  const selectedSource = selectedSourceId === 'source1' ? source1 : source2
+  const selectedSourceController =
+    selectedSourceId === 'source1' ? source1Controller : source2Controller
 
   return (
     <div ref={parentRef} className="save-items-display">
       <OhoFlex.RowEqualSized gridColumn="1 / span 2" gap="1" mx="1" mt="1">
-        <TitledCard title={renderSource(props.source1)} side="left">
+        <TitledCard title={renderSource(source1.sourceType)} side="left">
           <SaveItemsScroller
-            sourceController={source1}
+            sourceController={source1Controller}
             active={selectedSourceId === 'source1'}
             onClick={() => setSelectedSourceId('source1')}
           />
         </TitledCard>
-        <TitledCard title={renderSource(props.source2)} side="right">
+        <TitledCard title={renderSource(source2.sourceType)} side="right">
           <SaveItemsScroller
-            sourceController={source2}
+            sourceController={source2Controller}
             active={selectedSourceId === 'source2'}
             onClick={() => setSelectedSourceId('source2')}
           />
         </TitledCard>
       </OhoFlex.RowEqualSized>
       <ItemTransferControls
-        sourceController={selectedSource}
+        sourceController={selectedSourceController}
+        destController={
+          selectedSourceController === source1Controller ? source2Controller : source1Controller
+        }
         side={selectedSourceId === 'source1' ? 'right' : 'left'}
       />
     </div>
@@ -77,10 +85,12 @@ function renderSource(source: OriginGame | 'OpenHome') {
 
 type ItemTransferCardProps = {
   sourceController: Option<SourceController>
+  destController: Option<SourceController>
   side: 'left' | 'right'
 }
 
 function ItemTransferControls(props: ItemTransferCardProps) {
+  const [itemCount, setItemCount] = useState(props.sourceController?.item?.count ? 1 : 0)
   const sourceItem = props.sourceController?.item
     ? Item.fromIndex(props.sourceController?.item.index)
     : undefined
@@ -91,6 +101,12 @@ function ItemTransferControls(props: ItemTransferCardProps) {
       color="red"
       variant="classic"
       style={{ fontWeight: 'bold', height: '2.5rem', width: '12rem' }}
+      onClick={() => {
+        if (sourceItem?.index) {
+          props.sourceController?.source.removeItems(sourceItem?.index, itemCount)
+          props.destController?.source.addItems(sourceItem?.index, itemCount)
+        }
+      }}
     >
       {props.side === 'left' && <ArrowUpIcon />}
       Send Items
@@ -102,15 +118,20 @@ function ItemTransferControls(props: ItemTransferCardProps) {
     <div className="item-transfer-card">
       {props.side === 'left' && button}
       <Card style={{ padding: 'var(--padding-radius-sm-lg)', flex: 1 }}>
-        <OhoFlex.Row justify={props.side === 'left' ? 'end' : 'start'} gap="3">
-          <ItemIcon item={sourceItem} style={{ width: '1.25rem', height: '1.25rem' }} />
-          <p>{sourceItem?.name}</p>
+        <OhoFlex.Row justify={props.side === 'left' ? 'end' : 'start'} align="center" gap="3">
+          <ItemIcon item={sourceItem} style={{ width: '1.15rem', height: '1.15rem' }} />
+          {sourceItem?.name ? (
+            <p>{sourceItem.name}</p>
+          ) : (
+            <p className="select-item-message">Select Item</p>
+          )}
           <p>×</p>
           <LabelledInput.Int
             key={sourceItem?.index}
-            value={props.sourceController?.item?.count ? 1 : 0}
-            onChange={console.info}
+            value={itemCount}
+            onChange={(v) => setItemCount(v ?? 0)}
             style={{ width: '3.25rem' }}
+            disabled={!sourceItem}
           />
           <code>/</code>
           <code style={{ width: '3rem' }}>{props.sourceController?.item?.count ?? '--'}</code>
@@ -121,7 +142,7 @@ function ItemTransferControls(props: ItemTransferCardProps) {
   )
 }
 
-type SourceController = ReturnType<typeof useSource>
+type SourceController = ReturnType<typeof useSourceController>
 
 interface SaveItemsScrollerProps {
   sourceController: SourceController
@@ -147,8 +168,10 @@ function SaveItemsScroller(props: SaveItemsScrollerProps) {
           <ItemRow
             key={item.index}
             itemData={item}
+            database={sourceController.database}
             selected={sourceController.selection === item.index}
             inactive={props.active === false}
+            disallowed={item.pouch === 4294967295}
             onClick={() => {
               sourceController.setSelection(item.index)
               props.onClick?.()
@@ -161,11 +184,8 @@ function SaveItemsScroller(props: SaveItemsScrollerProps) {
 }
 
 export interface SaveItemsModalProps {
-  // these should be bundled together down the line
-  source1: OriginGame | 'OpenHome'
-  source1Items: ItemData[]
-  source2: OriginGame | 'OpenHome'
-  source2Items: ItemData[]
+  source1: ItemTransferSource
+  source2: ItemTransferSource
   isOpen: boolean
   onClose?: () => void
 }
@@ -181,12 +201,7 @@ export function SaveItemsModal(props: SaveItemsModalProps) {
             <Dialog.Description>Detailed information about the selected Pokémon</Dialog.Description>
           </VisuallyHidden>
           <Fallback>
-            <ItemTransfer
-              source1Items={props.source1Items}
-              source1={props.source1}
-              source2Items={props.source2Items}
-              source2={props.source2}
-            />
+            <ItemTransfer source1={props.source1} source2={props.source2} />
           </Fallback>
         </Dialog.Popup>
       </Dialog.Portal>
