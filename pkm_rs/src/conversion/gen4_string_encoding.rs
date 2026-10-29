@@ -3122,6 +3122,7 @@ pub const fn encode(value: u16) -> Option<u16> {
         12955 => Some(239),
         65291 => Some(240),
         65293 => Some(241),
+        12540 => Some(241),
         8855 => Some(242),
         8856 => Some(243),
         65309 => Some(244),
