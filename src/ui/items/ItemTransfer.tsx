@@ -222,9 +222,13 @@ function ItemTransferControls(props: ItemTransferCardProps) {
     </OhoButton>
   )
 
-  const max = sourceItem?.index
+  const maxAllowed = sourceItem?.index
     ? props.destController?.database.maxAllowed(sourceItem.index)
     : undefined
+  const max =
+    maxAllowed && props.sourceController?.item?.count
+      ? Math.min(maxAllowed, props.sourceController.item.count)
+      : undefined
 
   return (
     <div className="item-transfer-card">
