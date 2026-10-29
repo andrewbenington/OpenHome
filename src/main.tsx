@@ -4,7 +4,6 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router'
 import { initializeApp } from './init'
 import App from './ui/App'
-console.log('main???')
 
 await initializeApp()
 
