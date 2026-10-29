@@ -127,8 +127,13 @@ function LabelledIntInput(props: LabelledIntInputProps) {
         onChange={(e) => {
           const newValue = parseIntOrNull(e.target.value)
           if (newValue !== null) {
-            if (props.min !== undefined && newValue < props.min) return
-            if (props.max !== undefined && newValue > props.max) return
+            if (props.min !== undefined && newValue < props.min) {
+              onChange(null)
+              return
+            } else if (props.max !== undefined && newValue > props.max) {
+              onChange(props.max)
+              return
+            }
           }
           onChange(newValue)
         }}
