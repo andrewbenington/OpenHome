@@ -12,7 +12,12 @@ pub trait EmeraldExpnSpeciesIndex: From<u16> + Into<u16> + Serialize + Copy {
     fn try_to_species_and_form(self) -> Result<SpeciesForm>;
     fn try_from_species_and_form(species: &SpeciesForm) -> Result<Self>;
 
-    fn is_fakemon(&self) -> bool;
+    fn is_fakemon(&self) {
+
+        // All Pokemon in-game are real
+        return false;
+    }
+
     fn plugin_identifier() -> &'static str;
 }
 
