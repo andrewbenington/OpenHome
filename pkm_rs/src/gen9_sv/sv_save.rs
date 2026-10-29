@@ -33,30 +33,17 @@ pub struct ScarletVioletSave {
 
 impl ScarletVioletSave {
     pub fn from_bytes(bytes: Box<[u8]>) -> Result<Self> {
-        let byte_length = bytes.len();
-        if byte_length < SAVE_SIZE_BYTES_MIN {
-            return Err(Error::buffer_size_with_source(
+        match bytes.len() {
+            byte_length @ ..SAVE_SIZE_BYTES_MIN => Err(Error::buffer_size_with_source(
                 "scarlet/violet save file min",
                 SAVE_SIZE_BYTES_MIN,
                 byte_length,
-            ));
-        } else if byte_length > SAVE_SIZE_BYTES_MAX {
-            return Err(Error::buffer_size_with_source(
-                "scarlet/violet save file max",
-                SAVE_SIZE_BYTES_MAX,
+            )),
+            byte_length => Ok(Self {
+                blocks: SvBlocks::from_blocks(SwishBlocks::from_bytes(bytes)?)?,
                 byte_length,
-            ));
+            }),
         }
-
-        let blocks = SvBlocks::from_blocks(
-            SwishBlocks::from_bytes(bytes)
-                .map_err(|e| Error::other(&format!("SwishBlocks from_bytes: {e}")))?,
-        )?;
-
-        Ok(Self {
-            blocks,
-            byte_length,
-        })
     }
 
     const fn my_status(&self) -> &MyStatusFields {
@@ -158,7 +145,9 @@ impl ScarletVioletSave {
 
     #[cfg(feature = "wasm")]
     pub fn prepare_bytes_for_saving(&self) -> Vec<u8> {
+        crate::log!("before getting blocks");
         let mut blocks: Vec<_> = self.blocks.to_blocks().into_values().collect();
+        crate::log!("after getting blocks");
         swish_crypto::encrypt_blocks(&mut blocks, self.byte_length)
     }
 
@@ -366,15 +355,7 @@ impl ScarletVioletSave {
 
     #[wasm_bindgen(js_name = "updateItemData")]
     pub fn update_item_inventory_wasm(&mut self, v: Ts<ItemDataTs>) -> JsResult<()> {
-        let data = v.to_rust()?;
-        self.blocks
-            .items
-            .get_mut(data.index as usize)
-            .ok_or(Error::Other(format!(
-                "Invalid item index provided to updateItemData: {}",
-                data.index
-            )))?
-            .update_from_ts(data);
+        self.blocks.items.update_item_from_ts(v.to_rust()?);
 
         Ok(())
     }

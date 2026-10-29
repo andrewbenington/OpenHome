@@ -18,6 +18,7 @@ import SearchFields from '@openhome-ui/components/search/SearchFields'
 import PokemonSearchModal from '@openhome-ui/components/search/SearchModal'
 import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import { getPublicImageURL } from '@openhome-ui/images/images'
+import { useOpenHomeItemTransfer, useSaveItemTransfer } from '@openhome-ui/items/transferSource'
 import PokemonDetailsModal from '@openhome-ui/pokemon/PokemonDetailsModal'
 import { useCanSwapWithDragging } from '@openhome-ui/state-zustand/drag-and-drop/dragStore'
 import { ErrorContext } from '@openhome-ui/state/error'
@@ -186,7 +187,8 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
       return { save, mon, openhomeId, pendingMon }
     })
 
-  const saveItemData = save.getItemInventory?.()
+  const saveItemTransfer = useSaveItemTransfer(save)
+  const openhomeItemTransfer = useOpenHomeItemTransfer()
 
   return save && save.currentPCBox !== undefined ? (
     <>
@@ -320,20 +322,10 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
         ]}
         open={TrackedDataRecovery.state === 'pending_confirm'}
       />
-      {saveItemData !== undefined && (
+      {saveItemTransfer !== undefined && (
         <SaveItemsModal
-          source1Items={saveItemData}
-          source1={save.origin}
-          source2Items={Object.entries(openhomeItemBag.itemCounts)
-            .map(([indexStr, count]) => ({
-              index: parseInt(indexStr),
-              count,
-              pouch: 0,
-              isObtained: true,
-              isFavorite: false,
-            }))
-            .filter((item) => item.index !== 0)}
-          source2={'OpenHome'}
+          source1={saveItemTransfer}
+          source2={openhomeItemTransfer}
           isOpen={openModal === 'items'}
           onClose={() => {
             if (openModal === 'items') {
