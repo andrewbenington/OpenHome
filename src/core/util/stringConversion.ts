@@ -412,9 +412,9 @@ export const writeGen4StringToBytes = (
 ) => {
   for (let i = 0; i < Math.min(str.length, length); i++) {
     const val = str.charCodeAt(i)
-    const gen4Char = UTFToGen4Map[val]
+    const gen4Char: number | undefined = UTFToGen4Map[val]
 
-    if (gen4Char === -1) {
+    if (gen4Char === undefined) {
       // unsupported characters are now '?'
       dataView.setUint16(offset + i * 2, 0x01ac, true)
     } else {
