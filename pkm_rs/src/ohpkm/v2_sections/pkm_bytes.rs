@@ -19,6 +19,8 @@ const PB8_SIZE: usize = 344;
 const PK9_SIZE: usize = 344;
 const PA9_SIZE: usize = 344;
 
+const PH4_PKM_MAX_SIZE: usize = 0x2A6;
+
 const PK3CFRU_PARTY_SIZE: usize = 58;
 const PB8LUMI_SIZE: usize = 344;
 
@@ -42,6 +44,7 @@ pub enum Tag {
     Pb8 = 11,
     Pk9 = 12,
     Pa9 = 13,
+    Ph4 = 14,
 
     Pk3Rr = 0xfffe,
     Pk3Ub = 0xfffd,
@@ -99,6 +102,7 @@ impl From<PkmFormat> for Option<Tag> {
             PkmFormat::PK6 => Some(Tag::Pk6),
             PkmFormat::PK7 => Some(Tag::Pk7),
             PkmFormat::PB7 => Some(Tag::Pb7),
+            PkmFormat::PH4 => Some(Tag::Ph4),
             PkmFormat::PK8 => Some(Tag::Pk8),
             PkmFormat::PA8 => Some(Tag::Pa8),
             PkmFormat::PB8 => Some(Tag::Pb8),
@@ -128,6 +132,7 @@ impl Tag {
             Self::Pb8 => PB8_SIZE,
             Self::Pk9 => PK9_SIZE,
             Self::Pa9 => PA9_SIZE,
+            Self::Ph4 => PH4_PKM_MAX_SIZE,
 
             Self::Pk3Rr => PK3CFRU_PARTY_SIZE,
             Self::Pk3Ub => PK3CFRU_PARTY_SIZE,
@@ -137,51 +142,53 @@ impl Tag {
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Display, Debug)]
+#[derive(Clone, PartialEq, Eq, Hash, Display, Debug)]
 pub enum StoredPkmBytes {
-    Pk1([u8; PK1_PARTY_SIZE]),
-    Pk2([u8; PK2_PARTY_SIZE]),
-    Pk3([u8; PK3_PARTY_SIZE]),
-    Pk4([u8; PK4_PARTY_SIZE]),
-    Pk5([u8; PK5_PARTY_SIZE]),
-    Pk6([u8; PK6_PARTY_SIZE]),
-    Pk7([u8; PK7_PARTY_SIZE]),
-    Pb7([u8; PB7_SIZE]),
-    Pk8([u8; PK8_SIZE]),
-    Pa8([u8; PA8_SIZE]),
-    Pb8([u8; PB8_SIZE]),
-    Pk9([u8; PK9_SIZE]),
-    Pa9([u8; PA9_SIZE]),
+    Pk1(Box<[u8; PK1_PARTY_SIZE]>),
+    Pk2(Box<[u8; PK2_PARTY_SIZE]>),
+    Pk3(Box<[u8; PK3_PARTY_SIZE]>),
+    Pk4(Box<[u8; PK4_PARTY_SIZE]>),
+    Pk5(Box<[u8; PK5_PARTY_SIZE]>),
+    Pk6(Box<[u8; PK6_PARTY_SIZE]>),
+    Pk7(Box<[u8; PK7_PARTY_SIZE]>),
+    Pb7(Box<[u8; PB7_SIZE]>),
+    Pk8(Box<[u8; PK8_SIZE]>),
+    Pa8(Box<[u8; PA8_SIZE]>),
+    Pb8(Box<[u8; PB8_SIZE]>),
+    Pk9(Box<[u8; PK9_SIZE]>),
+    Pa9(Box<[u8; PA9_SIZE]>),
+    Ph4(Box<[u8; PH4_PKM_MAX_SIZE]>),
 
-    Pk3Rr([u8; PK3CFRU_PARTY_SIZE]),
-    Pk3Ub([u8; PK3CFRU_PARTY_SIZE]),
-    Pb8Lumi([u8; PB8_SIZE]),
-    Pk9Compass([u8; PK9_SIZE]),
+    Pk3Rr(Box<[u8; PK3CFRU_PARTY_SIZE]>),
+    Pk3Ub(Box<[u8; PK3CFRU_PARTY_SIZE]>),
+    Pb8Lumi(Box<[u8; PB8_SIZE]>),
+    Pk9Compass(Box<[u8; PK9_SIZE]>),
 }
 
 const LENGTH_CHECKED_MESSAGE: &str = "data length checked above";
 
 impl StoredPkmBytes {
-    pub const fn data_as_bytes(&self) -> &[u8] {
+    pub fn data_as_bytes(&self) -> &[u8] {
         let bytes: &[u8] = match self {
-            Self::Pk1(bytes) => bytes,
-            Self::Pk2(bytes) => bytes,
-            Self::Pk3(bytes) => bytes,
-            Self::Pk4(bytes) => bytes,
-            Self::Pk5(bytes) => bytes,
-            Self::Pk6(bytes) => bytes,
-            Self::Pk7(bytes) => bytes,
-            Self::Pb7(bytes) => bytes,
-            Self::Pk8(bytes) => bytes,
-            Self::Pa8(bytes) => bytes,
-            Self::Pb8(bytes) => bytes,
-            Self::Pk9(bytes) => bytes,
-            Self::Pa9(bytes) => bytes,
+            Self::Pk1(bytes) => bytes.as_ref(),
+            Self::Pk2(bytes) => bytes.as_ref(),
+            Self::Pk3(bytes) => bytes.as_ref(),
+            Self::Pk4(bytes) => bytes.as_ref(),
+            Self::Pk5(bytes) => bytes.as_ref(),
+            Self::Pk6(bytes) => bytes.as_ref(),
+            Self::Pk7(bytes) => bytes.as_ref(),
+            Self::Pb7(bytes) => bytes.as_ref(),
+            Self::Pk8(bytes) => bytes.as_ref(),
+            Self::Ph4(bytes) => bytes.as_ref(),
+            Self::Pa8(bytes) => bytes.as_ref(),
+            Self::Pb8(bytes) => bytes.as_ref(),
+            Self::Pk9(bytes) => bytes.as_ref(),
+            Self::Pa9(bytes) => bytes.as_ref(),
 
-            Self::Pk3Rr(bytes) => bytes,
-            Self::Pk3Ub(bytes) => bytes,
-            Self::Pb8Lumi(bytes) => bytes,
-            Self::Pk9Compass(bytes) => bytes,
+            Self::Pk3Rr(bytes) => bytes.as_ref(),
+            Self::Pk3Ub(bytes) => bytes.as_ref(),
+            Self::Pb8Lumi(bytes) => bytes.as_ref(),
+            Self::Pk9Compass(bytes) => bytes.as_ref(),
         };
         bytes
     }
@@ -197,6 +204,7 @@ impl StoredPkmBytes {
             Self::Pk7(_) => Tag::Pk7,
             Self::Pb7(_) => Tag::Pb7,
             Self::Pk8(_) => Tag::Pk8,
+            Self::Ph4(_) => Tag::Ph4,
             Self::Pa8(_) => Tag::Pa8,
             Self::Pb8(_) => Tag::Pb8,
             Self::Pk9(_) => Tag::Pk9,
@@ -219,24 +227,25 @@ impl StoredPkmBytes {
         }
 
         match tag {
-            Tag::Pk1 => Ok(Self::Pk1(copy_to_sized_array(data))),
-            Tag::Pk2 => Ok(Self::Pk2(copy_to_sized_array(data))),
-            Tag::Pk3 => Ok(Self::Pk3(copy_to_sized_array(data))),
-            Tag::Pk4 => Ok(Self::Pk4(copy_to_sized_array(data))),
-            Tag::Pk5 => Ok(Self::Pk5(copy_to_sized_array(data))),
-            Tag::Pk6 => Ok(Self::Pk6(copy_to_sized_array(data))),
-            Tag::Pk7 => Ok(Self::Pk7(copy_to_sized_array(data))),
-            Tag::Pb7 => Ok(Self::Pb7(copy_to_sized_array(data))),
-            Tag::Pk8 => Ok(Self::Pk8(copy_to_sized_array(data))),
-            Tag::Pa8 => Ok(Self::Pa8(copy_to_sized_array(data))),
-            Tag::Pb8 => Ok(Self::Pb8(copy_to_sized_array(data))),
-            Tag::Pk9 => Ok(Self::Pk9(copy_to_sized_array(data))),
-            Tag::Pa9 => Ok(Self::Pa9(copy_to_sized_array(data))),
+            Tag::Pk1 => Ok(Self::Pk1(Box::new(copy_to_sized_array(data)))),
+            Tag::Pk2 => Ok(Self::Pk2(Box::new(copy_to_sized_array(data)))),
+            Tag::Pk3 => Ok(Self::Pk3(Box::new(copy_to_sized_array(data)))),
+            Tag::Pk4 => Ok(Self::Pk4(Box::new(copy_to_sized_array(data)))),
+            Tag::Pk5 => Ok(Self::Pk5(Box::new(copy_to_sized_array(data)))),
+            Tag::Pk6 => Ok(Self::Pk6(Box::new(copy_to_sized_array(data)))),
+            Tag::Pk7 => Ok(Self::Pk7(Box::new(copy_to_sized_array(data)))),
+            Tag::Pb7 => Ok(Self::Pb7(Box::new(copy_to_sized_array(data)))),
+            Tag::Pk8 => Ok(Self::Pk8(Box::new(copy_to_sized_array(data)))),
+            Tag::Pa8 => Ok(Self::Pa8(Box::new(copy_to_sized_array(data)))),
+            Tag::Pb8 => Ok(Self::Pb8(Box::new(copy_to_sized_array(data)))),
+            Tag::Pk9 => Ok(Self::Pk9(Box::new(copy_to_sized_array(data)))),
+            Tag::Pa9 => Ok(Self::Pa9(Box::new(copy_to_sized_array(data)))),
+            Tag::Ph4 => Ok(Self::Ph4(Box::new(copy_to_sized_array(data)))),
 
-            Tag::Pk3Rr => Ok(Self::Pk3Rr(copy_to_sized_array(data))),
-            Tag::Pk3Ub => Ok(Self::Pk3Ub(copy_to_sized_array(data))),
-            Tag::Pb8Lumi => Ok(Self::Pb8Lumi(copy_to_sized_array(data))),
-            Tag::Pk9Compass => Ok(Self::Pk9Compass(copy_to_sized_array(data))),
+            Tag::Pk3Rr => Ok(Self::Pk3Rr(Box::new(copy_to_sized_array(data)))),
+            Tag::Pk3Ub => Ok(Self::Pk3Ub(Box::new(copy_to_sized_array(data)))),
+            Tag::Pb8Lumi => Ok(Self::Pb8Lumi(Box::new(copy_to_sized_array(data)))),
+            Tag::Pk9Compass => Ok(Self::Pk9Compass(Box::new(copy_to_sized_array(data)))),
         }
     }
 
@@ -260,7 +269,7 @@ impl StoredPkmBytes {
         Self::new(tag, &bytes[2..])
     }
 
-    pub fn to_bytes(self) -> Vec<u8> {
+    pub fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = Vec::with_capacity(2 + self.tag().data_size());
         bytes.extend_from_slice(&self.tag().to_le_bytes());
         bytes.extend_from_slice(self.data_as_bytes());
@@ -275,7 +284,7 @@ fn copy_to_sized_array<const N: usize>(slice: &[u8]) -> [u8; N] {
     arr
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct OriginalBackup(StoredPkmBytes);
 
 impl OriginalBackup {
@@ -289,7 +298,7 @@ impl OriginalBackup {
     }
 
     #[cfg(feature = "wasm")]
-    pub const fn data_as_bytes(&self) -> &[u8] {
+    pub fn data_as_bytes(&self) -> &[u8] {
         self.0.data_as_bytes()
     }
 
@@ -309,37 +318,7 @@ impl DataSection for OriginalBackup {
     }
 
     fn to_bytes(&self) -> Vec<u8> {
-        self.0.to_bytes()
-    }
-
-    fn is_empty(&self) -> bool {
-        // if this section exists, it should always have data, so it is never empty
-        false
-    }
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct UnconvertedPkm(StoredPkmBytes);
-
-#[cfg(feature = "wasm")]
-impl UnconvertedPkm {
-    pub const fn new(pkm_bytes: StoredPkmBytes) -> Self {
-        Self(pkm_bytes)
-    }
-}
-
-impl DataSection for UnconvertedPkm {
-    type TagType = OhpkmSectionTag;
-    const TAG: Self::TagType = OhpkmSectionTag::UnconvertedPkm;
-
-    type ErrorType = Error;
-
-    fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Ok(Self(StoredPkmBytes::from_bytes(bytes)?))
-    }
-
-    fn to_bytes(&self) -> Vec<u8> {
-        self.0.to_bytes()
+        self.0.clone().to_bytes()
     }
 
     fn is_empty(&self) -> bool {

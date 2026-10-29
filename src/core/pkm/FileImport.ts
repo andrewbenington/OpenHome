@@ -23,6 +23,7 @@ import PK3UB from '@openhome-core/save/unbound/PK3UB'
 import { AnyPkmClass, SavePkmClass } from '@openhome-core/save/util'
 import { PkmFormat } from '@pkm-rs/pkg/pkm_rs'
 import PK9Compass from '../save/compass/PK9Compass'
+import PH4 from './PH4'
 import { isPkmFormat, PkmOrOhpkmFormat } from './util'
 
 function fileTypeFromBytes(bytes: Uint8Array): SavePkmClass | undefined {
@@ -76,6 +77,8 @@ export function fileTypeFromStringNonOhpkm(type: PkmFormat): SavePkmClass | unde
       return PB7
     case 'PK8':
       return PK8
+    case 'PH4':
+      return PH4
     case 'PA8':
       return PA8
     case 'PB8':

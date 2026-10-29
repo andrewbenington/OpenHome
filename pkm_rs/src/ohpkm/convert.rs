@@ -6,6 +6,8 @@ mod pk7;
 mod pk8;
 #[cfg(feature = "wasm")]
 mod pk9;
+#[cfg(feature = "wasm")]
+mod pkh;
 
 use crate::convert_strategy::ConvertStrategy;
 use crate::ohpkm::v2_sections::ScarletVioletData;

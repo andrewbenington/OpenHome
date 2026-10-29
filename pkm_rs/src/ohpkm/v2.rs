@@ -13,7 +13,7 @@ use crate::ohpkm::id::OpenHomeId;
 use crate::ohpkm::issues::OhpkmIssue;
 use crate::ohpkm::v1::OhpkmV1;
 use crate::ohpkm::v2_sections::UnknownHandlerSave;
-use crate::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, StoredPkmBytes, UnconvertedPkm};
+use crate::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, StoredPkmBytes};
 use crate::result::{Error, Result};
 use crate::sectioned_data::{DataSection, SectionTag, SectionedData};
 use crate::traits::{HasSpeciesAndForm, IsShiny, PkmBytes};
@@ -132,7 +132,7 @@ pub enum OhpkmSectionTag {
     MostRecentSave = 0x0B,
     Tag = 0x0C,
     OriginalBackup = 0x0D,
-    UnconvertedPkm = 0x0E,
+    //  UNUSED:  0x0E,
     PastHandlerV2 = 0x0F,
     LearnedMoves = 0x10,
 
@@ -164,7 +164,6 @@ impl OhpkmSectionTag {
             Self::MostRecentSave => 31,
             Self::Tag => 0,
             Self::OriginalBackup => 2, // Size of the tag
-            Self::UnconvertedPkm => 2, // Size of the tag
             Self::LearnedMoves => 2,   // Size of length field
 
             #[allow(deprecated)]
@@ -209,9 +208,6 @@ pub struct OhpkmV2 {
     #[cfg_attr(feature = "randomize", randomize(skip))]
     #[serde(skip)]
     original_data: Option<OriginalBackup>,
-    #[cfg_attr(feature = "randomize", randomize(skip))]
-    #[serde(skip)]
-    unconverted_pkm: Option<UnconvertedPkm>,
 }
 
 type DataUpdated = bool;
@@ -1520,10 +1516,12 @@ impl OhpkmV2 {
     }
 
     pub fn original_data_bytes(&self) -> Option<StoredPkmBytes> {
-        self.original_data.map(|data| *data.tagged_bytes())
+        self.original_data
+            .as_ref()
+            .map(|data| data.tagged_bytes().to_owned())
     }
 
-    pub const fn set_original_data_bytes(&mut self, original_bytes: StoredPkmBytes) {
+    pub fn set_original_data_bytes(&mut self, original_bytes: StoredPkmBytes) {
         self.original_data = Some(OriginalBackup::new(original_bytes));
     }
 
@@ -1594,7 +1592,6 @@ impl OhpkmV2 {
             most_recent_save: None,
             tags: None,
             original_data: None,
-            unconverted_pkm: None,
         })
     }
 
@@ -1633,7 +1630,6 @@ impl OhpkmV2 {
             most_recent_save: MostRecentSave::extract_from(&sectioned_data)?,
             tags: MonTags::extract_from(&sectioned_data)?,
             original_data: OriginalBackup::extract_from(&sectioned_data)?,
-            unconverted_pkm: UnconvertedPkm::extract_from(&sectioned_data)?,
         };
 
         Ok(result)
@@ -1680,7 +1676,6 @@ impl OhpkmV2 {
             most_recent_save: MostRecentSave::extract_from(&sectioned_data).ok().flatten(),
             tags: MonTags::extract_from(&sectioned_data).ok().flatten(),
             original_data: OriginalBackup::extract_from(&sectioned_data).ok().flatten(),
-            unconverted_pkm: UnconvertedPkm::extract_from(&sectioned_data).ok().flatten(),
         };
 
         Ok(result)
@@ -1710,7 +1705,6 @@ impl OhpkmV2 {
             most_recent_save: None,
             tags: None,
             original_data: None,
-            unconverted_pkm: None,
         }
     }
 
@@ -1737,7 +1731,6 @@ impl OhpkmV2 {
             most_recent_save,
             tags,
             original_data,
-            unconverted_pkm,
         } = to_be_sectioned;
 
         sectioned_data
@@ -1755,8 +1748,7 @@ impl OhpkmV2 {
             .add_if_some(learned_moves)
             .add_if_some(most_recent_save)
             .add_if_some(tags)
-            .add_if_some(original_data)
-            .add_if_some(unconverted_pkm);
+            .add_if_some(original_data);
 
         sectioned_data
     }
@@ -2025,7 +2017,6 @@ impl OhpkmV2 {
             most_recent_save,
             tags,
             original_data,
-            unconverted_pkm,
         } = self;
 
         js_sys::Reflect::set(
@@ -2052,7 +2043,6 @@ impl OhpkmV2 {
         add_section_bytes_to_js_object(&obj, most_recent_save)?;
         add_section_bytes_to_js_object(&obj, tags)?;
         add_section_bytes_to_js_object(&obj, original_data)?;
-        add_section_bytes_to_js_object(&obj, unconverted_pkm)?;
 
         Ok(obj)
     }
@@ -3718,7 +3708,7 @@ impl OhpkmV2 {
     // Original Data
     #[wasm_bindgen(getter = originalData)]
     pub fn original_data_js(&self) -> Option<OriginalDataJs> {
-        self.original_data.map(|d| OriginalDataJs {
+        self.original_data.as_ref().map(|d| OriginalDataJs {
             tag: d.tag(),
             data: d.data_as_bytes().to_vec(),
         })
@@ -3729,20 +3719,6 @@ impl OhpkmV2 {
         let pkm_bytes = StoredPkmBytes::new(tag, &data)?;
 
         self.original_data = Some(OriginalBackup::new(pkm_bytes));
-        Ok(())
-    }
-
-    // Unconverted PKM (Pokémon that have been opted out of intergenerational conversion)
-    #[wasm_bindgen(getter = unconvertedPkm)]
-    pub fn unconverted_pkm(&self) -> Option<Vec<u8>> {
-        Some(self.unconverted_pkm?.to_bytes())
-    }
-
-    #[wasm_bindgen(js_name = trySetUnconvertedPkm)]
-    pub fn try_set_unconverted_pkm(&mut self, tag: pkm_bytes::Tag, data: Vec<u8>) -> Result<()> {
-        let pkm_bytes = StoredPkmBytes::new(tag, &data)?;
-
-        self.unconverted_pkm = Some(UnconvertedPkm::new(pkm_bytes));
         Ok(())
     }
 
