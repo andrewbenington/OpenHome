@@ -28,7 +28,7 @@ export default class PB7 {
   static getFormat() {
     return 'PB7' as const
   }
-  format: 'PB7' = 'PB7'
+  format = 'PB7' as const
   static getBoxSize() {
     return 260
   }

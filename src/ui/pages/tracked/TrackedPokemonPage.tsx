@@ -7,8 +7,9 @@ import { numericSorter } from '@openhome-core/util/sort'
 import Badge from '@openhome-ui/components/badge/Badge'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import MessageRibbon from '@openhome-ui/components/MessageRibbon'
+import OhoButton from '@openhome-ui/components/OhoButton'
 import SideTabNavigation from '@openhome-ui/components/side-tabs/SideTabNavigation'
-import useDisplayError from '@openhome-ui/hooks/displayError'
+import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import PokemonDetailsModal from '@openhome-ui/pokemon/PokemonDetailsModal'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { SaveError, saveErrorMessage, saveErrorTitle, useSaves } from '@openhome-ui/state/saves'
@@ -50,7 +51,7 @@ export default function TrackedPokemonPage() {
         return
       }
 
-      loadResult.then(
+      await loadResult.then(
         R.match(
           (mon) => setSelectedMon(mon),
           (error) =>
@@ -106,10 +107,11 @@ function ManageDialog(props: { onClose: () => void }) {
   const { findSavesForAllMons, findingSaveState, clearFindingState } = useManageTracked()
   const [loading, setLoading] = useState(false)
 
-  async function runDetectRecover() {
+  function runDetectRecover() {
     setLoading(true)
-    await findSavesForAllMons()
-    setLoading(false)
+    findSavesForAllMons()
+      .catch(console.error)
+      .finally(() => setLoading(false))
   }
 
   return (
@@ -232,8 +234,8 @@ function ForOneStateBody(props: ForOneStateBodyProps) {
   const { getCurrentBank } = useBanksAndBoxes()
   const displayError = useDisplayError()
 
-  function openSaveAndNavToHome(save: SAV) {
-    saves.addSave(save).then(
+  async function openSaveAndNavToHome(save: SAV) {
+    await saves.addSave(save).then(
       R.match(
         () => navigate('/home'),
         (error: SaveError) => displayError(saveErrorTitle(error.type), saveErrorMessage(error))
@@ -244,12 +246,12 @@ function ForOneStateBody(props: ForOneStateBodyProps) {
   function recoverToBox(boxIndex: number) {
     // Radix UI is bugged when you have a dropdown and a dialog open at the same time.
     // This is necessary to restore clickability for the whole app
-    document.body.style.pointerEvents = 'auto'
+    // document.body.style.pointerEvents = 'auto'
 
     setLoading(true)
     saves.recoverMonToBox(state.id, boxIndex)
     switchBoxCurrentBank(boxIndex)
-    navigate('/home')
+    void navigate('/home')
   }
 
   switch (state.type) {
@@ -284,7 +286,15 @@ function ForOneStateBody(props: ForOneStateBodyProps) {
             {state.save.filePath.raw}
           </Flex>
           <ButtonStack>
-            <Button size="1" onClick={() => openSaveAndNavToHome(state.save)}>
+            <Button
+              size="1"
+              onClick={() => {
+                setLoading(true)
+                openSaveAndNavToHome(state.save)
+                  .catch(console.error)
+                  .finally(() => setLoading(false))
+              }}
+            >
               Open Save
             </Button>
             <Button size="1" color="gray" onClick={onClose}>
@@ -336,13 +346,13 @@ function ForAllStateBody(props: ForAllStateBodyProps) {
   const { addBoxesWithIds, switchBoxCurrentBank } = useBanksAndBoxes()
   const navigate = useNavigate()
 
-  function recoverMons(ids: OhpkmIdentifier[]) {
+  async function recoverMons(ids: OhpkmIdentifier[]) {
     setLoading(true)
     const firstNewBoxIndex = addBoxesWithIds(ids, 'Recovered Pokémon')
     if (firstNewBoxIndex !== undefined) {
       switchBoxCurrentBank(firstNewBoxIndex)
     }
-    navigate('/home')?.then(() => setLoading(false))
+    await navigate('/home')?.then(() => setLoading(false))
   }
 
   switch (state.type) {
@@ -380,9 +390,18 @@ function ForAllStateBody(props: ForAllStateBodyProps) {
           )}
           <ButtonStack>
             {state.missingMonIds.length > 0 && (
-              <Button size="1" onClick={() => recoverMons(state.missingMonIds)} loading={loading}>
+              <OhoButton
+                size="1"
+                onClick={() => {
+                  setLoading(true)
+                  recoverMons(state.missingMonIds)
+                    .catch(console.error)
+                    .finally(() => setLoading(false))
+                }}
+                loading={loading}
+              >
                 Recover All to New Boxes
-              </Button>
+              </OhoButton>
             )}
             <Button size="1" color="gray" onClick={onClose}>
               Cancel

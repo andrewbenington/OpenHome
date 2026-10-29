@@ -1,5 +1,6 @@
 import { SortableColumn, SortableValue } from '@openhome-core/util/sort'
 import { Flex } from '@radix-ui/themes'
+import { OpenHomeCtxMenu } from '../context-menu'
 import OhoButton from '../OhoButton'
 import OhoFlex from '../OhoFlex'
 import SortableDataGrid from '../SortableDataGrid'
@@ -28,31 +29,33 @@ export default function SortableSearch<T extends SortableValue, SC extends Searc
   }
 
   return (
-    <Flex direction="column" gap="2" flexGrow="1" height="0">
-      <form
-        onSubmit={(e) => {
-          e.preventDefault()
-          document.getElementById('search-button')?.click()
-        }}
-      >
-        <Flex gap="2" pt="1" pb="1" align="start">
-          <FormComponent controller={controller} />
-          <OhoButton type="clear" onClick={reset} mt="1.5rem" />
-          <OhoFlex.Spacer />
-          {topRightComponent}
-        </Flex>
-      </form>
-      <SortableDataGrid
-        className="search-results-grid"
-        rows={results ?? []}
-        columns={columns}
-        onCellClick={(props) => updateSelected(props.row)}
-        rowKeyGetter={controller.getRowId}
-        rowClass={(row) =>
-          controller.getRowId(row) === selectedId ? 'search-row-selected' : undefined
-        }
-        fetching={loading ? 'next' : undefined}
-      />
-    </Flex>
+    <OpenHomeCtxMenu elements={[]} style={{ overflow: 'hidden', height: '100%' }}>
+      <Flex direction="column" gap="2" flexGrow="1" height="0">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            document.getElementById('search-button')?.click()
+          }}
+        >
+          <Flex gap="2" pt="1" pb="1" align="start">
+            <FormComponent controller={controller} />
+            <OhoButton type="clear" onClick={reset} mt="1.5rem" />
+            <OhoFlex.Spacer />
+            {topRightComponent}
+          </Flex>
+        </form>
+        <SortableDataGrid
+          className="search-results-grid"
+          rows={results ?? []}
+          columns={columns}
+          onCellClick={(props) => updateSelected(props.row)}
+          rowKeyGetter={controller.getRowId}
+          rowClass={(row) =>
+            controller.getRowId(row) === selectedId ? 'search-row-selected' : undefined
+          }
+          fetching={loading ? 'next' : undefined}
+        />
+      </Flex>
+    </OpenHomeCtxMenu>
   )
 }

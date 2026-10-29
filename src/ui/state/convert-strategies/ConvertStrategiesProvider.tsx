@@ -32,7 +32,7 @@ function stateReducer(
   prev: Option<ConvertStrategies>,
   action: ConvertStrategyEntries
 ): ConvertStrategies {
-  let strategies_by_id = { ...prev?.strategies_by_id }
+  const strategies_by_id = { ...prev?.strategies_by_id }
   action.ids_and_strategies.forEach(([id, strategy]) => {
     strategies_by_id[id] = strategy
   })

@@ -32,7 +32,7 @@ export default class PK1 {
   static getFormat() {
     return 'PK1' as const
   }
-  format: 'PK1' = 'PK1'
+  format = 'PK1' as const
   static getBoxSize() {
     return 33
   }

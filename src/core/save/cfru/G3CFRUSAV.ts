@@ -118,7 +118,7 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
       this.currentPCBox = 0
     }
     this.boxNames = []
-    this.boxesWithResults = new Array(boxCount)
+    this.boxesWithResults = Array(boxCount)
     for (let i = 0; i < boxCount; i++) {
       // TODO: More research into where BOX names are located
       this.boxesWithResults[i] = new Box('Box' + (i + 1), BOX_SLOTS)
@@ -264,10 +264,10 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
       if (mon && slotMon) {
         try {
           // If mon is a OHPKM then convert to PK3RR
-          const mon =
+          const mon: T =
             slotMon instanceof this.pkmTypeClass ? slotMon : new this.pkmTypeClass(slotMon)
 
-          if (mon?.gameOfOrigin && mon?.nationalDex) pcBytes.set(new Uint8Array(mon.toPCBytes()), 0)
+          if (mon?.gameOfOrigin && mon?.nationalDex) pcBytes.set(new Uint8Array(mon.toBytes()), 0)
         } catch (e) {
           console.error(e)
         }

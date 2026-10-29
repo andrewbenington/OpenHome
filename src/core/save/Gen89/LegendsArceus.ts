@@ -87,7 +87,9 @@ export class LegendsArceusSave extends Gen8Gen9Save<PA8> {
       throw Error(`Missing block ${blockName}`)
     }
     if (!blockIsType(block, type)) {
-      throw Error(`Block ${blockName} has data ${JSON.stringify(block.data)}(expected ${type})`)
+      throw Error(
+        `Block ${blockName} has data ${JSON.stringify(block.data)}(expected ${JSON.stringify(type)})`
+      )
     }
     return block.data
   }

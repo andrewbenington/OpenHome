@@ -23,7 +23,7 @@ export class Box<P> {
 
   constructor(name: string, boxSize: number) {
     this.name = name
-    this.boxSlots = new Array(boxSize)
+    this.boxSlots = Array(boxSize)
   }
 
   map<U>(f: (slotData: Option<P>) => U): Box<U> {
@@ -39,7 +39,8 @@ export interface BoxAndSlot {
 }
 
 export type SlotMetadata =
-  { isDisabled: true; disabledReason: string } | { isDisabled: false; disabledReason?: undefined }
+  | { isDisabled: true; disabledReason: string }
+  | { isDisabled: false; disabledReason?: undefined }
 
 export type SAV<P extends PKMInterface = PKMInterface> = OfficialSAV<P> | PluginSAV<P>
 

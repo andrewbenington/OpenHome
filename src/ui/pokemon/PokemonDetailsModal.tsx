@@ -4,7 +4,6 @@ import { fileTypeFromStringNonOhpkm } from '@openhome-core/pkm/FileImport'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM, originalDataTagToMonFormat } from '@openhome-core/pkm/OHPKM'
 import { isRomHackFormat } from '@openhome-core/pkm/PKM'
-import { FileSchemas } from '@openhome-core/pkm/schema'
 import { $R, isResult, Option, R, Result } from '@openhome-core/util/functional'
 import Badge from '@openhome-ui/components/badge/Badge'
 import DebugOnly from '@openhome-ui/components/DebugOnly'
@@ -14,6 +13,7 @@ import FileTypeSelect from '@openhome-ui/components/FileTypeSelect'
 import HexDisplay from '@openhome-ui/components/HexDisplay'
 import { ArrowLeftIcon, ArrowRightIcon } from '@openhome-ui/components/Icons'
 import MessageRibbon from '@openhome-ui/components/MessageRibbon'
+import OhoButton from '@openhome-ui/components/OhoButton'
 import SideTabs from '@openhome-ui/components/side-tabs/SideTabs'
 import MiniBoxIndicator, { MiniBoxIndicatorProps } from '@openhome-ui/saves/boxes/MiniBoxIndicator'
 import { ConvertStrategy, OriginalDataJs, PkmFormat } from '@pkm-rs/pkg'
@@ -188,18 +188,19 @@ function ModalContents(props: ModalContentsProps) {
             disabled={showOriginal}
             onChange={setDisplayFormat}
           />
-          <button
+          <OhoButton
             className="mini-button"
-            onClick={() => {
+            iconOnly
+            onClickAsync={async () => {
               displayMonOrFallback.refreshChecksum?.()
-              backend.saveLocalFile(
+              await backend.saveLocalFile(
                 new Uint8Array(displayMonOrFallback.toBytes()),
                 `${displayMonOrFallback.nickname}.${displayMonOrFallback.format.toLocaleLowerCase()}`
               )
             }}
           >
             <MdDownload style={{ color: 'white' }} />
-          </button>
+          </OhoButton>
         </Flex>
         <SideTabs.Tab value="summary">Summary</SideTabs.Tab>
         <SideTabs.Tab value="moves">Moves</SideTabs.Tab>
@@ -282,11 +283,7 @@ function ModalContents(props: ModalContentsProps) {
               <Fallback>
                 <HexDisplay
                   data={new Uint8Array(mon.toBytes({ includeExtraFields: true }))}
-                  format={
-                    isRomHackFormat(mon.format)
-                      ? undefined
-                      : (mon.format as keyof typeof FileSchemas | 'OHPKM')
-                  }
+                  format={isRomHackFormat(mon.format) ? undefined : mon.format}
                 />
               </Fallback>
             </SideTabs.Panel>

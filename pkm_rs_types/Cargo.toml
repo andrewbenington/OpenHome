@@ -7,25 +7,26 @@ repository = "https://github.com/andrewbenington/OpenHome"
 license = "GPL-3.0+"
 
 [dependencies]
-pkm_rs_derive = {path = "../pkm_rs_derive"}
+pkm_rs_derive = { path = "../pkm_rs_derive" }
 serde = { version = "1.0.229", features = ["derive"] }
 static_assertions = "1.1.0"
-wasm-bindgen = { version = "0.2.128", optional = true }
-js-sys = { version = "0.3.105", optional = true }
+wasm-bindgen = { version = "0.2.129", optional = true }
+js-sys = { version = "0.3.106", optional = true }
 serde-wasm-bindgen = { version = "0.6.5", optional = true }
 getrandom = { version = "0.4.3", features = ["wasm_js"] }
 strum = "0.28.0"
 strum_macros = "0.28.0"
 time = "0.3.55"
 arbitrary-int = "2.2.0"
-rand = { version = "0.10.2", optional = true }
-tsify = { version = "0.5.8", features = [ "js" ] }
+rand = { version = "0.10.3", optional = true }
+tsify = { version = "0.5.8", features = ["js"] }
 num_enum = "0.7.6"
 chrono = "0.4.45"
 pastey = "0.2.3"
-specta = { version = "=2.0.0-rc.22", features = [ "serde_json", "derive" ], optional = true }
+specta = { version = "=2.0.0-rc.22", features = ["serde_json", "derive"], optional = true }
 enum-iterator = "2.3.0"
-zerocopy = { version = "0.8.61", features = ["derive"] }
+zerocopy = { version = "0.8.63", features = ["derive"] }
+thiserror = "2.0.21"
 
 [lib]
 name = "pkm_rs_types"

@@ -128,7 +128,7 @@ export class G2SAVJP extends OfficialSAV<PK2> {
       BOX_OFFSETS[this.currentPCBox]
     )
 
-    this.boxes = new Array<Box<PK2>>(BOX_OFFSETS.length)
+    this.boxes = Array(BOX_OFFSETS.length)
 
     BOX_OFFSETS.forEach((offset, boxNumber) => {
       const monCount = Math.min(bytes[offset], BOX_CAPACITY)

@@ -9,7 +9,7 @@ type GameMetadataLgpe = GameMetadata<PersonalInfoLgpe, LGPE_ENTRY_SIZE>;
 pub static METADATA_TABLE_LGPE: GameMetadataLgpe = GameMetadataLgpe::from_binary(
     LGPE_PERSONAL_FILE,
     LGPE_LEVELUP_PKL,
-    "Lets Go Pikachu/Eevee",
+    "Let's Go Pikachu/Eevee",
 );
 
 #[derive(Debug, Clone, Copy)]

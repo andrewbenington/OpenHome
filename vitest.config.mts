@@ -8,6 +8,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['src/test-setup.ts'],
     hideSkippedTests: true,
+    include: ['src/**/*.test.ts'],
   },
 
   resolve: {

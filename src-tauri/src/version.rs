@@ -142,10 +142,9 @@ pub fn handle_updates_get_features(
 
 fn appdata_dir_exists(data_controller: &impl DataController) -> Result<bool> {
     data_controller
-        .absolute_dir_path(DataDir::OpenHomeRoot)
-        .map_err(Error::data_folder)?
+        .absolute_dir_path(DataDir::OpenHomeRoot)?
         .try_exists()
-        .map_err(Error::data_folder)
+        .map_err(|error| Error::DataFolderAccess(Box::new(error)))
 }
 
 #[derive(EnumIter, Clone, Copy, strum::Display, Debug, PartialEq, Eq, Hash, Serialize)]

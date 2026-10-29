@@ -32,7 +32,7 @@ export default class PK5 {
   static getFormat() {
     return 'PK5' as const
   }
-  format: 'PK5' = 'PK5'
+  format = 'PK5' as const
   static getBoxSize() {
     return 136
   }

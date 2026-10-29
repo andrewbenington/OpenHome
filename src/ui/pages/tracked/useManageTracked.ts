@@ -33,7 +33,7 @@ import { isErr, not, Option, R, range, Result } from '@openhome-core/util/functi
 import { $O } from '@openhome-core/util/option'
 import { filterUndefined } from '@openhome-core/util/sort'
 import { SaveRef } from '@openhome-core/util/types'
-import useDisplayError from '@openhome-ui/hooks/displayError'
+import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import { useBanksAndBoxes } from '@openhome-ui/state-zustand/banks-and-boxes/store'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import { useLookups } from '@openhome-ui/state/lookups'
@@ -50,7 +50,7 @@ export function useManageTracked() {
   const displayError = useDisplayError()
   const [findingSaveState, setFindingSaveState] = useState<FindingSavesState>()
 
-  const enabledSaveTypes = useMemo(getEnabledSaveTypes, [getEnabledSaveTypes])
+  const enabledSaveTypes = useMemo(() => getEnabledSaveTypes(), [getEnabledSaveTypes])
 
   const findSaveForMon = useCallback(
     async (identifier: OhpkmIdentifier) => {
@@ -138,7 +138,7 @@ export function useManageTracked() {
           setState({ type: 'found', id: identifier, save: saveFile.data, location })
 
           mon.syncWithGameData(match, saveFile.data)
-          ohpkmStore.insertOrUpdate(mon)
+          await ohpkmStore.insertOrUpdate(mon)
           return saveFile.data
         }
       }
@@ -188,7 +188,7 @@ export function useManageTracked() {
     }
 
     const totalMons = allOhpkmIdsNotInBoxes.size
-    let foundMonIds = new Set<string>()
+    const foundMonIds = new Set<string>()
 
     const saveRefs = result.data
 
@@ -244,7 +244,7 @@ export function useManageTracked() {
       }
     }
 
-    ohpkmStore.insertOrUpdateAll(toUpdate)
+    await ohpkmStore.insertOrUpdateAll(toUpdate)
 
     const allMissingIdsNotInBoxes = Array.from(notFoundIds.difference(foundMonIds))
 

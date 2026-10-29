@@ -1,5 +1,3 @@
-use std::num::NonZeroU64;
-
 use super::v2_sections::{
     GameboyData, Gen45Data, Gen67Data, LearnedMoves, LegendsArceusData, LegendsZaData, MainDataV2,
     MonTags, MostRecentSave, Notes, PastHandlerDataV2, PluginData, SV_BASE_TM_BYTES_EXCLUDE_UNUSED,
@@ -20,34 +18,31 @@ use crate::result::{Error, Result};
 use crate::sectioned_data::{DataSection, SectionTag, SectionedData};
 use crate::traits::{HasSpeciesAndForm, IsShiny, PkmBytes};
 
-#[cfg(feature = "wasm")]
-use arrayref::array_ref;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::{MoveIndex, MoveSlot, MoveSlots, la_tutor, lza_tm, sv_tm, swsh_tr};
 use pkm_rs_resources::natures::{NatureIndex, WithNature};
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
-use pkm_rs_resources::species::SpeciesForm;
-use pkm_rs_resources::species::SpeciesMetadata;
-#[cfg(feature = "wasm")]
-use pkm_rs_types::TsResult;
+use pkm_rs_resources::species::{SpeciesForm, SpeciesMetadata};
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
-    AbilityNumber, BinaryGender, ContestStats, FlagSet, Gender, Geolocations, HyperTraining, Ivs,
-    Language, MarkingsSixShapesColors, OriginGame, PkmType, PokeDate, Pokerus, ShinyLeaves, Stats8,
-    Stats16Le, StatsPreSplit, TeraType, TrainerData, TrainerMemory,
+    AbilityNumber, BinaryGender, ContestStats, Dvs, FlagSet, Gender, Geolocations, HyperTraining,
+    Ivs, Language, MarkingsSixShapesColors, NationalDex, OriginGame, PkmType, PokeDate, Pokerus,
+    ShinyLeaves, Stats8, Stats16Le, StatsPreSplit, TeraType, TrainerData, TrainerMemory,
 };
-use pkm_rs_types::{Dvs, NationalDex};
 use serde::Serialize;
+use std::num::NonZeroU64;
 use strum_macros::Display;
 
+#[cfg(feature = "wasm")]
+use arrayref::array_ref;
 #[cfg(feature = "wasm")]
 use pkm_rs_resources::abilities::AbilityIndexWasm;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 #[cfg(feature = "wasm")]
-use pkm_rs_types::{JsResult, TryIntoTs};
+use pkm_rs_types::{JsResult, TryIntoTs, TsResult};
 #[cfg(feature = "wasm")]
 use tsify::Ts;
 #[cfg(feature = "wasm")]
@@ -3445,7 +3440,9 @@ impl OhpkmV2 {
 
     #[wasm_bindgen(setter = teraTypeOverride)]
     pub fn set_tera_type_override_js(&mut self, value: Option<Ts<TeraType>>) -> Result<()> {
-        let value_rust = value.map(|t| t.to_rust()).transpose()?;
+        let value_rust = value
+            .map(|t| t.to_rust().map_err(Error::tsify))
+            .transpose()?;
 
         self.sv_data
             .get_or_insert(ScarletVioletData::default_generated_tera_type(

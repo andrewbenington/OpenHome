@@ -55,6 +55,10 @@ export function numericSorter<T, N extends number = number>(func: (val: T) => N 
   }
 }
 
+const identity = <T>(v: T) => v
+
+export const lowestToHighest = numericSorter<number>(identity)
+
 function originGameOrderValue(origin?: OriginGame): number {
   if (!origin) return Number.POSITIVE_INFINITY
 

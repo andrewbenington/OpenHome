@@ -1,7 +1,7 @@
 import useBackend from '@openhome-core/backend/useBackend'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { SAV } from '@openhome-core/save/interfaces'
+import { SAV, saveToStringIdentifier } from '@openhome-core/save/interfaces'
 import { monSupportedBySave } from '@openhome-core/save/util'
 import { FullMetadataLookup } from '@openhome-core/util'
 import { $R, Option, R, range, Result } from '@openhome-core/util/functional'
@@ -17,7 +17,7 @@ import OhoFlex from '@openhome-ui/components/OhoFlex'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import SearchFields from '@openhome-ui/components/search/SearchFields'
 import PokemonSearchModal from '@openhome-ui/components/search/SearchModal'
-import useDisplayError from '@openhome-ui/hooks/displayError'
+import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import PokemonDetailsModal from '@openhome-ui/pokemon/PokemonDetailsModal'
 import { useCanSwapWithDragging } from '@openhome-ui/state-zustand/drag-and-drop/dragStore'
 import { ErrorContext } from '@openhome-ui/state/error'
@@ -121,7 +121,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
       return
     }
 
-    importMonsToLocation(mons, location)
+    return importMonsToLocation(mons, location)
   }
 
   const canSwapWithDragging = useCanSwapWithDragging(save)
@@ -234,16 +234,16 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                 <BoxCellAsync
                   key={uniqueKey}
                   onClick={() => setSelectedIndex(index)}
-                  dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${index}`}
+                  dragID={`${saveToStringIdentifier(save)}_${save.currentPCBox}_${index}`}
                   location={location}
                   isDisabled={(mon) =>
                     !canSwapWithDragging(mon) || slotMetadata?.isDisabled === true
                   }
                   disabledReason={slotMetadata?.disabledReason}
                   monPromise={mon}
-                  onDrop={(importedMons) => {
+                  onDrop={async (importedMons) => {
                     if (importedMons) {
-                      attemptImportMons(importedMons, location)
+                      return await attemptImportMons(importedMons, location)
                     }
                   }}
                   multiSelectEnabled={multiSelectState.multiSelectEnabled}
@@ -410,14 +410,12 @@ function SaveHeader({ save, setDetailsModal }: SaveHeaderProps) {
     Item.label('Open file location').action(() => backend.openDirectory(save.filePath.dir)),
     Submenu.label('Move to Bank...')
       .with(
-        Item.label(`This Box (${currentBoxMonCount})`).action(() => {
+        Item.label(`This Box (${currentBoxMonCount})`).action(() =>
           savesManager.moveBoxToBank(save)
-        })
+        )
       )
       .with(
-        Item.label(`Entire Save (${totalMonCount})`).action(() => {
-          savesManager.moveSaveToBank(save)
-        })
+        Item.label(`Entire Save (${totalMonCount})`).action(() => savesManager.moveSaveToBank(save))
       ),
   ]
 

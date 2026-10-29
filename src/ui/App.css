@@ -452,6 +452,9 @@ label {
   width: fit-content;
   transition: none;
   border-radius: var(--border-radius-sm);
+  background-color: var(--gray-a7);
+  box-shadow: none;
+  display: grid;
 
   svg {
     height: 1rem;
@@ -461,6 +464,7 @@ label {
 
 .mini-button-icon-only {
   width: auto;
+  min-width: fit-content !important;
   padding: 0;
 
   display: grid;

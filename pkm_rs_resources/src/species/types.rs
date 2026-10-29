@@ -348,6 +348,18 @@ impl FormMetadata {
         }
     }
 
+    pub fn ability_bounded<const NEW_MAX: u16>(
+        &self,
+        ability_num: AbilityNumber,
+    ) -> Option<AbilityIndexBounded<NEW_MAX>> {
+        match ability_num {
+            AbilityNumber::First => self.abilities.0,
+            AbilityNumber::Second => self.abilities.1,
+            AbilityNumber::Hidden => self.hidden_ability.unwrap_or(self.abilities.0),
+        }
+        .change_bound()
+    }
+
     pub fn get_base_evolution(&self) -> SpeciesForm {
         match self.pre_evolution {
             None => self.species_form(),
