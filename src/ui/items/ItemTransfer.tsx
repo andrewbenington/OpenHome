@@ -1,4 +1,5 @@
 import { Option } from '@openhome-core/util/functional'
+import { stringSorter } from '@openhome-core/util/sort'
 import Badge from '@openhome-ui/components/badge/Badge'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import Fallback from '@openhome-ui/components/Fallback'
@@ -37,7 +38,8 @@ function useSourceController(source: ItemTransferSource) {
   const items = source
     .getItemData()
     .filter((item) => pouch === 'ALL_ITEMS' || item.pouch === pouch)
-    .filter((item) => item.count > 0 || database.availability(item.index) === 'Obtainable')
+    .filter((item) => item.count > 0)
+    .toSorted(stringSorter((item) => Item.fromIndex(item.index)?.name))
   const item = selection ? items.find((item) => item.index === selection) : undefined
 
   return { item, items, selection, setSelection, source, database, pouch, setPouch }
@@ -241,11 +243,7 @@ function ItemTransferControls(props: ItemTransferCardProps) {
             key={sourceItem?.index}
             value={itemCount || 0}
             min={0}
-            max={
-              sourceItem?.index
-                ? props.destController?.database.maxAllowed(sourceItem.index)
-                : undefined
-            }
+            max={max}
             onChange={(v) => setItemCount(v ?? 0)}
             style={{ width: '3.25rem' }}
             disabled={!sourceItem}
@@ -291,7 +289,6 @@ function SaveItemsScroller(props: SaveItemsScrollerProps) {
               database={sourceController.database}
               selected={sourceController.selection === item.index}
               inactive={props.active === false}
-              disallowed={item.pouch === 4294967295}
               onClick={() => {
                 sourceController.setSelection(item.index)
                 props.onClick?.()

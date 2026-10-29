@@ -37,24 +37,6 @@ pub enum SvItemPouch {
     Materials = 9,
 }
 
-impl SvItemPouch {
-    const fn from_category(category: PkhexItemCategory) -> Option<Self> {
-        match category {
-            PkhexItemCategory::Medicine => Some(Self::Medicine),
-            PkhexItemCategory::Balls => Some(Self::Balls),
-            PkhexItemCategory::BattleItems => Some(Self::Battle),
-            PkhexItemCategory::Berries => Some(Self::Berries),
-            PkhexItemCategory::Items => Some(Self::Other),
-            PkhexItemCategory::TechnicalMachines => Some(Self::TechnicalMachines),
-            PkhexItemCategory::Treasure => Some(Self::Treasure),
-            PkhexItemCategory::Ingredients => Some(Self::Picnic),
-            PkhexItemCategory::KeyItems => Some(Self::KeyItems),
-            PkhexItemCategory::SpeciesItems => Some(Self::Materials),
-            _ => None,
-        }
-    }
-}
-
 impl From<SvItemPouch> for PkhexItemCategory {
     fn from(value: SvItemPouch) -> Self {
         match value {
@@ -192,20 +174,6 @@ impl SvItemStorage {
         2517, 2518, 2519, 2520, 2521,
     ];
 
-    /// Pouches that exist in Gen 9, in lookup-priority order.
-    const VALID_TYPES: [PkhexItemCategory; 10] = [
-        PkhexItemCategory::Items,
-        PkhexItemCategory::KeyItems,
-        PkhexItemCategory::TechnicalMachines,
-        PkhexItemCategory::Medicine,
-        PkhexItemCategory::Berries,
-        PkhexItemCategory::Balls,
-        PkhexItemCategory::BattleItems,
-        PkhexItemCategory::Treasure,
-        PkhexItemCategory::Ingredients,
-        PkhexItemCategory::SpeciesItems,
-    ];
-
     /// Items that exist in the data but cannot be legally btained.
     pub const UNRELEASED: &'static [u16] = &[
         16,   // Cherish Ball
@@ -300,7 +268,10 @@ impl SvItemStorage {
 }
 
 #[cfg(feature = "wasm")]
-use pkm_rs_types::TsResult;
+use pkm_rs_types::{JsResult, TsResult};
+
+#[cfg(feature = "wasm")]
+use tsify::Ts;
 
 #[cfg(feature = "wasm")]
 #[wasm_bindgen]
@@ -340,6 +311,13 @@ impl SvItemStorage {
                 .to_string(),
         )
     }
+
+    #[wasm_bindgen(js_name = pouchForItem)]
+    pub fn pouch_for_item(item_index: u16) -> JsResult<Option<Ts<SvItemPouch>>> {
+        Self::pouch_for(item_index)
+            .map(|pouch| pouch.try_into_ts())
+            .transpose()
+    }
 }
 
 impl ItemAdapter for SvItemStorage {
@@ -376,10 +354,6 @@ impl ItemAdapter for SvItemStorage {
             Ok(_) => Availability::Unreleased,
             Err(_) => Availability::Obtainable,
         }
-    }
-
-    fn item_ids_ascending(&self, category: PkhexItemCategory) -> Option<&'static [u16]> {
-        SvItemPouch::from_category(category).and_then(Self::items_by_pouch)
     }
 }
 
