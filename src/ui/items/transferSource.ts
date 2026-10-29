@@ -2,7 +2,7 @@ import { SAV } from '@openhome-core/save/interfaces'
 import { Option } from '@openhome-core/util/functional'
 import { useItemBag } from '@openhome-ui/state/items'
 // import { Availability, OriginGame, SvItemStorage } from '@pkm-rs/pkg'
-import { OriginGame } from '@pkm-rs/pkg'
+import { Availability, OriginGame, SvItemStorage } from '@pkm-rs/pkg'
 import { useMemo } from 'react'
 import { ItemData } from './ItemRow'
 
@@ -87,17 +87,19 @@ export function useSaveItemTransfer(save: SAV): Option<ItemTransferSource> {
 }
 
 export interface ItemTransferDatabase {
-  readonly pouchIndexes: number[]
+  pouchIndexes: () => number[]
   pouchName: (pouchIndex: number) => Option<string>
   maxAllowed: (itemIndex: number) => Option<number>
   // pouchItems: (pouchIndex?: number) => ItemData[]
   availability: (index: number) => Availability
   // getPouchName?: (pouchIndex?: number) => string
 }
+// console.log(SvItemStorage.pouchIndexes)
 
-// export const ScarletVioletItemTransfer: ItemTransferDatabase = {
-//   pouchIndexes: Array.from(SvItemStorage.pouchIndexes),
-//   pouchName: SvItemStorage.pouchName,
-//   maxAllowed: SvItemStorage.maxAllowed,
-//   availability: SvItemStorage.availabilityOf,
-// }
+console.log(SvItemStorage.pouchIndexes)
+export const ScarletVioletItemTransfer: ItemTransferDatabase = {
+  pouchIndexes: () => Array.from(SvItemStorage.pouchIndexes()),
+  pouchName: SvItemStorage.pouchName,
+  maxAllowed: SvItemStorage.maxAllowed,
+  availability: SvItemStorage.availabilityOf,
+}

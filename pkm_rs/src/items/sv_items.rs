@@ -320,7 +320,7 @@ impl SvItemStorage {
         Self::availability_of(item_index).try_into_ts()
     }
 
-    #[wasm_bindgen(getter = pouchIndexes)]
+    #[wasm_bindgen(js_name = pouchIndexes)]
     pub fn pouch_indexes() -> Vec<u32> {
         SvItemPouch::iter().map(u32::from).collect()
     }

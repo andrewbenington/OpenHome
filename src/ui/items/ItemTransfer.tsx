@@ -14,7 +14,11 @@ import { ItemIcon } from './ItemIcon'
 import { ItemRow } from './ItemRow'
 import './ItemTransfer.css'
 import { TitledCard } from './TitledCard'
-import { ItemTransferDatabase, ItemTransferSource } from './transferSource'
+import {
+  ItemTransferDatabase,
+  ItemTransferSource,
+  ScarletVioletItemTransfer,
+} from './transferSource'
 
 interface ItemTransferProps {
   source1: ItemTransferSource

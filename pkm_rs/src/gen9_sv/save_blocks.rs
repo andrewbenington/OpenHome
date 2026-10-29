@@ -6,6 +6,7 @@ use crate::encryption::swish_crypto::{
     self, Block, BlockData, NumericBlock, ObjectBlock, SwishBlocks, SwishError,
 };
 use crate::gen9_sv::{BoxIndex, BoxSlot, MAX_BOX_COUNT};
+use crate::items::SvItemStorage;
 // use crate::items::SvItemStorage;
 use crate::result::{Error, Result, StdResult};
 use crate::traits::PkmBytes;
@@ -331,11 +332,11 @@ impl ItemDataSv {
     fn update_from_ts(&mut self, update: ItemDataTs) {
         self.update_count(i32::try_from(update.count).unwrap_or(i32::MAX));
         self.set_flag(ItemIs::Favorite, update.is_favorite);
-        // self.pouch.set(
-        //     SvItemStorage::pouch_for(update.index)
-        //         .map(u32::from)
-        //         .unwrap_or(0),
-        // )
+        self.pouch.set(
+            SvItemStorage::pouch_for(update.index)
+                .map(u32::from)
+                .unwrap_or(0),
+        )
     }
 }
 #[cfg_attr(
