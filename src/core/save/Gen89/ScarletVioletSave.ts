@@ -7,6 +7,7 @@ import {
 } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { Result } from '@openhome-core/util/functional'
+import { ScarletVioletItemTransfer } from '@openhome-ui/items/transferSource'
 import {
   ConvertStrategy,
   ExtraFormIndex,
@@ -108,6 +109,9 @@ export class ScarletVioletSave extends WasmOfficialSave<Pk9Wasm, PK9, ScarletVio
   getItemInventory = () => this.inner.getItemInventory()
 
   updateItemData = (itemData: ItemDataTs) => this.inner.updateItemData(itemData)
+
+  getItemDatabase = () => ScarletVioletItemTransfer
+
   getDisplayPkms() {
     const rideLegend = this.inner.getRideLegend()
     return rideLegend ? [{ mon: PK9.fromWasm(rideLegend), description: 'Ride Legendary' }] : []

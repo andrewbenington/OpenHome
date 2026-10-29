@@ -2,6 +2,7 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { PluginIdentifier as RustPluginIdentifier } from '@openhome-core/tauri/spectaCommands'
 import { Errorable, Option, R, range, Result } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
+import { ItemTransferDatabase } from '@openhome-ui/items/transferSource'
 import {
   BinaryGender,
   ConvertStrategy,
@@ -95,6 +96,7 @@ interface BaseSAV<P extends PKMInterface = PKMInterface> {
   convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<P>
   getItemInventory?: () => ItemDataTs[]
   updateItemData?: (itemData: ItemDataTs) => void
+  getItemDatabase?: () => ItemTransferDatabase
 
   free?: () => void
 }
@@ -124,6 +126,7 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   abstract convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<P>
   getItemInventory?: () => ItemDataTs[]
   updateItemData?: (itemData: ItemDataTs) => void
+  getItemDatabase?: () => ItemTransferDatabase
 
   prepareWriter(): SaveWriter {
     this.prepareForSaving()
@@ -252,6 +255,7 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   abstract convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<P>
   getItemInventory?: () => ItemDataTs[]
   updateItemData?: (itemData: ItemDataTs) => void
+  getItemDatabase?: () => ItemTransferDatabase
 
   prepareWriter(): SaveWriter {
     this.prepareForSaving()

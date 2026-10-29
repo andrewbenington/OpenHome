@@ -29,7 +29,7 @@ interface ItemTransferProps {
 
 type Source = 'source1' | 'source2'
 
-function useSourceController(source: ItemTransferSource) {
+function useSourceController(source: ItemTransferSource, dest: ItemTransferSource) {
   const [selection, setSelection] = useState<Option<number>>(undefined)
   const [pouch, setPouch] = useState<number | 'ALL_ITEMS'>('ALL_ITEMS')
 
@@ -37,6 +37,7 @@ function useSourceController(source: ItemTransferSource) {
 
   const items = source
     .getItemData()
+    .filter((item) => dest.database.availability(item.index) !== 'Unsupported')
     .filter((item) => pouch === 'ALL_ITEMS' || item.pouch === pouch)
     .filter((item) => item.count > 0)
     .toSorted(stringSorter((item) => Item.fromIndex(item.index)?.name))
@@ -50,8 +51,8 @@ export function ItemTransfer(props: ItemTransferProps) {
   const parentRef = useRef(null)
   const [selectedSourceId, setSelectedSourceId] = useState<Option<Source>>()
 
-  const source1Controller = useSourceController(source1)
-  const source2Controller = useSourceController(source2)
+  const source1Controller = useSourceController(source1, source2)
+  const source2Controller = useSourceController(source2, source1)
 
   const selectedSourceController =
     selectedSourceId === 'source1' ? source1Controller : source2Controller

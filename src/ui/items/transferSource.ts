@@ -9,7 +9,7 @@ import { ItemData } from './ItemRow'
 export type SourceType = OriginGame | 'OpenHome'
 export interface ItemTransferSource {
   getItemData: (pouchIndex?: number) => ItemData[]
-  itemIsAllowed: (index: number) => boolean
+  database: ItemTransferDatabase
   sourceType: SourceType
   addItems: (index: number, count: number) => void
   removeItems: (index: number, count: number) => void
@@ -35,7 +35,7 @@ export function useOpenHomeItemTransfer(): ItemTransferSource {
 
   return {
     getItemData: () => itemData,
-    itemIsAllowed: () => true,
+    database: ScarletVioletItemTransfer,
     sourceType: 'OpenHome',
     addItems: addItem,
     removeItems: removeItem,
@@ -45,7 +45,7 @@ export function useOpenHomeItemTransfer(): ItemTransferSource {
 // type ItemTransferSave = SAV & Required<Pick<SAV, 'getItemInventory' | 'updateItemData'>>
 
 export function useSaveItemTransfer(save: SAV): Option<ItemTransferSource> {
-  if (save.getItemInventory === undefined || !save.updateItemData) return
+  if (save.getItemInventory === undefined || !save.updateItemData || !save.getItemDatabase) return
 
   const getItemInventory = () => save.getItemInventory?.() || []
   const updateItemData = save.updateItemData
@@ -76,10 +76,7 @@ export function useSaveItemTransfer(save: SAV): Option<ItemTransferSource> {
 
   return {
     getItemData: getItemInventory,
-    itemIsAllowed: (index) =>
-      getItemInventory().some(
-        (item) => item.index === index && item.pouch !== 0 && item.pouch !== 4294967295
-      ),
+    database: save.getItemDatabase(),
     sourceType: save.origin,
     addItems,
     removeItems,
@@ -96,7 +93,6 @@ export interface ItemTransferDatabase {
 }
 // console.log(SvItemStorage.pouchIndexes)
 
-console.log(SvItemStorage.pouchIndexes)
 export const ScarletVioletItemTransfer: ItemTransferDatabase = {
   pouchIndexes: () => Array.from(SvItemStorage.pouchIndexes()),
   pouchName: SvItemStorage.pouchName,
