@@ -4,8 +4,9 @@ use crate::checksum::RefreshChecksum;
 use crate::convert_strategy::ConvertStrategy;
 use crate::encryption::swish_crypto::{self, NumericBlock, SwishBlocks};
 #[cfg(feature = "wasm")]
-use crate::gen9_sv::save_blocks::{ItemDataTs, SvBlockKey};
+use crate::gen9_sv::save_blocks::SvBlockKey;
 use crate::gen9_sv::{BoxIndex, BoxSlot};
+use crate::items::ItemDataTs;
 use crate::result::{Error, Result, StdResult};
 use crate::traits::PkmBytes;
 use pkm_rs_types::{BinaryGender, Language, OriginGame};

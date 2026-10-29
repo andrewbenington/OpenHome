@@ -6,7 +6,7 @@ use crate::encryption::swish_crypto::{
     self, Block, BlockData, NumericBlock, ObjectBlock, SwishBlocks, SwishError,
 };
 use crate::gen9_sv::{BoxIndex, BoxSlot, MAX_BOX_COUNT};
-use crate::items::SvItemStorage;
+use crate::items::{ItemDataTs, SvItemStorage};
 // use crate::items::SvItemStorage;
 use crate::result::{Error, Result, StdResult};
 use crate::traits::PkmBytes;
@@ -314,7 +314,7 @@ impl ItemDataSv {
     fn mark_as_obtained(&mut self) {
         let already_obtained = self.get_flag(ItemIs::Obtained);
         self.set_flag(ItemIs::Obtained, true);
-        self.set_flag(ItemIs::New, already_obtained);
+        self.set_flag(ItemIs::New, !already_obtained);
     }
 
     fn update_count(&mut self, updated: i32) {
@@ -338,20 +338,6 @@ impl ItemDataSv {
                 .unwrap_or(0),
         )
     }
-}
-#[cfg_attr(
-    feature = "wasm",
-    derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
-)]
-#[derive(Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ItemDataTs {
-    pub index: u16,
-    pub pouch: u32,
-    pub count: u32,
-    pub is_new: bool,
-    pub is_obtained: bool,
-    pub is_favorite: bool,
 }
 
 #[derive(Debug, Clone, Default)]
