@@ -3,3 +3,18 @@ mod category;
 mod sv_items;
 
 pub use sv_items::SvItemStorage;
+
+#[cfg_attr(
+    feature = "wasm",
+    derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
+)]
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "wasm", serde(rename_all = "camelCase"))]
+pub struct ItemDataTs {
+    pub index: u16,
+    pub pouch: u32,
+    pub count: u32,
+    pub is_new: bool,
+    pub is_obtained: bool,
+    pub is_favorite: bool,
+}

@@ -1,10 +1,16 @@
-import { useVirtualizer } from '@tanstack/react-virtual'
+import { ReactVirtualizerOptions, useVirtualizer } from '@tanstack/react-virtual'
 import { RefObject, useEffect, useState } from 'react'
+
+type SimpleVirtualizerOptions = Omit<
+  Partial<ReactVirtualizerOptions<HTMLElement, Element>>,
+  'count' | 'estimateSize' | 'getScrollElement'
+>
 
 export default function useSimpleVirtualizer(
   count: number,
   estimateSize: (index: number, baseFontSize: number) => number,
-  scrollRef: RefObject<HTMLElement | null>
+  scrollRef: RefObject<HTMLElement | null>,
+  options?: SimpleVirtualizerOptions
 ) {
   const [baseFontSize, setBaseFontSize] = useState(() =>
     parseFloat(getComputedStyle(document.documentElement).fontSize)
@@ -17,6 +23,7 @@ export default function useSimpleVirtualizer(
     estimateSize: (index) => estimateSize(index, baseFontSize),
     overscan: 100,
     directDomUpdates: true,
+    ...options,
   })
 
   useEffect(() => {

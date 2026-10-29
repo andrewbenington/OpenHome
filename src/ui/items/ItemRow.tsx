@@ -2,6 +2,7 @@ import { FavoriteIcon } from '@openhome-ui/components/Icons'
 import { cssClass } from '@openhome-ui/util/style'
 import { Item } from '@pkm-rs/pkg'
 import { Grid } from '@radix-ui/themes'
+import { CSSProperties } from 'react'
 import { ItemIcon } from './ItemIcon'
 import './ItemRow.css'
 import { ItemTransferDatabase } from './transferSource'
@@ -10,6 +11,7 @@ export type ItemData = {
   index: number
   pouch: number
   count: number
+  isNew?: boolean
   isObtained: boolean
   isFavorite: boolean
 }
@@ -20,7 +22,9 @@ export interface ItemRowProps {
   selected: boolean
   disallowed: boolean
   inactive: boolean
+  otherText?: string
   onClick?: () => void
+  style?: CSSProperties
 }
 
 export function ItemRow(props: ItemRowProps) {
@@ -35,11 +39,10 @@ export function ItemRow(props: ItemRowProps) {
         .if(props.disallowed)
         .build()}
       onClick={onClick}
+      style={props.style}
     >
       <ItemIcon item={item} />
-      <p>
-        {item?.name} – {database.pouchName(itemData.pouch)} – {database.availability(itemData.index)}
-      </p>
+      <p>{item?.name}</p>
       {itemData.isFavorite ? <FavoriteIcon /> : <div />}
       <div className="item-count">x{itemData.count}</div>
     </Grid>

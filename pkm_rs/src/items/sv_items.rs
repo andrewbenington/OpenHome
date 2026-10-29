@@ -3,7 +3,7 @@
 //! Port of PKHeX's `PKHeX.Core/Items/ItemStorage9SV.cs`.
 
 use crate::items::adapter::{Availability, ItemAdapter};
-use crate::items::category::ItemCategory;
+use crate::items::category::PkhexItemCategory;
 
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use pkm_rs_types::TryIntoTs;
@@ -38,24 +38,24 @@ pub enum SvItemPouch {
 }
 
 impl SvItemPouch {
-    const fn from_category(category: ItemCategory) -> Option<Self> {
+    const fn from_category(category: PkhexItemCategory) -> Option<Self> {
         match category {
-            ItemCategory::Medicine => Some(Self::Medicine),
-            ItemCategory::Balls => Some(Self::Balls),
-            ItemCategory::BattleItems => Some(Self::Battle),
-            ItemCategory::Berries => Some(Self::Berries),
-            ItemCategory::Items => Some(Self::Other),
-            ItemCategory::TechnicalMachines => Some(Self::TechnicalMachines),
-            ItemCategory::Treasure => Some(Self::Treasure),
-            ItemCategory::Ingredients => Some(Self::Picnic),
-            ItemCategory::KeyItems => Some(Self::KeyItems),
-            ItemCategory::Candy => Some(Self::Materials),
+            PkhexItemCategory::Medicine => Some(Self::Medicine),
+            PkhexItemCategory::Balls => Some(Self::Balls),
+            PkhexItemCategory::BattleItems => Some(Self::Battle),
+            PkhexItemCategory::Berries => Some(Self::Berries),
+            PkhexItemCategory::Items => Some(Self::Other),
+            PkhexItemCategory::TechnicalMachines => Some(Self::TechnicalMachines),
+            PkhexItemCategory::Treasure => Some(Self::Treasure),
+            PkhexItemCategory::Ingredients => Some(Self::Picnic),
+            PkhexItemCategory::KeyItems => Some(Self::KeyItems),
+            PkhexItemCategory::SpeciesItems => Some(Self::Materials),
             _ => None,
         }
     }
 }
 
-impl From<SvItemPouch> for ItemCategory {
+impl From<SvItemPouch> for PkhexItemCategory {
     fn from(value: SvItemPouch) -> Self {
         match value {
             SvItemPouch::Medicine => Self::Medicine,
@@ -67,9 +67,16 @@ impl From<SvItemPouch> for ItemCategory {
             SvItemPouch::Treasure => Self::Treasure,
             SvItemPouch::Picnic => Self::Ingredients,
             SvItemPouch::KeyItems => Self::KeyItems,
-            SvItemPouch::Materials => Self::Candy,
+            SvItemPouch::Materials => Self::SpeciesItems,
         }
     }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_name = svItemPouchToItemCategory)]
+pub fn sv_item_pouch_to_category_wasm(pouch_index: u32) -> TsResult<PkhexItemCategory> {
+    PkhexItemCategory::from(SvItemPouch::try_from(pouch_index).unwrap_or(SvItemPouch::Other))
+        .try_into_ts()
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
@@ -186,17 +193,17 @@ impl SvItemStorage {
     ];
 
     /// Pouches that exist in Gen 9, in lookup-priority order.
-    const VALID_TYPES: [ItemCategory; 10] = [
-        ItemCategory::Items,
-        ItemCategory::KeyItems,
-        ItemCategory::TechnicalMachines,
-        ItemCategory::Medicine,
-        ItemCategory::Berries,
-        ItemCategory::Balls,
-        ItemCategory::BattleItems,
-        ItemCategory::Treasure,
-        ItemCategory::Ingredients,
-        ItemCategory::Candy,
+    const VALID_TYPES: [PkhexItemCategory; 10] = [
+        PkhexItemCategory::Items,
+        PkhexItemCategory::KeyItems,
+        PkhexItemCategory::TechnicalMachines,
+        PkhexItemCategory::Medicine,
+        PkhexItemCategory::Berries,
+        PkhexItemCategory::Balls,
+        PkhexItemCategory::BattleItems,
+        PkhexItemCategory::Treasure,
+        PkhexItemCategory::Ingredients,
+        PkhexItemCategory::SpeciesItems,
     ];
 
     /// Items that exist in the data but cannot be legally btained.
@@ -248,8 +255,8 @@ impl SvItemStorage {
         })
     }
 
-    pub fn category_for(item_index: u16) -> Option<ItemCategory> {
-        Self::pouch_for(item_index).map(ItemCategory::from)
+    pub fn category_for(item_index: u16) -> Option<PkhexItemCategory> {
+        Self::pouch_for(item_index).map(PkhexItemCategory::from)
     }
 
     pub const fn is_ingredient(item_index: u16) -> bool {
@@ -267,18 +274,18 @@ impl SvItemStorage {
         matches!(item_index, 2311..=2400 | 2417..=2437) && !Self::is_pick(item_index)
     }
 
-    pub const fn max_allowed_for_category(&self, category: ItemCategory) -> Option<u16> {
+    pub const fn max_allowed_for_category(&self, category: PkhexItemCategory) -> Option<u16> {
         match category {
-            ItemCategory::KeyItems => Some(1),
-            ItemCategory::Items
-            | ItemCategory::TechnicalMachines
-            | ItemCategory::Medicine
-            | ItemCategory::Berries
-            | ItemCategory::Balls
-            | ItemCategory::BattleItems
-            | ItemCategory::Treasure
-            | ItemCategory::Ingredients // 999 (depends on item)
-            | ItemCategory::Candy => Some(999),
+            PkhexItemCategory::KeyItems => Some(1),
+            PkhexItemCategory::Items
+            | PkhexItemCategory::TechnicalMachines
+            | PkhexItemCategory::Medicine
+            | PkhexItemCategory::Berries
+            | PkhexItemCategory::Balls
+            | PkhexItemCategory::BattleItems
+            | PkhexItemCategory::Treasure
+            | PkhexItemCategory::Ingredients // 999 (depends on item)
+            | PkhexItemCategory::SpeciesItems => Some(999),
             _ => None,
         }
     }
@@ -301,16 +308,16 @@ impl SvItemStorage {
     #[wasm_bindgen(js_name = maxAllowed)]
     pub fn max_allowed(item_index: u16) -> Option<u16> {
         match Self::category_for(item_index) {
-            Some(ItemCategory::KeyItems) => Some(1),
-            Some(ItemCategory::Items
-            | ItemCategory::TechnicalMachines
-            | ItemCategory::Medicine
-            | ItemCategory::Berries
-            | ItemCategory::Balls
-            | ItemCategory::BattleItems
-            | ItemCategory::Treasure
-            | ItemCategory::Ingredients // 999 (depends on item)
-            | ItemCategory::Candy) => Some(999),
+            Some(PkhexItemCategory::KeyItems) => Some(1),
+            Some(PkhexItemCategory::Items
+            | PkhexItemCategory::TechnicalMachines
+            | PkhexItemCategory::Medicine
+            | PkhexItemCategory::Berries
+            | PkhexItemCategory::Balls
+            | PkhexItemCategory::BattleItems
+            | PkhexItemCategory::Treasure
+            | PkhexItemCategory::Ingredients // 999 (depends on item)
+            | PkhexItemCategory::SpeciesItems) => Some(999),
             _ => None,
         }
     }
@@ -336,28 +343,33 @@ impl SvItemStorage {
 }
 
 impl ItemAdapter for SvItemStorage {
-    fn capacity(&self, ty: ItemCategory) -> Option<u16> {
+    fn capacity(&self, ty: PkhexItemCategory) -> Option<u16> {
         match ty {
-            ItemCategory::KeyItems => Some(1),
-            ItemCategory::Items
-            | ItemCategory::TechnicalMachines
-            | ItemCategory::Medicine
-            | ItemCategory::Berries
-            | ItemCategory::Balls
-            | ItemCategory::BattleItems
-            | ItemCategory::Treasure
-            | ItemCategory::Ingredients // 999 (depends on item)
-            | ItemCategory::Candy => Some(999),
+            PkhexItemCategory::KeyItems => Some(1),
+            PkhexItemCategory::Items
+            | PkhexItemCategory::TechnicalMachines
+            | PkhexItemCategory::Medicine
+            | PkhexItemCategory::Berries
+            | PkhexItemCategory::Balls
+            | PkhexItemCategory::BattleItems
+            | PkhexItemCategory::Treasure
+            | PkhexItemCategory::Ingredients // 999 (depends on item)
+            | PkhexItemCategory::SpeciesItems => Some(999),
             _ => None,
         }
     }
 
-    fn availability(&self, ty: ItemCategory, item_index: u16, item_count: u32) -> Availability {
+    fn availability(
+        &self,
+        ty: PkhexItemCategory,
+        item_index: u16,
+        item_count: u32,
+    ) -> Availability {
         if item_count == 0 {
             return Availability::Unsupported;
         }
         let unreleased = match ty {
-            ItemCategory::Ingredients => Self::UNRELEASED_INGREDIENTS,
+            PkhexItemCategory::Ingredients => Self::UNRELEASED_INGREDIENTS,
             _ => Self::UNRELEASED,
         };
         match unreleased.binary_search(&item_index) {
@@ -366,7 +378,7 @@ impl ItemAdapter for SvItemStorage {
         }
     }
 
-    fn item_ids_ascending(&self, category: ItemCategory) -> Option<&'static [u16]> {
+    fn item_ids_ascending(&self, category: PkhexItemCategory) -> Option<&'static [u16]> {
         SvItemPouch::from_category(category).and_then(Self::items_by_pouch)
     }
 }
@@ -422,13 +434,16 @@ mod tests {
     fn category_lookup() {
         assert_eq!(
             SvItemStorage::category_for(17),
-            Some(ItemCategory::Medicine)
+            Some(PkhexItemCategory::Medicine)
         );
         assert_eq!(
             SvItemStorage::category_for(328),
-            Some(ItemCategory::TechnicalMachines)
+            Some(PkhexItemCategory::TechnicalMachines)
         );
-        assert_eq!(SvItemStorage::category_for(2000), Some(ItemCategory::Candy));
+        assert_eq!(
+            SvItemStorage::category_for(2000),
+            Some(PkhexItemCategory::SpeciesItems)
+        );
         assert_eq!(SvItemStorage::category_for(9999), None);
     }
 
@@ -436,23 +451,23 @@ mod tests {
     fn legality() {
         let s = SvItemStorage::INSTANCE;
         assert_eq!(
-            s.availability(ItemCategory::Medicine, 17, 1),
+            s.availability(PkhexItemCategory::Medicine, 17, 1),
             Availability::Obtainable
         );
         assert_eq!(
-            s.availability(ItemCategory::Medicine, 17, 0),
+            s.availability(PkhexItemCategory::Medicine, 17, 0),
             Availability::Unsupported
         );
         assert_eq!(
-            s.availability(ItemCategory::Balls, 16, 1),
+            s.availability(PkhexItemCategory::Balls, 16, 1),
             Availability::Unreleased
         ); // Cherish Ball
         assert_eq!(
-            s.availability(ItemCategory::Ingredients, 2395, 1),
+            s.availability(PkhexItemCategory::Ingredients, 2395, 1),
             Availability::Unreleased
         ); // Blue Dish
         assert_eq!(
-            s.availability(ItemCategory::Ingredients, 2396, 1),
+            s.availability(PkhexItemCategory::Ingredients, 2396, 1),
             Availability::Obtainable
         ); // Green Dish
     }
@@ -460,8 +475,8 @@ mod tests {
     #[test]
     fn max_counts() {
         let s = SvItemStorage::INSTANCE;
-        assert_eq!(s.capacity(ItemCategory::KeyItems), Some(1));
-        assert_eq!(s.capacity(ItemCategory::Berries), Some(999));
-        assert_eq!(s.capacity(ItemCategory::None), None);
+        assert_eq!(s.capacity(PkhexItemCategory::KeyItems), Some(1));
+        assert_eq!(s.capacity(PkhexItemCategory::Berries), Some(999));
+        assert_eq!(s.capacity(PkhexItemCategory::None), None);
     }
 }
