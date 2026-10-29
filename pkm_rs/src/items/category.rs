@@ -1,9 +1,12 @@
+use pkm_rs_resources::items::Item;
+
 #[cfg_attr(
     feature = "wasm",
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
 )]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, strum::EnumString, strum::EnumIter)]
-pub enum PkhexItemCategory {
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, strum::EnumString, strum::EnumIter)]
+pub enum OpenhomeItemCategory {
+    #[default]
     None,
     Items,
     #[strum(to_string = "Key Items")]
@@ -31,7 +34,7 @@ pub enum PkhexItemCategory {
     MegaStones,
 }
 
-impl PkhexItemCategory {
+impl OpenhomeItemCategory {
     pub const fn icon_path(&self) -> &'static str {
         match self {
             Self::None => "items/category/none.png",
@@ -52,19 +55,44 @@ impl PkhexItemCategory {
             Self::MegaStones => "items/category/mega-stones.png",
         }
     }
+
+    pub fn for_item(item: Item) -> Self {
+        if item.is_mega_stone() {
+            Self::MegaStones
+        } else if item.is_z_crystal() {
+            Self::ZCrystals
+        } else {
+            SvItemStorage::pouch_for(item.get())
+                .map(Self::from)
+                .unwrap_or_default()
+        }
+    }
 }
 
 #[cfg(feature = "wasm")]
-use pkm_rs_types::JsResult;
+use pkm_rs_types::TryIntoTs;
+#[cfg(feature = "wasm")]
+use pkm_rs_types::{JsResult, TsResult};
 #[cfg(feature = "wasm")]
 use tsify::Ts;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
+use crate::items::SvItemStorage;
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_name = "openhomeCategoryForItem")]
+pub fn openhome_category_for_item(item_index: u16) -> TsResult<OpenhomeItemCategory> {
+    Item::new(item_index)
+        .map(OpenhomeItemCategory::for_item)
+        .unwrap_or_default()
+        .try_into_ts()
+}
+
 #[cfg(feature = "wasm")]
 #[wasm_bindgen(js_name = "itemCategoryIconPath")]
-pub fn item_category_icon_path(category: Ts<PkhexItemCategory>) -> JsResult<String> {
+pub fn item_category_icon_path(category: Ts<OpenhomeItemCategory>) -> JsResult<String> {
     Ok(category.to_rust()?.icon_path().to_owned())
 }
 
@@ -81,7 +109,7 @@ mod tests {
             .canonicalize()
             .expect("canonical path is valid");
 
-        let missing: Vec<&str> = PkhexItemCategory::iter()
+        let missing: Vec<&str> = OpenhomeItemCategory::iter()
             .map(|category| category.icon_path())
             .filter(|path| !root.join(path).is_file())
             .collect();

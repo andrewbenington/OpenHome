@@ -38,6 +38,26 @@ impl Item {
     pub const fn to_le_bytes(self) -> [u8; 2] {
         self.get().to_le_bytes()
     }
+
+    pub const fn is_mega_stone(self) -> bool {
+        let index = self.get();
+
+        (index >= (ItemIndex::NormaliumZ as u16) && index <= (ItemIndex::PikaniumZ as u16))
+            || (index >= (ItemIndex::DecidiumZ as u16)
+                && index <= (ItemIndex::PikashuniumZ2 as u16))
+            || (index >= (ItemIndex::SolganiumZ as u16) && index <= (ItemIndex::KommoniumZ2 as u16))
+    }
+
+    pub const fn is_z_crystal(self) -> bool {
+        let index = self.get();
+
+        (index >= (ItemIndex::Gengarite as u16) && index <= (ItemIndex::Latiosite as u16))
+            || (index >= (ItemIndex::Swampertite as u16)
+                && index <= (ItemIndex::Beedrillite as u16))
+            || (index >= (ItemIndex::Clefablite as u16) && index <= (ItemIndex::Falinksite as u16))
+            || (index >= (ItemIndex::RaichuniteX as u16)
+                && index <= (ItemIndex::Glimmoranite as u16))
+    }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
@@ -333,4 +353,60 @@ impl Serialize for ItemGen3 {
     {
         self.0.serialize(serializer)
     }
+}
+
+pub enum ItemIndex {
+    SecretPotion = 464,
+    SecretKey = 467,
+    RedOrb = 534,
+    BlueOrb = 535,
+    EnigmaStone = 536,
+
+    Xtransceiver = 621,
+    RevealGlass = 638,
+
+    Gengarite = 656,
+    Latiosite = 685,
+
+    MegaGlove = 717,
+
+    Swampertite = 752,
+    Beedrillite = 770,
+
+    EonFlute = 775,
+
+    NormaliumZ = 776,
+    PikaniumZ = 794,
+    DecidiumZ = 798,
+    PikashuniumZ2 = 836,
+
+    FairyMemory = 920,
+
+    SolganiumZ = 921,
+    UltranecroziumZ1 = 923,
+    UltranecroziumZ2 = 929,
+    KommoniumZ2 = 932,
+
+    RotoCatch = 959,
+
+    MagmarCandy = 1057,
+
+    RustedSword = 1103,
+    RustedShield = 1104,
+
+    DynamaxCrystalAql7235 = 1578,
+    MarkCharm = 1589,
+    ReinsOfUnity3 = 1607,
+    DsSounds = 1822,
+    LegendPlate = 1828,
+
+    YellowDish = 2400,
+    GlimmeringCharm = 2481,
+    BriarsBook = 2557,
+
+    Clefablite = 2559,
+    Falinksite = 2587,
+
+    RaichuniteX = 2635,
+    Glimmoranite = 2650,
 }

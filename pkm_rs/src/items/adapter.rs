@@ -1,10 +1,14 @@
-use crate::items::category::PkhexItemCategory;
+use crate::items::category::OpenhomeItemCategory;
 
 pub trait ItemAdapter {
-    fn capacity(&self, ty: PkhexItemCategory) -> Option<u16>;
+    fn capacity(&self, ty: OpenhomeItemCategory) -> Option<u16>;
 
-    fn availability(&self, ty: PkhexItemCategory, item_index: u16, item_count: u32)
-    -> Availability;
+    fn availability(
+        &self,
+        ty: OpenhomeItemCategory,
+        item_index: u16,
+        item_count: u32,
+    ) -> Availability;
 }
 
 #[cfg_attr(
