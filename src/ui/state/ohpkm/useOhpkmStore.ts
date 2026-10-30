@@ -14,7 +14,9 @@ import { Filter, PaginationCursor } from '@openhome-core/tauri/spectaCommands'
 import { expectExhaustive } from '@openhome-core/util'
 import { $R, Option, PromisedResultBox, R, Result } from '@openhome-core/util/functional'
 import { LRUCache } from '@openhome-core/util/lruCache'
+import { $O } from '@openhome-core/util/option'
 import { isThenable, NowOrLater } from '@openhome-core/util/promise'
+import { filterUndefined } from '@openhome-core/util/sort'
 import { FourMoves } from '@openhome-core/util/types'
 import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import { Lookup, MarkingsSixShapesColors, ModernRibbon, OriginGames } from '@pkm-rs/pkg/pkm_rs'
@@ -114,27 +116,26 @@ export function useOhpkmStore() {
       .then(R.peek((ohpkm) => ohpkmCache.set(ohpkm.openhomeId, ohpkm)))
   }
 
-  function tryLoadBatch(ids: OhpkmIdentifier[]): NowOrLater<OhpkmBatchLookupResults> {
+  async function tryLoadBatch(ids: OhpkmIdentifier[]): Promise<Result<OhpkmBatchLookupResults>> {
     const batchResults: OhpkmBatchLookupResults = new Map()
-
-    const pendingMons: Promise<[string, OhpkmLookupResult]>[] = []
-    for (const identifier of ids) {
-      const resultOrPromise = tryLoadFromId(identifier)
-      if (!isThenable(resultOrPromise)) {
-        batchResults.set(identifier, resultOrPromise)
+    const uncachedIds: OhpkmIdentifier[] = []
+    for (const id of ids) {
+      const cached = ohpkmCache.get(id)
+      if (cached) {
+        batchResults.set(id, R.Ok(cached))
       } else {
-        pendingMons.push(resultOrPromise.then((ohpkm) => [identifier, ohpkm]))
+        uncachedIds.push(id)
       }
     }
 
-    if (pendingMons.length === 0) {
-      return batchResults
-    }
+    if (uncachedIds.length === 0) return R.Ok(batchResults)
 
-    return Promise.all(pendingMons).then((results) => {
-      results.forEach(([id, ohpkm]) => batchResults.set(id, ohpkm))
-      return batchResults
-    })
+    return backend.lookupOhpkmBatch(uncachedIds).then(
+      R.map((results) => {
+        results.entries().forEach(([id, result]) => batchResults.set(id, result))
+        return batchResults
+      })
+    )
   }
 
   async function monIsStored(id: string): Promise<boolean> {
@@ -393,6 +394,27 @@ export function useOhpkmStore() {
     return openhomeId ? getById(openhomeId) : undefined
   }
 
+  async function loadIfTrackedBatch(
+    mons: PKMInterface[]
+  ): Promise<Result<[PKMInterface, Option<OHPKM>][]>> {
+    const monsWithIds = mons.map((mon) => [mon, calculateOrLookupOhpkmId(mon)] as const)
+    return tryLoadBatch(monsWithIds.map(([, id]) => id).filter(filterUndefined)).then(
+      R.map((results) => {
+        return monsWithIds.map(([mon, id]) => {
+          const ohpkmIfFound = $O(id)
+            .flatMap((id) => results.get(id))
+            .flatMap(R.dropError)
+            .get()
+          if (id && ohpkmIfFound) {
+            ohpkmCache.set(id, ohpkmIfFound)
+          }
+
+          return [mon, ohpkmIfFound] as const
+        })
+      })
+    )
+  }
+
   async function loadOrStartTracking(
     mon: PKMInterface,
     sourceSave: Option<SAV>,
@@ -453,8 +475,9 @@ export function useOhpkmStore() {
 
   async function scanFullStoreAndFixHandlers(save: SAV) {
     return R.after(backend.getOhpkmIdsMatchingUnknownHandler(save))
-      .awaitMap(async (ohpkmIds) => {
-        for (const result of (await tryLoadBatch(ohpkmIds)).values()) {
+      .awaitFlatMap(tryLoadBatch)
+      .awaitMap(async (lookupResults) => {
+        for (const result of lookupResults.values()) {
           await $R(result).match(
             async (mon) => fixMissingHandlerIfPresent(save, mon),
             async ({ identifier }) => {
@@ -500,6 +523,7 @@ export function useOhpkmStore() {
     startTrackingNewMon,
     getIdIfTracked,
     loadIfTracked,
+    loadIfTrackedBatch,
     loadOrStartTracking,
     getPotentialOhpkmId: calculateOrLookupOhpkmId,
     monOrOhpkmIfTracked,

@@ -223,15 +223,17 @@ export function useSaves(): SavesAndBanksManager {
         await ohpkmStore.scanFullStoreAndFixHandlers(save)
       }
 
+      const lookupResult = await ohpkmStore.loadIfTrackedBatch(save.getAllMons())
+      if (R.isErr(lookupResult)) return R.Err({ type: 'OTHER', cause: lookupResult.error })
+
       const toUpdate: OhpkmStoreData = {}
-      for (const mon of save.getAllMons()) {
-        const trackedData = await ohpkmStore.loadIfTracked(mon)
-        if (trackedData) {
-          const updates = trackedData.syncWithGameData(mon, save)
+      for (const [mon, existingOhpkm] of lookupResult.data) {
+        if (existingOhpkm) {
+          const updates = existingOhpkm.syncWithGameData(mon, save)
 
           if (updates.length > 0) {
             void backend.log('DEBUG', `synced ${mon.nickname} with game data`, {
-              ohpkm_id: trackedData.openhomeId,
+              ohpkm_id: existingOhpkm.openhomeId,
               event: 'game_data_sync',
               updates,
             })
@@ -242,14 +244,14 @@ export function useSaves(): SavesAndBanksManager {
               'INFO',
               `${mon.nickname}: ${update.message ?? `Updated ${update.field} from ${JSON.stringify(update.prevValue)} to ${JSON.stringify(update.newValue)}`}`,
               {
-                ohpkm_id: trackedData.openhomeId,
+                ohpkm_id: existingOhpkm.openhomeId,
                 event: 'game_data_sync',
                 updates,
               }
             )
           }
 
-          toUpdate[trackedData.openhomeId] = trackedData
+          toUpdate[existingOhpkm.openhomeId] = existingOhpkm
         }
 
         mon.free?.()

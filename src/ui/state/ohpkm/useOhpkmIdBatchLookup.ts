@@ -19,7 +19,10 @@ export default function useOhpkmIdBatchLookup(
   const loadBatch = useEffectEvent(() => ohpkmStore.tryLoadBatch(openhomeIds))
   const subscribeOhpkmUpdates = useEffectEvent(ohpkmStore.subscribeAllUpdates)
   const openhomeIdsKey = openhomeIds.join()
-  const displayError = useEffectEvent(useDisplayError())
+  const displayErrorDialog = useDisplayError()
+  const displayError = useEffectEvent((error: unknown) =>
+    displayErrorDialog('Error loading OHPKM batch', `Error: '${error}'`)
+  )
 
   useEffect(() => {
     // if this effect is cleaned up before the results return, the ignore flag tells the callback that it is outdated and should set the results
@@ -29,13 +32,15 @@ export default function useOhpkmIdBatchLookup(
     const batchResult = loadBatch()
     if (isThenable(batchResult)) {
       batchResult
-        .then((result) => {
-          setLoading(false)
-          if (!ignore) {
-            setBatchResults(result)
-          }
-        })
-        .catch((error) => displayError('Error loading OHPKM batch', `Error: '${error}'`))
+        .then(
+          R.match((result) => {
+            if (!ignore) {
+              setBatchResults(result)
+              setLoading(false)
+            }
+          }, displayError)
+        )
+        .catch(displayError)
         .finally(() => setLoading(false))
     } else {
       setBatchResults(batchResult)
