@@ -62,7 +62,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const { multiSelectState, toggleSelection, isSelected } = useMultiSelect()
   const [selectedMonNotInBoxes, setSelectedMonNotInBoxes] = useState<PKMInterface>()
 
-  const save = useMemo(() => allOpenSaves[saveIndex], [allOpenSaves, saveIndex])
+  const save = allOpenSaves[saveIndex]
   const displayError = useDisplayError()
 
   const allSaveMons = save.getAllMons().map((mon) => [mon, save] as const)
