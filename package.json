@@ -35,7 +35,7 @@
     "clippy": "cargo clippy --all-targets --all-features --profile test -- -Dwarnings",
     "typecheck": "tsc",
     "build": "pnpm wasm-compile && pnpm vite build",
-    "ui-test-build": "pnpm tauri build --no-bundle --config src-tauri/tauri.uitest.conf.json -- --features=uitest",
+    "ui-test-build": "VITE_UI_TESTING=true pnpm tauri build --no-bundle --config src-tauri/tauri.uitest.conf.json -- --features=uitest",
     "dev": "pnpm wasm-compile-dev && pnpm vite",
     "tauri": "tauri",
     "test-cargo": "cargo nextest run --workspace --all-features --no-fail-fast",
