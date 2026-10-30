@@ -174,6 +174,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
   const clearOhpkmCache = useEffectEvent(ohpkmStore.clearCache)
   const reloadItemBag = useEffectEvent(itemBag.refetchStoredBag)
   const saveChangesEvent = useEffectEvent(saveChanges)
+  const reloadBankStoreEvent = useEffectEvent(reloadBankStore)
 
   useEffect(() => {
     let ignore = false
@@ -183,7 +184,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       reset: async () => {
         if (ignore) return
         openSavesDispatch({ type: 'clear_mons_to_release' })
-        await Promise.all([reloadBankStore(), reloadItemBag()])
+        await Promise.all([reloadBankStoreEvent(), reloadItemBag()])
         clearOhpkmCache()
         openSavesDispatch({ type: 'close_all_saves' })
       },
@@ -195,7 +196,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       ignore = true
       stopListening()
     }
-  }, [openSavesDispatch, reloadBankStore])
+  }, [])
 
   if (openSavesState.error) {
     return (

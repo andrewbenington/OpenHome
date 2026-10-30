@@ -1,11 +1,10 @@
-import useBackend from '@openhome-core/backend/useBackend'
 import { bytesToPKM } from '@openhome-core/pkm/FileImport'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { tryCalculateIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { TauriBackend } from '@openhome-core/tauri/backend'
 import { range } from '@openhome-core/util/functional'
 import { useDisplayError } from '@openhome-ui/hooks/displayError'
-import FilterPanel from '@openhome-ui/pages/home/display/FilterPanel'
 import PokemonDetailsModal from '@openhome-ui/pokemon/PokemonDetailsModal'
 import BankHeader from '@openhome-ui/saves/BankHeader'
 import HomeBoxDisplay from '@openhome-ui/saves/boxes/HomeBoxDisplay'
@@ -17,11 +16,11 @@ import { Button, Card, Flex, Tabs } from '@radix-ui/themes'
 import { useCallback, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
 import DisplayPanel from './display/DisplayPanel'
+import FilterPanel from './display/FilterPanel'
 import './Home.css'
 import ReleaseArea from './ReleaseArea'
 
 const Home = () => {
-  const backend = useBackend()
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const savesAndBanks = useSaves()
@@ -29,14 +28,14 @@ const Home = () => {
 
   useEffect(() => {
     // returns a function to stop listening
-    const stopListening = backend.onMenuEvent('open', () => setOpenSaveDialog(true))
+    const stopListening = TauriBackend.onMenuEvent('open', () => setOpenSaveDialog(true))
 
     // the "stop listening" function should be called when the effect returns,
     // otherwise duplicate listeners will exist
     return () => {
       stopListening()
     }
-  }, [backend])
+  }, [])
 
   const previewFile = useCallback(
     async (file: File) => {

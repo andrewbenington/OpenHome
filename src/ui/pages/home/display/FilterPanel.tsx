@@ -128,6 +128,8 @@ export default function FilterPanel() {
 
   const BlankIconSpacer = <div className="filter-icon" />
 
+  return null
+
   return (
     <div className="filter-panel">
       <Button

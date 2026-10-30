@@ -33,6 +33,7 @@ export function usePokemonTable(queryKey: string, filters: Filter[]) {
   )
 
   const query = useInfiniteQuery({
+    enabled: false,
     queryKey: [queryKey, filtersKey],
     queryFn: async (d) => {
       const pageParam = d.pageParam
