@@ -90,6 +90,10 @@ export class G3Sector {
 }
 
 export class G3SaveBackup {
+  // @ts-ignore
+  any(arg0: (item: any) => boolean): never {
+      return __notImplemented();
+  }
   origin: OriginGame
 
   bytes: Uint8Array
@@ -397,20 +401,20 @@ export class G3SAV extends OfficialSAV<PK3> {
   static saveTypeAbbreviation = 'RSE/FRLG'
   static saveTypeName = 'Pokémon Ruby/Sapphire/Emerald/FireRed/LeafGreen'
   static saveTypeID = 'G3SAV'
-  private availableMoves: List<Move> = __notImplemented();
+  private availableMoves: Move[] = __notImplemented();
 
-  static fileIsSave(bytes: Uint8Array): boolean {
-    if (bytes.length < SAVE_SIZE_BYTES || bytes.length - SAVE_SIZE_BYTES > MAX_ADDITIONAL_BYTES) {
-      return false
-    }
-    try {
-      const save = new G3SAV(emptyPathData, bytes)
-      return this.saveFileIsThisFormat(save)
-    } catch (e) {
-      console.error(e)
-      return false
-    }
-  }
+  // static fileIsSave(bytes: Uint8Array): boolean {
+  //   if (bytes.length < SAVE_SIZE_BYTES || bytes.length - SAVE_SIZE_BYTES > MAX_ADDITIONAL_BYTES) {
+  //     return false
+  //   }
+  //   try {
+  //     const save = new G3SAV(emptyPathData, bytes)
+  //     return this.saveFileIsThisFormat(save)
+  //   } catch (e) {
+  //     console.error(e)
+  //     return false
+  //   }
+  // }
 
   public static saveFileIsThisFormat(save: G3SAV) {
     if (save.primarySave.gameCode === 0) {
