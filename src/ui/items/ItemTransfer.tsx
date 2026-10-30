@@ -1,5 +1,5 @@
 import { Option } from '@openhome-core/util/functional'
-import { stringSorter } from '@openhome-core/util/sort'
+import { multiSorter, numericSorter, stringSorter } from '@openhome-core/util/sort'
 import Badge from '@openhome-ui/components/badge/Badge'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import Fallback from '@openhome-ui/components/Fallback'
@@ -9,18 +9,14 @@ import OhoButton from '@openhome-ui/components/OhoButton'
 import OhoFlex from '@openhome-ui/components/OhoFlex'
 import useSimpleVirtualizer from '@openhome-ui/hooks/simpleVirtualizer'
 import { getPublicImageURL } from '@openhome-ui/images/images'
-import { Item, itemCategoryIconPath, OriginGame, svItemPouchToItemCategory } from '@pkm-rs/pkg'
+import { Item, OpenhomeItemStorage, OriginGame } from '@pkm-rs/pkg'
 import { Card, Flex, Select, VisuallyHidden } from '@radix-ui/themes'
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { ItemIcon } from './ItemIcon'
 import { ItemRow } from './ItemRow'
 import './ItemTransfer.css'
 import { TitledCard } from './TitledCard'
-import {
-  ItemTransferDatabase,
-  ItemTransferSource,
-  ScarletVioletItemTransfer,
-} from './transferSource'
+import { ItemTransferSource } from './transfer'
 
 interface ItemTransferProps {
   source1: ItemTransferSource
@@ -28,31 +24,94 @@ interface ItemTransferProps {
 }
 
 type Source = 'source1' | 'source2'
+type ItemSort = 'category_and_index' | 'alphabetical'
 
-function useSourceController(source: ItemTransferSource, dest: ItemTransferSource) {
+type ItemFilter = {
+  includeUnsupported: boolean
+  includeEmpty: boolean
+  includeBlank: boolean
+  sort: ItemSort
+}
+
+const defaultFilter: ItemFilter = {
+  includeEmpty: false,
+  includeUnsupported: false,
+  includeBlank: false,
+  sort: 'category_and_index',
+}
+
+function useSourceController(
+  source: ItemTransferSource,
+  dest: ItemTransferSource,
+  itemFilter: ItemFilterController
+) {
   const [selection, setSelection] = useState<Option<number>>(undefined)
   const [pouch, setPouch] = useState<number | 'ALL_ITEMS'>('ALL_ITEMS')
 
-  const database: ItemTransferDatabase = ScarletVioletItemTransfer
+  const { filter } = itemFilter
+  const allItems = useMemo(() => source.getItemData(), [source])
 
-  const items = source
-    .getItemData()
-    .filter((item) => dest.database.availability(item.index) !== 'Unsupported')
-    .filter((item) => pouch === 'ALL_ITEMS' || item.pouch === pouch)
-    .filter((item) => item.count > 0)
-    .toSorted(stringSorter((item) => Item.fromIndex(item.index)?.name))
+  const database = source.database
+
+  const items = useMemo(
+    () =>
+      allItems
+        .filter(
+          (item) =>
+            filter.includeUnsupported || dest.database.availability(item.index) !== 'Unsupported'
+        )
+        .filter((item) => pouch === 'ALL_ITEMS' || item.pouch === pouch)
+        .filter((item) => {
+          const nameTrimmed = Item.fromIndex(item.index)?.name?.trim()
+          return (nameTrimmed && nameTrimmed !== '???') || filter.includeBlank
+        })
+        .filter((item) => item.count > 0 || filter?.includeEmpty)
+        .toSorted(
+          filter.sort === 'alphabetical'
+            ? stringSorter((item) => Item.fromIndex(item.index)?.name)
+            : multiSorter(
+                numericSorter((item) => item.index),
+                numericSorter((item) => item.pouch)
+              )
+        ),
+    [allItems, pouch, dest, filter]
+  )
+
   const item = selection ? items.find((item) => item.index === selection) : undefined
 
-  return { item, items, selection, setSelection, source, database, pouch, setPouch }
+  return {
+    item,
+    items,
+    selection,
+    setSelection,
+    source,
+    database,
+    pouch,
+    setPouch,
+    ...itemFilter,
+  }
 }
+
+function useItemFilter() {
+  const [filter, setFilter] = useState<ItemFilter>(defaultFilter)
+
+  function updateFilter(updates: Partial<ItemFilter>) {
+    setFilter({ ...filter, ...updates })
+  }
+
+  return { filter, updateFilter }
+}
+
+type ItemFilterController = ReturnType<typeof useItemFilter>
 
 export function ItemTransfer(props: ItemTransferProps) {
   const { source1, source2 } = props
   const parentRef = useRef(null)
+  const itemFilter = useItemFilter()
   const [selectedSourceId, setSelectedSourceId] = useState<Option<Source>>()
 
-  const source1Controller = useSourceController(source1, source2)
-  const source2Controller = useSourceController(source2, source1)
+  const source1Controller = useSourceController(source1, source2, itemFilter)
+  const source2Controller = useSourceController(source2, source1, itemFilter)
 
   const selectedSourceController =
     selectedSourceId === 'source1' ? source1Controller : source2Controller
@@ -82,12 +141,12 @@ export function ItemTransfer(props: ItemTransferProps) {
                   <Flex as="span" align="center" gap="0.5rem">
                     <img
                       className="item-category-icon"
-                      src={getPublicImageURL(itemCategoryIconPath('None'))}
+                      src={getPublicImageURL(OpenhomeItemStorage.categoryIconPath('None'))}
                     />
                     All Items
                   </Flex>
                 </Select.Item>
-                {source1Controller.database.pouchIndexes().map((pouchIndex) => (
+                {source1Controller.database.categoryIndexes().map((pouchIndex) => (
                   <Select.Item
                     className="item-category-select"
                     key={pouchIndex}
@@ -97,10 +156,12 @@ export function ItemTransfer(props: ItemTransferProps) {
                       <img
                         className="item-category-icon"
                         src={getPublicImageURL(
-                          itemCategoryIconPath(svItemPouchToItemCategory(pouchIndex))
+                          OpenhomeItemStorage.categoryIconPath(
+                            source1Controller.database.catIndexToOpenHome(pouchIndex)
+                          )
                         )}
                       />
-                      {source1Controller.database.pouchName(pouchIndex)}
+                      {source1Controller.database.categoryName(pouchIndex)}
                     </Flex>
                   </Select.Item>
                 ))}
@@ -136,21 +197,23 @@ export function ItemTransfer(props: ItemTransferProps) {
                   <Flex as="span" align="center" gap="0.5rem">
                     <img
                       className="item-category-icon"
-                      src={getPublicImageURL(itemCategoryIconPath('None'))}
+                      src={getPublicImageURL(OpenhomeItemStorage.categoryIconPath('None'))}
                     />
                     All Items
                   </Flex>
                 </Select.Item>
-                {source1Controller.database.pouchIndexes().map((pouchIndex) => (
+                {source2Controller.database.categoryIndexes().map((pouchIndex) => (
                   <Select.Item key={pouchIndex} value={pouchIndex.toString()}>
                     <Flex as="span" align="center" gap="0.5rem">
                       <img
                         className="item-category-icon"
                         src={getPublicImageURL(
-                          itemCategoryIconPath(svItemPouchToItemCategory(pouchIndex))
+                          OpenhomeItemStorage.categoryIconPath(
+                            source2Controller.database.catIndexToOpenHome(pouchIndex)
+                          )
                         )}
                       />
-                      {source1Controller.database.pouchName(pouchIndex)}
+                      {source2Controller.database.categoryName(pouchIndex)}
                     </Flex>
                   </Select.Item>
                 ))}
@@ -168,13 +231,42 @@ export function ItemTransfer(props: ItemTransferProps) {
           />
         </TitledCard>
       </OhoFlex.RowEqualSized>
-      <ItemTransferControls
-        sourceController={selectedSourceController}
-        destController={
-          selectedSourceController === source1Controller ? source2Controller : source1Controller
-        }
-        side={selectedSourceId === 'source1' ? 'right' : 'left'}
-      />
+      <div className="item-transfer-card">
+        <OhoFlex.ColFullWidth>
+          <ItemTransferControls
+            sourceController={selectedSourceController}
+            destController={
+              selectedSourceController === source1Controller ? source2Controller : source1Controller
+            }
+            side={selectedSourceId === 'source1' ? 'right' : 'left'}
+          />
+          <Card style={{ padding: 'var(--padding-radius-sm-lg)', flex: 1 }}>
+            <OhoFlex.Row gap="6">
+              <LabelledInput.Checkbox
+                label="Show Unsupported"
+                checked={selectedSourceController.filter.includeUnsupported}
+                onCheckedChange={(includeUnsupported) =>
+                  selectedSourceController.updateFilter({ includeUnsupported })
+                }
+              />
+              <LabelledInput.Checkbox
+                label="Show Empty Slots"
+                checked={selectedSourceController.filter.includeEmpty}
+                onCheckedChange={(includeEmpty) =>
+                  selectedSourceController.updateFilter({ includeEmpty })
+                }
+              />
+              <LabelledInput.Checkbox
+                label="Show Blank/???"
+                checked={selectedSourceController.filter.includeBlank}
+                onCheckedChange={(includeBlank) =>
+                  selectedSourceController.updateFilter({ includeBlank })
+                }
+              />
+            </OhoFlex.Row>
+          </Card>
+        </OhoFlex.ColFullWidth>
+      </div>
     </div>
   )
 }
@@ -187,7 +279,7 @@ function renderSource(source: OriginGame | 'OpenHome') {
   )
 }
 
-type ItemTransferCardProps = {
+type ItemTransferControlsProps = {
   sourceController: Option<SourceController>
   destController: Option<SourceController>
   side: 'left' | 'right'
@@ -195,7 +287,7 @@ type ItemTransferCardProps = {
 
 const AMOUNT_INPUT_ID = 'item-transfer-amount-input'
 
-function ItemTransferControls(props: ItemTransferCardProps) {
+function ItemTransferControls(props: ItemTransferControlsProps) {
   const [itemCount, setItemCount] = useState<number | ''>(
     props.sourceController?.item?.count ? 1 : 0
   )
@@ -232,10 +324,15 @@ function ItemTransferControls(props: ItemTransferCardProps) {
       : undefined
 
   return (
-    <div className="item-transfer-card">
+    <OhoFlex.Row width="100%">
       {props.side === 'left' && button}
       <Card style={{ padding: 'var(--padding-radius-sm-lg)', flex: 1 }}>
-        <OhoFlex.Row justify={props.side === 'left' ? 'end' : 'start'} align="center" gap="3">
+        <OhoFlex.Row
+          justify={props.side === 'left' ? 'end' : 'start'}
+          align="center"
+          gap="3"
+          width="100%"
+        >
           <ItemIcon item={sourceItem} style={{ width: '1.15rem', height: '1.15rem' }} />
           {sourceItem?.name ? (
             <p>{sourceItem.name}</p>
@@ -259,7 +356,7 @@ function ItemTransferControls(props: ItemTransferCardProps) {
         </OhoFlex.Row>
       </Card>
       {props.side === 'right' && button}
-    </div>
+    </OhoFlex.Row>
   )
 }
 

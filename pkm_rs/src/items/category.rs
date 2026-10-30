@@ -1,10 +1,25 @@
+use num_enum::{IntoPrimitive, TryFromPrimitive};
 use pkm_rs_resources::items::Item;
 
 #[cfg_attr(
     feature = "wasm",
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
 )]
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, strum::EnumString, strum::EnumIter)]
+#[derive(
+    Debug,
+    Default,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    strum::Display,
+    strum::EnumString,
+    strum::EnumIter,
+    TryFromPrimitive,
+    IntoPrimitive,
+)]
+#[repr(u32)]
 pub enum OpenhomeItemCategory {
     #[default]
     None,
@@ -29,7 +44,7 @@ pub enum OpenhomeItemCategory {
     #[strum(to_string = "Species Items")] // Candy in LGPE, materials in SV
     SpeciesItems,
     Treasure,
-    Ingredients,
+    Food,
     #[strum(to_string = "Mega Stones")]
     MegaStones,
 }
@@ -51,7 +66,7 @@ impl OpenhomeItemCategory {
             Self::ZCrystals => "items/category/z-crystals.png",
             Self::SpeciesItems => "items/category/tm-materials.png",
             Self::Treasure => "items/category/treasure.png",
-            Self::Ingredients => "items/category/picnic.png",
+            Self::Food => "items/category/picnic.png",
             Self::MegaStones => "items/category/mega-stones.png",
         }
     }
@@ -70,31 +85,9 @@ impl OpenhomeItemCategory {
 }
 
 #[cfg(feature = "wasm")]
-use pkm_rs_types::TryIntoTs;
-#[cfg(feature = "wasm")]
-use pkm_rs_types::{JsResult, TsResult};
-#[cfg(feature = "wasm")]
-use tsify::Ts;
-
-#[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
 use crate::items::SvItemStorage;
-
-#[cfg(feature = "wasm")]
-#[wasm_bindgen(js_name = "openhomeCategoryForItem")]
-pub fn openhome_category_for_item(item_index: u16) -> TsResult<OpenhomeItemCategory> {
-    Item::new(item_index)
-        .map(OpenhomeItemCategory::for_item)
-        .unwrap_or_default()
-        .try_into_ts()
-}
-
-#[cfg(feature = "wasm")]
-#[wasm_bindgen(js_name = "itemCategoryIconPath")]
-pub fn item_category_icon_path(category: Ts<OpenhomeItemCategory>) -> JsResult<String> {
-    Ok(category.to_rust()?.icon_path().to_owned())
-}
 
 #[cfg(test)]
 mod tests {

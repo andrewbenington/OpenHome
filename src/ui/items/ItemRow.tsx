@@ -1,11 +1,12 @@
 import { FavoriteIcon } from '@openhome-ui/components/Icons'
+import { getPublicImageURL } from '@openhome-ui/images/images'
 import { cssClass } from '@openhome-ui/util/style'
-import { Item } from '@pkm-rs/pkg'
+import { Item, OpenhomeItemStorage } from '@pkm-rs/pkg'
 import { Grid } from '@radix-ui/themes'
 import { CSSProperties } from 'react'
 import { ItemIcon } from './ItemIcon'
 import './ItemRow.css'
-import { ItemTransferDatabase } from './transferSource'
+import { ItemTransferDatabase } from './transfer'
 
 export type ItemData = {
   index: number
@@ -44,6 +45,12 @@ export function ItemRow(props: ItemRowProps) {
       <p>{item?.name}</p>
       {itemData.isFavorite ? <FavoriteIcon /> : <div />}
       <div className="item-count">x{itemData.count}</div>
+      <img
+        className="item-category-icon"
+        src={getPublicImageURL(
+          OpenhomeItemStorage.categoryIconPath(database.catIndexToOpenHome(itemData.pouch))
+        )}
+      />
     </Grid>
   )
 }

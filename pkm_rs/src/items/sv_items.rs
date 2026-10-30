@@ -2,7 +2,7 @@
 //!
 //! Port of PKHeX's `PKHeX.Core/Items/ItemStorage9SV.cs`.
 
-use crate::items::adapter::{Availability, ItemAdapter};
+use crate::items::adapter::Availability;
 use crate::items::category::OpenhomeItemCategory;
 
 use num_enum::{IntoPrimitive, TryFromPrimitive};
@@ -47,18 +47,11 @@ impl From<SvItemPouch> for OpenhomeItemCategory {
             SvItemPouch::Other => Self::Items,
             SvItemPouch::TechnicalMachines => Self::TechnicalMachines,
             SvItemPouch::Treasure => Self::Treasure,
-            SvItemPouch::Picnic => Self::Ingredients,
+            SvItemPouch::Picnic => Self::Food,
             SvItemPouch::KeyItems => Self::KeyItems,
             SvItemPouch::Materials => Self::SpeciesItems,
         }
     }
-}
-
-#[cfg(feature = "wasm")]
-#[wasm_bindgen(js_name = svItemPouchToItemCategory)]
-pub fn sv_item_pouch_to_category_wasm(pouch_index: u32) -> TsResult<OpenhomeItemCategory> {
-    OpenhomeItemCategory::from(SvItemPouch::try_from(pouch_index).unwrap_or(SvItemPouch::Other))
-        .try_into_ts()
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
@@ -250,7 +243,7 @@ impl SvItemStorage {
             | OpenhomeItemCategory::Balls
             | OpenhomeItemCategory::BattleItems
             | OpenhomeItemCategory::Treasure
-            | OpenhomeItemCategory::Ingredients // 999 (depends on item)
+            | OpenhomeItemCategory::Food // 999 (depends on item)
             | OpenhomeItemCategory::SpeciesItems => Some(999),
             _ => None,
         }
@@ -267,7 +260,7 @@ impl SvItemStorage {
             | OpenhomeItemCategory::Balls
             | OpenhomeItemCategory::BattleItems
             | OpenhomeItemCategory::Treasure
-            | OpenhomeItemCategory::Ingredients // 999 (depends on item)
+            | OpenhomeItemCategory::Food // 999 (depends on item)
             | OpenhomeItemCategory::SpeciesItems => Some(999),
             _ => None,
         }
@@ -320,6 +313,13 @@ impl SvItemStorage {
         Self::pouch_for(item_index)
             .map(|pouch| pouch.try_into_ts())
             .transpose()
+    }
+
+    #[cfg(feature = "wasm")]
+    #[wasm_bindgen(js_name = categoryToOpenHome)]
+    pub fn sv_category_to_openhome_category(sv_pouch: u32) -> TsResult<OpenhomeItemCategory> {
+        OpenhomeItemCategory::from(SvItemPouch::try_from(sv_pouch).unwrap_or(SvItemPouch::Other))
+            .try_into_ts()
     }
 }
 
