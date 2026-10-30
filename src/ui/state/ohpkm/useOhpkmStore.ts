@@ -30,23 +30,23 @@ export type MoveSlotIndex = 0 | 1 | 2 | 3
 
 export type OhpkmLookupResult = Result<OHPKM, IdentifierNotPresentError>
 export type OhpkmBatchLookupResults = Map<OhpkmIdentifier, OhpkmLookupResult>
+type OhpkmCallback = (data: Option<OHPKM>) => void
+type OhpkmWithIdCallback = (id: OhpkmIdentifier, data: Option<OHPKM>) => void
 
 function createOhpkmStore(capacity: number) {
   const cache = new LRUCache<OhpkmIdentifier, OHPKM>(capacity)
-  const listeners = new Map<OhpkmIdentifier, Set<() => void>>()
-  const globalListeners = new Set<() => void>()
+  const listeners = new Map<OhpkmIdentifier, Set<OhpkmCallback>>()
+  const globalListeners = new Set<OhpkmWithIdCallback>()
 
   function notify(id: OhpkmIdentifier) {
-    listeners.get(id)?.forEach((l) => l())
-    globalListeners.forEach((l) => l())
+    listeners.get(id)?.forEach((callback) => callback(cache.get(id)))
+    globalListeners.forEach((callback) => callback(id, cache.get(id)))
   }
 
   return {
     get: (id: OhpkmIdentifier) => cache.get(id),
-    peek: (id: OhpkmIdentifier) => cache.peek(id),
     set: (id: OhpkmIdentifier, pkm: OHPKM) => {
-      const evicted = cache.set(id, pkm)
-      if (evicted !== undefined) notify(evicted) // let evicted entry's subscribers know
+      cache.insert(id, pkm)
       notify(id)
     },
     delete: (id: OhpkmIdentifier) => {
@@ -54,12 +54,12 @@ function createOhpkmStore(capacity: number) {
       if (existed) notify(id)
       return existed
     },
-    subscribe: (id: OhpkmIdentifier, cb: () => void) => {
+    subscribe: (id: OhpkmIdentifier, cb: OhpkmCallback) => {
       if (!listeners.has(id)) listeners.set(id, new Set())
       listeners.get(id)?.add(cb)
       return () => listeners.get(id)?.delete(cb)
     },
-    subscribeAll: (cb: () => void) => {
+    subscribeAll: (cb: OhpkmWithIdCallback) => {
       globalListeners.add(cb)
       return () => globalListeners.delete(cb)
     },
@@ -76,7 +76,14 @@ export function useOhpkmStore() {
   const backend = useBackend()
   const displayError = useDisplayError()
 
-  const updateStore = backend.addToOhpkmStore
+  async function updateStore(updates: OhpkmStoreData): Promise<Result<null>> {
+    for (const [id, ohpkm] of Object.entries(updates)) {
+      ohpkmCache.set(id, ohpkm)
+    }
+    await backend.addToOhpkmStore(updates)
+
+    return R.Ok(null)
+  }
 
   const getById = useCallback(
     (id: string): NowOrLater<Option<OHPKM>> => {
@@ -89,6 +96,8 @@ export function useOhpkmStore() {
         .then((ohpkm) => {
           if (ohpkm) {
             ohpkmCache.set(ohpkm.openhomeId, ohpkm)
+          } else {
+            console.warn(`ID NOT FOUND: ${id}`)
           }
           return ohpkm
         })
@@ -486,6 +495,7 @@ export function useOhpkmStore() {
     replaceHeldItem,
     setMonNickname,
     setMonMove,
+    subscribeAllUpdates: ohpkmCache.subscribeAll,
 
     searchStore,
     updateAndConvertForSave,
