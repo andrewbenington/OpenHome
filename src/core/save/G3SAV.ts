@@ -23,6 +23,7 @@ import { filterUndefined } from '../util/sort'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { LookupType } from './util'
 import { emptyPathData, PathData } from './util/path'
+import {Move} from "@openhome-core/resources";
 
 const SAVE_SIZE_BYTES = 0x20000
 const EMERALD_SECURITY_OFFSET = 0xac
@@ -229,6 +230,7 @@ export class G3SaveBackup {
   }
 }
 
+
 export class G3SAV extends OfficialSAV<PK3> {
   static pkmType = PK3
 
@@ -395,6 +397,7 @@ export class G3SAV extends OfficialSAV<PK3> {
   static saveTypeAbbreviation = 'RSE/FRLG'
   static saveTypeName = 'Pokémon Ruby/Sapphire/Emerald/FireRed/LeafGreen'
   static saveTypeID = 'G3SAV'
+  private availableMoves: List<Move> = __notImplemented();
 
   static fileIsSave(bytes: Uint8Array): boolean {
     if (bytes.length < SAVE_SIZE_BYTES || bytes.length - SAVE_SIZE_BYTES > MAX_ADDITIONAL_BYTES) {
@@ -459,4 +462,12 @@ export class G3SAV extends OfficialSAV<PK3> {
       box.map((mon) => (mon ? R.dropError(mon) : undefined))
     )
   }
+
+  supportsMove(move : Move) {
+    return this.availableMoves.includes(move);
+  }
 }
+function __notImplemented(): never {
+    throw new Error("Function not implemented.")
+}
+
