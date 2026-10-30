@@ -94,16 +94,7 @@ export class ScarletVioletSave extends WasmOfficialSave<Pk9Wasm, PK9, ScarletVio
   }
 
   getDisplayData() {
-    return {
-      ...this.inner.getDisplayData(),
-      // items: this.inner.itemInventory
-      //   .map((data) => ({
-      //     name: WasmItem.fromIndex(data.index)?.name,
-      //     ...data,
-      //   }))
-      //   .map((item) => `${item.name}: ${item.count} ${item.is_new ? 'N' : '_'}`)
-      //   .join('/n'),
-    }
+    return { ...this.inner.getDisplayData() }
   }
 
   getItemInventory = () => this.inner.getItemInventory()
