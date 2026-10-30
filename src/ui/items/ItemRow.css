@@ -51,3 +51,7 @@
   opacity: 1 !important;
   background-color: var(--ruby-a5);
 }
+
+.item-row-disabled {
+  cursor: not-allowed;
+}

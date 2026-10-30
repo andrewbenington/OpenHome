@@ -58,6 +58,46 @@ impl Item {
                 && index <= (ItemIndex::PikashuniumZ2 as u16))
             || (index >= (ItemIndex::SolganiumZ as u16) && index <= (ItemIndex::KommoniumZ2 as u16))
     }
+
+    pub const fn is_mail(self) -> bool {
+        matches!(self.get(), 137..=148) // Greet Mail to Bridge Mail M
+    }
+
+    pub const fn is_berry(self) -> bool {
+        matches!(self.get(), 149..=212 | 686..=688 | 861..=866 | 1754)
+    }
+
+    pub const fn is_tm(self) -> bool {
+        matches!(self.get(), 328..=419 | 618..=620 | 690..=694 | 1230)
+    }
+
+    pub const fn is_tr(self) -> bool {
+        matches!(self.get(), 1130..=1229)
+    }
+
+    pub const fn is_hm(self) -> bool {
+        matches!(self.get(), 420..=427 | 737)
+    }
+
+    pub const fn is_gem(self) -> bool {
+        matches!(self.get(), 548..=564 | 715)
+    }
+
+    pub const fn is_species_candy(self) -> bool {
+        matches!(self.get(), 978..=1057)
+    }
+
+    pub const fn is_curry_ingredient(self) -> bool {
+        matches!(self.get(), 1084..=1099 | 1256..=1264)
+    }
+
+    pub const fn is_mint(self) -> bool {
+        matches!(self.get(), 1231..=1251)
+    }
+
+    pub const fn is_dynamax_crystal(self) -> bool {
+        matches!(self.get(), 1279..=1578)
+    }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]

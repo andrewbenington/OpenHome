@@ -22,6 +22,8 @@ export interface ItemRowProps {
   database: ItemTransferDatabase
   selected: boolean
   inactive: boolean
+  unobtainable: boolean
+  disabled: boolean
   otherText?: string
   onClick?: () => void
   style?: CSSProperties
@@ -36,9 +38,11 @@ export function ItemRow(props: ItemRowProps) {
         .with(`item-row-selected-${inactive ? 'inactive' : 'active'}`)
         .if(selected)
         .with('item-row-disallowed')
-        .if(database.availability(itemData.index) !== 'Obtainable')
+        .if(props.unobtainable)
+        .with('item-row-disabled')
+        .if(props.disabled)
         .build()}
-      onClick={onClick}
+      onClick={props.disabled ? undefined : onClick}
       style={props.style}
     >
       <ItemIcon item={item} />
@@ -48,7 +52,7 @@ export function ItemRow(props: ItemRowProps) {
       <img
         className="item-category-icon"
         src={getPublicImageURL(
-          OpenhomeItemStorage.categoryIconPath(database.catIndexToOpenHome(itemData.pouch))
+          OpenhomeItemStorage.categoryIconPath(database.internalCategoryToOpenhome(itemData.pouch))
         )}
       />
     </Grid>

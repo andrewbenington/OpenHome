@@ -2,6 +2,7 @@ import { SAV } from '@openhome-core/save/interfaces'
 import { Option } from '@openhome-core/util/functional'
 import { useItemBag } from '@openhome-ui/state/items'
 // import { Availability, OriginGame, SvItemStorage } from '@pkm-rs/pkg'
+import { $O } from '@openhome-core/util/option'
 import {
   Availability,
   Item,
@@ -61,18 +62,18 @@ export function useSaveItemTransfer(save: SAV): Option<ItemTransferSource> {
   const getItemInventory = () => save.getItemInventory?.() || []
   const updateItemData = save.updateItemData
 
+  const database = save.getItemDatabase()
+
   function addItems(index: number, added: number) {
     const existing = getItemInventory().find((item) => item.index === index)
-    // const database = save.getItemDatabase?.()
-    const openhomeCategory =
-      OpenhomeItemStorage.categoryIndexForItem(index) ?? OpenhomeItemStorage.categoryIndex('None')
+    const openhomeCategory = OpenhomeItemStorage.categoryForItem(index) ?? 'None'
 
     if (existing) {
       updateItemData({ ...existing, count: existing.count + added })
     } else {
       updateItemData({
         index,
-        pouch: openhomeCategory,
+        pouch: database.internalCategoryFromOpenhome(openhomeCategory) ?? 0,
         count: added,
         isNew: true,
         isObtained: true,
@@ -102,9 +103,10 @@ export interface ItemTransferDatabase {
   categoryIndexes: () => number[]
   categoryName: (categoryIndex: number) => Option<string>
   maxAllowed: (itemIndex: number) => Option<number>
-  convertCategory: (otherCategoryIndex: number) => OpenhomeItemCategory
   availability: (index: number) => Availability
-  catIndexToOpenHome: (categoryIndex: number) => OpenhomeItemCategory
+  internalCategoryForItem: (itemIndex: number) => Option<number>
+  internalCategoryToOpenhome: (categoryIndex: number) => OpenhomeItemCategory
+  internalCategoryFromOpenhome: (categoryToConvert: OpenhomeItemCategory) => Option<number>
 }
 // console.log(SvItemStorage.pouchIndexes)
 
@@ -112,22 +114,25 @@ export const OpenHomeItemTransfer: ItemTransferDatabase = {
   categoryIndexes: () => Array.from(OpenhomeItemStorage.categoryIndexes()),
   categoryName: OpenhomeItemStorage.categoryName,
   maxAllowed: (index) => (OpenhomeItemStorage.categoryForItem(index) === 'KeyItems' ? 1 : 99999),
-  convertCategory: OpenhomeItemStorage.categoryFromIndex,
   availability: (index) => {
     const item = Item.fromIndex(index)
     return !item?.name || item.name === '???' ? 'Unsupported' : 'Obtainable'
   },
-  catIndexToOpenHome: OpenhomeItemStorage.categoryFromIndex,
+  internalCategoryForItem: OpenhomeItemStorage.categoryIndexForItem,
+  internalCategoryToOpenhome: OpenhomeItemStorage.categoryFromIndex,
+  internalCategoryFromOpenhome: OpenhomeItemStorage.categoryIndex,
 }
 
 export const ScarletVioletItemTransfer: ItemTransferDatabase = {
-  categoryIndexes: () =>
-    Array.from(SvItemStorage.pouchIndexes())
-      .map(SvItemStorage.categoryToOpenHome)
-      .map(OpenhomeItemStorage.categoryIndex),
+  categoryIndexes: () => Array.from(SvItemStorage.pouchIndexes()),
   categoryName: SvItemStorage.pouchName,
   maxAllowed: SvItemStorage.maxAllowed,
-  convertCategory: SvItemStorage.categoryToOpenHome,
   availability: SvItemStorage.availabilityOf,
-  catIndexToOpenHome: SvItemStorage.categoryToOpenHome,
+  internalCategoryForItem: (index) =>
+    $O(SvItemStorage.pouchIndexForItem(index))
+      .map(SvItemStorage.pouchIndexToOpenHome)
+      .map(OpenhomeItemStorage.categoryIndex)
+      .get(),
+  internalCategoryToOpenhome: SvItemStorage.pouchIndexToOpenHome,
+  internalCategoryFromOpenhome: SvItemStorage.pouchIndexFromOpenHome,
 }
