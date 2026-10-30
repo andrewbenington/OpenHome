@@ -42,21 +42,21 @@ impl Item {
     pub const fn is_mega_stone(self) -> bool {
         let index = self.get();
 
-        (index >= (ItemIndex::NormaliumZ as u16) && index <= (ItemIndex::PikaniumZ as u16))
-            || (index >= (ItemIndex::DecidiumZ as u16)
-                && index <= (ItemIndex::PikashuniumZ2 as u16))
-            || (index >= (ItemIndex::SolganiumZ as u16) && index <= (ItemIndex::KommoniumZ2 as u16))
-    }
-
-    pub const fn is_z_crystal(self) -> bool {
-        let index = self.get();
-
         (index >= (ItemIndex::Gengarite as u16) && index <= (ItemIndex::Latiosite as u16))
             || (index >= (ItemIndex::Swampertite as u16)
                 && index <= (ItemIndex::Beedrillite as u16))
             || (index >= (ItemIndex::Clefablite as u16) && index <= (ItemIndex::Falinksite as u16))
             || (index >= (ItemIndex::RaichuniteX as u16)
                 && index <= (ItemIndex::Glimmoranite as u16))
+    }
+
+    pub const fn is_z_crystal(self) -> bool {
+        let index = self.get();
+
+        (index >= (ItemIndex::NormaliumZ as u16) && index <= (ItemIndex::PikaniumZ as u16))
+            || (index >= (ItemIndex::DecidiumZ as u16)
+                && index <= (ItemIndex::PikashuniumZ2 as u16))
+            || (index >= (ItemIndex::SolganiumZ as u16) && index <= (ItemIndex::KommoniumZ2 as u16))
     }
 }
 

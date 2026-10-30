@@ -7,7 +7,7 @@ import {
 } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { Result } from '@openhome-core/util/functional'
-import { ScarletVioletItemTransfer } from '@openhome-ui/items/transferSource'
+import { ScarletVioletItemTransfer } from '@openhome-ui/items/transfer'
 import {
   ConvertStrategy,
   ExtraFormIndex,

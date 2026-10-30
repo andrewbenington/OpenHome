@@ -1,5 +1,6 @@
 mod adapter;
 mod category;
+mod oh_items;
 mod sv_items;
 
 pub use sv_items::SvItemStorage;

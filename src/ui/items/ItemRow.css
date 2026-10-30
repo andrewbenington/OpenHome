@@ -3,7 +3,7 @@
   padding: 0;
   border-radius: var(--border-radius-sm);
   display: grid;
-  grid-template-columns: 2.5rem 1fr 2rem 3rem;
+  grid-template-columns: 2.5rem 1fr 2rem 3rem 2.5rem;
   align-items: center;
   column-gap: 0.25rem;
   position: absolute;

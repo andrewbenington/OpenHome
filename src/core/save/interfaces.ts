@@ -2,7 +2,7 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { PluginIdentifier as RustPluginIdentifier } from '@openhome-core/tauri/spectaCommands'
 import { Errorable, Option, R, range, Result } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
-import { ItemTransferDatabase } from '@openhome-ui/items/transferSource'
+import { ItemTransferDatabase } from '@openhome-ui/items/transfer'
 import {
   BinaryGender,
   ConvertStrategy,
