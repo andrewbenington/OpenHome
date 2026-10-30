@@ -1,8 +1,11 @@
-mod adapter;
+mod availability;
 mod category;
+#[cfg(feature = "wasm")]
 mod oh_items;
+#[cfg(feature = "wasm")]
 mod sv_items;
 
+#[cfg(feature = "wasm")]
 pub use sv_items::SvItemStorage;
 
 #[cfg_attr(

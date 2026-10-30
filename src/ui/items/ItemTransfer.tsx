@@ -10,7 +10,7 @@ import OhoFlex from '@openhome-ui/components/OhoFlex'
 import useSimpleVirtualizer from '@openhome-ui/hooks/simpleVirtualizer'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { Item, OpenhomeItemStorage, OriginGame } from '@pkm-rs/pkg'
-import { Card, Flex, Select, VisuallyHidden } from '@radix-ui/themes'
+import { Flex, Select, VisuallyHidden } from '@radix-ui/themes'
 import { useMemo, useRef, useState } from 'react'
 import { ItemIcon } from './ItemIcon'
 import { ItemRow } from './ItemRow'
@@ -157,7 +157,7 @@ export function ItemTransfer(props: ItemTransferProps) {
                         className="item-category-icon"
                         src={getPublicImageURL(
                           OpenhomeItemStorage.categoryIconPath(
-                            source1Controller.database.catIndexToOpenHome(pouchIndex)
+                            source1Controller.database.internalCategoryToOpenhome(pouchIndex)
                           )
                         )}
                       />
@@ -172,6 +172,7 @@ export function ItemTransfer(props: ItemTransferProps) {
         >
           <SaveItemsScroller
             sourceController={source1Controller}
+            destController={source2Controller}
             active={selectedSourceId === 'source1'}
             onClick={() => {
               setSelectedSourceId('source1')
@@ -209,7 +210,7 @@ export function ItemTransfer(props: ItemTransferProps) {
                         className="item-category-icon"
                         src={getPublicImageURL(
                           OpenhomeItemStorage.categoryIconPath(
-                            source2Controller.database.catIndexToOpenHome(pouchIndex)
+                            source2Controller.database.internalCategoryToOpenhome(pouchIndex)
                           )
                         )}
                       />
@@ -223,6 +224,7 @@ export function ItemTransfer(props: ItemTransferProps) {
         >
           <SaveItemsScroller
             sourceController={source2Controller}
+            destController={source1Controller}
             active={selectedSourceId === 'source2'}
             onClick={() => {
               setSelectedSourceId('source2')
@@ -232,7 +234,7 @@ export function ItemTransfer(props: ItemTransferProps) {
         </TitledCard>
       </OhoFlex.RowEqualSized>
       <div className="item-transfer-card">
-        <OhoFlex.ColFullWidth>
+        <OhoFlex.ColFullWidth gap="1">
           <ItemTransferControls
             sourceController={selectedSourceController}
             destController={
@@ -240,7 +242,7 @@ export function ItemTransfer(props: ItemTransferProps) {
             }
             side={selectedSourceId === 'source1' ? 'right' : 'left'}
           />
-          <Card style={{ padding: 'var(--padding-radius-sm-lg)', flex: 1 }}>
+          <div className="card-sm-radius" style={{ flex: 1 }}>
             <OhoFlex.Row gap="6">
               <LabelledInput.Checkbox
                 label="Show Unsupported"
@@ -264,7 +266,7 @@ export function ItemTransfer(props: ItemTransferProps) {
                 }
               />
             </OhoFlex.Row>
-          </Card>
+          </div>
         </OhoFlex.ColFullWidth>
       </div>
     </div>
@@ -324,9 +326,9 @@ function ItemTransferControls(props: ItemTransferControlsProps) {
       : undefined
 
   return (
-    <OhoFlex.Row width="100%">
+    <OhoFlex.Row width="100%" gap="1">
       {props.side === 'left' && button}
-      <Card style={{ padding: 'var(--padding-radius-sm-lg)', flex: 1 }}>
+      <div className="card-sm-radius" style={{ flex: 1 }}>
         <OhoFlex.Row
           justify={props.side === 'left' ? 'end' : 'start'}
           align="center"
@@ -354,7 +356,7 @@ function ItemTransferControls(props: ItemTransferControlsProps) {
           <code>/</code>
           <code style={{ width: '3rem' }}>{props.sourceController?.item?.count ?? '--'}</code>
         </OhoFlex.Row>
-      </Card>
+      </div>
       {props.side === 'right' && button}
     </OhoFlex.Row>
   )
@@ -364,12 +366,13 @@ type SourceController = ReturnType<typeof useSourceController>
 
 interface SaveItemsScrollerProps {
   sourceController: SourceController
+  destController: SourceController
   active?: boolean
   onClick?: () => void
 }
 
 function SaveItemsScroller(props: SaveItemsScrollerProps) {
-  const { sourceController } = props
+  const { sourceController, destController } = props
   const parentRef = useRef(null)
 
   const virtualizer = useSimpleVirtualizer(
@@ -391,6 +394,11 @@ function SaveItemsScroller(props: SaveItemsScrollerProps) {
               database={sourceController.database}
               selected={sourceController.selection === item.index}
               inactive={props.active === false}
+              unobtainable={
+                sourceController.database.availability(item.index) !== 'Obtainable' ||
+                destController.database.availability(item.index) !== 'Obtainable'
+              }
+              disabled={destController.database.availability(item.index) !== 'Obtainable'}
               onClick={() => {
                 sourceController.setSelection(item.index)
                 props.onClick?.()

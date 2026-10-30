@@ -22,7 +22,6 @@ import { useOpenHomeItemTransfer, useSaveItemTransfer } from '@openhome-ui/items
 import PokemonDetailsModal from '@openhome-ui/pokemon/PokemonDetailsModal'
 import { useCanSwapWithDragging } from '@openhome-ui/state-zustand/drag-and-drop/dragStore'
 import { ErrorContext } from '@openhome-ui/state/error'
-import { useItemBag } from '@openhome-ui/state/items'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import useOhpkmBatchIdLookup from '@openhome-ui/state/ohpkm/useOhpkmIdBatchLookup'
 import useTrackedDataRecovery from '@openhome-ui/state/ohpkm/useTrackedDataRecovery'
@@ -62,8 +61,6 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const { saveIndex } = props
   const { multiSelectState, toggleSelection, isSelected } = useMultiSelect()
   const [selectedMonNotInBoxes, setSelectedMonNotInBoxes] = useState<PKMInterface>()
-
-  const openhomeItemBag = useItemBag()
 
   const save = useMemo(() => allOpenSaves[saveIndex], [allOpenSaves, saveIndex])
   const displayError = useDisplayError()

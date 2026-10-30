@@ -2,7 +2,7 @@
 //!
 //! Port of PKHeX's `PKHeX.Core/Items/ItemStorage9SV.cs`.
 
-use crate::items::adapter::Availability;
+use crate::items::availability::Availability;
 use crate::items::category::OpenhomeItemCategory;
 
 use num_enum::{IntoPrimitive, TryFromPrimitive};
@@ -35,6 +35,24 @@ pub enum SvItemPouch {
     #[strum(to_string = "Key Items")]
     KeyItems = 8,
     Materials = 9,
+}
+
+impl SvItemPouch {
+    pub const fn from_openhome(openhome_category: OpenhomeItemCategory) -> Option<Self> {
+        match openhome_category {
+            OpenhomeItemCategory::Medicine => Some(Self::Medicine),
+            OpenhomeItemCategory::Balls => Some(Self::Balls),
+            OpenhomeItemCategory::BattleItems => Some(Self::Battle),
+            OpenhomeItemCategory::Berries => Some(Self::Berries),
+            OpenhomeItemCategory::Items => Some(Self::Other),
+            OpenhomeItemCategory::TechnicalMachines => Some(Self::TechnicalMachines),
+            OpenhomeItemCategory::Treasure => Some(Self::Treasure),
+            OpenhomeItemCategory::Food => Some(Self::Picnic),
+            OpenhomeItemCategory::KeyItems => Some(Self::KeyItems),
+            OpenhomeItemCategory::SpeciesItems => Some(Self::Materials),
+            _ => None,
+        }
+    }
 }
 
 impl From<SvItemPouch> for OpenhomeItemCategory {
@@ -315,11 +333,24 @@ impl SvItemStorage {
             .transpose()
     }
 
+    #[wasm_bindgen(js_name = pouchIndexForItem)]
+    pub fn pouch_index_for_item(item_index: u16) -> Option<u32> {
+        Self::pouch_for(item_index).map(u32::from)
+    }
+
     #[cfg(feature = "wasm")]
-    #[wasm_bindgen(js_name = categoryToOpenHome)]
+    #[wasm_bindgen(js_name = pouchIndexToOpenHome)]
     pub fn sv_category_to_openhome_category(sv_pouch: u32) -> TsResult<OpenhomeItemCategory> {
         OpenhomeItemCategory::from(SvItemPouch::try_from(sv_pouch).unwrap_or(SvItemPouch::Other))
             .try_into_ts()
+    }
+
+    #[cfg(feature = "wasm")]
+    #[wasm_bindgen(js_name = pouchIndexFromOpenHome)]
+    pub fn pouch_index_from_openhome_category(
+        openhome_category: Ts<OpenhomeItemCategory>,
+    ) -> JsResult<Option<u32>> {
+        Ok(SvItemPouch::from_openhome(openhome_category.to_rust()?).map(u32::from))
     }
 }
 

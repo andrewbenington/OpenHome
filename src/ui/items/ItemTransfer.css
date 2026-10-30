@@ -25,7 +25,7 @@
 
 .item-transfer-card {
   background-color: var(--color-sidebar);
-  padding: var(--padding-radius-sm-lg);
+  padding: 0.25rem;
   box-shadow:
     rgba(0, 0, 0, 0.3) 0px 3px 12px,
     rgba(0, 0, 0, 0.23) 0px 3px 6px;
@@ -34,7 +34,6 @@
   align-items: center;
   flex-direction: row;
   grid-column: 1 / span 2;
-  gap: 0.5rem;
 }
 
 .item-scroller {
@@ -44,10 +43,6 @@
   overscroll-behavior: none;
   padding: var(--padding-radius-sm-lg);
   box-sizing: border-box;
-
-  /* .item-row {
-    position: relative;
-  } */
 }
 
 .item-scroller-inner {
