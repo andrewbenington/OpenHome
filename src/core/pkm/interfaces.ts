@@ -1,7 +1,7 @@
 import { PKM, RomHackPKM } from '@openhome-core/pkm/PKM'
+import { PluginIdentifier } from '@openhome-core/tauri/spectaCommands'
 import { Stats } from '@openhome-core/util/types'
 import { SpeciesMetadata, StatsPreSplit } from '@pkm-rs/pkg'
-import { PluginIdentifier } from '../save/interfaces'
 import { AllPKMFields } from './util/pkmInterface'
 
 // pluginIdentifier for a given plugin format is the plugin origin associated with that format. It is functionally a static field, but is an instance field to allow access from an instance of the class

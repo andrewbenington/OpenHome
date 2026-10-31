@@ -21,7 +21,7 @@ import { OHPKM } from '../pkm/OHPKM'
 import { $R, Errorable, Option, R, range, Result } from '../util/functional'
 import { filterUndefined } from '../util/sort'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
-import { LookupType } from './util'
+import { LookupType } from './types'
 import { emptyPathData, PathData } from './util/path'
 
 const SAVE_SIZE_BYTES = 0x20000

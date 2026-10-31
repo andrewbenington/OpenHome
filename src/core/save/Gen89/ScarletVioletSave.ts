@@ -7,9 +7,11 @@ import {
 } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { Result } from '@openhome-core/util/functional'
+import { ScarletVioletItemTransfer } from '@openhome-ui/items/types'
 import {
   ConvertStrategy,
   ExtraFormIndex,
+  ItemDataTs,
   OriginGame,
   Pk9Wasm,
   ScarletVioletSaveRust,
@@ -95,6 +97,12 @@ export class ScarletVioletSave extends WasmOfficialSave<Pk9Wasm, PK9, ScarletVio
     return { ...this.inner.getDisplayData() }
   }
 
+  getItemInventory = () => this.inner.getItemInventory()
+
+  updateItemData = (itemData: ItemDataTs) => this.inner.updateItemData(itemData)
+
+  getItemDatabase = () => ScarletVioletItemTransfer
+
   getDisplayPkms() {
     const rideLegend = this.inner.getRideLegend()
     return rideLegend ? [{ mon: PK9.fromWasm(rideLegend), description: 'Ride Legendary' }] : []
@@ -106,9 +114,5 @@ export class ScarletVioletSave extends WasmOfficialSave<Pk9Wasm, PK9, ScarletVio
 
   static includesOrigin(origin: OriginGame) {
     return ScarletVioletSaveRust.includesOrigin(origin)
-  }
-
-  free() {
-    this.inner.free()
   }
 }

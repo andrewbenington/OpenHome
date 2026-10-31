@@ -2,7 +2,7 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { PkmFormSpecifiers } from '@openhome-core/pkm/util/pkmInterface'
 import { SAV, SaveIdentifier, saveToStringIdentifier } from '@openhome-core/save/interfaces'
-import { SAVClass } from '@openhome-core/save/util'
+import { SAVClass } from '@openhome-core/save/types'
 import { Option } from '@openhome-core/util/functional'
 import { createContext, Dispatch, Reducer } from 'react'
 

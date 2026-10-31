@@ -10,6 +10,7 @@ import {
   MdArrowForward,
   MdArrowForwardIos,
   MdArrowOutward,
+  MdArrowUpward,
   MdCheckCircle,
   MdClear,
   MdCompareArrows,
@@ -22,6 +23,7 @@ import {
   MdMoreVert,
   MdOutlineTextSnippet,
   MdSelectAll,
+  MdStar,
   MdTextSnippet,
 } from 'react-icons/md'
 import {
@@ -55,9 +57,11 @@ export const CardsIcon = IoGrid
 
 export const ArrowLeftIcon = MdArrowBack
 export const ArrowRightIcon = MdArrowForward
+export const ArrowUpIcon = MdArrowUpward
 export const ArrowLeftRightIcon = MdCompareArrows
 export const DropdownArrowIcon = MdArrowDropDown
 export const FilterIcon = MdFilterListAlt
+export const FavoriteIcon = MdStar
 
 export const ExpandArrowIcon = MdArrowForwardIos
 

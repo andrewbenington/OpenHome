@@ -20,7 +20,7 @@ import * as types from '../util/types'
 import { FourMoves } from '../util/types'
 import { getHeightCalculated, getWeightCalculated, MoveFilter } from '../util/util'
 import { PkmConverter } from './conversion/converter'
-import { PkmConstructorOptions } from './PKM'
+import { PkmConstructorOptions } from './types'
 import { modernStatCalc } from './util'
 import * as encryption from './util/encryption'
 

@@ -8,16 +8,17 @@ import { $R, Option, R, range, Result } from '@openhome-core/util/functional'
 import { $O } from '@openhome-core/util/option'
 import { isThenable, NowOrLater } from '@openhome-core/util/promise'
 import { filterUndefined } from '@openhome-core/util/sort'
-import AttributeRow from '@openhome-ui/components/AttributeRow'
-import AttributeRowExpand from '@openhome-ui/components/AttributeRowExpand'
 import { Item, OpenHomeCtxMenu, Submenu } from '@openhome-ui/components/context-menu'
 import PromptDialog from '@openhome-ui/components/dialog/PromptDialog'
 import Fallback from '@openhome-ui/components/Fallback'
+import { ExpandArrowIcon } from '@openhome-ui/components/Icons'
+import MiniButton from '@openhome-ui/components/MiniButton'
 import OhoFlex from '@openhome-ui/components/OhoFlex'
-import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import SearchFields from '@openhome-ui/components/search/SearchFields'
 import PokemonSearchModal from '@openhome-ui/components/search/SearchModal'
 import { useDisplayError } from '@openhome-ui/hooks/displayError'
+import { getPublicImageURL } from '@openhome-ui/images/images'
+import { useOpenHomeItemTransfer, useSaveItemTransfer } from '@openhome-ui/items/useTransfer'
 import PokemonDetailsModal from '@openhome-ui/pokemon/PokemonDetailsModal'
 import { useCanSwapWithDragging } from '@openhome-ui/state-zustand/drag-and-drop/dragStore'
 import { ErrorContext } from '@openhome-ui/state/error'
@@ -26,11 +27,13 @@ import useOhpkmBatchIdLookup from '@openhome-ui/state/ohpkm/useOhpkmIdBatchLooku
 import useTrackedDataRecovery from '@openhome-ui/state/ohpkm/useTrackedDataRecovery'
 import { EMPTY_SLOT, MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { colorIsDark } from '@openhome-ui/util/color'
-import { Button, Dialog, Flex, Grid, Separator } from '@radix-ui/themes'
+import { Button, Flex, Grid, Separator } from '@radix-ui/themes'
 import { useContext, useMemo, useState } from 'react'
 import { MdClose } from 'react-icons/md'
+import { SaveItemsModal } from '../../items/ItemTransfer'
 import useMultiSelect from '../../state/drag-and-drop/useMultiSelect'
 import { cssClass } from '../../util/style'
+import { SaveDetailsModal } from '../SaveDetailsModal'
 import { useBoxNavigator } from '../util'
 import ArrowButton from './ArrowButton'
 import BoxCellAsync from './BoxCellAsync'
@@ -46,18 +49,20 @@ type SlotMetadata = {
   pendingMon: Option<string | symbol | PKMInterface>
 }
 
+type SaveDataModalType = 'details' | 'items'
+
 const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const savesManager = useSaves()
   const { allOpenSaves, importMonsToLocation } = savesManager
 
   const ohpkmStore = useOhpkmStore()
   const [, dispatchError] = useContext(ErrorContext)
-  const [detailsModal, setDetailsModal] = useState(false)
+  const [openModal, setOpenModal] = useState<Option<SaveDataModalType>>(undefined)
   const { saveIndex } = props
   const { multiSelectState, toggleSelection, isSelected } = useMultiSelect()
   const [selectedMonNotInBoxes, setSelectedMonNotInBoxes] = useState<PKMInterface>()
 
-  const save = useMemo(() => allOpenSaves[saveIndex], [allOpenSaves, saveIndex])
+  const save = allOpenSaves[saveIndex]
   const displayError = useDisplayError()
 
   const allSaveMons = save.getAllMons().map((mon) => [mon, save] as const)
@@ -126,8 +131,6 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
 
   const canSwapWithDragging = useCanSwapWithDragging(save)
 
-  const displayData = useMemo(() => save.getDisplayData?.() ?? {}, [save])
-
   const allCellsDisabled = range(save.boxColumns * save.boxRows)
     .map((index: number) => save.getMonAt(save.currentPCBox, index))
     .every(canSwapWithDragging)
@@ -181,6 +184,9 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
       return { save, mon, openhomeId, pendingMon }
     })
 
+  const saveItemTransfer = useSaveItemTransfer(save)
+  const openhomeItemTransfer = useOpenHomeItemTransfer()
+
   return save && save.currentPCBox !== undefined ? (
     <>
       <Flex direction="column" width="100%">
@@ -193,7 +199,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
             .else('save-box-standard')
             .build()}
         >
-          <SaveHeader save={save} setDetailsModal={setDetailsModal} />
+          <SaveHeader save={save} openModal={setOpenModal} />
           <Separator />
           <div className="box-navigation pad-x-sm-lg">
             <ArrowButton
@@ -270,72 +276,19 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
             })}
           </Grid>
         </div>
-        <Dialog.Root open={detailsModal} onOpenChange={setDetailsModal}>
-          <Dialog.Content className="save-details-modal">
-            <AttributeRow label="Game">Pokémon {save.gameNameFull}</AttributeRow>
-            <AttributeRow label="Trainer Name">{save.name}</AttributeRow>
-            <AttributeRow label="Trainer Display ID">{save.displayID}</AttributeRow>
-            <AttributeRow label="Trainer Real ID">
-              <code>0x{save.tid.toString(16)}</code>
-            </AttributeRow>
-            {save.sid !== undefined && (
-              <AttributeRow label="Secret ID">
-                <code>0x{save.sid.toString(16)}</code>
-              </AttributeRow>
-            )}
-            {save.trainerGender !== undefined && (
-              <AttributeRow label="Trainer Gender">
-                {save.trainerGender ? 'Female' : 'Male'}
-              </AttributeRow>
-            )}
-            <AttributeRow label="File">
-              <div style={{ overflowWrap: 'break-word', width: '100%' }}>{save.filePath.raw}</div>
-            </AttributeRow>
-            {save.fileCreated && (
-              <AttributeRow label="File">
-                <div style={{ overflowWrap: 'break-word', width: '100%' }}>
-                  {save.fileCreated.toDateString()}
-                </div>
-              </AttributeRow>
-            )}
-            {Object.entries(displayData).map(([label, value]) => (
-              <AttributeRow label={label} key={label}>
-                {value}
-              </AttributeRow>
-            ))}
-            <AttributeRowExpand summary="Updated Box Slots" value={save.updatedBoxSlots.length}>
-              {save.updatedBoxSlots.map(({ box, boxSlot }, i) => (
-                <AttributeRow label={String(i + 1)} key={`${box}-${boxSlot}`}>
-                  Box {box}, Slot {boxSlot}
-                </AttributeRow>
-              ))}
-            </AttributeRowExpand>
-            <OhoFlex.RowCentered>
-              {save.getDisplayPkms().map(
-                ({ mon, description }) =>
-                  mon && (
-                    <AttributeRow label={description} key={description}>
-                      <button
-                        key={description}
-                        onClick={() => {
-                          setDetailsModal(false)
-                          setSelectedMonNotInBoxes(mon)
-                        }}
-                        className="mon-icon-button"
-                      >
-                        <PokemonIcon
-                          nationalDex={mon.nationalDex}
-                          formIndex={mon.formIndex}
-                          style={{ height: '1.75rem', width: '1.75rem' }}
-                        />
-                      </button>
-                    </AttributeRow>
-                  )
-              )}
-            </OhoFlex.RowCentered>
-          </Dialog.Content>
-        </Dialog.Root>
       </Flex>
+      <SaveDetailsModal
+        open={openModal === 'details'}
+        setOpen={(v) => {
+          if (v) {
+            setOpenModal('details')
+          } else if (openModal === 'details') {
+            setOpenModal(undefined)
+          }
+        }}
+        save={save}
+        setSelectedMon={setSelectedMonNotInBoxes}
+      />
       <PokemonSearchModal
         typeName="Pokémon"
         title={TrackedDataRecovery.selectDataPrompt}
@@ -366,6 +319,18 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
         ]}
         open={TrackedDataRecovery.state === 'pending_confirm'}
       />
+      {saveItemTransfer !== undefined && (
+        <SaveItemsModal
+          source1={saveItemTransfer}
+          source2={openhomeItemTransfer}
+          isOpen={openModal === 'items'}
+          onClose={() => {
+            if (openModal === 'items') {
+              setOpenModal(undefined)
+            }
+          }}
+        />
+      )}
       <Fallback>
         <PokemonDetailsModal
           mon={selectedMon}
@@ -396,9 +361,12 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   )
 }
 
-type SaveHeaderProps = { save: SAV; setDetailsModal: (open: boolean) => void }
+type SaveHeaderProps = {
+  save: SAV
+  openModal: (type: SaveDataModalType) => void
+}
 
-function SaveHeader({ save, setDetailsModal }: SaveHeaderProps) {
+function SaveHeader({ save, openModal }: SaveHeaderProps) {
   const savesManager = useSaves()
   const backend = useBackend()
 
@@ -406,7 +374,8 @@ function SaveHeader({ save, setDetailsModal }: SaveHeaderProps) {
   const totalMonCount = save.getPcMonCount()
 
   const contextElements = [
-    Item.label('Details...').action(() => setDetailsModal(true)),
+    Item.label('Details...').action(() => openModal('details')),
+    Item.label('Items...').action(() => openModal('items')),
     Item.label('Open file location').action(() => backend.openDirectory(save.filePath.dir)),
     Submenu.label('Move to Bank...')
       .with(
@@ -433,7 +402,7 @@ function SaveHeader({ save, setDetailsModal }: SaveHeaderProps) {
             }}
           >
             <Button
-              className="save-close-button mini-button"
+              className="save-close-button"
               onClick={() => savesManager.removeSave(save)}
               disabled={!!save.updatedBoxSlots.length}
             >
@@ -442,6 +411,15 @@ function SaveHeader({ save, setDetailsModal }: SaveHeaderProps) {
             {save.gameNameFull}
           </div>
           {save?.name}
+          <OhoFlex.RowEnd gap="var(--padding-radius-sm-lg)">
+            {save.getItemInventory && (
+              <MiniButton
+                onClick={() => openModal('items')}
+                imageSrc={getPublicImageURL('items/index/0000.png')}
+              />
+            )}
+            <MiniButton onClick={() => openModal('items')} icon={ExpandArrowIcon} />
+          </OhoFlex.RowEnd>
         </div>
       </div>
     </OpenHomeCtxMenu>

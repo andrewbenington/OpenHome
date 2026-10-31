@@ -1,6 +1,6 @@
 import { displayIndexAdder, isBattleFormItem } from '@openhome-core/pkm'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { isPluginGame, PluginIdentifier, SAV } from '@openhome-core/save/interfaces'
+import { isPluginGame, SAV } from '@openhome-core/save/interfaces'
 import * as SpectaGenerated from '@openhome-core/tauri/spectaCommands'
 import { OriginGameStr } from '@openhome-core/tauri/spectaCommands'
 import { Option } from '@openhome-core/util/functional'
@@ -102,7 +102,7 @@ function pokedexFlagsFromMon(mon: PKMInterface): SpectaGenerated.PokedexFlag[] {
 
 export function updatesFromMon(
   mon: PKMInterface,
-  game?: OriginGame | PluginIdentifier
+  game?: OriginGame | SpectaGenerated.PluginIdentifier
 ): PokedexUpdate[] {
   const pokedexUpdates: PokedexUpdate[] = []
   pokedexUpdates.push({

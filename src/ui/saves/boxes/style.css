@@ -177,6 +177,7 @@
   align-items: center;
   gap: var(--padding-radius-xs-sm);
   height: 100%;
+  padding-right: var(--padding-radius-sm-lg);
 }
 
 .save-header-game {

@@ -101,3 +101,5 @@ export type RadixColor =
   | 'lime'
   | 'mint'
   | 'sky'
+
+export const OPENHOME_COLOR = '#7DCEAB'

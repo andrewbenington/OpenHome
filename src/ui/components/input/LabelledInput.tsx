@@ -8,6 +8,7 @@ import Typeahead from '../typeahead/Typeahead'
 import './style.css'
 
 interface LabelledInputProps {
+  id?: string
   label?: string
   placeholder?: string
   flex?: number
@@ -106,21 +107,36 @@ function LabelledTypeaheadInput<T>(props: LabelledTypeaheadInputProps<T>) {
 
 type LabelledIntInputProps = {
   value: number | null
+  max?: number
+  min?: number
   onChange: (newValue: number | null) => void
-} & LabelledInputProps
+} & LabelledInputProps &
+  Omit<TextField.RootProps, 'value' | 'onChange'>
 
 function LabelledIntInput(props: LabelledIntInputProps) {
   const { value, onChange, placeholder, ...inputProps } = props
 
   return (
-    <label className={labelClass(props)} style={styleFromProps(props)}>
+    <label id={props.id} className={labelClass(props)} style={styleFromProps(props)}>
       {formatLabel(props)}
       <TextField.Root
         size="1"
         placeholder={placeholder}
         type="number"
-        value={value ?? ''}
-        onChange={(e) => onChange(parseIntOrNull(e.target.value))}
+        value={value || ''}
+        onChange={(e) => {
+          const newValue = parseIntOrNull(e.target.value)
+          if (newValue !== null) {
+            if (props.min !== undefined && newValue < props.min) {
+              onChange(null)
+              return
+            } else if (props.max !== undefined && newValue > props.max) {
+              onChange(props.max)
+              return
+            }
+          }
+          onChange(newValue)
+        }}
         {...inputProps}
       />
     </label>

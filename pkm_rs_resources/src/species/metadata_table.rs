@@ -48,8 +48,15 @@ use crate::species::metadata_table::{
     gen9_za::METADATA_TABLE_LZA,
 };
 
+#[derive(Clone, Copy)]
+pub enum FormExistsCheck {
+    FormInfo,
+    BaseInfo,
+}
+
 pub trait PersonalInfo: Sized + std::panic::RefUnwindSafe + std::panic::UnwindSafe {
     const MAX_NATIONAL_DEX: NationalDex;
+    const BASE_FORM_PERSONAL_INFO: FormExistsCheck = FormExistsCheck::FormInfo;
 
     fn from_pkl_bytes(bytes: &'static [u8]) -> Self;
 
@@ -220,13 +227,15 @@ impl<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize> MetadataTable
     }
 
     fn form_is_present(&self, national_dex: u16, form_index: u16) -> bool {
-        self.personal
-            .get_personal_info(national_dex, form_index)
-            .or(self.personal.get_base_form_personal_info(national_dex))
-            .is_some_and(|info| {
-                info.form_is_present_in_game(national_dex, form_index)
-                    && self.get_game_index(national_dex, form_index).is_some()
-            })
+        let personal_info_for_form_check = match INFO::BASE_FORM_PERSONAL_INFO {
+            FormExistsCheck::FormInfo => self.personal.get_personal_info(national_dex, form_index),
+            FormExistsCheck::BaseInfo => self.personal.get_base_form_personal_info(national_dex),
+        };
+
+        personal_info_for_form_check.is_some_and(|info| {
+            info.form_is_present_in_game(national_dex, form_index)
+                && self.get_game_index(national_dex, form_index).is_some()
+        })
     }
 }
 
@@ -682,5 +691,14 @@ mod tests {
         assert_eq!(types, Some((PkmType::Normal, None)));
 
         Ok(())
+    }
+
+    #[test]
+    fn vivillon_pattern_present_usum() {
+        assert!(source_has_form_metadata(
+            MetadataSource::UltraSunUltraMoon,
+            NationalDex::Vivillon as u16,
+            7,
+        ));
     }
 }

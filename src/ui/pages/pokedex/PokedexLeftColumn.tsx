@@ -8,6 +8,7 @@ import OhoFlex from '@openhome-ui/components/OhoFlex'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import useMonSprite from '@openhome-ui/pokemon/useMonSprite'
+import { Pokedex } from '@openhome-ui/util/pokedex'
 import { cssClass } from '@openhome-ui/util/style'
 import {
   canBeAlpha,
@@ -22,6 +23,7 @@ import {
   MetadataSummaryLookup,
   NationalDex,
   SpeciesLookup,
+  SpeciesMetadata,
   totemFormAcquirable,
 } from '@pkm-rs/pkg'
 import { Button, Card, Flex, ScrollArea, Separator, Spinner, Text } from '@radix-ui/themes'
@@ -29,12 +31,19 @@ import { ReactNode, useEffect, useState } from 'react'
 import EvolutionFamily from './EvolutionFamily'
 import './pokedex.css'
 import './PokedexLeftColumn.css'
-import { PokedexDetailsProps } from './PokedexPage'
 import TooltipPokemonIcon from './TooltipPokemonIcon'
 import { getFormPokedexData, isExtraFormMetadata } from './util'
 
+export type PokedexLeftColumnProps = {
+  pokedex: Pokedex
+  speciesMetadata: SpeciesMetadata
+  formMetadata: FormMetadata | ExtraFormMetadata
+  setSelectedForm: (form?: FormMetadata | ExtraFormMetadata) => void
+  setSelectedSpecies: (species?: SpeciesMetadata) => void
+}
+
 // this component could use a better name
-export default function PokedexLeftColumn(props: PokedexDetailsProps) {
+export default function PokedexLeftColumn(props: PokedexLeftColumnProps) {
   const [imageError, setImageError] = useState(false)
   const [showShiny, setShowShiny] = useState(false)
   const [showFemale, setShowFemale] = useState(false)

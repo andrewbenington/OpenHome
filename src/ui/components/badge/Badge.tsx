@@ -1,8 +1,9 @@
-import { PluginIdentifier } from '@openhome-core/save/interfaces'
+import { PluginIdentifier } from '@openhome-core/tauri/spectaCommands'
 import { pluralize } from '@openhome-core/util/format'
 import { Nullable, Option } from '@openhome-core/util/functional'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getDetailsOfficialSave, getDetailsPluginSave } from '@openhome-ui/saves/util'
+import { OPENHOME_COLOR } from '@openhome-ui/util/color'
 import { Pokerus } from '@pkm-rs/pkg'
 import { memo } from 'react'
 import { HyperTrainIcon } from '../Icons'
@@ -97,6 +98,14 @@ export function GameBadge(props: GameBadgeProps) {
       label={props.withNameAbbr ? shortName : props.withName ? fullName : undefined}
       {...props}
     />
+  )
+}
+
+function OpenHomeBadge(props: BadgePropsNoBackground) {
+  return (
+    <BaseBadge tooltip="OpenHome" backgroundColor={OPENHOME_COLOR} color="#111" {...props}>
+      OpenHome
+    </BaseBadge>
   )
 }
 
@@ -204,6 +213,7 @@ function TotemBadge(props: BadgePropsNoBackground) {
 const Badge = {
   Alpha: memo(AlphaBadge),
   Game: memo(GameBadge),
+  OpenHome: memo(OpenHomeBadge),
   Gigantamax: memo(GigantamaxBadge),
   HyperTrain: memo(HyperTrainBadge),
   Image: memo(ImageBadge),

@@ -2,17 +2,19 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { PluginIdentifier as RustPluginIdentifier } from '@openhome-core/tauri/spectaCommands'
 import { Errorable, Option, R, range, Result } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
+import { ItemTransferDatabase } from '@openhome-ui/items/types'
 import {
   BinaryGender,
   ConvertStrategy,
   ExtraFormIndex,
+  ItemDataTs,
   Language,
   OriginGame,
   OriginGames,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
 import { filterUndefined } from '../util/sort'
-import { LookupType, SAVClass } from './util'
+import { LookupType, SAVClass } from './types'
 import { PathData } from './util/path'
 import { TransferRestrictions } from './util/TransferRestrictions'
 
@@ -92,6 +94,9 @@ interface BaseSAV<P extends PKMInterface = PKMInterface> {
   getDisplayData(): Record<string, string | number | undefined> | undefined
   getDisplayPkms(): DisplayPkm<P>[]
   convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<P>
+  getItemInventory?: () => ItemDataTs[]
+  updateItemData?: (itemData: ItemDataTs) => void
+  getItemDatabase?: () => ItemTransferDatabase
 
   free?: () => void
 }
@@ -119,6 +124,9 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   abstract supportsItem(itemIndex: number): boolean
   abstract prepareForSaving(): void
   abstract convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<P>
+  getItemInventory?: () => ItemDataTs[]
+  updateItemData?: (itemData: ItemDataTs) => void
+  getItemDatabase?: () => ItemTransferDatabase
 
   prepareWriter(): SaveWriter {
     this.prepareForSaving()
@@ -245,6 +253,9 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   abstract getSlotMetadata?: ((boxNum: number, boxSlot: number) => SlotMetadata) | undefined
   abstract prepareForSaving(): void
   abstract convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<P>
+  getItemInventory?: () => ItemDataTs[]
+  updateItemData?: (itemData: ItemDataTs) => void
+  getItemDatabase?: () => ItemTransferDatabase
 
   prepareWriter(): SaveWriter {
     this.prepareForSaving()
@@ -413,6 +424,8 @@ export interface WasmSaveInner<P> {
   getPcMonCount(): number
 
   getBoxName(box_num: number): string
+
+  free(): void
 }
 
 type WasmPkmInterface<P> = PKMInterface & { inner: P }
@@ -541,5 +554,11 @@ export abstract class WasmOfficialSave<
 
   getBoxName(boxIndex: number): string {
     return this.inner.getBoxName(boxIndex)
+  }
+
+  free() {
+    if ('__wbg_ptr' in this.inner && this.inner.__wbg_ptr !== 0) {
+      this.inner.free()
+    }
   }
 }
