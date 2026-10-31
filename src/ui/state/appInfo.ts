@@ -29,7 +29,6 @@ import { updateStyleForUiScale } from '@openhome-ui/util/style'
 import { Dispatch, Reducer, createContext } from 'react'
 
 const ScarletViolet = ScarletVioletSave
-console.log(ScarletVioletSave)
 
 export const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
   G1SAV,
@@ -66,8 +65,6 @@ function initialMonDisplayState(): MonDisplayState {
     boxIconSprites: 'default',
   }
 }
-
-console.log(OFFICIAL_SAVE_TYPES)
 
 export const defaultSettings: Settings = {
   enabledSaveTypes: Object.fromEntries(
