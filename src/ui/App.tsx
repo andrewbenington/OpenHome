@@ -10,7 +10,6 @@ import { TransactionStateProvider } from '@openhome-ui/state/app-state'
 import { AppInfoContext, appInfoInitialState, appInfoReducer } from '@openhome-ui/state/appInfo'
 import PokemonDndContext from '@openhome-ui/state/drag-and-drop/PokemonDndContext'
 import { ErrorContext, errorReducer } from '@openhome-ui/state/error'
-import { ItemBagContext, itemBagReducer } from '@openhome-ui/state/items'
 import { LookupsProvider } from '@openhome-ui/state/lookups'
 import { MouseContext, mouseReducer } from '@openhome-ui/state/mouse'
 import { SavesProvider } from '@openhome-ui/state/saves'
@@ -28,6 +27,7 @@ import {
   MultiSelectContext,
   MultiSelectState,
 } from './state/drag-and-drop/useMultiSelect'
+import { ItemBagProvider } from './state/items/provider'
 import PluginsProvider from './state/plugin/PluginProvider'
 
 const ZOOM_CHANGE_PCT = 5
@@ -72,11 +72,6 @@ function AppWithBackend() {
   const [appInfoState, appInfoDispatch] = useReducer(appInfoReducer, appInfoInitialState)
   const [settingsLoading, setSettingsLoading] = useState(false)
   const { saveChanges } = useBanksAndBoxes()
-  const [bagState, bagDispatch] = useReducer(itemBagReducer, {
-    itemCounts: {},
-    modified: false,
-    loaded: false,
-  })
 
   const backend = useBackend()
   const displayTitledError = useTitledErrorDisplay()
@@ -179,7 +174,7 @@ function AppWithBackend() {
           <MouseContext value={[mouseState, mouseDispatch]}>
             <LookupsProvider>
               <ConvertStrategiesProvider>
-                <ItemBagContext value={[bagState, bagDispatch]}>
+                <ItemBagProvider>
                   <SavesProvider>
                     <MultiSelectContext value={[multiSelectState, setMultiSelectState]}>
                       <PokemonDndContext>
@@ -197,7 +192,7 @@ function AppWithBackend() {
                       </PokemonDndContext>
                     </MultiSelectContext>
                   </SavesProvider>
-                </ItemBagContext>
+                </ItemBagProvider>
               </ConvertStrategiesProvider>
             </LookupsProvider>
           </MouseContext>
