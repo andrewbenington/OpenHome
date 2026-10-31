@@ -227,8 +227,7 @@ img {
 }
 
 code {
-  font-family:
-    source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
 html,
@@ -300,7 +299,7 @@ fieldset {
   transition: border-color 0.25s;
 }
 
-input[type="checkbox"] {
+input[type='checkbox'] {
   height: 1rem;
   width: 1rem;
 }
@@ -413,13 +412,13 @@ label {
 }
 
 .rt-BaseDialogOverlay {
-  &:where([data-state="closed"]) {
+  &:where([data-state='closed']) {
     animation: none !important;
   }
-  &:where([data-state="open"])::before {
+  &:where([data-state='open'])::before {
     animation: rt-fade-in 200ms cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
-  &:where([data-state="closed"])::before {
+  &:where([data-state='closed'])::before {
     opacity: 0;
     animation: rt-fade-out 200ms cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
@@ -427,10 +426,10 @@ label {
 
 .rt-BaseDialogContent {
   --dialog-content-padding: 0.75rem;
-  &:where([data-state="open"]) {
+  &:where([data-state='open']) {
     animation: none !important;
   }
-  &:where([data-state="closed"]) {
+  &:where([data-state='closed']) {
     opacity: 0;
     animation: rt-dialog-content-hide 100ms cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
@@ -446,13 +445,7 @@ label {
 }
 
 .diagonal-clip {
-  clip-path: polygon(
-    0% 0%,
-    0% 100%,
-    calc(100% - 0.75rem) 100%,
-    calc(100% - 0px) 0%,
-    100% 0%
-  );
+  clip-path: polygon(0% 0%, 0% 100%, calc(100% - 0.75rem) 100%, calc(100% - 0px) 0%, 100% 0%);
 }
 
 svg {
@@ -508,11 +501,7 @@ svg {
   padding: var(--padding-radius-sm-lg);
 
   box-shadow: 0 0 0 1px
-    color-mix(
-      in oklab,
-      color(display-p3 1 1 1 / 0.134),
-      color(display-p3 0.192 0.192 0.192) 25%
-    );
+    color-mix(in oklab, color(display-p3 1 1 1 / 0.134), color(display-p3 0.192 0.192 0.192) 25%);
 }
 
 .panel-lg-radius ::-webkit-scrollbar-thumb,
@@ -526,11 +515,7 @@ svg {
   padding: var(--padding-radius-sm-lg);
 
   box-shadow: 0 0 0 1px
-    color-mix(
-      in oklab,
-      color(display-p3 1 1 1 / 0.134),
-      color(display-p3 0.192 0.192 0.192) 25%
-    );
+    color-mix(in oklab, color(display-p3 1 1 1 / 0.134), color(display-p3 0.192 0.192 0.192) 25%);
 }
 
 .panel-lg-radius {

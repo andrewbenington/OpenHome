@@ -8,12 +8,9 @@ mod sv_items;
 #[cfg(feature = "wasm")]
 pub use sv_items::SvItemStorage;
 
-#[cfg_attr(
-    feature = "wasm",
-    derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
-)]
-#[derive(Debug, Clone)]
-#[cfg_attr(feature = "wasm", serde(rename_all = "camelCase"))]
+#[cfg(feature = "wasm")]
+#[derive(Debug, Clone, tsify::Tsify, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ItemDataTs {
     pub index: u16,
     pub pouch: u32,

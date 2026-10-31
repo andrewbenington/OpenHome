@@ -53,24 +53,19 @@
   <body style="height: 100vh; overflow: hidden; margin: 0">
     <div id="root">
       <div class="loading-logo-container">
-        <img
-          src="logos/logo-full.png"
-          style="width: 9rem; height: 9rem; position: absolute"
-        />
+        <img src="logos/logo-full.png" style="width: 9rem; height: 9rem; position: absolute" />
         <h2 id="loading-screen-subtitle" />
       </div>
     </div>
     <script type="module">
       if (import.meta.env.VITE_UI_TESTING) {
-        const subtitleElement = document.getElementById(
-          "loading-screen-subtitle",
-        );
+        const subtitleElement = document.getElementById('loading-screen-subtitle')
         if (subtitleElement) {
-          subtitleElement.textContent = "UI Testing Build";
+          subtitleElement.textContent = 'UI Testing Build'
         }
 
         // Necessary for the WDIO ui interaction code to be initialized, but we don't want this in non-ui-testing builds
-        import("@wdio/tauri-plugin");
+        import('@wdio/tauri-plugin')
       }
     </script>
     <script type="module" src="/src/main.tsx"></script>
