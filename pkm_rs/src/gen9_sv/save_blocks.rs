@@ -35,7 +35,10 @@ pub(super) struct SvBlocks {
 impl SvBlocks {
     pub fn from_blocks(mut blocks: SwishBlocks<SvBlockKey>) -> Result<Self> {
         let my_status = MyStatusFields::read(blocks.try_pop_object(SvBlockKey::MyStatus)?.bytes())?;
-        let pokemon_boxes = BoxData::read(blocks.try_pop_object(SvBlockKey::Box)?.bytes())?;
+        let pokemon_boxes = BoxData(
+            vec_into_box::<BoxDataInner>(blocks.try_pop_object(SvBlockKey::Box)?.into_bytes())
+                .map_err(|_| Error::other("failed to transmute pc boxes block"))?,
+        );
         let box_layouts = BoxLayout(blocks.try_pop_array(SvBlockKey::BoxLayout)?);
         let current_box = blocks.try_pop_numeric(SvBlockKey::CurrentBox)?;
         let item_inventory =
@@ -53,35 +56,6 @@ impl SvBlocks {
     }
 
     pub fn to_blocks(&self) -> BTreeMap<u32, Block> {
-        crate::log!("to_blocks");
-        crate::log!("{:?}", self.items);
-        // let Self {
-        //     my_status,
-        //     pokemon_boxes,
-        //     box_layouts,
-        //     current_box,
-        //     items,
-        //     other_blocks,
-        // } = self.clone();
-
-        // crate::log!("cloned");
-        // // the game will read the file fine if the blocks aren't sorted, but PKHeX expects them to be in key order.
-        // // an iterator from a btree will preserve key order.
-        // let mut all_blocks = other_blocks.into_inner();
-        // crate::log!("intoed inner");
-        // for block in [
-        //     my_status.into_block(),
-        //     pokemon_boxes.into_block(),
-        //     box_layouts.into_block(),
-        //     items.0.into_block(),
-        //     Block::new(SvBlockKey::CurrentBox, BlockData::Value(current_box)),
-        // ] {
-        //     crate::log!("writing block: {:x}", block.key());
-        //     all_blocks.insert(block.key(), block);
-        // }
-
-        // all_blocks
-
         let mut all_blocks = self.other_blocks.clone().into_inner();
         for block in [
             self.my_status.to_block(),
@@ -144,9 +118,9 @@ pub struct MyStatusFields {
     _remaining: [u8; 62],
 }
 
-// const_assert_eq!(std::mem::offset_of!(MyStatusFields, game_raw), 0x04);
+const_assert_eq!(std::mem::offset_of!(MyStatusFields, game_raw), 0x04);
 
-// const_assert_eq!(std::mem::offset_of!(MyStatusFields, trainer_name), 0x10);
+const_assert_eq!(std::mem::offset_of!(MyStatusFields, trainer_name), 0x10);
 
 impl MyStatusFields {
     pub const NAME_BYTE_LENGTH: usize = 26;
@@ -172,7 +146,7 @@ const PK9_PARTY_SIZE: usize = 0x158;
 type Pk9PartyBytes = [u8; PK9_PARTY_SIZE];
 type PcBoxBytes = [Pk9PartyBytes; BOX_SLOTS as usize];
 
-#[derive(Debug, Clone, FromBytes, IntoBytes, KnownLayout, Immutable)]
+#[derive(Debug, Clone, FromBytes, IntoBytes, KnownLayout, Immutable, Unaligned)]
 #[repr(C, packed)]
 pub struct BoxDataInner {
     pub boxes: [PcBoxBytes; MAX_BOX_COUNT as usize],
@@ -201,18 +175,6 @@ impl BoxData {
             SvBlockKey::Box,
             swish_crypto::BlockData::Object(ObjectBlock::new(self.as_bytes().to_vec())),
         )
-    }
-
-    pub fn read(bytes: &[u8]) -> StdResult<Self, SwishError> {
-        let Ok(box_bytes) = BoxDataInner::ref_from_bytes(bytes) else {
-            return Err(SwishError::ByteLength {
-                context: "BoxData".to_owned(),
-                expected: size_of::<Self>(),
-                actual: bytes.len(),
-            });
-        };
-
-        Ok(Self(Box::new(box_bytes.clone())))
     }
 }
 
