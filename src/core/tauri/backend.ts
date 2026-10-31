@@ -1,5 +1,6 @@
 import BackendInterface, {
   BankOrBoxChange,
+  ItemBag,
   LogEntry,
   LogsResponse,
   MenuEvent,
@@ -288,13 +289,12 @@ export const TauriBackend: BackendInterface = {
 
   /* bag */
   loadItemBag: async () => {
-    return (await Commands.get_storage_file_json('item-bag.json')) as Errorable<
-      Record<string, number>
-    >
+    const result = (await Commands.get_storage_file_json('item-bag.json')) as Result<ItemBag>
+    // tanstack query will catch and return the error
+    return R.assert(result)
   },
 
-  saveItemBag: async (items: Record<string, number>) =>
-    Commands.write_storage_file_json('item-bag.json', items),
+  saveItemBag: async (items: ItemBag) => Commands.write_storage_file_json('item-bag.json', items),
   /* transactions */
   startTransaction: Commands.startTransaction,
   commitTransaction: Commands.commitTransaction,

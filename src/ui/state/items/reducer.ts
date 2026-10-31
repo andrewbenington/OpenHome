@@ -1,4 +1,4 @@
-import { createContext, Dispatch, Reducer } from 'react'
+import { Reducer } from 'react'
 
 /*
  *  STATE
@@ -6,7 +6,6 @@ import { createContext, Dispatch, Reducer } from 'react'
 export type ItemBagState = {
   itemCounts: Record<number, number>
   modified: boolean
-  loaded: boolean
   error?: string
 }
 
@@ -51,13 +50,3 @@ export const itemBagReducer: Reducer<ItemBagState, ItemBagAction> = (state, acti
       return state
   }
 }
-
-const initialBagState: ItemBagState = { itemCounts: {}, modified: false, loaded: false }
-
-/*
- *  CONTEXT
- */
-export const ItemBagContext = createContext<[ItemBagState, Dispatch<ItemBagAction>]>([
-  initialBagState,
-  () => {},
-])

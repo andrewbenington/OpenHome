@@ -64,6 +64,8 @@ export type StoredLookups = { gen12: LookupMap; gen345: LookupMap }
 
 export type OhpkmStore = Record<string, OHPKM>
 
+export type ItemBag = Record<string, number>
+
 export default interface BackendInterface {
   /* past gen identifier lookups */
   loadLookups: () => Promise<Errorable<StoredLookups>>
@@ -115,8 +117,8 @@ export default interface BackendInterface {
   upsertSaveFolder: (folderPath: string, label: string) => Promise<Errorable<null>>
 
   /* item bag */
-  loadItemBag: () => Promise<Errorable<Record<string, number>>>
-  saveItemBag: (items: Record<string, number>) => Promise<Errorable<null>>
+  loadItemBag: () => Promise<ItemBag>
+  saveItemBag: (items: ItemBag) => Promise<Errorable<null>>
 
   /* transactions */
   startTransaction: () => Promise<Errorable<null>>

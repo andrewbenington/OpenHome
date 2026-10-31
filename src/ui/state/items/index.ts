@@ -1,2 +1,1 @@
-export * from './reducer'
-export * from './useItemBag'
+export * from './provider'
