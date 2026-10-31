@@ -245,8 +245,7 @@
 
 .box-overview-button {
   align-items: start;
-  padding: var(--padding-radius-sm-lg) var(--padding-radius-sm-lg) 0
-    var(--padding-radius-sm-lg);
+  padding: var(--padding-radius-sm-lg) var(--padding-radius-sm-lg) 0 var(--padding-radius-sm-lg);
   width: 100%;
   min-width: 100%;
   height: 100%;
@@ -319,7 +318,7 @@
   background-color: var(--accent-a5);
 }
 
-.ToggleGroupItem[data-state="on"] {
+.ToggleGroupItem[data-state='on'] {
   background-color: var(--focus-8);
 }
 

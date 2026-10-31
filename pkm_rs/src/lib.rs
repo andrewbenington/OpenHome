@@ -2,6 +2,7 @@
 mod checksum;
 #[cfg(feature = "wasm")]
 mod encryption;
+#[cfg(feature = "wasm")]
 mod items;
 mod rom_hacks;
 mod strings;
