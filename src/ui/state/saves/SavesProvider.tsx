@@ -1,7 +1,7 @@
 import useBackend from '@openhome-core/backend/useBackend'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { SAVClass } from '@openhome-core/save/util'
+import { SAVClass } from '@openhome-core/save/types'
 import { TauriBackend } from '@openhome-core/tauri/backend'
 import { $R, Option, R, range, Result } from '@openhome-core/util/functional'
 import { NowOrLater } from '@openhome-core/util/promise'
@@ -176,10 +176,12 @@ export default function SavesProvider({ children }: SavesProviderProps) {
   const saveChangesEvent = useEffectEvent(saveChanges)
 
   useEffect(() => {
+    let ignore = false
     // returns a function to stop listening
     const stopListening = TauriBackend.onMenuEvents({
       save: () => saveChangesEvent(false),
       reset: async () => {
+        if (ignore) return
         openSavesDispatch({ type: 'clear_mons_to_release' })
         await Promise.all([reloadBankStore(), reloadItemBag()])
         clearOhpkmCache()
@@ -190,6 +192,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     // the "stop listening" function should be called when the effect returns,
     // otherwise duplicate listeners will exist
     return () => {
+      ignore = true
       stopListening()
     }
   }, [openSavesDispatch, reloadBankStore])

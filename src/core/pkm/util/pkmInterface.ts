@@ -1,6 +1,6 @@
 import { PkmOrOhpkmFormat } from '@openhome-core/pkm/util'
 import { Move } from '@openhome-core/resources'
-import { PluginIdentifier } from '@openhome-core/save/interfaces'
+import { PluginIdentifier } from '@openhome-core/tauri/spectaCommands'
 import { MonTag } from '@openhome-ui/util/tags'
 import {
   AbilityIndex,

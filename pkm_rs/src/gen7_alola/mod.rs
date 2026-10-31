@@ -88,7 +88,9 @@ type BoxSlot = pkm_rs_types::BoundedU8<{ BOX_SLOTS - 1 }>;
 
 #[cfg(test)]
 mod tests {
-    use super::{BOX_COUNT, BOX_SLOTS, BoxIndex, BoxSlot};
+    use pkm_rs_types::NationalDex;
+
+    use super::*;
     use crate::result::{Error, Result};
 
     #[test]
@@ -101,6 +103,13 @@ mod tests {
             BoxSlot::check_bound(slot).or(Err(Error::BoxSlot(slot)))?;
         }
 
+        Ok(())
+    }
+
+    #[test]
+    fn vivillon_valid() -> Result<()> {
+        Pk7SpeciesAndForm::try_new(SpeciesForm::new_valid_ndex(NationalDex::Vivillon, 7).unwrap())
+            .expect("vivillon is valid");
         Ok(())
     }
 }

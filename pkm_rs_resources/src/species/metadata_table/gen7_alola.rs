@@ -1,7 +1,7 @@
 use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
 use crate::pkhex_bin::{SM_LEVELUP_PKL, SM_PERSONAL_FILE, USUM_LEVELUP_PKL, USUM_PERSONAL_FILE};
-use crate::species::metadata_table::{BaseStats, GameMetadata, PersonalInfo};
+use crate::species::metadata_table::{BaseStats, FormExistsCheck, GameMetadata, PersonalInfo};
 
 const GEN7_ALOLA_ENTRY_SIZE: usize = 0x54;
 
@@ -57,6 +57,7 @@ impl PersonalInfoGen7Alola {
 
 impl PersonalInfo for PersonalInfoGen7Alola {
     const MAX_NATIONAL_DEX: NationalDex = NationalDex::Zeraora;
+    const BASE_FORM_PERSONAL_INFO: FormExistsCheck = FormExistsCheck::BaseInfo;
 
     fn from_pkl_bytes(bytes: &'static [u8]) -> Self {
         Self::from_pkl_bytes(bytes)
@@ -94,6 +95,12 @@ mod tests {
             metadata.get_game_index(NationalDex::Urshifu as u16, 0),
             None
         );
+    }
+
+    #[test]
+    fn vivillon_form_supported() {
+        assert!(METADATA_TABLE_SM.form_is_present(NationalDex::Vivillon as u16, 18));
+        assert!(METADATA_TABLE_USUM.form_is_present(NationalDex::Vivillon as u16, 18));
     }
 
     #[test]

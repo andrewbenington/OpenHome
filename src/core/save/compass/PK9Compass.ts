@@ -1,11 +1,11 @@
 import { PluginPKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import PK9 from '@openhome-core/pkm/PK9'
-import { PkmConstructorOptions } from '@openhome-core/pkm/PKM'
+import { PkmConstructorOptions } from '@openhome-core/pkm/types'
 import { modernStatCalc } from '@openhome-core/pkm/util'
+import { PluginIdentifier } from '@openhome-core/tauri/spectaCommands'
 import { Errorable, R } from '@openhome-core/util/functional'
 import { ConvertStrategy, OriginGames, Pk9Wasm, PkmFormat } from '@pkm-rs/pkg'
-import { PluginIdentifier } from '../interfaces'
 
 const COMPASS_PLUGIN_ID = 'compass'
 

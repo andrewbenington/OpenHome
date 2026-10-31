@@ -20,7 +20,7 @@ import {
   SpeciesLookup,
   TeraType,
 } from '@pkm-rs/pkg'
-import { PkmConstructorOptions } from './PKM'
+import { PkmConstructorOptions } from './types'
 import * as encryption from './util/encryption'
 import { convertPokeDate, convertPokeDateOptional } from './wasm/convert'
 

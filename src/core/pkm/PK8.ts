@@ -21,7 +21,7 @@ import {
   SpeciesLookup,
   swshTrIndexByMoveId,
 } from '@pkm-rs/pkg'
-import { PkmConstructorOptions } from './PKM'
+import { PkmConstructorOptions } from './types'
 import { convertPokeDate, convertPokeDateOptional } from './wasm/convert'
 
 export default class PK8 {

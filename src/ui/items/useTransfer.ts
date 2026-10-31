@@ -1,28 +1,9 @@
 import { SAV } from '@openhome-core/save/interfaces'
 import { Option } from '@openhome-core/util/functional'
 import { useItemBag } from '@openhome-ui/state/items'
-// import { Availability, OriginGame, SvItemStorage } from '@pkm-rs/pkg'
-import { $O } from '@openhome-core/util/option'
-import {
-  Availability,
-  Item,
-  OpenhomeItemCategory,
-  OpenhomeItemStorage,
-  OriginGame,
-  SvItemStorage,
-} from '@pkm-rs/pkg'
+import { OpenhomeItemStorage } from '@pkm-rs/pkg'
 import { useMemo } from 'react'
-import { ItemData } from './ItemRow'
-
-export type SourceType = OriginGame | 'OpenHome'
-export interface ItemTransferSource {
-  getItemData: (pouchIndex?: number) => ItemData[]
-  database: ItemTransferDatabase
-  sourceType: SourceType
-  addItems: (index: number, count: number) => void
-  removeItems: (index: number, count: number) => void
-  getPouchName?: (pouchIndex?: number) => string
-}
+import { ItemTransferSource, OpenHomeItemTransfer } from './types'
 
 export function useOpenHomeItemTransfer(): ItemTransferSource {
   const { itemCounts, addItem, removeItem } = useItemBag()
@@ -53,7 +34,6 @@ export function useOpenHomeItemTransfer(): ItemTransferSource {
     removeItems: removeItem,
   }
 }
-
 // type ItemTransferSave = SAV & Required<Pick<SAV, 'getItemInventory' | 'updateItemData'>>
 
 export function useSaveItemTransfer(save: SAV): Option<ItemTransferSource> {
@@ -97,42 +77,4 @@ export function useSaveItemTransfer(save: SAV): Option<ItemTransferSource> {
     addItems,
     removeItems,
   }
-}
-
-export interface ItemTransferDatabase {
-  categoryIndexes: () => number[]
-  categoryName: (categoryIndex: number) => Option<string>
-  maxAllowed: (itemIndex: number) => Option<number>
-  availability: (index: number) => Availability
-  internalCategoryForItem: (itemIndex: number) => Option<number>
-  internalCategoryToOpenhome: (categoryIndex: number) => OpenhomeItemCategory
-  internalCategoryFromOpenhome: (categoryToConvert: OpenhomeItemCategory) => Option<number>
-}
-// console.log(SvItemStorage.pouchIndexes)
-
-export const OpenHomeItemTransfer: ItemTransferDatabase = {
-  categoryIndexes: () => Array.from(OpenhomeItemStorage.categoryIndexes()),
-  categoryName: OpenhomeItemStorage.categoryName,
-  maxAllowed: (index) => (OpenhomeItemStorage.categoryForItem(index) === 'KeyItems' ? 1 : 99999),
-  availability: (index) => {
-    const item = Item.fromIndex(index)
-    return !item?.name || item.name === '???' ? 'Unsupported' : 'Obtainable'
-  },
-  internalCategoryForItem: OpenhomeItemStorage.categoryIndexForItem,
-  internalCategoryToOpenhome: OpenhomeItemStorage.categoryFromIndex,
-  internalCategoryFromOpenhome: OpenhomeItemStorage.categoryIndex,
-}
-
-export const ScarletVioletItemTransfer: ItemTransferDatabase = {
-  categoryIndexes: () => Array.from(SvItemStorage.pouchIndexes()),
-  categoryName: SvItemStorage.pouchName,
-  maxAllowed: SvItemStorage.maxAllowed,
-  availability: SvItemStorage.availabilityOf,
-  internalCategoryForItem: (index) =>
-    $O(SvItemStorage.pouchIndexForItem(index))
-      .map(SvItemStorage.pouchIndexToOpenHome)
-      .map(OpenhomeItemStorage.categoryIndex)
-      .get(),
-  internalCategoryToOpenhome: SvItemStorage.pouchIndexToOpenHome,
-  internalCategoryFromOpenhome: SvItemStorage.pouchIndexFromOpenHome,
 }

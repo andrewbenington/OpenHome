@@ -19,11 +19,14 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
 import PK3RR from '@openhome-core/save/radicalred/PK3RR'
+import { SavePkmClass } from '@openhome-core/save/types'
 import PK3UB from '@openhome-core/save/unbound/PK3UB'
-import { AnyPkmClass, SavePkmClass } from '@openhome-core/save/util'
+import { Option } from '@openhome-core/util/functional'
 import { PkmFormat } from '@pkm-rs/pkg/pkm_rs'
 import PK9Compass from '../save/compass/PK9Compass'
 import { isPkmFormat, PkmOrOhpkmFormat } from './util'
+
+type AnyPkmClass = SavePkmClass | typeof OHPKM
 
 function fileTypeFromBytes(bytes: Uint8Array): SavePkmClass | undefined {
   switch (bytes.length) {
@@ -91,7 +94,7 @@ export function fileTypeFromStringNonOhpkm(type: PkmFormat): SavePkmClass | unde
   }
 }
 
-function fileTypeFromString(type: PkmOrOhpkmFormat): AnyPkmClass | undefined {
+function fileTypeFromString(type: PkmOrOhpkmFormat): Option<AnyPkmClass> {
   if (type === 'OHPKM') {
     return OHPKM
   }
@@ -99,7 +102,7 @@ function fileTypeFromString(type: PkmOrOhpkmFormat): AnyPkmClass | undefined {
 }
 
 export const bytesToPKM = (bytes: Uint8Array, extension: string): PKMInterface => {
-  let T: AnyPkmClass | undefined
+  let T: Option<AnyPkmClass>
 
   if (extension === '' || extension.toUpperCase() === 'PKM') {
     T = fileTypeFromBytes(new Uint8Array(bytes))

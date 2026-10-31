@@ -14,7 +14,7 @@ import {
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import { FourMoves, Stats, ToBytesOptions } from '../util/types'
-import { PkmConstructorOptions } from './PKM'
+import { PkmConstructorOptions } from './types'
 import * as encryption from './util/encryption'
 
 export default class PK3 implements PKMInterface {

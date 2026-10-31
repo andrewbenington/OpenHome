@@ -1,7 +1,7 @@
 import { R } from '@openhome-core/util/functional'
-import { SAVClass } from '.'
 import { Errorable } from '../../util/functional'
 import { SAV } from '../interfaces'
+import { SAVClass } from '../types'
 import { PathData } from './path'
 
 export const getPossibleSaveTypes = (

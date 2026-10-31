@@ -54,16 +54,6 @@ export type PkmClass<P extends PKMInterface> = {
   getFormat(): PkmFormat
 }
 
-export type PkmConstructorOptions =
-  | {
-      encrypted?: boolean
-      strategy?: never
-    }
-  | {
-      encrypted?: never
-      strategy: ConvertStrategy
-    }
-
 export function isRomHackFormat(format: string): format is 'PK3RR' | 'PK3UB' | 'PB8LUMI' {
   return format === 'PK3RR' || format === 'PK3UB' || format === 'PB8LUMI'
 }

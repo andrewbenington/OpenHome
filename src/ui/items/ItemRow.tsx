@@ -6,16 +6,7 @@ import { Grid } from '@radix-ui/themes'
 import { CSSProperties } from 'react'
 import { ItemIcon } from './ItemIcon'
 import './ItemRow.css'
-import { ItemTransferDatabase } from './transfer'
-
-export type ItemData = {
-  index: number
-  pouch: number
-  count: number
-  isNew?: boolean
-  isObtained: boolean
-  isFavorite: boolean
-}
+import { ItemData, ItemTransferDatabase } from './types'
 
 export interface ItemRowProps {
   itemData: ItemData

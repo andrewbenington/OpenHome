@@ -3,9 +3,13 @@ import { Errorable, R } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
 import { ConvertStrategy, getDefaultConvertStrategy } from '@pkm-rs/pkg'
 import { createContext, useContext } from 'react'
-import { ConvertStrategies } from './ConvertStrategiesProvider'
 
 const ZERO_UUID = '00000000-0000-0000-0000-000000000000'
+
+export type ConvertStrategies = {
+  strategies_by_id: Partial<Record<string, NamedStrategy>>
+  default_strategy_id: string
+}
 
 export type ConvertStrategiesController = {
   convertStrategies: ConvertStrategies

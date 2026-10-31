@@ -1,8 +1,8 @@
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import LoadingIndicator from '@openhome-ui/components/LoadingIndicator'
 import { Callout, Flex } from '@radix-ui/themes'
-
-import { TauriBackend } from '@openhome-core/tauri/backend'
+// import { TauriBackend } from '@openhome-core/tauri/backend'
+import useBackend from '@openhome-core/backend/useBackend'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   createContext,
@@ -20,9 +20,10 @@ const BAG_KEY = ['ITEM_BAG'] as const
 
 // remote state fetching layer
 export function ItemBagProvider({ children }: PropsWithChildren) {
+  const backend = useBackend()
   const { data, isPending, error } = useQuery({
     queryKey: BAG_KEY,
-    queryFn: TauriBackend.loadItemBag,
+    queryFn: backend.loadItemBag,
   })
 
   if (error) {
@@ -78,6 +79,7 @@ export const LoadedLocalStateContext = createContext<LoadedLocalStateController>
 // hook exposing item bag API to the rest of the app
 export function useItemBag() {
   const queryClient = useQueryClient()
+  const backend = useBackend()
   const { state, dispatch } = useContext(LoadedLocalStateContext)
   const [loading, setLoading] = useState(false)
 
@@ -85,13 +87,13 @@ export function useItemBag() {
     setLoading(true)
     const response = await queryClient.query({
       queryKey: BAG_KEY,
-      queryFn: TauriBackend.loadItemBag,
+      queryFn: backend.loadItemBag,
       staleTime: 0,
     })
 
     dispatch({ type: 'load_item_bag', payload: response })
     setLoading(false)
-  }, [queryClient, dispatch])
+  }, [queryClient, dispatch, backend])
 
   function addItem(index: number, quantity: number) {
     dispatch({ type: 'add_item', payload: { index, qty: quantity } })

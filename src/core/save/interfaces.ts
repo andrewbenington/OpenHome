@@ -2,7 +2,7 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { PluginIdentifier as RustPluginIdentifier } from '@openhome-core/tauri/spectaCommands'
 import { Errorable, Option, R, range, Result } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
-import { ItemTransferDatabase } from '@openhome-ui/items/transfer'
+import { ItemTransferDatabase } from '@openhome-ui/items/types'
 import {
   BinaryGender,
   ConvertStrategy,
@@ -14,7 +14,7 @@ import {
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
 import { filterUndefined } from '../util/sort'
-import { LookupType, SAVClass } from './util'
+import { LookupType, SAVClass } from './types'
 import { PathData } from './util/path'
 import { TransferRestrictions } from './util/TransferRestrictions'
 
@@ -424,6 +424,8 @@ export interface WasmSaveInner<P> {
   getPcMonCount(): number
 
   getBoxName(box_num: number): string
+
+  free(): void
 }
 
 type WasmPkmInterface<P> = PKMInterface & { inner: P }
@@ -552,5 +554,11 @@ export abstract class WasmOfficialSave<
 
   getBoxName(boxIndex: number): string {
     return this.inner.getBoxName(boxIndex)
+  }
+
+  free() {
+    if ('__wbg_ptr' in this.inner && this.inner.__wbg_ptr !== 0) {
+      this.inner.free()
+    }
   }
 }
