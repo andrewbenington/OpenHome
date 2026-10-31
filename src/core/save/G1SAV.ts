@@ -15,7 +15,7 @@ import {
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
-import { LookupType } from './util'
+import { LookupType } from './types'
 import {
   areGen2JapanCrystalChecksumsValid,
   areGen2JapanGoldSilverChecksumsValid,

@@ -1,4 +1,4 @@
-import { PluginIdentifier } from '@openhome-core/save/interfaces'
+import { PluginIdentifier } from '@openhome-core/tauri/spectaCommands'
 import { pluralize } from '@openhome-core/util/format'
 import { Nullable, Option } from '@openhome-core/util/functional'
 import { getPublicImageURL } from '@openhome-ui/images/images'

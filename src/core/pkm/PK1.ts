@@ -23,7 +23,7 @@ import * as types from '../util/types'
 import { MoveFilter } from '../util/util'
 import * as conversion from './conversion'
 import { PkmConverter } from './conversion/converter'
-import { PkmConstructorOptions } from './PKM'
+import { PkmConstructorOptions } from './types'
 
 const BOX_SIZE_WESTERN = 69
 const BOX_SIZE_JAPAN = 59

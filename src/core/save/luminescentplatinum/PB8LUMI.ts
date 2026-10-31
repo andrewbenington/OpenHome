@@ -1,6 +1,7 @@
 import { PB8 } from '@openhome-core/pkm'
 import { PluginPKMInterface } from '@openhome-core/pkm/interfaces'
-import { PkmConstructorOptions } from '@openhome-core/pkm/PKM'
+import { PkmConstructorOptions } from '@openhome-core/pkm/types'
+import { PluginIdentifier } from '@openhome-core/tauri/spectaCommands'
 import { Errorable, Option, R } from '@openhome-core/util/functional'
 import {
   ConvertStrategy,
@@ -9,7 +10,6 @@ import {
   OriginGames,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
-import { PluginIdentifier } from '../interfaces'
 import { getLumiCustomForm as getLumiExtraFormIndex } from './conversion/LuminescentPlatinumFormMap'
 import {
   fromLumiItemIndex,

@@ -2,7 +2,7 @@ import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { getTypes, isMegaStone, isZCrystal } from '@openhome-core/pkm/util'
 import { DisplayDataOhpkm, FormSpecifiersForFormat } from '@openhome-core/pkm/util/pkmInterface'
 import { Move } from '@openhome-core/resources'
-import { PluginIdentifier } from '@openhome-core/save/interfaces'
+import { PluginIdentifier } from '@openhome-core/tauri/spectaCommands'
 import * as types from '@openhome-core/util/types'
 import {
   AbilityIndex,

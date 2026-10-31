@@ -20,8 +20,8 @@ import { G8LumiSAV } from '@openhome-core/save/luminescentplatinum/G8LUMISAV'
 import { ORASSAV } from '@openhome-core/save/ORASSAV'
 import { PtSAV } from '@openhome-core/save/PtSAV'
 import { G3RRSAV } from '@openhome-core/save/radicalred/G3RRSAV'
+import { PluginSaveClass, SAVClass } from '@openhome-core/save/types'
 import { G3UBSAV } from '@openhome-core/save/unbound/G3UBSAV'
-import { PluginSaveClass, SAVClass } from '@openhome-core/save/util'
 import { XYSAV } from '@openhome-core/save/XYSAV'
 import { MonDisplayState } from '@openhome-ui/hooks/monDisplay'
 import { SaveViewMode } from '@openhome-ui/saves/util'
@@ -29,6 +29,7 @@ import { updateStyleForUiScale } from '@openhome-ui/util/style'
 import { Dispatch, Reducer, createContext } from 'react'
 
 const ScarletViolet = ScarletVioletSave
+console.log(ScarletVioletSave)
 
 export const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
   G1SAV,
@@ -65,6 +66,8 @@ function initialMonDisplayState(): MonDisplayState {
     boxIconSprites: 'default',
   }
 }
+
+console.log(OFFICIAL_SAVE_TYPES)
 
 export const defaultSettings: Settings = {
   enabledSaveTypes: Object.fromEntries(

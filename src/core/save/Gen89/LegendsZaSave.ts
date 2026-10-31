@@ -33,9 +33,9 @@ const SAVE_SIZE_2_0_1 = 0x309fb3
 export class LegendsZaSave extends Gen8Gen9Save<PA9> {
   static boxSizeBytes = (PA9.getBoxSize() + BOX_SLOT_GAP_BYTES) * 30
   static pkmType = PA9
-  static saveTypeAbbreviation = 'SV'
-  static saveTypeName = 'Pokémon Scarlet/Violet'
-  static saveTypeID = 'SVSAV'
+  static saveTypeAbbreviation = 'ZA'
+  static saveTypeName = 'Pokémon Legends Z-A'
+  static saveTypeID = 'ZASAV'
 
   trainerBlock: MyStatus
 

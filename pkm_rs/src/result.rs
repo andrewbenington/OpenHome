@@ -59,9 +59,7 @@ pub enum Error {
         value: u16,
         converting_from: PokemonIndexType,
     },
-    #[error(
-        "Invalid form index {form_index} for national dex {national_dex} (must be <= {form_index})"
-    )]
+    #[error("Invalid form index {form_index} for national dex {national_dex}")]
     FormIndex {
         national_dex: NationalDex,
         form_index: u16,

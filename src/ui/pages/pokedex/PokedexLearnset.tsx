@@ -3,7 +3,7 @@ import MoveCard from '@openhome-ui/components/pokemon/MoveCard'
 import { FormMetadata, MetadataSource } from '@pkm-rs/pkg'
 import { Card, Flex, Text } from '@radix-ui/themes'
 import './PokedexLearnset.css'
-import { MOST_CURRENT_SOURCE, MostCurrentSource } from './PokedexPage'
+import { MOST_CURRENT_SOURCE, MostCurrentSource } from './util'
 
 interface PokedexLearnsetProps {
   selectedForm: FormMetadata

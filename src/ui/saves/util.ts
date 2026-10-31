@@ -1,11 +1,7 @@
 import BackendInterface from '@openhome-core/backend/backendInterface'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import {
-  pluginGameName,
-  PluginIdentifier,
-  pluginOriginMarkPath,
-  SAV,
-} from '@openhome-core/save/interfaces'
+import { pluginGameName, pluginOriginMarkPath, SAV } from '@openhome-core/save/interfaces'
+import { PluginIdentifier } from '@openhome-core/tauri/spectaCommands'
 import { Option } from '@openhome-core/util/functional'
 import { isThenable } from '@openhome-core/util/promise'
 import { SaveRef } from '@openhome-core/util/types'

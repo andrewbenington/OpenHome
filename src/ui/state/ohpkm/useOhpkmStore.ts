@@ -9,7 +9,7 @@ import {
 } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
-import { SAVClass } from '@openhome-core/save/util'
+import { SAVClass } from '@openhome-core/save/types'
 import { Filter, PaginationCursor } from '@openhome-core/tauri/spectaCommands'
 import { expectExhaustive } from '@openhome-core/util'
 import { $R, Option, PromisedResultBox, R, Result } from '@openhome-core/util/functional'
@@ -96,8 +96,6 @@ export function useOhpkmStore() {
         .then((ohpkm) => {
           if (ohpkm) {
             ohpkmCache.set(ohpkm.openhomeId, ohpkm)
-          } else {
-            console.warn(`ID NOT FOUND: ${id}`)
           }
           return ohpkm
         })

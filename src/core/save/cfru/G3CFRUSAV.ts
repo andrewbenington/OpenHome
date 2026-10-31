@@ -1,4 +1,5 @@
 import { PluginPKMInterface } from '@openhome-core/pkm/interfaces'
+import { PluginIdentifier } from '@openhome-core/tauri/spectaCommands'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -7,8 +8,8 @@ import {
 } from '@openhome-core/util/byteLogic'
 import { $R, Option, R, Result } from '@openhome-core/util/functional'
 import { BinaryGender, Gen3Strings, Language, OriginGame } from '@pkm-rs/pkg'
-import { Box, BoxAndSlot, PluginIdentifier, PluginSAV } from '../interfaces'
-import { LookupType } from '../util'
+import { Box, BoxAndSlot, PluginSAV } from '../interfaces'
+import { LookupType } from '../types'
 import { PathData } from '../util/path'
 
 export const SAVE_SIZES_BYTES = [0x20000, 0x20010]
