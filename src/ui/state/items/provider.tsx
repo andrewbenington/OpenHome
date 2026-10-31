@@ -1,8 +1,7 @@
+import useBackend from '@openhome-core/backend/useBackend'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import LoadingIndicator from '@openhome-ui/components/LoadingIndicator'
 import { Callout, Flex } from '@radix-ui/themes'
-// import { TauriBackend } from '@openhome-core/tauri/backend'
-import useBackend from '@openhome-core/backend/useBackend'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   createContext,
@@ -24,6 +23,7 @@ export function ItemBagProvider({ children }: PropsWithChildren) {
   const { data, isPending, error } = useQuery({
     queryKey: BAG_KEY,
     queryFn: backend.loadItemBag,
+    retry: 0,
   })
 
   if (error) {
@@ -89,6 +89,7 @@ export function useItemBag() {
       queryKey: BAG_KEY,
       queryFn: backend.loadItemBag,
       staleTime: 0,
+      retry: 0,
     })
 
     dispatch({ type: 'load_item_bag', payload: response })
