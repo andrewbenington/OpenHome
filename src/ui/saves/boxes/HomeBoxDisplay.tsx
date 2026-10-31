@@ -27,7 +27,7 @@ import {
   useDragSourceSupportsMon,
   useIsDraggingActive,
 } from '@openhome-ui/state-zustand/drag-and-drop/dragStore'
-import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
+import useOhpkmBatchIdLookup from '@openhome-ui/state/ohpkm/useOhpkmIdBatchLookup'
 import useTrackedDataRecovery from '@openhome-ui/state/ohpkm/useTrackedDataRecovery'
 import { EMPTY_SLOT, HomeMonLocation, useSaves } from '@openhome-ui/state/saves'
 import { cssClass } from '@openhome-ui/util/style'
@@ -46,7 +46,7 @@ import useMultiSelect from '../../state/drag-and-drop/useMultiSelect'
 import { useOpenHomeBoxNavigator } from '../util'
 import AllHomeBoxes from './AllHomeBoxes'
 import ArrowButton from './ArrowButton'
-import BoxCellAsync, { BoxSlotContents } from './BoxCellAsync'
+import BoxCellAsync, { BoxSlotResult } from './BoxCellAsync'
 import DroppableSpace from './DroppableSpace'
 import './style.css'
 
@@ -248,13 +248,13 @@ export default function HomeBoxDisplay() {
 }
 
 type SlotData = {
-  monPromise: BoxSlotContents
+  monPromise: Option<BoxSlotResult>
   location: HomeMonLocation
   identifier: Option<OhpkmIdentifier>
+  loading?: boolean
 }
 
 function SingleBoxMonDisplay() {
-  const ohpkmStore = useOhpkmStore()
   const displayError = useDisplayError()
   const { importMonsToLocation, getPendingMon } = useSaves()
   const { getCurrentBox, getCurrentBank, removeAllHomeDupes } = useBanksAndBoxes()
@@ -269,11 +269,6 @@ function SingleBoxMonDisplay() {
   } = useOpenHomeBoxNavigator()
 
   const currentBox = getCurrentBox()
-  const getById = ohpkmStore.tryLoadFromId
-  const lookupOhpkmById = useCallback(
-    (identifier: OhpkmIdentifier) => getById(identifier),
-    [getById]
-  )
 
   const TrackedDataRecovery = useTrackedDataRecovery()
   const dataRecoverySearchModal = {
@@ -308,6 +303,10 @@ function SingleBoxMonDisplay() {
   const currentBankIndex = getCurrentBank().index
   const currentBoxIndex = getCurrentBox().index
 
+  const { batchResults: ohpkmsById, loading } = useOhpkmBatchIdLookup(
+    Array.from(currentBox.identifiers.values())
+  )
+
   const slots: SlotData[] = useMemo(
     () =>
       range(OPENHOME_BOX_SLOTS)
@@ -321,7 +320,7 @@ function SingleBoxMonDisplay() {
           }
 
           let identifier = storedId
-          let monPromise: BoxSlotContents = R.Ok(undefined) as BoxSlotContents
+          let monPromise: BoxSlotResult = R.Ok(undefined) as BoxSlotResult
 
           // pendingMon means this slot is in the process of being updated, but needs to wait
           // for the OHPKM data to be registered. In the meantime the pendingMon should be displayed
@@ -334,29 +333,29 @@ function SingleBoxMonDisplay() {
               identifier = pendingMon
             } else {
               identifier = undefined
-              monPromise = R.Ok(pendingMon) as BoxSlotContents
+              monPromise = R.Ok(pendingMon) as BoxSlotResult
             }
           }
 
           if (identifier) {
-            const lookupResult = lookupOhpkmById(identifier)
-            if (isThenable(lookupResult)) {
-              monPromise = lookupResult
-            } else if (lookupResult) {
-              monPromise = lookupOhpkmById(identifier)
-            }
+            const lookupResult = ohpkmsById?.get(identifier)
+            monPromise =
+              lookupResult ?? (loading ? (R.Ok(undefined) as BoxSlotResult) : R.Err({ identifier }))
           }
 
-          return { monPromise, location, identifier }
+          const monPresentButLoading =
+            (loading && identifier !== undefined && monPromise !== undefined) ||
+            pendingMon !== undefined
+          return { monPromise, location, identifier, loading: monPresentButLoading }
         }),
-    [currentBankIndex, currentBox.identifiers, currentBoxIndex, getPendingMon, lookupOhpkmById]
+    [currentBankIndex, currentBox.identifiers, currentBoxIndex, getPendingMon, ohpkmsById, loading]
   )
 
   return (
     <>
       <OpenHomeCtxMenu sections={[contextElements, [removeDupesItem]]}>
         <div className="home-box-grid">
-          {slots.map(({ monPromise, location, identifier }, index) => {
+          {slots.map(({ monPromise, location, identifier, loading }, index) => {
             // if underlying data changes but this key doesn't, the box cell will be stale and may not display the correct species
             const uniqueKey = identifier ?? `${currentBoxIndex}-${index}`
 
@@ -367,6 +366,7 @@ function SingleBoxMonDisplay() {
                 key={uniqueKey}
                 monPlaceholder={!isThenable(monNowOrLater) ? monNowOrLater : undefined}
                 monPromise={monPromise}
+                loading={loading}
                 onClick={() => setSelectedIndex(index)}
                 dragID={`home_${currentBoxIndex}_${index}`}
                 location={location}

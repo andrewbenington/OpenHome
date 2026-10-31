@@ -16,7 +16,6 @@ export default function useOhpkmIdBatchLookup(
   const [loading, setLoading] = useState(true)
   const ohpkmStore = useOhpkmStore()
   const [batchResults, setBatchResults] = useState<Option<OhpkmBatchLookupResults>>()
-
   const loadBatch = useEffectEvent(() => ohpkmStore.tryLoadBatch(openhomeIds))
   const subscribeOhpkmUpdates = useEffectEvent(ohpkmStore.subscribeAllUpdates)
   const openhomeIdsKey = openhomeIds.join()
@@ -31,12 +30,13 @@ export default function useOhpkmIdBatchLookup(
     if (isThenable(batchResult)) {
       batchResult
         .then((result) => {
+          setLoading(false)
           if (!ignore) {
             setBatchResults(result)
-            setLoading(false)
           }
         })
         .catch((error) => displayError('Error loading OHPKM batch', `Error: '${error}'`))
+        .finally(() => setLoading(false))
     } else {
       setBatchResults(batchResult)
       setLoading(false)
@@ -52,10 +52,9 @@ export default function useOhpkmIdBatchLookup(
 
     // if this effect is cleaned up before the results return, the ignore flag tells the callback that it is outdated and should set the results
     let ignore = false
-    setLoading(true)
 
     const cancel = subscribeOhpkmUpdates((id, ohpkm) => {
-      if (ignore) return
+      if (ignore || !batchResults.has(id)) return
 
       const newResults = new Map(batchResults)
       newResults.set(id, ohpkm ? R.Ok(ohpkm) : R.Err({ identifier: id }))
@@ -68,5 +67,5 @@ export default function useOhpkmIdBatchLookup(
     }
   }, [batchResults, openhomeIdsKey])
 
-  return { loading, batchResults }
+  return { loading: loading || !batchResults, batchResults }
 }

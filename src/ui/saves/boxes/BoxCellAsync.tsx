@@ -20,6 +20,7 @@ interface BoxCellAsyncProps {
   onClick: () => void
   monPlaceholder?: Option<BoxCellMon>
   monPromise?: BoxSlotContents
+  loading?: boolean
   onDrop: (_: PKMInterface[]) => void
   isDisabled?: (mon: Option<BoxCellMon>) => boolean
   disabledReason?: string
@@ -34,6 +35,28 @@ interface BoxCellAsyncProps {
 }
 
 function BoxCellAsync(props: BoxCellAsyncProps) {
+  if (props.loading)
+    return (
+      <div
+        className="box-cell box-cell-loading"
+        style={{
+          backgroundColor: '#6662',
+        }}
+      >
+        <img
+          src="/items/index/0000.png"
+          alt=""
+          aria-hidden
+          draggable={false}
+          style={{
+            width: 'calc(0.7 * var(--box-cell-size))',
+            aspectRatio: 1,
+            padding: '0.25rem',
+          }}
+        />
+      </div>
+    )
+
   return props.monPromise ? (
     <Suspense
       fallback={
