@@ -1,4 +1,3 @@
-//use crate::bytes::{AsBytes, AsBytesMut};
 use crate::bytes::AsBytes;
 use crate::result::Result;
 use pkm_rs_resources::abilities::AbilityIndexWasm;
@@ -34,10 +33,7 @@ impl From<Offset> for usize {
 // covers all getters, and a second (narrower) block covers setters.
 //
 //   PkhPb8BufferRef<'a>  = PkhPb8Buffer<&'a [u8]>       — read-only
-//   PkhPb8BufferMut<'a>  = PkhPb8Buffer<&'a mut [u8]>   — read + write
 // ---------------------------------------------------------------------------
-
-//pub type PkhPb8BufferMut<'a> = PkhPb8Buffer<&'a mut [u8]>;
 
 #[derive(Default, Clone, Copy)]
 pub struct PkhPb8Buffer<S: AsRef<[u8]>>(S);
@@ -54,17 +50,6 @@ impl<'a> PkhPb8Buffer<&'a [u8]> {
 }
 
 // ------------------------------------------------------------------
-// Constructors — mutable
-// ------------------------------------------------------------------
-
-//impl<'a> PkhPb8Buffer<&'a mut [u8]> {
-//    pub fn new_mut(span: &'a mut [u8]) -> Self {
-//        assert_eq!(span.len(), super::HOME_PB8_DATA_SIZE);
-//        Self(span)
-//    }
-//}
-
-// ------------------------------------------------------------------
 // Accessors
 // ------------------------------------------------------------------
 
@@ -78,44 +63,7 @@ impl<S: AsRef<[u8]>> PkhPb8Buffer<S> {
         let offset = offset as usize;
         read_u16_le!(self.bytes(), offset)
     }
-
-    fn get_array<const N: usize>(&self, offset: Offset) -> [u8; N] {
-        let offset = offset as usize;
-        self.bytes()[offset..offset + N].try_into().unwrap()
-    }
 }
-
-//impl<S: AsRef<[u8]> + AsMut<[u8]>> PkhPb8Buffer<S> {
-//    fn set_u8(&mut self, offset: Offset, v: u8) {
-//        let offset = offset as usize;
-//        self.bytes_mut()[offset] = v;
-//    }
-//
-//    fn set_u16_le(&mut self, offset: Offset, v: u16) {
-//        let offset = offset as usize;
-//        self.bytes_mut()[offset..offset + 2].copy_from_slice(&v.to_le_bytes());
-//    }
-//
-//    fn set_u32_le(&mut self, offset: Offset, v: u32) {
-//        let offset = offset as usize;
-//        self.bytes_mut()[offset..offset + 4].copy_from_slice(&v.to_le_bytes());
-//    }
-//
-//    fn set_u64_le(&mut self, offset: Offset, v: u64) {
-//        let offset = offset as usize;
-//        self.bytes_mut()[offset..offset + 8].copy_from_slice(&v.to_le_bytes());
-//    }
-//
-//    fn set_flag(&mut self, offset: Offset, bit_index: usize, v: bool) {
-//        let offset = offset as usize;
-//        util::set_flag(self.bytes_mut(), offset, bit_index, v);
-//    }
-//
-//    fn set_array<const N: usize>(&mut self, offset: Offset, v: &[u8; N]) {
-//        let offset = offset as usize;
-//        self.bytes_mut()[offset..offset + N].copy_from_slice(v);
-//    }
-//}
 
 // ------------------------------------------------------------------
 // Shared methods
@@ -175,16 +123,6 @@ impl<S: AsRef<[u8]>> PkhPb8Buffer<S> {
 }
 
 // ==================================================================
-// Setters  (available only on PkhPb8BufferMut)
-// ==================================================================
-
-//impl<S: AsRef<[u8]> + AsMut<[u8]>> PkhPb8Buffer<S> {
-//    fn bytes_mut(&mut self) -> &mut [u8] {
-//        self.0.as_mut()
-//    }
-//}
-
-// ==================================================================
 // Trait impls
 // ==================================================================
 
@@ -193,9 +131,3 @@ impl<S: AsRef<[u8]>> AsBytes for PkhPb8Buffer<S> {
         self.0.as_ref()
     }
 }
-
-//impl<S: AsRef<[u8]> + AsMut<[u8]>> AsBytesMut for PkhPb8Buffer<S> {
-//    fn as_bytes_mut(&mut self) -> &mut [u8] {
-//        self.0.as_mut()
-//    }
-//}

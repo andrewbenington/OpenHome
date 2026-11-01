@@ -23,8 +23,6 @@ pub struct HomePb7Data {
     pub moves: MoveSlots,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub relearn_moves: [MoveSlot; 4],
-    //pub height_absolute: f32,
-    //pub weight_absolute: f32,
     pub spirit: u8,
     pub mood: u8,
     pub fullness: u8,

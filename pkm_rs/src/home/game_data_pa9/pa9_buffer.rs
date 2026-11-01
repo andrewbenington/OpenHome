@@ -1,4 +1,3 @@
-//use crate::bytes::{AsBytes, AsBytesMut};
 use crate::bytes::AsBytes;
 use crate::result::Result;
 use crate::util;
@@ -33,10 +32,7 @@ impl From<Offset> for usize {
 // covers all getters, and a second (narrower) block covers setters.
 //
 //   PkhPa9BufferRef<'a>  = PkhPa9Buffer<&'a [u8]>       — read-only
-//   PkhPa9BufferMut<'a>  = PkhPa9Buffer<&'a mut [u8]>   — read + write
 // ---------------------------------------------------------------------------
-
-//pub type PkhPa9BufferMut<'a> = PkhPa9Buffer<&'a mut [u8]>;
 
 #[derive(Default, Clone, Copy)]
 pub struct PkhPa9Buffer<S: AsRef<[u8]>>(S);
@@ -87,38 +83,6 @@ impl<S: AsRef<[u8]>> PkhPa9Buffer<S> {
         self.bytes()[offset..offset + N].try_into().unwrap()
     }
 }
-
-//impl<S: AsRef<[u8]> + AsMut<[u8]>> PkhPa9Buffer<S> {
-//    fn set_u8(&mut self, offset: Offset, v: u8) {
-//        let offset = offset as usize;
-//        self.bytes_mut()[offset] = v;
-//    }
-//
-//    fn set_u16_le(&mut self, offset: Offset, v: u16) {
-//        let offset = offset as usize;
-//        self.bytes_mut()[offset..offset + 2].copy_from_slice(&v.to_le_bytes());
-//    }
-//
-//    fn set_u32_le(&mut self, offset: Offset, v: u32) {
-//        let offset = offset as usize;
-//        self.bytes_mut()[offset..offset + 4].copy_from_slice(&v.to_le_bytes());
-//    }
-//
-//    fn set_u64_le(&mut self, offset: Offset, v: u64) {
-//        let offset = offset as usize;
-//        self.bytes_mut()[offset..offset + 8].copy_from_slice(&v.to_le_bytes());
-//    }
-//
-//    fn set_flag(&mut self, offset: Offset, bit_index: usize, v: bool) {
-//        let offset = offset as usize;
-//        util::set_flag(self.bytes_mut(), offset, bit_index, v);
-//    }
-//
-//    fn set_array<const N: usize>(&mut self, offset: Offset, v: &[u8; N]) {
-//        let offset = offset as usize;
-//        self.bytes_mut()[offset..offset + N].copy_from_slice(v);
-//    }
-//}
 
 // ------------------------------------------------------------------
 // Shared methods
@@ -190,16 +154,6 @@ impl<S: AsRef<[u8]>> PkhPa9Buffer<S> {
 }
 
 // ==================================================================
-// Setters  (available only on PkhPa9BufferMut)
-// ==================================================================
-
-//impl<S: AsRef<[u8]> + AsMut<[u8]>> PkhPa9Buffer<S> {
-//    fn bytes_mut(&mut self) -> &mut [u8] {
-//        self.0.as_mut()
-//    }
-//}
-
-// ==================================================================
 // Trait impls
 // ==================================================================
 
@@ -208,9 +162,3 @@ impl<S: AsRef<[u8]>> AsBytes for PkhPa9Buffer<S> {
         self.0.as_ref()
     }
 }
-
-//impl<S: AsRef<[u8]> + AsMut<[u8]>> AsBytesMut for PkhPa9Buffer<S> {
-//    fn as_bytes_mut(&mut self) -> &mut [u8] {
-//        self.0.as_mut()
-//    }
-//}

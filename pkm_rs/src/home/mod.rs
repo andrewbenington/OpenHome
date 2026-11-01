@@ -1,4 +1,3 @@
-//use core_data::*;
 use game_data_pa8::*;
 use game_data_pa9::*;
 use game_data_pb7::*;

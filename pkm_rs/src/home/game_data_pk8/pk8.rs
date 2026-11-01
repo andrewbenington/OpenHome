@@ -24,7 +24,6 @@ pub struct HomePk8Data {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub relearn_moves: [MoveSlot; 4],
     pub dynamax_level: u8,
-    // poke job data goes here but is currently not read in OpenHome at all
     pub fullness: u8,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub tr_flags_swsh: FlagSet<14>,

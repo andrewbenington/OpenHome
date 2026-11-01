@@ -28,8 +28,6 @@ pub struct HomePa8Data {
     pub relearn_moves: [MoveSlot; 4],
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub gvs: Stats8,
-    //pub height_absolute: f32,
-    //pub weight_absolute: f32,
     pub ball: Ball,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub tutor_flags_la: FlagSet<MOVE_FLAG_BYTE_LENGTH>,
