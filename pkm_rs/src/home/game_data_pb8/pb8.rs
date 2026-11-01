@@ -5,7 +5,7 @@ use crate::result::{Error, Result};
 use pkm_rs_resources::abilities::{AbilityIndexBounded, AbilityIndexWasm};
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::{MoveSlot, MoveSlots};
-use pkm_rs_types::{AbilityNumber, FlagSet, Pokerus};
+use pkm_rs_types::{AbilityNumber, Pokerus};
 use serde::Serialize;
 
 #[cfg(feature = "wasm")]
@@ -21,8 +21,6 @@ pub struct HomePb8Data {
     pub moves: MoveSlots,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub relearn_moves: [MoveSlot; 4],
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub tm_flags_bdsp: FlagSet<14>,
     pub ball: Ball,
     pub egg_location_index: u16,
     pub met_location_index: u16,
@@ -46,7 +44,6 @@ impl HomePb8Data {
                 buf.relearn_move(2),
                 buf.relearn_move(3),
             ],
-            tm_flags_bdsp: FlagSet::from_bytes(buf.tm_flags_bdsp_raw()),
             ball: buf.ball(),
             egg_location_index: buf.egg_location_index(),
             met_location_index: buf.met_location_index(),
@@ -73,11 +70,6 @@ impl HomePb8Data {
     #[wasm_bindgen(getter)]
     pub fn relearn_move_indices(&self) -> Vec<u16> {
         self.relearn_moves.into_iter().map(u16::from).collect()
-    }
-
-    #[wasm_bindgen(getter = tmFlagsBdsp)]
-    pub fn tm_flags_bdsp_wasm(&self) -> Vec<u8> {
-        self.tm_flags_bdsp.to_bytes().to_vec()
     }
 
     #[wasm_bindgen(getter = abilityIndex)]

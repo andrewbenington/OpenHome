@@ -655,10 +655,6 @@ export default class PH4 {
     }
   }
 
-  get tmFlagsBDSP() {
-    return this.inner.pb8_data?.tmFlagsBdsp
-  }
-
   // SV data
 
   get movesSV() {

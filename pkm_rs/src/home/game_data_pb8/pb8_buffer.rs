@@ -15,7 +15,6 @@ const MOVE_DATA_OFFSETS: MoveDataOffsets = MoveDataOffsets {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Offset {
     RelearnMoves = 0x10,
-    TmFlags = 0x18,
     Ball = 0x26,
     EggLocation = 0x27,
     MetLocation = 0x29,
@@ -138,10 +137,6 @@ impl<S: AsRef<[u8]>> PkhPb8Buffer<S> {
 
     pub fn relearn_move(&self, idx: usize) -> MoveSlot {
         MoveSlot::from_le_bytes(self.relearn_move_raw(idx))
-    }
-
-    pub fn tm_flags_bdsp_raw(&self) -> [u8; 14] {
-        self.get_array(Offset::TmFlags)
     }
 
     fn ball_raw(&self) -> u8 {
