@@ -1,4 +1,6 @@
 #[cfg(feature = "wasm")]
+mod ph4;
+#[cfg(feature = "wasm")]
 mod pk3;
 #[cfg(feature = "wasm")]
 mod pk7;
@@ -6,10 +8,11 @@ mod pk7;
 mod pk8;
 #[cfg(feature = "wasm")]
 mod pk9;
-#[cfg(feature = "wasm")]
-mod pkh;
 
 use crate::convert_strategy::ConvertStrategy;
+use crate::ohpkm::v2_sections::LearnedMoves;
+use crate::ohpkm::v2_sections::LegendsArceusData;
+use crate::ohpkm::v2_sections::LegendsZaData;
 use crate::ohpkm::v2_sections::ScarletVioletData;
 use crate::ohpkm::v2_sections::SwordShieldData;
 use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
@@ -29,7 +32,19 @@ pub trait OhpkmConvert: Pkm {
         None
     }
 
+    fn to_la_data(&self) -> Option<LegendsArceusData> {
+        None
+    }
+
     fn to_sv_data(&self) -> Option<ScarletVioletData> {
+        None
+    }
+
+    fn to_lza_data(&self) -> Option<LegendsZaData> {
+        None
+    }
+
+    fn to_learned_moves(&self) -> Option<LearnedMoves> {
         None
     }
 

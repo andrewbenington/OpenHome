@@ -76,6 +76,7 @@ impl TryFrom<u16> for Tag {
             11 => Ok(Self::Pb8),
             12 => Ok(Self::Pk9),
             13 => Ok(Self::Pa9),
+            14 => Ok(Self::Ph4),
 
             0xfffe => Ok(Self::Pk3Rr),
             0xfffd => Ok(Self::Pk3Ub),

@@ -91,18 +91,3 @@ impl HomePb7Data {
         }
     }
 }
-
-// #[cfg(feature = "wasm")]
-// #[wasm_bindgen(js_class = "PkhPb7DataWasm")]
-// #[allow(clippy::missing_const_for_fn)]
-// impl HomePb7Data {
-//     #[wasm_bindgen(getter = avs)]
-//     pub fn avs_wasm(&self) -> Stats16Le {
-//         self.avs.into()
-//     }
-
-//     #[wasm_bindgen(getter)]
-//     pub fn relearn_move_indices(&self) -> Vec<u16> {
-//         self.relearn_moves.into_iter().map(u16::from).collect()
-//     }
-// }

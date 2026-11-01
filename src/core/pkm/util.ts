@@ -191,6 +191,7 @@ function MetadataSourceByFormat(format: MonFormat): MetadataSource {
       return MetadataSource.BrilliantDiamondShiningPearl
     case 'PA8':
       return MetadataSource.LegendsArceus
+    case 'PH4':
     case 'PK9':
     case 'PK3RR':
     case 'PK3UB':

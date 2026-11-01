@@ -6,8 +6,8 @@ use game_data_pb8::*;
 use game_data_pk8::*;
 use game_data_pk9::*;
 
-mod pkh;
-pub use pkh::*;
+mod ph4;
+pub use ph4::*;
 mod core_data;
 pub mod game_data_pa8;
 pub mod game_data_pa9;

@@ -2,13 +2,15 @@ use pkm_rs_resources::moves::MoveSlots;
 use pkm_rs_resources::ribbons::OpenHomeRibbonSet;
 
 use crate::convert_strategy::ConvertStrategy;
-use crate::home::{self, GameData, Pkh};
+use crate::home::{self, GameData, Ph4};
 use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
-use crate::ohpkm::v2_sections::{MainDataV2, ScarletVioletData, SwordShieldData};
+use crate::ohpkm::v2_sections::{
+    LearnedMoves, LegendsArceusData, LegendsZaData, MainDataV2, ScarletVioletData, SwordShieldData,
+};
 use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 use crate::result::{Error, Result};
 
-impl OhpkmConvert for Pkh {
+impl OhpkmConvert for Ph4 {
     fn to_main_data(&self) -> MainDataV2 {
         let mut data = MainDataV2 {
             personality_value: self.core_data.personality_value,
@@ -158,23 +160,74 @@ impl OhpkmConvert for Pkh {
     }
 
     fn to_swsh_data(&self) -> Option<SwordShieldData> {
-        let unwrap = self.pk8_data.unwrap_or_default();
         Some(SwordShieldData {
-            can_gigantamax: unwrap.can_gigantamax,
-            dynamax_level: unwrap.dynamax_level,
-            palma: unwrap.palma,
-            tr_flags: unwrap.tr_flags_swsh.to_bytes(),
+            can_gigantamax: self.pk8_data?.can_gigantamax,
+            dynamax_level: self.pk8_data?.dynamax_level,
+            palma: self.pk8_data?.palma,
+            tr_flags: self.pk8_data?.tr_flags_swsh.to_bytes(),
+        })
+    }
+
+    fn to_la_data(&self) -> Option<LegendsArceusData> {
+        Some(LegendsArceusData {
+            gvs: self.gvs()?,
+            tutor_flags: self.pa8_data?.tutor_flags_la,
+            master_flags: self.pa8_data?.master_flags_la,
+            is_alpha: self.pa8_data?.is_alpha || self.pa9_data?.is_alpha,
+            is_noble: self.pa8_data?.is_noble,
+            alpha_move: self.pa8_data?.alpha_move?.to_raw()?,
+            ..Default::default()
         })
     }
 
     fn to_sv_data(&self) -> Option<ScarletVioletData> {
-        let unwrap = self.pk9_data.unwrap_or_default();
         Some(ScarletVioletData {
-            tera_type_original: unwrap.tera_type_original,
-            tera_type_override: unwrap.tera_type_override,
-            tm_flags: unwrap.tm_flags_base_game.resized(),
-            tm_flags_dlc: unwrap.tm_flags_dlc,
+            tera_type_original: self.pk9_data?.tera_type_original,
+            tera_type_override: self.pk9_data?.tera_type_override,
+            tm_flags: self.pk9_data?.tm_flags_base_game.resized(),
+            tm_flags_dlc: self.pk9_data?.tm_flags_dlc,
         })
+    }
+
+    fn to_lza_data(&self) -> Option<LegendsZaData> {
+        Some(LegendsZaData {
+            plus_moves: self.pa9_data?.plus_flags_za(),
+            ..Default::default()
+        })
+    }
+
+    fn to_learned_moves(&self) -> Option<LearnedMoves> {
+        let mut learned_moves = LearnedMoves::new();
+
+        if let Some(pb7_data) = self.pb7_data {
+            learned_moves.add_from_slots(pb7_data.moves.into_iter().map(|slot| slot.move_index));
+        }
+
+        if let Some(pk8_data) = self.pk8_data {
+            learned_moves.add_from_slots(pk8_data.moves.into_iter().map(|slot| slot.move_index));
+        }
+
+        if let Some(pa8_data) = self.pa8_data {
+            learned_moves.add_from_slots(pa8_data.moves.into_iter().map(|slot| slot.move_index));
+        }
+
+        if let Some(pb8_data) = self.pb8_data {
+            learned_moves.add_from_slots(pb8_data.moves.into_iter().map(|slot| slot.move_index));
+        }
+
+        if let Some(pk9_data) = self.pk9_data {
+            learned_moves.add_from_slots(pk9_data.moves.into_iter().map(|slot| slot.move_index));
+        }
+
+        if let Some(pa9_data) = self.pa9_data {
+            learned_moves.add_from_slots(pa9_data.moves);
+        }
+
+        if learned_moves.count() > 0 {
+            Some(learned_moves)
+        } else {
+            None
+        }
     }
 
     fn from_ohpkm(_ohpkm: &OhpkmV2, _strategy: ConvertStrategy) -> Result<Self> {

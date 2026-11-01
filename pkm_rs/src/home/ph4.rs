@@ -46,7 +46,7 @@ pub enum GameData {
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "PkhWasm"))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
-pub struct Pkh {
+pub struct Ph4 {
     // header
     pub data_version: u16,
     pub encryption_seed: u64,
@@ -67,12 +67,12 @@ pub struct Pkh {
     pub pa9_data: Option<HomePa9Data>,
 }
 
-impl Pkh {
+impl Ph4 {
     pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
         let core_data_size = read_u16_le!(bytes, 0x10); // 0xC4
         let game_data_size_offset = 0x12 + core_data_size as usize; // 0xD6
 
-        let mut mon = Pkh {
+        let mut mon = Ph4 {
             data_version: read_u16_le!(bytes, 0x00),
             encryption_seed: read_u64_le!(bytes, 0x02),
             checksum: read_u32_le!(bytes, 0x0A),
@@ -189,6 +189,20 @@ impl Pkh {
         }
     }
 
+    pub fn gvs(&self) -> Option<Stats8> {
+        let natural_gvs = Stats8::gvs_from_ivs(&Stats8::from(self.core_data.ivs));
+        let additional_gvs = self.pa8_data.map(|data| data.gvs).unwrap_or_default();
+
+        Some(Stats8::new(
+            natural_gvs.hp + additional_gvs.hp,
+            natural_gvs.atk + additional_gvs.atk,
+            natural_gvs.def + additional_gvs.def,
+            natural_gvs.spa + additional_gvs.spa,
+            natural_gvs.spd + additional_gvs.spd,
+            natural_gvs.spe + additional_gvs.spe,
+        ))
+    }
+
     pub fn calculate_stats(&self) -> Stats16Le {
         stats::calculate_all_modern_for_source(
             MetadataSource::ScarletViolet,
@@ -203,9 +217,8 @@ impl Pkh {
     }
 }
 
-impl PkmBytes for Pkh {
+impl PkmBytes for Ph4 {
     const BOX_SIZE: usize = super::PH4_PKM_MAX_SIZE;
-    const PARTY_SIZE: usize = todo!();
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
         Self::from_bytes(bytes)
@@ -227,7 +240,7 @@ impl PkmBytes for Pkh {
     }
 }
 
-impl HasSpeciesAndForm for Pkh {
+impl HasSpeciesAndForm for Ph4 {
     fn get_species_metadata(&self) -> &'static SpeciesMetadata {
         self.core_data.species_and_form.get_species_metadata()
     }
@@ -246,21 +259,21 @@ impl HasSpeciesAndForm for Pkh {
 #[cfg(feature = "wasm")]
 #[wasm_bindgen(js_class = "PkhWasm")]
 #[allow(clippy::missing_const_for_fn)]
-impl Pkh {
+impl Ph4 {
     #[wasm_bindgen(js_name = fromOhpkmBytes)]
     pub fn from_ohpkm_bytes(
         bytes: Vec<u8>,
         strategy: tsify::Ts<ConvertStrategy>,
     ) -> JsResult<Self> {
-        Ok(Pkh::from_ohpkm(
+        Ok(Ph4::from_ohpkm(
             &OhpkmV2::from_bytes(&bytes)?,
             strategy.to_rust()?,
         )?)
     }
 
     #[wasm_bindgen(js_name = fromBytes)]
-    pub fn from_byte_vector(bytes: Vec<u8>) -> core::result::Result<Pkh, JsValue> {
-        Pkh::from_bytes(&bytes).map_err(JsValue::from)
+    pub fn from_byte_vector(bytes: Vec<u8>) -> core::result::Result<Ph4, JsValue> {
+        Ph4::from_bytes(&bytes).map_err(JsValue::from)
     }
 
     #[wasm_bindgen(js_name = toBytes)]
@@ -365,9 +378,19 @@ impl Pkh {
 
     #[wasm_bindgen(getter = gvs)]
     pub fn gvs_wasm(&self) -> JsResult<Option<Ts<Stats16Le>>> {
-        self.pa8_data
-            .map(|data| Stats16Le::from(data.gvs).try_into_ts())
-            .transpose()
+        let unwrap = self.gvs().unwrap();
+        Some(
+            Stats16Le::new(
+                unwrap.hp.into(),
+                unwrap.atk.into(),
+                unwrap.def.into(),
+                unwrap.spa.into(),
+                unwrap.spd.into(),
+                unwrap.spe.into(),
+            )
+            .try_into_ts(),
+        )
+        .transpose()
     }
 
     #[wasm_bindgen(getter = alphaMove)]
@@ -402,7 +425,7 @@ impl Pkh {
 
     #[wasm_bindgen(getter = isAlpha)]
     pub fn is_alpha_wasm(&self) -> Option<bool> {
-        Some(self.pa8_data?.is_alpha)
+        Some(self.pa8_data?.is_alpha || self.pa9_data?.is_alpha)
     }
 
     // Scarlet/Violet
@@ -421,15 +444,20 @@ impl Pkh {
             .map(|t| t.try_into_ts())
             .transpose()
     }
+
+    #[wasm_bindgen(js_name = toOhpkm)]
+    pub fn to_ohpkm(&self) -> Result<OhpkmV2> {
+        OhpkmV2::convert_with_backup(self, &self.to_party_bytes())
+    }
 }
 
-impl ModernEvs for Pkh {
+impl ModernEvs for Ph4 {
     fn get_evs(&self) -> Stats8 {
         self.core_data.evs
     }
 }
 
-impl IsShiny for Pkh {
+impl IsShiny for Ph4 {
     fn is_shiny(&self) -> bool {
         self.core_data.is_shiny()
     }

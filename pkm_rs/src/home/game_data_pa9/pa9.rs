@@ -80,12 +80,12 @@ impl HomePa9Data {
     }
 
     #[wasm_bindgen(getter = plusFlagsLza)]
-    pub fn plus_flags_za_wasm(&self) -> PlusMoveFlags {
+    pub fn plus_flags_za(&self) -> PlusMoveFlags {
         PlusMoveFlags::from_flag_sets(self.plus_moves_c, self.plus_moves_b)
     }
 
     #[wasm_bindgen(getter = abilityIndex)]
-    pub fn ability_index_wasm(&self) -> AbilityIndexWasm {
+    pub fn ability_index(&self) -> AbilityIndexWasm {
         AbilityIndexWasm::try_from(self.ability_index.to_u16())
             .expect("AbilityIndexWasm should accept any valid ability index")
     }

@@ -218,7 +218,10 @@ impl OhpkmV2 {
             main_data: other.to_main_data(),
             gen67_data: other.to_gen_67_data(),
             swsh_data: other.to_swsh_data(),
+            la_data: other.to_la_data(),
             sv_data: other.to_sv_data(),
+            lza_data: other.to_lza_data(),
+            learned_moves: other.to_learned_moves(),
             ..Default::default()
         };
 

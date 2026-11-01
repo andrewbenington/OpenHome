@@ -21,6 +21,7 @@ import PK7 from './PK7'
 import PK8 from './PK8'
 import PK9 from './PK9'
 import XDPKM from './XDPKM'
+import PH4 from './PH4'
 
 export type PKM =
   | PK1
@@ -38,8 +39,9 @@ export type PKM =
   | PB8
   | PK9
   | PA9
+  | PH4
 
-const WasmPkmFormats = [PK3, PK7, PK8, PK9, PK9Compass]
+const WasmPkmFormats = [PK3, PK7, PK8, PK9, PH4, PK9Compass]
 export type WasmPkmFormat = InstanceType<(typeof WasmPkmFormats)[number]>
 
 export function isWasmFormat(pkm: PKMInterface): pkm is WasmPkmFormat {

@@ -147,37 +147,3 @@ impl HomeCoreData {
         }
     }
 }
-
-// #[cfg(feature = "wasm")]
-// #[wasm_bindgen(js_class = "PkhCoreDataWasm")]
-// #[allow(clippy::missing_const_for_fn)]
-// impl HomeCoreData {
-//     #[wasm_bindgen(getter = evs)]
-//     pub fn evs_wasm(&self) -> Stats16Le {
-//         self.evs.into()
-//     }
-
-//     #[wasm_bindgen(getter)]
-//     pub fn ribbons(&self) -> Vec<String> {
-//         self.ribbons
-//             .get_ribbons()
-//             .iter()
-//             .map(|ribbon| ribbon.to_string())
-//             .collect()
-//     }
-
-//     #[wasm_bindgen(getter)]
-//     pub fn ribbon_bytes(&self) -> Vec<u8> {
-//         self.ribbons.to_bytes().into_iter().collect()
-//     }
-
-//     #[wasm_bindgen(getter = ivs)]
-//     pub fn ivs_wasm(&self) -> Stats16Le {
-//         self.ivs.into()
-//     }
-
-//     #[wasm_bindgen(setter = ivs)]
-//     pub fn set_ivs_wasm(&mut self, v: Stats16Le) {
-//         self.ivs = v.to_ivs_capped()
-//     }
-// }
