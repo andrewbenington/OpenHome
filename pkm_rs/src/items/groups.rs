@@ -189,10 +189,13 @@ pub const KEY_ITEMS_EXCLUDED: &[u16] = &merge_dedup!(
     ARCEUS_PLATES_PRE_LA,
     LGPE_TREASURES,
     &[
-        78,  // escape rope
-        111, // odd keystone
-        216, // exp. share
-        504, // rage candy bar
+        78,   // escape rope
+        111,  // odd keystone
+        216,  // exp. share
+        504,  // rage candy bar
+        1777, // adamant crystal
+        1778, // lustrous globe
+        1779, // grisous core
     ]
 );
 
