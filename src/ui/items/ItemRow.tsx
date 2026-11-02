@@ -13,7 +13,7 @@ export interface ItemRowProps {
   database: ItemTransferDatabase
   selected: boolean
   inactive: boolean
-  soft: boolean
+  unobtained: boolean
   keyItem: boolean
   disabled: boolean
   onClick?: () => void
@@ -28,15 +28,15 @@ export function ItemRow(props: ItemRowProps) {
       className={cssClass('item-row')
         .with(`item-row-selected-${inactive ? 'inactive' : 'active'}`)
         .if(selected)
-        .with('item-row-soft')
-        .if(props.soft || (keyItem && itemData.count === 0))
+        .with('item-row-unobtained')
+        .if(props.unobtained || (keyItem && itemData.count === 0))
         .with('item-row-disabled')
         .if(props.disabled)
         .build()}
       onClick={props.disabled ? undefined : onClick}
       style={props.style}
     >
-      <ItemIcon item={item} />
+      <ItemIcon item={item} silhouette={props.unobtained} />
       <p>{item?.name}</p>
       {itemData.isFavorite ? <FavoriteIcon /> : <div />}
       {props.keyItem ? (
@@ -45,9 +45,13 @@ export function ItemRow(props: ItemRowProps) {
         <div className="item-count">x{itemData.count}</div>
       )}
       <img
-        className="item-category-icon"
+        className="item-category-icon contrast-filter"
         src={getPublicImageURL(
-          OpenhomeItemStorage.categoryIconPath(database.internalCategoryToOpenhome(itemData.pouch))
+          OpenhomeItemStorage.categoryIconPath(
+            database.internalCategoryToOpenhome(
+              database.internalCategoryForItem(itemData.index) ?? 0
+            )
+          )
         )}
       />
     </Grid>

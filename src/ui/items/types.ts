@@ -1,5 +1,4 @@
 import { Option } from '@openhome-core/util/functional'
-import { $O } from '@openhome-core/util/option'
 import {
   Availability,
   Item,
@@ -54,18 +53,13 @@ export const ScarletVioletItemTransfer: ItemTransferDatabase = {
   categoryName: SvItemStorage.pouchName,
   maxAllowed: SvItemStorage.maxAllowed,
   availability: SvItemStorage.availabilityOf,
-  internalCategoryForItem: (index) =>
-    $O(SvItemStorage.pouchIndexForItem(index))
-      .map(SvItemStorage.pouchIndexToOpenHome)
-      .map(OpenhomeItemStorage.categoryIndex)
-      .get(),
+  internalCategoryForItem: (index) => SvItemStorage.pouchIndexForItem(index),
   internalCategoryToOpenhome: SvItemStorage.pouchIndexToOpenHome,
   internalCategoryFromOpenhome: SvItemStorage.pouchIndexFromOpenHome,
 }
 
 export type ItemData = {
   index: number
-  pouch: number
   count: number
   isNew?: boolean
   isObtained: boolean

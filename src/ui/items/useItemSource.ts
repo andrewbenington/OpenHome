@@ -18,19 +18,28 @@ export function useItemSource(
 
   const database = source.database
 
-  const nonKeyItems = useMemo(
+  const isKeyItemsCategory =
+    pouch !== 'ALL_ITEMS' && database.internalCategoryToOpenhome(pouch) === 'KeyItems'
+
+  const items = useMemo(
     () =>
       allItems
         .filter(
           (item) =>
             filter.includeUnsupported || dest.database.availability(item.index) !== 'Unsupported'
         )
-        .filter((item) => pouch === 'ALL_ITEMS' || item.pouch === pouch)
+        .filter(
+          (item) => pouch === 'ALL_ITEMS' || database.internalCategoryForItem(item.index) === pouch
+        )
         .filter((item) => {
           const nameTrimmed = Item.fromIndex(item.index)?.name?.trim()
           return (nameTrimmed && nameTrimmed !== '???') || filter.includeBlank
         })
-        .filter((item) => item.count > 0 || filter?.includeEmpty)
+        .filter((item) => isKeyItemsCategory || item.count > 0 || filter?.includeEmpty)
+        .map((item) => ({
+          ...item,
+          pouch: database.internalCategoryForItem(item.index) ?? 0,
+        }))
         .toSorted(
           filter.sort === 'alphabetical'
             ? stringSorter((item) => Item.fromIndex(item.index)?.name)
@@ -39,22 +48,26 @@ export function useItemSource(
                 numericSorter((item) => item.pouch)
               )
         ),
-    [allItems, pouch, dest, filter]
+    [allItems, pouch, dest, filter, isKeyItemsCategory, database]
   )
 
-  const selectedNonKeyItem = selection
-    ? nonKeyItems.find((item) => item.index === selection)
-    : undefined
+  const selectedItem = selection ? items.find((item) => item.index === selection) : undefined
+
+  function getItemData(index: number) {
+    return allItems.find((item) => item.index === index)
+  }
 
   return {
-    item: selectedNonKeyItem,
-    items: nonKeyItems,
+    selectedItem,
+    items,
+    getItemData,
     selection,
     setSelection,
     source,
     database,
     pouch,
     setPouch,
+    isKeyItemsCategory,
     ...itemFilter,
   }
 }

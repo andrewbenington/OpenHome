@@ -1,6 +1,10 @@
 mod availability;
 mod category;
 #[cfg(feature = "wasm")]
+mod groups;
+#[cfg(feature = "wasm")]
+mod merge_dedup;
+#[cfg(feature = "wasm")]
 mod oh_items;
 #[cfg(feature = "wasm")]
 mod sv_items;

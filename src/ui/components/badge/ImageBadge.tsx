@@ -9,6 +9,7 @@ export type ImageBadgeProps = BaseBadgeProps & {
   label?: string
   onClick?: () => void
   showIf?: Option<boolean>
+  noSillhouette?: boolean
 }
 
 export function ImageBadge(props: ImageBadgeProps) {
@@ -34,7 +35,11 @@ export function ImageBadge(props: ImageBadgeProps) {
       {...props}
     >
       {typeof src === 'string' ? (
-        <img className={filterClass} draggable={false} src={src} />
+        <img
+          className={props.noSillhouette ? undefined : filterClass}
+          draggable={false}
+          src={src}
+        />
       ) : src ? (
         src({ style: {} })
       ) : null}

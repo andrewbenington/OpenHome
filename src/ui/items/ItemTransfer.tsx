@@ -1,7 +1,8 @@
 import { Option } from '@openhome-core/util/functional'
+import Badge from '@openhome-ui/components/badge/Badge'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import Fallback from '@openhome-ui/components/Fallback'
-import { ArrowUpIcon } from '@openhome-ui/components/Icons'
+import { ArrowUpIcon, RegisteredIcon } from '@openhome-ui/components/Icons'
 import LabelledInput from '@openhome-ui/components/input/LabelledInput'
 import OhoButton from '@openhome-ui/components/OhoButton'
 import OhoFlex from '@openhome-ui/components/OhoFlex'
@@ -60,27 +61,42 @@ export function ItemTransfer(props: ItemTransferProps) {
       </OhoFlex.RowEqualSized>
       <div className="item-transfer-card">
         <OhoFlex.ColFullWidth gap="1">
-          <ItemTransferControls
-            sourceController={selectedSourceController}
-            destController={
-              selectedSourceController === source1Controller ? source2Controller : source1Controller
-            }
-            side={selectedSourceId === 'source1' ? 'right' : 'left'}
-          />
+          {selectedSourceController.isKeyItemsCategory ? (
+            <KeyItemRegisterControls
+              sourceController={selectedSourceController}
+              destController={
+                selectedSourceController === source1Controller
+                  ? source2Controller
+                  : source1Controller
+              }
+              side={selectedSourceId === 'source1' ? 'right' : 'left'}
+            />
+          ) : (
+            <ItemTransferControls
+              sourceController={selectedSourceController}
+              destController={
+                selectedSourceController === source1Controller
+                  ? source2Controller
+                  : source1Controller
+              }
+              side={selectedSourceId === 'source1' ? 'right' : 'left'}
+            />
+          )}
           <div className="card-sm-radius" style={{ flex: 1 }}>
             <OhoFlex.Row gap="6">
-              <LabelledInput.Checkbox
-                label="Show Unsupported"
-                checked={selectedSourceController.filter.includeUnsupported}
-                onCheckedChange={(includeUnsupported) =>
-                  selectedSourceController.updateFilter({ includeUnsupported })
-                }
-              />
               <LabelledInput.Checkbox
                 label="Show Empty Slots"
                 checked={selectedSourceController.filter.includeEmpty}
                 onCheckedChange={(includeEmpty) =>
                   selectedSourceController.updateFilter({ includeEmpty })
+                }
+              />
+              <OhoFlex.Spacer />
+              <LabelledInput.Checkbox
+                label="Show Unsupported"
+                checked={selectedSourceController.filter.includeUnsupported}
+                onCheckedChange={(includeUnsupported) =>
+                  selectedSourceController.updateFilter({ includeUnsupported })
                 }
               />
               <LabelledInput.Checkbox
@@ -99,8 +115,8 @@ export function ItemTransfer(props: ItemTransferProps) {
 }
 
 type ItemTransferControlsProps = {
-  sourceController: Option<ItemSourceController>
-  destController: Option<ItemSourceController>
+  sourceController: ItemSourceController
+  destController: ItemSourceController
   side: 'left' | 'right'
 }
 
@@ -108,10 +124,10 @@ const AMOUNT_INPUT_ID = 'item-transfer-amount-input'
 
 function ItemTransferControls(props: ItemTransferControlsProps) {
   const [itemCount, setItemCount] = useState<number | ''>(
-    props.sourceController?.item?.count ? 1 : 0
+    props.sourceController?.selectedItem?.count ? 1 : 0
   )
-  const sourceItem = props.sourceController?.item
-    ? Item.fromIndex(props.sourceController?.item.index)
+  const sourceItem = props.sourceController?.selectedItem
+    ? Item.fromIndex(props.sourceController?.selectedItem.index)
     : undefined
 
   const button = (
@@ -135,15 +151,15 @@ function ItemTransferControls(props: ItemTransferControlsProps) {
   )
 
   const maxAllowed = sourceItem?.index
-    ? props.destController?.database.maxAllowed(sourceItem.index)
+    ? props.destController.database.maxAllowed(sourceItem.index)
     : undefined
   const max =
-    maxAllowed && props.sourceController?.item?.count
-      ? Math.min(maxAllowed, props.sourceController.item.count)
+    maxAllowed && props.sourceController?.selectedItem?.count
+      ? Math.min(maxAllowed, props.sourceController.selectedItem.count)
       : undefined
 
   return (
-    <OhoFlex.Row width="100%" gap="1">
+    <OhoFlex.Row width="100%" gap="1" height="2.6rem" mt="var(--padding-radius-xs-sm)">
       {props.side === 'left' && button}
       <div className="card-sm-radius" style={{ flex: 1 }}>
         <OhoFlex.Row
@@ -171,7 +187,9 @@ function ItemTransferControls(props: ItemTransferControlsProps) {
             autoFocus
           />
           <code>/</code>
-          <code style={{ width: '3rem' }}>{props.sourceController?.item?.count ?? '--'}</code>
+          <code style={{ width: '3rem' }}>
+            {props.sourceController?.selectedItem?.count ?? '--'}
+          </code>
         </OhoFlex.Row>
       </div>
       {props.side === 'right' && button}
@@ -179,6 +197,44 @@ function ItemTransferControls(props: ItemTransferControlsProps) {
   )
 }
 
+function KeyItemRegisterControls(props: ItemTransferControlsProps) {
+  const itemDataForSource = props.sourceController.selectedItem
+  const itemDataForDest = itemDataForSource
+    ? props.destController.getItemData(itemDataForSource.index)
+    : undefined
+
+  const registeredForSource = Boolean(itemDataForSource?.count)
+  const sourceItem = itemDataForSource ? Item.fromIndex(itemDataForSource.index) : undefined
+  const registeredForDest = Boolean(itemDataForDest?.count)
+
+  const registeredIcon = registeredForDest ? <RegisteredIcon /> : null
+
+  return (
+    <OhoFlex.Row gap="1" direction={props.side === 'left' ? 'row' : 'row-reverse'}>
+      <OhoFlex.RowCentered width="50%" height="2.6rem" mt="var(--padding-radius-xs-sm)">
+        <OhoButton
+          size="3"
+          color="red"
+          variant="classic"
+          style={{ fontWeight: 'bold', width: 'fit-content' }}
+          onClick={() => {
+            if (registeredForSource && sourceItem && !registeredForDest) {
+              props.destController.source.addItems(sourceItem?.index, 1)
+            }
+          }}
+          disabled={!registeredForSource || registeredForDest}
+        >
+          {props.side === 'left' ? <ArrowUpIcon /> : registeredIcon}
+          Register
+          {sourceItem && (
+            <Badge.Item item={sourceItem} showLabel backgroundColor="var(--gray-11)" />
+          )}
+          {props.side === 'right' ? <ArrowUpIcon /> : registeredIcon}
+        </OhoButton>
+      </OhoFlex.RowCentered>
+    </OhoFlex.Row>
+  )
+}
 export interface SaveItemsModalProps {
   source1: ItemTransferSource
   source2: ItemTransferSource

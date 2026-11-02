@@ -1,5 +1,5 @@
 import Badge from '@openhome-ui/components/badge/Badge'
-import { Select } from '@openhome-ui/components/select/select'
+import { Select } from '@openhome-ui/components/select/Select'
 import useSimpleVirtualizer from '@openhome-ui/hooks/simpleVirtualizer'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { OpenhomeItemStorage, OriginGame } from '@pkm-rs/pkg'
@@ -142,7 +142,7 @@ function SaveItemsScroller(props: SaveItemsScrollerProps) {
               database={sourceController.database}
               selected={sourceController.selection === item.index}
               inactive={props.active === false}
-              soft={isUnobtainable(item)}
+              unobtained={isUnobtainable(item)}
               disabled={destController.database.availability(item.index) !== 'Obtainable'}
               onClick={() => onClick(item)}
               style={style(v)}
@@ -158,8 +158,10 @@ function KeyItemsScroller(props: SaveItemsScrollerProps) {
   const { sourceController, destController } = props
   const parentRef = useRef(null)
 
+  const supportedItems = sourceController.items
+
   const virtualizer = useSimpleVirtualizer(
-    sourceController.items.length,
+    supportedItems.length,
     (_, baseFontSize) => baseFontSize * 2,
     parentRef,
     { gap: 4 }
@@ -174,7 +176,7 @@ function KeyItemsScroller(props: SaveItemsScrollerProps) {
     <div ref={parentRef} className="item-scroller">
       <div className="item-scroller-inner" style={{ height: virtualizer.getTotalSize() }}>
         {virtualizer.getVirtualItems().map((v) => {
-          const item = sourceController.items[v.index]
+          const item = supportedItems[v.index]
           return (
             <ItemRow
               key={item.index}
@@ -183,7 +185,7 @@ function KeyItemsScroller(props: SaveItemsScrollerProps) {
               database={sourceController.database}
               selected={sourceController.selection === item.index}
               inactive={props.active === false}
-              soft={item.count === 0}
+              unobtained={item.count === 0}
               disabled={destController.database.availability(item.index) !== 'Obtainable'}
               onClick={() => onClick(item)}
               style={style(v)}
