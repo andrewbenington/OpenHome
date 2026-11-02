@@ -1,109 +1,26 @@
 import { Option } from '@openhome-core/util/functional'
-import { multiSorter, numericSorter, stringSorter } from '@openhome-core/util/sort'
-import Badge from '@openhome-ui/components/badge/Badge'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import Fallback from '@openhome-ui/components/Fallback'
 import { ArrowUpIcon } from '@openhome-ui/components/Icons'
 import LabelledInput from '@openhome-ui/components/input/LabelledInput'
 import OhoButton from '@openhome-ui/components/OhoButton'
 import OhoFlex from '@openhome-ui/components/OhoFlex'
-import { Select } from '@openhome-ui/components/select/select'
-import useSimpleVirtualizer from '@openhome-ui/hooks/simpleVirtualizer'
-import { getPublicImageURL } from '@openhome-ui/images/images'
-import { Item, OpenhomeItemStorage, OriginGame } from '@pkm-rs/pkg'
-import { Flex, VisuallyHidden } from '@radix-ui/themes'
-import { useMemo, useRef, useState } from 'react'
+import { Item } from '@pkm-rs/pkg'
+import { VisuallyHidden } from '@radix-ui/themes'
+import { useRef, useState } from 'react'
 import { ItemIcon } from './ItemIcon'
-import { ItemRow } from './ItemRow'
 import './ItemTransfer.css'
-import { TitledCard } from './TitledCard'
+import { ItemTransferSourceDisplay } from './ItemTransferSourceDisplay'
 import { ItemTransferSource } from './types'
+import { useItemFilter } from './useItemFilter'
+import { ItemSourceController, useItemSource } from './useItemSource'
 
-interface ItemTransferProps {
+type Source = 'source1' | 'source2'
+
+export interface ItemTransferProps {
   source1: ItemTransferSource
   source2: ItemTransferSource
 }
-
-type Source = 'source1' | 'source2'
-type ItemSort = 'category_and_index' | 'alphabetical'
-
-type ItemFilter = {
-  includeUnsupported: boolean
-  includeEmpty: boolean
-  includeBlank: boolean
-  sort: ItemSort
-}
-
-const defaultFilter: ItemFilter = {
-  includeEmpty: false,
-  includeUnsupported: false,
-  includeBlank: false,
-  sort: 'category_and_index',
-}
-
-function useSourceController(
-  source: ItemTransferSource,
-  dest: ItemTransferSource,
-  itemFilter: ItemFilterController
-) {
-  const [selection, setSelection] = useState<Option<number>>(undefined)
-  const [pouch, setPouch] = useState<number | 'ALL_ITEMS'>('ALL_ITEMS')
-
-  const { filter } = itemFilter
-  const allItems = useMemo(() => source.getItemData(), [source])
-
-  const database = source.database
-
-  const items = useMemo(
-    () =>
-      allItems
-        .filter(
-          (item) =>
-            filter.includeUnsupported || dest.database.availability(item.index) !== 'Unsupported'
-        )
-        .filter((item) => pouch === 'ALL_ITEMS' || item.pouch === pouch)
-        .filter((item) => {
-          const nameTrimmed = Item.fromIndex(item.index)?.name?.trim()
-          return (nameTrimmed && nameTrimmed !== '???') || filter.includeBlank
-        })
-        .filter((item) => item.count > 0 || filter?.includeEmpty)
-        .toSorted(
-          filter.sort === 'alphabetical'
-            ? stringSorter((item) => Item.fromIndex(item.index)?.name)
-            : multiSorter(
-                numericSorter((item) => item.index),
-                numericSorter((item) => item.pouch)
-              )
-        ),
-    [allItems, pouch, dest, filter]
-  )
-
-  const item = selection ? items.find((item) => item.index === selection) : undefined
-
-  return {
-    item,
-    items,
-    selection,
-    setSelection,
-    source,
-    database,
-    pouch,
-    setPouch,
-    ...itemFilter,
-  }
-}
-
-function useItemFilter() {
-  const [filter, setFilter] = useState<ItemFilter>(defaultFilter)
-
-  function updateFilter(updates: Partial<ItemFilter>) {
-    setFilter({ ...filter, ...updates })
-  }
-
-  return { filter, updateFilter }
-}
-
-type ItemFilterController = ReturnType<typeof useItemFilter>
 
 export function ItemTransfer(props: ItemTransferProps) {
   const { source1, source2 } = props
@@ -111,8 +28,8 @@ export function ItemTransfer(props: ItemTransferProps) {
   const itemFilter = useItemFilter()
   const [selectedSourceId, setSelectedSourceId] = useState<Option<Source>>()
 
-  const source1Controller = useSourceController(source1, source2, itemFilter)
-  const source2Controller = useSourceController(source2, source1, itemFilter)
+  const source1Controller = useItemSource(source1, source2, itemFilter)
+  const source2Controller = useItemSource(source2, source1, itemFilter)
 
   const selectedSourceController =
     selectedSourceId === 'source1' ? source1Controller : source2Controller
@@ -120,113 +37,24 @@ export function ItemTransfer(props: ItemTransferProps) {
   return (
     <div ref={parentRef} className="save-items-display">
       <OhoFlex.RowEqualSized gridColumn="1 / span 2" gap="1" mx="1" mt="1">
-        <TitledCard
-          title={renderSource(source1.sourceType)}
-          topControls={
-            <Select.Root
-              defaultValue="ALL_ITEMS"
-              value={source1Controller.pouch.toString()}
-              onValueChange={(value) =>
-                source1Controller.setPouch(value === 'ALL_ITEMS' ? 'ALL_ITEMS' : parseInt(value))
-              }
-              onOpenChange={console.info}
-            >
-              <Select.Trigger />
-              <Select.Content align="end">
-                <Select.Item value="ALL_ITEMS">
-                  <Flex as="span" align="center" gap="0.5rem">
-                    <img
-                      className="item-category-icon"
-                      src={getPublicImageURL(OpenhomeItemStorage.categoryIconPath('None'))}
-                    />
-                    All Items
-                  </Flex>
-                </Select.Item>
-                {source1Controller.database.categoryIndexes().map((pouchIndex) => (
-                  <Select.Item
-                    className="item-category-select"
-                    key={pouchIndex}
-                    value={pouchIndex.toString()}
-                  >
-                    <Flex as="span" align="center" gap="0.5rem">
-                      <img
-                        className="item-category-icon"
-                        src={getPublicImageURL(
-                          OpenhomeItemStorage.categoryIconPath(
-                            source1Controller.database.internalCategoryToOpenhome(pouchIndex)
-                          )
-                        )}
-                      />
-                      {source1Controller.database.categoryName(pouchIndex)}
-                    </Flex>
-                  </Select.Item>
-                ))}
-              </Select.Content>
-            </Select.Root>
-          }
-          side="left"
-        >
-          <SaveItemsScroller
-            sourceController={source1Controller}
-            destController={source2Controller}
-            active={selectedSourceId === 'source1'}
-            onClick={() => {
-              setSelectedSourceId('source1')
-              document.getElementById(AMOUNT_INPUT_ID)?.focus()
-            }}
-          />
-        </TitledCard>
-        <TitledCard
-          title={renderSource(source2.sourceType)}
-          side="right"
-          topControls={
-            <Select.Root
-              defaultValue="ALL_ITEMS"
-              value={source2Controller.pouch.toString()}
-              onValueChange={(value) =>
-                source2Controller.setPouch(value === 'ALL_ITEMS' ? 'ALL_ITEMS' : parseInt(value))
-              }
-            >
-              <Select.Trigger />
-              <Select.Content align="start">
-                <Select.Item value="ALL_ITEMS">
-                  <Flex as="span" align="center" gap="0.5rem">
-                    <img
-                      className="item-category-icon"
-                      src={getPublicImageURL(OpenhomeItemStorage.categoryIconPath('None'))}
-                    />
-                    All Items
-                  </Flex>
-                </Select.Item>
-                {source2Controller.database.categoryIndexes().map((pouchIndex) => (
-                  <Select.Item key={pouchIndex} value={pouchIndex.toString()}>
-                    <Flex as="span" align="center" gap="0.5rem">
-                      <img
-                        className="item-category-icon"
-                        src={getPublicImageURL(
-                          OpenhomeItemStorage.categoryIconPath(
-                            source2Controller.database.internalCategoryToOpenhome(pouchIndex)
-                          )
-                        )}
-                      />
-                      {source2Controller.database.categoryName(pouchIndex)}
-                    </Flex>
-                  </Select.Item>
-                ))}
-              </Select.Content>
-            </Select.Root>
-          }
-        >
-          <SaveItemsScroller
-            sourceController={source2Controller}
-            destController={source1Controller}
-            active={selectedSourceId === 'source2'}
-            onClick={() => {
-              setSelectedSourceId('source2')
-              document.getElementById(AMOUNT_INPUT_ID)?.focus()
-            }}
-          />
-        </TitledCard>
+        <ItemTransferSourceDisplay
+          sourceController={source1Controller}
+          destController={source2Controller}
+          active={selectedSourceId === 'source1'}
+          onSelect={() => {
+            setSelectedSourceId('source1')
+            document.getElementById(AMOUNT_INPUT_ID)?.focus()
+          }}
+        />
+        <ItemTransferSourceDisplay
+          sourceController={source2Controller}
+          destController={source1Controller}
+          active={selectedSourceId === 'source2'}
+          onSelect={() => {
+            setSelectedSourceId('source2')
+            document.getElementById(AMOUNT_INPUT_ID)?.focus()
+          }}
+        />
       </OhoFlex.RowEqualSized>
       <div className="item-transfer-card">
         <OhoFlex.ColFullWidth gap="1">
@@ -268,17 +96,9 @@ export function ItemTransfer(props: ItemTransferProps) {
   )
 }
 
-function renderSource(source: OriginGame | 'OpenHome') {
-  return source === 'OpenHome' ? (
-    <Badge.OpenHome />
-  ) : (
-    <Badge.Game originGame={source} withName style={{ width: 'fit-content' }} />
-  )
-}
-
 type ItemTransferControlsProps = {
-  sourceController: Option<SourceController>
-  destController: Option<SourceController>
+  sourceController: Option<ItemSourceController>
+  destController: Option<ItemSourceController>
   side: 'left' | 'right'
 }
 
@@ -354,60 +174,6 @@ function ItemTransferControls(props: ItemTransferControlsProps) {
       </div>
       {props.side === 'right' && button}
     </OhoFlex.Row>
-  )
-}
-
-type SourceController = ReturnType<typeof useSourceController>
-
-interface SaveItemsScrollerProps {
-  sourceController: SourceController
-  destController: SourceController
-  active?: boolean
-  onClick?: () => void
-}
-
-function SaveItemsScroller(props: SaveItemsScrollerProps) {
-  const { sourceController, destController } = props
-  const parentRef = useRef(null)
-
-  const virtualizer = useSimpleVirtualizer(
-    sourceController.items.length,
-    (_, baseFontSize) => baseFontSize * 2,
-    parentRef,
-    { gap: 4 }
-  )
-
-  return (
-    <div ref={parentRef} className="item-scroller">
-      <div className="item-scroller-inner" style={{ height: virtualizer.getTotalSize() }}>
-        {virtualizer.getVirtualItems().map((v) => {
-          const item = sourceController.items[v.index]
-          return (
-            <ItemRow
-              key={item.index}
-              itemData={item}
-              database={sourceController.database}
-              selected={sourceController.selection === item.index}
-              inactive={props.active === false}
-              unobtainable={
-                sourceController.database.availability(item.index) !== 'Obtainable' ||
-                destController.database.availability(item.index) !== 'Obtainable'
-              }
-              disabled={destController.database.availability(item.index) !== 'Obtainable'}
-              onClick={() => {
-                sourceController.setSelection(item.index)
-                props.onClick?.()
-              }}
-              style={{
-                width: '100%',
-                height: `${v.size}px`,
-                transform: `translateY(${v.start}px)`,
-              }}
-            />
-          )
-        })}
-      </div>
-    </div>
   )
 }
 
