@@ -356,6 +356,8 @@ export function pluginGameName(
       return 'Unbound'
     case 'luminescent_platinum':
       return type === 'full' ? 'Luminescent Platinum' : 'Lumi. Platinum'
+    case 'emerald_expn':
+      return 'Emerald Expansion'
     case 'compass':
       return 'Compass'
     default:
@@ -371,6 +373,7 @@ export function pluginOriginMarkPath(identifier: PluginIdentifier): string | und
   switch (identifier) {
     case 'radical_red':
     case 'unbound':
+    case 'emerald_expn':
       return '/origin_marks/GameBoyAdvance.png'
     case 'luminescent_platinum':
       return '/origin_marks/Bdsp.png'

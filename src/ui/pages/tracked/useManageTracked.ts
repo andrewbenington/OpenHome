@@ -40,6 +40,7 @@ import { useLookups } from '@openhome-ui/state/lookups'
 import { OhpkmStoreData, useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { ExtraFormIndex, GameSetting, Generation, OriginGame, OriginGames } from '@pkm-rs/pkg'
 import { useCallback, useContext, useMemo, useState } from 'react'
+import {EMERALD_EXPN_TRANSFER_RESTRICTIONS} from "@openhome-core/save/emerald_expn/G3EmeraldExpnSave.ts";
 
 export function useManageTracked() {
   const ohpkmStore = useOhpkmStore()
@@ -306,6 +307,8 @@ function monPossiblySupported(
     return isSupported(UB_TRANSFER_RESTRICTIONS)
   } else if (saveRef.pluginIdentifier === 'luminescent_platinum') {
     return isSupported(LP_TRANSFER_RESTRICTIONS)
+  } else if (saveRef.pluginIdentifier === 'emerald_expn') {
+    return isSupported(EMERALD_EXPN_TRANSFER_RESTRICTIONS)
   }
 
   switch (OriginGames.generation(saveRef.game)) {

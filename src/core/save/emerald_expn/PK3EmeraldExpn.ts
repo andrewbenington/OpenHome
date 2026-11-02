@@ -9,6 +9,9 @@ import { MonTag } from "@openhome-ui/util/tags";
 import { Stats16Le, StatsPreSplit, ExtraFormIndex, Geolocations, BinaryGender, TrainerMemory, HyperTraining, ShinyLeaves, NatureIndex, TeraType, PlusMoveFlags } from "@pkm-rs/pkg";
 
 export class PK3EmeraldExpn extends PK3 implements PluginPKMInterface {
+    static getBoxSize() {
+        return 14
+    }
     // @ts-ignore
     pluginIdentifier: PluginIdentifier;
     pluginOrigin?: PluginIdentifier | undefined;

@@ -701,6 +701,7 @@ pub fn plugin_color(plugin_identifier: &str) -> &'static str {
         "radical_red" => "#660000",
         "luminescent_platinum" => "#25C2A0",
         "compass" => "#FDF351",
+        "emerald_expn" => "#5CFF5C",
         _ => "#666666",
     }
 }

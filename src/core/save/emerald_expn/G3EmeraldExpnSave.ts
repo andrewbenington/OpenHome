@@ -2,25 +2,50 @@ import {Box, BoxAndSlot, PluginSAV, SlotMetadata} from "../interfaces";
 import {PluginIdentifier} from "@openhome-core/tauri/spectaCommands";
 import {Option} from "@openhome-core/util/functional";
 import {emptyPathData, PathData} from "../util/path";
-import {TransferRestrictions} from "../util/TransferRestrictions";
+import {TransferLockedForms, TransferRestrictions} from "../util/TransferRestrictions";
 import {PK3EmeraldExpn} from "./PK3EmeraldExpn";
 import {Move} from "@openhome-core/resources";
 import {
     BinaryGender,
     ExtraFormIndex,
     // ItemGen3EmeraldExpn,
-    Language,
+    Language, luminescentSupportsExtraForm,
     NationalDex,
-    OriginGame
+    OriginGame, OriginGames
 } from "../../../../pkm_rs/pkg";
 import {G3SAV} from "../G3SAV";
+import PB8LUMI from "@openhome-core/save/luminescentplatinum/PB8LUMI.ts";
+import {LP_TRANSFER_RESTRICTIONS} from "@openhome-core/save/luminescentplatinum/G8LUMISAV.ts";
 
 const MAX_ADDITIONAL_BYTES = 0x100;
 const SAVE_SIZE_BYTES = 0x20000
 
 
+function emeraldExpnSupportsExtraForm() {
+    return __notImplemented();
+}
+
+export const EMERALD_EXPN_TRANSFER_RESTRICTIONS: TransferRestrictions = {
+
+    // Pokemon Emerald Expansion supports every Pokémon, including alternate form, up to Gen IX.
+    maxDexNum: 1025,
+    excludedForms: {
+        ...TransferLockedForms,
+    },
+    supportsExtraForm: emeraldExpnSupportsExtraForm,
+}
+
 // noinspection JSUnusedGlobalSymbols,JSUnusedLocalSymbols
 export class G3EmeraldExpnSave<T extends PK3EmeraldExpn> extends PluginSAV<T> {
+
+    static saveTypeAbbreviation = 'EMERALD_EXPN'
+    static saveTypeName = 'Pokémon Emerald Expansion'
+    static saveTypeID = 'emerald_expn' as const
+    static pkmType = PK3EmeraldExpn
+    static boxSizeBytes = PK3EmeraldExpn.getBoxSize() * 30
+    static transferRestrictions: TransferRestrictions = EMERALD_EXPN_TRANSFER_RESTRICTIONS
+
+
     /**
      * Non-Emerald game codes, representing Ruby/Sapphire (0) and FireRed/LeafGreen (1).
      */
