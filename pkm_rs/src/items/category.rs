@@ -60,7 +60,7 @@ pub enum OpenhomeItemCategory {
 impl OpenhomeItemCategory {
     pub const fn icon_path(&self) -> &'static str {
         match self {
-            Self::None => "items/category/none.png",
+            Self::None => "items/category/generic.png",
             Self::Items => "items/category/other.png",
             Self::KeyItems => "items/category/key-items.png",
             Self::TechnicalMachines => "items/category/tms.png",
@@ -69,7 +69,7 @@ impl OpenhomeItemCategory {
             Self::Balls => "items/category/balls.png",
             Self::BattleItems => "items/category/battle-items.png",
             Self::Mail => "items/category/mail.png",
-            Self::PcItems => "items/category/none.png",
+            Self::PcItems => "items/category/generic.png",
             Self::FreeSpace => "items/category/free-space.png",
             Self::ZCrystals => "items/category/z-crystals.png",
             Self::SpeciesItems => "items/category/tm-materials.png",

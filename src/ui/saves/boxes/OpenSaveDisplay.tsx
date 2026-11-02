@@ -11,11 +11,12 @@ import { filterUndefined } from '@openhome-core/util/sort'
 import { Item, OpenHomeCtxMenu, Submenu } from '@openhome-ui/components/context-menu'
 import PromptDialog from '@openhome-ui/components/dialog/PromptDialog'
 import Fallback from '@openhome-ui/components/Fallback'
-import { ExpandArrowIcon } from '@openhome-ui/components/Icons'
+import { MenuIcon } from '@openhome-ui/components/Icons'
 import MiniButton from '@openhome-ui/components/MiniButton'
 import OhoFlex from '@openhome-ui/components/OhoFlex'
 import SearchFields from '@openhome-ui/components/search/SearchFields'
 import PokemonSearchModal from '@openhome-ui/components/search/SearchModal'
+import { Select } from '@openhome-ui/components/select/select'
 import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { useOpenHomeItemTransfer, useSaveItemTransfer } from '@openhome-ui/items/useTransfer'
@@ -411,14 +412,15 @@ function SaveHeader({ save, openModal }: SaveHeaderProps) {
             {save.gameNameFull}
           </div>
           {save?.name}
+          <Select.Root></Select.Root>
           <OhoFlex.RowEnd gap="var(--padding-radius-sm-lg)">
             {save.getItemInventory && (
               <MiniButton
                 onClick={() => openModal('items')}
-                imageSrc={getPublicImageURL('items/index/0000.png')}
+                imageSrc={getPublicImageURL('items/category/generic.png')}
               />
             )}
-            <MiniButton onClick={() => openModal('items')} icon={ExpandArrowIcon} />
+            <MiniButton onClick={() => openModal('details')} icon={MenuIcon} />
           </OhoFlex.RowEnd>
         </div>
       </div>
