@@ -1,29 +1,20 @@
-import { PK3 } from '@openhome-core/pkm'
-import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
-import { GEN3_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
+import {PK3} from '@openhome-core/pkm'
+import {NationalDex} from '@openhome-core/resources/consts/NationalDex'
+import {GEN3_TRANSFER_RESTRICTIONS} from '@openhome-core/resources/consts/TransferRestrictions'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
 } from '@openhome-core/util/byteLogic'
-import { $O } from '@openhome-core/util/option'
-import {
-  BinaryGender,
-  ConvertStrategy,
-  ExtraFormIndex,
-  Gen3Strings,
-  ItemGen3,
-  Language,
-  OriginGame,
-} from '@pkm-rs/pkg'
-import { OHPKM } from '../pkm/OHPKM'
-import { $R, Errorable, Option, R, range, Result } from '../util/functional'
-import { filterUndefined } from '../util/sort'
-import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
-import { LookupType } from './util'
-import { emptyPathData, PathData } from './util/path'
-import {Move} from "@openhome-core/resources";
+import {$O} from '@openhome-core/util/option'
+import {BinaryGender, ConvertStrategy, ExtraFormIndex, Gen3Strings, ItemGen3, Language, OriginGame,} from '@pkm-rs/pkg'
+import {OHPKM} from '../pkm/OHPKM'
+import {$R, Errorable, Option, R, range, Result} from '../util/functional'
+import {filterUndefined} from '../util/sort'
+import {Box, BoxAndSlot, OfficialSAV} from './interfaces'
+import {LookupType} from './util'
+import {emptyPathData, PathData} from './util/path'
 
 const SAVE_SIZE_BYTES = 0x20000
 const EMERALD_SECURITY_OFFSET = 0xac
@@ -91,9 +82,7 @@ export class G3Sector {
 
 export class G3SaveBackup {
   // @ts-ignore
-  any(arg0: (item: any) => boolean): never {
-      return __notImplemented();
-  }
+
   origin: OriginGame
 
   bytes: Uint8Array
@@ -355,7 +344,7 @@ export class G3SAV extends OfficialSAV<PK3> {
       const monOffset = BOX_SLOTS * box + boxSlot
       const pcBytes = new Uint8Array(PK3_SIZE_BYTES)
 
-      // mon will be undefined if pokemon was moved from this slot
+      // mon will be undefined if Pokémon was moved from this slot
       // and the slot was left empty
       $R(this.tryGetMonAt(box, boxSlot)).match(
         (mon) => {
@@ -401,28 +390,23 @@ export class G3SAV extends OfficialSAV<PK3> {
   static saveTypeAbbreviation = 'RSE/FRLG'
   static saveTypeName = 'Pokémon Ruby/Sapphire/Emerald/FireRed/LeafGreen'
   static saveTypeID = 'G3SAV'
-  private availableMoves: Move[] = __notImplemented();
 
-  // static fileIsSave(bytes: Uint8Array): boolean {
-  //   if (bytes.length < SAVE_SIZE_BYTES || bytes.length - SAVE_SIZE_BYTES > MAX_ADDITIONAL_BYTES) {
-  //     return false
-  //   }
-  //   try {
-  //     const save = new G3SAV(emptyPathData, bytes)
-  //     return this.saveFileIsThisFormat(save)
-  //   } catch (e) {
-  //     console.error(e)
-  //     return false
-  //   }
-  // }
-
-  public static saveFileIsThisFormat(save: G3SAV) {
-    if (save.primarySave.gameCode === 0) {
-      return true
+  static fileIsSave(bytes: Uint8Array): boolean {
+    if (bytes.length < SAVE_SIZE_BYTES || bytes.length - SAVE_SIZE_BYTES > MAX_ADDITIONAL_BYTES) {
+      return false
     }
-    return save.primarySave.securityKey > 0 && save.primarySave.signature === GEN3_SIGNATURE
+    try {
+      const save = new G3SAV(emptyPathData, bytes)
+      if (save.primarySave.gameCode === 0) {
+        return true
+      } else {
+        return save.primarySave.securityKey > 0 && save.primarySave.signature === GEN3_SIGNATURE
+      }
+    } catch (e) {
+      console.error(e)
+      return false
+    }
   }
-
   static includesOrigin(origin: OriginGame) {
     return origin >= OriginGame.Sapphire && origin <= OriginGame.LeafGreen
   }
@@ -467,11 +451,5 @@ export class G3SAV extends OfficialSAV<PK3> {
     )
   }
 
-  supportsMove(move : Move) {
-    return this.availableMoves.includes(move);
-  }
-}
-function __notImplemented(): never {
-    throw new Error("Function not implemented.")
 }
 

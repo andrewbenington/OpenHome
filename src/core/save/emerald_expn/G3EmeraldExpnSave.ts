@@ -56,19 +56,18 @@ export class G3EmeraldExpnSave<T extends PK3EmeraldExpn> extends PluginSAV<T> {
     // @ts-ignore
     bytes: Uint8Array<ArrayBufferLike> = __notImplemented();
 
-
-    // static fileIsSave(bytes: Uint8Array): boolean {
-    //     if (bytes.length < SAVE_SIZE_BYTES || bytes.length - SAVE_SIZE_BYTES > MAX_ADDITIONAL_BYTES) {
-    //         return false
-    //     }
-    //     try {
-    //         const save = new G3SAV(emptyPathData, bytes)
-    //         return save.bytes.slice(0, 6).toString() == "RHHEXP";
-    //     } catch (e) {
-    //         console.error(e)
-    //         return false
-    //     }
-    // }
+    static fileIsSave(bytes: Uint8Array): boolean {
+        if (bytes.length < SAVE_SIZE_BYTES || bytes.length - SAVE_SIZE_BYTES > MAX_ADDITIONAL_BYTES) {
+            return false
+        }
+        try {
+            const save = new G3SAV(emptyPathData, bytes)
+            return save.bytes.slice(0, 6).toString() == "RHHEXP";
+        } catch (e) {
+            console.error(e)
+            return false
+        }
+    }
 
 
 
