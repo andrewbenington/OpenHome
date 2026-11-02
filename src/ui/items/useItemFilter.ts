@@ -5,14 +5,14 @@ type ItemSort = 'category_and_index' | 'alphabetical'
 type ItemFilter = {
   includeUnsupported: boolean
   includeEmpty: boolean
-  includeBlank: boolean
+  includeUnobtained: boolean
   sort: ItemSort
 }
 
 const defaultFilter: ItemFilter = {
   includeEmpty: false,
   includeUnsupported: false,
-  includeBlank: false,
+  includeUnobtained: false,
   sort: 'category_and_index',
 }
 

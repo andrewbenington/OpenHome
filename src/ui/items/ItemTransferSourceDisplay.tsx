@@ -120,10 +120,6 @@ function SaveItemsScroller(props: SaveItemsScrollerProps) {
     { gap: 4 }
   )
 
-  const isUnobtainable = (item: ItemData) =>
-    sourceController.database.availability(item.index) !== 'Obtainable' ||
-    destController.database.availability(item.index) !== 'Obtainable'
-
   function onClick(item: ItemData) {
     sourceController.setSelection(item.index)
     props.onClick?.()
@@ -142,7 +138,7 @@ function SaveItemsScroller(props: SaveItemsScrollerProps) {
               database={sourceController.database}
               selected={sourceController.selection === item.index}
               inactive={props.active === false}
-              unobtained={isUnobtainable(item)}
+              unobtained={!item.isObtained}
               disabled={destController.database.availability(item.index) !== 'Obtainable'}
               onClick={() => onClick(item)}
               style={style(v)}

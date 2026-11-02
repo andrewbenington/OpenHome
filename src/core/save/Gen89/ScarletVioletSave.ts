@@ -7,7 +7,7 @@ import {
 } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { Result } from '@openhome-core/util/functional'
-import { ScarletVioletItemTransfer } from '@openhome-ui/items/types'
+import { ItemTransferDatabase } from '@openhome-ui/items/types'
 import {
   ConvertStrategy,
   ExtraFormIndex,
@@ -15,6 +15,7 @@ import {
   OriginGame,
   Pk9Wasm,
   ScarletVioletSaveRust,
+  SvItemStorage,
   SvVersion,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
@@ -101,7 +102,7 @@ export class ScarletVioletSave extends WasmOfficialSave<Pk9Wasm, PK9, ScarletVio
 
   updateItemData = (itemData: ItemDataTs) => this.inner.updateItemData(itemData)
 
-  getItemDatabase = () => ScarletVioletItemTransfer
+  getItemDatabase = () => ScarletVioletItemDatabase
 
   getDisplayPkms() {
     const rideLegend = this.inner.getRideLegend()
@@ -115,4 +116,14 @@ export class ScarletVioletSave extends WasmOfficialSave<Pk9Wasm, PK9, ScarletVio
   static includesOrigin(origin: OriginGame) {
     return ScarletVioletSaveRust.includesOrigin(origin)
   }
+}
+
+const ScarletVioletItemDatabase: ItemTransferDatabase = {
+  categoryIndexes: () => Array.from(SvItemStorage.pouchIndexes()),
+  categoryName: SvItemStorage.pouchName,
+  maxAllowed: SvItemStorage.maxAllowed,
+  availability: SvItemStorage.availabilityOf,
+  internalCategoryForItem: (index) => SvItemStorage.pouchIndexForItem(index),
+  internalCategoryToOpenhome: SvItemStorage.pouchIndexToOpenHome,
+  internalCategoryFromOpenhome: SvItemStorage.pouchIndexFromOpenHome,
 }

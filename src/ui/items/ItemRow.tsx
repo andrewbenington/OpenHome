@@ -1,7 +1,6 @@
 import { FavoriteIcon, RegisteredIcon } from '@openhome-ui/components/Icons'
-import { getPublicImageURL } from '@openhome-ui/images/images'
 import { cssClass } from '@openhome-ui/util/style'
-import { Item, OpenhomeItemStorage } from '@pkm-rs/pkg'
+import { Item, OpenhomeItemCategory, OpenhomeItemStorage } from '@pkm-rs/pkg'
 import { Grid } from '@radix-ui/themes'
 import { CSSProperties } from 'react'
 import { ItemIcon } from './ItemIcon'
@@ -23,6 +22,10 @@ export interface ItemRowProps {
 export function ItemRow(props: ItemRowProps) {
   const { itemData, keyItem, database, selected, inactive, onClick } = props
   const item = Item.fromIndex(itemData.index)
+  const sourceCategory = database.internalCategoryForItem(itemData.index)
+  const openhomeCategory: OpenhomeItemCategory =
+    sourceCategory !== undefined ? database.internalCategoryToOpenhome(sourceCategory) : 'None'
+
   return (
     <Grid
       className={cssClass('item-row')
@@ -46,13 +49,7 @@ export function ItemRow(props: ItemRowProps) {
       )}
       <img
         className="item-category-icon contrast-filter"
-        src={getPublicImageURL(
-          OpenhomeItemStorage.categoryIconPath(
-            database.internalCategoryToOpenhome(
-              database.internalCategoryForItem(itemData.index) ?? 0
-            )
-          )
-        )}
+        src={OpenhomeItemStorage.categoryIconPath(openhomeCategory)}
       />
     </Grid>
   )

@@ -91,19 +91,19 @@ export function ItemTransfer(props: ItemTransferProps) {
                   selectedSourceController.updateFilter({ includeEmpty })
                 }
               />
+              <LabelledInput.Checkbox
+                label="Show Unobtained"
+                checked={selectedSourceController.filter.includeUnobtained}
+                onCheckedChange={(includeUnobtained) =>
+                  selectedSourceController.updateFilter({ includeUnobtained })
+                }
+              />
               <OhoFlex.Spacer />
               <LabelledInput.Checkbox
                 label="Show Unsupported"
                 checked={selectedSourceController.filter.includeUnsupported}
                 onCheckedChange={(includeUnsupported) =>
                   selectedSourceController.updateFilter({ includeUnsupported })
-                }
-              />
-              <LabelledInput.Checkbox
-                label="Show Blank/???"
-                checked={selectedSourceController.filter.includeBlank}
-                onCheckedChange={(includeBlank) =>
-                  selectedSourceController.updateFilter({ includeBlank })
                 }
               />
             </OhoFlex.Row>

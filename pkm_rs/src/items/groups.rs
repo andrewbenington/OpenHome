@@ -158,6 +158,12 @@ pub const SV_KEY_ITEMS: &[u16] = &[
     2557,
 ];
 
+pub const ZA_KEY_ITEMS: &[u16] = &[
+    632, 700, 765, 847, 1278, 2588, 2589, 2590, 2591, 2592, 2595, 2596, 2597, 2598, 2599, 2600,
+    2601, 2602, 2603, 2604, 2605, 2606, 2607, 2608, 2609, 2610, 2611, 2612, 2613, 2620, 2621, 2622,
+    2623, 2624, 2625, 2626, 2627, 2628, 2629, 2630, 2631, 2632, 2633, 2634,
+];
+
 pub const KEY_ITEMS: &[u16] = &merge_dedup!(
     PT_KEY_ITEMS,
     HGSS_KEY_ITEMS,
@@ -171,7 +177,8 @@ pub const KEY_ITEMS: &[u16] = &merge_dedup!(
     SWSH_KEY_ITEMS,
     BDSP_KEY_ITEMS,
     LA_KEY_ITEMS,
-    SV_KEY_ITEMS
+    SV_KEY_ITEMS,
+    ZA_KEY_ITEMS
 );
 
 pub const ARCEUS_PLATES_PRE_LA: &[u16] = &[

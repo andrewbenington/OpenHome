@@ -42,18 +42,14 @@ export function useSaveItemTransfer(save: SAV): Option<ItemTransferSource> {
   const getItemInventory = () => save.getItemInventory?.() || []
   const updateItemData = save.updateItemData
 
-  const database = save.getItemDatabase()
-
   function addItems(index: number, added: number) {
     const existing = getItemInventory().find((item) => item.index === index)
-    const openhomeCategory = OpenhomeItemStorage.categoryForItem(index) ?? 'None'
 
     if (existing) {
       updateItemData({ ...existing, count: existing.count + added })
     } else {
       updateItemData({
         index,
-        pouch: database.internalCategoryFromOpenhome(openhomeCategory) ?? 0,
         count: added,
         isNew: true,
         isObtained: true,

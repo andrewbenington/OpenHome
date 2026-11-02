@@ -7,14 +7,18 @@ import {
 } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { Errorable } from '@openhome-core/util/functional'
+import { numericSorter } from '@openhome-core/util/sort'
+import { ItemTransferDatabase } from '@openhome-ui/items/types'
 import {
   Block,
   ConvertStrategy,
   ExtraFormIndex,
+  ItemDataTs,
   OriginGame,
   Pk8Wasm,
   SwordShieldSaveRust,
   SwordShieldVersion,
+  SwshItemStorage,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
 import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
@@ -120,6 +124,13 @@ export class SwordShieldSave extends WasmOfficialSave<Pk8Wasm, PK8, SwordShieldS
     }
   }
 
+  getItemInventory = () =>
+    this.inner.getItemInventory().toSorted(numericSorter((item) => item.index))
+
+  updateItemData = (itemData: ItemDataTs) => this.inner.updateItemData(itemData)
+
+  getItemDatabase = () => SwordShieldItemDatabase
+
   static fileIsSave(bytes: Uint8Array): boolean {
     return SwordShieldSaveRust.fileIsSave(bytes)
   }
@@ -127,4 +138,14 @@ export class SwordShieldSave extends WasmOfficialSave<Pk8Wasm, PK8, SwordShieldS
   static includesOrigin(origin: OriginGame) {
     return SwordShieldSaveRust.includesOrigin(origin)
   }
+}
+
+const SwordShieldItemDatabase: ItemTransferDatabase = {
+  categoryIndexes: () => Array.from(SwshItemStorage.pouchIndexes()),
+  categoryName: SwshItemStorage.pouchName,
+  maxAllowed: SwshItemStorage.maxAllowed,
+  availability: SwshItemStorage.availabilityOf,
+  internalCategoryForItem: (index) => SwshItemStorage.pouchIndexForItem(index),
+  internalCategoryToOpenhome: SwshItemStorage.pouchIndexToOpenHome,
+  internalCategoryFromOpenhome: SwshItemStorage.pouchIndexFromOpenHome,
 }

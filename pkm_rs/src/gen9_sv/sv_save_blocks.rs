@@ -10,7 +10,7 @@ use crate::items::{ItemDataTs, SvItemStorage};
 // use crate::items::SvItemStorage;
 use crate::result::{Error, Result, StdResult};
 use crate::traits::PkmBytes;
-use crate::util;
+use crate::util::{self, vec_into_box};
 
 use arrayref::array_ref;
 use num_enum::{IntoPrimitive, TryFromPrimitive, TryFromPrimitiveError};
@@ -265,7 +265,6 @@ impl ItemDataSv {
     pub fn to_ts(self, index: u16) -> ItemDataTs {
         ItemDataTs {
             index,
-            pouch: self.pouch.get(),
             count: self.get_count(),
             is_new: self.get_flag(ItemIs::New),
             is_obtained: self.get_flag(ItemIs::Obtained),
@@ -331,15 +330,11 @@ impl ItemInventory {
     }
 
     fn to_block(&self) -> swish_crypto::Block {
-        crate::log!("defaulting");
-        Self::default().as_bytes().to_vec();
-        crate::log!("intoing block");
         swish_crypto::Block::new(
             SvBlockKey::Item,
             swish_crypto::BlockData::Object(ObjectBlock::new(self.as_bytes().to_vec())),
         )
     }
-
     const fn empty(&self) -> ItemDataSv {
         self.items[0]
     }
@@ -370,25 +365,3 @@ impl Default for ItemInventory {
 }
 
 const_assert_eq!(std::mem::size_of::<ItemInventory>(), ITEM_INVENTORY_SIZE);
-
-/// Reinterprets an owned byte buffer as a `Box<T>` without copying.
-/// Returns the original Vec if the length doesn't match exactly.
-pub fn vec_into_box<T>(v: Vec<u8>) -> StdResult<Box<T>, Vec<u8>>
-where
-    T: FromBytes + Unaligned,
-{
-    if v.len() != size_of::<T>() {
-        return Err(v);
-    }
-
-    // Shrinks capacity to len. This is a no-op (no realloc) if cap == len already.
-    let boxed: Box<[u8]> = v.into_boxed_slice();
-    let ptr: *mut T = Box::into_raw(boxed).cast::<T>();
-
-    // SAFETY:
-    // - The allocation has layout (size = len = size_of::<T>(), align = 1),
-    //   which is exactly Layout::new::<T>() because T: Unaligned.
-    // - T: FromBytes means every initialized byte pattern is a valid T.
-    // - Ownership is transferred; the Box<[u8]> was consumed by into_raw.
-    Ok(unsafe { Box::from_raw(ptr) })
-}

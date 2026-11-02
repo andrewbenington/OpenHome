@@ -61,3 +61,14 @@ macro_rules! merge_dedup {
         $crate::items::merge_dedup::merge_dedup::<LEN>(SLICES)
     }};
 }
+
+pub const fn is_strictly_ascending(s: &[u16]) -> bool {
+    let mut i = 1;
+    while i < s.len() {
+        if s[i - 1] >= s[i] {
+            return false;
+        }
+        i += 1;
+    }
+    true
+}

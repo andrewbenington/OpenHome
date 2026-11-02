@@ -1,10 +1,10 @@
-use super::save_blocks::{BoxData, MyStatusFields, SvBlocks};
+use super::sv_save_blocks::{BoxData, MyStatusFields, SvBlocks};
 use super::{BOX_COLS, BOX_ROWS, BoxName, MAX_BOX_COUNT, Pk9, Pk9Buffer};
 use crate::checksum::RefreshChecksum;
 use crate::convert_strategy::ConvertStrategy;
 use crate::encryption::swish_crypto::{self, NumericBlock, SwishBlocks};
 #[cfg(feature = "wasm")]
-use crate::gen9_sv::save_blocks::SvBlockKey;
+use crate::gen9_sv::sv_save_blocks::SvBlockKey;
 use crate::gen9_sv::{BoxIndex, BoxSlot};
 use crate::items::ItemDataTs;
 use crate::result::{Error, Result, StdResult};
@@ -146,9 +146,7 @@ impl ScarletVioletSave {
 
     #[cfg(feature = "wasm")]
     pub fn prepare_bytes_for_saving(&self) -> Vec<u8> {
-        crate::log!("before getting blocks");
         let mut blocks: Vec<_> = self.blocks.to_blocks().into_values().collect();
-        crate::log!("after getting blocks");
         swish_crypto::encrypt_blocks(&mut blocks, self.byte_length)
     }
 
@@ -492,7 +490,6 @@ mod tests {
         assert_eq!(block_vec.len(), 6242);
 
         let slice = save_bytes.into_boxed_slice();
-        dbg!(slice.len());
 
         let save = ScarletVioletSave::from_bytes(slice)?;
 

@@ -33,8 +33,9 @@ export function useItemSource(
         )
         .filter((item) => {
           const nameTrimmed = Item.fromIndex(item.index)?.name?.trim()
-          return (nameTrimmed && nameTrimmed !== '???') || filter.includeBlank
+          return nameTrimmed && nameTrimmed !== '???'
         })
+        .filter((item) => item.isObtained || filter.includeUnobtained)
         .filter((item) => isKeyItemsCategory || item.count > 0 || filter?.includeEmpty)
         .map((item) => ({
           ...item,

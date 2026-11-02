@@ -5,7 +5,6 @@ import {
   OpenhomeItemCategory,
   OpenhomeItemStorage,
   OriginGame,
-  SvItemStorage,
 } from '@pkm-rs/pkg'
 
 export type SourceType = OriginGame | 'OpenHome'
@@ -46,16 +45,6 @@ export const OpenHomeItemTransfer: ItemTransferDatabase = {
   internalCategoryForItem: OpenhomeItemStorage.categoryIndexForItem,
   internalCategoryToOpenhome: OpenhomeItemStorage.categoryFromIndex,
   internalCategoryFromOpenhome: OpenhomeItemStorage.categoryIndex,
-}
-
-export const ScarletVioletItemTransfer: ItemTransferDatabase = {
-  categoryIndexes: () => Array.from(SvItemStorage.pouchIndexes()),
-  categoryName: SvItemStorage.pouchName,
-  maxAllowed: SvItemStorage.maxAllowed,
-  availability: SvItemStorage.availabilityOf,
-  internalCategoryForItem: (index) => SvItemStorage.pouchIndexForItem(index),
-  internalCategoryToOpenhome: SvItemStorage.pouchIndexToOpenHome,
-  internalCategoryFromOpenhome: SvItemStorage.pouchIndexFromOpenHome,
 }
 
 export type ItemData = {
