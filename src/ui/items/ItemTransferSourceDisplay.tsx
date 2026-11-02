@@ -4,10 +4,12 @@ import useSimpleVirtualizer from '@openhome-ui/hooks/simpleVirtualizer'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { OpenhomeItemStorage, OriginGame } from '@pkm-rs/pkg'
 import { Flex } from '@radix-ui/themes'
-import { useRef } from 'react'
+import { VirtualItem } from '@tanstack/react-virtual'
+import { CSSProperties, useRef } from 'react'
 import { ItemRow } from './ItemRow'
 import './ItemTransferSourceDisplay.css'
-import { TitledCard } from './TitledCard'
+import { Side, TitledCard } from './TitledCard'
+import { ItemData } from './types'
 import { ItemSourceController } from './useItemSource'
 
 interface ItemTransferSourceDisplayProps {
@@ -15,16 +17,18 @@ interface ItemTransferSourceDisplayProps {
   destController: ItemSourceController
   active: boolean
   onSelect: () => void
+  side: Side
 }
 
 export function ItemTransferSourceDisplay(props: ItemTransferSourceDisplayProps) {
-  const { sourceController, destController, active, onSelect } = props
+  const { sourceController, destController, active, onSelect, side } = props
   const parentRef = useRef(null)
 
   return (
     <div ref={parentRef}>
       <TitledCard
         title={renderSource(sourceController.source.sourceType)}
+        side={side}
         topControls={
           <Select.Root
             defaultValue="ALL_ITEMS"
@@ -67,14 +71,24 @@ export function ItemTransferSourceDisplay(props: ItemTransferSourceDisplayProps)
             </Select.Content>
           </Select.Root>
         }
-        side="left"
       >
-        <SaveItemsScroller
-          sourceController={sourceController}
-          destController={destController}
-          active={active}
-          onClick={onSelect}
-        />
+        {sourceController.pouch !== 'ALL_ITEMS' &&
+        sourceController.database.internalCategoryToOpenhome(sourceController.pouch) ===
+          'KeyItems' ? (
+          <KeyItemsScroller
+            sourceController={sourceController}
+            destController={destController}
+            active={active}
+            onClick={onSelect}
+          />
+        ) : (
+          <SaveItemsScroller
+            sourceController={sourceController}
+            destController={destController}
+            active={active}
+            onClick={onSelect}
+          />
+        )}
       </TitledCard>
     </div>
   )
@@ -106,6 +120,15 @@ function SaveItemsScroller(props: SaveItemsScrollerProps) {
     { gap: 4 }
   )
 
+  const isUnobtainable = (item: ItemData) =>
+    sourceController.database.availability(item.index) !== 'Obtainable' ||
+    destController.database.availability(item.index) !== 'Obtainable'
+
+  function onClick(item: ItemData) {
+    sourceController.setSelection(item.index)
+    props.onClick?.()
+  }
+
   return (
     <div ref={parentRef} className="item-scroller">
       <div className="item-scroller-inner" style={{ height: virtualizer.getTotalSize() }}>
@@ -115,27 +138,67 @@ function SaveItemsScroller(props: SaveItemsScrollerProps) {
             <ItemRow
               key={item.index}
               itemData={item}
+              keyItem={false}
               database={sourceController.database}
               selected={sourceController.selection === item.index}
               inactive={props.active === false}
-              unobtainable={
-                sourceController.database.availability(item.index) !== 'Obtainable' ||
-                destController.database.availability(item.index) !== 'Obtainable'
-              }
+              soft={isUnobtainable(item)}
               disabled={destController.database.availability(item.index) !== 'Obtainable'}
-              onClick={() => {
-                sourceController.setSelection(item.index)
-                props.onClick?.()
-              }}
-              style={{
-                width: '100%',
-                height: `${v.size}px`,
-                transform: `translateY(${v.start}px)`,
-              }}
+              onClick={() => onClick(item)}
+              style={style(v)}
             />
           )
         })}
       </div>
     </div>
   )
+}
+
+function KeyItemsScroller(props: SaveItemsScrollerProps) {
+  const { sourceController, destController } = props
+  const parentRef = useRef(null)
+
+  const virtualizer = useSimpleVirtualizer(
+    sourceController.items.length,
+    (_, baseFontSize) => baseFontSize * 2,
+    parentRef,
+    { gap: 4 }
+  )
+
+  function onClick(item: ItemData) {
+    sourceController.setSelection(item.index)
+    props.onClick?.()
+  }
+
+  return (
+    <div ref={parentRef} className="item-scroller">
+      <div className="item-scroller-inner" style={{ height: virtualizer.getTotalSize() }}>
+        {virtualizer.getVirtualItems().map((v) => {
+          const item = sourceController.items[v.index]
+          return (
+            <ItemRow
+              key={item.index}
+              itemData={item}
+              keyItem
+              database={sourceController.database}
+              selected={sourceController.selection === item.index}
+              inactive={props.active === false}
+              soft={item.count === 0}
+              disabled={destController.database.availability(item.index) !== 'Obtainable'}
+              onClick={() => onClick(item)}
+              style={style(v)}
+            />
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function style(virtualItem: VirtualItem): CSSProperties {
+  return {
+    width: '100%',
+    height: `${virtualItem.size}px`,
+    transform: `translateY(${virtualItem.start}px)`,
+  }
 }

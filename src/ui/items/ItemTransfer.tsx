@@ -35,9 +35,10 @@ export function ItemTransfer(props: ItemTransferProps) {
     selectedSourceId === 'source1' ? source1Controller : source2Controller
 
   return (
-    <div ref={parentRef} className="save-items-display">
-      <OhoFlex.RowEqualSized gridColumn="1 / span 2" gap="1" mx="1" mt="1">
+    <div className="save-items-display">
+      <OhoFlex.RowEqualSized ref={parentRef} gridColumn="1 / span 2" gap="1" mx="1" mt="1">
         <ItemTransferSourceDisplay
+          side="left"
           sourceController={source1Controller}
           destController={source2Controller}
           active={selectedSourceId === 'source1'}
@@ -47,6 +48,7 @@ export function ItemTransfer(props: ItemTransferProps) {
           }}
         />
         <ItemTransferSourceDisplay
+          side="right"
           sourceController={source2Controller}
           destController={source1Controller}
           active={selectedSourceId === 'source2'}

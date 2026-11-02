@@ -51,6 +51,7 @@ export const EditIcon = AiFillEdit
 export const MoveIcon = BiMove
 export const AddIcon = TiPlus
 export const ClearIcon = MdClear
+export const RegisteredIcon = MdCheckCircle
 
 export const GridIcon = MdGrid4X4
 export const CardsIcon = IoGrid

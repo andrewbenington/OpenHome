@@ -18,7 +18,7 @@ export function useItemSource(
 
   const database = source.database
 
-  const items = useMemo(
+  const nonKeyItems = useMemo(
     () =>
       allItems
         .filter(
@@ -42,11 +42,13 @@ export function useItemSource(
     [allItems, pouch, dest, filter]
   )
 
-  const item = selection ? items.find((item) => item.index === selection) : undefined
+  const selectedNonKeyItem = selection
+    ? nonKeyItems.find((item) => item.index === selection)
+    : undefined
 
   return {
-    item,
-    items,
+    item: selectedNonKeyItem,
+    items: nonKeyItems,
     selection,
     setSelection,
     source,

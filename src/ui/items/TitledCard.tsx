@@ -2,8 +2,10 @@ import OhoFlex from '@openhome-ui/components/OhoFlex'
 import { CSSProperties, PropsWithChildren, ReactNode } from 'react'
 import './TitledCard.css'
 
+export type Side = 'left' | 'right'
+
 export type TitledCardProps = PropsWithChildren & {
-  side: 'left' | 'right'
+  side: Side
   title: ReactNode
   topControls?: ReactNode
   style?: CSSProperties

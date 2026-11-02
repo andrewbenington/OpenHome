@@ -28,7 +28,13 @@ export interface ItemTransferDatabase {
   internalCategoryToOpenhome: (categoryIndex: number) => OpenhomeItemCategory
   internalCategoryFromOpenhome: (categoryToConvert: OpenhomeItemCategory) => Option<number>
 }
-// console.log(SvItemStorage.pouchIndexes)
+
+export interface KeyItemTransferSource {
+  getItemData: () => ItemData[]
+  database: ItemTransferDatabase
+  sourceType: SourceType
+  registerItem: (index: number) => void
+}
 
 export const OpenHomeItemTransfer: ItemTransferDatabase = {
   categoryIndexes: () => Array.from(OpenhomeItemStorage.categoryIndexes()),
