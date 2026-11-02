@@ -182,7 +182,6 @@ impl OhpkmConvert for Ph4 {
             gvs: self.gvs()?,
             tutor_flags: self.pa8_data?.tutor_flags_la,
             master_flags: self.pa8_data?.master_flags_la,
-            is_alpha: self.pa8_data?.is_alpha || self.pa9_data?.is_alpha,
             is_noble: self.pa8_data?.is_noble,
             alpha_move: self.pa8_data?.alpha_move?.to_raw()?,
             ..Default::default()

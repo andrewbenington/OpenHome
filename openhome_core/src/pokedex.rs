@@ -87,7 +87,7 @@ impl PokedexFlag {
             PokedexFlag::NsPokemon => ohpkm.is_ns_pokemon().is_some_and(is_true),
             PokedexFlag::Totem => ohpkm.get_form_metadata().is_totem_form(),
             PokedexFlag::Gigantamax => ohpkm.can_gigantamax().is_some_and(is_true),
-            PokedexFlag::Alpha => ohpkm.is_alpha().is_some_and(is_true),
+            PokedexFlag::Alpha => ohpkm.is_alpha(),
             PokedexFlag::Titan => ohpkm.ribbons().includes(ModernRibbon::TitanMark),
         }
     }

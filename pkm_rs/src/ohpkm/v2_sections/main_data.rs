@@ -245,6 +245,16 @@ impl MainDataV2 {
         self.species_and_form.get_ndex()
     }
 
+    pub const fn is_alpha(&self) -> bool {
+        self.ribbons
+            .includes_raw_modern(ModernRibbon::AlphaMark as usize)
+    }
+
+    pub const fn set_is_alpha(&mut self, v: bool) {
+        self.ribbons
+            .set_raw_modern(ModernRibbon::AlphaMark as usize, v)
+    }
+
     pub const fn with_timestamp_if_missing(
         &mut self,
         started_tracking_seconds: Option<NonZeroU64>,

@@ -841,10 +841,12 @@ export default class PH4 {
   }
 
   get pokerus() {
-    if (!(
-      this.primaryGameData instanceof PkhPk9DataWasm ||
-      this.primaryGameData instanceof PkhPa9DataWasm
-    )) {
+    if (
+      !(
+        this.primaryGameData instanceof PkhPk9DataWasm ||
+        this.primaryGameData instanceof PkhPa9DataWasm
+      )
+    ) {
       return this.primaryGameData?.pokerus
     }
   }

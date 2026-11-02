@@ -198,12 +198,20 @@ impl<const N: usize, FLAG: Copy + Into<usize> + From<usize>> FlagSet<N, FLAG> {
         self.raw.iter()
     }
 
+    pub const fn set_flag_raw(&mut self, flag: usize, value: bool) {
+        util::set_flag(&mut self.raw, 0, flag, value);
+    }
+
     pub fn set_flag(&mut self, flag: FLAG, value: bool) {
         util::set_flag(&mut self.raw, 0, flag.into(), value);
     }
 
+    pub const fn get_flag_raw(&self, flag: usize) -> bool {
+        util::get_flag(&self.raw, 0, flag)
+    }
+
     pub fn get_flag(&self, flag: FLAG) -> bool {
-        util::get_flag(&self.raw, 0, flag.into())
+        self.get_flag_raw(flag.into())
     }
 
     pub const fn clear(&mut self) {

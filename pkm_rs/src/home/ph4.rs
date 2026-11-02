@@ -462,8 +462,9 @@ impl Ph4 {
     }
 
     #[wasm_bindgen(getter = isAlpha)]
-    pub fn is_alpha(&self) -> Option<bool> {
-        Some(self.pa8_data?.is_alpha || self.pa9_data?.is_alpha)
+    pub fn is_alpha(&self) -> bool {
+        self.pa8_data.is_some_and(|data| data.is_alpha)
+            || self.pa9_data.is_some_and(|data| data.is_alpha)
     }
 
     // Scarlet/Violet

@@ -1302,19 +1302,12 @@ impl OhpkmV2 {
         }
     }
 
-    pub fn is_alpha(&self) -> Option<bool> {
-        Some(self.la_data?.is_alpha)
+    pub const fn is_alpha(&self) -> bool {
+        self.main_data.is_alpha()
     }
 
-    pub fn set_is_alpha(&mut self, value: Option<bool>) {
-        match value {
-            Some(is_alpha) => self.la_data.get_or_insert_default().is_alpha = is_alpha,
-            None => {
-                if let Some(la_data) = &mut self.la_data {
-                    la_data.is_alpha = false
-                }
-            }
-        }
+    pub const fn set_is_alpha(&mut self, v: bool) {
+        self.main_data.set_is_alpha(v);
     }
 
     pub fn flag2_la(&self) -> Option<bool> {
@@ -3339,20 +3332,13 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = isAlpha)]
-    pub fn is_alpha_js(&self) -> Option<bool> {
-        Some(self.la_data?.is_alpha)
+    pub fn is_alpha_js(&self) -> bool {
+        self.is_alpha()
     }
 
     #[wasm_bindgen(setter = isAlpha)]
-    pub fn set_is_alpha_js(&mut self, value: Option<bool>) {
-        match value {
-            Some(is_alpha) => self.la_data.get_or_insert_default().is_alpha = is_alpha,
-            None => {
-                if let Some(la_data) = &mut self.la_data {
-                    la_data.is_alpha = false
-                }
-            }
-        }
+    pub fn set_is_alpha_js(&mut self, v: bool) {
+        self.set_is_alpha(v);
     }
 
     #[wasm_bindgen(getter = flag2LA)]
