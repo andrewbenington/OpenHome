@@ -204,16 +204,54 @@ impl Ph4 {
     }
 
     pub fn calculate_stats(&self) -> Stats16Le {
-        stats::calculate_all_modern_for_source(
-            MetadataSource::ScarletViolet,
-            self.core_data.species_and_form,
-            &self.core_data.ivs,
-            &self.core_data.evs,
-            self.calculate_level() as u16,
-            self.core_data.mint_nature.get_metadata(),
-            Some(self.core_data.hyper_training),
-        )
-        .expect("All species are valid in HOME")
+        if MetadataSource::ScarletViolet.supports_form(self.core_data.species_and_form) {
+            stats::calculate_all_modern_for_source(
+                MetadataSource::ScarletViolet,
+                self.core_data.species_and_form,
+                &self.core_data.ivs,
+                &self.core_data.evs,
+                self.calculate_level() as u16,
+                self.core_data.mint_nature.get_metadata(),
+                Some(self.core_data.hyper_training),
+            )
+            .expect("Species is supported by SV metadata source")
+        } else if MetadataSource::SwordShield.supports_form(self.core_data.species_and_form) {
+            stats::calculate_all_modern_for_source(
+                MetadataSource::SwordShield,
+                self.core_data.species_and_form,
+                &self.core_data.ivs,
+                &self.core_data.evs,
+                self.calculate_level() as u16,
+                self.core_data.mint_nature.get_metadata(),
+                Some(self.core_data.hyper_training),
+            )
+            .expect("Species is supported by SwSh metadata source")
+        } else if MetadataSource::BrilliantDiamondShiningPearl
+            .supports_form(self.core_data.species_and_form)
+        {
+            stats::calculate_all_modern_for_source(
+                MetadataSource::BrilliantDiamondShiningPearl,
+                self.core_data.species_and_form,
+                &self.core_data.ivs,
+                &self.core_data.evs,
+                self.calculate_level() as u16,
+                self.core_data.mint_nature.get_metadata(),
+                Some(self.core_data.hyper_training),
+            )
+            .expect("Species is supported by BDSP metadata source")
+        } else {
+            // fall back to USUM for Pokemon that haven't yet been in a "traditional" Gen 8+ core series game
+            stats::calculate_all_modern_for_source(
+                MetadataSource::UltraSunUltraMoon,
+                self.core_data.species_and_form,
+                &self.core_data.ivs,
+                &self.core_data.evs,
+                self.calculate_level() as u16,
+                self.core_data.mint_nature.get_metadata(),
+                Some(self.core_data.hyper_training),
+            )
+            .expect("Species is supported by USUM metadata source")
+        }
     }
 }
 
