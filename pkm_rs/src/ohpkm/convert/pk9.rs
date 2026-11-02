@@ -1,4 +1,5 @@
 use pkm_rs_resources::ball::Ball;
+use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::{metadata_source::MetadataSource, ribbons::OpenHomeRibbonSet};
 use pkm_rs_types::{AbilityNumber, FlagSet, OriginGame, Stats16Le};
 
@@ -76,6 +77,7 @@ impl OhpkmConvert for Pk9 {
             language: self.language,
             form_argument: self.form_argument,
             affixed_ribbon: self.affixed_ribbon,
+            alpha_move: MoveSlot::empty(),
             trainer_name: self.trainer_name,
             trainer_friendship: self.trainer_friendship,
             trainer_memory: self.trainer_memory,

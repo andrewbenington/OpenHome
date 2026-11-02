@@ -1217,19 +1217,12 @@ impl OhpkmV2 {
         }
     }
 
-    pub fn alpha_move(&self) -> Option<u16> {
-        Some(self.la_data?.alpha_move)
+    pub const fn alpha_move(&self) -> MoveSlot {
+        self.main_data.alpha_move
     }
 
-    pub fn set_alpha_move(&mut self, value: Option<u16>) {
-        match value {
-            Some(alpha_move) => self.la_data.get_or_insert_default().alpha_move = alpha_move,
-            None => {
-                if let Some(la_data) = &mut self.la_data {
-                    la_data.alpha_move = 0
-                }
-            }
-        }
+    pub const fn set_alpha_move(&mut self, value: MoveSlot) {
+        self.main_data.alpha_move = value
     }
 
     pub fn move_flags_la(&self) -> Option<Vec<u8>> {
@@ -1771,6 +1764,7 @@ impl OhpkmV2 {
         self.sync_learned_moves();
         self.update_la_mastered_moves_by_current_level();
         self.update_plus_moves_by_current_level();
+        self.copy_deprecated_la_alpha_fields();
 
         fixed_issues.append(&mut self.main_data.fix_errors());
 
@@ -1918,6 +1912,18 @@ impl OhpkmV2 {
 
         if learned_moves.count() > 0 {
             self.learned_moves = Some(learned_moves);
+        }
+    }
+
+    #[allow(deprecated)]
+    pub const fn copy_deprecated_la_alpha_fields(&mut self) {
+        if let Some(la_data) = self.la_data {
+            if la_data.is_alpha {
+                self.main_data.set_is_alpha(true);
+            }
+            if la_data.alpha_move != 0 {
+                self.main_data.alpha_move = MoveSlot::from_u16(la_data.alpha_move)
+            }
         }
     }
 }
@@ -3226,18 +3232,13 @@ impl OhpkmV2 {
 
     #[wasm_bindgen(getter = alphaMove)]
     pub fn alpha_move_js(&self) -> Option<u16> {
-        Some(self.la_data?.alpha_move)
+        self.alpha_move().to_raw()
     }
 
     #[wasm_bindgen(setter = alphaMove)]
     pub fn set_alpha_move_js(&mut self, value: Option<u16>) {
-        match value {
-            Some(alpha_move) => self.la_data.get_or_insert_default().alpha_move = alpha_move,
-            None => {
-                if let Some(la_data) = &mut self.la_data {
-                    la_data.alpha_move = 0
-                }
-            }
+        if let Some(value) = value {
+            self.set_alpha_move(MoveSlot::from_u16(value));
         }
     }
 
