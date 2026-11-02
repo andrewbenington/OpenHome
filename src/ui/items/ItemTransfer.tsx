@@ -7,10 +7,11 @@ import { ArrowUpIcon } from '@openhome-ui/components/Icons'
 import LabelledInput from '@openhome-ui/components/input/LabelledInput'
 import OhoButton from '@openhome-ui/components/OhoButton'
 import OhoFlex from '@openhome-ui/components/OhoFlex'
+import { Select } from '@openhome-ui/components/select/select'
 import useSimpleVirtualizer from '@openhome-ui/hooks/simpleVirtualizer'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { Item, OpenhomeItemStorage, OriginGame } from '@pkm-rs/pkg'
-import { Flex, Select, VisuallyHidden } from '@radix-ui/themes'
+import { Flex, VisuallyHidden } from '@radix-ui/themes'
 import { useMemo, useRef, useState } from 'react'
 import { ItemIcon } from './ItemIcon'
 import { ItemRow } from './ItemRow'
@@ -123,7 +124,6 @@ export function ItemTransfer(props: ItemTransferProps) {
           title={renderSource(source1.sourceType)}
           topControls={
             <Select.Root
-              size="1"
               defaultValue="ALL_ITEMS"
               value={source1Controller.pouch.toString()}
               onValueChange={(value) =>
@@ -132,11 +132,7 @@ export function ItemTransfer(props: ItemTransferProps) {
               onOpenChange={console.info}
             >
               <Select.Trigger />
-              <Select.Content
-                position="popper"
-                align="end"
-                container={document.getElementsByClassName('items-modal').item(0)}
-              >
+              <Select.Content align="end">
                 <Select.Item value="ALL_ITEMS">
                   <Flex as="span" align="center" gap="0.5rem">
                     <img
@@ -185,7 +181,6 @@ export function ItemTransfer(props: ItemTransferProps) {
           side="right"
           topControls={
             <Select.Root
-              size="1"
               defaultValue="ALL_ITEMS"
               value={source2Controller.pouch.toString()}
               onValueChange={(value) =>
@@ -193,7 +188,7 @@ export function ItemTransfer(props: ItemTransferProps) {
               }
             >
               <Select.Trigger />
-              <Select.Content position="popper" align="start">
+              <Select.Content align="start">
                 <Select.Item value="ALL_ITEMS">
                   <Flex as="span" align="center" gap="0.5rem">
                     <img

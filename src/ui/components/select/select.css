@@ -1,0 +1,158 @@
+/*
+ * Radix Themes-style Select for Base UI.
+ * Every color/size reads a Radix Themes variable first and falls back to a
+ * sensible default, so it matches your theme if present and works without it.
+ * Override any --ui-select-* variable on a parent to customize.
+ */
+
+.ui-select-trigger {
+  --_height: var(--ui-select-height, 1.75rem);
+
+  appearance: none;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem;
+  height: var(--_height);
+  min-width: 0;
+  padding: 0 0.5rem;
+  border: 0;
+  border-radius: var(--border-radius-sm);
+  background-color: var(--color-surface, #fff);
+  box-shadow: inset 0 0 0 1px var(--gray-a7, rgba(0, 0, 0, 0.25));
+  color: var(--gray-12, #202020);
+  text-align: start;
+  cursor: var(--cursor-button, pointer);
+  user-select: none;
+}
+
+.ui-select-trigger:hover {
+  box-shadow: inset 0 0 0 1px var(--gray-a8, rgba(0, 0, 0, 0.35));
+}
+
+.ui-select-trigger:focus-visible {
+  outline: 2px solid var(--focus-8, #3e63dd);
+  outline-offset: -1px;
+}
+
+.ui-select-trigger[data-disabled] {
+  color: var(--gray-a11, rgba(0, 0, 0, 0.5));
+  background-color: var(--gray-a2, rgba(0, 0, 0, 0.03));
+  cursor: not-allowed;
+}
+
+.ui-select-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ui-select-value[data-placeholder] {
+  color: var(--gray-a10, rgba(0, 0, 0, 0.55));
+}
+
+.ui-select-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+/* Popup */
+
+.ui-select-positioner {
+  z-index: var(--ui-select-z-index, 1000);
+  outline: none;
+}
+
+.ui-select-content {
+  box-sizing: border-box;
+  min-width: var(--anchor-width);
+  max-height: var(--available-height);
+  overflow-y: auto;
+  padding: 4px;
+  border-radius: var(--radius-3, 8px);
+  background-color: var(--color-panel-solid, #fff);
+  box-shadow:
+    var(
+      --shadow-5,
+      0 12px 32px -16px rgba(0, 0, 0, 0.3),
+      0 8px 40px rgba(0, 0, 0, 0.15)
+    ),
+    inset 0 0 0 1px var(--gray-a3, rgba(0, 0, 0, 0.06));
+  color: var(--gray-12, #202020);
+  transform-origin: var(--transform-origin);
+  transition:
+    opacity 100ms ease,
+    transform 100ms ease;
+  outline: none;
+}
+
+.ui-select-content[data-starting-style],
+.ui-select-content[data-ending-style] {
+  opacity: 0;
+  transform: scale(0.97);
+}
+
+.ui-select-list {
+  outline: none;
+}
+
+/* Items */
+
+.ui-select-item {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  height: var(--ui-select-item-height, 2rem);
+  padding: 0 0.5rem 0 0.5rem;
+  border-radius: var(--border-radius-sm);
+  cursor: var(--cursor-menu-item, default);
+  user-select: none;
+  outline: none;
+}
+
+.ui-select-item[data-highlighted] {
+  background-color: var(--accent-9, #3e63dd);
+  color: var(--accent-contrast, #fff);
+}
+
+.ui-select-item[data-disabled] {
+  color: var(--gray-a8, rgba(0, 0, 0, 0.35));
+  cursor: not-allowed;
+}
+
+.ui-select-item-indicator {
+  position: absolute;
+  left: 6px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.ui-select-item-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Group label / separator */
+
+.ui-select-label {
+  box-sizing: border-box;
+  padding: 0.5rem 1rem 0.25rem 2rem;
+  color: var(--gray-a10, rgba(0, 0, 0, 0.55));
+  user-select: none;
+}
+
+.ui-select-separator {
+  height: 1px;
+  margin: 4px 12px;
+  background-color: var(--gray-a6, rgba(0, 0, 0, 0.12));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-select-content {
+    transition: none;
+  }
+}
