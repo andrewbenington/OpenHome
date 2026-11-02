@@ -327,7 +327,7 @@ impl Ph4 {
     // Core data
 
     #[wasm_bindgen(getter = abilityIndex)]
-    pub fn ability_index_wasm(&self) -> Option<AbilityIndexWasm> {
+    pub fn ability_index(&self) -> Option<AbilityIndexWasm> {
         let ability_index_u16 = match self.get_origin_game_data() {
             GameData::Pb7(Some(home_pb7_data)) => return Some(home_pb7_data.ability_index),
             GameData::Pk8(Some(home_pk8_data)) => home_pk8_data.ability_index.to_u16(),
@@ -399,14 +399,14 @@ impl Ph4 {
 
     // Lets Go Pikachu/Eevee
 
-    #[wasm_bindgen(getter = relearnMovesLgpeWasm)]
-    pub fn relearn_move_indices_js(&self) -> Option<Vec<u16>> {
+    #[wasm_bindgen(getter = relearnMovesLgpe)]
+    pub fn relearn_move_indices_lgpe(&self) -> Option<Vec<u16>> {
         self.pb7_data
             .map(|data| data.relearn_moves.into_iter().map(u16::from).collect())
     }
 
-    #[wasm_bindgen(getter = avs)]
-    pub fn avs_js(&self) -> JsResult<Option<Ts<Stats16Le>>> {
+    #[wasm_bindgen(getter)]
+    pub fn avs(&self) -> JsResult<Option<Ts<Stats16Le>>> {
         self.pb7_data
             .map(|data| Stats16Le::from(data.avs).try_into_ts())
             .transpose()
@@ -432,51 +432,51 @@ impl Ph4 {
     }
 
     #[wasm_bindgen(getter = alphaMove)]
-    pub fn alpha_move_wasm(&self) -> Option<u16> {
+    pub fn alpha_move(&self) -> Option<u16> {
         self.pa8_data?.alpha_move?.to_raw()
     }
 
     #[wasm_bindgen(getter = movesLa)]
-    pub fn move_flags_la_wasm(&self) -> Option<Vec<u16>> {
+    pub fn move_flags_la(&self) -> Option<Vec<u16>> {
         Some(self.pa8_data?.moves.indices())
     }
 
     #[wasm_bindgen(getter = movePpLa)]
-    pub fn move_pp_wasm(&self) -> Option<Vec<u8>> {
+    pub fn move_pp_la(&self) -> Option<Vec<u8>> {
         Some(self.pa8_data?.moves.pp())
     }
 
     #[wasm_bindgen(getter = tutorFlagsLa)]
-    pub fn tutor_flags_la_wasm(&self) -> Option<Vec<u8>> {
+    pub fn tutor_flags_la(&self) -> Option<Vec<u8>> {
         Some(self.pa8_data?.tutor_flags_la.bytes().copied().collect())
     }
 
     #[wasm_bindgen(getter = masterFlagsLa)]
-    pub fn master_flags_la_wasm(&self) -> Option<Vec<u8>> {
+    pub fn master_flags_la(&self) -> Option<Vec<u8>> {
         Some(self.pa8_data?.master_flags_la.bytes().copied().collect())
     }
 
     #[wasm_bindgen(getter = isNoble)]
-    pub fn is_noble_wasm(&self) -> Option<bool> {
+    pub fn is_noble(&self) -> Option<bool> {
         Some(self.pa8_data?.is_noble)
     }
 
     #[wasm_bindgen(getter = isAlpha)]
-    pub fn is_alpha_wasm(&self) -> Option<bool> {
+    pub fn is_alpha(&self) -> Option<bool> {
         Some(self.pa8_data?.is_alpha || self.pa9_data?.is_alpha)
     }
 
     // Scarlet/Violet
 
     #[wasm_bindgen(getter = teraTypeOriginal)]
-    pub fn tera_type_original_wasm(&self) -> JsResult<Option<Ts<TeraType>>> {
+    pub fn tera_type_original(&self) -> JsResult<Option<Ts<TeraType>>> {
         self.pk9_data
             .map(|d| d.tera_type_original.try_into_ts())
             .transpose()
     }
 
     #[wasm_bindgen(getter = teraTypeOverride)]
-    pub fn tera_type_override_wasm(&self) -> JsResult<Option<Ts<TeraType>>> {
+    pub fn tera_type_override(&self) -> JsResult<Option<Ts<TeraType>>> {
         self.pk9_data
             .and_then(|d| d.tera_type_override)
             .map(|t| t.try_into_ts())

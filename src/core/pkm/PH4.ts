@@ -451,8 +451,8 @@ export default class PH4 {
   }
 
   get relearnMovesLGPE() {
-    if (this.inner.relearnMovesLgpeWasm) {
-      const relearnMoves = Array.from(this.inner.relearnMovesLgpeWasm)
+    if (this.inner.relearnMovesLgpe) {
+      const relearnMoves = Array.from(this.inner.relearnMovesLgpe)
       if (relearnMoves.length !== 4) {
         throw new Error(
           `PKH PB7 WASM struct has relearn move array length of ${relearnMoves.length} (expected 4)`
@@ -560,11 +560,11 @@ export default class PH4 {
   // PLA data
 
   get isNoble() {
-    return this.inner.pa8_data?.is_noble
+    return this.inner.isNoble
   }
 
   get alphaMove() {
-    return this.inner.pa8_data?.alpha_move?.index
+    return this.inner.alphaMove
   }
 
   get movesPLA() {
@@ -850,12 +850,7 @@ export default class PH4 {
   }
 
   get isAlpha() {
-    if (this.inner.pa8_data) {
-      return this.inner.pa8_data.is_alpha
-    }
-    if (this.inner.pa9_data) {
-      return this.inner.pa9_data.is_alpha
-    }
+    return this.inner.isAlpha
   }
 
   get scale() {

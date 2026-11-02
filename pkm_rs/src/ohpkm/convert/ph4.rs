@@ -5,7 +5,8 @@ use crate::convert_strategy::ConvertStrategy;
 use crate::home::{self, GameData, Ph4};
 use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
 use crate::ohpkm::v2_sections::{
-    LearnedMoves, LegendsArceusData, LegendsZaData, MainDataV2, ScarletVioletData, SwordShieldData,
+    Gen67Data, LearnedMoves, LegendsArceusData, LegendsZaData, MainDataV2, ScarletVioletData,
+    SwordShieldData,
 };
 use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 use crate::result::{Error, Result};
@@ -159,6 +160,14 @@ impl OhpkmConvert for Ph4 {
         data
     }
 
+    fn to_gen_67_data(&self) -> Option<Gen67Data> {
+        Some(Gen67Data {
+            resort_event_status: self.pb7_data?.resort_event_status,
+            avs: self.pb7_data?.avs.into(),
+            ..Default::default()
+        })
+    }
+
     fn to_swsh_data(&self) -> Option<SwordShieldData> {
         Some(SwordShieldData {
             can_gigantamax: self.pk8_data?.can_gigantamax,
@@ -199,28 +208,28 @@ impl OhpkmConvert for Ph4 {
     fn to_learned_moves(&self) -> Option<LearnedMoves> {
         let mut learned_moves = LearnedMoves::new();
 
-        if let Some(pb7_data) = self.pb7_data {
-            learned_moves.add_from_slots(pb7_data.moves.into_iter().map(|slot| slot.move_index));
+        if let Some(data) = self.pb7_data {
+            learned_moves.add_from_slots(data.moves.into_iter().map(|slot| slot.move_index));
         }
 
-        if let Some(pk8_data) = self.pk8_data {
-            learned_moves.add_from_slots(pk8_data.moves.into_iter().map(|slot| slot.move_index));
+        if let Some(data) = self.pk8_data {
+            learned_moves.add_from_slots(data.moves.into_iter().map(|slot| slot.move_index));
         }
 
-        if let Some(pa8_data) = self.pa8_data {
-            learned_moves.add_from_slots(pa8_data.moves.into_iter().map(|slot| slot.move_index));
+        if let Some(data) = self.pa8_data {
+            learned_moves.add_from_slots(data.moves.into_iter().map(|slot| slot.move_index));
         }
 
-        if let Some(pb8_data) = self.pb8_data {
-            learned_moves.add_from_slots(pb8_data.moves.into_iter().map(|slot| slot.move_index));
+        if let Some(data) = self.pb8_data {
+            learned_moves.add_from_slots(data.moves.into_iter().map(|slot| slot.move_index));
         }
 
-        if let Some(pk9_data) = self.pk9_data {
-            learned_moves.add_from_slots(pk9_data.moves.into_iter().map(|slot| slot.move_index));
+        if let Some(data) = self.pk9_data {
+            learned_moves.add_from_slots(data.moves.into_iter().map(|slot| slot.move_index));
         }
 
-        if let Some(pa9_data) = self.pa9_data {
-            learned_moves.add_from_slots(pa9_data.moves);
+        if let Some(data) = self.pa9_data {
+            learned_moves.add_from_slots(data.moves);
         }
 
         if learned_moves.count() > 0 {
