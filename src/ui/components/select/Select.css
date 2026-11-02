@@ -113,6 +113,12 @@
   outline: none;
 }
 
+.ui-select-item[data-selected] {
+  background-color: var(--accent-a4, rgba(62, 99, 221, 0.15));
+  color: var(--accent-11, #3a5bc7);
+  font-weight: var(--ui-select-selected-weight, 500);
+}
+
 .ui-select-item[data-highlighted] {
   background-color: var(--accent-9, #3e63dd);
   color: var(--accent-contrast, #fff);
