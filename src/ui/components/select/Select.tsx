@@ -1,7 +1,7 @@
 import { Select as SelectPrimitive } from '@base-ui/react/select'
 import { classNames } from '@openhome-ui/util/style'
 import * as React from 'react'
-import './select.css'
+import './Select.css'
 
 const useIsoLayoutEffect = typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect
 

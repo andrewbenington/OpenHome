@@ -114,8 +114,8 @@
 }
 
 .ui-select-item[data-selected] {
-  background-color: var(--accent-a4, rgba(62, 99, 221, 0.15));
-  color: var(--accent-11, #3a5bc7);
+  background-color: var(--accent-a5, rgba(62, 99, 221, 0.15));
+  color: var(--accent-12, #3a5bc7);
   font-weight: var(--ui-select-selected-weight, 500);
 }
 
