@@ -9,6 +9,7 @@ import {
   CtxMenuElementBuilder,
   Item,
   Label,
+  LoadingItem,
   OpenHomeCtxMenu,
   Submenu,
 } from '@openhome-ui/components/context-menu'
@@ -172,7 +173,7 @@ function BoxCell(props: BoxCellProps) {
         tagSubmenu,
         displayColorSubmenu,
         mon.heldItemIndex > 0
-          ? Item.label('Move Item to Bag').action(() => moveMonItemToBag(location))
+          ? LoadingItem.label('Move Item to Bag').action(() => moveMonItemToBag(location))
           : undefined,
         Item.label('Move To Release Area').action(() => releaseMonAtLocation(location)),
       ]

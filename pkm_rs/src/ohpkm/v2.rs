@@ -1966,6 +1966,7 @@ impl From<&OhpkmV2> for PidGenerationParameters {
             },
             trainer_id: value.trainer_id(),
             secret_id: value.secret_id(),
+            existing_pid: Some(value.personality_value()),
         }
     }
 }

@@ -174,6 +174,7 @@ impl PidModificationStrategy {
             trainer_id,
             secret_id,
             is_shiny,
+            existing_pid,
             ..
         } = &parameters;
 
@@ -181,7 +182,7 @@ impl PidModificationStrategy {
         let tid_sid_seed: u64 = (tid_sid_seed as u64) << 32 | (tid_sid_seed as u64);
         let rng = &mut StdRng::seed_from_u64(tid_sid_seed);
 
-        let mut personality_value = rng.next_u32();
+        let mut personality_value = existing_pid.unwrap_or(rng.next_u32());
 
         for i in 0..u16::MAX {
             let inconsistencies = self.find_field_inconsistencies(personality_value, &parameters);
@@ -223,6 +224,7 @@ pub struct PidGenerationParameters {
     pub unown_letter: Option<u8>,
     pub trainer_id: u16,
     pub secret_id: u16,
+    pub existing_pid: Option<u32>,
 }
 
 pub fn generate_pk3_compatible_pid(
@@ -244,6 +246,7 @@ pub struct PidGenerationParametersJs {
     pub unown_letter: Option<u8>,
     pub trainer_id: u16,
     pub secret_id: u16,
+    pub existing_pid: Option<u32>,
 }
 
 #[cfg(feature = "wasm")]
@@ -259,6 +262,7 @@ impl PidGenerationParametersJs {
         unown_letter: Option<u8>,
         trainer_id: u16,
         secret_id: u16,
+        existing_pid: Option<u32>,
     ) -> Self {
         Self {
             national_dex,
@@ -269,6 +273,7 @@ impl PidGenerationParametersJs {
             unown_letter,
             trainer_id,
             secret_id,
+            existing_pid,
         }
     }
 }
@@ -286,6 +291,7 @@ impl TryFrom<PidGenerationParametersJs> for PidGenerationParameters {
             unown_letter: value.unown_letter,
             trainer_id: value.trainer_id,
             secret_id: value.secret_id,
+            existing_pid: value.existing_pid,
         })
     }
 }

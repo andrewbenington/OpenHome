@@ -60,7 +60,8 @@ export class PkmConverter {
       mon.isShiny(),
       mon.formIndex,
       mon.trainerID,
-      mon.secretID
+      mon.secretID,
+      mon.personalityValue
     )
 
     return this._inner.personalityValue(parameters, shinyOdds)

@@ -1,7 +1,7 @@
 import { Option } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
-import { Inset, ContextMenu as RadixCtxMenu } from '@radix-ui/themes'
-import { ReactNode, useMemo } from 'react'
+import { Inset, ContextMenu as RadixCtxMenu, Spinner } from '@radix-ui/themes'
+import { MouseEvent, ReactNode, useMemo, useState } from 'react'
 import './style.css'
 import {
   CtxMenuElement,
@@ -59,6 +59,20 @@ function CtxMenuItem(props: RadixCtxMenu.ItemProps) {
   return <RadixCtxMenu.Item {...props} />
 }
 
+function CtxMenuLoadingItem(
+  props: RadixCtxMenu.ItemProps & { onClickAsync: (e: MouseEvent<HTMLDivElement>) => Promise<void> }
+) {
+  const [loading, setLoading] = useState(false)
+  const { onClickAsync } = props
+
+  function onClick(e: MouseEvent<HTMLDivElement>) {
+    setLoading(true)
+    void onClickAsync(e).then(() => setLoading(false))
+  }
+
+  return loading ? <Spinner /> : <RadixCtxMenu.Item {...props} onClick={onClick} />
+}
+
 function CtxMenuLabel(props: RadixCtxMenu.LabelProps) {
   return <RadixCtxMenu.Label className="ContextMenuLabel" {...props} />
 }
@@ -110,6 +124,20 @@ function componentsFromElement(element: CtxMenuElement, index: number): ReactNod
         >
           {renderContent(element.content)}
         </CtxMenuItem>
+      )
+    case 'loading_item':
+      return (
+        <CtxMenuLoadingItem
+          key={index}
+          onClickAsync={async (e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            await element.action?.()
+          }}
+          // disabled={element.disabled}
+        >
+          {renderContent(element.content)}
+        </CtxMenuLoadingItem>
       )
     case 'label':
       return <CtxMenuLabel key={index}>{renderContent(element.content)}</CtxMenuLabel>
