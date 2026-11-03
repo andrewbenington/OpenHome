@@ -366,11 +366,6 @@ impl ScarletVioletSave {
 
     #[wasm_bindgen(js_name = getDisplayData)]
     pub fn display_data(&self) -> StdResult<js_sys::Object, JsValue> {
-        // let mut map = BTreeMap::new();
-        // map.insert("pokedexOwned", 3);
-
-        // let serializer = Serializer::new().serialize_maps_as_objects(true);
-        // map.serialize(&serializer).map_err(Into::into)
         let obj = js_sys::Object::new();
         let MyStatusFields {
             trainer_id,
