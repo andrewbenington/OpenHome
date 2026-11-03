@@ -159,7 +159,7 @@ describe('evolution and form change update ohpkm', async () => {
 
 describe('Pokemon Emerald Expn Unit Test Placeholder', () => {
   test('Pokemon Emerald Expn Unit Test Placeholder', () => {
-    __notImplemented();
+    todo!();
   })
 })
 

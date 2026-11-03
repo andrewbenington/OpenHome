@@ -3,7 +3,6 @@ use phf::phf_map;
 use pkm_rs_resources::species::SpeciesForm;
 
 /**
-TODO: Verify that this is correct, because it probably isn't
 */
 
 pub static EMERALD_EXPN_TO_NATIONAL_DEX_MAP: phf::Map<u16, SpeciesForm> = phf_map! {

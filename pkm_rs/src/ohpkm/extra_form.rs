@@ -287,6 +287,9 @@ impl ExtraFormIndex {
             )
     }
 
+    // Emerald EXPN only has official mons
+    pub const fn in_emerald_expn(&self) -> bool { false }
+
     pub const fn in_luminescent(&self) -> bool {
         self.is_clone()
             || matches!(
@@ -636,6 +639,13 @@ pub fn unbound_supports_extra_form(form: ExtraFormIndex) -> bool {
 #[allow(clippy::missing_const_for_fn)]
 pub fn luminescent_supports_extra_form(form: ExtraFormIndex) -> bool {
     form.in_luminescent()
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_name = "emeraldExpnSupportsExtraForm")]
+#[allow(clippy::missing_const_for_fn)]
+pub fn emerald_expn_supports_extra_form(form: ExtraFormIndex) -> bool {
+    form.in_emerald_expn()
 }
 
 #[cfg(feature = "wasm")]

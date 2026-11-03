@@ -4,35 +4,68 @@ import {Option} from "@openhome-core/util/functional";
 import {emptyPathData, PathData} from "../util/path";
 import {TransferLockedForms, TransferRestrictions} from "../util/TransferRestrictions";
 import {PK3EmeraldExpn} from "./PK3EmeraldExpn";
-import {Move} from "@openhome-core/resources";
 import {
     BinaryGender,
+    emeraldExpnSupportsExtraForm,
     ExtraFormIndex,
-    // ItemGen3EmeraldExpn,
-    Language, luminescentSupportsExtraForm,
+    Language,
     NationalDex,
-    OriginGame, OriginGames
-} from "../../../../pkm_rs/pkg";
+    OriginGame
+} from "@pkm-rs/pkg";
 import {G3SAV} from "../G3SAV";
-import PB8LUMI from "@openhome-core/save/luminescentplatinum/PB8LUMI.ts";
-import {LP_TRANSFER_RESTRICTIONS} from "@openhome-core/save/luminescentplatinum/G8LUMISAV.ts";
+import {todo} from "node:test";
+import {MyStatusBlock} from "@openhome-core/save/emerald_expn/MyStatusBlock.ts";
+import {utf16BytesToString} from "@openhome-core/util";
 
 const MAX_ADDITIONAL_BYTES = 0x100;
 const SAVE_SIZE_BYTES = 0x20000
 
 
-function emeraldExpnSupportsExtraForm() {
-    return __notImplemented();
-}
-
 export const EMERALD_EXPN_TRANSFER_RESTRICTIONS: TransferRestrictions = {
 
-    // Pokemon Emerald Expansion supports every Pokémon, including alternate form, up to Gen IX.
+    // Pokémon Emerald Expansion supports every Pokémon, including alternate form, up to Gen IX.
     maxDexNum: 1025,
     excludedForms: {
         ...TransferLockedForms,
     },
     supportsExtraForm: emeraldExpnSupportsExtraForm,
+}
+
+class ConfigBlock {
+    dataView: DataView<ArrayBuffer>
+
+    constructor(saveBytes: Uint8Array) {
+        todo!()
+    }
+
+    public getBoxName(index: number): string {
+        todo!()
+    }
+
+    public getCurrentBox(): number {
+        todo!()
+    }
+}
+
+class BoxLayoutEmeraldExpn {
+    dataView: DataView<ArrayBuffer>
+    private BOX_COUNT: number = 14;
+
+    constructor(saveBytes: Uint8Array) {
+        todo!()
+    }
+
+    public getBoxName(index: number): string {
+        if (index >= this.BOX_COUNT) {
+            throw Error('Attempting to get box name at index past BOX_COUNT')
+        }
+        return todo!()
+    }
+
+    public getCurrentBox(): number {
+        todo!()
+    }
+
 }
 
 // noinspection JSUnusedGlobalSymbols,JSUnusedLocalSymbols
@@ -57,30 +90,82 @@ export class G3EmeraldExpnSave<T extends PK3EmeraldExpn> extends PluginSAV<T> {
         ExtraFormIndex.PikachuPhD,
         ExtraFormIndex.PikachuLibre,
     ]
-    transferRestrictions: TransferRestrictions = __notImplemented();
-    origin: OriginGame = __notImplemented();
-    filePath: PathData = __notImplemented();
-    fileCreated?: Date | undefined = __notImplemented();
-    money: number = __notImplemented();
-    name: string = __notImplemented();
-    tid: number = __notImplemented();
-    sid?: number | undefined = __notImplemented();
-    trainerGender: BinaryGender = __notImplemented();
-    language?: Language | undefined = __notImplemented();
-    displayID: string = __notImplemented();
-    currentPCBox: number = __notImplemented();
-    invalid: boolean = __notImplemented();
-    tooEarlyToOpen: boolean = __notImplemented();
-    updatedBoxSlots: BoxAndSlot[] = __notImplemented();
-    getSlotMetadata?: ((boxNum: number, boxSlot: number) => SlotMetadata) | undefined = __notImplemented();
-    pluginIdentifier: PluginIdentifier = __notImplemented();
-    boxColumns: number = __notImplemented();
-    boxRows: number = __notImplemented();
-    boxes: Readonly<Box<T>>[] = __notImplemented();
+    transferRestrictions: TransferRestrictions = G3EmeraldExpnSave.transferRestrictions;
+    origin: OriginGame;
+    filePath: PathData = todo!();
+    fileCreated?: Date | undefined = todo!();
+    money: number = todo!();
+    name: string = todo!();
+    tid: number = todo!();
+    sid?: number | undefined = todo!();
+    trainerGender: BinaryGender = todo!();
+    language?: Language | undefined = todo!();
+    displayID: string = todo!();
+    currentPCBox: number = todo!();
+    invalid: boolean = todo!();
+    tooEarlyToOpen: boolean = todo!();
+    updatedBoxSlots: BoxAndSlot[] = todo!();
+    getSlotMetadata?: ((boxNum: number, boxSlot: number) => SlotMetadata) | undefined = todo!();
+    pluginIdentifier: PluginIdentifier = todo!();
+    boxColumns: number = 6;
+    boxRows: number = 5;
+    boxes: Readonly<Box<T>>[] = todo!();
 
     // @ts-ignore
-    bytes: Uint8Array<ArrayBufferLike> = __notImplemented();
+    bytes: Uint8Array<ArrayBufferLike> = todo!();
+    private myStatusBlock: MyStatusBlock;
+    private hashOffset = todo!() // Type: number
+    private configBlock: ConfigBlock;
+    private BOX_SIZE: number = 30;
 
+    constructor(path: PathData, bytes: Uint8Array) {
+        super()
+        this.bytes = bytes
+        this.filePath = path
+        this.hashOffset = todo!()
+
+        // Parse trainer information
+        this.myStatusBlock = new MyStatusBlock(bytes)
+        this.origin = this.myStatusBlock.getGame();
+        this.configBlock = new ConfigBlock(bytes)
+        this.name = this.myStatusBlock.getName()
+
+        const fullTrainerID = this.myStatusBlock.getFullID()
+        this.tid = todo!()
+        this.sid = todo!()
+        this.displayID = todo!()
+        this.origin = this.myStatusBlock.getGame()
+
+        // Initialize PC boxes and names
+        const boxNamesBlock = new BoxLayoutEmeraldExpn(this.bytes)
+        this.boxes = Array(this.getBoxCount())
+
+        for (let box = 0; box < this.getBoxCount(); box++) {
+            const boxName = boxNamesBlock.getBoxName(box) || `Box ${box + 1}`
+            this.boxes[box] = new Box(boxName, this.BOX_SIZE)
+        }
+
+        // Parse Pokémon stored in the PC
+        for (let box = 0; box < this.getBoxCount(); box++) {
+            for (let monIndex = 0; monIndex < 30; monIndex++) {
+                try {
+                    const startByte = todo!()
+                    const endByte = todo!()
+                    const monData = todo!()
+                    const mon = this.buildPKM(monData, true)
+
+                    // Only populate slots containing valid Pokémon
+                    if (mon.gameOfOrigin !== 0 && mon.nationalDex !== 0) {
+                        this.boxes[box].boxSlots[monIndex] = mon
+                    }
+
+                } catch (e) {
+                    console.error(`Failed to parse Pokémon in Box ${box + 1}, Slot ${monIndex + 1}:`, e)
+                }
+            }
+        }
+    }
+    
     static fileIsSave(bytes: Uint8Array): boolean {
         if (bytes.length < SAVE_SIZE_BYTES || bytes.length - SAVE_SIZE_BYTES > MAX_ADDITIONAL_BYTES) {
             return false
@@ -113,24 +198,19 @@ export class G3EmeraldExpnSave<T extends PK3EmeraldExpn> extends PluginSAV<T> {
         return G3EmeraldExpnSave.cosplayPikachuForms.includes(extraFormIndex)
     }
 
-    // noinspection JSUnusedLocalSymbols
-    // @ts-ignore
-    private static any(allMons: any, param2: (mon) => AbortSignal) {
-        return __notImplemented();
-    }
 
     prepareForSaving(): void {
-        throw __notImplemented();
+        throw todo!();
     }
 
     // @ts-ignore
     getMonAt(boxNum: number, boxSlot: number): Option<T> {
-        throw __notImplemented();
+        throw todo!();
     }
 
     // @ts-ignore
     setMonAt(boxNum: number, boxSlot: number, mon: Option<T>): void {
-        throw __notImplemented();
+        throw todo!();
     }
 
     override supportsMon(
@@ -148,14 +228,13 @@ export class G3EmeraldExpnSave<T extends PK3EmeraldExpn> extends PluginSAV<T> {
 
     // @ts-ignore
     supportsItem(itemIndex: number) {
-        return __notImplemented();
+        return todo!();
     }
 
     // @ts-ignore
     convertOhpkm(ohpkm: OHPKM, strategy) {
-        return __notImplemented();
+        return todo!();
     }
 
 
 }
-
