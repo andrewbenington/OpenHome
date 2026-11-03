@@ -189,20 +189,6 @@ impl Ph4 {
         }
     }
 
-    pub fn gvs(&self) -> Option<Stats8> {
-        let natural_gvs = Stats8::gvs_from_ivs(&Stats8::from(self.core_data.ivs));
-        let additional_gvs = self.pa8_data.map(|data| data.gvs).unwrap_or_default();
-
-        Some(Stats8::new(
-            natural_gvs.hp + additional_gvs.hp,
-            natural_gvs.atk + additional_gvs.atk,
-            natural_gvs.def + additional_gvs.def,
-            natural_gvs.spa + additional_gvs.spa,
-            natural_gvs.spd + additional_gvs.spd,
-            natural_gvs.spe + additional_gvs.spe,
-        ))
-    }
-
     pub fn calculate_stats(&self) -> Stats16Le {
         if MetadataSource::ScarletViolet.supports_form(self.core_data.species_and_form) {
             stats::calculate_all_modern_for_source(
@@ -416,7 +402,7 @@ impl Ph4 {
 
     #[wasm_bindgen(getter = gvs)]
     pub fn gvs_wasm(&self) -> JsResult<Option<Ts<Stats16Le>>> {
-        let unwrap = self.gvs().unwrap();
+        let unwrap = self.pa8_data.unwrap_or_default().gvs;
         Some(
             Stats16Le::new(
                 unwrap.hp.into(),

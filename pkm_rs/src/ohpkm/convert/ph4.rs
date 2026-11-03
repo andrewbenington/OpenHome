@@ -179,7 +179,7 @@ impl OhpkmConvert for Ph4 {
 
     fn to_la_data(&self) -> Option<LegendsArceusData> {
         Some(LegendsArceusData {
-            gvs: self.gvs()?,
+            gvs: self.pa8_data?.gvs,
             tutor_flags: self.pa8_data?.tutor_flags_la,
             master_flags: self.pa8_data?.master_flags_la,
             is_noble: self.pa8_data?.is_noble,
