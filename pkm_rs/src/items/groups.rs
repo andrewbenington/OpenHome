@@ -1,6 +1,8 @@
 // All lists below are sorted ascending (enforced at compile time at the
 // bottom of this file), which allows `binary_search` lookups.
 
+use pkm_rs_resources::items::ItemIndex;
+
 use crate::merge_dedup;
 
 pub const MEDICINE: &[u16] = &[
@@ -189,13 +191,13 @@ pub const KEY_ITEMS_EXCLUDED: &[u16] = &merge_dedup!(
     ARCEUS_PLATES_PRE_LA,
     LGPE_TREASURES,
     &[
-        78,   // escape rope
-        111,  // odd keystone
-        216,  // exp. share
-        504,  // rage candy bar
-        1777, // adamant crystal
-        1778, // lustrous globe
-        1779, // grisous core
+        ItemIndex::EscapeRope as u16,
+        ItemIndex::OddKeystone as u16,
+        ItemIndex::ExpShare as u16,
+        ItemIndex::RageCandyBar as u16,
+        ItemIndex::AdamantCrystal as u16,
+        ItemIndex::LustrousGlobe as u16,
+        ItemIndex::GriseousCore as u16,
     ]
 );
 

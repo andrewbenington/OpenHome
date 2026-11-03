@@ -13,18 +13,18 @@ export interface ItemRowProps {
   selected: boolean
   inactive: boolean
   unobtained: boolean
-  keyItem: boolean
+  singleton: boolean
   disabled: boolean
   onClick?: () => void
   style?: CSSProperties
 }
 
 export function ItemRow(props: ItemRowProps) {
-  const { itemData, keyItem, database, selected, inactive, onClick } = props
+  const { itemData, singleton, database, selected, inactive, onClick } = props
   const item = Item.fromIndex(itemData.index)
   const sourceCategory = database.internalCategoryForItem(itemData.index)
   const openhomeCategory: OpenhomeItemCategory =
-    sourceCategory !== undefined ? database.internalCategoryToOpenhome(sourceCategory) : 'None'
+    sourceCategory !== undefined ? database.internalCategoryToOpenhome(sourceCategory) : 'General'
 
   return (
     <Grid
@@ -32,7 +32,7 @@ export function ItemRow(props: ItemRowProps) {
         .with(`item-row-selected-${inactive ? 'inactive' : 'active'}`)
         .if(selected)
         .with('item-row-unobtained')
-        .if(props.unobtained || (keyItem && itemData.count === 0))
+        .if(props.unobtained || (singleton && itemData.count === 0))
         .with('item-row-disabled')
         .if(props.disabled)
         .build()}
@@ -42,7 +42,7 @@ export function ItemRow(props: ItemRowProps) {
       <ItemIcon item={item} silhouette={props.unobtained} />
       <p>{item?.name}</p>
       {itemData.isFavorite ? <FavoriteIcon /> : <div />}
-      {props.keyItem ? (
+      {props.singleton ? (
         <div className="item-count">{itemData.count ? <RegisteredIcon /> : <div />}</div>
       ) : (
         <div className="item-count">x{itemData.count}</div>

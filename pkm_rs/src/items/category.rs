@@ -27,7 +27,7 @@ use pkm_rs_resources::items::Item;
 #[repr(u32)]
 pub enum OpenhomeItemCategory {
     #[default]
-    None,
+    General,
     Items,
     #[strum(to_string = "Key Items")]
     KeyItems,
@@ -57,7 +57,7 @@ pub enum OpenhomeItemCategory {
 impl OpenhomeItemCategory {
     pub const fn icon_path(&self) -> &'static str {
         match self {
-            Self::None => "items/category/generic.png",
+            Self::General => "items/category/generic.png",
             Self::Items => "items/category/other.png",
             Self::KeyItems => "items/category/key-items.png",
             Self::TechnicalMachines => "items/category/tms.png",
@@ -93,7 +93,7 @@ impl OpenhomeItemCategory {
             | Self::PcItems
             | Self::FreeSpace
             | Self::ZCrystals
-            | Self::None => None,
+            | Self::General => None,
         }
     }
 

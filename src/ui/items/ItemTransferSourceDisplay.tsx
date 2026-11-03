@@ -1,3 +1,4 @@
+import { $O } from '@openhome-core/util/option'
 import Badge from '@openhome-ui/components/badge/Badge'
 import { Select } from '@openhome-ui/components/select/Select'
 import useSimpleVirtualizer from '@openhome-ui/hooks/simpleVirtualizer'
@@ -44,7 +45,7 @@ export function ItemTransferSourceDisplay(props: ItemTransferSourceDisplayProps)
                 <Flex as="span" align="center" gap="0.5rem">
                   <img
                     className="item-category-icon"
-                    src={getPublicImageURL(OpenhomeItemStorage.categoryIconPath('None'))}
+                    src={getPublicImageURL(OpenhomeItemStorage.categoryIconPath('General'))}
                   />
                   All Items
                 </Flex>
@@ -134,7 +135,9 @@ function SaveItemsScroller(props: SaveItemsScrollerProps) {
             <ItemRow
               key={item.index}
               itemData={item}
-              keyItem={false}
+              singleton={$O(sourceController.database.maxAllowed(item.index)).isSomeAnd(
+                (max) => max === 1
+              )}
               database={sourceController.database}
               selected={sourceController.selection === item.index}
               inactive={props.active === false}
@@ -177,7 +180,7 @@ function KeyItemsScroller(props: SaveItemsScrollerProps) {
             <ItemRow
               key={item.index}
               itemData={item}
-              keyItem
+              singleton
               database={sourceController.database}
               selected={sourceController.selection === item.index}
               inactive={props.active === false}

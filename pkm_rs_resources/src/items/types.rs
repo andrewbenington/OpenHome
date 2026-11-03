@@ -32,7 +32,7 @@ impl Item {
     }
 
     pub const fn get_metadata(&self) -> &ItemMetadata {
-        modern::ALL_ITEMS[(self.get() - 1) as usize]
+        &modern::ALL_ITEMS[(self.get() - 1) as usize]
     }
 
     pub const fn to_le_bytes(self) -> [u8; 2] {
@@ -395,9 +395,16 @@ impl Serialize for ItemGen3 {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u16)]
 pub enum ItemIndex {
+    EscapeRope = 78,
+    OddKeystone = 111,
+    ExpShare = 216,
+
     SecretPotion = 464,
     SecretKey = 467,
+    RageCandyBar = 504,
     RedOrb = 534,
     BlueOrb = 535,
     EnigmaStone = 536,
@@ -437,6 +444,9 @@ pub enum ItemIndex {
     DynamaxCrystalAql7235 = 1578,
     MarkCharm = 1589,
     ReinsOfUnity3 = 1607,
+    AdamantCrystal = 1777,
+    LustrousGlobe = 1778,
+    GriseousCore = 1779,
     DsSounds = 1822,
     LegendPlate = 1828,
 
@@ -449,4 +459,10 @@ pub enum ItemIndex {
 
     RaichuniteX = 2635,
     Glimmoranite = 2650,
+}
+
+impl PartialEq<ItemIndex> for Item {
+    fn eq(&self, other: &ItemIndex) -> bool {
+        self.get() == *other as u16
+    }
 }

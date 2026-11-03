@@ -2,6 +2,7 @@ use crate::items::{
     availability::Availability, category::OpenhomeItemCategory, merge_dedup::is_strictly_ascending,
 };
 use num_enum::{IntoPrimitive, TryFromPrimitive};
+use pkm_rs_resources::items::{Item, ItemIndex};
 use strum::{Display, EnumIter, IntoEnumIterator};
 
 #[cfg(feature = "wasm")]
@@ -227,6 +228,15 @@ impl SwshItemStorage {
         }
     }
 
+    pub fn max_allowed(item_index: u16) -> Option<u16> {
+        let item = Item::from_index(item_index)?;
+        if item.is_tm() || item == ItemIndex::EscapeRope {
+            Some(1)
+        } else {
+            Self::category_for(item_index).and_then(Self::max_allowed_for_category)
+        }
+    }
+
     pub fn availability_of(item_index: u16) -> Availability {
         if Self::pouch_for(item_index).is_none() {
             Availability::Unsupported
@@ -247,8 +257,8 @@ use tsify::Ts;
 #[wasm_bindgen]
 impl SwshItemStorage {
     #[wasm_bindgen(js_name = maxAllowed)]
-    pub fn max_allowed(item_index: u16) -> Option<u16> {
-        Self::category_for(item_index).and_then(Self::max_allowed_for_category)
+    pub fn max_allowed_wasm(item_index: u16) -> Option<u16> {
+        Self::max_allowed(item_index)
     }
 
     #[wasm_bindgen(js_name = availabilityOf)]
