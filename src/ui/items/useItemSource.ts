@@ -26,7 +26,9 @@ export function useItemSource(
       allItems
         .filter(
           (item) =>
-            filter.includeUnsupported || dest.database.availability(item.index) !== 'Unsupported'
+            filter.includeUnsupported ||
+            (source.database.availability(item.index) !== 'Unsupported' &&
+              dest.database.availability(item.index) !== 'Unsupported')
         )
         .filter(
           (item) => pouch === 'ALL_ITEMS' || database.internalCategoryForItem(item.index) === pouch
@@ -36,7 +38,6 @@ export function useItemSource(
           return nameTrimmed && nameTrimmed !== '???'
         })
         .filter((item) => item.isObtained || filter.includeUnobtained)
-        .filter((item) => isKeyItemsCategory || item.count > 0 || filter?.includeEmpty)
         .map((item) => ({
           ...item,
           pouch: database.internalCategoryForItem(item.index) ?? 0,
@@ -49,7 +50,7 @@ export function useItemSource(
                 numericSorter((item) => item.pouch)
               )
         ),
-    [allItems, pouch, dest, filter, isKeyItemsCategory, database]
+    [allItems, pouch, dest.database, filter, database, source.database]
   )
 
   const selectedItem = selection ? items.find((item) => item.index === selection) : undefined

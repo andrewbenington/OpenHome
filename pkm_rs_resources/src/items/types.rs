@@ -64,7 +64,7 @@ impl Item {
     }
 
     pub const fn is_berry(self) -> bool {
-        matches!(self.get(), 149..=212 | 686..=688 | 861..=866 | 1754)
+        matches!(self.get(), 149..=212 | 686..=688 | 861..=866 | 1754 | 2651..=2683)
     }
 
     pub const fn is_tm(self) -> bool {

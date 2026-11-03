@@ -2,8 +2,9 @@
 // bottom of this file), which allows `binary_search` lookups.
 
 use pkm_rs_resources::items::ItemIndex;
+use static_assertions::const_assert;
 
-use crate::merge_dedup;
+use crate::{items::merge_dedup::is_strictly_ascending, merge_dedup};
 
 pub const MEDICINE: &[u16] = &[
     17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
@@ -19,12 +20,6 @@ pub const BALLS: &[u16] = &[
 pub const BATTLE: &[u16] = &[
     55, 56, 57, 58, 59, 60, 61, 62, 63, 593, 594, 595, 596, 597, 598, 599, 600, 601, 602, 603, 604,
     605, 606, 607, 608, 609, 610, 611, 612, 613, 614, 615,
-];
-
-pub const BERRY: &[u16] = &[
-    149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 169, 170, 171, 172,
-    173, 174, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200,
-    201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 686, 687, 688,
 ];
 
 pub const OTHER: &[u16] = &[
@@ -220,3 +215,13 @@ pub const MATERIAL: &[u16] = &[
     2502, 2503, 2504, 2505, 2506, 2507, 2508, 2509, 2510, 2511, 2512, 2513, 2514, 2515, 2516, 2517,
     2518, 2519, 2520, 2521,
 ];
+
+const_assert!(is_strictly_ascending(MEDICINE));
+const_assert!(is_strictly_ascending(BALLS));
+const_assert!(is_strictly_ascending(BATTLE));
+const_assert!(is_strictly_ascending(OTHER));
+const_assert!(is_strictly_ascending(MACHINE));
+const_assert!(is_strictly_ascending(TREASURE));
+const_assert!(is_strictly_ascending(PICNIC));
+const_assert!(is_strictly_ascending(KEY_ITEMS));
+const_assert!(is_strictly_ascending(MATERIAL));

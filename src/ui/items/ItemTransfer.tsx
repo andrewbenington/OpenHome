@@ -34,6 +34,8 @@ export function ItemTransfer(props: ItemTransferProps) {
 
   const selectedSourceController =
     selectedSourceId === 'source1' ? source1Controller : source2Controller
+  const unselectedSourceController =
+    selectedSourceId === 'source2' ? source1Controller : source2Controller
 
   return (
     <div className="save-items-display">
@@ -64,21 +66,13 @@ export function ItemTransfer(props: ItemTransferProps) {
           {selectedSourceController.isKeyItemsCategory ? (
             <KeyItemRegisterControls
               sourceController={selectedSourceController}
-              destController={
-                selectedSourceController === source1Controller
-                  ? source2Controller
-                  : source1Controller
-              }
+              destController={unselectedSourceController}
               side={selectedSourceId === 'source1' ? 'right' : 'left'}
             />
           ) : (
             <ItemTransferControls
               sourceController={selectedSourceController}
-              destController={
-                selectedSourceController === source1Controller
-                  ? source2Controller
-                  : source1Controller
-              }
+              destController={unselectedSourceController}
               side={selectedSourceId === 'source1' ? 'right' : 'left'}
             />
           )}
@@ -123,7 +117,7 @@ type ItemTransferControlsProps = {
 const AMOUNT_INPUT_ID = 'item-transfer-amount-input'
 
 function ItemTransferControls(props: ItemTransferControlsProps) {
-  const [itemCount, setItemCount] = useState<number | ''>(
+  const [moveCount, setMoveCount] = useState<number | ''>(
     props.sourceController?.selectedItem?.count ? 1 : 0
   )
   const sourceItem = props.sourceController?.selectedItem
@@ -137,12 +131,12 @@ function ItemTransferControls(props: ItemTransferControlsProps) {
       variant="classic"
       style={{ fontWeight: 'bold', height: '2.5rem', width: '12rem' }}
       onClick={() => {
-        if (itemCount && sourceItem?.index) {
-          props.sourceController?.source.removeItems(sourceItem?.index, itemCount)
-          props.destController?.source.addItems(sourceItem?.index, itemCount)
+        if (moveCount && sourceItem?.index) {
+          props.sourceController.source.removeItems(sourceItem.index, moveCount)
+          props.destController.source.addItems(sourceItem.index, moveCount)
         }
       }}
-      disabled={!itemCount}
+      disabled={!moveCount || !props.sourceController.selectedItem?.count}
     >
       {props.side === 'left' && <ArrowUpIcon />}
       Send Items
@@ -153,8 +147,9 @@ function ItemTransferControls(props: ItemTransferControlsProps) {
   const maxAllowed = sourceItem?.index
     ? props.destController.database.maxAllowed(sourceItem.index)
     : undefined
+
   const max =
-    maxAllowed && props.sourceController?.selectedItem?.count
+    maxAllowed !== undefined && props.sourceController.selectedItem?.count
       ? Math.min(maxAllowed, props.sourceController.selectedItem.count)
       : undefined
 
@@ -178,12 +173,12 @@ function ItemTransferControls(props: ItemTransferControlsProps) {
           <LabelledInput.Int
             id={AMOUNT_INPUT_ID}
             key={sourceItem?.index}
-            value={itemCount || 0}
+            value={moveCount || 0}
             min={0}
             max={max}
-            onChange={(v) => setItemCount(v ?? 0)}
+            onChange={(v) => setMoveCount(v ?? 0)}
             style={{ width: '3.25rem' }}
-            disabled={!sourceItem}
+            disabled={!sourceItem || !props.sourceController.selectedItem?.count}
             autoFocus
           />
           <code>/</code>
@@ -212,25 +207,27 @@ function KeyItemRegisterControls(props: ItemTransferControlsProps) {
   return (
     <OhoFlex.Row gap="1" direction={props.side === 'left' ? 'row' : 'row-reverse'}>
       <OhoFlex.RowCentered width="50%" height="2.6rem" mt="var(--padding-radius-xs-sm)">
-        <OhoButton
-          size="3"
-          color="red"
-          variant="classic"
-          style={{ fontWeight: 'bold', width: 'fit-content' }}
-          onClick={() => {
-            if (registeredForSource && sourceItem && !registeredForDest) {
-              props.destController.source.addItems(sourceItem?.index, 1)
-            }
-          }}
-          disabled={!registeredForSource || registeredForDest}
-        >
-          {props.side === 'left' ? <ArrowUpIcon /> : registeredIcon}
-          Register
-          {sourceItem && (
-            <Badge.Item item={sourceItem} showLabel backgroundColor="var(--gray-11)" />
-          )}
-          {props.side === 'right' ? <ArrowUpIcon /> : registeredIcon}
-        </OhoButton>
+        {sourceItem && props.destController.database.maxAllowed(sourceItem.index) === 1 && (
+          <OhoButton
+            size="3"
+            color="red"
+            variant="classic"
+            style={{ fontWeight: 'bold', width: 'fit-content' }}
+            onClick={() => {
+              if (registeredForSource && sourceItem && !registeredForDest) {
+                props.destController.source.addItems(sourceItem?.index, 1)
+              }
+            }}
+            disabled={!registeredForSource || registeredForDest}
+          >
+            {props.side === 'right' ? null : registeredForDest ? registeredIcon : <ArrowUpIcon />}
+            {registeredForDest ? 'Registered' : 'Register'}
+            {sourceItem && !registeredForDest && (
+              <Badge.Item item={sourceItem} showLabel backgroundColor="var(--gray-11)" />
+            )}
+            {props.side === 'left' ? null : registeredForDest ? registeredIcon : <ArrowUpIcon />}
+          </OhoButton>
+        )}
       </OhoFlex.RowCentered>
     </OhoFlex.Row>
   )

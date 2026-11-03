@@ -1,6 +1,6 @@
 use crate::items::groups::{
-    BALLS, BATTLE, BERRY, KEY_ITEMS, KEY_ITEMS_EXCLUDED, MACHINE, MATERIAL, MEDICINE, OTHER,
-    PICNIC, TREASURE,
+    BALLS, BATTLE, KEY_ITEMS, KEY_ITEMS_EXCLUDED, MACHINE, MATERIAL, MEDICINE, OTHER, PICNIC,
+    TREASURE,
 };
 
 use num_enum::{IntoPrimitive, TryFromPrimitive};
@@ -80,7 +80,6 @@ impl OpenhomeItemCategory {
         match self {
             Self::TechnicalMachines => Some(MACHINE),
             Self::Medicine => Some(MEDICINE),
-            Self::Berries => Some(BERRY),
             Self::Balls => Some(BALLS),
             Self::BattleItems => Some(BATTLE),
             Self::Treasure => Some(TREASURE),
@@ -88,6 +87,7 @@ impl OpenhomeItemCategory {
             Self::SpeciesItems => Some(MATERIAL),
             Self::Items => Some(OTHER),
             Self::KeyItems
+            | Self::Berries
             | Self::MegaStones
             | Self::Mail
             | Self::PcItems
@@ -132,30 +132,6 @@ impl OpenhomeItemCategory {
         }
     }
 }
-
-const fn is_strictly_ascending(s: &[u16]) -> bool {
-    let mut i = 1;
-    while i < s.len() {
-        if s[i - 1] >= s[i] {
-            return false;
-        }
-        i += 1;
-    }
-    true
-}
-
-const _: () = {
-    assert!(is_strictly_ascending(MEDICINE));
-    assert!(is_strictly_ascending(BALLS));
-    assert!(is_strictly_ascending(BATTLE));
-    assert!(is_strictly_ascending(BERRY));
-    assert!(is_strictly_ascending(OTHER));
-    assert!(is_strictly_ascending(MACHINE));
-    assert!(is_strictly_ascending(TREASURE));
-    assert!(is_strictly_ascending(PICNIC));
-    assert!(is_strictly_ascending(KEY_ITEMS));
-    assert!(is_strictly_ascending(MATERIAL));
-};
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
