@@ -13,7 +13,6 @@ import { ItemIcon } from './ItemIcon'
 import './ItemTransfer.css'
 import { ItemTransferSourceDisplay } from './ItemTransferSourceDisplay'
 import { ItemTransferSource } from './types'
-import { useItemFilter } from './useItemFilter'
 import { ItemSourceController, useItemSource } from './useItemSource'
 
 type Source = 'source1' | 'source2'
@@ -26,11 +25,10 @@ export interface ItemTransferProps {
 export function ItemTransfer(props: ItemTransferProps) {
   const { source1, source2 } = props
   const parentRef = useRef(null)
-  const itemFilter = useItemFilter()
   const [selectedSourceId, setSelectedSourceId] = useState<Option<Source>>()
 
-  const source1Controller = useItemSource(source1, source2, itemFilter)
-  const source2Controller = useItemSource(source2, source1, itemFilter)
+  const source1Controller = useItemSource(source1, source2)
+  const source2Controller = useItemSource(source2, source1)
 
   const selectedSourceController =
     selectedSourceId === 'source1' ? source1Controller : source2Controller

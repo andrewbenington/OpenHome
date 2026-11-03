@@ -1,19 +1,15 @@
 import { Option } from '@openhome-core/util/functional'
-import { multiSorter, numericSorter, stringSorter } from '@openhome-core/util/sort'
 import { Item } from '@pkm-rs/pkg'
 import { useMemo, useState } from 'react'
-import { ItemTransferSource } from './types'
-import { ItemFilterController } from './useItemFilter'
+import { itemSorter, ItemTransferSource } from './types'
+import { useItemFilter } from './useItemFilter'
 
-export function useItemSource(
-  source: ItemTransferSource,
-  dest: ItemTransferSource,
-  itemFilter: ItemFilterController
-) {
+export function useItemSource(source: ItemTransferSource, dest: ItemTransferSource) {
   const [selection, setSelection] = useState<Option<number>>(undefined)
   const [category, setCategory] = useState<number | 'ALL_ITEMS'>('ALL_ITEMS')
 
-  const { filter } = itemFilter
+  const filterController = useItemFilter()
+  const filter = filterController.filter
   const allItems = useMemo(() => source.getItemData(), [source])
 
   const database = source.database
@@ -51,14 +47,7 @@ export function useItemSource(
           ...item,
           pouch: database.internalCategoryForItem(item.index) ?? 0,
         }))
-        .toSorted(
-          filter.sort === 'alphabetical'
-            ? stringSorter((item) => Item.fromIndex(item.index)?.name)
-            : multiSorter(
-                numericSorter((item) => item.index),
-                numericSorter((item) => item.pouch)
-              )
-        ),
+        .toSorted(itemSorter(filter.sort)),
     [allItems, category, dest.database, filter, database, source.database]
   )
 
@@ -80,7 +69,7 @@ export function useItemSource(
     setPouch: setCategory,
     isKeyItemsCategory,
     categoryIndexesWithItems,
-    ...itemFilter,
+    ...filterController,
   }
 }
 
