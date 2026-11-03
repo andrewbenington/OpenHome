@@ -21,7 +21,7 @@ use pkm_rs_types::randomize::Randomize;
 pub struct HomePa8Data {
     pub is_alpha: bool,
     pub is_noble: bool,
-    pub alpha_move: Option<MoveSlot>,
+    pub alpha_move: MoveSlot,
     pub scale: u8,
     pub moves: MoveSlots,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
@@ -50,7 +50,7 @@ impl HomePa8Data {
         let data = HomePa8Data {
             is_alpha: buf.is_alpha(),
             is_noble: buf.is_noble(),
-            alpha_move: Some(buf.alpha_move()),
+            alpha_move: buf.alpha_move(),
             scale: buf.scale(),
             moves: buf.move_slots(),
             relearn_moves: [
