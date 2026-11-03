@@ -37,6 +37,8 @@ export function ItemTransfer(props: ItemTransferProps) {
   const unselectedSourceController =
     selectedSourceId === 'source2' ? source1Controller : source2Controller
 
+  const selectedItem = selectedSourceController.selectedItem
+
   return (
     <div className="save-items-display">
       <OhoFlex.RowEqualSized ref={parentRef} gridColumn="1 / span 2" gap="1" mx="1" mt="1">
@@ -63,7 +65,8 @@ export function ItemTransfer(props: ItemTransferProps) {
       </OhoFlex.RowEqualSized>
       <div className="item-transfer-card">
         <OhoFlex.ColFullWidth gap="1">
-          {selectedSourceController.isKeyItemsCategory ? (
+          {selectedItem?.index &&
+          selectedSourceController.database.maxAllowed(selectedItem.index) === 1 ? (
             <KeyItemRegisterControls
               sourceController={selectedSourceController}
               destController={unselectedSourceController}

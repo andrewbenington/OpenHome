@@ -42,7 +42,7 @@
 }
 
 .item-row-selected-inactive {
-  background-color: var(--focus-7);
+  background-color: var(--gray-a7);
   font-weight: bold;
 }
 

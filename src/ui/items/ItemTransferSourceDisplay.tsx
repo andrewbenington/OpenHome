@@ -50,22 +50,22 @@ export function ItemTransferSourceDisplay(props: ItemTransferSourceDisplayProps)
                   All Items
                 </Flex>
               </Select.Item>
-              {sourceController.database.categoryIndexes().map((pouchIndex) => (
+              {sourceController.categoryIndexesWithItems.map((categoryIndex) => (
                 <Select.Item
                   className="item-category-select"
-                  key={pouchIndex}
-                  value={pouchIndex.toString()}
+                  key={categoryIndex}
+                  value={categoryIndex.toString()}
                 >
                   <Flex as="span" align="center" gap="0.5rem">
                     <img
                       className="item-category-icon"
                       src={getPublicImageURL(
                         OpenhomeItemStorage.categoryIconPath(
-                          sourceController.database.internalCategoryToOpenhome(pouchIndex)
+                          sourceController.database.internalCategoryToOpenhome(categoryIndex)
                         )
                       )}
                     />
-                    {sourceController.database.categoryName(pouchIndex)}
+                    {sourceController.database.categoryName(categoryIndex)}
                   </Flex>
                 </Select.Item>
               ))}

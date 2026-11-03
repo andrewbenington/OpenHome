@@ -11,7 +11,7 @@ export function useItemSource(
   itemFilter: ItemFilterController
 ) {
   const [selection, setSelection] = useState<Option<number>>(undefined)
-  const [pouch, setPouch] = useState<number | 'ALL_ITEMS'>('ALL_ITEMS')
+  const [category, setCategory] = useState<number | 'ALL_ITEMS'>('ALL_ITEMS')
 
   const { filter } = itemFilter
   const allItems = useMemo(() => source.getItemData(), [source])
@@ -19,7 +19,15 @@ export function useItemSource(
   const database = source.database
 
   const isKeyItemsCategory =
-    pouch !== 'ALL_ITEMS' && database.internalCategoryToOpenhome(pouch) === 'KeyItems'
+    category !== 'ALL_ITEMS' && database.internalCategoryToOpenhome(category) === 'KeyItems'
+
+  const categoryIndexesWithItems = database
+    .categoryIndexes()
+    .filter((categoryIndex) =>
+      allItems.some(
+        (item) => item.count > 0 && database.internalCategoryForItem(item.index) === categoryIndex
+      )
+    )
 
   const items = useMemo(
     () =>
@@ -31,7 +39,8 @@ export function useItemSource(
               dest.database.availability(item.index) !== 'Unsupported')
         )
         .filter(
-          (item) => pouch === 'ALL_ITEMS' || database.internalCategoryForItem(item.index) === pouch
+          (item) =>
+            category === 'ALL_ITEMS' || database.internalCategoryForItem(item.index) === category
         )
         .filter((item) => {
           const nameTrimmed = Item.fromIndex(item.index)?.name?.trim()
@@ -50,7 +59,7 @@ export function useItemSource(
                 numericSorter((item) => item.pouch)
               )
         ),
-    [allItems, pouch, dest.database, filter, database, source.database]
+    [allItems, category, dest.database, filter, database, source.database]
   )
 
   const selectedItem = selection ? items.find((item) => item.index === selection) : undefined
@@ -67,9 +76,10 @@ export function useItemSource(
     setSelection,
     source,
     database,
-    pouch,
-    setPouch,
+    pouch: category,
+    setPouch: setCategory,
     isKeyItemsCategory,
+    categoryIndexesWithItems,
     ...itemFilter,
   }
 }
