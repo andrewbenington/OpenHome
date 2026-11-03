@@ -433,7 +433,7 @@ impl Ph4 {
 
     #[wasm_bindgen(getter = alphaMove)]
     pub fn alpha_move(&self) -> Option<u16> {
-        self.pa8_data?.alpha_move?.to_raw()
+        self.pa8_data?.alpha_move.to_raw()
     }
 
     #[wasm_bindgen(getter = movesLa)]

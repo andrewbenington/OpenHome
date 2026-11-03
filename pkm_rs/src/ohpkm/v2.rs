@@ -1217,12 +1217,12 @@ impl OhpkmV2 {
         }
     }
 
-    pub const fn alpha_move(&self) -> MoveSlot {
-        self.main_data.alpha_move
+    pub fn alpha_move(&self) -> MoveSlot {
+        self.la_data.unwrap_or_default().alpha_move
     }
 
-    pub const fn set_alpha_move(&mut self, value: MoveSlot) {
-        self.main_data.alpha_move = value
+    pub fn set_alpha_move(&mut self, value: MoveSlot) {
+        self.la_data.get_or_insert_default().alpha_move = value
     }
 
     pub fn move_flags_la(&self) -> Option<Vec<u8>> {
@@ -1917,13 +1917,10 @@ impl OhpkmV2 {
 
     #[allow(deprecated)]
     pub const fn copy_deprecated_la_alpha_fields(&mut self) {
-        if let Some(la_data) = self.la_data {
-            if la_data.is_alpha {
-                self.main_data.set_is_alpha(true);
-            }
-            if la_data.alpha_move != 0 {
-                self.main_data.alpha_move = MoveSlot::from_u16(la_data.alpha_move)
-            }
+        if let Some(la_data) = self.la_data
+            && la_data.is_alpha
+        {
+            self.main_data.set_is_alpha(true);
         }
     }
 }

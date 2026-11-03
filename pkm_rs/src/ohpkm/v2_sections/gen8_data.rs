@@ -4,7 +4,7 @@ use crate::result::{Error, Result};
 use crate::sectioned_data::DataSection;
 use crate::util;
 
-use pkm_rs_resources::moves::la_tutor;
+use pkm_rs_resources::moves::{MoveSlot, la_tutor};
 use pkm_rs_types::FlagSet;
 use pkm_rs_types::OriginGame;
 use pkm_rs_types::Stats8;
@@ -104,12 +104,7 @@ pub struct LegendsArceusData {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub is_alpha: bool,
     pub is_noble: bool,
-    #[deprecated(
-        since = "1.19.0",
-        note = "the alpha_move field in main_data is used instead. this is no longer set on writes."
-    )]
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub alpha_move: u16,
+    pub alpha_move: MoveSlot,
     pub flag2: bool,
     pub unknown_a0: u32,
     pub unknown_f3: u8,
@@ -129,7 +124,7 @@ impl LegendsArceusData {
         } else {
             Some(Self {
                 gvs: old.gvs,
-                alpha_move: old.alpha_move,
+                alpha_move: old.alpha_move.into(),
                 move_flags: FlagSet::from_bytes(old.move_flags_la),
                 tutor_flags: FlagSet::from_bytes(old.tutor_flags_la),
                 master_flags: FlagSet::from_bytes(old.master_flags_la),
@@ -161,8 +156,7 @@ impl DataSection for LegendsArceusData {
         // try_into() will always succeed thanks to the buffer size check
         Ok(Self {
             gvs: Stats8::from_bytes(bytes[0..6].try_into().unwrap()),
-            #[allow(deprecated)]
-            alpha_move: u16::from_le_bytes(bytes[6..8].try_into().unwrap()),
+            alpha_move: MoveSlot::from_le_bytes(bytes[6..8].try_into().unwrap()),
             move_flags: FlagSet::from_bytes(bytes[8..22].try_into().unwrap()),
             tutor_flags: FlagSet::from_bytes(bytes[22..30].try_into().unwrap()),
             master_flags: FlagSet::from_bytes(bytes[30..38].try_into().unwrap()),
@@ -179,7 +173,7 @@ impl DataSection for LegendsArceusData {
         let mut bytes = [0u8; 44];
 
         bytes[0..6].copy_from_slice(&self.gvs.to_bytes());
-        bytes[6..8].copy_from_slice(&[0; 2]);
+        bytes[6..8].copy_from_slice(&self.alpha_move.to_le_bytes());
         bytes[8..22].copy_from_slice(&self.move_flags.to_bytes());
         bytes[22..30].copy_from_slice(&self.tutor_flags.to_bytes());
         bytes[30..38].copy_from_slice(&self.master_flags.to_bytes());

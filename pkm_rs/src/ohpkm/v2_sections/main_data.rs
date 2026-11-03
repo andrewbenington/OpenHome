@@ -106,7 +106,6 @@ pub struct MainDataV2 {
     pub language: Language,
     pub form_argument: u32,
     pub affixed_ribbon: Option<ModernRibbon>,
-    pub alpha_move: MoveSlot,
     pub extra_form: Option<ExtraFormIndex>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub trainer_name: SizedUtf16String<26>,
@@ -226,7 +225,6 @@ impl MainDataV2 {
             language: old.language,
             form_argument: old.form_argument,
             affixed_ribbon: old.affixed_ribbon,
-            alpha_move: MoveSlot::from_u16(old.alpha_move),
             extra_form: None,
             trainer_name: old.trainer_name,
             trainer_friendship: old.trainer_friendship,
@@ -610,7 +608,7 @@ impl DataSection for MainDataV2 {
             openhome_id: OpenHomeId::try_from_bytes(array_ref![bytes, 250, 10]).unwrap_or(
                 OpenHomeId::new(national_dex, trainer_id, secret_id, personality_value),
             ),
-            alpha_move: MoveSlot::from_le_bytes(*array_ref![bytes, 260, 2]),
+            // gap: 260-263
 
             // TODO: handle invalid values
             extra_form: u64::from_le_bytes(*array_ref![bytes, 264, 8])
@@ -844,7 +842,6 @@ impl Randomize for MainDataV2 {
             language: Language::randomized(rng),
             form_argument: u32::randomized(rng),
             affixed_ribbon: Option::<ModernRibbon>::randomized(rng),
-            alpha_move: MoveSlot::randomized(rng),
             extra_form: {
                 // randomize whether there should be an extra form or not with a 50/50 chance, and if there is, randomize it appropriately for the mon's species. If the species doesn't have any extra forms this will just be None.
                 if bool::randomized(rng) {
