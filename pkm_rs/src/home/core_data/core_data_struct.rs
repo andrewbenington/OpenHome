@@ -116,7 +116,7 @@ impl HomeCoreData {
             status_condition: buf.status_condition(),
             handler_name: buf.handler_name(),
             handler_gender: buf.handler_gender(),
-            handler_language: buf.handler_language().ok(),
+            handler_language: buf.handler_language()?,
             is_current_handler: buf.is_current_handler(),
             handler_id: buf.handler_id(),
             handler_friendship: buf.handler_friendship(),

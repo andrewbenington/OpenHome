@@ -1,3 +1,4 @@
+use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::moves::MoveSlots;
 use pkm_rs_resources::ribbons::OpenHomeRibbonSet;
 
@@ -39,7 +40,7 @@ impl OhpkmConvert for Ph4 {
             is_egg: self.core_data.is_egg,
             is_nicknamed: self.core_data.is_nicknamed,
             handler_name: self.core_data.handler_name,
-            handler_language: self.core_data.handler_language,
+            handler_language: Some(self.core_data.handler_language),
             is_current_handler: self.core_data.is_current_handler,
             handler_id: self.core_data.handler_id,
             handler_friendship: self.core_data.handler_friendship,
@@ -69,7 +70,8 @@ impl OhpkmConvert for Ph4 {
                 data.relearn_moves = unwrap.relearn_moves;
                 data.ball = unwrap.ball;
                 data.pokerus = unwrap.pokerus;
-                // TODO: ability index
+                data.ability_index = AbilityIndexBounded::try_from(unwrap.ability_index)
+                    .expect("PKH PA9 max ability <= overall max ability");
                 data.ability_num = unwrap.ability_num;
                 data.fullness = unwrap.fullness;
                 data.egg_location_index = Some(unwrap.egg_location_index);
@@ -136,9 +138,7 @@ impl OhpkmConvert for Ph4 {
                 data.moves = MoveSlots::from_arrays(unwrap.moves, [0; 4], [0; 4]); // TODO: figure out a better way to set PP
                 data.ball = unwrap.ball;
                 data.obedience_level = unwrap.obedience_level;
-                data.ability_index = unwrap
-                    .ability_index
-                    .change_bound()
+                data.ability_index = AbilityIndexBounded::try_from(unwrap.ability_index)
                     .expect("PKH PA9 max ability <= overall max ability");
                 data.ability_num = unwrap.ability_num;
                 data.egg_location_index = Some(unwrap.egg_location_index);

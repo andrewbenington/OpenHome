@@ -2,10 +2,9 @@ use super::PkhPa9Buffer;
 #[cfg(feature = "wasm")]
 use crate::gen9_lza::PlusMoveFlags;
 use crate::gen9_lza::{LZA_PLUS_MOVES_0X94_BYTES, LZA_PLUS_MOVES_0XD6_BYTES};
-use crate::gen9_sv::Pk9AbilityIndex;
 use crate::result::{Error, Result};
 
-use pkm_rs_resources::abilities::{AbilityIndexBounded, AbilityIndexWasm};
+use pkm_rs_resources::abilities::AbilityIndexWasm;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_types::{AbilityNumber, FlagSet};
@@ -34,7 +33,7 @@ pub struct HomePa9Data {
     pub met_location_index: u16,
     pub obedience_level: u8,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub ability_index: Pk9AbilityIndex,
+    pub ability_index: AbilityIndexWasm,
     pub ability_num: AbilityNumber,
     // PKHeX has not yet updated GameDataPA9 for MD, so DLC plus move flags are not yet included here.
 }
@@ -55,7 +54,7 @@ impl HomePa9Data {
             egg_location_index: buf.egg_location_index(),
             met_location_index: buf.met_location_index(),
             obedience_level: buf.obedience_level(),
-            ability_index: AbilityIndexBounded::try_from(buf.ability_index_raw())?,
+            ability_index: AbilityIndexWasm::try_from(buf.ability_index_raw())?,
             ability_num: buf.ability_num()?,
         };
         Ok(data)
