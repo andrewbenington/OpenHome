@@ -8,6 +8,7 @@ use super::game_data_pk9::HomePk9Data;
 use crate::result::Result;
 use crate::traits::{HasSpeciesAndForm, IsShiny, ModernEvs, PkmBytes};
 
+use arrayref::array_ref;
 use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_resources::species::{FormMetadata, SpeciesMetadata};
 use pkm_rs_resources::stats;
@@ -63,7 +64,8 @@ pub struct Ph4 {
     pub pa8_data: Option<HomePa8Data>,
     pub pb8_data: Option<HomePb8Data>,
     pub pk9_data: Option<HomePk9Data>,
-    //pub pc9_data: Option<HomePc9Data>,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub pc9_data: Option<[u8; super::HOME_PC9_DATA_SIZE]>,
     pub pa9_data: Option<HomePa9Data>,
 }
 
@@ -86,6 +88,7 @@ impl Ph4 {
             pa8_data: None,
             pb8_data: None,
             pk9_data: None,
+            pc9_data: None,
             pa9_data: None,
         };
 
@@ -141,7 +144,9 @@ impl Ph4 {
                 6 => {
                     // this contains Champions data, which is merely tracking information:
                     // https://github.com/kwsch/PKHeX/blob/master/PKHeX.Core/PKM/HOME/GameDataPC9.cs
-                    byte_counter += 0x19;
+                    mon.pc9_data =
+                        Some(*array_ref![bytes, byte_counter, super::HOME_PC9_DATA_SIZE]);
+                    byte_counter += super::HOME_PC9_DATA_SIZE;
                 }
                 7 => {
                     mon.pa9_data = HomePa9Data::try_from_bytes(
