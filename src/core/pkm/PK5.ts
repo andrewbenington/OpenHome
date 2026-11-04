@@ -16,6 +16,7 @@ import {
   MarkingsSixShapes,
   MetadataSummaryLookup,
   NatureIndex,
+  OriginGame,
   OriginGames,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
@@ -213,7 +214,24 @@ export default class PK5 {
       this.eggLocationIndex = other.eggLocationIndex ?? 0
 
       this.gameOfOrigin = metData.gameOfOrigin
-      this.metLocationIndex = metData.locationIndex
+      if (metData.locationIndex === 30001) {
+        // G3/G4 Pokemon transferred using Poke Transfer had their met location erased.
+        if (OriginGames.isGba(metData.locationIndex)) {
+          this.metLocationIndex = 254 // (in-game trade)
+        } else if (
+          (this.gameOfOrigin >= OriginGame.HeartGold && this.gameOfOrigin <= OriginGame.Platinum) ||
+          this.gameOfOrigin === OriginGame.BattleRevolution
+        ) {
+          this.metLocationIndex = 0x37 // Pal Park
+        } else if (this.gameOfOrigin === OriginGame.ColosseumXd) {
+          this.metLocationIndex = 0 // distant land
+        } else {
+          this.metLocationIndex = metData.locationIndex // not legal, just store as-is
+        }
+      } else {
+        this.metLocationIndex = metData.locationIndex // Gen 5 native
+      }
+
       this.pokerusByte = other.pokerusByte
       if (other.ball && PK5.maxValidBall() >= other.ball) {
         this.ball = other.ball
