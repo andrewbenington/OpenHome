@@ -1,5 +1,6 @@
-use crate::bytes::AsBytes;
+use crate::bytes::{AsBytes, AsBytesMut};
 use crate::result::Result;
+use crate::traits::OhpkmByte;
 use crate::util;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
@@ -77,7 +78,10 @@ impl From<Offset> for usize {
 // covers all getters, and a second (narrower) block covers setters.
 //
 //   PkhCoreBufferRef<'a>  = PkhCoreBuffer<&'a [u8]>       — read-only
+//   PkhCoreBufferMut<'a>  = PkhCoreBuffer<&'a mut [u8]>   — read + write
 // ---------------------------------------------------------------------------
+
+pub type PkhCoreBufferMut<'a> = PkhCoreBuffer<&'a mut [u8]>;
 
 #[derive(Default, Clone, Copy)]
 pub struct PkhCoreBuffer<S: AsRef<[u8]>>(S);
@@ -88,6 +92,17 @@ pub struct PkhCoreBuffer<S: AsRef<[u8]>>(S);
 
 impl<'a> PkhCoreBuffer<&'a [u8]> {
     pub fn new(span: &'a [u8]) -> Self {
+        assert_eq!(span.len(), super::HOME_CORE_DATA_SIZE);
+        Self(span)
+    }
+}
+
+// ------------------------------------------------------------------
+// Constructors — mutable
+// ------------------------------------------------------------------
+
+impl<'a> PkhCoreBuffer<&'a mut [u8]> {
+    pub fn new_mut(span: &'a mut [u8]) -> Self {
         assert_eq!(span.len(), super::HOME_CORE_DATA_SIZE);
         Self(span)
     }
@@ -125,6 +140,38 @@ impl<S: AsRef<[u8]>> PkhCoreBuffer<S> {
     fn get_array<const N: usize>(&self, offset: Offset) -> [u8; N] {
         let offset = offset as usize;
         self.bytes()[offset..offset + N].try_into().unwrap()
+    }
+}
+
+impl<S: AsRef<[u8]> + AsMut<[u8]>> PkhCoreBuffer<S> {
+    fn set_u8(&mut self, offset: Offset, v: u8) {
+        let offset = offset as usize;
+        self.bytes_mut()[offset] = v;
+    }
+
+    fn set_u16_le(&mut self, offset: Offset, v: u16) {
+        let offset = offset as usize;
+        self.bytes_mut()[offset..offset + 2].copy_from_slice(&v.to_le_bytes());
+    }
+
+    fn set_u32_le(&mut self, offset: Offset, v: u32) {
+        let offset = offset as usize;
+        self.bytes_mut()[offset..offset + 4].copy_from_slice(&v.to_le_bytes());
+    }
+
+    fn set_u64_le(&mut self, offset: Offset, v: u64) {
+        let offset = offset as usize;
+        self.bytes_mut()[offset..offset + 8].copy_from_slice(&v.to_le_bytes());
+    }
+
+    fn set_flag(&mut self, offset: Offset, bit_index: usize, v: bool) {
+        let offset = offset as usize;
+        util::set_flag(self.bytes_mut(), offset, bit_index, v);
+    }
+
+    fn set_array<const N: usize>(&mut self, offset: Offset, v: &[u8; N]) {
+        let offset = offset as usize;
+        self.bytes_mut()[offset..offset + N].copy_from_slice(v);
     }
 }
 
@@ -457,11 +504,333 @@ impl<S: AsRef<[u8]>> PkhCoreBuffer<S> {
 }
 
 // ==================================================================
+// Setters  (available only on PkhCoreBufferMut)
+// ==================================================================
+
+impl<S: AsRef<[u8]> + AsMut<[u8]>> PkhCoreBuffer<S> {
+    fn bytes_mut(&mut self) -> &mut [u8] {
+        self.0.as_mut()
+    }
+
+    pub fn set_home_tracker(&mut self, v: u64) {
+        self.set_u64_le(Offset::HomeTracker, v);
+    }
+
+    pub fn set_encryption_constant(&mut self, v: u32) {
+        self.set_u32_le(Offset::EncryptionConstant, v);
+    }
+
+    pub fn set_is_bad_egg(&mut self, v: bool) {
+        self.set_flag(Offset::IsBadEgg, 0, v);
+    }
+
+    pub fn set_species_ndex(&mut self, v: u16) {
+        self.set_u16_le(Offset::NationalDex, v);
+    }
+
+    pub fn set_form_num(&mut self, v: u16) {
+        self.set_u16_le(Offset::FormNum, v);
+    }
+
+    pub fn set_species_and_form(&mut self, v: SpeciesForm) {
+        self.set_species_ndex(v.get_ndex() as u16);
+        self.set_form_num(v.get_form_index());
+    }
+
+    pub fn set_trainer_id(&mut self, v: u16) {
+        self.set_u16_le(Offset::TrainerId, v);
+    }
+
+    pub fn set_secret_id(&mut self, v: u16) {
+        self.set_u16_le(Offset::SecretId, v);
+    }
+
+    pub fn set_exp(&mut self, v: u32) {
+        self.set_u32_le(Offset::Exp, v);
+    }
+
+    pub fn set_is_favorite(&mut self, v: bool) {
+        self.set_flag(Offset::IsFavorite, 0, v);
+    }
+
+    fn set_markings_raw(&mut self, v: &[u8; 2]) {
+        self.set_array(Offset::Markings, v);
+    }
+
+    pub fn set_markings(&mut self, v: MarkingsSixShapesColors) {
+        self.set_markings_raw(&v.to_bytes());
+    }
+
+    pub fn set_personality_value(&mut self, v: u32) {
+        self.set_u32_le(Offset::PersonalityValue, v);
+    }
+
+    fn set_nature_raw(&mut self, v: u8) {
+        self.set_u8(Offset::Nature, v);
+    }
+
+    pub fn set_nature(&mut self, v: NatureIndex) {
+        self.set_nature_raw(v.to_byte());
+    }
+
+    fn set_mint_nature_raw(&mut self, v: u8) {
+        self.set_u8(Offset::MintNature, v);
+    }
+
+    pub fn set_mint_nature(&mut self, v: NatureIndex) {
+        self.set_mint_nature_raw(v.to_byte());
+    }
+
+    pub fn set_is_fateful_encounter(&mut self, v: bool) {
+        self.set_flag(Offset::IsFatefulEncounter, 0, v);
+    }
+
+    pub fn set_gender(&mut self, v: Gender) {
+        self.set_u8(Offset::Gender, v.to_byte());
+    }
+
+    fn set_evs_raw(&mut self, v: &[u8; 6]) {
+        self.set_array(Offset::Evs, v);
+    }
+
+    pub fn set_evs(&mut self, v: Stats8) {
+        self.set_evs_raw(&v.to_bytes());
+    }
+
+    fn set_contest_raw(&mut self, v: &[u8; 6]) {
+        self.set_array(Offset::Contest, v);
+    }
+
+    pub fn set_contest(&mut self, v: ContestStats) {
+        self.set_contest_raw(&v.to_bytes());
+    }
+
+    fn set_ribbons_a_raw(&mut self, v: &[u8; 8]) {
+        self.set_array(Offset::RibbonsA, v);
+    }
+
+    fn set_ribbons_b_raw(&mut self, v: &[u8; 8]) {
+        self.set_array(Offset::RibbonsB, v);
+    }
+
+    pub fn set_ribbons(&mut self, v: ModernRibbonSet<16, { super::MAX_RIBBON_HOME }>) {
+        let bytes = v.to_bytes();
+        let mut a = [0u8; 8];
+        let mut b = [0u8; 8];
+        a.copy_from_slice(&bytes[..8]);
+        b.copy_from_slice(&bytes[8..16]);
+        self.set_ribbons_a_raw(&a);
+        self.set_ribbons_b_raw(&b);
+    }
+
+    pub fn set_contest_memory_count(&mut self, v: u8) {
+        self.set_u8(Offset::ContestMemoryCount, v);
+    }
+
+    pub fn set_battle_memory_count(&mut self, v: u8) {
+        self.set_u8(Offset::BattleMemoryCount, v);
+    }
+
+    pub fn set_height_scalar(&mut self, v: u8) {
+        self.set_u8(Offset::HeightScalar, v);
+    }
+
+    pub fn set_weight_scalar(&mut self, v: u8) {
+        self.set_u8(Offset::WeightScalar, v);
+    }
+
+    fn set_nickname_raw(&mut self, v: &[u8; 26]) {
+        self.set_array(Offset::Nickname, v);
+    }
+
+    pub fn set_nickname(&mut self, v: &SizedUtf16String<26>) {
+        self.set_nickname_raw(&v.bytes());
+    }
+
+    fn set_ivs_raw(&mut self, v: &[u8; 6]) {
+        self.set_array(Offset::Ivs, v);
+    }
+
+    pub fn set_ivs(&mut self, v: &Ivs) {
+        self.set_ivs_raw(&Stats8::from(*v).to_bytes());
+    }
+
+    pub fn set_is_egg(&mut self, v: bool) {
+        self.set_flag(Offset::IsEgg, 0, v);
+    }
+
+    pub fn set_is_nicknamed(&mut self, v: bool) {
+        self.set_flag(Offset::IsNicknamed, 0, v);
+    }
+
+    pub fn set_status_condition(&mut self, v: u32) {
+        self.set_u32_le(Offset::StatusCondition, v);
+    }
+
+    fn set_handler_name_raw(&mut self, v: &[u8; 26]) {
+        self.set_array(Offset::HandlerName, v);
+    }
+
+    pub fn set_handler_name(&mut self, v: &SizedUtf16String<26>) {
+        self.set_handler_name_raw(&v.bytes());
+    }
+
+    pub fn set_handler_gender_raw(&mut self, v: bool) {
+        self.set_flag(Offset::HandlerGender, 0, v);
+    }
+
+    pub fn set_handler_gender(&mut self, v: BinaryGender) {
+        self.set_handler_gender_raw(v.into());
+    }
+
+    pub fn set_handler_language_raw(&mut self, v: u8) {
+        self.set_u8(Offset::HandlerLanguage, v);
+    }
+
+    pub fn set_handler_language(&mut self, v: Language) {
+        self.set_handler_language_raw(v as u8);
+    }
+
+    pub fn set_is_current_handler(&mut self, v: bool) {
+        self.set_flag(Offset::IsCurrentHandler, 0, v);
+    }
+
+    pub fn set_handler_id(&mut self, v: u16) {
+        self.set_u16_le(Offset::HandlerId, v);
+    }
+
+    pub fn set_handler_friendship(&mut self, v: u8) {
+        self.set_u8(Offset::HandlerFriendship, v);
+    }
+
+    pub fn set_handler_memory_intensity(&mut self, v: u8) {
+        let off = Offset::HandlerMemory as usize;
+        self.bytes_mut()[off] = v;
+    }
+
+    pub fn set_handler_memory_memory(&mut self, v: u8) {
+        let off = Offset::HandlerMemory as usize + 1;
+        self.bytes_mut()[off] = v;
+    }
+
+    pub fn set_handler_memory_feeling(&mut self, v: u8) {
+        let off = Offset::HandlerMemory as usize + 2;
+        self.bytes_mut()[off] = v;
+    }
+
+    pub fn set_handler_memory_text_variable(&mut self, v: u16) {
+        let off = Offset::HandlerMemory as usize + 3;
+        self.bytes_mut()[off..off + 2].copy_from_slice(&v.to_le_bytes());
+    }
+
+    pub fn set_handler_memory(&mut self, v: TrainerMemory) {
+        let offset = Offset::HandlerMemory as usize;
+        self.bytes_mut()[offset..offset + 5].copy_from_slice(&v.to_bytes_switch_handler());
+    }
+
+    fn set_game_of_origin_raw(&mut self, v: u8) {
+        self.set_u8(Offset::GameOfOrigin, v);
+    }
+
+    pub fn set_game_of_origin(&mut self, v: OriginGame) {
+        self.set_game_of_origin_raw(v as u8);
+    }
+
+    pub fn set_game_of_origin_battle_raw(&mut self, v: u8) {
+        self.set_u8(Offset::GameOfOriginBattle, v);
+    }
+
+    pub fn set_game_of_origin_battle(&mut self, v: Option<OriginGame>) {
+        self.set_game_of_origin_battle_raw(v.to_ohpkm_byte());
+    }
+
+    fn set_language_raw(&mut self, v: u8) {
+        self.set_u8(Offset::Language, v);
+    }
+
+    pub fn set_language(&mut self, v: Language) {
+        self.set_language_raw(v as u8);
+    }
+
+    pub fn set_form_argument(&mut self, v: u32) {
+        self.set_u32_le(Offset::FormArgument, v);
+    }
+
+    pub fn set_affixed_ribbon(&mut self, v: Option<ModernRibbon>) {
+        self.set_u8(Offset::AffixedRibbon, ModernRibbon::to_affixed_byte(v));
+    }
+
+    fn set_trainer_name_raw(&mut self, v: &[u8; 26]) {
+        self.set_array(Offset::TrainerName, v);
+    }
+
+    pub fn set_trainer_name(&mut self, v: &SizedUtf16String<26>) {
+        self.set_trainer_name_raw(&v.bytes());
+    }
+
+    pub fn set_trainer_friendship(&mut self, v: u8) {
+        self.set_u8(Offset::TrainerFriendship, v);
+    }
+
+    pub fn set_trainer_memory(&mut self, v: TrainerMemory) {
+        let offset = Offset::TrainerMemory as usize;
+        self.bytes_mut()[offset..offset + 6].copy_from_slice(&v.to_bytes_switch_trainer());
+    }
+
+    fn set_egg_date_raw(&mut self, v: [u8; 3]) {
+        self.set_array(Offset::EggDate, &v);
+    }
+
+    pub fn set_egg_date(&mut self, v: Option<PokeDate>) {
+        self.set_egg_date_raw(PokeDate::to_bytes_optional(v));
+    }
+
+    fn set_met_date_raw(&mut self, v: [u8; 3]) {
+        self.set_array(Offset::MetDate, &v);
+    }
+
+    pub fn set_met_date(&mut self, v: PokeDate) {
+        self.set_met_date_raw(v.to_bytes());
+    }
+
+    pub fn set_met_level(&mut self, v: u8) {
+        self.set_u8(Offset::MetLevel, v);
+    }
+
+    fn set_trainer_gender_raw(&mut self, v: bool) {
+        let bytes = self.bytes_mut();
+        util::set_flag(bytes, Offset::TrainerGender as usize, 0, v);
+    }
+
+    pub fn set_trainer_gender(&mut self, v: BinaryGender) {
+        self.set_trainer_gender_raw(v.into());
+    }
+
+    fn set_hyper_training_raw(&mut self, v: u8) {
+        self.set_u8(Offset::HyperTraining, v);
+    }
+
+    pub fn set_hyper_training(&mut self, v: HyperTraining) {
+        self.set_hyper_training_raw(v.to_byte());
+    }
+
+    pub fn set_held_item_index(&mut self, v: u16) {
+        self.set_u16_le(Offset::HeldItem, v);
+    }
+}
+
+// ==================================================================
 // Trait impls
 // ==================================================================
 
 impl<S: AsRef<[u8]>> AsBytes for PkhCoreBuffer<S> {
     fn as_bytes(&self) -> &[u8] {
         self.0.as_ref()
+    }
+}
+
+impl<S: AsRef<[u8]> + AsMut<[u8]>> AsBytesMut for PkhCoreBuffer<S> {
+    fn as_bytes_mut(&mut self) -> &mut [u8] {
+        self.0.as_mut()
     }
 }

@@ -1,4 +1,5 @@
 use super::PkhPb7Buffer;
+use super::pb7_buffer::PkhPb7BufferMut;
 use crate::result::{Error, Result};
 
 use pkm_rs_resources::abilities::AbilityIndexWasm;
@@ -81,11 +82,46 @@ impl HomePb7Data {
         Ok(data)
     }
 
+    pub fn write_to_box_buffer(&self, buf: &mut PkhPb7BufferMut) {
+        buf.set_avs(self.avs);
+        buf.set_resort_event_status(self.resort_event_status);
+        buf.set_move_slots(&self.moves);
+        buf.set_relearn_move(0, self.relearn_moves[0]);
+        buf.set_relearn_move(1, self.relearn_moves[1]);
+        buf.set_relearn_move(2, self.relearn_moves[2]);
+        buf.set_relearn_move(3, self.relearn_moves[3]);
+        buf.set_spirit(self.spirit);
+        buf.set_mood(self.mood);
+        buf.set_fullness(self.fullness);
+        buf.set_rank(self.rank);
+        buf.set_received_date_year(self.received_year);
+        buf.set_received_date_month(self.received_month);
+        buf.set_received_date_day(self.received_day);
+        buf.set_received_date_hour(self.received_hour);
+        buf.set_received_date_minute(self.received_minute);
+        buf.set_received_date_second(self.received_second);
+        buf.set_enjoyment(self.enjoyment);
+        buf.set_geo_padding(self.geo_padding);
+        buf.set_ball(self.ball);
+        buf.set_egg_location_index(self.egg_location_index);
+        buf.set_met_location_index(self.met_location_index);
+        buf.set_pokerus(self.pokerus);
+        buf.set_ability_index(self.ability_index);
+        buf.set_ability_num(self.ability_num);
+    }
+
     pub fn try_from_bytes(bytes: &[u8]) -> Result<Self> {
         let size = bytes.len();
         match size {
             super::HOME_PB7_DATA_SIZE => Self::from_buffer(&PkhPb7Buffer::new(bytes)),
             _ => Err(Error::buffer_size(super::HOME_PB7_DATA_SIZE, size)),
         }
+    }
+
+    pub fn to_bytes(self) -> [u8; super::HOME_PB7_DATA_SIZE] {
+        let mut bytes = [0u8; super::HOME_PB7_DATA_SIZE];
+        self.write_to_box_buffer(&mut PkhPb7BufferMut::new_mut(&mut bytes));
+
+        bytes
     }
 }

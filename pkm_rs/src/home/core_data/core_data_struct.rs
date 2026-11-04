@@ -1,4 +1,5 @@
 use super::PkhCoreBuffer;
+use super::core_data_buffer::PkhCoreBufferMut;
 use crate::result::{Error, Result};
 
 use pkm_rs_derive::IsShiny4096;
@@ -56,7 +57,7 @@ pub struct HomeCoreData {
     pub status_condition: u32,
     pub handler_name: SizedUtf16String<26>,
     pub handler_gender: BinaryGender,
-    pub handler_language: Option<Language>,
+    pub handler_language: Language,
     pub is_current_handler: bool,
     pub handler_id: u16,
     pub handler_friendship: u8,
@@ -139,11 +140,68 @@ impl HomeCoreData {
         Ok(data)
     }
 
+    pub fn write_to_box_buffer(&self, buf: &mut PkhCoreBufferMut) {
+        buf.set_home_tracker(self.home_tracker);
+        buf.set_encryption_constant(self.encryption_constant);
+        buf.set_is_bad_egg(self.is_bad_egg);
+        buf.set_species_and_form(self.species_and_form);
+        buf.set_trainer_id(self.trainer_id);
+        buf.set_secret_id(self.secret_id);
+        buf.set_exp(self.exp);
+        buf.set_is_favorite(self.is_favorite);
+        buf.set_markings(self.markings);
+        buf.set_personality_value(self.personality_value);
+        buf.set_nature(self.nature);
+        buf.set_mint_nature(self.mint_nature);
+        buf.set_is_fateful_encounter(self.is_fateful_encounter);
+        buf.set_gender(self.gender);
+        buf.set_evs(self.evs);
+        buf.set_contest(self.contest);
+        buf.set_ribbons(self.ribbons);
+        buf.set_contest_memory_count(self.contest_memory_count);
+        buf.set_battle_memory_count(self.battle_memory_count);
+        buf.set_height_scalar(self.height_scalar);
+        buf.set_weight_scalar(self.weight_scalar);
+        buf.set_nickname(&self.nickname);
+        buf.set_ivs(&self.ivs);
+        buf.set_is_egg(self.is_egg);
+        buf.set_is_nicknamed(self.is_nicknamed);
+        buf.set_status_condition(self.status_condition);
+        buf.set_handler_name(&self.handler_name);
+        buf.set_handler_gender(self.handler_gender);
+        buf.set_handler_language(self.handler_language);
+        buf.set_is_current_handler(self.is_current_handler);
+        buf.set_handler_id(self.handler_id);
+        buf.set_handler_friendship(self.handler_friendship);
+        buf.set_handler_memory(self.handler_memory);
+        buf.set_game_of_origin(self.game_of_origin);
+        buf.set_game_of_origin_battle(self.game_of_origin_battle);
+        buf.set_language(self.language);
+        buf.set_form_argument(self.form_argument);
+        buf.set_affixed_ribbon(self.affixed_ribbon);
+        buf.set_trainer_name(&self.trainer_name);
+        buf.set_trainer_friendship(self.trainer_friendship);
+        buf.set_trainer_memory(self.trainer_memory);
+        buf.set_egg_date(self.egg_date);
+        buf.set_met_date(self.met_date);
+        buf.set_met_level(self.met_level);
+        buf.set_trainer_gender(self.trainer_gender);
+        buf.set_hyper_training(self.hyper_training);
+        buf.set_held_item_index(self.held_item_index);
+    }
+
     pub fn try_from_bytes(bytes: &[u8]) -> Result<Self> {
         let size = bytes.len();
         match size {
             super::HOME_CORE_DATA_SIZE => Self::from_buffer(&PkhCoreBuffer::new(bytes)),
             _ => Err(Error::buffer_size(super::HOME_CORE_DATA_SIZE, size)),
         }
+    }
+
+    pub fn to_bytes(self) -> [u8; super::HOME_CORE_DATA_SIZE] {
+        let mut bytes = [0u8; super::HOME_CORE_DATA_SIZE];
+        self.write_to_box_buffer(&mut PkhCoreBufferMut::new_mut(&mut bytes));
+
+        bytes
     }
 }

@@ -1,4 +1,5 @@
-use crate::bytes::AsBytes;
+use crate::bytes::{AsBytes, AsBytesMut};
+use crate::gen8_swsh::Pk8AbilityIndex;
 use crate::result::Result;
 use crate::util;
 use pkm_rs_resources::abilities::AbilityIndexWasm;
@@ -40,7 +41,10 @@ impl From<Offset> for usize {
 // covers all getters, and a second (narrower) block covers setters.
 //
 //   PkhPk8BufferRef<'a>  = PkhPk8Buffer<&'a [u8]>       — read-only
+//   PkhPk8BufferMut<'a>  = PkhPk8Buffer<&'a mut [u8]>   — read + write
 // ---------------------------------------------------------------------------
+
+pub type PkhPk8BufferMut<'a> = PkhPk8Buffer<&'a mut [u8]>;
 
 #[derive(Default, Clone, Copy)]
 pub struct PkhPk8Buffer<S: AsRef<[u8]>>(S);
@@ -51,6 +55,17 @@ pub struct PkhPk8Buffer<S: AsRef<[u8]>>(S);
 
 impl<'a> PkhPk8Buffer<&'a [u8]> {
     pub fn new(span: &'a [u8]) -> Self {
+        assert_eq!(span.len(), super::HOME_PK8_DATA_SIZE);
+        Self(span)
+    }
+}
+
+// ------------------------------------------------------------------
+// Constructors — mutable
+// ------------------------------------------------------------------
+
+impl<'a> PkhPk8Buffer<&'a mut [u8]> {
+    pub fn new_mut(span: &'a mut [u8]) -> Self {
         assert_eq!(span.len(), super::HOME_PK8_DATA_SIZE);
         Self(span)
     }
@@ -83,6 +98,33 @@ impl<S: AsRef<[u8]>> PkhPk8Buffer<S> {
     fn get_array<const N: usize>(&self, offset: Offset) -> [u8; N] {
         let offset = offset as usize;
         self.bytes()[offset..offset + N].try_into().unwrap()
+    }
+}
+
+impl<S: AsRef<[u8]> + AsMut<[u8]>> PkhPk8Buffer<S> {
+    fn set_u8(&mut self, offset: Offset, v: u8) {
+        let offset = offset as usize;
+        self.bytes_mut()[offset] = v;
+    }
+
+    fn set_u16_le(&mut self, offset: Offset, v: u16) {
+        let offset = offset as usize;
+        self.bytes_mut()[offset..offset + 2].copy_from_slice(&v.to_le_bytes());
+    }
+
+    fn set_u32_le(&mut self, offset: Offset, v: u32) {
+        let offset = offset as usize;
+        self.bytes_mut()[offset..offset + 4].copy_from_slice(&v.to_le_bytes());
+    }
+
+    fn set_flag(&mut self, offset: Offset, bit_index: usize, v: bool) {
+        let offset = offset as usize;
+        util::set_flag(self.bytes_mut(), offset, bit_index, v);
+    }
+
+    fn set_array<const N: usize>(&mut self, offset: Offset, v: &[u8; N]) {
+        let offset = offset as usize;
+        self.bytes_mut()[offset..offset + N].copy_from_slice(v);
     }
 }
 
@@ -168,11 +210,96 @@ impl<S: AsRef<[u8]>> PkhPk8Buffer<S> {
 }
 
 // ==================================================================
+// Setters  (available only on PkhPk8BufferMut)
+// ==================================================================
+
+impl<S: AsRef<[u8]> + AsMut<[u8]>> PkhPk8Buffer<S> {
+    fn bytes_mut(&mut self) -> &mut [u8] {
+        self.0.as_mut()
+    }
+
+    pub fn set_can_gigantamax(&mut self, v: bool) {
+        self.set_flag(Offset::CanGigantamax, 0, v);
+    }
+
+    pub fn set_sociability(&mut self, v: u8) {
+        self.set_u8(Offset::Sociability, v);
+    }
+
+    pub fn set_move_slots(&mut self, v: &MoveSlots) {
+        v.write_spans(self.bytes_mut(), MOVE_DATA_OFFSETS, PpUpStorage::FourBytes);
+    }
+
+    fn set_relearn_move_raw(&mut self, idx: usize, v: [u8; 2]) {
+        let off = Offset::RelearnMoves as usize + idx * 2;
+        self.bytes_mut()[off..off + 2].copy_from_slice(&v);
+    }
+
+    pub fn set_relearn_move(&mut self, idx: usize, v: MoveSlot) {
+        self.set_relearn_move_raw(idx, v.to_le_bytes());
+    }
+
+    pub fn set_dynamax_level(&mut self, v: u8) {
+        self.set_u8(Offset::DynamaxLevel, v);
+    }
+
+    pub fn set_fullness(&mut self, v: u8) {
+        self.set_u8(Offset::Fullness, v);
+    }
+
+    pub fn set_tr_flags_swsh(&mut self, v: &[u8; 14]) {
+        self.set_array(Offset::TrFlagsSwSh, v);
+    }
+
+    pub fn set_palma(&mut self, v: u32) {
+        self.set_u32_le(Offset::Palma, v);
+    }
+
+    fn set_ball_raw(&mut self, v: u8) {
+        self.set_u8(Offset::Ball, v);
+    }
+
+    pub fn set_ball(&mut self, v: Ball) {
+        self.set_ball_raw(v as u8);
+    }
+
+    pub fn set_egg_location_index(&mut self, v: u16) {
+        self.set_u16_le(Offset::EggLocation, v);
+    }
+
+    pub fn set_met_location_index(&mut self, v: u16) {
+        self.set_u16_le(Offset::MetLocation, v);
+    }
+
+    pub fn set_pokerus(&mut self, v: Pokerus) {
+        self.set_u8(Offset::Pokerus, v.to_byte());
+    }
+
+    fn set_ability_index_raw(&mut self, v: u16) {
+        self.set_u16_le(Offset::AbilityIndex, v);
+    }
+
+    pub fn set_ability_index(&mut self, v: Pk8AbilityIndex) {
+        self.set_ability_index_raw(u16::from(v));
+    }
+
+    pub fn set_ability_num(&mut self, v: AbilityNumber) {
+        self.set_u8(Offset::AbilityNumber, v.to_byte());
+    }
+}
+
+// ==================================================================
 // Trait impls
 // ==================================================================
 
 impl<S: AsRef<[u8]>> AsBytes for PkhPk8Buffer<S> {
     fn as_bytes(&self) -> &[u8] {
         self.0.as_ref()
+    }
+}
+
+impl<S: AsRef<[u8]> + AsMut<[u8]>> AsBytesMut for PkhPk8Buffer<S> {
+    fn as_bytes_mut(&mut self) -> &mut [u8] {
+        self.0.as_mut()
     }
 }

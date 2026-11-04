@@ -1,5 +1,6 @@
 use super::MOVE_FLAG_BYTE_LENGTH;
 use super::PkhPa8Buffer;
+use super::pa8_buffer::PkhPa8BufferMut;
 use crate::gen8_swsh::Pk8AbilityIndex;
 use crate::result::{Error, Result};
 
@@ -72,11 +73,40 @@ impl HomePa8Data {
         Ok(data)
     }
 
+    pub fn write_to_box_buffer(&self, buf: &mut PkhPa8BufferMut) {
+        buf.set_is_alpha(self.is_alpha);
+        buf.set_is_noble(self.is_noble);
+        buf.set_alpha_move(self.alpha_move);
+        buf.set_scale(self.scale);
+        buf.set_move_slots(self.moves);
+        buf.set_relearn_move(0, self.relearn_moves[0]);
+        buf.set_relearn_move(1, self.relearn_moves[1]);
+        buf.set_relearn_move(2, self.relearn_moves[2]);
+        buf.set_relearn_move(3, self.relearn_moves[3]);
+        buf.set_gvs(self.gvs);
+        // TODO: write absolute height and weight
+        buf.set_ball(self.ball);
+        buf.set_tutor_flags_la(&self.tutor_flags_la.to_bytes());
+        buf.set_mastered_flags_la(&self.master_flags_la.to_bytes());
+        buf.set_egg_location_index(self.egg_location_index);
+        buf.set_met_location_index(self.met_location_index);
+        buf.set_pokerus(self.pokerus);
+        buf.set_ability_index(self.ability_index);
+        buf.set_ability_num(self.ability_num);
+    }
+
     pub fn try_from_bytes(bytes: &[u8]) -> Result<Self> {
         let size = bytes.len();
         match size {
             super::HOME_PA8_DATA_SIZE => Self::from_buffer(&PkhPa8Buffer::new(bytes)),
             _ => Err(Error::buffer_size(super::HOME_PA8_DATA_SIZE, size)),
         }
+    }
+
+    pub fn to_bytes(self) -> [u8; super::HOME_PA8_DATA_SIZE] {
+        let mut bytes = [0u8; super::HOME_PA8_DATA_SIZE];
+        self.write_to_box_buffer(&mut PkhPa8BufferMut::new_mut(&mut bytes));
+
+        bytes
     }
 }

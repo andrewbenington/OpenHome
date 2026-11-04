@@ -1,4 +1,5 @@
 use super::PkhPa9Buffer;
+use super::pa9_buffer::PkhPa9BufferMut;
 #[cfg(feature = "wasm")]
 use crate::gen9_lza::PlusMoveFlags;
 use crate::gen9_lza::{LZA_PLUS_MOVES_0X94_BYTES, LZA_PLUS_MOVES_0XD6_BYTES};
@@ -60,12 +61,33 @@ impl HomePa9Data {
         Ok(data)
     }
 
+    pub fn write_to_box_buffer(&self, buf: &mut PkhPa9BufferMut) {
+        buf.set_scale(self.scale);
+        buf.set_moves(&self.moves);
+        buf.set_is_alpha(self.is_alpha);
+        buf.set_plus_flags_za_b(&self.plus_moves_b.to_bytes());
+        buf.set_plus_flags_za_c(&self.plus_moves_c.to_bytes());
+        buf.set_ball(self.ball);
+        buf.set_egg_location_index(self.egg_location_index);
+        buf.set_met_location_index(self.met_location_index);
+        buf.set_obedience_level(self.obedience_level);
+        buf.set_ability_index(self.ability_index);
+        buf.set_ability_num(self.ability_num);
+    }
+
     pub fn try_from_bytes(bytes: &[u8]) -> Result<Self> {
         let size = bytes.len();
         match size {
             super::HOME_PA9_DATA_SIZE => Self::from_buffer(&PkhPa9Buffer::new(bytes)),
             _ => Err(Error::buffer_size(super::HOME_PA9_DATA_SIZE, size)),
         }
+    }
+
+    pub fn to_bytes(self) -> [u8; super::HOME_PA9_DATA_SIZE] {
+        let mut bytes = [0u8; super::HOME_PA9_DATA_SIZE];
+        self.write_to_box_buffer(&mut PkhPa9BufferMut::new_mut(&mut bytes));
+
+        bytes
     }
 }
 

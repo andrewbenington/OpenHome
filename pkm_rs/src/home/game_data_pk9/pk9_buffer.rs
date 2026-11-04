@@ -1,5 +1,5 @@
-use crate::bytes::AsBytes;
-use crate::gen9_sv::{TM_FLAG_BYTE_LENGTH_BASE, TM_FLAG_BYTE_LENGTH_DLC};
+use crate::bytes::{AsBytes, AsBytesMut};
+use crate::gen9_sv::{Pk9AbilityIndex, TM_FLAG_BYTE_LENGTH_BASE, TM_FLAG_BYTE_LENGTH_DLC};
 use crate::result::Result;
 use pkm_rs_resources::abilities::AbilityIndexWasm;
 use pkm_rs_resources::ball::Ball;
@@ -39,7 +39,10 @@ impl From<Offset> for usize {
 // covers all getters, and a second (narrower) block covers setters.
 //
 //   PkhPk9BufferRef<'a>  = PkhPk9Buffer<&'a [u8]>       — read-only
+//   PkhPk9BufferMut<'a>  = PkhPk9Buffer<&'a mut [u8]>   — read + write
 // ---------------------------------------------------------------------------
+
+pub type PkhPk9BufferMut<'a> = PkhPk9Buffer<&'a mut [u8]>;
 
 #[derive(Default, Clone, Copy)]
 pub struct PkhPk9Buffer<S: AsRef<[u8]>>(S);
@@ -50,6 +53,17 @@ pub struct PkhPk9Buffer<S: AsRef<[u8]>>(S);
 
 impl<'a> PkhPk9Buffer<&'a [u8]> {
     pub fn new(span: &'a [u8]) -> Self {
+        assert_eq!(span.len(), super::HOME_PK9_DATA_SIZE);
+        Self(span)
+    }
+}
+
+// ------------------------------------------------------------------
+// Constructors — mutable
+// ------------------------------------------------------------------
+
+impl<'a> PkhPk9Buffer<&'a mut [u8]> {
+    pub fn new_mut(span: &'a mut [u8]) -> Self {
         assert_eq!(span.len(), super::HOME_PK9_DATA_SIZE);
         Self(span)
     }
@@ -73,6 +87,23 @@ impl<S: AsRef<[u8]>> PkhPk9Buffer<S> {
     fn get_array<const N: usize>(&self, offset: Offset) -> [u8; N] {
         let offset = offset as usize;
         self.bytes()[offset..offset + N].try_into().unwrap()
+    }
+}
+
+impl<S: AsRef<[u8]> + AsMut<[u8]>> PkhPk9Buffer<S> {
+    fn set_u8(&mut self, offset: Offset, v: u8) {
+        let offset = offset as usize;
+        self.bytes_mut()[offset] = v;
+    }
+
+    fn set_u16_le(&mut self, offset: Offset, v: u16) {
+        let offset = offset as usize;
+        self.bytes_mut()[offset..offset + 2].copy_from_slice(&v.to_le_bytes());
+    }
+
+    fn set_array<const N: usize>(&mut self, offset: Offset, v: &[u8; N]) {
+        let offset = offset as usize;
+        self.bytes_mut()[offset..offset + N].copy_from_slice(v);
     }
 }
 
@@ -154,11 +185,92 @@ impl<S: AsRef<[u8]>> PkhPk9Buffer<S> {
 }
 
 // ==================================================================
+// Setters  (available only on PkhPk8BufferMut)
+// ==================================================================
+
+impl<S: AsRef<[u8]> + AsMut<[u8]>> PkhPk9Buffer<S> {
+    fn bytes_mut(&mut self) -> &mut [u8] {
+        self.0.as_mut()
+    }
+
+    pub fn set_scale(&mut self, v: u8) {
+        self.set_u8(Offset::Scale, v);
+    }
+
+    pub fn set_move_slots(&mut self, v: &MoveSlots) {
+        v.write_spans(self.bytes_mut(), MOVE_DATA_OFFSETS, PpUpStorage::FourBytes);
+    }
+
+    fn set_relearn_move_raw(&mut self, idx: usize, v: [u8; 2]) {
+        let off = Offset::RelearnMoves as usize + idx * 2;
+        self.bytes_mut()[off..off + 2].copy_from_slice(&v);
+    }
+
+    pub fn set_relearn_move(&mut self, idx: usize, v: MoveSlot) {
+        self.set_relearn_move_raw(idx, v.to_le_bytes());
+    }
+
+    pub fn set_tera_type_original(&mut self, v: u8) {
+        self.set_u8(Offset::TeraTypeOriginal, v);
+    }
+
+    pub fn set_tera_type_override(&mut self, v: u8) {
+        self.set_u8(Offset::TeraTypeOverride, v);
+    }
+
+    fn set_ball_raw(&mut self, v: u8) {
+        self.set_u8(Offset::Ball, v);
+    }
+
+    pub fn set_ball(&mut self, v: Ball) {
+        self.set_ball_raw(v as u8);
+    }
+
+    pub fn set_egg_location_index(&mut self, v: u16) {
+        self.set_u16_le(Offset::EggLocation, v);
+    }
+
+    pub fn set_met_location_index(&mut self, v: u16) {
+        self.set_u16_le(Offset::MetLocation, v);
+    }
+
+    pub fn set_tm_flags_base_game(&mut self, v: &[u8; TM_FLAG_BYTE_LENGTH_BASE]) {
+        self.set_array(Offset::TmFlags, v);
+    }
+
+    pub fn set_obedience_level(&mut self, v: u8) {
+        self.set_u8(Offset::ObedienceLevel, v);
+    }
+
+    fn set_ability_index_raw(&mut self, v: u16) {
+        self.set_u16_le(Offset::AbilityIndex, v);
+    }
+
+    pub fn set_ability_index(&mut self, v: Pk9AbilityIndex) {
+        self.set_ability_index_raw(u16::from(v));
+    }
+
+    pub fn set_ability_num(&mut self, v: AbilityNumber) {
+        self.set_u8(Offset::AbilityNumber, v.to_byte());
+    }
+
+    pub fn set_tm_flags_dlc(&mut self, v: &[u8; TM_FLAG_BYTE_LENGTH_DLC]) {
+        self.set_array(Offset::TmFlagsDlc, v);
+    }
+}
+
+// ==================================================================
 // Trait impls
 // ==================================================================
 
 impl<S: AsRef<[u8]>> AsBytes for PkhPk9Buffer<S> {
     fn as_bytes(&self) -> &[u8] {
         self.0.as_ref()
+    }
+}
+
+impl<S: AsRef<[u8]> + AsMut<[u8]>> AsBytesMut for PkhPk9Buffer<S> {
+    fn as_bytes_mut(&mut self) -> &mut [u8] {
+        self.0.as_mut()
     }
 }

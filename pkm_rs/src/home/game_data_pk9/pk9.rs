@@ -1,4 +1,5 @@
 use super::PkhPk9Buffer;
+use super::pk9_buffer::PkhPk9BufferMut;
 use crate::gen9_sv::Pk9AbilityIndex;
 use crate::gen9_sv::{TM_FLAG_BYTE_LENGTH_BASE, TM_FLAG_BYTE_LENGTH_DLC};
 use crate::result::{Error, Result};
@@ -69,12 +70,41 @@ impl HomePk9Data {
         Ok(data)
     }
 
+    pub fn write_to_box_buffer(&self, buf: &mut PkhPk9BufferMut) {
+        buf.set_scale(self.scale);
+        buf.set_move_slots(&self.moves);
+        buf.set_relearn_move(0, self.relearn_moves[0]);
+        buf.set_relearn_move(1, self.relearn_moves[1]);
+        buf.set_relearn_move(2, self.relearn_moves[2]);
+        buf.set_relearn_move(3, self.relearn_moves[3]);
+        buf.set_tera_type_original(self.tera_type_original.to_byte());
+        buf.set_tera_type_override(
+            self.tera_type_override
+                .map_or(TeraType::NO_OVERRIDE, TeraType::to_byte),
+        );
+        buf.set_ball(self.ball);
+        buf.set_egg_location_index(self.egg_location_index);
+        buf.set_met_location_index(self.met_location_index);
+        buf.set_tm_flags_base_game(&self.tm_flags_base_game.to_bytes());
+        buf.set_obedience_level(self.obedience_level);
+        buf.set_ability_index(self.ability_index);
+        buf.set_ability_num(self.ability_num);
+        buf.set_tm_flags_dlc(&self.tm_flags_dlc.to_bytes());
+    }
+
     pub fn try_from_bytes(bytes: &[u8]) -> Result<Self> {
         let size = bytes.len();
         match size {
             super::HOME_PK9_DATA_SIZE => Self::from_buffer(&PkhPk9Buffer::new(bytes)),
             _ => Err(Error::buffer_size(super::HOME_PK9_DATA_SIZE, size)),
         }
+    }
+
+    pub fn to_bytes(self) -> [u8; super::HOME_PK9_DATA_SIZE] {
+        let mut bytes = [0u8; super::HOME_PK9_DATA_SIZE];
+        self.write_to_box_buffer(&mut PkhPk9BufferMut::new_mut(&mut bytes));
+
+        bytes
     }
 }
 

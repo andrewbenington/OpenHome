@@ -44,6 +44,8 @@ pub enum GameData {
     Pa9(Option<HomePa9Data>),
 }
 
+const GAME_DATA_SIZE_EXPECT: &str = "game_data_size always fits in a u16";
+
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "PkhWasm"))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
@@ -266,6 +268,132 @@ impl PkmBytes for Ph4 {
         bytes[10..14].copy_from_slice(&self.checksum.to_le_bytes());
         bytes[14..16].copy_from_slice(&self.encoded_data_size.to_le_bytes());
         bytes[16..18].copy_from_slice(&self.core_data_size.to_le_bytes());
+
+        let core_range_end = 18 + self.core_data_size as usize;
+        bytes[18..core_range_end].copy_from_slice(&self.core_data.to_bytes());
+        let mut pc = core_range_end + 2;
+        bytes[core_range_end..pc].copy_from_slice(&self.game_data_size.to_le_bytes());
+
+        if let Some(data) = self.pb7_data {
+            // write headers
+            bytes[pc] = 1;
+            bytes[pc + 1..pc + 3].copy_from_slice(
+                &u16::try_from(super::HOME_PB7_DATA_SIZE)
+                    .expect(GAME_DATA_SIZE_EXPECT)
+                    .to_le_bytes(),
+            );
+            pc += 3;
+
+            // write data
+            let pb7_range_end = pc + super::HOME_PB7_DATA_SIZE;
+            bytes[pc..pb7_range_end].copy_from_slice(&data.to_bytes());
+
+            pc += super::HOME_PB7_DATA_SIZE;
+        }
+        if let Some(data) = self.pk8_data {
+            // write headers
+            bytes[pc] = 2;
+            bytes[pc + 1..pc + 3].copy_from_slice(
+                &u16::try_from(super::HOME_PK8_DATA_SIZE)
+                    .expect(GAME_DATA_SIZE_EXPECT)
+                    .to_le_bytes(),
+            );
+            pc += 3;
+
+            // write data
+            let pk8_range_end = pc + super::HOME_PK8_DATA_SIZE;
+            bytes[pc..pk8_range_end].copy_from_slice(&data.to_bytes());
+
+            pc += super::HOME_PK8_DATA_SIZE;
+        }
+        if let Some(data) = self.pa8_data {
+            // write headers
+            bytes[pc] = 3;
+            bytes[pc + 1..pc + 3].copy_from_slice(
+                &u16::try_from(super::HOME_PA8_DATA_SIZE)
+                    .expect(GAME_DATA_SIZE_EXPECT)
+                    .to_le_bytes(),
+            );
+            pc += 3;
+
+            // write data
+            let pa8_range_end = pc + super::HOME_PA8_DATA_SIZE;
+            bytes[pc..pa8_range_end].copy_from_slice(&data.to_bytes());
+
+            pc += super::HOME_PA8_DATA_SIZE;
+        }
+        if let Some(data) = self.pb8_data {
+            // write headers
+            bytes[pc] = 4;
+            bytes[pc + 1..pc + 3].copy_from_slice(
+                &u16::try_from(super::HOME_PB8_DATA_SIZE)
+                    .expect(GAME_DATA_SIZE_EXPECT)
+                    .to_le_bytes(),
+            );
+            pc += 3;
+
+            // write data
+            let pb8_range_end = pc + super::HOME_PB8_DATA_SIZE;
+            bytes[pc..pb8_range_end].copy_from_slice(&data.to_bytes());
+
+            pc += super::HOME_PB8_DATA_SIZE;
+        }
+        if let Some(data) = self.pk9_data {
+            // write headers
+            bytes[pc] = 5;
+            bytes[pc + 1..pc + 3].copy_from_slice(
+                &u16::try_from(super::HOME_PK9_DATA_SIZE)
+                    .expect(GAME_DATA_SIZE_EXPECT)
+                    .to_le_bytes(),
+            );
+            pc += 3;
+
+            // write data
+            let pk9_range_end = pc + super::HOME_PK9_DATA_SIZE;
+            bytes[pc..pk9_range_end].copy_from_slice(&data.to_bytes());
+
+            pc += super::HOME_PK9_DATA_SIZE;
+        }
+        if let Some(data) = self.pc9_data {
+            // write headers
+            bytes[pc] = 6;
+            bytes[pc + 1..pc + 3].copy_from_slice(
+                &u16::try_from(super::HOME_PC9_DATA_SIZE)
+                    .expect(GAME_DATA_SIZE_EXPECT)
+                    .to_le_bytes(),
+            );
+            pc += 3;
+
+            // write data
+            let pc9_range_end = pc + super::HOME_PC9_DATA_SIZE;
+            bytes[pc..pc9_range_end].copy_from_slice(&data);
+
+            pc += super::HOME_PC9_DATA_SIZE;
+        }
+        if let Some(data) = self.pa9_data {
+            // write headers
+            bytes[pc] = 7;
+            bytes[pc + 1..pc + 3].copy_from_slice(
+                &u16::try_from(super::HOME_PA9_DATA_SIZE)
+                    .expect(GAME_DATA_SIZE_EXPECT)
+                    .to_le_bytes(),
+            );
+            pc += 3;
+
+            // write data
+            let pa9_range_end = pc + super::HOME_PA9_DATA_SIZE;
+            bytes[pc..pa9_range_end].copy_from_slice(&data.to_bytes());
+
+            pc += super::HOME_PA9_DATA_SIZE;
+        }
+
+        // pad to nearest 0x10
+        let mut remainder = bytes[0..pc].len() & 0xF;
+        if remainder != 0 {
+            remainder = 0x10 - remainder;
+        }
+        let inner_size = pc + remainder;
+        bytes[pc..inner_size].fill(remainder as u8);
     }
 
     fn to_box_bytes(&self) -> Box<[u8]> {

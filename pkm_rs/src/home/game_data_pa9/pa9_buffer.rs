@@ -1,4 +1,4 @@
-use crate::bytes::AsBytes;
+use crate::bytes::{AsBytes, AsBytesMut};
 use crate::result::Result;
 use crate::util;
 use pkm_rs_resources::abilities::AbilityIndexWasm;
@@ -32,7 +32,10 @@ impl From<Offset> for usize {
 // covers all getters, and a second (narrower) block covers setters.
 //
 //   PkhPa9BufferRef<'a>  = PkhPa9Buffer<&'a [u8]>       — read-only
+//   PkhPa9BufferMut<'a>  = PkhPa9Buffer<&'a mut [u8]>   — read + write
 // ---------------------------------------------------------------------------
+
+pub type PkhPa9BufferMut<'a> = PkhPa9Buffer<&'a mut [u8]>;
 
 #[derive(Default, Clone, Copy)]
 pub struct PkhPa9Buffer<S: AsRef<[u8]>>(S);
@@ -81,6 +84,28 @@ impl<S: AsRef<[u8]>> PkhPa9Buffer<S> {
     fn get_array<const N: usize>(&self, offset: Offset) -> [u8; N] {
         let offset = offset as usize;
         self.bytes()[offset..offset + N].try_into().unwrap()
+    }
+}
+
+impl<S: AsRef<[u8]> + AsMut<[u8]>> PkhPa9Buffer<S> {
+    fn set_u8(&mut self, offset: Offset, v: u8) {
+        let offset = offset as usize;
+        self.bytes_mut()[offset] = v;
+    }
+
+    fn set_u16_le(&mut self, offset: Offset, v: u16) {
+        let offset = offset as usize;
+        self.bytes_mut()[offset..offset + 2].copy_from_slice(&v.to_le_bytes());
+    }
+
+    fn set_flag(&mut self, offset: Offset, bit_index: usize, v: bool) {
+        let offset = offset as usize;
+        util::set_flag(self.bytes_mut(), offset, bit_index, v);
+    }
+
+    fn set_array<const N: usize>(&mut self, offset: Offset, v: &[u8; N]) {
+        let offset = offset as usize;
+        self.bytes_mut()[offset..offset + N].copy_from_slice(v);
     }
 }
 
@@ -154,11 +179,83 @@ impl<S: AsRef<[u8]>> PkhPa9Buffer<S> {
 }
 
 // ==================================================================
+// Setters  (available only on PkhPk8BufferMut)
+// ==================================================================
+
+impl<S: AsRef<[u8]> + AsMut<[u8]>> PkhPa9Buffer<S> {
+    fn bytes_mut(&mut self) -> &mut [u8] {
+        self.0.as_mut()
+    }
+
+    pub fn set_scale(&mut self, v: u8) {
+        self.set_u8(Offset::Scale, v);
+    }
+
+    pub fn set_moves(&mut self, v: &[MoveSlot; 4]) {
+        let offset = Offset::Moves as usize;
+        self.bytes_mut()[offset..offset + 2].copy_from_slice(&v[0].to_le_bytes());
+        self.bytes_mut()[offset + 2..offset + 4].copy_from_slice(&v[1].to_le_bytes());
+        self.bytes_mut()[offset + 4..offset + 6].copy_from_slice(&v[2].to_le_bytes());
+        self.bytes_mut()[offset + 6..offset + 8].copy_from_slice(&v[3].to_le_bytes());
+    }
+
+    pub fn set_is_alpha(&mut self, v: bool) {
+        self.set_flag(Offset::IsAlpha, 0, v);
+    }
+
+    pub fn set_plus_flags_za_b(&mut self, v: &[u8; 12]) {
+        self.set_array(Offset::PlusMovesB, v);
+    }
+
+    pub fn set_plus_flags_za_c(&mut self, v: &[u8; 33]) {
+        self.set_array(Offset::PlusMovesC, v);
+    }
+
+    fn set_ball_raw(&mut self, v: u8) {
+        self.set_u8(Offset::Ball, v);
+    }
+
+    pub fn set_ball(&mut self, v: Ball) {
+        self.set_ball_raw(v as u8);
+    }
+
+    pub fn set_egg_location_index(&mut self, v: u16) {
+        self.set_u16_le(Offset::EggLocation, v);
+    }
+
+    pub fn set_met_location_index(&mut self, v: u16) {
+        self.set_u16_le(Offset::MetLocation, v);
+    }
+
+    pub fn set_obedience_level(&mut self, v: u8) {
+        self.set_u8(Offset::ObedienceLevel, v);
+    }
+
+    fn set_ability_index_raw(&mut self, v: u16) {
+        self.set_u16_le(Offset::AbilityIndex, v);
+    }
+
+    pub fn set_ability_index(&mut self, v: AbilityIndexWasm) {
+        self.set_ability_index_raw(u16::from(v));
+    }
+
+    pub fn set_ability_num(&mut self, v: AbilityNumber) {
+        self.set_u8(Offset::AbilityNumber, v.to_byte());
+    }
+}
+
+// ==================================================================
 // Trait impls
 // ==================================================================
 
 impl<S: AsRef<[u8]>> AsBytes for PkhPa9Buffer<S> {
     fn as_bytes(&self) -> &[u8] {
         self.0.as_ref()
+    }
+}
+
+impl<S: AsRef<[u8]> + AsMut<[u8]>> AsBytesMut for PkhPa9Buffer<S> {
+    fn as_bytes_mut(&mut self) -> &mut [u8] {
+        self.0.as_mut()
     }
 }
