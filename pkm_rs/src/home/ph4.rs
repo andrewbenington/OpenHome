@@ -96,7 +96,11 @@ impl Ph4 {
         let mut byte_counter = game_data_size_offset + 2;
 
         loop {
-            // Game data is no smaller than 25 bytes in size, and padding is only to the nearest 0x10.
+            // check if we are past game_data_size
+            if byte_counter > game_data_size_offset + 1 + mon.game_data_size as usize {
+                break;
+            }
+            // check if we are about to read out of bounds
             let eof_check = bytes.get(byte_counter + 16);
             if eof_check.is_none() {
                 break;
@@ -156,7 +160,10 @@ impl Ph4 {
                     byte_counter += super::HOME_PA9_DATA_SIZE;
                 }
                 _ => {
-                    panic!("Invalid byte read as game type");
+                    panic!(
+                        "Invalid byte read as game type. Counter: {:?}",
+                        byte_counter
+                    );
                 }
             }
         }
