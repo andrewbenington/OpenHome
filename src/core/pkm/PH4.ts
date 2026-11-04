@@ -284,7 +284,7 @@ export default class PH4 {
   get handlerLanguage() {
     return this.inner.core_data.handler_language
   }
-  set handlerLanguage(value: Option<Language>) {
+  set handlerLanguage(value: Language) {
     this.inner.core_data.handler_language = value
   }
 
