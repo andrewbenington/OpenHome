@@ -300,7 +300,7 @@ export default abstract class PK3CFRU implements PluginPKMInterface {
         this.pluginOrigin = other.pluginOrigin
       }
 
-      if (other.ball && other.ball <= Ball.Beast && other.ball !== Ball.Sport) {
+      if (other.ball <= Ball.Beast && other.ball !== Ball.Sport) {
         this.ball = other.ball
       } else {
         this.ball = Ball.Poke

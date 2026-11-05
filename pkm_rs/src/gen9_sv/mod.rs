@@ -32,6 +32,8 @@ mod pokemon_index;
 mod save_blocks;
 #[cfg(feature = "wasm")]
 mod sv_save;
+#[cfg(feature = "wasm")]
+mod wasm;
 
 #[cfg(feature = "wasm")]
 use pkm_rs_types::strings::SizedUtf16String;
