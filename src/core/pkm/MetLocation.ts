@@ -3,6 +3,7 @@ import {
   formatMatchesOrigin,
   Language,
   Lookup,
+  NationalDex,
   OriginGame,
   OriginGames,
   PkmFormat,
@@ -14,13 +15,18 @@ export function getLocationStringOrOrigin(
   game: OriginGame,
   index: number,
   format: PkmFormat | 'OHPKM',
+  nationalDex: NationalDex,
+  trainerID: number,
+  trainerName: string,
   language: Language,
   egg = false
 ) {
   if (game === OriginGame.Go) {
     return 'in Pokémon GO' // todo: i18n
   } else if (format === 'OHPKM' || formatMatchesOrigin(format, game)) {
-    return getLocationString(game, index, language, egg)
+    return getLocationString(game, index, nationalDex, trainerID, trainerName, language, egg)
+  } else if (format === 'PK3' && !(OriginGames.isGba(game))) {
+    return DISTANT_LAND_STRING
   } else if (format === 'PB7' && !OriginGames.isLetsGo(game)) {
     return game <= OriginGame.UltraMoon
       ? `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
@@ -68,9 +74,32 @@ export function getLocationStringOrOrigin(
 export const getLocationString = (
   game: OriginGame,
   index: number,
+  nationalDex: NationalDex,
+  trainerID: number,
+  trainerName: string,
   language: Language,
   egg = false
 ) => {
+  let isEeveelution = [133, 134, 135, 136, 196, 197, 470, 471, 720].includes(nationalDex)
+  let isGcnMetAt254 = game === OriginGame.ColosseumXd && index === 254
+
+  if (!index) {
+    if (game === OriginGame.ColosseumXd && isEeveelution) {
+      return 'from dad' // todo: i18n
+    }
+    return 'an undefined location'
+  }
+
+  if (isGcnMetAt254 && [196, 197].includes(nationalDex)) {
+    return 'old friend' // todo: i18n
+  }
+
+  // TODO: non-English Trainer names
+  if (isGcnMetAt254 && [213, 246, 247, 248, 307, 308, 311].includes(nationalDex) && trainerID === 37149 && trainerName === 'DUKING') {
+    return `from ${trainerName}` // todo: i18n
+  }
+
+
   if (game <= OriginGame.White && index === 30001) {
     return 'at the Poké Transfer Lab' // todo: i18n
   }
@@ -121,8 +150,11 @@ const ORIGIN_GAME_BY_FORMAT: { [key: string]: OriginGame } = {
 export const getFormatLocationString = (
   index: number,
   format: MonFormat,
+  nationalDex: NationalDex,
+  trainerID: number,
+  trainerName: string,
   language: Language,
   egg = false
 ) => {
-  return getLocationString(ORIGIN_GAME_BY_FORMAT[format], index, language, egg)
+  return getLocationString(ORIGIN_GAME_BY_FORMAT[format], index, nationalDex, trainerID, trainerName, language, egg)
 }

@@ -8,7 +8,7 @@ import { BallsImageList } from '@openhome-ui/images/items'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { formatTitleAndNickname } from '@openhome-ui/util/format'
-import { Ball, Language, Languages, OriginGames } from '@pkm-rs/pkg'
+import { Ball, Language, Languages, OriginGame, OriginGames } from '@pkm-rs/pkg'
 import { Badge, Flex } from '@radix-ui/themes'
 import { useContext, useMemo } from 'react'
 import './MetDataTab.css'
@@ -26,18 +26,47 @@ const MetDataTab = (props: { mon: PKMInterface }) => {
     }
     return `Egg received on ${mon.eggDate.month}/${mon.eggDate.day}/${
       mon.eggDate.year
-    } ${getLocationString(mon.gameOfOrigin, mon.eggLocationIndex, Language.English, true)}.` // todo: i18n
+    } ${getLocationString(mon.gameOfOrigin, mon.eggLocationIndex, mon.nationalDex, mon.trainerID, mon.trainerName, Language.English, true)}.` // todo: i18n
   }, [mon])
 
   const metMessage = useMemo(() => {
     if (
+      mon.gameOfOrigin !== OriginGame.ColosseumXd &&
       !mon.metLocationIndex ||
       (OriginGames.isBdsp(mon.gameOfOrigin) && mon.metLocationIndex === 65535) // BDSP Egg
     ) {
       return 'Met location unknown.' // todo: i18n
     }
 
+    if (mon.format === 'PK3' && mon.gameOfOrigin === OriginGame.ColosseumXd) {
+      return 'Obtained in a trade.' // todo: i18n
+    }
+
+    let isEeveelution = [133, 134, 135, 136, 196, 197, 470, 471, 720].includes(mon.nationalDex)
+    let isXdStarter = mon.gameOfOrigin === OriginGame.ColosseumXd && isEeveelution && mon.metLocationIndex === 0 
+
+    let isGcnMetAt254 = mon.gameOfOrigin === OriginGame.ColosseumXd && mon.metLocationIndex === 254
+    let isColoStarter = isGcnMetAt254 && [196, 197].includes(mon.nationalDex)
+    let isDukingMon = [213, 246, 247, 248, 307, 308, 311].includes(mon.nationalDex)
+    // TODO: non-English Trainer names
+    let isDukingGift = isGcnMetAt254 && isDukingMon && mon.trainerID === 37149 && mon.trainerName === 'DUKING'
+
     let message = 'Met'
+    if (isXdStarter) {
+      if (mon.format === 'XDPKM') return `Obtained from ${mon.trainerName}'s dad.`
+      if (mon.format === 'OHPKM') {
+        message = `Obtained from ${mon.trainerName}'s dad` // todo: i18n
+      }
+    }
+    if (isColoStarter) {
+      if (mon.format === 'COLOPKM') return `${mon.trainerName}'s old friend.`
+      if (mon.format === 'OHPKM') {
+        message = `${mon.trainerName}'s old friend, met` // todo: i18n
+      }
+    }
+    if (mon.format === 'PK3' && mon.metLocationIndex === 254) {
+      message = `Obtained in a trade` // todo: i18n
+    }
 
     if (mon.pluginOrigin) {
       const pluginSaveType = getEnabledSaveTypes().find(
@@ -55,36 +84,58 @@ const MetDataTab = (props: { mon: PKMInterface }) => {
       message += ` ${metTimesOfDay[mon.metTimeOfDay - 1]}`
     }
     if (mon.metDate) {
-      message += ` on ${mon.metDate.month}/${mon.metDate.day}/${mon.metDate.year}`
+      if (mon.format === 'OHPKM' && (isColoStarter || isXdStarter)) {
+        message += ' sometime before'
+      } else {
+        message += ' on'
+      }
+      message += ` ${mon.metDate.month}/${mon.metDate.day}/${mon.metDate.year}`
     }
-    if (mon.gameOfOrigin && mon.metLocationIndex) {
-      try {
-        const location = getLocationStringOrOrigin(
-          mon.gameOfOrigin,
-          mon.metLocationIndex,
-          mon.format,
-          Language.English
-        )
 
-        message += ` ${location}`
-      } catch (e) {
-        console.error('Error getting location string', {
-          error: e,
-          game: mon.gameOfOrigin,
-          index: mon.metLocationIndex,
-          format: mon.format,
-        })
-        message += ' at an unknown location'
+    if (mon.gameOfOrigin && mon.metLocationIndex) {
+      if ((mon.format === 'OHPKM' && isColoStarter) || (mon.format === 'PK3' && mon.metLocationIndex === 254)) {
+        // suppress the normal met location, as it's already handled above
+        message += ''
+      } else {
+        try {
+          const location = getLocationStringOrOrigin(
+            mon.gameOfOrigin,
+            mon.metLocationIndex,
+            mon.format,
+            mon.nationalDex,
+            mon.trainerID,
+            mon.trainerName,
+            Language.English
+          )
+
+          message += ` ${location}`
+        } catch (e) {
+          console.error('Error getting location string', {
+            error: e,
+            game: mon.gameOfOrigin,
+            index: mon.metLocationIndex,
+            format: mon.format,
+          })
+          message += ' at an unknown location'
+        }
       }
     }
 
-    if ('isFatefulEncounter' in mon && mon.isFatefulEncounter) {
-      message += ', where it met its trainer in a fateful encounter'
+    if (!['PK3', 'COLOPKM', 'XDPKM'].includes(mon.format) && 'isFatefulEncounter' in mon && mon.isFatefulEncounter) {
+      message += ', where it met its Trainer in a fateful encounter'
     }
+
     message += '.'
-    if (mon.metLevel) {
+
+    if (
+      !(
+        isGcnMetAt254 || isXdStarter ||
+        (mon.format === 'PK3' && mon.gameOfOrigin === OriginGame.ColosseumXd)
+      ) && mon.metLevel
+    ) {
       message += ` At the time, it was level ${mon.metLevel}.`
     }
+
     return message
   }, [getEnabledSaveTypes, mon])
 
