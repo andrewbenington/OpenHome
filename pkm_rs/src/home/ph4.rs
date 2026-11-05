@@ -633,6 +633,13 @@ impl IsShiny for Ph4 {
 }
 
 #[cfg(test)]
+impl crate::tests::PkhexJson for Ph4 {
+    fn to_pkhex_json_value(&self) -> std::result::Result<serde_json::Value, serde_json::Error> {
+        serde_json::to_value(self)
+    }
+}
+
+#[cfg(test)]
 mod tests {
     use super::Ph4;
     use crate::tests::{self, TestResult};
@@ -648,6 +655,11 @@ mod tests {
         assert!(mon.is_shiny());
 
         Ok(())
+    }
+
+    #[test]
+    fn compare_pkhex_json() -> TestResult<()> {
+        tests::compare_pkhex_json_all_in_dir::<Ph4>(&PathBuf::from("ph4"))
     }
 
     #[test]

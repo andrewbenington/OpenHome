@@ -81,6 +81,17 @@ public static partial class Util
     return new { hp = pk.EV_HP, atk = pk.EV_ATK, def = pk.EV_DEF, spa = pk.EV_SPA, spd = pk.EV_SPD, spe = pk.EV_SPE };
   }
 
+  public static object GVs(IGanbaru pk)
+  {
+    return new { hp = pk.GV_HP, atk = pk.GV_ATK, def = pk.GV_DEF, spa = pk.GV_SPA, spd = pk.GV_SPD, spe = pk.GV_SPE };
+  }
+
+  public static object GVs(GameDataPA8 pk)
+  {
+    return new { hp = pk.GV_HP, atk = pk.GV_ATK, def = pk.GV_DEF, spa = pk.GV_SPA, spd = pk.GV_SPD, spe = pk.GV_SPE };
+  }
+
+
   public static object Stats(PKM pk)
   {
     return new { hp = pk.Stat_HPCurrent, atk = pk.Stat_ATK, def = pk.Stat_DEF, spa = pk.Stat_SPA, spd = pk.Stat_SPD, spe = pk.Stat_SPE };
@@ -104,7 +115,7 @@ public static partial class Util
     }
   }
 
-  static object MoveData(PKM pk, int moveIndex, GameStrings strings)
+  static object MoveData(IGameDataSide pk, int moveIndex, GameStrings strings)
   {
     var moveId = moveIndex switch
     {
@@ -138,6 +149,40 @@ public static partial class Util
     return [MoveData(pk, 1, strings), MoveData(pk, 2, strings), MoveData(pk, 3, strings), MoveData(pk, 4, strings)];
   }
 
+  static object MoveData(PKM pk, int moveIndex, GameStrings strings)
+  {
+    var moveId = moveIndex switch
+    {
+      1 => FormatMoveName(pk.Move1, strings),
+      2 => FormatMoveName(pk.Move2, strings),
+      3 => FormatMoveName(pk.Move3, strings),
+      4 => FormatMoveName(pk.Move4, strings),
+      _ => throw new ArgumentException($"Unexpected move index: {moveIndex}"),
+    };
+    var movePp = moveIndex switch
+    {
+      1 => pk.Move1_PP,
+      2 => pk.Move2_PP,
+      3 => pk.Move3_PP,
+      4 => pk.Move4_PP,
+      _ => throw new ArgumentException($"Unexpected move index: {moveIndex}"),
+    };
+    var movePpUps = moveIndex switch
+    {
+      1 => pk.Move1_PPUps,
+      2 => pk.Move2_PPUps,
+      3 => pk.Move3_PPUps,
+      4 => pk.Move4_PPUps,
+      _ => throw new ArgumentException($"Unexpected move index: {moveIndex}"),
+    };
+    return new { move_index = moveId, pp = movePp, pp_ups = movePpUps };
+  }
+
+  public static object[] AllMoveData(IGameDataSide pk, GameStrings strings)
+  {
+    return [MoveData(pk, 1, strings), MoveData(pk, 2, strings), MoveData(pk, 3, strings), MoveData(pk, 4, strings)];
+  }
+
   static object RelearnMove(int moveIndex, PKM pk, GameStrings strings)
   {
     var moveId = moveIndex switch
@@ -151,7 +196,25 @@ public static partial class Util
     return FormatMoveName(moveId, strings);
   }
 
+  static object RelearnMove(int moveIndex, IGameDataSide pk, GameStrings strings)
+  {
+    var moveId = moveIndex switch
+    {
+      1 => pk.RelearnMove1,
+      2 => pk.RelearnMove2,
+      3 => pk.RelearnMove3,
+      4 => pk.RelearnMove4,
+      _ => throw new ArgumentException($"Unexpected relearn move index: {moveIndex}"),
+    };
+    return FormatMoveName(moveId, strings);
+  }
+
   public static object[] RelearnMoves(PKM pk, GameStrings strings)
+  {
+    return [RelearnMove(1, pk, strings), RelearnMove(2, pk, strings), RelearnMove(3, pk, strings), RelearnMove(4, pk, strings)];
+  }
+
+  public static object[] RelearnMoves(IGameDataSide pk, GameStrings strings)
   {
     return [RelearnMove(1, pk, strings), RelearnMove(2, pk, strings), RelearnMove(3, pk, strings), RelearnMove(4, pk, strings)];
   }
@@ -281,6 +344,12 @@ public static partial class Util
     return strings.balllist.GetValue(pk.Ball).ToString().Replace(" Ball", "").Replace("Poke", "Poké");
   }
 
+  public static object FormatBall(IGameDataSide pk, GameStrings strings)
+  {
+    return strings.balllist.GetValue(pk.Ball).ToString().Replace(" Ball", "").Replace("Poke", "Poké");
+  }
+
+
   public static object FormatGame(GameVersion version, GameStrings strings) => version switch
   {
     GameVersion.GN => "BlueGreen",
@@ -329,4 +398,15 @@ public static partial class Util
 
   [GeneratedRegex(@"(?=[A-Z])")]
   private static partial Regex RibbonRegex();
+
+  public static List<int> GetFlagIndexes(int flagCount, Func<int, bool> isSet)
+{
+    var result = new List<int>();
+    for (int i = 0; i < flagCount; i++)
+    {
+        if (isSet(i))
+            result.Add(i);
+    }
+    return result;
+}
 }

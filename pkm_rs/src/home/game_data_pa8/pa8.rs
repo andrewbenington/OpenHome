@@ -120,3 +120,10 @@ impl HomePa8Data {
         bytes
     }
 }
+
+#[cfg(test)]
+impl crate::tests::PkhexJson for HomePa8Data {
+    fn to_pkhex_json_value(&self) -> std::result::Result<serde_json::Value, serde_json::Error> {
+        serde_json::to_value(self)
+    }
+}
