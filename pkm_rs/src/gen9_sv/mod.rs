@@ -1,5 +1,7 @@
 #[cfg(feature = "wasm")]
 use crate::checksum::RefreshChecksum;
+#[cfg(feature = "wasm")]
+use crate::encryption::swish_crypto::SwishBlocks;
 use crate::result::Error;
 #[cfg(feature = "wasm")]
 use pk9_buffer::Pk9Buffer;
@@ -153,4 +155,10 @@ mod tests {
 
         Ok(())
     }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_name = isCompassSave)]
+pub fn is_compass_save(bytes: Box<[u8]>, key: u32) -> bool {
+    SwishBlocks::<u32>::from_bytes(bytes).is_ok_and(|blocks| blocks.has_raw_key(key))
 }

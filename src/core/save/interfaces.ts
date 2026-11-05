@@ -543,3 +543,121 @@ export abstract class WasmOfficialSave<
     return this.inner.getBoxName(boxIndex)
   }
 }
+
+export abstract class WasmPluginSave<
+  WasmP,
+  P extends WasmPkmInterface<WasmP>,
+  WasmSave extends WasmSaveInner<WasmP>,
+> extends PluginSAV<P> {
+  inner: WasmSave
+  boxes: Array<Box<P>> = []
+  currentPCBox: number
+
+  constructor(inner: WasmSave) {
+    super()
+    this.inner = inner
+    this.currentPCBox = inner.currentPcBoxIdx
+  }
+
+  abstract WASM_SAVE_CLASS: WasmSaveClass<WasmSave>
+
+  get name() {
+    return this.inner.trainerName
+  }
+
+  get tid() {
+    return this.inner.trainerId
+  }
+
+  get sid() {
+    return this.inner.secretId
+  }
+
+  get displayID() {
+    return this.inner.displayId
+  }
+
+  get trainerGender() {
+    return this.inner.trainerGender
+  }
+
+  saveCurrentPcBox() {
+    this.inner.currentPcBoxIdx = this.currentPCBox
+  }
+
+  get origin() {
+    return this.inner.gameOfOrigin
+  }
+
+  get language() {
+    return this.inner.language
+  }
+
+  get bytes() {
+    return this.inner.prepareBytesForSaving()
+  }
+
+  abstract monFromWasm(wasmMon: WasmP): P
+
+  get MAX_BOX_COUNT(): number {
+    return this.WASM_SAVE_CLASS.MAX_BOX_COUNT
+  }
+
+  get SLOTS_PER_BOX(): number {
+    return this.WASM_SAVE_CLASS.SLOTS_PER_BOX
+  }
+
+  get boxRows() {
+    return this.WASM_SAVE_CLASS.BOX_ROWS
+  }
+
+  get boxColumns() {
+    return this.WASM_SAVE_CLASS.BOX_COLS
+  }
+
+  getMonAt(boxNum: number, boxSlot: number): Option<P> {
+    const wasmMon = this.inner.getMonAt(boxNum, boxSlot)
+    return wasmMon ? this.monFromWasm(wasmMon) : undefined
+  }
+
+  tryGetMonAt(boxNum: number, boxSlot: number): Result<Option<P>> {
+    const wasmMon = this.inner.getMonAt(boxNum, boxSlot)
+    return R.Ok(wasmMon ? this.monFromWasm(wasmMon) : undefined)
+  }
+
+  setMonAt(boxIndex: number, boxSlot: number, mon: Option<P>): void {
+    this.inner.setMonAt(boxIndex, boxSlot, mon?.inner)
+  }
+
+  getAllMons() {
+    const boxCount = this.MAX_BOX_COUNT
+    const slotCount = this.SLOTS_PER_BOX
+    return range(boxCount)
+      .flatMap((boxIndex) => range(slotCount).map((boxSlot) => ({ boxIndex, boxSlot })))
+      .map(({ boxIndex, boxSlot }) => this.getMonAt(boxIndex, boxSlot))
+      .filter(filterUndefined)
+  }
+
+  getBoxMonCount(boxIndex: number): number {
+    return this.inner.getBoxMonCount(boxIndex)
+  }
+  getPcMonCount(): number {
+    return this.inner.getPcMonCount()
+  }
+
+  prepareForSaving(): Uint8Array {
+    return this.inner.prepareBytesForSaving()
+  }
+
+  getBoxCount(): number {
+    return this.MAX_BOX_COUNT
+  }
+
+  get boxSlotCount(): number {
+    return this.SLOTS_PER_BOX
+  }
+
+  getBoxName(boxIndex: number): string {
+    return this.inner.getBoxName(boxIndex)
+  }
+}

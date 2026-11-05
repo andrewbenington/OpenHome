@@ -25,9 +25,8 @@ describe('Accessing a save mon', () => {
   })
 
   it('should display a Pokémon in a save and switch to the stats tab successfully', async () => {
-    await ui.findAndClick('#open-save-button', { expectedText: 'Open Save' })
-
-    await ui.findAndClick('.save-card')
+    await ui.openAnySave()
+    
     await ui.findAndClick('.draggable-mon')
     await ui.findAndClick('button=Stats')
 
