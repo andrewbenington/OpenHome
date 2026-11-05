@@ -30,8 +30,8 @@ const fileTypeColors: Record<string, string> = {
 }
 
 interface FileTypeSelectProps {
-  baseFormat: string
-  currentFormat: string
+  baseFormat: PkmOrOhpkmFormat
+  currentFormat: PkmOrOhpkmFormat
   color?: string
   formData: PKMInterface
   onChange: (selectedFormat: PkmOrOhpkmFormat) => void
@@ -55,6 +55,11 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
   const backgroundColor = color ?? fileTypeColors[currentFormat]
   const gameColorIsDark = colorIsDark(backgroundColor)
 
+  // Some formats can be converted to OHPKM but not back, and thus could be currentFormat
+  // without being in supportedFormats. dropdownFormats will always include the currentFormat
+  // value, thus ensuring the selected value is always an <option> and will be visible
+  const dropdownFormats = Array.from(new Set([currentFormat, ...supportedFormats]))
+
   return (
     <select
       className={cssClass('file-type-select')
@@ -72,7 +77,7 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
     >
       <option value="OHPKM">OpenHome</option>
       {baseFormat === 'OHPKM' ? (
-        supportedFormats.map((format) => (
+        dropdownFormats.map((format) => (
           <option key={format} value={format}>
             {format}
           </option>
