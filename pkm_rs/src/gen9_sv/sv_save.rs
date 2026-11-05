@@ -39,12 +39,6 @@ impl ScarletVioletSave {
                 SAVE_SIZE_BYTES_MIN,
                 byte_length,
             ));
-        } else if byte_length > SAVE_SIZE_BYTES_MAX {
-            return Err(Error::buffer_size_with_source(
-                "scarlet/violet save file max",
-                SAVE_SIZE_BYTES_MAX,
-                byte_length,
-            ));
         }
 
         let blocks = SvBlocks::from_blocks(
