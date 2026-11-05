@@ -8,7 +8,7 @@ import { BallsImageList } from '@openhome-ui/images/items'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { formatTitleAndNickname } from '@openhome-ui/util/format'
-import { Ball, Language, Languages, OriginGame, OriginGames } from '@pkm-rs/pkg'
+import { Ball, BinaryGender, formatMatchesOrigin, Language, Languages, OriginGame, OriginGames } from '@pkm-rs/pkg'
 import { Badge, Flex } from '@radix-ui/themes'
 import { useContext, useMemo } from 'react'
 import './MetDataTab.css'
@@ -47,9 +47,18 @@ const MetDataTab = (props: { mon: PKMInterface }) => {
     let isXdStarter = mon.gameOfOrigin === OriginGame.ColosseumXd && eeveelutions.includes(mon.nationalDex) && mon.metLocationIndex === 0 
     let isGcnMetAt254 = mon.gameOfOrigin === OriginGame.ColosseumXd && mon.metLocationIndex === 254
     let isColoStarter = isGcnMetAt254 && [196, 197].includes(mon.nationalDex)
-    let isDukingMon = [213, 246, 247, 248, 307, 308, 311].includes(mon.nationalDex)
-    // TODO: non-English Trainer names
-    let isDukingGift = isGcnMetAt254 && isDukingMon && mon.trainerID === 37149 && mon.trainerName === 'DUKING'
+    let isPalPark = (
+      mon.format === 'PK4' &&
+      !mon.encounterType &&
+      (OriginGames.isGba(mon.gameOfOrigin) || mon.gameOfOrigin === OriginGame.ColosseumXd) &&
+      mon.metLocationIndex === 0x37
+    )
+    let isHayleyGift = (
+      mon.gameOfOrigin === OriginGame.Diamond &&
+      mon.trainerName === 'Hayley' &&
+      mon.trainerID === 1000 &&
+      mon.trainerGender === BinaryGender.Female // My Pokemon Ranch gift
+    )
 
     let message = 'Met'
     if (isXdStarter) {
@@ -66,6 +75,34 @@ const MetDataTab = (props: { mon: PKMInterface }) => {
     }
     if (mon.format === 'PK3' && mon.metLocationIndex === 254) {
       message = `Obtained in a trade` // todo: i18n
+    }
+    if (mon.format === 'OHPKM') {
+      if (
+        !mon.encounterType &&
+        // to prevent collisions with other games
+        (mon.gameOfOrigin >= OriginGame.HeartGold && mon.gameOfOrigin <= OriginGame.Platinum)
+      ) {
+        if (mon.eggLocationIndex) {
+          message = 'Hatched' // todo: i18n
+        } else if (isHayleyGift) {
+          message = 'Received' // todo: i18n
+        }
+      } else if (mon.encounterType === 12) {
+        message = 'Received' // todo: i18n
+      } else if (
+        mon.encounterType === 24 &&
+        mon.metLocationIndex
+      ) {
+        if ([0x5E, 0x8C].includes(mon.metLocationIndex)) {
+          // met in Oreburgh Museum or Pewter Museum, must have been revived from a fossil
+          message = 'Resurrected' // todo: i18n
+        } else {
+          // most likely received as a gift or in Sinjoh
+          message = 'Received' // todo: i18n
+        }
+      }
+    } else if (isPalPark) {
+      message = 'Reunited in Pal Park' // todo: i18n
     }
 
     if (mon.pluginOrigin) {
@@ -92,11 +129,52 @@ const MetDataTab = (props: { mon: PKMInterface }) => {
       message += ` ${mon.metDate.month}/${mon.metDate.day}/${mon.metDate.year}`
     }
 
+    if (mon.format === 'OHPKM') {
+      if (mon.encounterType) {
+        if (mon.encounterType === 2) {
+          message += ' in the tall grass' // todo: i18n
+        } else if ([5, 9].includes(mon.encounterType)) {
+          message += ' while exploring' // todo: i18n
+        } else if (mon.encounterType === 7) {
+          message += ' in the water' // todo: i18n
+        } else if (mon.encounterType === 10) {
+          message += ' while playing the Safari Game' // todo: i18n
+        }
+      } else {
+        if (
+          (mon.gameOfOrigin >= OriginGame.HeartGold && mon.gameOfOrigin <= OriginGame.Platinum) &&
+          !isPalPark &&
+          !mon.eggLocationIndex
+        ) {
+          if (mon.metLocationIndex) {
+            if (mon.metLocationIndex >= 3000) {
+              message += ' on a special occasion' // todo: i18n
+            } else if (isHayleyGift) {
+              message += ` from ${mon.trainerName}, who met it` // todo: i18n
+            }
+          } else if ((mon.gameOfOrigin >= OriginGame.Diamond && mon.gameOfOrigin <= OriginGame.Platinum)) {
+            message += ' on a Honey Tree' // todo: i18n
+          } else if (
+            [OriginGame.HeartGold, OriginGame.SoulSilver].includes(mon.gameOfOrigin) &&
+            mon.metLocationIndex !== 0xE9 // Pokewalker
+          ) {
+            message += ' after headbutting a tree' // todo: i18n
+          }
+        } 
+      }
+    }
+
     if (OriginGames.isGameboy(mon.gameOfOrigin) && !mon.metLocationIndex) {
       message += ` in the ${OriginGames.gameSettingName(mon.gameOfOrigin)} region` // todo: i18n
     }
     if (mon.gameOfOrigin && mon.metLocationIndex) {
-      if ((mon.format === 'OHPKM' && isColoStarter) || (mon.format === 'PK3' && mon.metLocationIndex === 254)) {
+      if (isPalPark) {
+        message += ` after traveling through time from the ${OriginGames.gameSettingName(mon.gameOfOrigin)} region` // todo: i18n
+      } else if (
+        (mon.format === 'OHPKM' && isColoStarter) ||
+        mon.format === 'PK2' ||
+        (mon.format === 'PK3' && mon.metLocationIndex === 254)
+      ) {
         // suppress the normal met location, as it's already handled above
         message += ''
       } else {
@@ -144,7 +222,12 @@ const MetDataTab = (props: { mon: PKMInterface }) => {
         (mon.format === 'PK3' && mon.gameOfOrigin === OriginGame.ColosseumXd)
       ) && mon.metLevel
     ) {
-      message += ` At the time, it was level ${mon.metLevel}.`
+      if (mon.format !== 'OHPKM' && !formatMatchesOrigin(mon.format, mon.gameOfOrigin)) {
+        message += ' When first met,' // todo: i18n
+      } else {
+        message += ' At the time,' // todo: i18n
+      }
+      message += ` it was level ${mon.metLevel}.` // todo: i18n
     }
 
     return message
