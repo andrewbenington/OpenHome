@@ -103,7 +103,7 @@ export class SwordShieldSave extends WasmOfficialSave<Pk8Wasm, PK8, SwordShieldS
     try {
       return this.inner.saveVersion
     } catch {
-      return 'Base Game'
+      return 'Crown Tundra'
     }
   }
 
