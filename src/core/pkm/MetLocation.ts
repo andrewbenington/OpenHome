@@ -9,6 +9,7 @@ import {
   PkmFormat,
 } from '@pkm-rs/pkg'
 
+const GEN3_TRADE_STRING = 'in a trade' // todo: i18n
 const DISTANT_LAND_STRING = 'in a distant land' // todo: i18n
 const FARAWAY_PLACE_STRING = 'in a faraway place' // todo: i18n
 
@@ -26,7 +27,11 @@ export function getLocationStringOrOrigin(
     return 'in Pokémon GO' // todo: i18n
   } else if (format === 'OHPKM' || formatMatchesOrigin(format, game)) {
     return getLocationString(game, index, nationalDex, trainerID, trainerName, language, egg)
+  } else if (format === 'PK2' && !(game >= OriginGame.Gold && game <= OriginGame.Crystal)) {
+    return GEN3_TRADE_STRING
   } else if (format === 'PK3' && !(OriginGames.isGba(game))) {
+    return GEN3_TRADE_STRING
+  } else if (['COLOPKM', 'XDPKM'].includes(format) && game !== OriginGame.ColosseumXd) {
     return DISTANT_LAND_STRING
   } else if (format === 'PB7' && !OriginGames.isLetsGo(game)) {
     return game <= OriginGame.UltraMoon
@@ -112,6 +117,20 @@ export const getLocationString = (
   }
 
   if (OriginGames.isGba(game) && index === 254) {
+    return GEN3_TRADE_STRING
+  }
+  if (
+    ((game >= OriginGame.HeartGold && game <= OriginGame.Platinum) || game === OriginGame.BattleRevolution) &&
+    index === 2001
+  ) {
+    return 'in a link trade' // todo: i18n
+  }
+  if (
+    (OriginGames.isLetsGo(game) && index === 30001) ||
+    (game >= OriginGame.White && game <= OriginGame.Black2) && index === 30002
+  ) {
+    return 'in a Link Trade' // todo: i18n
+  }
 
   if (game === OriginGame.BattleRevolution && index === 0x37) {
     return 'in Pokétopia' // todo: i18n

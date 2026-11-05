@@ -73,7 +73,10 @@ const MetDataTab = (props: { mon: PKMInterface }) => {
         message = `${mon.trainerName}'s old friend, met` // todo: i18n
       }
     }
-    if (mon.format === 'PK3' && mon.metLocationIndex === 254) {
+    if (
+      (mon.format === 'PK2') ||
+      (mon.format === 'PK3' && mon.metLocationIndex === 254)
+    ) {
       message = `Obtained in a trade` // todo: i18n
     }
     if (mon.format === 'OHPKM') {
