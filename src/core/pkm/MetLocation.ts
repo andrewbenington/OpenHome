@@ -105,8 +105,11 @@ export const getLocationString = (
   let isGcnMetAt254 = game === OriginGame.ColosseumXd && index === 254
 
   if (!index) {
-    if (game === OriginGame.ColosseumXd && isEeveelution) {
-      return 'from dad' // todo: i18n
+    if (game === OriginGame.ColosseumXd) {
+      if (isEeveelution) {
+        return 'from dad' // todo: i18n
+      }
+      return DISTANT_LAND_STRING
     }
     if (OriginGames.isGameboy(game)) {
       return regionString

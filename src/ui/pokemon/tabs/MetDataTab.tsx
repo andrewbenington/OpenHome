@@ -167,8 +167,12 @@ const MetDataTab = (props: { mon: PKMInterface }) => {
       }
     }
 
-    if (OriginGames.isGameboy(mon.gameOfOrigin) && !mon.metLocationIndex) {
-      message += ` in the ${OriginGames.gameSettingName(mon.gameOfOrigin)} region` // todo: i18n
+    if (!mon.metLocationIndex) {
+      if (OriginGames.isGameboy(mon.gameOfOrigin)) {
+        message += ` in the ${OriginGames.gameSettingName(mon.gameOfOrigin)} region` // todo: i18n
+      } else if (mon.gameOfOrigin === OriginGame.ColosseumXd) {
+        message += ' in a distant land'  // todo: i18n
+      }
     }
     if (mon.gameOfOrigin && mon.metLocationIndex) {
       if (isPalPark) {
