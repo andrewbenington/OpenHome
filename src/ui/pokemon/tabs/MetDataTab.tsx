@@ -32,6 +32,7 @@ const MetDataTab = (props: { mon: PKMInterface }) => {
   const metMessage = useMemo(() => {
     if (
       mon.gameOfOrigin !== OriginGame.ColosseumXd &&
+      !OriginGames.isGameboy(mon.gameOfOrigin) &&
       !mon.metLocationIndex ||
       (OriginGames.isBdsp(mon.gameOfOrigin) && mon.metLocationIndex === 65535) // BDSP Egg
     ) {
@@ -92,6 +93,9 @@ const MetDataTab = (props: { mon: PKMInterface }) => {
       message += ` ${mon.metDate.month}/${mon.metDate.day}/${mon.metDate.year}`
     }
 
+    if (OriginGames.isGameboy(mon.gameOfOrigin) && !mon.metLocationIndex) {
+      message += ` in the ${OriginGames.gameSettingName(mon.gameOfOrigin)} region` // todo: i18n
+    }
     if (mon.gameOfOrigin && mon.metLocationIndex) {
       if ((mon.format === 'OHPKM' && isColoStarter) || (mon.format === 'PK3' && mon.metLocationIndex === 254)) {
         // suppress the normal met location, as it's already handled above
@@ -121,11 +125,19 @@ const MetDataTab = (props: { mon: PKMInterface }) => {
       }
     }
 
+    if (mon.format === 'PK7' && OriginGames.isGameboy(mon.gameOfOrigin)) {
+      message += ' in the good old days'
+    }
+
     if (!['PK3', 'COLOPKM', 'XDPKM'].includes(mon.format) && 'isFatefulEncounter' in mon && mon.isFatefulEncounter) {
       message += ', where it met its Trainer in a fateful encounter'
     }
 
     message += '.'
+
+    if (['OHPKM', 'PK8', 'PA8', 'PB8', 'PK9', 'PA9'].includes(mon.format) && OriginGames.isGameboy(mon.gameOfOrigin)) {
+      message += ' How nostalgic!'
+    }
 
     if (
       !(

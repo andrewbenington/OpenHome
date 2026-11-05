@@ -89,7 +89,10 @@ export const getLocationString = (
     if (game === OriginGame.ColosseumXd && isEeveelution) {
       return 'from dad' // todo: i18n
     }
-    return 'an undefined location'
+    if (OriginGames.isGameboy(game)) {
+      return `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
+    }
+    return 'an undefined location' // todo: i18n
   }
 
   if (isGcnMetAt254 && [196, 197].includes(nationalDex)) {
@@ -101,6 +104,16 @@ export const getLocationString = (
     return `from ${trainerName}` // todo: i18n
   }
 
+  if (
+    (OriginGames.isGameboy(game) && [30013, 30017].includes(index)) ||
+    (OriginGames.isFrlgSwitch(game) && index === 254)
+  ) {
+    return `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
+  }
+
+  if (OriginGames.isGba(game) && index === 254) {
+    return 'in a trade' // todo: i18n
+  }
 
   if (game <= OriginGame.White && index === 30001) {
     return 'at the Poké Transfer Lab' // todo: i18n
