@@ -23,6 +23,8 @@ export function getLocationStringOrOrigin(
   language: Language,
   egg = false
 ) {
+  let regionString = `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
+
   if (game === OriginGame.Go) {
     return 'in Pokémon GO' // todo: i18n
   } else if (format === 'OHPKM' || formatMatchesOrigin(format, game)) {
@@ -33,49 +35,60 @@ export function getLocationStringOrOrigin(
     return GEN3_TRADE_STRING
   } else if (['COLOPKM', 'XDPKM'].includes(format) && game !== OriginGame.ColosseumXd) {
     return DISTANT_LAND_STRING
-  } else if (format === 'PB7' && !OriginGames.isLetsGo(game)) {
-    return game <= OriginGame.UltraMoon
-      ? `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
+  } else if (
+    format === 'PK4' &&
+    !(
+      (game >= OriginGame.HeartGold && game <= OriginGame.Platinum) ||
+      game === OriginGame.BattleRevolution
+    )
+  ) {
+    if (game === OriginGame.ColosseumXd) return DISTANT_LAND_STRING
+    return game <= OriginGame.LeafGreen
+      ? regionString
+      : FARAWAY_PLACE_STRING
+  } else if (format === 'PK5' && !(game >= OriginGame.White && game <= OriginGame.Black2)) {
+    if (game === OriginGame.ColosseumXd) return DISTANT_LAND_STRING
+    return game <= OriginGame.Platinum
+      ? regionString
+      : FARAWAY_PLACE_STRING
+  } else if (format === 'PK6' && !(game >= OriginGame.X && game <= OriginGame.OmegaRuby)) {
+    if (game === OriginGame.ColosseumXd) return DISTANT_LAND_STRING
+    return game <= OriginGame.Black2
+      ? regionString
+      : FARAWAY_PLACE_STRING
+  } else if (format === 'PK7' && !(game >= OriginGame.Sun && game <= OriginGame.UltraMoon)) {
+    if (game === OriginGame.ColosseumXd) return DISTANT_LAND_STRING
+    return game <= OriginGame.OmegaRuby || OriginGames.isGameboy(game)
+      ? regionString
       : FARAWAY_PLACE_STRING
   } else if (format === 'PK8' && !OriginGames.isSwSh(game)) {
     return game <= OriginGame.LetsGoEevee
-      ? `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
+      ? regionString
       : FARAWAY_PLACE_STRING
   } else if (format === 'PB8' && !OriginGames.isBdsp(game)) {
-    if (game === OriginGame.LegendsArceus) {
-      return 'in the Sinnoh region of old' // todo: i18n
-    }
-    if (OriginGames.isFrlgSwitch(game)) {
-      return DISTANT_LAND_STRING
-    }
+    if (game === OriginGame.LegendsArceus) return 'in the Sinnoh region of old' // todo: i18n
+    if (OriginGames.isFrlgSwitch(game)) return DISTANT_LAND_STRING
     return game <= OriginGame.Shield
-      ? `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
+      ? regionString
       : FARAWAY_PLACE_STRING
   } else if (format === 'PA8' && game !== OriginGame.LegendsArceus) {
-    if (OriginGames.isBdsp(game)) {
-      return 'in the Sinnoh region made new' // todo: i18n
-    } else if (OriginGames.isFrlgSwitch(game)) {
-      return DISTANT_LAND_STRING
-    }
+    if (OriginGames.isBdsp(game)) return 'in the Sinnoh region made new' // todo: i18n
+    if (OriginGames.isFrlgSwitch(game)) return DISTANT_LAND_STRING
     return game <= OriginGame.ShiningPearl
-      ? `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
+      ? regionString
       : FARAWAY_PLACE_STRING
   } else if (format === 'PK9' && !OriginGames.isScarletViolet(game)) {
-    if (OriginGames.isFrlgSwitch(game)) {
-      return DISTANT_LAND_STRING
-    }
+    if (OriginGames.isFrlgSwitch(game)) return DISTANT_LAND_STRING
     return game <= OriginGame.Violet
-      ? `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
+      ? regionString
       : FARAWAY_PLACE_STRING
   } else if (format === 'PA9' && game !== OriginGame.LegendsZa) {
-    if (OriginGames.isFrlgSwitch(game)) {
-      return DISTANT_LAND_STRING
-    }
+    if (OriginGames.isFrlgSwitch(game)) return DISTANT_LAND_STRING
     return game <= OriginGame.LegendsZa
-      ? `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
+      ? regionString
       : FARAWAY_PLACE_STRING
   }
-  return `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
+  return regionString
 }
 
 export const getLocationString = (
@@ -87,6 +100,7 @@ export const getLocationString = (
   language: Language,
   egg = false
 ) => {
+  let regionString = `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
   let isEeveelution = [133, 134, 135, 136, 196, 197, 470, 471, 720].includes(nationalDex)
   let isGcnMetAt254 = game === OriginGame.ColosseumXd && index === 254
 
@@ -95,7 +109,7 @@ export const getLocationString = (
       return 'from dad' // todo: i18n
     }
     if (OriginGames.isGameboy(game)) {
-      return `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
+      return regionString
     }
     return 'an undefined location' // todo: i18n
   }
@@ -113,7 +127,7 @@ export const getLocationString = (
     (OriginGames.isGameboy(game) && [30013, 30017].includes(index)) ||
     (OriginGames.isFrlgSwitch(game) && index === 254)
   ) {
-    return `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
+    return regionString
   }
 
   if (OriginGames.isGba(game) && index === 254) {
