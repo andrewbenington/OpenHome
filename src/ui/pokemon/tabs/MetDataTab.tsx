@@ -14,6 +14,7 @@ import { useContext, useMemo } from 'react'
 import './MetDataTab.css'
 
 const metTimesOfDay = ['in the morning', 'during the daytime', 'in the evening']
+const eeveelutions = [133, 134, 135, 136, 196, 197, 470, 471, 720]
 
 const MetDataTab = (props: { mon: PKMInterface }) => {
   const { mon } = props
@@ -43,9 +44,7 @@ const MetDataTab = (props: { mon: PKMInterface }) => {
       return 'Obtained in a trade.' // todo: i18n
     }
 
-    let isEeveelution = [133, 134, 135, 136, 196, 197, 470, 471, 720].includes(mon.nationalDex)
-    let isXdStarter = mon.gameOfOrigin === OriginGame.ColosseumXd && isEeveelution && mon.metLocationIndex === 0 
-
+    let isXdStarter = mon.gameOfOrigin === OriginGame.ColosseumXd && eeveelutions.includes(mon.nationalDex) && mon.metLocationIndex === 0 
     let isGcnMetAt254 = mon.gameOfOrigin === OriginGame.ColosseumXd && mon.metLocationIndex === 254
     let isColoStarter = isGcnMetAt254 && [196, 197].includes(mon.nationalDex)
     let isDukingMon = [213, 246, 247, 248, 307, 308, 311].includes(mon.nationalDex)
