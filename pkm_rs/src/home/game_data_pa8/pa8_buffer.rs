@@ -18,8 +18,8 @@ enum Offset {
     MovePp = 0x0D,
     RelearnMoves = 0x11,
     Gvs = 0x19,
-    //HeightAbsolute = 0x1F,
-    //WeightAbsolute = 0x23,
+    HeightAbsolute = 0x1F,
+    WeightAbsolute = 0x23,
     Ball = 0x27,
     TutorMoves = 0x28,
     MasteredMoves = 0x30,
@@ -178,7 +178,13 @@ impl<S: AsRef<[u8]>> PkhPa8Buffer<S> {
         Stats8::from_bytes(self.gvs_raw())
     }
 
-    // HeightAbsolute and WeightAbsolute are calculated from the mon's height/weight and species data.
+    pub fn height_absolute_raw(&self) -> [u8; 4] {
+        self.get_array(Offset::HeightAbsolute)
+    }
+
+    pub fn weight_absolute_raw(&self) -> [u8; 4] {
+        self.get_array(Offset::WeightAbsolute)
+    }
 
     fn ball_raw(&self) -> u8 {
         self.get_u8(Offset::Ball)
@@ -295,7 +301,13 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> PkhPa8Buffer<S> {
         self.set_gvs_raw(v.to_bytes());
     }
 
-    // TODO: write absolute height and weight
+    pub fn set_absolute_height_raw(&mut self, v: [u8; 4]) {
+        self.set_array(Offset::HeightAbsolute, &v);
+    }
+
+    pub fn set_absolute_weight_raw(&mut self, v: [u8; 4]) {
+        self.set_array(Offset::WeightAbsolute, &v);
+    }
 
     fn set_ball_raw(&mut self, v: u8) {
         self.set_u8(Offset::Ball, v);

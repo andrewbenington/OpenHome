@@ -29,6 +29,11 @@ pub struct HomePa8Data {
     pub relearn_moves: [MoveSlot; 4],
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub gvs: Stats8,
+    // save bytes for absolute height and weight as-is until calculators are ported to rust
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub height_absolute_raw: [u8; 4],
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub weight_absolute_raw: [u8; 4],
     pub ball: Ball,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub tutor_flags_la: FlagSet<MOVE_FLAG_BYTE_LENGTH>,
@@ -61,6 +66,9 @@ impl HomePa8Data {
                 buf.relearn_move(3),
             ],
             gvs: buf.gvs(),
+            // save bytes for absolute height and weight as-is until calculators are ported to rust
+            height_absolute_raw: buf.height_absolute_raw(),
+            weight_absolute_raw: buf.weight_absolute_raw(),
             tutor_flags_la: FlagSet::from_bytes(buf.tutor_flags_la_raw()),
             master_flags_la: FlagSet::from_bytes(buf.mastered_flags_la_raw()),
             ball: buf.ball(),
@@ -84,7 +92,9 @@ impl HomePa8Data {
         buf.set_relearn_move(2, self.relearn_moves[2]);
         buf.set_relearn_move(3, self.relearn_moves[3]);
         buf.set_gvs(self.gvs);
-        // TODO: write absolute height and weight
+        // write bytes for absolute height and weight as-is until calculators are ported to rust
+        buf.set_absolute_height_raw(self.height_absolute_raw);
+        buf.set_absolute_weight_raw(self.weight_absolute_raw);
         buf.set_ball(self.ball);
         buf.set_tutor_flags_la(&self.tutor_flags_la.to_bytes());
         buf.set_mastered_flags_la(&self.master_flags_la.to_bytes());

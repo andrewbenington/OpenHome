@@ -16,6 +16,8 @@ enum Offset {
     Avs = 0x00,
     ResortEventState = 0x06,
     RelearnMoves = 0x17,
+    HeightAbsolute = 0x1F,
+    WeightAbsolute = 0x23,
     Spirit = 0x27,
     Mood = 0x28,
     Fullness = 0x29,
@@ -159,7 +161,13 @@ impl<S: AsRef<[u8]>> PkhPb7Buffer<S> {
         MoveSlot::from_le_bytes(self.relearn_move_raw(idx))
     }
 
-    // HeightAbsolute and WeightAbsolute are calculated from the mon's height/weight and species data.
+    pub fn height_absolute_raw(&self) -> [u8; 4] {
+        self.get_array(Offset::HeightAbsolute)
+    }
+
+    pub fn weight_absolute_raw(&self) -> [u8; 4] {
+        self.get_array(Offset::WeightAbsolute)
+    }
 
     pub fn spirit(&self) -> u8 {
         self.get_u8(Offset::Spirit)
@@ -276,6 +284,14 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> PkhPb7Buffer<S> {
 
     pub fn set_relearn_move(&mut self, idx: usize, v: MoveSlot) {
         self.set_relearn_move_raw(idx, v.to_le_bytes());
+    }
+
+    pub fn set_absolute_height_raw(&mut self, v: [u8; 4]) {
+        self.set_array(Offset::HeightAbsolute, &v);
+    }
+
+    pub fn set_absolute_weight_raw(&mut self, v: [u8; 4]) {
+        self.set_array(Offset::WeightAbsolute, &v);
     }
 
     pub fn set_spirit(&mut self, v: u8) {

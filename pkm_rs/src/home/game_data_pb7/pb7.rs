@@ -24,6 +24,11 @@ pub struct HomePb7Data {
     pub moves: MoveSlots,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub relearn_moves: [MoveSlot; 4],
+    // save bytes for absolute height and weight as-is until calculators are ported to rust
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub height_absolute_raw: [u8; 4],
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub weight_absolute_raw: [u8; 4],
     pub spirit: u8,
     pub mood: u8,
     pub fullness: u8,
@@ -60,6 +65,9 @@ impl HomePb7Data {
                 buf.relearn_move(2),
                 buf.relearn_move(3),
             ],
+            // save bytes for absolute height and weight as-is until calculators are ported to rust
+            height_absolute_raw: buf.height_absolute_raw(),
+            weight_absolute_raw: buf.weight_absolute_raw(),
             spirit: buf.spirit(),
             mood: buf.mood(),
             fullness: buf.fullness(),
@@ -90,6 +98,9 @@ impl HomePb7Data {
         buf.set_relearn_move(1, self.relearn_moves[1]);
         buf.set_relearn_move(2, self.relearn_moves[2]);
         buf.set_relearn_move(3, self.relearn_moves[3]);
+        // write bytes for absolute height and weight as-is until calculators are ported to rust
+        buf.set_absolute_height_raw(self.height_absolute_raw);
+        buf.set_absolute_weight_raw(self.weight_absolute_raw);
         buf.set_spirit(self.spirit);
         buf.set_mood(self.mood);
         buf.set_fullness(self.fullness);
