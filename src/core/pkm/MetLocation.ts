@@ -9,6 +9,7 @@ import {
   PkmFormat,
 } from '@pkm-rs/pkg'
 
+const DISTANT_LAND_STRING = 'in a distant land' // todo: i18n
 const FARAWAY_PLACE_STRING = 'in a faraway place' // todo: i18n
 
 export function getLocationStringOrOrigin(
@@ -38,8 +39,9 @@ export function getLocationStringOrOrigin(
   } else if (format === 'PB8' && !OriginGames.isBdsp(game)) {
     if (game === OriginGame.LegendsArceus) {
       return 'in the Sinnoh region of old' // todo: i18n
-    } else if (OriginGames.isFrlgSwitch(game)) {
-      return 'in a distant land' // todo: i18n
+    }
+    if (OriginGames.isFrlgSwitch(game)) {
+      return DISTANT_LAND_STRING
     }
     return game <= OriginGame.Shield
       ? `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
@@ -48,21 +50,21 @@ export function getLocationStringOrOrigin(
     if (OriginGames.isBdsp(game)) {
       return 'in the Sinnoh region made new' // todo: i18n
     } else if (OriginGames.isFrlgSwitch(game)) {
-      return 'in a distant land' // todo: i18n
+      return DISTANT_LAND_STRING
     }
     return game <= OriginGame.ShiningPearl
       ? `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
       : FARAWAY_PLACE_STRING
   } else if (format === 'PK9' && !OriginGames.isScarletViolet(game)) {
     if (OriginGames.isFrlgSwitch(game)) {
-      return 'in a distant land' // todo: i18n
+      return DISTANT_LAND_STRING
     }
     return game <= OriginGame.Violet
       ? `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
       : FARAWAY_PLACE_STRING
   } else if (format === 'PA9' && game !== OriginGame.LegendsZa) {
     if (OriginGames.isFrlgSwitch(game)) {
-      return 'in a distant land' // todo: i18n
+      return DISTANT_LAND_STRING
     }
     return game <= OriginGame.LegendsZa
       ? `in the ${OriginGames.gameSettingName(game)} region` // todo: i18n
