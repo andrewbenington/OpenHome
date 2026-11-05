@@ -17,6 +17,10 @@ use pkm_rs_resources::species::metadata_table::source_has_form_metadata;
 use pkm_rs_types::randomize::Randomize;
 
 #[cfg(feature = "wasm")]
+mod compass;
+#[cfg(feature = "wasm")]
+pub use compass::*;
+#[cfg(feature = "wasm")]
 mod pk9;
 #[cfg(feature = "wasm")]
 pub use pk9::*;

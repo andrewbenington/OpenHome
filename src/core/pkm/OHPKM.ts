@@ -410,7 +410,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     return OHPKM.fromBytes(bytes.buffer)
   }
 
-  private static fromWasmImpl(mon: WasmPkmFormat): OHPKM {
+  private static fromWasmImpl(mon: WasmPkmFormat, pluginOrigin?: PluginIdentifier): OHPKM {
     return new OHPKM(mon.inner.toOhpkm().toByteArray())
   }
 
