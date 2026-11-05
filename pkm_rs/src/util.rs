@@ -98,6 +98,7 @@ mod tests {
     }
 }
 
+#[cfg(feature = "wasm")]
 /// Reinterprets an owned byte buffer as a `Box<T>` without copying.
 /// Returns the original Vec if the length doesn't match exactly.
 pub fn vec_into_box<T>(v: Vec<u8>) -> StdResult<Box<T>, Vec<u8>>
