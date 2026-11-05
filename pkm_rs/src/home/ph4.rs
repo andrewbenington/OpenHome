@@ -612,7 +612,7 @@ impl Ph4 {
 
     #[wasm_bindgen(js_name = toOhpkm)]
     pub fn to_ohpkm(&self) -> Result<OhpkmV2> {
-        OhpkmV2::convert_with_backup(self, &self.to_party_bytes())
+        OhpkmV2::convert_with_backup(self, &self.to_box_bytes())
     }
 }
 
@@ -629,5 +629,128 @@ impl IsShiny for Ph4 {
 
     fn is_square_shiny(&self) -> bool {
         self.core_data.is_square_shiny()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Ph4;
+    use crate::tests::{self, TestResult};
+    use crate::traits::IsShiny;
+    use std::path::PathBuf;
+
+    #[test]
+    fn is_shiny() -> TestResult<()> {
+        let mon = tests::pkm_from_file::<Ph4>(
+            &PathBuf::from("ph4").join("0447 ★ - Citra 4FD4CD0A5AF75E4B.ph4"),
+        )?
+        .0;
+        assert!(mon.is_shiny());
+
+        Ok(())
+    }
+
+    #[test]
+    fn ohpkm_preserves_moves() -> TestResult<()> {
+        let mon = tests::pkm_from_file::<Ph4>(
+            &PathBuf::from("ph4").join("0447 ★ - Citra 4FD4CD0A5AF75E4B.ph4"),
+        )?
+        .0;
+
+        let ohpkm = mon.to_ohpkm()?;
+
+        if let Some(data) = mon.pb7_data {
+            for lgpe_move in data.moves {
+                if let Some(index) = lgpe_move.move_index.index() {
+                    assert!(
+                        ohpkm.get_learned_moves().contains(&index),
+                        "LGPE move is preserved"
+                    )
+                }
+            }
+        }
+        if let Some(data) = mon.pk8_data {
+            for pk8_move in data.moves {
+                if let Some(index) = pk8_move.move_index.index() {
+                    assert!(
+                        ohpkm.get_learned_moves().contains(&index),
+                        "PK8 move is preserved"
+                    )
+                }
+            }
+        }
+        if let Some(data) = mon.pa8_data {
+            for pa8_move in data.moves {
+                if let Some(index) = pa8_move.move_index.index() {
+                    assert!(
+                        ohpkm.get_learned_moves().contains(&index),
+                        "PLA move is preserved"
+                    )
+                }
+            }
+        }
+        if let Some(data) = mon.pb8_data {
+            for pb8_move in data.moves {
+                if let Some(index) = pb8_move.move_index.index() {
+                    assert!(
+                        ohpkm.get_learned_moves().contains(&index),
+                        "BDSP move is preserved"
+                    )
+                }
+            }
+        }
+        if let Some(data) = mon.pk9_data {
+            for pk9_move in data.moves {
+                if let Some(index) = pk9_move.move_index.index() {
+                    assert!(
+                        ohpkm.get_learned_moves().contains(&index),
+                        "SV move is preserved"
+                    )
+                }
+            }
+        }
+        if let Some(data) = mon.pa9_data {
+            for pa9_move in data.moves {
+                if let Some(index) = pa9_move.index() {
+                    assert!(
+                        ohpkm.get_learned_moves().contains(&index),
+                        "Z-A move is preserved"
+                    )
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn ohpkm_preserves_alpha() -> TestResult<()> {
+        let pla_ph4 = tests::pkm_from_file::<Ph4>(
+            &PathBuf::from("ph4").join("0067 - Machoke 21BA513FF9AC69EE.ph4"),
+        )?
+        .0;
+        let pla_ohpkm = pla_ph4.to_ohpkm()?;
+        if let Some(data) = pla_ph4.pa8_data {
+            assert_eq!(
+                data.is_alpha,
+                pla_ohpkm.is_alpha(),
+                "PLA Alpha status is preserved"
+            )
+        }
+
+        let za_ph4 = tests::pkm_from_file::<Ph4>(
+            &PathBuf::from("ph4").join("0583 ★ - Vanillish 0275338D6E345BEE.ph4"),
+        )?
+        .0;
+        let za_ohpkm = za_ph4.to_ohpkm()?;
+        if let Some(data) = za_ph4.pa9_data {
+            assert_eq!(
+                data.is_alpha,
+                za_ohpkm.is_alpha(),
+                "Z-A Alpha status is preserved"
+            )
+        }
+
+        Ok(())
     }
 }
