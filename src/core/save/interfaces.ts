@@ -141,7 +141,7 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   }
 
   isPlugin: false = false
-  pluginIdentifier: undefined = undefined
+  pluginIdentifier: PluginIdentifier = undefined
 
   getSlotMetadata?: (boxNum: number, boxSlot: number) => SlotMetadata = undefined
 

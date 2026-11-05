@@ -18,6 +18,8 @@ export const buildUnknownSaveFile = (
 ): Errorable<SAV> => {
   const saveTypes = getPossibleSaveTypes(fileBytes, supportedSaveTypes)
 
+  console.log(saveTypes);
+
   if (saveTypes.length > 1) {
     return R.Err(
       'Could not distinguish between multiple possible save types: ' +

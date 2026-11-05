@@ -40,7 +40,7 @@ import { useLookups } from '@openhome-ui/state/lookups'
 import { OhpkmStoreData, useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { ExtraFormIndex, GameSetting, Generation, OriginGame, OriginGames } from '@pkm-rs/pkg'
 import { useCallback, useContext, useMemo, useState } from 'react'
-import {EMERALD_EXPN_TRANSFER_RESTRICTIONS} from "@openhome-core/save/emerald_expn/G3EmeraldExpnSave.ts";
+import {EMERALD_EXPN_TRANSFER_RESTRICTIONS} from "../../../core/save/emerald_expn/G3EmeraldExpnTransferRestrictions";
 
 export function useManageTracked() {
   const ohpkmStore = useOhpkmStore()

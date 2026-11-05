@@ -2,10 +2,10 @@ import {PK3} from '@openhome-core/pkm'
 import {NationalDex} from '@openhome-core/resources/consts/NationalDex'
 import {GEN3_TRANSFER_RESTRICTIONS} from '@openhome-core/resources/consts/TransferRestrictions'
 import {
-  bytesToUint16LittleEndian,
-  bytesToUint32LittleEndian,
-  uint16ToBytesLittleEndian,
-  uint32ToBytesLittleEndian,
+    bytesToUint16LittleEndian,
+    bytesToUint32LittleEndian,
+    uint16ToBytesLittleEndian,
+    uint32ToBytesLittleEndian,
 } from '@openhome-core/util/byteLogic'
 import {$O} from '@openhome-core/util/option'
 import {BinaryGender, ConvertStrategy, ExtraFormIndex, Gen3Strings, ItemGen3, Language, OriginGame,} from '@pkm-rs/pkg'
@@ -18,7 +18,6 @@ import {emptyPathData, PathData} from './util/path'
 
 const SAVE_SIZE_BYTES = 0x20000
 const EMERALD_SECURITY_OFFSET = 0xac
-const EMERALD_SECURITY_COPY_OFFSET = 0x01f4
 export const FRLG_SECURITY_OFFSET = 0x0af8
 export const FRLG_SECURITY_COPY_OFFSET = 0x0f20
 export const GEN3_SIGNATURE_OFFSET = 0x0ff8
@@ -34,422 +33,404 @@ const SECTION_SIZE = 0x0ff4
 const MAX_ADDITIONAL_BYTES = 0x100
 
 export class G3Sector {
-  data: Uint8Array
+    data: Uint8Array
 
-  sectionID: number
+    sectionID: number
 
-  checksum: number
+    checksum: number
 
-  signature: number
+    signature: number
 
-  saveIndex: number
+    saveIndex: number
 
-  constructor(bytes: Uint8Array, index: number) {
-    this.data = bytes.slice(index * 0x1000, index * 0x1000 + 3968)
-    this.sectionID = bytesToUint16LittleEndian(bytes, index * 0x1000 + 0xff4)
-    this.checksum = bytesToUint16LittleEndian(bytes, index * 0x1000 + 0xff6)
-    this.signature = bytesToUint32LittleEndian(bytes, index * 0x1000 + 0xff8)
-    this.saveIndex = bytesToUint32LittleEndian(bytes, index * 0x1000 + 0xffc)
-  }
-
-  writeToBuffer(bytes: Uint8Array, thisIndex: number, firstIndex: number) {
-    this.refreshChecksum()
-    const index = (thisIndex + 14 - firstIndex) % 14
-
-    bytes.set(this.data, index * 0x1000)
-    bytes.set(uint16ToBytesLittleEndian(this.sectionID), index * 0x1000 + 0xff4)
-    bytes.set(uint16ToBytesLittleEndian(this.checksum), index * 0x1000 + 0xff6)
-    bytes.set(uint32ToBytesLittleEndian(this.signature), index * 0x1000 + 0xff8)
-    bytes.set(uint32ToBytesLittleEndian(this.saveIndex), index * 0x1000 + 0xffc)
-  }
-
-  refreshChecksum() {
-    let checksum = 0
-    let byteLength = 3968
-
-    if (this.sectionID === 0) {
-      byteLength = 3884
-    } else if (this.sectionID === 13) {
-      byteLength = 2000
+    constructor(bytes: Uint8Array, index: number) {
+        this.data = bytes.slice(index * 0x1000, index * 0x1000 + 3968)
+        this.sectionID = bytesToUint16LittleEndian(bytes, index * 0x1000 + 0xff4)
+        this.checksum = bytesToUint16LittleEndian(bytes, index * 0x1000 + 0xff6)
+        this.signature = bytesToUint32LittleEndian(bytes, index * 0x1000 + 0xff8)
+        this.saveIndex = bytesToUint32LittleEndian(bytes, index * 0x1000 + 0xffc)
     }
-    for (let i = 0; i < byteLength; i += 4) {
-      checksum += bytesToUint32LittleEndian(this.data, i)
-      checksum = checksum & 0xffffffff
+
+    writeToBuffer(bytes: Uint8Array, thisIndex: number, firstIndex: number) {
+        this.refreshChecksum()
+        const index = (thisIndex + 14 - firstIndex) % 14
+
+        bytes.set(this.data, index * 0x1000)
+        bytes.set(uint16ToBytesLittleEndian(this.sectionID), index * 0x1000 + 0xff4)
+        bytes.set(uint16ToBytesLittleEndian(this.checksum), index * 0x1000 + 0xff6)
+        bytes.set(uint32ToBytesLittleEndian(this.signature), index * 0x1000 + 0xff8)
+        bytes.set(uint32ToBytesLittleEndian(this.saveIndex), index * 0x1000 + 0xffc)
     }
-    this.checksum = ((checksum & 0xffff) + ((checksum >> 16) & 0xffff)) & 0xffff
-  }
+
+    refreshChecksum() {
+        let checksum = 0
+        let byteLength = 3968
+
+        if (this.sectionID === 0) {
+            byteLength = 3884
+        } else if (this.sectionID === 13) {
+            byteLength = 2000
+        }
+        for (let i = 0; i < byteLength; i += 4) {
+            checksum += bytesToUint32LittleEndian(this.data, i)
+            checksum = checksum & 0xffffffff
+        }
+        this.checksum = ((checksum & 0xffff) + ((checksum >> 16) & 0xffff)) & 0xffff
+    }
 }
 
 export class G3SaveBackup {
-  // @ts-ignore
+    // @ts-ignore
 
-  origin: OriginGame
+    origin: OriginGame
 
-  bytes: Uint8Array
+    bytes: Uint8Array
 
-  saveIndex: number = 0
+    saveIndex: number = 0
+    gameCode: number = 0
+    signature: number
 
-  isFirstSave: boolean = false
+    money: number = -1
 
-  gameCode: number = 0
-  signature: number
+    name: string = ''
+    language = Language.None
 
-  money: number = -1
+    tid: number = 0
 
-  name: string = ''
-  language = Language.None
+    sid: number = 0
 
-  tid: number = 0
+    trainerGender: BinaryGender
 
-  sid: number = 0
+    sectors: G3Sector[]
 
-  trainerGender: BinaryGender
+    pcDataContiguous: Uint8Array
 
-  sectors: G3Sector[]
+    currentPCBox: number
+    firstSectorIndex: number = 0
+    private BOX_COUNT = 14;
+    boxesWithResults = Array<Box<Result<Option<PK3>>>>(this.BOX_COUNT)
 
-  pcDataContiguous: Uint8Array
+    constructor(bytes: Uint8Array) {
+        this.bytes = bytes
+        this.saveIndex = bytesToUint32LittleEndian(bytes, 0xffc)
+        this.sectors = []
+        for (let i = 0; i < BOX_COUNT; i++) {
+            this.sectors.push(new G3Sector(bytes, i))
+            this.firstSectorIndex = this.sectors[0].sectionID
+        }
 
-  currentPCBox: number
+        this.sectors.sort((sector1, sector2) => sector1.sectionID - sector2.sectionID)
 
-  boxesWithResults = Array<Box<Result<Option<PK3>>>>(14)
+        this.gameCode = bytesToUint32LittleEndian(this.sectors[0].data, 0xac)
+        this.signature = this.sectors[0].signature
 
-  firstSectorIndex: number = 0
+        switch (this.gameCode) {
+            case 0:
+                this.origin = OriginGame.Ruby
+                this.money = bytesToUint32LittleEndian(this.sectors[1].data, 0x490)
+                break
+            case 1:
+                this.origin = OriginGame.FireRed
+                this.money = bytesToUint32LittleEndian(this.sectors[1].data, 0x290) ^ this.securityKey
+                break
+            default:
+                this.origin = OriginGame.Emerald
+                this.money = bytesToUint32LittleEndian(this.sectors[1].data, 0x490) ^ this.securityKey
+                break
+        }
 
-  constructor(bytes: Uint8Array) {
-    this.bytes = bytes
-    this.saveIndex = bytesToUint32LittleEndian(bytes, 0xffc)
-    this.sectors = []
-    for (let i = 0; i < BOX_COUNT; i++) {
-      this.sectors.push(new G3Sector(bytes, i))
-      this.firstSectorIndex = this.sectors[0].sectionID
+        const trainerNameSlice = this.sectors[0].data.slice(0, 7)
+        this.name = Gen3Strings.decode7Bytes(trainerNameSlice, this.isJapanese ? 'Jpn' : 'Int')
+        // concatenate pc data from all sectors
+        this.pcDataContiguous = new Uint8Array(33744)
+        this.sectors.slice(5).forEach((sector, i) => {
+            if (i + 5 === 13) {
+                this.pcDataContiguous.set(sector.data.slice(0, 2000), i * 3968)
+            } else {
+                this.pcDataContiguous.set(sector.data, i * 3968)
+            }
+        })
+        this.currentPCBox = this.pcDataContiguous[0]
+
+        for (let i = 0; i < BOX_COUNT; i++) {
+            const boxNameStart = BOX_NAME_OFFSET + i * 9
+            const boxNameSlice = this.pcDataContiguous.slice(boxNameStart, boxNameStart + 10)
+            const boxName = Gen3Strings.decode10Bytes(boxNameSlice, this.isJapanese ? 'Jpn' : 'Int')
+            this.boxesWithResults[i] = new Box(boxName, 30)
+        }
+        for (let i = 0; i < BOX_COUNT * BOX_SLOTS; i++) {
+            const box = this.boxesWithResults[Math.floor(i / BOX_SLOTS)]
+            const slot = i % BOX_SLOTS
+            const buffer = this.pcDataContiguous.slice(
+                PC_OFFSET + i * PK3_SIZE_BYTES,
+                PC_OFFSET + (i + 1) * PK3_SIZE_BYTES
+            ).buffer
+            box.boxSlots[slot] = R.tryFrom(() => PK3.fromSlotBytes(buffer))
+        }
+
+        this.tid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0a)
+        this.sid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0c)
+        this.trainerGender = this.sectors[0].data[0x08] ? BinaryGender.Female : BinaryGender.Male
     }
 
-    this.sectors.sort((sector1, sector2) => sector1.sectionID - sector2.sectionID)
-
-    this.gameCode = bytesToUint32LittleEndian(this.sectors[0].data, 0xac)
-    this.signature = this.sectors[0].signature
-
-    switch (this.gameCode) {
-      case 0:
-        this.origin = OriginGame.Ruby
-        this.money = bytesToUint32LittleEndian(this.sectors[1].data, 0x490)
-        break
-      case 1:
-        this.origin = OriginGame.FireRed
-        this.money = bytesToUint32LittleEndian(this.sectors[1].data, 0x290) ^ this.securityKey
-        break
-      default:
-        this.origin = OriginGame.Emerald
-        this.money = bytesToUint32LittleEndian(this.sectors[1].data, 0x490) ^ this.securityKey
-        break
+    get securityKey() {
+        switch (this.gameCode) {
+            case 0:
+                return 0
+            case 1:
+                return bytesToUint32LittleEndian(this.sectors[0].data, FRLG_SECURITY_OFFSET)
+            default:
+                return bytesToUint32LittleEndian(this.sectors[0].data, EMERALD_SECURITY_OFFSET)
+        }
+    }
+    // Since JPN games don't touch the last 2 bytes (alignment), they end up as zeroes!
+    get isJapanese(): boolean {
+        return this.sectors[0].data[0x6] === 0
     }
 
-    const trainerNameSlice = this.sectors[0].data.slice(0, 7)
-    this.name = Gen3Strings.decode7Bytes(trainerNameSlice, this.isJapanese ? 'Jpn' : 'Int')
-    // concatenate pc data from all sectors
-    this.pcDataContiguous = new Uint8Array(33744)
-    this.sectors.slice(5).forEach((sector, i) => {
-      if (i + 5 === 13) {
-        this.pcDataContiguous.set(sector.data.slice(0, 2000), i * 3968)
-      } else {
-        this.pcDataContiguous.set(sector.data, i * 3968)
-      }
-    })
-    this.currentPCBox = this.pcDataContiguous[0]
+    // Per PKHeX:
+    // OT name is the first 8 bytes of Small. The game fills any unused characters with 0xFF.
+    // Japanese games are limited to 5 character OT names; INT 7 characters. +1 0xFF terminator.
 
-    for (let i = 0; i < BOX_COUNT; i++) {
-      const boxNameStart = BOX_NAME_OFFSET + i * 9
-      const boxNameSlice = this.pcDataContiguous.slice(boxNameStart, boxNameStart + 10)
-      const boxName = Gen3Strings.decode10Bytes(boxNameSlice, this.isJapanese ? 'Jpn' : 'Int')
-      this.boxesWithResults[i] = new Box(boxName, 30)
-    }
-    for (let i = 0; i < BOX_COUNT * BOX_SLOTS; i++) {
-      const box = this.boxesWithResults[Math.floor(i / BOX_SLOTS)]
-      const slot = i % BOX_SLOTS
-      const buffer = this.pcDataContiguous.slice(
-        PC_OFFSET + i * PK3_SIZE_BYTES,
-        PC_OFFSET + (i + 1) * PK3_SIZE_BYTES
-      ).buffer
-      box.boxSlots[slot] = R.tryFrom(() => PK3.fromSlotBytes(buffer))
+    // noinspection JSUnusedGlobalSymbols
+    get boxes() {
+        return this.boxesWithResults.map((box) =>
+            box.map((mon) => (mon ? R.dropError(mon) : undefined))
+        )
     }
 
-    this.tid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0a)
-    this.sid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0c)
-    this.trainerGender = this.sectors[0].data[0x08] ? BinaryGender.Female : BinaryGender.Male
-  }
+    static buildIfInitialized(bytes: Uint8Array): Option<G3SaveBackup> {
+        if (new DataView(bytes.buffer).getUint32(0) === 0xffffffff) {
+            return undefined
+        }
 
-  static buildIfInitialized(bytes: Uint8Array): Option<G3SaveBackup> {
-    if (new DataView(bytes.buffer).getUint32(0) === 0xffffffff) {
-      return undefined
+        return new G3SaveBackup(bytes)
     }
-
-    return new G3SaveBackup(bytes)
-  }
-
-  get securityKey() {
-    switch (this.gameCode) {
-      case 0:
-        return 0
-      case 1:
-        return bytesToUint32LittleEndian(this.sectors[0].data, FRLG_SECURITY_OFFSET)
-      default:
-        return bytesToUint32LittleEndian(this.sectors[0].data, EMERALD_SECURITY_OFFSET)
-    }
-  }
-
-  get securityKeyCopy() {
-    switch (this.gameCode) {
-      case 0:
-        return undefined
-      case 1:
-        return bytesToUint32LittleEndian(this.sectors[0].data, FRLG_SECURITY_COPY_OFFSET)
-      default:
-        return bytesToUint32LittleEndian(this.sectors[0].data, EMERALD_SECURITY_COPY_OFFSET)
-    }
-  }
-
-  // Per PKHeX:
-  // "OT name is the first 8 bytes of Small. The game fills any unused characters with 0xFF.
-  // Japanese games are limited to 5 character OT names; INT 7 characters. +1 0xFF terminator.
-  // Since JPN games don't touch the last 2 bytes (alignment), they end up as zeroes!"
-  get isJapanese(): boolean {
-    return this.sectors[0].data[0x6] === 0
-  }
-
-  get boxes() {
-    return this.boxesWithResults.map((box) =>
-      box.map((mon) => (mon ? R.dropError(mon) : undefined))
-    )
-  }
 }
 
 
 export class G3SAV extends OfficialSAV<PK3> {
-  static pkmType = PK3
+    static pkmType = PK3
 
-  static transferRestrictions = GEN3_TRANSFER_RESTRICTIONS
-  static lookupType: LookupType = 'gen345'
+    static transferRestrictions = GEN3_TRANSFER_RESTRICTIONS
+    static lookupType: LookupType = 'gen345'
 
-  static TRAINER_OFFSET = 0
+    // noinspection JSUnusedGlobalSymbols
+    static TRAINER_OFFSET = 0
 
-  static TEAM_ITEMS_OFFSET = SECTION_SIZE * 1
+    // noinspection PointlessArithmeticExpressionJS,JSUnusedGlobalSymbols
+    static PC_OFFSET = SECTION_SIZE * 5
+    static saveTypeAbbreviation = 'RSE/FRLG'
+    static saveTypeName = 'Pokémon Ruby/Sapphire/Emerald/FireRed/LeafGreen'
+    static saveTypeID = 'G3SAV'
+    primarySave: G3SaveBackup
+    backupSave?: G3SaveBackup
+    primarySaveOffset: number
+    origin: OriginGame
+    isPlugin = false as const
+    boxRows = 5
+    boxColumns = 6
+    filePath: PathData
+    fileCreated?: Date
+    money: number
+    name: string
+    tid: number
+    sid: number
+    displayID: string
+    language = Language.None
+    currentPCBox: number
+    boxesWithResults: Box<Result<Option<PK3>>>[]
+    bytes: Uint8Array
+    invalid: boolean = false
+    tooEarlyToOpen: boolean = false
+    updatedBoxSlots: BoxAndSlot[] = []
 
-  static PC_OFFSET = SECTION_SIZE * 5
+    constructor(path: PathData, bytes: Uint8Array) {
+        super()
+        this.bytes = bytes
+        this.filePath = path
+        const saveOne = G3SaveBackup.buildIfInitialized(bytes.slice(0, this.getSaveFile1EndBytes()))
+        const saveTwo = G3SaveBackup.buildIfInitialized(bytes.slice(0xe000, this.getSaveFile2EndBytes()))
 
-  primarySave: G3SaveBackup
+        if (saveOne && (!saveTwo || saveOne.saveIndex > saveTwo.saveIndex)) {
+            this.primarySave = saveOne
+            this.backupSave = saveTwo
+            this.primarySaveOffset = 0
+        } else if (saveTwo) {
+            this.primarySave = saveTwo
+            this.backupSave = saveOne
+            this.primarySaveOffset = 0xe000
+        } else {
+            throw Error(this.getSaveFileHasNoDataErrorMessage())
+        }
 
-  backupSave?: G3SaveBackup
+        this.currentPCBox = this.primarySave.currentPCBox
+        this.money = this.primarySave.money
+        this.name = this.primarySave.name
+        this.tid = this.primarySave.tid
+        this.displayID = this.primarySave.tid.toString().padStart(5, '0')
+        this.sid = this.primarySave.sid
+        this.currentPCBox = this.primarySave.currentPCBox
+        this.boxesWithResults = this.primarySave.boxesWithResults
 
-  primarySaveOffset: number
-
-  origin: OriginGame
-  isPlugin = false as const
-
-  boxRows = 5
-  boxColumns = 6
-
-  filePath: PathData
-  fileCreated?: Date
-
-  money: number
-  name: string
-  tid: number
-  sid: number
-  displayID: string
-  language = Language.None
-
-  currentPCBox: number
-  boxesWithResults: Box<Result<Option<PK3>>>[]
-
-  bytes: Uint8Array
-
-  invalid: boolean = false
-  tooEarlyToOpen: boolean = false
-
-  updatedBoxSlots: BoxAndSlot[] = []
-
-  constructor(path: PathData, bytes: Uint8Array) {
-    super()
-    this.bytes = bytes
-    this.filePath = path
-    const saveOne = G3SaveBackup.buildIfInitialized(bytes.slice(0, 0xe000))
-    const saveTwo = G3SaveBackup.buildIfInitialized(bytes.slice(0xe000, 0x1c000))
-
-    if (saveOne && (!saveTwo || saveOne.saveIndex > saveTwo.saveIndex)) {
-      this.primarySave = saveOne
-      this.backupSave = saveTwo
-      this.primarySaveOffset = 0
-    } else if (saveTwo) {
-      this.primarySave = saveTwo
-      this.backupSave = saveOne
-      this.primarySaveOffset = 0xe000
-    } else {
-      throw Error('Save file has no data')
+        this.origin = this.calculateGetOrigin();
+    }
+    get trainerGender() {
+        return this.primarySave.trainerGender
     }
 
-    this.currentPCBox = this.primarySave.currentPCBox
-    this.money = this.primarySave.money
-    this.name = this.primarySave.name
-    this.tid = this.primarySave.tid
-    this.displayID = this.primarySave.tid.toString().padStart(5, '0')
-    this.sid = this.primarySave.sid
-    this.currentPCBox = this.primarySave.currentPCBox
-    this.boxesWithResults = this.primarySave.boxesWithResults
-
-    // hacky way to detect save version
-    // TODO: make more robust
-    const trainerMon = range(BOX_COUNT)
-      .flatMap((box) => this.boxesWithResults.at(box)?.boxSlots)
-      .filter(filterUndefined)
-      .filter(R.isOk)
-      .map(R.assert)
-      .filter(filterUndefined)
-      .find(
-        (mon) =>
-          mon.trainerID === this.tid && mon.secretID === this.sid && mon.trainerName === this.name
-      )
-
-    if (trainerMon) {
-      this.origin = trainerMon?.gameOfOrigin
-    } else {
-      let fileName = this.filePath.name
-
-      fileName = fileName.replace(/\s+/g, '')
-      if (fileName.includes('Ruby')) {
-        this.origin = OriginGame.Ruby
-        return
-      }
-      if (fileName.includes('Sapphire')) {
-        this.origin = OriginGame.Sapphire
-        return
-      }
-      if (fileName.includes('FireRed')) {
-        this.origin = OriginGame.FireRed
-        return
-      }
-      if (fileName.includes('LeafGreen')) {
-        this.origin = OriginGame.LeafGreen
-      } else {
-        this.origin = this.primarySave.origin
-      }
+    get boxes() {
+        return this.boxesWithResults.map((box) =>
+            box.map((mon) => (mon ? R.dropError(mon) : undefined))
+        )
     }
-  }
 
-  get isJapanese() {
-    return this.primarySave.isJapanese
-  }
-
-  prepareForSaving() {
-    this.updatedBoxSlots.forEach(({ box, boxSlot }) => {
-      const monOffset = BOX_SLOTS * box + boxSlot
-      const pcBytes = new Uint8Array(PK3_SIZE_BYTES)
-
-      // mon will be undefined if Pokémon was moved from this slot
-      // and the slot was left empty
-      $R(this.tryGetMonAt(box, boxSlot)).match(
-        (mon) => {
-          if (mon?.gameOfOrigin && mon?.nationalDex) {
-            mon.refreshChecksum()
-            pcBytes.set(new Uint8Array(mon.toPCBytes()), 0)
-          }
-        },
-        (error) => `G3SAV: ${error}`
-      )
-
-      this.primarySave.pcDataContiguous.set(pcBytes, PC_OFFSET + monOffset * PK3_SIZE_BYTES)
-    })
-    this.primarySave.sectors.slice(5).forEach((sector, i) => {
-      const pcData = this.primarySave.pcDataContiguous.slice(
-        // 3968 times sector offset
-        i * 3968,
-        // 3968 ahead of that, or 2000 ahead of that if box 13 zero indexed
-        i * 3968 + (i + 5 === 13 ? 2000 : 3968)
-      )
-
-      sector.data.set(pcData)
-      sector.writeToBuffer(this.primarySave.bytes, i + 5, this.primarySave.firstSectorIndex)
-    })
-    this.bytes.set(this.primarySave.bytes, this.primarySaveOffset)
-  }
-
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK3> {
-    return PK3.fromOhpkm(ohpkm, strategy)
-  }
-
-  supportsMon(nationalDex: number, formNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
-    if (extraFormIndex !== undefined) return false
-    return (
-      nationalDex <= NationalDex.Deoxys && (formNumber === 0 || nationalDex === NationalDex.Unown)
-    )
-  }
-
-  supportsItem(itemIndex: number) {
-    return ItemGen3.fromModern(itemIndex) !== undefined
-  }
-
-  static saveTypeAbbreviation = 'RSE/FRLG'
-  static saveTypeName = 'Pokémon Ruby/Sapphire/Emerald/FireRed/LeafGreen'
-  static saveTypeID = 'G3SAV'
-
-  static fileIsSave(bytes: Uint8Array): boolean {
-    if (bytes.length < SAVE_SIZE_BYTES || bytes.length - SAVE_SIZE_BYTES > MAX_ADDITIONAL_BYTES) {
-      return false
+    // noinspection JSUnusedGlobalSymbols
+    static fileIsSave(bytes: Uint8Array): boolean {
+        if (bytes.length < SAVE_SIZE_BYTES || bytes.length - SAVE_SIZE_BYTES > MAX_ADDITIONAL_BYTES) {
+            return false
+        }
+        try {
+            const save = new G3SAV(emptyPathData, bytes)
+            return this.identifierMatchesGame(save);
+        } catch (e) {
+            console.error(e)
+            return false
+        }
     }
-    try {
-      const save = new G3SAV(emptyPathData, bytes)
-      if (save.primarySave.gameCode === 0) {
-        return true
-      } else {
-        return save.primarySave.securityKey > 0 && save.primarySave.signature === GEN3_SIGNATURE
-      }
-    } catch (e) {
-      console.error(e)
-      return false
+
+    static identifierMatchesGame(save: G3SAV) {
+        if (save.primarySave.gameCode === 0) {
+            return true
+        } else {
+            return save.primarySave.securityKey > 0 && save.primarySave.signature === GEN3_SIGNATURE
+        }
     }
-  }
-  static includesOrigin(origin: OriginGame) {
-    return origin >= OriginGame.Sapphire && origin <= OriginGame.LeafGreen
-  }
+    prepareForSaving() {
+        this.updatedBoxSlots.forEach(({box, boxSlot}) => {
+            const monOffset = BOX_SLOTS * box + boxSlot
+            const pcBytes = new Uint8Array(PK3_SIZE_BYTES)
 
-  getDisplayData(): Record<string, string | number | undefined> {
-    return {
-      ...super.getDisplayData(),
-      securityKey: this.primarySave.securityKey,
-      securityKeyCopyEmerald: new DataView(
-        this.primarySave.sectors[0].data.buffer as ArrayBuffer
-      ).getUint32(0x1f4, true),
-      securityKeyCopyFRLG: new DataView(
-        this.primarySave.sectors[0].data.buffer as ArrayBuffer
-      ).getUint32(0xf20, true),
-      // rivalName: gen3StringToUTF(this.primarySave.sectors[3].data, 0x0bcc, 8),
-      gameCode: this.primarySave.gameCode,
+            // mon will be undefined if Pokémon was moved from this slot
+            // and the slot was left empty
+            $R(this.tryGetMonAt(box, boxSlot)).match(
+                (mon) => {
+                    if (mon?.gameOfOrigin && mon?.nationalDex) {
+                        mon.refreshChecksum()
+                        pcBytes.set(new Uint8Array(mon.toPCBytes()), 0)
+                    }
+                },
+                (error) => `G3SAV: ${error}`
+            )
+
+            this.primarySave.pcDataContiguous.set(pcBytes, PC_OFFSET + monOffset * PK3_SIZE_BYTES)
+        })
+        this.primarySave.sectors.slice(5).forEach((sector, i) => {
+            const pcData = this.primarySave.pcDataContiguous.slice(
+                // 3968 times sector offset
+                i * 3968,
+                // 3968 ahead of that, or 2000 ahead of that if box 13 zero indexed
+                i * 3968 + (i + 5 === 13 ? 2000 : 3968)
+            )
+
+            sector.data.set(pcData)
+            sector.writeToBuffer(this.primarySave.bytes, i + 5, this.primarySave.firstSectorIndex)
+        })
+        this.bytes.set(this.primarySave.bytes, this.primarySaveOffset)
     }
-  }
 
-  get trainerGender() {
-    return this.primarySave.trainerGender
-  }
+    convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK3> {
+        return PK3.fromOhpkm(ohpkm, strategy)
+    }
 
-  getMonAt(boxIndex: number, boxSlot: number): Option<PK3> {
-    const slotResult = this.boxesWithResults.at(boxIndex)?.boxSlots.at(boxSlot)
-    return $O(slotResult).map(R.dropError).get()
-  }
+    supportsMon(nationalDex: number, formNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+        if (extraFormIndex !== undefined) return false
+        return (
+            nationalDex <= NationalDex.Deoxys && (formNumber === 0 || nationalDex === NationalDex.Unown)
+        )
+    }
 
-  tryGetMonAt(boxIndex: number, boxSlot: number): Result<Option<PK3>> {
-    return this.boxesWithResults.at(boxIndex)?.boxSlots.at(boxSlot) ?? R.Ok(undefined)
-  }
+    supportsItem(itemIndex: number) {
+        return ItemGen3.fromModern(itemIndex) !== undefined
+    }
 
-  setMonAt(boxIndex: number, boxSlot: number, mon: Option<PK3>): void {
-    const box = this.boxesWithResults[boxIndex]
-    if (!box) return
-    box.boxSlots[boxSlot] = R.Ok(mon)
-  }
+    getDisplayData(): Record<string, string | number | undefined> {
+        return {
+            ...super.getDisplayData(),
+            securityKey: this.primarySave.securityKey,
+            securityKeyCopyEmerald: new DataView(
+                this.primarySave.sectors[0].data.buffer as ArrayBuffer
+            ).getUint32(0x1f4, true),
+            securityKeyCopyFRLG: new DataView(
+                this.primarySave.sectors[0].data.buffer as ArrayBuffer
+            ).getUint32(0xf20, true),
+            // rivalName: gen3StringToUTF(this.primarySave.sectors[3].data, 0x0bcc, 8),
+            gameCode: this.primarySave.gameCode,
+        }
+    }
 
-  get boxes() {
-    return this.boxesWithResults.map((box) =>
-      box.map((mon) => (mon ? R.dropError(mon) : undefined))
-    )
-  }
+    getMonAt(boxIndex: number, boxSlot: number): Option<PK3> {
+        const slotResult = this.boxesWithResults.at(boxIndex)?.boxSlots.at(boxSlot)
+        return $O(slotResult).map(R.dropError).get()
+    }
+
+    tryGetMonAt(boxIndex: number, boxSlot: number): Result<Option<PK3>> {
+        return this.boxesWithResults.at(boxIndex)?.boxSlots.at(boxSlot) ?? R.Ok(undefined)
+    }
+
+    setMonAt(boxIndex: number, boxSlot: number, mon: Option<PK3>): void {
+        const box = this.boxesWithResults[boxIndex]
+        if (!box) return
+        box.boxSlots[boxSlot] = R.Ok(mon)
+    }
+
+    getSaveFile2EndBytes() {
+        return 0x1c000;
+    }
+
+    calculateGetOrigin() {
+
+        // hacky way to detect save version
+        // TODO: make more robust
+        const trainerMon = range(BOX_COUNT)
+            .flatMap((box) => this.boxesWithResults.at(box)?.boxSlots)
+            .filter(filterUndefined)
+            .filter(R.isOk)
+            .map(R.assert)
+            .filter(filterUndefined)
+            .find(
+                (mon) =>
+                    mon.trainerID === this.tid && mon.secretID === this.sid && mon.trainerName === this.name
+            )
+
+        let originGame: OriginGame;
+        if (trainerMon) {
+            originGame = trainerMon?.gameOfOrigin
+        } else {
+            let fileName = this.filePath.name
+
+            fileName = fileName.replace(/\s+/g, '')
+            if (fileName.includes('Ruby')) {
+                originGame = OriginGame.Ruby
+            } else if (fileName.includes('Sapphire')) {
+                originGame = OriginGame.Sapphire
+            } else if (fileName.includes('FireRed')) {
+                originGame = OriginGame.FireRed
+            } else if (fileName.includes('LeafGreen')) {
+                originGame = OriginGame.LeafGreen
+            } else {
+                originGame = this.primarySave.origin
+            }
+        }
+
+        return originGame;
+    }
+
+    getSaveFileHasNoDataErrorMessage() {
+        return 'Save file has no data';
+    }
+
+    getSaveFile1EndBytes = () => 0xe000;
 
 }
 
