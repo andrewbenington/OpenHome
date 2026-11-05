@@ -1,0 +1,54 @@
+{
+  "pa8_data": {
+    "ability_index": "Steadfast",
+    "ability_num": "First",
+    "moves": [
+      {
+        "move_index": "Aura Sphere",
+        "pp": 10,
+        "pp_ups": 0
+      },
+      {
+        "move_index": "Crunch",
+        "pp": 10,
+        "pp_ups": 0
+      },
+      {
+        "move_index": "Bulk Up",
+        "pp": 10,
+        "pp_ups": 0
+      },
+      {
+        "move_index": "Close Combat",
+        "pp": 5,
+        "pp_ups": 0
+      }
+    ],
+    "relearn_moves": [
+      "\u003Cempty\u003E",
+      "\u003Cempty\u003E",
+      "\u003Cempty\u003E",
+      "\u003Cempty\u003E"
+    ],
+    "is_alpha": false,
+    "is_noble": false,
+    "alpha_move": 0,
+    "scale": 141,
+    "height_absolute": 71.48236,
+    "weight_absolute": 201.58586,
+    "egg_location_index": 0,
+    "met_location_index": 97,
+    "ball": "Gigaton",
+    "pokerus": 0,
+    "gvs": {
+      "hp": 0,
+      "atk": 0,
+      "def": 0,
+      "spa": 0,
+      "spd": 0,
+      "spe": 0
+    },
+    "purchased_flags": [16],
+    "mastered_flags": [16]
+  }
+}

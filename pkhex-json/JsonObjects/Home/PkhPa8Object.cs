@@ -7,6 +7,10 @@ public static class PkhPa8Object
 
     public static object Build(GameDataPA8 pk)
     {
+        if (pk == null) {
+            return null;
+        }
+        
         var languageCode = Language.GetLanguageCode(LanguageID.English);
         var strings = GameInfo.GetStrings(languageCode);
         return new

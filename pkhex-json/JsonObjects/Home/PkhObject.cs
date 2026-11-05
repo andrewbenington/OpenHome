@@ -11,7 +11,7 @@ public static class PkhObject
         var strings = GameInfo.GetStrings(languageCode);
         return new
         {
-            pa8 = PkhPa8Object.Build(pk.DataPA8)
+            pa8_data = PkhPa8Object.Build(pk.DataPA8)
         };
     }
 }
