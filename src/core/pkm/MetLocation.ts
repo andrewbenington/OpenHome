@@ -112,7 +112,9 @@ export const getLocationString = (
   }
 
   if (OriginGames.isGba(game) && index === 254) {
-    return 'in a trade' // todo: i18n
+
+  if (game === OriginGame.BattleRevolution && index === 0x37) {
+    return 'in Pokétopia' // todo: i18n
   }
 
   if (game <= OriginGame.White && index === 30001) {
