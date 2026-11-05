@@ -69,7 +69,7 @@ public static class Pk9Object
             height_scalar = pk.HeightScalar,
             weight_scalar = pk.WeightScalar,
             scale = pk.Scale,
-            mint_nature = pk.StatNature.ToString(),
+            mint_nature = pk.StatAlignment.ToString(),
             tera_type_original = Util.FormatTeraType(pk.TeraTypeOriginal),
             tera_type_override = Util.FormatTeraType(pk.TeraTypeOverride),
             home_tracker = pk.Tracker > 0 ? (object)pk.Tracker : null,

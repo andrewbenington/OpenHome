@@ -72,7 +72,7 @@ public static class Pk8Object
             affixed_ribbon = Util.FormatAffixedRibbon(pk.AffixedRibbon, strings),
             height_scalar = pk.HeightScalar,
             weight_scalar = pk.WeightScalar,
-            mint_nature = pk.StatNature.ToString(),
+            mint_nature = pk.StatAlignment.ToString(),
             dynamax_level = pk.DynamaxLevel,
             is_favorite = pk.IsFavorite,
             sociability = pk.Sociability,

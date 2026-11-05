@@ -47,7 +47,16 @@ static object PkmToJsonObject(PKM pk)
 
 static byte[] PkmToEncryptedBytes(PKM pk)
 {
-    return pk is PK9 pk9 ? pk9.EncryptedPartyData : null;
+    if (pk is PK9 pk9)
+    {
+    var data = new byte[pk.SIZE_PARTY];
+    pk.WriteEncryptedDataParty(data);
+    return data;
+        
+    } else
+    {
+        return null;
+    }
 }
 
 foreach (var dir in pkmFileDirs)

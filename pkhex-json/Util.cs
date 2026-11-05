@@ -115,8 +115,8 @@ public static partial class Util
     }
   }
 
-  static object MoveData(IGameDataSide pk, int moveIndex, GameStrings strings)
-  {
+  static object MoveData<T>(T pk, int moveIndex, GameStrings strings)
+   where T: IGameDataSide, IGameDataSidePP {
     var moveId = moveIndex switch
     {
       1 => FormatMoveName(pk.Move1, strings),
@@ -178,7 +178,7 @@ public static partial class Util
     return new { move_index = moveId, pp = movePp, pp_ups = movePpUps };
   }
 
-  public static object[] AllMoveData(IGameDataSide pk, GameStrings strings)
+  public static object[] AllMoveData<T>(T pk, GameStrings strings) where T: IGameDataSide, IGameDataSidePP
   {
     return [MoveData(pk, 1, strings), MoveData(pk, 2, strings), MoveData(pk, 3, strings), MoveData(pk, 4, strings)];
   }
