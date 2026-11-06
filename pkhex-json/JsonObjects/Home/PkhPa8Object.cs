@@ -21,17 +21,17 @@ public static class PkhPa8Object
             relearn_moves = Util.RelearnMoves(pk, strings),
             is_alpha = pk.IsAlpha,
             is_noble = pk.IsNoble,
-            alpha_move = pk.AlphaMove,
+            alpha_move = Util.FormatMoveName(pk.AlphaMove, strings),
             scale = pk.Scale,
-            height_absolute = pk.HeightAbsolute,
-            weight_absolute = pk.WeightAbsolute,
+            height_absolute = Util.FormatFloat(pk.HeightAbsolute),
+            weight_absolute = Util.FormatFloat(pk.WeightAbsolute),
             egg_location_index = pk.EggLocation,
             met_location_index = pk.MetLocation,
             ball = Util.FormatBall(pk, strings),
             pokerus = pk.PokerusState,
             gvs = Util.GVs(pk),
-            purchased_flags = Util.GetFlagIndexes(64, pk.GetMasteredRecordFlag),
-            mastered_flags = Util.GetFlagIndexes(64, pk.GetMasteredRecordFlag),
+            tutor_flags_la = Util.GetFlagIndexes(64, pk.GetPurchasedRecordFlag),
+            master_flags_la = Util.GetFlagIndexes(64, pk.GetMasteredRecordFlag),
         };
     }
 }

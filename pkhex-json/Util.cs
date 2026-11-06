@@ -8,7 +8,12 @@ using PKHeX.Core;
 public static partial class Util
 {
 
-  public static object SpeciesForm(PKM pk)
+  public static string FormatFloat(float value)
+  {
+    return value.ToString("F5");
+  }
+
+  public static object SpeciesForm(ISpeciesForm pk)
   {
     return new { national_dex = pk.Species, form_index = pk.Form };
   }
@@ -76,7 +81,17 @@ public static partial class Util
     return new { hp = pk.IV_HP, atk = pk.IV_ATK, def = pk.IV_DEF, spa = pk.IV_SPA, spd = pk.IV_SPD, spe = pk.IV_SPE };
   }
 
+  public static object IVs(GameDataCore pk)
+  {
+    return new { hp = pk.IV_HP, atk = pk.IV_ATK, def = pk.IV_DEF, spa = pk.IV_SPA, spd = pk.IV_SPD, spe = pk.IV_SPE };
+  }
+
   public static object EVs(PKM pk)
+  {
+    return new { hp = pk.EV_HP, atk = pk.EV_ATK, def = pk.EV_DEF, spa = pk.EV_SPA, spd = pk.EV_SPD, spe = pk.EV_SPE };
+  }
+
+  public static object EVs(GameDataCore pk)
   {
     return new { hp = pk.EV_HP, atk = pk.EV_ATK, def = pk.EV_DEF, spa = pk.EV_SPA, spd = pk.EV_SPD, spe = pk.EV_SPE };
   }
@@ -102,7 +117,7 @@ public static partial class Util
     return new { cool = pk.ContestCool, beauty = pk.ContestBeauty, cute = pk.ContestCute, smart = pk.ContestSmart, tough = pk.ContestTough, sheen = pk.ContestSheen };
   }
 
-  static object FormatMoveName(int moveId, GameStrings strings)
+  public static object FormatMoveName(int moveId, GameStrings strings)
   {
     try
     {
@@ -116,7 +131,8 @@ public static partial class Util
   }
 
   static object MoveData<T>(T pk, int moveIndex, GameStrings strings)
-   where T: IGameDataSide, IGameDataSidePP {
+   where T : IGameDataSide, IGameDataSidePP
+  {
     var moveId = moveIndex switch
     {
       1 => FormatMoveName(pk.Move1, strings),
@@ -178,7 +194,7 @@ public static partial class Util
     return new { move_index = moveId, pp = movePp, pp_ups = movePpUps };
   }
 
-  public static object[] AllMoveData<T>(T pk, GameStrings strings) where T: IGameDataSide, IGameDataSidePP
+  public static object[] AllMoveData<T>(T pk, GameStrings strings) where T : IGameDataSide, IGameDataSidePP
   {
     return [MoveData(pk, 1, strings), MoveData(pk, 2, strings), MoveData(pk, 3, strings), MoveData(pk, 4, strings)];
   }
@@ -217,6 +233,19 @@ public static partial class Util
   public static object[] RelearnMoves(IGameDataSide pk, GameStrings strings)
   {
     return [RelearnMove(1, pk, strings), RelearnMove(2, pk, strings), RelearnMove(3, pk, strings), RelearnMove(4, pk, strings)];
+  }
+
+  public static List<string> GetRibbonNames(object pk)
+  {
+    var riblist = new List<string>();
+    var names = ReflectUtil.GetPropertiesStartWithPrefix(pk.GetType(), "Ribbon");
+    foreach (var name in names)
+    {
+      var value = ReflectUtil.GetValue(pk, name);
+      if (value is bool isPresent && isPresent)
+        riblist.Add(ReformatRibbonName(name));
+    }
+    return riblist;
   }
 
   static string ReformatRibbonName(string s)
@@ -400,13 +429,19 @@ public static partial class Util
   private static partial Regex RibbonRegex();
 
   public static List<int> GetFlagIndexes(int flagCount, Func<int, bool> isSet)
-{
+  {
     var result = new List<int>();
     for (int i = 0; i < flagCount; i++)
     {
-        if (isSet(i))
-            result.Add(i);
+      if (isSet(i))
+        result.Add(i);
     }
     return result;
-}
+  }
+
+  public static string NullableDateStrFromParts(int yearsSince2000, int month, int day)
+  {
+    DateOnly? date =  month != 0 && day != 0 && DateUtil.IsValidDate(yearsSince2000 + 2000, month, day) ? new DateOnly(yearsSince2000 + 2000, month, day) : null;
+    return date != null ? $"{date:M/d/yyyy}" : null;
+  }
 }

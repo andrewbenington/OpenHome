@@ -29,15 +29,22 @@ pub struct HomePa8Data {
     pub relearn_moves: [MoveSlot; 4],
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub gvs: Stats8,
-    // save bytes for absolute height and weight as-is until calculators are ported to rust
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub height_absolute_raw: [u8; 4],
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub weight_absolute_raw: [u8; 4],
+    #[cfg_attr(test, serde(serialize_with = "crate::tests::serialize_f32_pkhex_json"))]
+    pub height_absolute: f32,
+    #[cfg_attr(test, serde(serialize_with = "crate::tests::serialize_f32_pkhex_json"))]
+    pub weight_absolute: f32,
     pub ball: Ball,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    #[cfg_attr(
+        test,
+        serde(serialize_with = "crate::tests::serialize_flagset_pkhex_json")
+    )]
     pub tutor_flags_la: FlagSet<MOVE_FLAG_BYTE_LENGTH>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    #[cfg_attr(
+        test,
+        serde(serialize_with = "crate::tests::serialize_flagset_pkhex_json")
+    )]
     pub master_flags_la: FlagSet<MOVE_FLAG_BYTE_LENGTH>,
     pub egg_location_index: u16, // always set to 0
     pub met_location_index: u16,
@@ -67,8 +74,8 @@ impl HomePa8Data {
             ],
             gvs: buf.gvs(),
             // save bytes for absolute height and weight as-is until calculators are ported to rust
-            height_absolute_raw: buf.height_absolute_raw(),
-            weight_absolute_raw: buf.weight_absolute_raw(),
+            height_absolute: buf.height_absolute(),
+            weight_absolute: buf.weight_absolute(),
             tutor_flags_la: FlagSet::from_bytes(buf.tutor_flags_la_raw()),
             master_flags_la: FlagSet::from_bytes(buf.mastered_flags_la_raw()),
             ball: buf.ball(),
@@ -93,8 +100,8 @@ impl HomePa8Data {
         buf.set_relearn_move(3, self.relearn_moves[3]);
         buf.set_gvs(self.gvs);
         // write bytes for absolute height and weight as-is until calculators are ported to rust
-        buf.set_absolute_height_raw(self.height_absolute_raw);
-        buf.set_absolute_weight_raw(self.weight_absolute_raw);
+        buf.set_absolute_height(self.height_absolute);
+        buf.set_absolute_weight(self.weight_absolute);
         buf.set_ball(self.ball);
         buf.set_tutor_flags_la(&self.tutor_flags_la.to_bytes());
         buf.set_mastered_flags_la(&self.master_flags_la.to_bytes());

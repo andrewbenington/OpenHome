@@ -1,4 +1,6 @@
 use assert_json_diff::{CompareMode, Config, assert_json_matches_no_panic};
+use pkm_rs_types::FlagSet;
+use serde::Serialize;
 
 use crate::convert_strategy::ConvertStrategy;
 use crate::ohpkm::{OhpkmConvert, OhpkmV2};
@@ -401,6 +403,17 @@ pub fn compare_pkhex_json<PKM: Pkm + PkhexJson>(pkm_path: &Path) -> TestResult<(
 
         TestError::PkmRs(Error::other(&message), Some(pkm_path.to_path_buf()))
     })
+}
+
+pub fn serialize_f32_pkhex_json<S: serde::Serializer>(v: &f32, s: S) -> Result<S::Ok, S::Error> {
+    format!("{:.5}", v).serialize(s)
+}
+
+pub fn serialize_flagset_pkhex_json<const N: usize, S: serde::Serializer>(
+    v: &FlagSet<N>,
+    s: S,
+) -> Result<S::Ok, S::Error> {
+    v.get_flags().serialize(s)
 }
 
 pub fn compare_pkhex_encryption_all_in_dir<PKM: Pkm, F>(dir: &Path, encrypt: F) -> TestResult<()>

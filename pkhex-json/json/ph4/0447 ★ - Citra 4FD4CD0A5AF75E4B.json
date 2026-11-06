@@ -1,4 +1,109 @@
 {
+  "encryption_seed": 18386700688642770506,
+  "game_data_size": 144,
+  "encoded_data_size": 352,
+  "data_version": 4,
+  "checksum": 905621844,
+  "core_data_size": 196,
+  "core_data": {
+    "home_tracker": 5752448068418494027,
+    "encryption_constant": 3078339529,
+    "is_bad_egg": false,
+    "species_and_form": {
+      "national_dex": 447,
+      "form_index": 0
+    },
+    "held_item_index": 0,
+    "trainer_id": 15102,
+    "secret_id": 48548,
+    "exp": 150476,
+    "is_favorite": false,
+    "markings": {
+      "circle": "unset",
+      "square": "unset",
+      "triangle": "unset",
+      "heart": "unset",
+      "star": "unset",
+      "diamond": "unset"
+    },
+    "personality_value": 3039900266,
+    "nature": "Careful",
+    "is_fateful_encounter": false,
+    "gender": "Female",
+    "evs": {
+      "hp": 0,
+      "atk": 0,
+      "def": 0,
+      "spa": 0,
+      "spd": 0,
+      "spe": 0
+    },
+    "contest": {
+      "cool": 0,
+      "beauty": 0,
+      "cute": 0,
+      "smart": 0,
+      "tough": 0,
+      "sheen": 0
+    },
+    "ribbons": [],
+    "contest_memory_count": 0,
+    "battle_memory_count": 0,
+    "form_argument": 0,
+    "nickname": "Citra",
+    "nickname_trash": "4300690074007200610000000000000000000000000000000000",
+    "ivs": {
+      "hp": 17,
+      "atk": 14,
+      "def": 25,
+      "spa": 12,
+      "spd": 6,
+      "spe": 14
+    },
+    "is_egg": false,
+    "is_nicknamed": true,
+    "handler_name": "Flit",
+    "handler_gender": "Male",
+    "is_current_handler": true,
+    "handler_friendship": 50,
+    "handler_memory": {
+      "intensity": 0,
+      "memory": 0,
+      "feeling": 0,
+      "textVariables": 0
+    },
+    "handler_id": 0,
+    "handler_language": "English",
+    "trainer_name": "Malik",
+    "trainer_friendship": 50,
+    "trainer_memory": {
+      "intensity": 0,
+      "memory": 0,
+      "feeling": 0,
+      "textVariables": 0
+    },
+    "egg_date": null,
+    "met_date": "4/21/2023",
+    "met_level": 54,
+    "trainer_gender": "Male",
+    "hyper_training": {
+      "hp": false,
+      "atk": false,
+      "def": false,
+      "spa": false,
+      "spd": false,
+      "spe": false
+    },
+    "game_of_origin": "LegendsArceus",
+    "game_of_origin_battle": null,
+    "language": "English",
+    "status_condition": 0,
+    "affixed_ribbon": null,
+    "height_scalar": 141,
+    "weight_scalar": 113,
+    "mint_nature": "Careful",
+    "current_hp": 116
+  },
   "pa8_data": {
     "ability_index": "Steadfast",
     "ability_num": "First",
@@ -32,10 +137,10 @@
     ],
     "is_alpha": false,
     "is_noble": false,
-    "alpha_move": 0,
+    "alpha_move": "\u003Cempty\u003E",
     "scale": 141,
-    "height_absolute": 71.48236,
-    "weight_absolute": 201.58586,
+    "height_absolute": "71.48236",
+    "weight_absolute": "201.58586",
     "egg_location_index": 0,
     "met_location_index": 97,
     "ball": "Gigaton",
@@ -48,7 +153,7 @@
       "spd": 0,
       "spe": 0
     },
-    "purchased_flags": [16],
-    "mastered_flags": [16]
+    "tutor_flags_la": [],
+    "master_flags_la": [16]
   }
 }

@@ -61,13 +61,19 @@ pub struct Ph4 {
     pub core_data: HomeCoreData,
 
     // game data
+    #[serde(skip)] // TODO: uncomment to include in pkhex json test
     pub pb7_data: Option<HomePb7Data>,
+    #[serde(skip)] // TODO: uncomment to include in pkhex json test
     pub pk8_data: Option<HomePk8Data>,
     pub pa8_data: Option<HomePa8Data>,
+    #[serde(skip)] // TODO: uncomment to include in pkhex json test
     pub pb8_data: Option<HomePb8Data>,
+    #[serde(skip)] // TODO: uncomment to include in pkhex json test
     pub pk9_data: Option<HomePk9Data>,
+    #[serde(skip)] // TODO: uncomment to include in pkhex json test
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub pc9_data: Option<[u8; super::HOME_PC9_DATA_SIZE]>,
+    #[serde(skip)] // TODO: uncomment to include in pkhex json test
     pub pa9_data: Option<HomePa9Data>,
 }
 
@@ -635,7 +641,17 @@ impl IsShiny for Ph4 {
 #[cfg(test)]
 impl crate::tests::PkhexJson for Ph4 {
     fn to_pkhex_json_value(&self) -> std::result::Result<serde_json::Value, serde_json::Error> {
-        serde_json::to_value(self)
+        let mut value = serde_json::to_value(self)?;
+        value["core_data"]["nickname_trash"] = serde_json::json!(
+            self.core_data
+                .nickname
+                .bytes()
+                .iter()
+                .map(|b| format!("{:02X}", b))
+                .collect::<String>()
+        );
+
+        Ok(value)
     }
 }
 

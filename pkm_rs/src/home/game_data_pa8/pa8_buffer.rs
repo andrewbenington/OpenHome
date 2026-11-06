@@ -3,6 +3,7 @@ use crate::bytes::{AsBytes, AsBytesMut};
 use crate::gen8_swsh::Pk8AbilityIndex;
 use crate::result::Result;
 use crate::util;
+use arrayref::array_ref;
 use pkm_rs_resources::abilities::AbilityIndexWasm;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::{MoveSlot, MoveSlots};
@@ -86,6 +87,11 @@ impl<S: AsRef<[u8]>> PkhPa8Buffer<S> {
         read_u16_le!(self.bytes(), offset)
     }
 
+    fn get_f32_le(&self, offset: Offset) -> f32 {
+        let offset = offset as usize;
+        f32::from_le_bytes(*array_ref![self.bytes(), offset, 4])
+    }
+
     fn get_flag(&self, offset: Offset, bit_index: usize) -> bool {
         util::get_flag(self.bytes(), offset as usize, bit_index)
     }
@@ -105,6 +111,11 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> PkhPa8Buffer<S> {
     fn set_u16_le(&mut self, offset: Offset, v: u16) {
         let offset = offset as usize;
         self.bytes_mut()[offset..offset + 2].copy_from_slice(&v.to_le_bytes());
+    }
+
+    fn set_f32_le(&mut self, offset: Offset, v: f32) {
+        let offset = offset as usize;
+        self.bytes_mut()[offset..offset + 4].copy_from_slice(&v.to_le_bytes());
     }
 
     fn set_flag(&mut self, offset: Offset, bit_index: usize, v: bool) {
@@ -184,6 +195,14 @@ impl<S: AsRef<[u8]>> PkhPa8Buffer<S> {
 
     pub fn weight_absolute_raw(&self) -> [u8; 4] {
         self.get_array(Offset::WeightAbsolute)
+    }
+
+    pub fn height_absolute(&self) -> f32 {
+        self.get_f32_le(Offset::HeightAbsolute)
+    }
+
+    pub fn weight_absolute(&self) -> f32 {
+        self.get_f32_le(Offset::WeightAbsolute)
     }
 
     fn ball_raw(&self) -> u8 {
@@ -307,6 +326,14 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> PkhPa8Buffer<S> {
 
     pub fn set_absolute_weight_raw(&mut self, v: [u8; 4]) {
         self.set_array(Offset::WeightAbsolute, &v);
+    }
+
+    pub fn set_absolute_height(&mut self, v: f32) {
+        self.set_f32_le(Offset::HeightAbsolute, v);
+    }
+
+    pub fn set_absolute_weight(&mut self, v: f32) {
+        self.set_f32_le(Offset::WeightAbsolute, v);
     }
 
     fn set_ball_raw(&mut self, v: u8) {

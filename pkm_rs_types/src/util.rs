@@ -106,6 +106,18 @@ macro_rules! read_u64_le {
     };
 }
 
+#[macro_export]
+macro_rules! read_f32_le {
+    ($bytes:expr, $start:expr) => {
+        u32::from_le_bytes([
+            $bytes[$start],
+            $bytes[$start + 1],
+            $bytes[$start + 2],
+            $bytes[$start + 3],
+        ])
+    };
+}
+
 mod tests {
 
     #[test]
