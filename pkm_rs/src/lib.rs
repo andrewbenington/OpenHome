@@ -25,6 +25,7 @@ pub mod sectioned_data;
 #[cfg(test)]
 pub mod tests;
 pub mod traits;
+pub mod pkm_trait_based_impl;
 
 pub use rom_hacks::PluginIdentifier;
 

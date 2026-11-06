@@ -1,6 +1,6 @@
 import PK7 from '@openhome-core/pkm/PK7'
-import { Item } from '@openhome-core/resources/consts/Items'
-import { USUM_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
+import {Item} from '@openhome-core/resources/consts/Items'
+import {USUM_TRANSFER_RESTRICTIONS} from '@openhome-core/resources/consts/TransferRestrictions'
 import {
   ConvertStrategy,
   ExtraFormIndex,
@@ -8,27 +8,23 @@ import {
   OriginGame,
   Pk7Wasm,
 } from '@pkm-rs/pkg'
-import { OHPKM } from '../pkm/OHPKM'
-import { Result } from '../util/functional'
-import { BoxAndSlot, WasmOfficialSave } from './interfaces'
-import { PathData } from './util/path'
-import { isRestricted } from './util/TransferRestrictions'
+import {OHPKM} from '../pkm/OHPKM'
+import {Result} from '../util/functional'
+import {BoxAndSlot, WasmOfficialSave} from './interfaces'
+import {PathData} from './util/path'
+import {isRestricted} from './util/TransferRestrictions'
 
 export class Gen7AlolaSave extends WasmOfficialSave<Pk7Wasm, PK7, Gen7AlolaSaveRust> {
-  WASM_SAVE_CLASS = Gen7AlolaSaveRust
-
   static pkmType = PK7
   static saveTypeAbbreviation = 'SM/USUM'
   static saveTypeID = 'SM/USUM'
-
+  static saveTypeName: string = 'Pokémon Sun/Moon/Ultra Sun/Ultra Moon'
+  WASM_SAVE_CLASS = Gen7AlolaSaveRust
   filePath: PathData
   fileCreated?: Date
-
   money: number = 0 // TODO: Gen 7 money
-
   invalid = false
   tooEarlyToOpen = false
-
   updatedBoxSlots: BoxAndSlot[] = []
 
   constructor(path: PathData, bytes: Uint8Array) {
@@ -39,8 +35,6 @@ export class Gen7AlolaSave extends WasmOfficialSave<Pk7Wasm, PK7, Gen7AlolaSaveR
   static fileIsSave(bytes: Uint8Array): boolean {
     return Gen7AlolaSaveRust.fileIsSave(bytes)
   }
-
-  static saveTypeName: string = 'Pokémon Sun/Moon/Ultra Sun/Ultra Moon'
 
   static includesOrigin(origin: OriginGame) {
     return Gen7AlolaSaveRust.includesOrigin(origin)

@@ -1,0 +1,1 @@
+pub trait PkmBuffer<const N: usize>: Sized {}
