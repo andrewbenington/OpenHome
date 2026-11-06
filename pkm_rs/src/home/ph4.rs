@@ -61,7 +61,6 @@ pub struct Ph4 {
     pub core_data: HomeCoreData,
 
     // game data
-    #[serde(skip)] // TODO: uncomment to include in pkhex json test
     pub pb7_data: Option<HomePb7Data>,
     #[serde(skip)] // TODO: uncomment to include in pkhex json test
     pub pk8_data: Option<HomePk8Data>,

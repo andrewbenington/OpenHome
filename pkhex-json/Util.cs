@@ -106,6 +106,16 @@ public static partial class Util
     return new { hp = pk.GV_HP, atk = pk.GV_ATK, def = pk.GV_DEF, spa = pk.GV_SPA, spd = pk.GV_SPD, spe = pk.GV_SPE };
   }
 
+  public static object AVs(IAwakened pk)
+  {
+    return new { hp = pk.AV_HP, atk = pk.AV_ATK, def = pk.AV_DEF, spa = pk.AV_SPA, spd = pk.AV_SPD, spe = pk.AV_SPE };
+  }
+
+  public static object AVs(GameDataPB7 pk)
+  {
+    return new { hp = pk.AV_HP, atk = pk.AV_ATK, def = pk.AV_DEF, spa = pk.AV_SPA, spd = pk.AV_SPD, spe = pk.AV_SPE };
+  }
+
 
   public static object Stats(PKM pk)
   {
@@ -199,6 +209,8 @@ public static partial class Util
     return [MoveData(pk, 1, strings), MoveData(pk, 2, strings), MoveData(pk, 3, strings), MoveData(pk, 4, strings)];
   }
 
+
+
   static object RelearnMove(int moveIndex, PKM pk, GameStrings strings)
   {
     var moveId = moveIndex switch
@@ -230,7 +242,7 @@ public static partial class Util
     return [RelearnMove(1, pk, strings), RelearnMove(2, pk, strings), RelearnMove(3, pk, strings), RelearnMove(4, pk, strings)];
   }
 
-  public static object[] RelearnMoves(IGameDataSide pk, GameStrings strings)
+  public static object[] RelearnMoves<T>(T pk, GameStrings strings) where T : IGameDataSide, IGameDataSidePP
   {
     return [RelearnMove(1, pk, strings), RelearnMove(2, pk, strings), RelearnMove(3, pk, strings), RelearnMove(4, pk, strings)];
   }
@@ -441,7 +453,7 @@ public static partial class Util
 
   public static string NullableDateStrFromParts(int yearsSince2000, int month, int day)
   {
-    DateOnly? date =  month != 0 && day != 0 && DateUtil.IsValidDate(yearsSince2000 + 2000, month, day) ? new DateOnly(yearsSince2000 + 2000, month, day) : null;
+    DateOnly? date = month != 0 && day != 0 && DateUtil.IsValidDate(yearsSince2000 + 2000, month, day) ? new DateOnly(yearsSince2000 + 2000, month, day) : null;
     return date != null ? $"{date:M/d/yyyy}" : null;
   }
 }
