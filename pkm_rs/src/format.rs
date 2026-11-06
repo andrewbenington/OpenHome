@@ -75,6 +75,7 @@ impl PkmFormat {
             Self::PK3RR | Self::PK3UB => OriginGame::FireRed,
             Self::PB8LUMI => OriginGame::BrilliantDiamond,
             Self::PK9Compass => OriginGame::Scarlet,
+          PkmFormat::PK2PolishedCrystal => OriginGame::Crystal
         }
     }
 
@@ -96,6 +97,7 @@ impl PkmFormat {
             Self::PA9 => origin == OriginGame::LegendsZa,
 
             Self::PK3RR | Self::PK3UB | Self::PB8LUMI | Self::PK9Compass => false,
+          Self::PK2PolishedCrystal => origin.generation() == Generation::G2,
         }
     }
 
@@ -114,6 +116,7 @@ impl PkmFormat {
             Self::PK3RR | Self::PK3UB => Generation::G3,
             Self::PB8LUMI => Generation::G8,
             Self::PK9Compass => Generation::G9,
+            Self::PK2PolishedCrystal => Generation::G2,
         }
     }
 
@@ -137,7 +140,8 @@ impl PkmFormat {
             | Self::PK4
             | Self::PK5
             | Self::PK6
-            | Self::PB7 => false,
+            | Self::PB7
+            | Self::PK2PolishedCrystal => false,
         }
     }
 }
@@ -145,7 +149,7 @@ impl PkmFormat {
 impl PkmFormat {
     pub fn fallback_location_index(&self) -> u16 {
         if *self == Self::PK8 {
-            super::location::FARAWAY_PLACE_SWSH
+            location::FARAWAY_PLACE_SWSH
         } else {
             self.link_trade_location_index()
         }
@@ -153,7 +157,7 @@ impl PkmFormat {
 
     const fn link_trade_location_index(&self) -> u16 {
         match *self {
-            Self::PK1 | Self::PK2 => super::location::CANT_TELL_GEN2,
+            Self::PK1 | Self::PK2 => location::CANT_TELL_GEN2,
             Self::PK3 | Self::ColoPkm | Self::XdPkm => LinkTradeIndex::PkmGen3 as u16,
             Self::PK4 => LinkTradeIndex::Pk4 as u16,
             Self::PK5 => LinkTradeIndex::Pk5 as u16,
@@ -168,6 +172,7 @@ impl PkmFormat {
 
             Self::PK3RR | Self::PK3UB => LinkTradeIndex::PkmGen3 as u16,
             Self::PB8LUMI | Self::PK9Compass => LinkTradeIndex::Pkm3dsSwitch as u16,
+            Self::PK2PolishedCrystal => location::CANT_TELL_GEN2 // Verify if this is true todo!()
         }
     }
 
@@ -192,6 +197,7 @@ impl PkmFormat {
             Self::PK3UB => origin.generation() == Generation::G3,
             Self::PB8LUMI => origin <= OriginGame::ShiningPearl,
             Self::PK9Compass => origin <= OriginGame::Violet,
+            Self::PK2PolishedCrystal => false
         }
     }
 
@@ -298,6 +304,7 @@ impl PkmFormat {
             Self::PK3UB => FireRed,
             Self::PB8LUMI => ShiningPearl,
             Self::PK9Compass => Scarlet,
+            Self::PK2PolishedCrystal => Crystal
         }
     }
 
@@ -311,8 +318,8 @@ impl PkmFormat {
             return if self.matches_origin(original_origin) {
                 met_location_index
             } else if legalized_origin == OriginGame::Go {
-                // Pokémon transferred from Pokémon Go to Let's Go must go through the Go Park
-                super::location::GO_PARK_LETS_GO
+                // Pokémon transferred from Pokémon GO to Let's Go must go through the Go Park
+                location::GO_PARK_LETS_GO
             } else {
                 LinkTradeIndex::Pkm3dsSwitch as u16
             };
@@ -320,12 +327,12 @@ impl PkmFormat {
 
         if self == Self::PK4 && legalized_origin.generation() == Generation::G3 {
             // Gen 3 Pokémon transferred through Gen 4 must be obtained through the pal park
-            return super::location::PAL_PARK_GEN_4;
+            return location::PAL_PARK_GEN_4;
         }
 
         if self.generation() >= Generation::G5 && legalized_origin.generation() <= Generation::G4 {
             // Pokémon brought up through Gen V Poké Transfer use the transfer met index, not the Lab map index
-            return super::location::POKE_TRANSFER_MET_LOCATION_GEN_5;
+            return location::POKE_TRANSFER_MET_LOCATION_GEN_5;
         }
 
         if self == Self::PK8 {
@@ -338,7 +345,7 @@ impl PkmFormat {
                     OriginGame::ShiningPearl => 59998,
                     OriginGame::BrilliantDiamond => 59999,
                     OriginGame::LegendsArceus => 60000,
-                    _ => super::location::FARAWAY_PLACE_SWSH,
+                    _ => location::FARAWAY_PLACE_SWSH,
                 }
             } else {
                 met_location_index
@@ -347,7 +354,7 @@ impl PkmFormat {
 
         if matches!(self, Self::PA8 | Self::PB8 | Self::PK9 | Self::PA9) {
             return if original_origin.is_frlg_switch() {
-                super::location::DISTANT_LAND_FRLG_SWITCH
+                location::DISTANT_LAND_FRLG_SWITCH
             } else {
                 met_location_index
             };
@@ -379,7 +386,7 @@ impl PkmFormat {
             },
             Self::PK4 => location::gen4::index_of(location),
             Self::PK5 => match location {
-                Location::PokeTransferLab => Some(super::location::POKE_TRANSFER_LAB_INDEX_GEN_5),
+                Location::PokeTransferLab => Some(location::POKE_TRANSFER_LAB_INDEX_GEN_5),
                 Location::LinkTrade => Some(30002),
                 Location::KantoGen3 => Some(30004),
                 Location::JohtoGen4 => Some(30005),
@@ -894,6 +901,7 @@ impl PkmFormat {
                 Location::FatefulEncounter => Some(255),
                 _ => None,
             },
+          Self::PK2PolishedCrystal => location::gen2::index_of(location)
         }
     }
 
@@ -907,7 +915,7 @@ impl PkmFormat {
 
         match self {
             PkmFormat::PK1 | PkmFormat::PK2 => {
-                MetData::new(source_origin, super::location::CANT_TELL_GEN2)
+                MetData::new(source_origin, location::CANT_TELL_GEN2)
             }
             PkmFormat::PK3 => {
                 let legalized_origin = self.legalize_origin(source_origin);
@@ -917,7 +925,7 @@ impl PkmFormat {
                     // Pokémon caught in XD are given the Fateful Encounter location index, which sets the
                     // fateful encounter flag when transferred to Gen 4 or converted to OHPKM. Since the flag is set,
                     // the mon must be from XD and would have the fateful encounter location in the GBA games
-                    super::location::FATEFUL_ENCOUNTER_GEN_3
+                    location::FATEFUL_ENCOUNTER_GEN_3
                 } else {
                     self.legalize_met_location(source_origin, legalized_origin, source_met_location)
                 };
@@ -954,6 +962,9 @@ impl PkmFormat {
                 );
 
                 MetData::new(legalized_origin, location_index)
+            },
+            PkmFormat::PK2PolishedCrystal => {
+              MetData::new(source_origin, location::CANT_TELL_GEN2)
             }
         }
     }
@@ -978,6 +989,7 @@ impl PkmFormat {
             Self::PK3RR | Self::PK3UB => MetadataSource::FireRedLeafGreen,
             Self::PB8LUMI => MetadataSource::BrilliantDiamondShiningPearl,
             Self::PK9Compass => MetadataSource::ScarletViolet,
+            Self::PK2PolishedCrystal => MetadataSource::Crystal
         }
     }
 }

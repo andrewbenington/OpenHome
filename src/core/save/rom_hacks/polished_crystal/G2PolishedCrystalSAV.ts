@@ -22,7 +22,7 @@ export class G2PolishedCrystalSAV extends WasmPluginSave<Pk2PolishedCrystalWasm,
   getSlotMetadata: ((boxNum: number, boxSlot: number) => SlotMetadata) | undefined;
   invalid: boolean;
 
-  monFromWasm(wasmMon: Pk2Wasm): PK2PolishedCrystal {
+  monFromWasm(wasmMon: Pk2PolishedCrystalWasm): PK2PolishedCrystal {
     return undefined;
   }
 

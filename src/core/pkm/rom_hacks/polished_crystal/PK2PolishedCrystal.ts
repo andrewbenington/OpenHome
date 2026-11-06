@@ -1,16 +1,17 @@
-import {Pk2Wasm} from "@pkm-rs/pkg";
+import {Pk2PolishedCrystalWasm, Pk2Wasm} from "@pkm-rs/pkg";
 import {PkmConstructorOptions} from "../../PKM";
 import {convertPokeDate, convertPokeDateOptional} from "../../wasm/convert";
-import {modernStatCalc} from "../../util";
+import {modernStatCalc, PkmOrOhpkmFormat} from "../../util";
 import {decryptByteArrayGen67, get16BitChecksumLittleEndian, shuffleBlocksGen67} from "../../util/encryption";
 import { OHPKM } from "@openhome-core/pkm/OHPKM";
+import { AllPKMFields } from "@openhome-core/pkm/util/pkmInterface";
 
-export default class PK2PolishedCrystal {
+export default class PK2PolishedCrystal implements AllPKMFields {
 
   static getFormat() {
     return 'PK2PolishedCrystal' as const
   }
-  format = 'PK2PolishedCrystal' as const
+  format: PkmOrOhpkmFormat = 'PK2PolishedCrystal' as const
 
   static getBoxSize() {
     return __notImplemented();
@@ -24,7 +25,7 @@ export default class PK2PolishedCrystal {
     } else {
       const ohpkmBytes = new Uint8Array(arg.toBytes())
 
-      this.inner = Pk7Wasm.fromOhpkmBytes(
+      this.inner = Pk2PolishedCrystalWasm.fromOhpkmBytes(
         ohpkmBytes,
         options.strategy || ConvertStrategies.getDefault()
       )
