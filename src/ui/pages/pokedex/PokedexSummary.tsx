@@ -23,8 +23,13 @@ import { Card, Flex, ScrollArea, Text } from '@radix-ui/themes'
 import { useContext } from 'react'
 import BaseStatsChart from './BaseStatsChart'
 import './pokedex.css'
-import { MOST_CURRENT_SOURCE, MostCurrentSource } from './PokedexPage'
-import { getFormPokedexData, getPokedexSummary, isExtraFormMetadata } from './util'
+import {
+  getFormPokedexData,
+  getPokedexSummary,
+  isExtraFormMetadata,
+  MOST_CURRENT_SOURCE,
+  MostCurrentSource,
+} from './util'
 
 type PokedexSummaryProps = {
   pokedex: Pokedex

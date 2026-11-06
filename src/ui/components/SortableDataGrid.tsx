@@ -2,11 +2,11 @@ import { PaginatedPage } from '@openhome-core/tauri/spectaCommands'
 import { Errorable, Option } from '@openhome-core/util/functional'
 import {
   booleanSorter,
+  ComparisonFunction,
   dayjsSorter,
   numericSorter,
   SortableColumn,
   SortableValue,
-  Sorter,
   SortType,
   stringSorter,
 } from '@openhome-core/util/sort'
@@ -44,7 +44,7 @@ const dataGridProps = {
 function sorterBySortType<T>(
   sortType: SortType,
   columnKey: string & keyof T
-): Sorter<T> | undefined {
+): ComparisonFunction<T> | undefined {
   switch (sortType) {
     case 'string':
       return stringSorter((row: T) => {
