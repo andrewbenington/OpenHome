@@ -292,6 +292,7 @@ impl ItemUnbound {
   console.info(`Rust code written to ${filename}`)
 }
 
+// oxlint-disable-next-line no-unused-vars
 async function generateEmeraldExpn() {
   const allItems = await itemEmeraldExpnGetAll(new Database('generate/pkm.db'))
 
@@ -326,7 +327,7 @@ impl ItemEmeraldExpn {
 
   const filename = 'pkm_rs_resources/src/items/emerald_expn_2.rs'
   fs.writeFileSync(filename, output)
-  console.log(`Rust code written to ${filename}`)
+  console.info(`Rust code written to ${filename}`)
 }
 
 await Promise.all([
@@ -336,5 +337,5 @@ await Promise.all([
   generateGen3(),
   generateRadicalRed(),
   generateUnbound(),
-  generateEmeraldExpn(),
+  // generateEmeraldExpn(),
 ])

@@ -301,6 +301,6 @@ export async function itemEmeraldExpnGetAll(
   database: Database
 ): Promise<ItemEmeraldExpnGetAllRow[]> {
   const stmt = database.prepare(itemEmeraldExpnGetAllQuery)
-  const result = await stmt.all()
+  const result = stmt.all()
   return camelcaseKeys(result) as ItemEmeraldExpnGetAllRow[]
 }

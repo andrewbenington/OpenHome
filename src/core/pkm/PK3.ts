@@ -8,6 +8,7 @@ import {
   ConvertStrategies,
   ConvertStrategy,
   MetadataSummaryLookup,
+  OhpkmWasm,
   OriginGame,
   Pk3Wasm,
   Pokerus,
@@ -55,6 +56,10 @@ export default class PK3 implements PKMInterface {
 
   static fromWasm(pk3: Pk3Wasm): PK3 {
     return new PK3(pk3, {})
+  }
+
+  intoOhpkmWasm(): OhpkmWasm {
+    return this.inner.toOhpkm()
   }
 
   toBytes(options?: ToBytesOptions): ArrayBuffer {

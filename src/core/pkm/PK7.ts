@@ -10,6 +10,7 @@ import {
   Item,
   MetadataSummaryLookup,
   NatureIndex,
+  OhpkmWasm,
   OriginGame,
   Pk7Wasm,
   PokeDate,
@@ -70,6 +71,10 @@ export default class PK7 {
 
   static fromWasm(pk7: Pk7Wasm): PK7 {
     return new PK7(pk7, {})
+  }
+
+  intoOhpkmWasm(): OhpkmWasm {
+    return this.inner.toOhpkm()
   }
 
   get sanity() {

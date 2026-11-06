@@ -17,6 +17,10 @@ use pkm_rs_resources::species::metadata_table::source_has_form_metadata;
 use pkm_rs_types::randomize::Randomize;
 
 #[cfg(feature = "wasm")]
+mod compass;
+#[cfg(feature = "wasm")]
+pub use compass::*;
+#[cfg(feature = "wasm")]
 mod pk9;
 #[cfg(feature = "wasm")]
 pub use pk9::*;
@@ -28,6 +32,8 @@ mod pokemon_index;
 mod sv_save;
 #[cfg(feature = "wasm")]
 mod sv_save_blocks;
+#[cfg(feature = "wasm")]
+mod wasm;
 
 #[cfg(feature = "wasm")]
 use pkm_rs_types::strings::SizedUtf16String;

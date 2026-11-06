@@ -5,7 +5,7 @@ import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
 import PK3RR from '@openhome-core/save/radicalred/PK3RR'
 import PK3UB from '@openhome-core/save/unbound/PK3UB'
 import { Errorable } from '@openhome-core/util/functional'
-import { ConvertStrategy, PkmFormat } from '@pkm-rs/pkg'
+import { ConvertStrategy, OhpkmWasm, PkmFormat } from '@pkm-rs/pkg'
 import COLOPKM from './COLOPKM'
 import PA8 from './PA8'
 import PA9 from './PA9'
@@ -39,9 +39,16 @@ export type PKM =
   | PK9
   | PA9
 
-const WasmPkmFormats = [PK3, PK7, PK8, PK9, PK9Compass]
-export type WasmPkmFormat = InstanceType<(typeof WasmPkmFormats)[number]>
+export interface WasmPkmInterface extends PKMInterface {
+  intoOhpkmWasm(): OhpkmWasm
+}
+type WasmPkmClass = {
+  new (arg: OHPKM, options: PkmConstructorOptions): WasmPkmInterface
+}
 
+const WasmPkmFormats: WasmPkmClass[] = [PK3, PK7, PK8, PK9, PK9Compass]
+
+export type WasmPkmFormat = InstanceType<(typeof WasmPkmFormats)[number]>
 export function isWasmFormat(pkm: PKMInterface): pkm is WasmPkmFormat {
   return WasmPkmFormats.some((P) => pkm instanceof P)
 }
