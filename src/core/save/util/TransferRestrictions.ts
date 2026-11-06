@@ -173,12 +173,8 @@ export const isRestricted = (
   if (transferableDexNums && !transferableDexNums.includes(nationalDex)) {
     return true
   }
-  if (
-    excludedForms &&
+  return !!(excludedForms &&
     excludedForms[nationalDex] &&
-    excludedForms[nationalDex]?.includes(formIndex ?? 0)
-  ) {
-    return true
-  }
-  return false
+    excludedForms[nationalDex]?.includes(formIndex ?? 0));
+
 }

@@ -21,6 +21,7 @@ const PA9_SIZE: usize = 344;
 
 const PK3CFRU_PARTY_SIZE: usize = 58;
 const PB8LUMI_SIZE: usize = 344;
+const PK2_POLISHED_CRYSTAL_SIZE: usize = 73; // Is this accurate?
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
@@ -47,6 +48,7 @@ pub enum Tag {
     Pk3Ub = 0xfffd,
     Pb8Lumi = 0xfffc,
     Pk9Compass = 0xfffb,
+    Pk2PolishedCrystal = 0xfffa
 }
 
 impl Tag {
@@ -108,6 +110,7 @@ impl From<PkmFormat> for Option<Tag> {
             PkmFormat::PK3UB => Some(Tag::Pk3Ub),
             PkmFormat::PB8LUMI => Some(Tag::Pb8Lumi),
             PkmFormat::PK9Compass => Some(Tag::Pk9Compass),
+            PkmFormat::PK2PolishedCrystal => Some(Tag::Pk2PolishedCrystal)
         }
     }
 }
@@ -133,6 +136,7 @@ impl Tag {
             Self::Pk3Ub => PK3CFRU_PARTY_SIZE,
             Self::Pb8Lumi => PB8LUMI_SIZE,
             Self::Pk9Compass => PK9_SIZE,
+          Tag::Pk2PolishedCrystal => PK2_POLISHED_CRYSTAL_SIZE
         }
     }
 }
@@ -157,6 +161,7 @@ pub enum StoredPkmBytes {
     Pk3Ub([u8; PK3CFRU_PARTY_SIZE]),
     Pb8Lumi([u8; PB8_SIZE]),
     Pk9Compass([u8; PK9_SIZE]),
+    Pk2PolishedCrystal([u8; PK2_POLISHED_CRYSTAL_SIZE])
 }
 
 const LENGTH_CHECKED_MESSAGE: &str = "data length checked above";
@@ -182,6 +187,7 @@ impl StoredPkmBytes {
             Self::Pk3Ub(bytes) => bytes,
             Self::Pb8Lumi(bytes) => bytes,
             Self::Pk9Compass(bytes) => bytes,
+            Self::Pk2PolishedCrystal(bytes) => bytes
         };
         bytes
     }
@@ -206,6 +212,7 @@ impl StoredPkmBytes {
             Self::Pk3Ub(_) => Tag::Pk3Ub,
             Self::Pb8Lumi(_) => Tag::Pb8Lumi,
             Self::Pk9Compass(_) => Tag::Pk9Compass,
+          StoredPkmBytes::Pk2PolishedCrystal(_) => Tag::Pk2PolishedCrystal
         }
     }
 
@@ -237,6 +244,7 @@ impl StoredPkmBytes {
             Tag::Pk3Ub => Ok(Self::Pk3Ub(copy_to_sized_array(data))),
             Tag::Pb8Lumi => Ok(Self::Pb8Lumi(copy_to_sized_array(data))),
             Tag::Pk9Compass => Ok(Self::Pk9Compass(copy_to_sized_array(data))),
+          Tag::Pk2PolishedCrystal => Ok(Self::Pk2PolishedCrystal(copy_to_sized_array(data))),
         }
     }
 
