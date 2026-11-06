@@ -45,6 +45,7 @@ pub enum PkmFormat {
     PK3UB,
     PB8LUMI,
     PK9Compass,
+    PK2PolishedCrystal
 }
 
 impl PkmFormat {

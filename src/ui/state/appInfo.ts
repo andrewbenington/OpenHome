@@ -27,6 +27,7 @@ import { MonDisplayState } from '@openhome-ui/hooks/monDisplay'
 import { SaveViewMode } from '@openhome-ui/saves/util'
 import { updateStyleForUiScale } from '@openhome-ui/util/style'
 import { Dispatch, Reducer, createContext } from 'react'
+import {G2PolishedCrystalSAV} from "@openhome-core/save/rom_hacks/polished_crystal/G2PolishedCrystalSAV.ts";
 
 const ScarletViolet = ScarletVioletSave
 
@@ -50,8 +51,9 @@ export const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
   LegendsArceusSave,
   ScarletViolet,
   LegendsZaSave,
+
 ]
-const EXTRA_SAVE_TYPES = [G3RRSAV, G3UBSAV, G8LumiSAV, CompassSave]
+const EXTRA_SAVE_TYPES = [G3RRSAV, G3UBSAV, G8LumiSAV, CompassSave, G2PolishedCrystalSAV]
 
 function initialMonDisplayState(): MonDisplayState {
   return {
