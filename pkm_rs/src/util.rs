@@ -1,7 +1,3 @@
-use zerocopy::{FromBytes, Unaligned};
-
-use crate::result::StdResult;
-
 pub fn get_flag(bytes: &[u8], byte_offset: usize, bit_index: usize) -> bool {
     let byte_index = byte_offset + (bit_index / 8);
     if byte_index >= bytes.len() {
@@ -97,6 +93,11 @@ mod tests {
         );
     }
 }
+
+#[cfg(feature = "wasm")]
+use crate::result::StdResult;
+#[cfg(feature = "wasm")]
+use zerocopy::{FromBytes, Unaligned};
 
 #[cfg(feature = "wasm")]
 /// Reinterprets an owned byte buffer as a `Box<T>` without copying.
