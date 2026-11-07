@@ -120,6 +120,9 @@ pub enum ExtraFormIndex {
     LokixSevii,
 
     DialgaPrimal,
+
+    /* Emerald Expansion */
+    LugiaShadow,
 }
 
 impl ExtraFormIndex {
@@ -382,6 +385,8 @@ impl ExtraFormIndex {
             Self::LokixSevii => "Seviian Lokix",
 
             Self::DialgaPrimal => "Primal Dialga",
+
+            Self::LugiaShadow => "Shadow Lugia",
         }
         .to_owned()
     }
@@ -467,6 +472,8 @@ impl ExtraFormIndex {
                 Self::LokixSevii => "lokix-sevii",
 
                 // Self::DialgaPrimal => "dialga-primal",
+
+                // Self::LugiaShadow => "lugia-shadow"
                 _ => return None,
             }
             .to_owned(),
@@ -519,6 +526,7 @@ impl ExtraFormIndex {
             Self::TeddiursaSevii => NationalDex::Teddiursa,
             Self::UrsaringSevii => NationalDex::Ursaring,
             Self::MantineSevii => NationalDex::Mantine,
+            Self::LugiaShadow => NationalDex::Lugia,
             Self::FeebasSevii => NationalDex::Feebas,
             Self::MiloticSevii => NationalDex::Milotic,
             Self::CarnivineSevii => NationalDex::Carnivine,

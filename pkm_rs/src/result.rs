@@ -3,7 +3,7 @@ use crate::encryption::swish_crypto::SwishError;
 use crate::sectioned_data;
 
 use pkm_rs_resources::species::SpeciesForm;
-use pkm_rs_types::{InvalidAbilityNumber, NationalDex};
+use pkm_rs_types::{InvalidAbilityNumberU2, InvalidAbilityNumberU3, NationalDex};
 
 use serde::{Serialize, Serializer};
 use std::fmt::Display;
@@ -69,7 +69,9 @@ pub enum Error {
     #[error("Invalid ability index {0} (must be between 1 and 3)")]
     AbilityIndex(u16),
     #[error(transparent)]
-    AbilityNumber(#[from] InvalidAbilityNumber),
+    AbilityNumberU2(#[from] InvalidAbilityNumberU2),
+    #[error(transparent)]
+    AbilityNumberU3(#[from] InvalidAbilityNumberU3),
     #[error("error reading field {field}: {source}")]
     FieldError {
         field: &'static str,
@@ -162,6 +164,7 @@ pub enum PokemonIndexType {
     ScarletViolet,
     Gen3RR,
     Gen3UB,
+    Gen3Expn,
 }
 
 impl Display for PokemonIndexType {
@@ -178,6 +181,7 @@ impl Display for PokemonIndexType {
             PokemonIndexType::ScarletViolet => "Scarlet/Violet",
             PokemonIndexType::Gen3RR => "Radical Red",
             PokemonIndexType::Gen3UB => "Unbound",
+            PokemonIndexType::Gen3Expn => "Emerald Expn.",
         })
     }
 }

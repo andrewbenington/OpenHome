@@ -1,4 +1,4 @@
-use arbitrary_int::{u3, u4};
+use arbitrary_int::{u2, u3, u4};
 use chrono::Datelike;
 use serde::{Deserialize, Serialize, Serializer};
 
@@ -915,12 +915,12 @@ pub enum AbilityNumber {
 impl AbilityNumber {
     pub const fn from_u8_first_three_bits(
         byte: u8,
-    ) -> core::result::Result<Self, InvalidAbilityNumber> {
+    ) -> core::result::Result<Self, InvalidAbilityNumberU3> {
         match byte & 0b111 {
             1 => Ok(Self::First),
             2 => Ok(Self::Second),
             4 => Ok(Self::Hidden),
-            invalid => Err(InvalidAbilityNumber(u3::new(invalid))),
+            invalid => Err(InvalidAbilityNumberU3(u3::new(invalid))),
         }
     }
 
@@ -933,22 +933,39 @@ impl AbilityNumber {
     }
 }
 
-impl TryFrom<u3> for AbilityNumber {
-    type Error = InvalidAbilityNumber;
+impl TryFrom<u2> for AbilityNumber {
+    type Error = InvalidAbilityNumberU2;
 
-    fn try_from(value: u3) -> core::result::Result<Self, InvalidAbilityNumber> {
+    fn try_from(value: u2) -> core::result::Result<Self, InvalidAbilityNumberU2> {
+        match value.value() {
+            1 => Ok(Self::First),
+            2 => Ok(Self::Second),
+            3 => Ok(Self::Hidden),
+            _ => Err(InvalidAbilityNumberU2(value)),
+        }
+    }
+}
+
+impl TryFrom<u3> for AbilityNumber {
+    type Error = InvalidAbilityNumberU3;
+
+    fn try_from(value: u3) -> core::result::Result<Self, InvalidAbilityNumberU3> {
         match value.value() {
             1 => Ok(Self::First),
             2 => Ok(Self::Second),
             4 => Ok(Self::Hidden),
-            _ => Err(InvalidAbilityNumber(value)),
+            _ => Err(InvalidAbilityNumberU3(value)),
         }
     }
 }
 
 #[derive(Debug, Clone, Copy, thiserror::Error)]
 #[error("invalid ability number: {0}")]
-pub struct InvalidAbilityNumber(pub u3);
+pub struct InvalidAbilityNumberU2(pub u2);
+
+#[derive(Debug, Clone, Copy, thiserror::Error)]
+#[error("invalid ability number: {0}")]
+pub struct InvalidAbilityNumberU3(pub u3);
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Clone, Copy, Default, Serialize, PartialEq, Eq)]

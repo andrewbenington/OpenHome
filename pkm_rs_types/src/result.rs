@@ -4,7 +4,7 @@ use std::fmt::Display;
 
 use serde::{Serialize, Serializer};
 
-use crate::InvalidAbilityNumber;
+use crate::InvalidAbilityNumberU3;
 
 #[derive(Debug, Clone)]
 pub enum Error {
@@ -20,7 +20,7 @@ pub enum Error {
     NationalDex {
         national_dex: u16,
     },
-    AbilityNumber(InvalidAbilityNumber),
+    AbilityNumber(InvalidAbilityNumberU3),
     LanguageIndex {
         language_index: u8,
     },
@@ -46,7 +46,7 @@ impl Display for Error {
                 NationalDex::MAX
             )
             .to_owned(),
-            Self::AbilityNumber(InvalidAbilityNumber(num)) => {
+            Self::AbilityNumber(InvalidAbilityNumberU3(num)) => {
                 format!("Invalid ability number {num} (must be between 1 and 3)")
             }
             Self::LanguageIndex { language_index } => {
@@ -66,8 +66,8 @@ impl Display for Error {
 
 impl std::error::Error for Error {}
 
-impl From<InvalidAbilityNumber> for Error {
-    fn from(value: InvalidAbilityNumber) -> Self {
+impl From<InvalidAbilityNumberU3> for Error {
+    fn from(value: InvalidAbilityNumberU3) -> Self {
         Self::AbilityNumber(value)
     }
 }
