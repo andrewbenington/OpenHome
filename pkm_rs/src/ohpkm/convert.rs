@@ -13,6 +13,7 @@ use crate::convert_strategy::ConvertStrategy;
 use crate::ohpkm::v2_sections::LearnedMoves;
 use crate::ohpkm::v2_sections::LegendsArceusData;
 use crate::ohpkm::v2_sections::LegendsZaData;
+use crate::ohpkm::v2_sections::PluginData;
 use crate::ohpkm::v2_sections::ScarletVioletData;
 use crate::ohpkm::v2_sections::SwordShieldData;
 use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
@@ -45,6 +46,10 @@ pub trait OhpkmConvert: Pkm {
     }
 
     fn to_learned_moves(&self) -> Option<LearnedMoves> {
+        None
+    }
+
+    fn to_plugin_data(&self) -> Option<PluginData> {
         None
     }
 

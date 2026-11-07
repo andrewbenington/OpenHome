@@ -1,15 +1,22 @@
 import { PluginPKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import PK9 from '@openhome-core/pkm/PK9'
-import { PkmConstructorOptions } from '@openhome-core/pkm/PKM'
+import { PkmConstructorOptions, WasmPkmInterface } from '@openhome-core/pkm/PKM'
 import { modernStatCalc } from '@openhome-core/pkm/util'
 import { Errorable, R } from '@openhome-core/util/functional'
-import { ConvertStrategy, OriginGames, Pk9Wasm, PkmFormat } from '@pkm-rs/pkg'
+import {
+  CompassPk9Wasm,
+  ConvertStrategy,
+  OhpkmWasm,
+  OriginGames,
+  Pk9Wasm,
+  PkmFormat,
+} from '@pkm-rs/pkg'
 import { PluginIdentifier } from '../interfaces'
 
 const COMPASS_PLUGIN_ID = 'compass'
 
-export default class PK9Compass extends PK9 implements PluginPKMInterface {
+export default class PK9Compass extends PK9 implements PluginPKMInterface, WasmPkmInterface {
   static getFormat(): PkmFormat {
     return 'PK9Compass'
   }
@@ -45,6 +52,10 @@ export default class PK9Compass extends PK9 implements PluginPKMInterface {
 
   static fromWasm(pk9: Pk9Wasm): PK9Compass {
     return new PK9Compass(pk9, {})
+  }
+
+  intoOhpkmWasm(): OhpkmWasm {
+    return CompassPk9Wasm.fromPk9Wasm(this.inner).toOhpkm()
   }
 
   public getStats() {
