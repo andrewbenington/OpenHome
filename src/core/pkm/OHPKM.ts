@@ -1127,6 +1127,8 @@ function monFormatToOriginalDataTag(format: PkmFormat): Option<Tag> {
       return Tag.Pb7
     case 'PK8':
       return Tag.Pk8
+    case 'PH4':
+      return Tag.Ph4
     case 'PA8':
       return Tag.Pa8
     case 'PB8':
@@ -1171,6 +1173,8 @@ export function originalDataTagToMonFormat(tag: Tag): PkmFormat {
       return 'PB7'
     case Tag.Pk8:
       return 'PK8'
+    case Tag.Ph4:
+      return 'PH4'
     case Tag.Pa8:
       return 'PA8'
     case Tag.Pb8:

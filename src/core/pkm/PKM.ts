@@ -11,6 +11,7 @@ import PA8 from './PA8'
 import PA9 from './PA9'
 import PB7 from './PB7'
 import PB8 from './PB8'
+import PH4 from './PH4'
 import PK1 from './PK1'
 import PK2 from './PK2'
 import PK3 from './PK3'
@@ -38,6 +39,7 @@ export type PKM =
   | PB8
   | PK9
   | PA9
+  | PH4
 
 export interface WasmPkmInterface extends PKMInterface {
   intoOhpkmWasm(): OhpkmWasm
@@ -46,7 +48,7 @@ type WasmPkmClass = {
   new (arg: OHPKM, options: PkmConstructorOptions): WasmPkmInterface
 }
 
-const WasmPkmFormats: WasmPkmClass[] = [PK3, PK7, PK8, PK9, PK9Compass]
+const WasmPkmFormats: WasmPkmClass[] = [PK3, PK7, PK8, PK9, PH4, PK9Compass]
 
 export type WasmPkmFormat = InstanceType<(typeof WasmPkmFormats)[number]>
 export function isWasmFormat(pkm: PKMInterface): pkm is WasmPkmFormat {

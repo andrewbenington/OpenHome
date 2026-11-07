@@ -7,6 +7,7 @@ use crate::sectioned_data::DataSection;
 use crate::traits::IsShiny4096;
 use crate::util;
 
+use arrayref::array_ref;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::lookup;
@@ -245,6 +246,16 @@ impl MainDataV2 {
         self.species_and_form.get_ndex()
     }
 
+    pub const fn is_alpha(&self) -> bool {
+        self.ribbons
+            .includes_raw_modern(ModernRibbon::AlphaMark as usize)
+    }
+
+    pub const fn set_is_alpha(&mut self, v: bool) {
+        self.ribbons
+            .set_raw_modern(ModernRibbon::AlphaMark as usize, v)
+    }
+
     pub const fn with_timestamp_if_missing(
         &mut self,
         started_tracking_seconds: Option<NonZeroU64>,
@@ -473,25 +484,25 @@ impl DataSection for MainDataV2 {
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
         Self::ensure_buffer_size(bytes);
 
-        let home_tracker_raw = u64::from_le_bytes(bytes[172..180].try_into().unwrap());
+        let home_tracker_raw = u64::from_le_bytes(*array_ref![bytes, 172, 8]);
 
-        let personality_value = u32::from_le_bytes(bytes[0..4].try_into().unwrap());
-        let trainer_id = u16::from_le_bytes(bytes[12..14].try_into().unwrap());
-        let secret_id = u16::from_le_bytes(bytes[14..16].try_into().unwrap());
-        let national_dex = NationalDex::from_le_bytes(bytes[8..10].try_into().unwrap())?;
+        let personality_value = u32::from_le_bytes(*array_ref![bytes, 0, 4]);
+        let trainer_id = u16::from_le_bytes(*array_ref![bytes, 12, 2]);
+        let secret_id = u16::from_le_bytes(*array_ref![bytes, 14, 2]);
+        let national_dex = NationalDex::from_le_bytes(*array_ref![bytes, 8, 2])?;
 
         // try_into() will always succeed if the buffer range size is correct.
         // if incorrect, it is a fatal coding flaw and will always panic.
         let data = Self {
             personality_value,
-            encryption_constant: u32::from_le_bytes(bytes[4..8].try_into().unwrap()),
+            encryption_constant: u32::from_le_bytes(*array_ref![bytes, 4, 4]),
             species_and_form: SpeciesForm::new_valid_ndex(
                 national_dex,
-                u16::from_le_bytes(bytes[10..12].try_into().unwrap()),
+                u16::from_le_bytes(*array_ref![bytes, 10, 2]),
             )?,
             trainer_id,
             secret_id,
-            exp: u32::from_le_bytes(bytes[16..20].try_into().unwrap()),
+            exp: u32::from_le_bytes(*array_ref![bytes, 16, 4]),
             ability_index: AbilityIndexBounded::try_from(u16::from_le_bytes(
                 bytes[20..22].try_into().unwrap(),
             ))?,
@@ -518,9 +529,9 @@ impl DataSection for MainDataV2 {
             },
             gender: Gender::from_u8(bytes[34]),
 
-            held_item_index: u16::from_le_bytes(bytes[36..38].try_into().unwrap()),
+            held_item_index: u16::from_le_bytes(*array_ref![bytes, 36, 2]),
             evs: Stats8::from_bytes(bytes[38..44].try_into().unwrap()),
-            contest: ContestStats::from_bytes(bytes[44..50].try_into().unwrap()),
+            contest: ContestStats::from_bytes(*array_ref![bytes, 44, 6]),
             pokerus: Pokerus::from_byte(bytes[50]),
             contest_memory_count: bytes[52],
             battle_memory_count: bytes[53],
@@ -530,24 +541,24 @@ impl DataSection for MainDataV2 {
                     source: e.into(),
                 },
             )?,
-            sociability: u32::from_le_bytes(bytes[76..80].try_into().unwrap()),
+            sociability: u32::from_le_bytes(*array_ref![bytes, 76, 4]),
             height_scalar: bytes[80],
             weight_scalar: bytes[81],
             scale: bytes[82],
             moves: MoveSlots::from_bytes(bytes, MOVE_DATA_OFFSETS, PpUpStorage::FourBytes),
-            nickname: SizedUtf16String::<26>::from_bytes(bytes[96..122].try_into().unwrap()),
+            nickname: SizedUtf16String::<26>::from_bytes(*array_ref![bytes, 96, 26]),
             egg_date: PokeDate::from_bytes_optional(bytes[122..125].try_into().unwrap()),
             met_date: PokeDate::from_bytes(bytes[125..128].try_into().unwrap()),
             met_level: bytes[128] & !0x80,
             egg_location_index: none_if_zero_u16(u16::from_le_bytes(
                 bytes[129..131].try_into().unwrap(),
             )),
-            met_location_index: u16::from_le_bytes(bytes[131..133].try_into().unwrap()),
+            met_location_index: u16::from_le_bytes(*array_ref![bytes, 131, 2]),
             relearn_moves: [
-                MoveSlot::from(u16::from_le_bytes(bytes[138..140].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[140..142].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[142..144].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[144..146].try_into().unwrap())),
+                MoveSlot::from(u16::from_le_bytes(*array_ref![bytes, 138, 2])),
+                MoveSlot::from(u16::from_le_bytes(*array_ref![bytes, 140, 2])),
+                MoveSlot::from(u16::from_le_bytes(*array_ref![bytes, 142, 2])),
+                MoveSlot::from(u16::from_le_bytes(*array_ref![bytes, 144, 2])),
             ],
             ivs: Ivs::from_30_bits(bytes[148..152].try_into().unwrap()),
             is_egg: util::get_flag(bytes, 148, 30),
@@ -564,17 +575,17 @@ impl DataSection for MainDataV2 {
             } else {
                 None
             },
-            handler_name: SizedUtf16String::<26>::from_bytes(bytes[184..210].try_into().unwrap()),
+            handler_name: SizedUtf16String::<26>::from_bytes(*array_ref![bytes, 184, 26]),
             handler_language: bytes[211].try_into().ok(),
             is_current_handler: util::get_flag(bytes, 212, 0),
             // resort_event_status: bytes[213],
-            handler_id: u16::from_le_bytes(bytes[214..216].try_into().unwrap()),
+            handler_id: u16::from_le_bytes(*array_ref![bytes, 214, 2]),
             handler_friendship: bytes[216],
             handler_memory: TrainerMemory {
                 intensity: bytes[217],
                 memory: bytes[218],
                 feeling: bytes[219],
-                text_variable: u16::from_le_bytes(bytes[220..222].try_into().unwrap()),
+                text_variable: u16::from_le_bytes(*array_ref![bytes, 220, 2]),
             },
             handler_affection: bytes[222],
             started_tracking_seconds: NonZeroU64::new(u64::from_le_bytes(
@@ -591,24 +602,24 @@ impl DataSection for MainDataV2 {
             // region: bytes[240],
             console_region: bytes[240],
             language: Language::try_from(bytes[242])?,
-            form_argument: u32::from_le_bytes(bytes[244..248].try_into().unwrap()),
+            form_argument: u32::from_le_bytes(*array_ref![bytes, 244, 4]),
             affixed_ribbon: ModernRibbon::from_affixed_byte(bytes[248]),
             // gap: 249
-            openhome_id: OpenHomeId::try_from_bytes(bytes[250..260].try_into().unwrap()).unwrap_or(
+            openhome_id: OpenHomeId::try_from_bytes(array_ref![bytes, 250, 10]).unwrap_or(
                 OpenHomeId::new(national_dex, trainer_id, secret_id, personality_value),
             ),
             // gap: 260-263
 
             // TODO: handle invalid values
-            extra_form: u64::from_le_bytes(bytes[264..272].try_into().unwrap())
+            extra_form: u64::from_le_bytes(*array_ref![bytes, 264, 8])
                 .try_into()
                 .ok(),
-            trainer_name: SizedUtf16String::<26>::from_bytes(bytes[272..298].try_into().unwrap()),
+            trainer_name: SizedUtf16String::<26>::from_bytes(*array_ref![bytes, 272, 26]),
             trainer_friendship: bytes[298],
             trainer_memory: TrainerMemory {
                 intensity: bytes[299],
                 memory: bytes[300],
-                text_variable: u16::from_le_bytes(bytes[301..303].try_into().unwrap()),
+                text_variable: u16::from_le_bytes(*array_ref![bytes, 301, 2]),
                 feeling: bytes[303],
             },
             trainer_affection: bytes[304],

@@ -23,6 +23,7 @@ import {
   FormMetadata,
   metadataReaderFor,
   MetadataSource,
+  MetadataSources,
   MetadataSummaryLookup,
   PkmFormat,
   PkmFormats,
@@ -152,7 +153,7 @@ export const getTypes = (mon: FormSpecifiersForFormat): PkmType[] => {
   const metadataReader =
     mon.format === 'OHPKM'
       ? currentMetadataReader(mon.nationalDex, mon.formIndex)
-      : metadataReaderFor(MetadataSourceByFormat(mon.format), mon.nationalDex, mon.formIndex)
+      : metadataReaderFor(MetadataSourceByFormat(mon.format, mon.nationalDex, mon.formIndex), mon.nationalDex, mon.formIndex)
 
   if (!metadataReader) {
     return ['Normal']
@@ -164,7 +165,7 @@ export const getTypes = (mon: FormSpecifiersForFormat): PkmType[] => {
   return type2 ? [type1, type2] : [type1]
 }
 
-function MetadataSourceByFormat(format: MonFormat): MetadataSource {
+function MetadataSourceByFormat(format: MonFormat, nationalDex: number, form: number): MetadataSource {
   switch (format) {
     case 'PK1':
       return MetadataSource.Yellow
@@ -191,6 +192,17 @@ function MetadataSourceByFormat(format: MonFormat): MetadataSource {
       return MetadataSource.BrilliantDiamondShiningPearl
     case 'PA8':
       return MetadataSource.LegendsArceus
+    case 'PH4':
+      if (MetadataSources.supportsForm(MetadataSource.ScarletViolet, nationalDex, form)) {
+        return MetadataSource.ScarletViolet
+      }
+      if (MetadataSources.supportsForm(MetadataSource.SwordShield, nationalDex, form)) {
+        return MetadataSource.SwordShield
+      }
+      if (MetadataSources.supportsForm(MetadataSource.BrilliantDiamondShiningPearl, nationalDex, form)) {
+        return MetadataSource.BrilliantDiamondShiningPearl
+      }
+      return MetadataSource.UltraSunUltraMoon
     case 'PK9':
     case 'PK3RR':
     case 'PK3UB':

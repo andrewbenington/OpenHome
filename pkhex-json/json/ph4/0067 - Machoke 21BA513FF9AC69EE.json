@@ -1,0 +1,160 @@
+{
+  "encryption_seed": 12755957026327584339,
+  "game_data_size": 67,
+  "encoded_data_size": 272,
+  "data_version": 4,
+  "checksum": 3741651474,
+  "core_data_size": 196,
+  "core_data": {
+    "home_tracker": 2430344284133419502,
+    "encryption_constant": 4028316641,
+    "is_bad_egg": false,
+    "species_and_form": {
+      "national_dex": 67,
+      "form_index": 0
+    },
+    "held_item_index": 0,
+    "trainer_id": 15102,
+    "secret_id": 48548,
+    "exp": 466464,
+    "is_favorite": false,
+    "markings": {
+      "circle": "unset",
+      "square": "unset",
+      "triangle": "unset",
+      "heart": "unset",
+      "star": "unset",
+      "diamond": "unset"
+    },
+    "personality_value": 57955667,
+    "nature": "Brave",
+    "is_fateful_encounter": false,
+    "gender": "Male",
+    "evs": {
+      "hp": 0,
+      "atk": 0,
+      "def": 0,
+      "spa": 0,
+      "spd": 0,
+      "spe": 0
+    },
+    "contest": {
+      "cool": 0,
+      "beauty": 0,
+      "cute": 0,
+      "smart": 0,
+      "tough": 0,
+      "sheen": 0
+    },
+    "ribbons": ["Alpha Mark"],
+    "contest_memory_count": 0,
+    "battle_memory_count": 0,
+    "form_argument": 0,
+    "nickname": "Machoke",
+    "nickname_trash": "4D006100630068006F006B006500000000000000000000000000",
+    "ivs": {
+      "hp": 31,
+      "atk": 31,
+      "def": 19,
+      "spa": 28,
+      "spd": 31,
+      "spe": 31
+    },
+    "is_egg": false,
+    "is_nicknamed": false,
+    "handler_name": "",
+    "handler_gender": "Male",
+    "is_current_handler": false,
+    "handler_friendship": 0,
+    "handler_memory": {
+      "intensity": 0,
+      "memory": 0,
+      "feeling": 0,
+      "textVariables": 0
+    },
+    "handler_id": 0,
+    "handler_language": "None",
+    "trainer_name": "Malik",
+    "trainer_friendship": 50,
+    "trainer_memory": {
+      "intensity": 0,
+      "memory": 0,
+      "feeling": 0,
+      "textVariables": 0
+    },
+    "egg_date": null,
+    "met_date": "2/1/2025",
+    "met_level": 77,
+    "trainer_gender": "Male",
+    "hyper_training": {
+      "hp": false,
+      "atk": false,
+      "def": false,
+      "spa": false,
+      "spd": false,
+      "spe": false
+    },
+    "game_of_origin": "LegendsArceus",
+    "game_of_origin_battle": null,
+    "language": "English",
+    "status_condition": 0,
+    "affixed_ribbon": null,
+    "height_scalar": 255,
+    "weight_scalar": 255,
+    "mint_nature": "Brave",
+    "current_hp": 0
+  },
+  "pb7_data": null,
+  "pa8_data": {
+    "ability_index": "Guts",
+    "ability_num": "First",
+    "moves": [
+      {
+        "move_index": "Rock Smash",
+        "pp": 20,
+        "pp_ups": 0
+      },
+      {
+        "move_index": "Close Combat",
+        "pp": 5,
+        "pp_ups": 0
+      },
+      {
+        "move_index": "Double-Edge",
+        "pp": 5,
+        "pp_ups": 0
+      },
+      {
+        "move_index": "Bulk Up",
+        "pp": 10,
+        "pp_ups": 0
+      }
+    ],
+    "relearn_moves": [
+      "\u003Cempty\u003E",
+      "\u003Cempty\u003E",
+      "\u003Cempty\u003E",
+      "\u003Cempty\u003E"
+    ],
+    "is_alpha": true,
+    "is_noble": false,
+    "alpha_move": "Rock Smash",
+    "scale": 255,
+    "height_absolute": "180.00000",
+    "weight_absolute": "1015.20001",
+    "egg_location_index": 0,
+    "met_location_index": 150,
+    "ball": "Gigaton",
+    "pokerus": 0,
+    "gvs": {
+      "hp": 0,
+      "atk": 0,
+      "def": 0,
+      "spa": 0,
+      "spd": 0,
+      "spe": 0
+    },
+    "tutor_flags_la": [],
+    "master_flags_la": [5, 16]
+  }
+}
