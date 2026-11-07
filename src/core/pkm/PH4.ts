@@ -8,6 +8,7 @@ import {
   Language,
   ModernRibbon,
   NatureIndex,
+  OhpkmWasm,
   OriginGame,
   OriginGames,
   PkhPa9DataWasm,
@@ -55,6 +56,10 @@ export default class PH4 {
 
   static fromWasm(pkh: PkhWasm): PH4 {
     return new PH4(pkh, {})
+  }
+
+  intoOhpkmWasm(): OhpkmWasm {
+    return this.inner.toOhpkm()
   }
 
   get dataVersion() {
