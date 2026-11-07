@@ -20,6 +20,7 @@ import PK6 from './PK6'
 import PK7 from './PK7'
 import PK8 from './PK8'
 import PK9 from './PK9'
+import { PkmConstructorOptions } from './types'
 import XDPKM from './XDPKM'
 
 export type PKM =
