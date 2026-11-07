@@ -11,7 +11,7 @@ import { ConvertStrategy, ExtraFormIndex, Language, OriginGame } from '@pkm-rs/p
 import { OHPKM } from '../pkm/OHPKM'
 import { Errorable, Option } from '../util/functional'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
-import { LookupType } from './util'
+import { LookupType } from './types'
 import { PathData } from './util/path'
 
 const PKM_BOX_SIZE = 136

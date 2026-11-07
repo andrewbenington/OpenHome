@@ -29,9 +29,9 @@ mod pk9_buffer;
 #[cfg(feature = "wasm")]
 mod pokemon_index;
 #[cfg(feature = "wasm")]
-mod save_blocks;
-#[cfg(feature = "wasm")]
 mod sv_save;
+#[cfg(feature = "wasm")]
+mod sv_save_blocks;
 #[cfg(feature = "wasm")]
 mod wasm;
 

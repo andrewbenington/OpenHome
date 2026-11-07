@@ -18,7 +18,7 @@ import {
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
-import { LookupType } from './util'
+import { LookupType } from './types'
 import { emptyPathData, PathData } from './util/path'
 
 const CURRENT_BOX_OFFSET_GS_INTL = 0x2724

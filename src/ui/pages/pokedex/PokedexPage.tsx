@@ -30,12 +30,9 @@ import PokedexLearnset from './PokedexLearnset'
 import PokedexLeftColumn from './PokedexLeftColumn'
 import PokedexSidebar from './PokedexSidebar'
 import PokedexSummary from './PokedexSummary'
-import { isExtraFormMetadata } from './util'
+import { isExtraFormMetadata, MOST_CURRENT_SOURCE, MostCurrentSource } from './util'
 
 type PokedexView = 'summary' | 'levelup' | 'games'
-
-export const MOST_CURRENT_SOURCE = '$CURRENT'
-export type MostCurrentSource = typeof MOST_CURRENT_SOURCE
 
 export default function PokedexPage() {
   const pokedexState = usePokedex()

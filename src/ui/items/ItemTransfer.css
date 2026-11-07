@@ -1,0 +1,35 @@
+.save-items-display {
+  overflow: hidden;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.items-modal {
+  max-height: 100vh;
+  overflow-y: hidden;
+
+  --content-height: 34rem;
+
+  width: fit-content;
+  max-width: 80vw;
+  width: 50rem;
+
+  overflow: hidden;
+  padding: 0;
+  border-radius: var(--border-radius-lg);
+  background: var(--background-gradient);
+  box-sizing: border-box;
+}
+
+.item-transfer-card {
+  background-color: var(--color-sidebar);
+  padding: 0.25rem;
+  box-shadow:
+    rgba(0, 0, 0, 0.3) 0px 3px 12px,
+    rgba(0, 0, 0, 0.23) 0px 3px 6px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  grid-column: 1 / span 2;
+}

@@ -1,3 +1,4 @@
+import shutil
 import json
 import logging
 import os
@@ -37,24 +38,27 @@ def getPokeSpriteMap():
         print("Error fetching item map. Status code:", response.status_code)
         sys.exit()
 
-
-def image_src_from_columns(columns: ResultSet[Tag]):
+def image_uri_from_columns(columns: ResultSet[Tag]):
     if (
         len(columns) >= 3
         and (image := columns[2].find("img"))
         and (sprite_uri := image["src"])
         and (sprite_uri and isinstance(sprite_uri, str))
     ):
-        return "https:" + sprite_uri
+        return sprite_uri
+
+def image_src_from_columns(columns: ResultSet[Tag]):
+    return ("https:" + sprite_uri) if (sprite_uri := image_uri_from_columns(columns)) else None
 
 
 def scrape_bulbapedia_gen_9():
     # Set the URL of the Bulbapedia page
-    url = "https://bulbapedia.bulbagarden.net/wiki/List_of_items_by_index_number_(Generation_IX)"
+    contents: str
+    with open("generate/scrape-assets/downloaded-pages/items-gen9.html") as f:
+        contents = f.read()
 
     # Send a GET request to the page and parse the HTML content using BeautifulSoup
-    response = requests.get(url)
-    soup = BeautifulSoup(response.content, "html.parser")
+    soup = BeautifulSoup(contents, "html.parser")
 
     # Find the table on the page
     table = soup.find("table", class_="sortable")
@@ -69,32 +73,32 @@ def scrape_bulbapedia_gen_9():
 
         cells = row.find_all("td")
 
-        sprite_src = image_src_from_columns(cells)
-        if not sprite_src:
+        sprite_src = image_uri_from_columns(cells)
+        if not sprite_src or "Bag_None_SV_Sprite" in sprite_src: # skip empty icons
             continue
+        
+        sprite_src = f"generate/scrape-assets/downloaded-pages/{sprite_src}"
 
         # Extract the item index, name, and type
         filename = f"{int(cells[0].text.strip()):04}.png"
-        sprite_src = image_src_from_columns(cells)
-        if not sprite_src:
-            continue
+            
 
         name = cells[3].text.strip()
-        directory = "src/renderer/public/items/index/"
+        directory = "public/items/index/"
         if name.startswith("TM") and "Bag_TM_" in sprite_src:
-            directory = "src/renderer/public/items/tm/"
+            directory = "public/items/tm/"
             filename = sprite_src.split("Bag_TM_")[1].split("_")[0].lower() + ".png"
         elif "TM_Material_Sprite" in sprite_src:
-            directory = "src/renderer/public/items/shared"
+            directory = "public/items/shared"
             filename = "tm-material.png"
         elif "Picnic_Set" in sprite_src:
-            directory = "src/renderer/public/items/shared"
+            directory = "public/items/shared"
             filename = "picnic-set.png"
         elif "Bag_None_Sprite" in sprite_src:
             continue
 
         thread = threading.Thread(
-            target=download_png, args=(sprite_src, directory, filename)
+            target=copy_png, args=(sprite_src, directory, filename)
         )
         thread.start()
 
@@ -273,6 +277,23 @@ def scrape_bulbapedia_mega_stones():
         )
         thread.start()
 
+def copy_png(sprite_path: str, directory: str, filename: str, overwrite=False):
+    # Check if the file already exists in the directory
+    if not overwrite and os.path.isfile(os.path.join(directory, filename)):
+        # print(f"{filename} already exists in {directory}")
+        return False, False
+
+    print(f"Copying {filename} from {sprite_path}...")
+    
+    
+    try:
+        shutil.copy2(sprite_path, f"{directory}/{filename}")
+        print(f"\tCopied {filename} to {directory}")
+        return True, False
+    except Exception as e:  # noqa: BLE001
+        print(f"\tError copying: {e}")
+        return True, False
+
 
 def download_png(url, directory, filename, overwrite=False):
     # Check if the file already exists in the directory
@@ -293,9 +314,9 @@ def download_png(url, directory, filename, overwrite=False):
         return True, "404" not in str(e)
 
 
-# scrape_bulbapedia_gen_9()
+scrape_bulbapedia_gen_9()
 # scrape_bulbapedia_gen_8()
 # scrape_bulbapedia_gen_3()
-scrape_bulbapedia_mega_stones()
+# scrape_bulbapedia_mega_stones()
 # print(POKEMON_DATA["19"]["forms"][1])
 # print(exclude_forme_gen8(19, POKEMON_DATA["19"]["forms"][1]))

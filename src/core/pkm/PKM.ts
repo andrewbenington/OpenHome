@@ -20,6 +20,7 @@ import PK6 from './PK6'
 import PK7 from './PK7'
 import PK8 from './PK8'
 import PK9 from './PK9'
+import { PkmConstructorOptions } from './types'
 import XDPKM from './XDPKM'
 
 export type PKM =
@@ -60,16 +61,6 @@ export type PkmClass<P extends PKMInterface> = {
   fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<P>
   getFormat(): PkmFormat
 }
-
-export type PkmConstructorOptions =
-  | {
-      encrypted?: boolean
-      strategy?: never
-    }
-  | {
-      encrypted?: never
-      strategy: ConvertStrategy
-    }
 
 export function isRomHackFormat(format: string): format is 'PK3RR' | 'PK3UB' | 'PB8LUMI' {
   return format === 'PK3RR' || format === 'PK3UB' || format === 'PB8LUMI'
