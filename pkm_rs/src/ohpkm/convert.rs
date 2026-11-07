@@ -8,6 +8,7 @@ mod pk8;
 mod pk9;
 
 use crate::convert_strategy::ConvertStrategy;
+use crate::ohpkm::v2_sections::PluginData;
 use crate::ohpkm::v2_sections::ScarletVioletData;
 use crate::ohpkm::v2_sections::SwordShieldData;
 use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
@@ -28,6 +29,10 @@ pub trait OhpkmConvert: Pkm {
     }
 
     fn to_sv_data(&self) -> Option<ScarletVioletData> {
+        None
+    }
+
+    fn to_plugin_data(&self) -> Option<PluginData> {
         None
     }
 

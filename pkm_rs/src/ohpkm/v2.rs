@@ -189,7 +189,7 @@ impl SectionTag for OhpkmSectionTag {
 
 #[derive(Default, Debug, Clone, Serialize)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = OhpkmWasm))]
 pub struct OhpkmV2 {
     main_data: MainDataV2,
     gameboy_data: Option<GameboyData>,
@@ -223,7 +223,18 @@ impl OhpkmV2 {
             gen67_data: other.to_gen_67_data(),
             swsh_data: other.to_swsh_data(),
             sv_data: other.to_sv_data(),
-            ..Default::default()
+            gameboy_data: None,
+            gen45_data: None,
+            la_data: None,
+            lza_data: None,
+            handler_data: Vec::new(),
+            learned_moves: None,
+            plugin_data: other.to_plugin_data(),
+            notes: None,
+            most_recent_save: None,
+            tags: None,
+            original_data: None,
+            unconverted_pkm: None,
         };
 
         ohpkm.regenerate_openhome_id();
@@ -1971,7 +1982,7 @@ impl From<&OhpkmV2> for PidGenerationParameters {
 }
 
 #[cfg(feature = "wasm")]
-#[wasm_bindgen]
+#[wasm_bindgen(js_class = OhpkmWasm)]
 #[allow(clippy::missing_const_for_fn)]
 impl OhpkmV2 {
     #[wasm_bindgen(constructor)]

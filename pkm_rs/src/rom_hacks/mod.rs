@@ -16,6 +16,7 @@ use std::str::FromStr;
     serde::Deserialize,
     specta::Type,
     strum::EnumString,
+    strum::Display,
 )]
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]

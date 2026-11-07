@@ -14,6 +14,7 @@ import {
   MetadataSummaryLookup,
   ModernRibbon,
   NatureIndex,
+  OhpkmWasm,
   OriginGame,
   Pk8Wasm,
   PokeDate,
@@ -66,6 +67,10 @@ export default class PK8 {
 
   static fromWasm(pk8: Pk8Wasm): PK8 {
     return new PK8(pk8, {})
+  }
+
+  intoOhpkmWasm(): OhpkmWasm {
+    return this.inner.toOhpkm()
   }
 
   get encryptionConstant() {

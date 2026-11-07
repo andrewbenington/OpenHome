@@ -13,6 +13,7 @@ import {
   MetadataSummaryLookup,
   ModernRibbon,
   NatureIndex,
+  OhpkmWasm,
   OriginGame,
   Pk9Wasm,
   PkmFormat,
@@ -20,11 +21,11 @@ import {
   SpeciesLookup,
   TeraType,
 } from '@pkm-rs/pkg'
-import { PkmConstructorOptions } from './PKM'
+import { PkmConstructorOptions, WasmPkmInterface } from './PKM'
 import * as encryption from './util/encryption'
 import { convertPokeDate, convertPokeDateOptional } from './wasm/convert'
 
-export default class PK9 {
+export default class PK9 implements WasmPkmInterface {
   format: PkmFormat = 'PK9'
 
   inner: Pk9Wasm
@@ -63,6 +64,10 @@ export default class PK9 {
 
   static fromWasm(pk9: Pk9Wasm): PK9 {
     return new PK9(pk9, {})
+  }
+
+  intoOhpkmWasm(): OhpkmWasm {
+    return this.inner.toOhpkm()
   }
 
   get encryptionConstant() {
