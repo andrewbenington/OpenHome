@@ -21,6 +21,7 @@ public static class PkhObject
             core_data = PkhCoreDataObject.Build(pk.Core),
 
             pb7_data = PkhPb7Object.Build(pk.DataPB7),
+            pk8_data = PkhPk8Object.Build(pk.DataPK8),
             pa8_data = PkhPa8Object.Build(pk.DataPA8)
         };
     }

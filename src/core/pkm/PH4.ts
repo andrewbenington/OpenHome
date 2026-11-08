@@ -20,11 +20,12 @@ import {
   PokeDate,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
+import { PKMInterface } from './interfaces'
 import { OHPKM } from './OHPKM'
 import { PkmConstructorOptions } from './types'
 import { convertPokeDate, convertPokeDateOptional } from './wasm/convert'
 
-export default class PH4 {
+export default class PH4 implements PKMInterface {
   format = 'PH4' as const
   inner: PkhWasm
 
@@ -923,6 +924,12 @@ export default class PH4 {
 
   static maxValidBall() {
     return 26
+  }
+
+  extraDisplayFields(): Record<string, string | number | boolean> {
+    return {
+      'PKH sections': this.inner.getPresentSections().join(', '),
+    }
   }
 }
 

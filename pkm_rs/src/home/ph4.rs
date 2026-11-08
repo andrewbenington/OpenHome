@@ -62,7 +62,6 @@ pub struct Ph4 {
 
     // game data
     pub pb7_data: Option<HomePb7Data>,
-    #[serde(skip)] // TODO: uncomment to include in pkhex json test
     pub pk8_data: Option<HomePk8Data>,
     pub pa8_data: Option<HomePa8Data>,
     #[serde(skip)] // TODO: uncomment to include in pkhex json test
@@ -453,6 +452,35 @@ impl Ph4 {
     #[wasm_bindgen(js_name = calculateStats)]
     pub fn calculate_stats_wasm(&self) -> TsResult<Stats16Le> {
         self.calculate_stats().try_into_ts()
+    }
+
+    #[wasm_bindgen(js_name = getPresentSections)]
+    pub fn get_present_section_names(&self) -> Vec<String> {
+        let mut names: Vec<String> = Vec::new();
+
+        if self.pb7_data.is_some() {
+            names.push("Let's Go Pikachu/Eevee".to_owned());
+        }
+        if self.pk8_data.is_some() {
+            names.push("Sword/Shield".to_owned());
+        }
+        if self.pb8_data.is_some() {
+            names.push("Brilliant Diamond/Shining Pearl".to_owned());
+        }
+        if self.pa8_data.is_some() {
+            names.push("Legends: Arceus".to_owned());
+        }
+        if self.pk9_data.is_some() {
+            names.push("Scarlet/Violet".to_owned());
+        }
+        if self.pa9_data.is_some() {
+            names.push("Legends: Z-A".to_owned());
+        }
+        if self.pc9_data.is_some() {
+            names.push("Champions".to_owned());
+        }
+
+        names
     }
 
     // Core data
