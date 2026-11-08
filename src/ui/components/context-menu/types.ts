@@ -4,7 +4,13 @@ import { NowOrLater } from '@openhome-core/util/promise'
 import React, { ReactNode } from 'react'
 import PokemonIcon from '../PokemonIcon'
 
-export type Element = ItemData | Separator | LabelData | SubmenuData | CheckboxData
+export type Element =
+  | ItemData
+  | LoadingItemData
+  | Separator
+  | LabelData
+  | SubmenuData
+  | CheckboxData
 
 type SingleElementBuilder = () => Element
 
@@ -71,54 +77,49 @@ export class Item implements CtxMenuElementBuilder {
 
 // //* LOADING ITEM *//
 
-// type LoadingItemData = {
-//   content: ElementContent
-//   action?: () => void
-//   disabled: boolean
-//   __cm_type_tag: 'item'
-// }
+type LoadingItemData = {
+  content: ElementContent
+  action?: () => Promise<void>
+  disabled: boolean
+  __cm_type_tag: 'loading_item'
+}
 
-// export class LoadingItem implements CtxMenuElementBuilder {
-//   content: ElementContent
-//   #action?: () => void
-//   #disabled: boolean = true
+export class LoadingItem implements CtxMenuElementBuilder {
+  content: ElementContent
+  #action?: () => Promise<void>
+  #disabled: boolean = true
 
-//   private constructor(content: ElementContent) {
-//     this.content = content
-//   }
+  private constructor(content: ElementContent) {
+    this.content = content
+  }
 
-//   static label(label: string): LoadingItem {
-//     return new LoadingItem({ label })
-//   }
+  static label(label: string): LoadingItem {
+    return new LoadingItem({ label })
+  }
 
-//   static component(component: ReactNode): LoadingItem {
-//     return new LoadingItem({ component })
-//   }
+  static component(component: ReactNode): LoadingItem {
+    return new LoadingItem({ component })
+  }
 
-//   action(action?: () => void): LoadingItem {
-//     this.#action = action
-//     return this
-//   }
+  action(action?: () => Promise<void>): LoadingItem {
+    this.#action = action
+    return this
+  }
 
-//   loadingAction(action?: () => Promise<void>): LoadingItem {
-//     this.#action = action
-//     return this
-//   }
+  disabledIf(disabled: boolean): LoadingItem {
+    this.#disabled = disabled
+    return this
+  }
 
-//   disabled(disabled: boolean): LoadingItem {
-//     this.#disabled = disabled
-//     return this
-//   }
-
-//   build(): LoadingItemData {
-//     return {
-//       content: this.content,
-//       action: this.#action,
-//       disabled: this.#action === undefined || this.#disabled,
-//       __cm_type_tag: 'loading_item',
-//     }
-//   }
-// }
+  build(): LoadingItemData {
+    return {
+      content: this.content,
+      action: this.#action,
+      disabled: this.#action === undefined || this.#disabled,
+      __cm_type_tag: 'loading_item',
+    }
+  }
+}
 
 function contentIsLabel(content: ElementContent): content is { label: string } {
   return 'label' in content

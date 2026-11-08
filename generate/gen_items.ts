@@ -36,20 +36,20 @@ async function generateModern() {
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-pub const ITEM_MAX: usize = ${allItems.length};
+pub const ITEM_MAX: usize = ALL_ITEMS.len() - 1;
 
 #[allow(clippy::missing_const_for_fn)]
 #[wasm_bindgen(js_name = "getAllItems")]
 #[cfg(feature = "wasm")]
 pub fn get_all_items() -> Vec<ItemMetadata> {
-    ALL_ITEMS.into_iter().copied().collect()
+    ALL_ITEMS.to_vec()
 }
 
 `
 
   output +=
-    `pub static ALL_ITEMS: [&ItemMetadata; ITEM_MAX] = [\n` +
-    allItems.map(({ id, name }) => '&' + convertItem(id, name)).join(',\n') +
+    `pub static ALL_ITEMS: &[ItemMetadata] = &[\n` +
+    allItems.map(({ id, name }) => convertItem(id, name)).join(',\n') +
     '];'
 
   const filename = 'pkm_rs_resources/src/items/modern.rs'
@@ -292,6 +292,7 @@ impl ItemUnbound {
   console.info(`Rust code written to ${filename}`)
 }
 
+// oxlint-disable-next-line no-unused-vars
 async function generateEmeraldExpn() {
   const allItems = await itemEmeraldExpnGetAll(new Database('generate/pkm.db'))
 
@@ -326,7 +327,7 @@ impl ItemEmeraldExpn {
 
   const filename = 'pkm_rs_resources/src/items/emerald_expn_2.rs'
   fs.writeFileSync(filename, output)
-  console.log(`Rust code written to ${filename}`)
+  console.info(`Rust code written to ${filename}`)
 }
 
 await Promise.all([
@@ -336,6 +337,5 @@ await Promise.all([
   generateGen3(),
   generateRadicalRed(),
   generateUnbound(),
-  generateEmeraldExpn()
+  // generateEmeraldExpn(),
 ])
-
