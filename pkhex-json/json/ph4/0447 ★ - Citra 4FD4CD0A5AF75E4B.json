@@ -157,5 +157,50 @@
     },
     "tutor_flags_la": [],
     "master_flags_la": [16]
+  },
+  "pk9_data": {
+    "ability_index": "Steadfast",
+    "ability_num": "First",
+    "moves": [
+      {
+        "move_index": "Swords Dance",
+        "pp": 20,
+        "pp_ups": 0
+      },
+      {
+        "move_index": "Helping Hand",
+        "pp": 20,
+        "pp_ups": 0
+      },
+      {
+        "move_index": "Copycat",
+        "pp": 20,
+        "pp_ups": 0
+      },
+      {
+        "move_index": "Final Gambit",
+        "pp": 5,
+        "pp_ups": 0
+      }
+    ],
+    "relearn_moves": [
+      "\u003Cempty\u003E",
+      "\u003Cempty\u003E",
+      "\u003Cempty\u003E",
+      "\u003Cempty\u003E"
+    ],
+    "egg_location_index": 0,
+    "met_location_index": 97,
+    "ball": "Gigaton",
+    "tera_type_original": {
+      "Standard": "Fighting"
+    },
+    "tera_type_override": {
+      "Standard": "Fighting"
+    },
+    "scale": 141,
+    "obedience_level": 54,
+    "tm_flags_base_game": [],
+    "tm_flags_dlc": []
   }
 }

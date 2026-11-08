@@ -387,6 +387,8 @@ pub fn compare_pkhex_json<PKM: Pkm + PkhexJson>(pkm_path: &Path) -> TestResult<(
         TestError::PkmRs(Error::other(&e.to_string()), Some(pkm_path.to_path_buf()))
     })?;
 
+    println!("pkm_rs JSON:\n{:#}", pkm_rs_value);
+
     let mut json_path = Path::new("pkhex-json").join(pkm_path);
     json_path.set_extension("json");
     let mut file = File::open(json_path)

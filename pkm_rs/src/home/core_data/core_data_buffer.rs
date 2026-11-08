@@ -8,10 +8,11 @@ use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     BinaryGender, ContestStats, Gender, HyperTraining, Ivs, Language, MarkingsSixShapesColors,
-    OriginGame, PokeDate, SWITCH_HANDLER_MEMORY_SIZE, SWITCH_TRAINER_MEMORY_SIZE, Stats8,
-    TrainerMemory,
+    OriginGame, PokeDate, SWITCH_HANDLER_MEMORY_SIZE, Stats8, TrainerMemory,
 };
 use pkm_rs_types::{read_u16_le, read_u32_le, read_u64_le};
+
+const TRAINER_HANDLER_MEMORY_SIZE: usize = 5;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Offset {
@@ -454,12 +455,14 @@ impl<S: AsRef<[u8]>> PkhCoreBuffer<S> {
 
     pub fn trainer_memory(&self) -> TrainerMemory {
         let start = Offset::TrainerMemory as usize;
-        let end = start + SWITCH_TRAINER_MEMORY_SIZE;
-        TrainerMemory::from_bytes_switch_trainer(
-            self.bytes()[start..end]
-                .try_into()
-                .expect("start..end in trainer_memory() should be a slice of length 6"),
-        )
+        let end = start + TRAINER_HANDLER_MEMORY_SIZE;
+        let memory_bytes = &self.bytes()[start..=end];
+        TrainerMemory {
+            intensity: memory_bytes[0],
+            memory: memory_bytes[1],
+            text_variable: u16::from_le_bytes(memory_bytes[2..=3].try_into().unwrap()),
+            feeling: memory_bytes[4],
+        }
     }
 
     fn egg_date_raw(&self) -> [u8; 3] {
@@ -725,7 +728,8 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> PkhCoreBuffer<S> {
 
     pub fn set_handler_memory(&mut self, v: TrainerMemory) {
         let offset = Offset::HandlerMemory as usize;
-        self.bytes_mut()[offset..offset + 5].copy_from_slice(&v.to_bytes_switch_handler());
+        self.bytes_mut()[offset..offset + TRAINER_HANDLER_MEMORY_SIZE]
+            .copy_from_slice(&v.to_bytes_switch_handler());
     }
 
     fn set_game_of_origin_raw(&mut self, v: u8) {
@@ -773,8 +777,13 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> PkhCoreBuffer<S> {
     }
 
     pub fn set_trainer_memory(&mut self, v: TrainerMemory) {
-        let offset = Offset::TrainerMemory as usize;
-        self.bytes_mut()[offset..offset + 6].copy_from_slice(&v.to_bytes_switch_trainer());
+        let start = Offset::TrainerMemory as usize;
+        let end = start + TRAINER_HANDLER_MEMORY_SIZE;
+        let memory_bytes = &mut self.bytes_mut()[start..=end];
+        memory_bytes[0] = v.intensity;
+        memory_bytes[1] = v.memory;
+        memory_bytes[2..=3].copy_from_slice(&v.text_variable.to_le_bytes());
+        memory_bytes[4] = v.feeling;
     }
 
     fn set_egg_date_raw(&mut self, v: [u8; 3]) {

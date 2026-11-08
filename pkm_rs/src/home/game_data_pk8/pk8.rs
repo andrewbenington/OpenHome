@@ -25,8 +25,18 @@ pub struct HomePk8Data {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub relearn_moves: [MoveSlot; 4],
     pub dynamax_level: u8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    #[cfg_attr(
+        test,
+        serde(serialize_with = "crate::tests::serialize_flagset_pkhex_json")
+    )]
+    pub poke_job_flags: FlagSet<14>,
     pub fullness: u8,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    #[cfg_attr(
+        test,
+        serde(serialize_with = "crate::tests::serialize_flagset_pkhex_json")
+    )]
     pub tr_flags_swsh: FlagSet<14>,
     pub palma: u32,
     pub ball: Ball,
@@ -55,6 +65,7 @@ impl HomePk8Data {
                 buf.relearn_move(3),
             ],
             dynamax_level: buf.dynamax_level(),
+            poke_job_flags: FlagSet::from_bytes(buf.poke_job_flags_raw()),
             fullness: buf.fullness(),
             tr_flags_swsh: FlagSet::from_bytes(buf.tr_flags_swsh_raw()),
             palma: buf.palma(),
@@ -77,6 +88,7 @@ impl HomePk8Data {
         buf.set_relearn_move(2, self.relearn_moves[2]);
         buf.set_relearn_move(3, self.relearn_moves[3]);
         buf.set_dynamax_level(self.dynamax_level);
+        buf.set_poke_job_flags(&self.poke_job_flags.to_bytes());
         buf.set_fullness(self.fullness);
         buf.set_tr_flags_swsh(&self.tr_flags_swsh.to_bytes());
         buf.set_palma(self.palma);

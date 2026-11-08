@@ -32,12 +32,20 @@ pub struct HomePk9Data {
     pub egg_location_index: u16,
     pub met_location_index: u16,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    #[cfg_attr(
+        test,
+        serde(serialize_with = "crate::tests::serialize_flagset_pkhex_json")
+    )]
     pub tm_flags_base_game: FlagSet<TM_FLAG_BYTE_LENGTH_BASE>,
     pub obedience_level: u8,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ability_index: Pk9AbilityIndex,
     pub ability_num: AbilityNumber,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    #[cfg_attr(
+        test,
+        serde(serialize_with = "crate::tests::serialize_flagset_pkhex_json")
+    )]
     pub tm_flags_dlc: FlagSet<TM_FLAG_BYTE_LENGTH_DLC>,
 }
 

@@ -1,0 +1,153 @@
+{
+  "encryption_seed": 7510047209431841151,
+  "game_data_size": 103,
+  "encoded_data_size": 304,
+  "data_version": 4,
+  "checksum": 1743666138,
+  "core_data_size": 196,
+  "core_data": {
+    "home_tracker": 8989074328195514087,
+    "encryption_constant": 142415828,
+    "is_bad_egg": false,
+    "species_and_form": {
+      "national_dex": 186,
+      "form_index": 0
+    },
+    "held_item_index": 0,
+    "trainer_id": 50329,
+    "secret_id": 18178,
+    "exp": 211060,
+    "is_favorite": false,
+    "markings": {
+      "circle": "blue",
+      "square": "blue",
+      "triangle": "blue",
+      "heart": "blue",
+      "star": "blue",
+      "diamond": "blue"
+    },
+    "personality_value": 1825501013,
+    "nature": "Lonely",
+    "is_fateful_encounter": false,
+    "gender": "Female",
+    "evs": {
+      "hp": 0,
+      "atk": 0,
+      "def": 0,
+      "spa": 0,
+      "spd": 0,
+      "spe": 0
+    },
+    "contest": {
+      "cool": 0,
+      "beauty": 0,
+      "cute": 0,
+      "smart": 0,
+      "tough": 0,
+      "sheen": 0
+    },
+    "ribbons": [],
+    "contest_memory_count": 0,
+    "battle_memory_count": 0,
+    "form_argument": 0,
+    "nickname": "Politoed",
+    "nickname_trash": "50006F006C00690074006F006500640000000000000000000000",
+    "ivs": {
+      "hp": 31,
+      "atk": 31,
+      "def": 31,
+      "spa": 31,
+      "spd": 31,
+      "spe": 31
+    },
+    "is_egg": false,
+    "is_nicknamed": false,
+    "handler_name": "",
+    "handler_gender": "Male",
+    "is_current_handler": false,
+    "handler_friendship": 0,
+    "handler_memory": {
+      "intensity": 0,
+      "memory": 0,
+      "feeling": 0,
+      "textVariables": 0
+    },
+    "handler_id": 0,
+    "handler_language": "None",
+    "trainer_name": "Malik",
+    "trainer_friendship": 50,
+    "trainer_memory": {
+      "intensity": 6,
+      "memory": 86,
+      "feeling": 2,
+      "textVariables": 40
+    },
+    "egg_date": null,
+    "met_date": "6/4/2021",
+    "met_level": 60,
+    "trainer_gender": "Male",
+    "hyper_training": {
+      "hp": false,
+      "atk": false,
+      "def": false,
+      "spa": false,
+      "spd": false,
+      "spe": false
+    },
+    "game_of_origin": "Sword",
+    "game_of_origin_battle": null,
+    "language": "English",
+    "status_condition": 0,
+    "affixed_ribbon": null,
+    "height_scalar": 154,
+    "weight_scalar": 41,
+    "mint_nature": "Lonely",
+    "current_hp": 196
+  },
+  "pb7_data": null,
+  "pk8_data": {
+    "ability_index": "Water Absorb",
+    "ability_num": "First",
+    "moves": [
+      {
+        "move_index": "Hydro Pump",
+        "pp": 5,
+        "pp_ups": 0
+      },
+      {
+        "move_index": "Weather Ball",
+        "pp": 10,
+        "pp_ups": 0
+      },
+      {
+        "move_index": "Body Slam",
+        "pp": 15,
+        "pp_ups": 0
+      },
+      {
+        "move_index": "Earth Power",
+        "pp": 10,
+        "pp_ups": 0
+      }
+    ],
+    "relearn_moves": [
+      "\u003Cempty\u003E",
+      "\u003Cempty\u003E",
+      "\u003Cempty\u003E",
+      "\u003Cempty\u003E"
+    ],
+    "can_gigantamax": false,
+    "dynamax_level": 10,
+    "poke_job_flags": [],
+    "tr_flags_swsh": [],
+    "palma": 0,
+    "fullness": 0,
+    "sociability": 0,
+    "egg_location_index": 0,
+    "met_location_index": 180,
+    "ball": "Repeat",
+    "pokerus": 0
+  },
+  "pa8_data": null,
+  "pk9_data": null
+}

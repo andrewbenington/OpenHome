@@ -19,6 +19,7 @@ enum Offset {
     Sociability = 0x01,
     RelearnMoves = 0x15,
     DynamaxLevel = 0x1D,
+    PokeJobs = 0x1E,
     Fullness = 0x2C,
     TrFlagsSwSh = 0x2D,
     Palma = 0x3B,
@@ -162,6 +163,10 @@ impl<S: AsRef<[u8]>> PkhPk8Buffer<S> {
         self.get_u8(Offset::DynamaxLevel)
     }
 
+    pub fn poke_job_flags_raw(&self) -> [u8; 14] {
+        self.get_array(Offset::PokeJobs)
+    }
+
     pub fn fullness(&self) -> u8 {
         self.get_u8(Offset::Fullness)
     }
@@ -241,6 +246,10 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> PkhPk8Buffer<S> {
 
     pub fn set_dynamax_level(&mut self, v: u8) {
         self.set_u8(Offset::DynamaxLevel, v);
+    }
+
+    pub fn set_poke_job_flags(&mut self, v: &[u8; 14]) {
+        self.set_array(Offset::PokeJobs, v);
     }
 
     pub fn set_fullness(&mut self, v: u8) {
