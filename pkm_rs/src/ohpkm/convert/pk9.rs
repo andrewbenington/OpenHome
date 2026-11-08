@@ -261,13 +261,15 @@ impl OhpkmConvert for CompassPk9 {
     }
 
     fn bytes_to_stored(bytes: &[u8]) -> Result<StoredPkmBytes> {
-        Box::new(bytes.as_array().ok_or(Error::buffer_size_with_source(
-            "CompassPk9::OhpkmConvert::bytes_to_stored",
-            gen8_swsh::PKM_DATA_SIZE,
-            bytes.len(),
-        )))
-        .copied()
-        .map(Box::new)
-        .map(StoredPkmBytes::Pk9)
+        bytes
+            .as_array()
+            .ok_or(Error::buffer_size_with_source(
+                "CompassPk9::OhpkmConvert::bytes_to_stored",
+                gen8_swsh::PKM_DATA_SIZE,
+                bytes.len(),
+            ))
+            .copied()
+            .map(Box::new)
+            .map(StoredPkmBytes::Pk9)
     }
 }

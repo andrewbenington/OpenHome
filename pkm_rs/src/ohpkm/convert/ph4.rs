@@ -246,13 +246,15 @@ impl OhpkmConvert for Ph4 {
     }
 
     fn bytes_to_stored(bytes: &[u8]) -> Result<StoredPkmBytes> {
-        Box::new(bytes.as_array().ok_or(Error::buffer_size_with_source(
-            "Pkh::OhpkmConvert::bytes_to_stored",
-            home::PH4_PKM_MAX_SIZE,
-            bytes.len(),
-        )))
-        .copied()
-        .map(Box::new)
-        .map(StoredPkmBytes::Ph4)
+        bytes
+            .as_array()
+            .ok_or(Error::buffer_size_with_source(
+                "Pkh::OhpkmConvert::bytes_to_stored",
+                home::PH4_PKM_MAX_SIZE,
+                bytes.len(),
+            ))
+            .copied()
+            .map(Box::new)
+            .map(StoredPkmBytes::Ph4)
     }
 }

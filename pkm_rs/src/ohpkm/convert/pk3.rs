@@ -205,14 +205,16 @@ impl OhpkmConvert for Pk3 {
                 })
                 .map(StoredPkmBytes::Pk3);
         }
-        Box::new(bytes.as_array().ok_or(Error::buffer_size_with_source(
-            "Pk3::OhpkmConvert::bytes_to_stored",
-            gen3::PARTY_SIZE,
-            bytes.len(),
-        )))
-        .copied()
-        .map(Box::new)
-        .map(StoredPkmBytes::Pk3)
+        bytes
+            .as_array()
+            .ok_or(Error::buffer_size_with_source(
+                "Pk3::OhpkmConvert::bytes_to_stored",
+                gen3::PARTY_SIZE,
+                bytes.len(),
+            ))
+            .copied()
+            .map(Box::new)
+            .map(StoredPkmBytes::Pk3)
     }
 }
 
