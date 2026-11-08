@@ -26,8 +26,16 @@ pub struct HomePa9Data {
     pub moves: [MoveSlot; 4],
     pub is_alpha: bool,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    #[cfg_attr(
+        test,
+        serde(serialize_with = "crate::tests::serialize_flagset_pkhex_json")
+    )]
     pub plus_moves_b: FlagSet<LZA_PLUS_MOVES_0X94_BYTES>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    #[cfg_attr(
+        test,
+        serde(serialize_with = "crate::tests::serialize_flagset_pkhex_json")
+    )]
     pub plus_moves_c: FlagSet<LZA_PLUS_MOVES_0XD6_BYTES>,
     pub ball: Ball,
     pub egg_location_index: u16,

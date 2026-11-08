@@ -5,6 +5,9 @@ using System.Linq;
 public static class PkhPk9Object
 {
 
+    const int FIRST_DLC_TM_INDEX = 200;
+    const int TOTAL_TM_FLAG_BYTES = 38;
+    
     public static object Build(GameDataPK9 pk)
     {
         if (pk == null) {
@@ -26,8 +29,8 @@ public static class PkhPk9Object
             tera_type_override = Util.FormatTeraType(pk.TeraTypeOverride),
             scale = pk.Scale,
             obedience_level = pk.Obedience_Level,
-            tm_flags_base_game = Util.GetFlagIndexes(64, pk.GetMoveRecordFlag),
-            tm_flags_dlc = Util.GetFlagIndexes(64, pk.GetMoveRecordFlag),
+            tm_flags_base_game = Util.GetFlagIndexes(TOTAL_TM_FLAG_BYTES, index => index < FIRST_DLC_TM_INDEX && pk.GetMoveRecordFlag(index)),
+            tm_flags_dlc = Util.GetFlagIndexes(TOTAL_TM_FLAG_BYTES, index => index >= FIRST_DLC_TM_INDEX && pk.GetMoveRecordFlag(index)),
         };
     }
 }

@@ -170,6 +170,19 @@ public static partial class Util
     return new { move_index = moveId, pp = movePp, pp_ups = movePpUps };
   }
 
+  static object MoveData(GameDataPA9 pk, int moveIndex, GameStrings strings)
+  {
+    var moveId = moveIndex switch
+    {
+      1 => FormatMoveName(pk.Move1, strings),
+      2 => FormatMoveName(pk.Move2, strings),
+      3 => FormatMoveName(pk.Move3, strings),
+      4 => FormatMoveName(pk.Move4, strings),
+      _ => throw new ArgumentException($"Unexpected move index: {moveIndex}"),
+    };
+    return new { move_index = moveId, pp = 0, pp_ups = 0 };
+  }
+
   public static object[] AllMoveData(PKM pk, GameStrings strings)
   {
     return [MoveData(pk, 1, strings), MoveData(pk, 2, strings), MoveData(pk, 3, strings), MoveData(pk, 4, strings)];
@@ -205,6 +218,11 @@ public static partial class Util
   }
 
   public static object[] AllMoveData<T>(T pk, GameStrings strings) where T : IGameDataSide, IGameDataSidePP
+  {
+    return [MoveData(pk, 1, strings), MoveData(pk, 2, strings), MoveData(pk, 3, strings), MoveData(pk, 4, strings)];
+  }
+
+  public static object[] AllMoveData(GameDataPA9 pk, GameStrings strings)
   {
     return [MoveData(pk, 1, strings), MoveData(pk, 2, strings), MoveData(pk, 3, strings), MoveData(pk, 4, strings)];
   }
@@ -246,6 +264,12 @@ public static partial class Util
   {
     return [RelearnMove(1, pk, strings), RelearnMove(2, pk, strings), RelearnMove(3, pk, strings), RelearnMove(4, pk, strings)];
   }
+
+  public static object[] RelearnMoves(GameDataPA9 pk, GameStrings strings)
+  {
+    return [RelearnMove(1, pk, strings), RelearnMove(2, pk, strings), RelearnMove(3, pk, strings), RelearnMove(4, pk, strings)];
+  }
+
 
   public static List<string> GetRibbonNames(object pk)
   {
@@ -450,6 +474,7 @@ public static partial class Util
     }
     return result;
   }
+
 
   public static string NullableDateStrFromParts(int yearsSince2000, int month, int day)
   {
