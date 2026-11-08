@@ -23,7 +23,8 @@ public static class PkhObject
             pb8_data = PkhPb8Object.Build(pk.DataPB8),
             pa8_data = PkhPa8Object.Build(pk.DataPA8),
             pk9_data = PkhPk9Object.Build(pk.DataPK9),
-            pa9_data = PkhPa9Object.Build(pk.DataPA9)
+            pa9_data = PkhPa9Object.Build(pk.DataPA9),
+            pc9_data = PkhPc9Object.Build(pk.DataPC9)
         };
     }
 }

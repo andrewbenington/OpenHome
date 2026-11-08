@@ -62,8 +62,6 @@ pub struct Ph4 {
     pub pa8_data: Option<HomePa8Data>,
     pub pb8_data: Option<HomePb8Data>,
     pub pk9_data: Option<HomePk9Data>,
-    #[serde(skip)] // TODO: uncomment to include in pkhex json test
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub pc9_data: Option<HomePc9Data>,
     pub pa9_data: Option<HomePa9Data>,
 }
