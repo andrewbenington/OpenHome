@@ -373,7 +373,8 @@ export function useOhpkmStore() {
       case 'PB8LUMI':
       case 'PK9':
       case 'PK9Compass':
-      case 'PA9': {
+      case 'PA9':
+      case 'PK2PolishedCrystal': {
         return tryCalculateIdentifier(mon)
       }
       default:

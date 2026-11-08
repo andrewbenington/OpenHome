@@ -118,6 +118,8 @@
     "oxlint": "^1.89.0",
     "oxlint-tsgolint": "^7.0.2005",
     "react-dom": "^19.3.1",
+    "ts-lombok-kit": "^0.2.0",
+    "ts-patch": "^4.0.1",
     "typescript": "7.0.2",
     "vite": "^8.3.5",
     "vitest": "^5.0.5",

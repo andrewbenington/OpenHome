@@ -1,8 +1,7 @@
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::wasm_bindgen;
-use crate::gen7_alola::Gen7AlolaSave;
 
-struct Gen2PolishedCrystalSave {
+pub struct Gen2PolishedCrystalSave {
 
 }
 

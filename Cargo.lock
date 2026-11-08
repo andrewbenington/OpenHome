@@ -333,6 +333,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "boilermates"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b159337fa36894b98dc2f55dc0ada298afb38d64589bbdbb945128ba4c86ccd9"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
+]
+
+[[package]]
 name = "brotli"
 version = "9.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3197,6 +3208,7 @@ dependencies = [
  "arbitrary-int",
  "arrayref",
  "assert-json-diff",
+ "boilermates",
  "console_error_panic_hook",
  "getrandom 0.4.3",
  "hex",
@@ -4445,6 +4457,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "72b64191b275b66ffe2469e8af2c1cfe3bafa67b529ead792a6d0160888b4237"
 dependencies = [
  "proc-macro2",
+ "quote",
  "unicode-ident",
 ]
 

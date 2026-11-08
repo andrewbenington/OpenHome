@@ -504,13 +504,13 @@ export const CHAMPS_TRANSFER_RESTRICTIONS: TransferRestrictions = {
 }
 
 /**
- * Dex numbers of mons that evolve into or evolve from a Pokémon originating in Kanto.
+ * Dex numbers of non-Kanto/Johto mons that evolve into or evolve from a Pokémon originating in Kanto.
  */
 export const KANTO_RELATIVES_DEX_NUMBERS = [
   439, 440, 446, 462, 463, 464, 465, 466, 467, 470, 471, 474, 700, 863, 865, 866, 900, 979
 ]
 /**
- * Dex numbers of mons that evolve into or evolve from a Pokémon originating in Johto.
+ * Dex numbers of non-Kanto/Johto mons that evolve into or evolve from a Pokémon originating in Johto.
  */
 export const JOHTO_RELATIVES_DEX_NUMBERS = [
 298, 360, 424, 429, 430, 438, 458, 461, 468, 469, 472, 473, 864, 899, 901, 903, 904, 980, 981, 982
@@ -523,8 +523,8 @@ export const POLISHED_CRYSTAL_TRANSFER_RESTRICTIONS: TransferRestrictions = {
     .concat(KANTO_RELATIVES_DEX_NUMBERS)
     .concat(JOHTO_RELATIVES_DEX_NUMBERS),
   excludedForms: {
+    ...CapAndStarterPikachus,
     [NationalDex.Eevee]: [LGE_STARTER],
-    [NationalDex.Pikachu]: [LGP_STARTER, WORLD_CAP],
     [NationalDex.Pichu]: [SPIKY_EAR]
   },
 }

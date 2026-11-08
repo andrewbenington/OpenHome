@@ -294,77 +294,77 @@ impl Pk7 {
     }
 
     pub fn try_from_bytes(bytes: &[u8]) -> Result<Self> {
-        let size = bytes.len();
-        match size {
-            Self::BOX_SIZE => Self::from_buffer(&Pk7Buffer::box_span(bytes)),
-            Self::PARTY_SIZE => Self::from_buffer(&Pk7Buffer::party_span(bytes)),
-            _ => Err(Error::buffer_size(Self::BOX_SIZE, size)),
-        }
+    let size = bytes.len();
+    match size {
+      Self::BOX_SIZE => Self::from_buffer(&Pk7Buffer::box_span(bytes)),
+      Self::PARTY_SIZE => Self::from_buffer(&Pk7Buffer::party_span(bytes)),
+      _ => Err(Error::buffer_size(Self::BOX_SIZE, size)),
     }
+  }
 
-    pub fn from_encrypted_bytes(mut bytes: Box<[u8]>) -> Result<Self> {
-        Self::from_buffer(Pk7Buffer::box_or_party_span_mut(&mut bytes).decrypted())
-    }
+  pub fn from_encrypted_bytes(mut bytes: Box<[u8]>) -> Result<Self> {
+    Self::from_buffer(Pk7Buffer::box_or_party_span_mut(&mut bytes).decrypted())
+  }
 
-    pub fn to_box_bytes_encrypted(self) -> Box<[u8]> {
-        let mut bytes = self.to_box_bytes();
-        Pk7Buffer::box_span_mut(&mut bytes).encrypt();
+  pub fn to_box_bytes_encrypted(self) -> Box<[u8]> {
+    let mut bytes = self.to_box_bytes();
+    Pk7Buffer::box_span_mut(&mut bytes).encrypt();
 
-        bytes
-    }
+    bytes
+  }
 
-    pub fn calculate_checksum(&self) -> u16 {
-        let mut bytes = [0u8; Self::BOX_SIZE];
-        self.write_box_bytes(&mut bytes);
-        Pk7Buffer::box_span(&bytes).calculate_checksum()
-    }
+  pub fn calculate_checksum(&self) -> u16 {
+    let mut bytes = [0u8; Self::BOX_SIZE];
+    self.write_box_bytes(&mut bytes);
+    Pk7Buffer::box_span(&bytes).calculate_checksum()
+  }
 
-    pub fn refresh_checksum(&mut self) {
-        self.checksum = self.calculate_checksum();
-    }
+  pub fn refresh_checksum(&mut self) {
+    self.checksum = self.calculate_checksum();
+  }
 
-    pub fn calculate_stats(&self) -> Stats16Le {
-        stats::calculate_all_modern_for_source(
-            MetadataSource::UltraSunUltraMoon,
-            self.species_and_form.0,
-            &self.ivs,
-            &self.evs,
-            self.calculate_level() as u16,
-            self.nature.get_metadata(),
-            Some(self.hyper_training),
+  pub fn calculate_stats(&self) -> Stats16Le {
+    stats::calculate_all_modern_for_source(
+      MetadataSource::UltraSunUltraMoon,
+      self.species_and_form.0,
+      &self.ivs,
+      &self.evs,
+      self.calculate_level() as u16,
+      self.nature.get_metadata(),
+      Some(self.hyper_training),
+    )
+      .unwrap_or_else(|| {
+        panic!(
+          "pk7 has species/form present in ultra sun + moon: {:#?}",
+          self.species_and_form.0
         )
-        .unwrap_or_else(|| {
-            panic!(
-                "pk7 has species/form present in ultra sun + moon: {:#?}",
-                self.species_and_form.0
-            )
-        })
-    }
+      })
+  }
 
-    pub fn recalculate_stats(&mut self) {
-        self.stats = self.calculate_stats();
-    }
+  pub fn recalculate_stats(&mut self) {
+    self.stats = self.calculate_stats();
+  }
 
-    pub fn empty_box_slot_bytes(trainer_name: &SizedUtf16String<26>) -> Box<[u8]> {
-        let mut bytes = Box::new([0u8; Self::BOX_SIZE]);
-        let mut buffer = Pk7BufferMut::box_span_mut(bytes.as_mut_slice());
+  pub fn empty_box_slot_bytes(trainer_name: &SizedUtf16String<26>) -> Box<[u8]> {
+    let mut bytes = Box::new([0u8; Self::BOX_SIZE]);
+    let mut buffer = Pk7BufferMut::box_span_mut(bytes.as_mut_slice());
 
-        buffer.set_handler_name(trainer_name);
-        buffer.set_is_current_handler(true);
-        buffer.refresh_checksum();
+    buffer.set_handler_name(trainer_name);
+    buffer.set_is_current_handler(true);
+    buffer.refresh_checksum();
 
-        buffer.encrypt();
+    buffer.encrypt();
 
-        bytes
-    }
+    bytes
+  }
 
-    pub fn is_empty_slot(bytes: &[u8]) -> bool {
-        let mut owned = bytes.to_owned();
-        let mut buffer = Pk7Buffer::box_span_mut(&mut owned);
-        buffer.decrypt();
+  pub fn is_empty_slot(bytes: &[u8]) -> bool {
+    let mut owned = bytes.to_owned();
+    let mut buffer = Pk7Buffer::box_span_mut(&mut owned);
+    buffer.decrypt();
 
-        buffer.species_ndex() == 0
-    }
+    buffer.species_ndex() == 0
+  }
 }
 
 impl PkmBytes for Pk7 {
