@@ -117,8 +117,8 @@
     "ball": "Ultra",
     "scale": 255,
     "obedience_level": 44,
-    "plus_moves_c": [10, 24, 28],
     "plus_moves_b": [],
+    "plus_moves_c": [10, 24, 28, 60, 68, 77, 91, 119, 124, 202],
     "is_alpha": true
   }
 }
