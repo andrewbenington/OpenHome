@@ -25,8 +25,8 @@ public static class PkhPa9Object
             ball = Util.FormatBall(pk, strings),
             scale = pk.Scale,
             obedience_level = pk.Obedience_Level,
-            plus_moves_c = Util.GetFlagIndexes(TOTAL_PLUS_FLAG_BYTES, pk.GetMovePlusFlag),
-            plus_moves_b = Util.GetFlagIndexes(TOTAL_PLUS_FLAG_BYTES, pk.GetMovePlusFlag),
+            plus_moves_c = Util.GetFlagIndexes(TOTAL_PLUS_FLAG_BYTES, index => index < FIRST_PLUS_FLAG_BLOCK_B_INDEX && pk.GetMovePlusFlag(index)),
+            plus_moves_b = Util.GetFlagIndexes(TOTAL_PLUS_FLAG_BYTES, index => index >= FIRST_PLUS_FLAG_BLOCK_B_INDEX && pk.GetMovePlusFlag(index)),
             is_alpha = pk.IsAlpha,
         };
     }

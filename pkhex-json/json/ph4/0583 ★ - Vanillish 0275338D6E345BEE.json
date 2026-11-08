@@ -118,7 +118,7 @@
     "scale": 255,
     "obedience_level": 44,
     "plus_moves_c": [10, 24, 28],
-    "plus_moves_b": [10, 24, 28],
+    "plus_moves_b": [],
     "is_alpha": true
   }
 }
