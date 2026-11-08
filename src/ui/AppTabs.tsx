@@ -43,7 +43,7 @@ export default function AppTabs() {
           value={tab}
           orientation="vertical"
           onValueChange={(tab) => navigate(tab)}
-          style={{ flex: 1, maxHeight: 'calc(100vh - var(--footer-height)' }}
+          style={{ flex: 1, maxHeight: '100vh' }}
         >
           <Flex style={{ height: '100%', flexGrow: 1 }}>
             <Tabs.IconList className="tab-sidebar" direction="column">
@@ -99,7 +99,16 @@ export default function AppTabs() {
               <Tabs.Indicator />
             </Tabs.IconList>
             <Separator className="Separator" orientation="vertical" />
-            <Box style={{ flex: 1, width: '100%', height: '100%', overflowY: 'hidden' }}>
+            <Box
+              style={{
+                flex: 1,
+                width: '100%',
+                height: '100%',
+                overflowY: 'hidden',
+                position: 'relative',
+                paddingBottom: 'var(--footer-height)',
+              }}
+            >
               <div style={{ height: '100%' }}>
                 <Routes>
                   <Route index path="/" element={homeElement} />
@@ -126,23 +135,21 @@ export default function AppTabs() {
                   </Tabs.Panel>
                 </DebugOnly>
               </div>
+              <div className="app-footer">
+                <OhoFlex.Spacer />
+                <p style={{ fontSize: '0.8rem' }}>WASM memory usage:</p>
+                <code>{wasmSize}</code>
+                <OhoButton
+                  size="1"
+                  onClick={() => setWasmSize(wasmSizeDisplay())}
+                  style={{ fontSize: '0.7rem', padding: '0.15rem', height: 'fit-content' }}
+                >
+                  Refresh
+                </OhoButton>
+              </div>
             </Box>
           </Flex>
         </Tabs.Root>
-        <DebugOnly>
-          <div className="modal-footer">
-            <OhoFlex.Spacer />
-            <p style={{ fontSize: '0.8rem' }}>WASM memory usage:</p>
-            <code>{wasmSize}</code>
-            <OhoButton
-              size="1"
-              onClick={() => setWasmSize(wasmSizeDisplay())}
-              style={{ fontSize: '0.7rem', padding: '0.15rem', height: 'fit-content' }}
-            >
-              Refresh
-            </OhoButton>
-          </div>
-        </DebugOnly>
       </Flex>
     </Fallback>
   )
