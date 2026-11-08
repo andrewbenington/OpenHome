@@ -64,7 +64,6 @@ pub struct Ph4 {
     pub pb7_data: Option<HomePb7Data>,
     pub pk8_data: Option<HomePk8Data>,
     pub pa8_data: Option<HomePa8Data>,
-    #[serde(skip)] // TODO: uncomment to include in pkhex json test
     pub pb8_data: Option<HomePb8Data>,
     pub pk9_data: Option<HomePk9Data>,
     #[serde(skip)] // TODO: uncomment to include in pkhex json test
