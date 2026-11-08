@@ -16,6 +16,8 @@ import {
   MarkingsSixShapes,
   MetadataSummaryLookup,
   NatureIndex,
+  OriginGame,
+  OriginGames,
   ShinyLeaves,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
@@ -28,6 +30,7 @@ import { modernStatCalc } from './util'
 import * as encryption from './util/encryption'
 import { filterRibbons } from './util/ribbonLogic'
 
+const DP_PAL_PARK = 0x37
 const DP_FARAWAY_PLACE = 0xbba
 
 function validDPLocation(index: number): boolean {
@@ -174,6 +177,14 @@ export default class PK4 {
         this.metLocationIndex = this.metLocationIndexPtHGSS
       } else {
         this.metLocationIndex = this.metLocationIndexDP
+      }
+      // G3 mons transferred via Pal Park had their met location erased.
+      if (this.metLocationIndex === DP_PAL_PARK) {
+        if (OriginGames.isGba(this.gameOfOrigin)) {
+          this.metLocationIndex = 0xFE // (in-game trade)
+        } else if (this.gameOfOrigin === OriginGame.ColosseumXd) {
+          this.metLocationIndex = 0x0 // will display in-game as distant land
+        }
       }
 
       this.ribbons = byteLogic
