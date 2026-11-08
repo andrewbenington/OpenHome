@@ -21,7 +21,7 @@ import {
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import { OHPKM } from './OHPKM'
-import { PkmConstructorOptions } from './PKM'
+import { PkmConstructorOptions } from './types'
 import { convertPokeDate, convertPokeDateOptional } from './wasm/convert'
 
 export default class PH4 {
