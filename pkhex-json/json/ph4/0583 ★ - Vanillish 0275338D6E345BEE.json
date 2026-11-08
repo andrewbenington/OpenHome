@@ -107,5 +107,18 @@
   "pb7_data": null,
   "pk8_data": null,
   "pa8_data": null,
-  "pk9_data": null
+  "pk9_data": null,
+  "pa9_data": {
+    "ability_index": "Ice Body",
+    "ability_num": "First",
+    "moves": ["Hyper Voice", "Acid Armor", "Icicle Crash", "Self-Destruct"],
+    "egg_location_index": 0,
+    "met_location_index": 273,
+    "ball": "Ultra",
+    "scale": 255,
+    "obedience_level": 44,
+    "plus_moves_c": [10, 24, 28],
+    "plus_moves_b": [10, 24, 28],
+    "is_alpha": true
+  }
 }

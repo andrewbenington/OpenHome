@@ -170,19 +170,6 @@ public static partial class Util
     return new { move_index = moveId, pp = movePp, pp_ups = movePpUps };
   }
 
-  static object MoveData(GameDataPA9 pk, int moveIndex, GameStrings strings)
-  {
-    var moveId = moveIndex switch
-    {
-      1 => FormatMoveName(pk.Move1, strings),
-      2 => FormatMoveName(pk.Move2, strings),
-      3 => FormatMoveName(pk.Move3, strings),
-      4 => FormatMoveName(pk.Move4, strings),
-      _ => throw new ArgumentException($"Unexpected move index: {moveIndex}"),
-    };
-    return new { move_index = moveId, pp = 0, pp_ups = 0 };
-  }
-
   public static object[] AllMoveData(PKM pk, GameStrings strings)
   {
     return [MoveData(pk, 1, strings), MoveData(pk, 2, strings), MoveData(pk, 3, strings), MoveData(pk, 4, strings)];
@@ -222,9 +209,9 @@ public static partial class Util
     return [MoveData(pk, 1, strings), MoveData(pk, 2, strings), MoveData(pk, 3, strings), MoveData(pk, 4, strings)];
   }
 
-  public static object[] AllMoveData(GameDataPA9 pk, GameStrings strings)
+  public static object[] AllMoveNames(GameDataPA9 pk, GameStrings strings)
   {
-    return [MoveData(pk, 1, strings), MoveData(pk, 2, strings), MoveData(pk, 3, strings), MoveData(pk, 4, strings)];
+    return [FormatMoveName(pk.Move1, strings), FormatMoveName(pk.Move2, strings), FormatMoveName(pk.Move3, strings), FormatMoveName(pk.Move4, strings)];
   }
 
 

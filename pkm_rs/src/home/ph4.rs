@@ -70,7 +70,6 @@ pub struct Ph4 {
     #[serde(skip)] // TODO: uncomment to include in pkhex json test
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub pc9_data: Option<[u8; super::HOME_PC9_DATA_SIZE]>,
-    #[serde(skip)] // TODO: uncomment to include in pkhex json test
     pub pa9_data: Option<HomePa9Data>,
 }
 
