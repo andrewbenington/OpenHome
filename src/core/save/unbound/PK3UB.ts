@@ -1,11 +1,11 @@
 import { PluginPKMInterface, RomHackFormat } from '@openhome-core/pkm/interfaces'
+import { PluginIdentifier } from '@openhome-core/tauri/spectaCommands'
 import { Option } from '@openhome-core/util/functional'
 import { ExtraFormIndex, ItemUnbound, PkmFormat } from '@pkm-rs/pkg'
 import PK3CFRU from '../cfru/PK3CFRU'
 import { fromGen3CFRUMoveIndex, toGen3CFRUMoveIndex } from '../cfru/conversion/Gen3CFRUMovesIndex'
 import { CFRUToNationalMap } from '../cfru/conversion/Gen3CFRUMovesIndex/CFRUToNationalMap'
 import { CfruSpeciesAndForm } from '../cfru/conversion/util'
-import { PluginIdentifier } from '../interfaces'
 import { toUnboundPokemonIndex, unboundIndexLookup } from './conversion/UnboundSpeciesMap'
 
 // const FAKEMON_INDEXES = [

@@ -12,6 +12,7 @@ import {
   movesFromSwshTrFlags,
   SWSH_TR_BYTE_COUNT,
 } from '@openhome-core/resources/moves/flags'
+import { PluginIdentifier } from '@openhome-core/tauri/spectaCommands'
 import {
   expectExhaustive,
   getFlag,
@@ -60,7 +61,7 @@ import {
 } from '@pkm-rs/pkg'
 import dayjs, { Dayjs } from 'dayjs'
 import Prando from 'prando'
-import { PluginIdentifier, SAV } from '../save/interfaces'
+import { SAV } from '../save/interfaces'
 import { PkmConverter } from './conversion/converter'
 import { isEvolution } from './Lookup'
 import {

@@ -1,0 +1,235 @@
+import { $O } from '@openhome-core/util/option'
+import Badge from '@openhome-ui/components/badge/Badge'
+import OhoFlex from '@openhome-ui/components/OhoFlex'
+import { Select } from '@openhome-ui/components/select/Select'
+import useSimpleVirtualizer from '@openhome-ui/hooks/simpleVirtualizer'
+import { getPublicImageURL } from '@openhome-ui/images/images'
+import { OpenhomeItemStorage, OriginGame } from '@pkm-rs/pkg'
+import { Flex } from '@radix-ui/themes'
+import { VirtualItem } from '@tanstack/react-virtual'
+import { CSSProperties, useRef } from 'react'
+import { ItemRow } from './ItemRow'
+import './ItemTransferSourceDisplay.css'
+import { Side, TitledCard } from './TitledCard'
+import {
+  displayItemSortType,
+  ITEM_SORT_TYPES,
+  ItemData,
+  ItemSortType,
+  itemSortTypeIcon,
+} from './types'
+import { ItemSourceController } from './useItemSource'
+
+interface ItemTransferSourceDisplayProps {
+  sourceController: ItemSourceController
+  destController: ItemSourceController
+  active: boolean
+  onSelect: () => void
+  side: Side
+}
+
+export function ItemTransferSourceDisplay(props: ItemTransferSourceDisplayProps) {
+  const { sourceController, destController, active, onSelect, side } = props
+  const parentRef = useRef(null)
+
+  return (
+    <div ref={parentRef}>
+      <TitledCard
+        title={renderSource(sourceController.source.sourceType)}
+        side={side}
+        topControls={
+          <OhoFlex.RowEnd gap="1">
+            <Select.Root
+              defaultValue="alphabetical_a_z"
+              value={sourceController.filter.sort}
+              onValueChange={(value) =>
+                sourceController.updateFilter({ sort: value as ItemSortType })
+              }
+              onOpenChange={console.info}
+            >
+              <Select.Trigger>{itemSortTypeIcon(sourceController.filter.sort)}</Select.Trigger>
+              <Select.Content align="end">
+                {ITEM_SORT_TYPES.map((sortType) => (
+                  <Select.Item
+                    className="item-category-select"
+                    key={sortType}
+                    value={sortType.toString()}
+                  >
+                    <Flex as="span" align="center" gap="0.5rem">
+                      {displayItemSortType(sortType)}
+                    </Flex>
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select.Root>
+            <Select.Root
+              defaultValue="ALL_ITEMS"
+              value={sourceController.pouch.toString()}
+              onValueChange={(value) =>
+                sourceController.setPouch(value === 'ALL_ITEMS' ? 'ALL_ITEMS' : parseInt(value))
+              }
+              onOpenChange={console.info}
+            >
+              <Select.Trigger />
+              <Select.Content align="end">
+                <Select.Item value="ALL_ITEMS">
+                  <Flex as="span" align="center" gap="0.5rem">
+                    <img
+                      className="item-category-icon"
+                      src={getPublicImageURL(OpenhomeItemStorage.categoryIconPath('General'))}
+                    />
+                    All Items
+                  </Flex>
+                </Select.Item>
+                {sourceController.categoryIndexesWithItems.map((categoryIndex) => (
+                  <Select.Item
+                    className="item-category-select"
+                    key={categoryIndex}
+                    value={categoryIndex.toString()}
+                  >
+                    <Flex as="span" align="center" gap="0.5rem">
+                      <img
+                        className="item-category-icon"
+                        src={OpenhomeItemStorage.categoryIconPath(
+                          sourceController.database.internalCategoryToOpenhome(categoryIndex)
+                        )}
+                      />
+                      {sourceController.database.categoryName(categoryIndex)}
+                    </Flex>
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select.Root>
+          </OhoFlex.RowEnd>
+        }
+      >
+        {sourceController.pouch !== 'ALL_ITEMS' &&
+        sourceController.database.internalCategoryToOpenhome(sourceController.pouch) ===
+          'KeyItems' ? (
+          <KeyItemsScroller
+            sourceController={sourceController}
+            destController={destController}
+            active={active}
+            onClick={onSelect}
+          />
+        ) : (
+          <SaveItemsScroller
+            sourceController={sourceController}
+            destController={destController}
+            active={active}
+            onClick={onSelect}
+          />
+        )}
+      </TitledCard>
+    </div>
+  )
+}
+
+function renderSource(source: OriginGame | 'OpenHome') {
+  return source === 'OpenHome' ? (
+    <Badge.OpenHome />
+  ) : (
+    <Badge.Game originGame={source} withName style={{ width: 'fit-content' }} />
+  )
+}
+
+interface SaveItemsScrollerProps {
+  sourceController: ItemSourceController
+  destController: ItemSourceController
+  active?: boolean
+  onClick?: () => void
+}
+
+function SaveItemsScroller(props: SaveItemsScrollerProps) {
+  const { sourceController, destController } = props
+  const parentRef = useRef(null)
+
+  const virtualizer = useSimpleVirtualizer(
+    sourceController.items.length,
+    (_, baseFontSize) => baseFontSize * 2,
+    parentRef,
+    { gap: 4 }
+  )
+
+  function onClick(item: ItemData) {
+    sourceController.setSelection(item.index)
+    props.onClick?.()
+  }
+
+  return (
+    <div ref={parentRef} className="item-scroller">
+      <div className="item-scroller-inner" style={{ height: virtualizer.getTotalSize() }}>
+        {virtualizer.getVirtualItems().map((v) => {
+          const item = sourceController.items[v.index]
+          return (
+            <ItemRow
+              key={item.index}
+              itemData={item}
+              singleton={$O(sourceController.database.maxAllowed(item.index)).isSomeAnd(
+                (max) => max === 1
+              )}
+              database={sourceController.database}
+              selected={sourceController.selection === item.index}
+              inactive={props.active === false}
+              unobtained={!item.isObtained}
+              disabled={destController.database.availability(item.index) !== 'Obtainable'}
+              onClick={() => onClick(item)}
+              style={style(v)}
+            />
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function KeyItemsScroller(props: SaveItemsScrollerProps) {
+  const { sourceController, destController } = props
+  const parentRef = useRef(null)
+
+  const supportedItems = sourceController.items
+
+  const virtualizer = useSimpleVirtualizer(
+    supportedItems.length,
+    (_, baseFontSize) => baseFontSize * 2,
+    parentRef,
+    { gap: 4 }
+  )
+
+  function onClick(item: ItemData) {
+    sourceController.setSelection(item.index)
+    props.onClick?.()
+  }
+
+  return (
+    <div ref={parentRef} className="item-scroller">
+      <div className="item-scroller-inner" style={{ height: virtualizer.getTotalSize() }}>
+        {virtualizer.getVirtualItems().map((v) => {
+          const item = supportedItems[v.index]
+          return (
+            <ItemRow
+              key={item.index}
+              itemData={item}
+              singleton
+              database={sourceController.database}
+              selected={sourceController.selection === item.index}
+              inactive={props.active === false}
+              unobtained={item.count === 0}
+              disabled={destController.database.availability(item.index) !== 'Obtainable'}
+              onClick={() => onClick(item)}
+              style={style(v)}
+            />
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function style(virtualItem: VirtualItem): CSSProperties {
+  return {
+    width: '100%',
+    height: `${virtualItem.size}px`,
+    transform: `translateY(${virtualItem.start}px)`,
+  }
+}

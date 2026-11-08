@@ -1,9 +1,11 @@
-import { PluginIdentifier } from '@openhome-core/save/interfaces'
+import { PluginIdentifier } from '@openhome-core/tauri/spectaCommands'
 import { pluralize } from '@openhome-core/util/format'
 import { Nullable, Option } from '@openhome-core/util/functional'
 import { getPublicImageURL } from '@openhome-ui/images/images'
+import { getItemIconPath } from '@openhome-ui/images/items'
 import { getDetailsOfficialSave, getDetailsPluginSave } from '@openhome-ui/saves/util'
-import { Pokerus } from '@pkm-rs/pkg'
+import { OPENHOME_COLOR } from '@openhome-ui/util/color'
+import { Item, Pokerus } from '@pkm-rs/pkg'
 import { memo } from 'react'
 import { HyperTrainIcon } from '../Icons'
 import { BaseBadge, BaseBadgeProps } from './BaseBadge'
@@ -70,6 +72,21 @@ function AlphaBadge(props: Omit<BadgeProps, 'backgroundColor'>) {
   )
 }
 
+export type ItemBadgeProps = BadgeProps & { item: Option<Item> }
+
+function ItemBadge(props: ItemBadgeProps) {
+  const label = labelIf(props.showLabel, props.item?.name ?? 'No Item')
+  return (
+    <ImageBadge
+      src={props.item ? getItemIconPath(props.item?.index) : '/icons/no-icon.png'}
+      backgroundColor={props.backgroundColor}
+      label={label}
+      noSillhouette
+      {...props}
+    />
+  )
+}
+
 export type GameBadgeProps = BadgePropsNoBackground & {
   originGame?: Nullable<number>
   plugin?: Nullable<PluginIdentifier>
@@ -97,6 +114,14 @@ export function GameBadge(props: GameBadgeProps) {
       label={props.withNameAbbr ? shortName : props.withName ? fullName : undefined}
       {...props}
     />
+  )
+}
+
+function OpenHomeBadge(props: BadgePropsNoBackground) {
+  return (
+    <BaseBadge tooltip="OpenHome" backgroundColor={OPENHOME_COLOR} color="#111" {...props}>
+      OpenHome
+    </BaseBadge>
   )
 }
 
@@ -204,9 +229,11 @@ function TotemBadge(props: BadgePropsNoBackground) {
 const Badge = {
   Alpha: memo(AlphaBadge),
   Game: memo(GameBadge),
+  OpenHome: memo(OpenHomeBadge),
   Gigantamax: memo(GigantamaxBadge),
   HyperTrain: memo(HyperTrainBadge),
   Image: memo(ImageBadge),
+  Item: memo(ItemBadge),
   Numeric: memo(NumericBadge),
   NsPokemon: memo(NsPokemonBadge),
   Pokerus: memo(PokerusBadge),

@@ -297,8 +297,10 @@ export async function itemUnboundGetAll(database: Database): Promise<ItemUnbound
   return camelcaseKeys(result) as ItemUnboundGetAllRow[]
 }
 
-export async function itemEmeraldExpnGetAll(database: Database): Promise<ItemEmeraldExpnGetAllRow[]> {
+export async function itemEmeraldExpnGetAll(
+  database: Database
+): Promise<ItemEmeraldExpnGetAllRow[]> {
   const stmt = database.prepare(itemEmeraldExpnGetAllQuery)
-  const result = await stmt.all()
+  const result = stmt.all()
   return camelcaseKeys(result) as ItemEmeraldExpnGetAllRow[]
 }

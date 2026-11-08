@@ -22,8 +22,8 @@ import {
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { MoveFilter } from '../util/util'
-import { PkmConstructorOptions } from './PKM'
 import { PkmConverter } from './conversion/converter'
+import { PkmConstructorOptions } from './types'
 import { modernStatCalc } from './util'
 import {
   filterRibbons,

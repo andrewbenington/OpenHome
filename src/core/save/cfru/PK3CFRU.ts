@@ -1,8 +1,9 @@
 import { getMoveMaxPP } from '@openhome-core/pkm'
 import { PkmConverter } from '@openhome-core/pkm/conversion/converter'
 import { PluginPKMInterface, RomHackFormat } from '@openhome-core/pkm/interfaces'
-import { PkmConstructorOptions } from '@openhome-core/pkm/PKM'
+import { PkmConstructorOptions } from '@openhome-core/pkm/types'
 import { modernStatCalc } from '@openhome-core/pkm/util'
+import { PluginIdentifier } from '@openhome-core/tauri/spectaCommands'
 import {
   generatePersonalityValuePreservingAttributes,
   getFlag,
@@ -43,7 +44,7 @@ import {
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
 import { Errorable, Option, R } from '../../util/functional'
-import { pluginGameName, PluginIdentifier } from '../interfaces'
+import { pluginGameName } from '../interfaces'
 import { CfruSpeciesAndForm } from './conversion/util'
 
 const INTERNAL_ORIGIN_NON_RR = OriginGame.Invalid6

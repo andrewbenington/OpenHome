@@ -1,7 +1,7 @@
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Move } from '@openhome-core/resources'
-import { PluginIdentifier } from '@openhome-core/save/interfaces'
+import { PluginIdentifier } from '@openhome-core/tauri/spectaCommands'
 import * as types from '@openhome-core/util/types'
 import { TopRightBadgeType } from '@openhome-ui/hooks/monDisplay'
 import { BallsImageList } from '@openhome-ui/images/items'
