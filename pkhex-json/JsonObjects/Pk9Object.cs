@@ -2,10 +2,10 @@ using PKHeX.Core;
 using System;
 using System.Linq;
 
-public static class Pk8Object
+public static class Pk9Object
 {
 
-    public static object Build(PK8 pk)
+    public static object Build(PK9 pk)
     {
         pk.ResetPartyStats();
         var languageCode = Language.GetLanguageCode((LanguageID)pk.Language);
@@ -29,7 +29,6 @@ public static class Pk8Object
             gender = Util.FormatGender(pk.Gender),
             evs = Util.EVs(pk),
             contest = Util.ContestStats(pk),
-            pokerus = pk.PokerusState,
             ribbons = Util.GetRibbons(pk),
             contest_memory_count = pk.RibbonCountMemoryContest,
             battle_memory_count = pk.RibbonCountMemoryBattle,
@@ -48,8 +47,6 @@ public static class Pk8Object
             handler_memory = Util.HandlerMemoryData(pk),
             handler_id = pk.HandlingTrainerID,
             handler_language = Util.FormatLanguageName(pk.HandlingTrainerLanguage),
-            fullness = pk.Fullness,
-            enjoyment = pk.Enjoyment,
             trainer_name = pk.OriginalTrainerName,
             trainer_friendship = pk.OriginalTrainerFriendship,
             trainer_memory = Util.TrainerMemoryData(pk),
@@ -68,18 +65,18 @@ public static class Pk8Object
             stat_level = pk.Stat_Level,
             stats = Util.Stats(pk),
             level = pk.CurrentLevel,
-            palma = pk.Palma,
             affixed_ribbon = Util.FormatAffixedRibbon(pk.AffixedRibbon, strings),
             height_scalar = pk.HeightScalar,
             weight_scalar = pk.WeightScalar,
-            mint_nature = pk.StatNature.ToString(),
-            dynamax_level = pk.DynamaxLevel,
-            is_favorite = pk.IsFavorite,
-            sociability = pk.Sociability,
+            scale = pk.Scale,
+            mint_nature = pk.StatAlignment.ToString(),
+            tera_type_original = Util.FormatTeraType(pk.TeraTypeOriginal),
+            tera_type_override = Util.FormatTeraType(pk.TeraTypeOverride),
             home_tracker = pk.Tracker > 0 ? (object)pk.Tracker : null,
-            tr_flags_swsh = pk.RecordFlags.ToArray().ToList(),
-            can_gigantamax = pk.CanGigantamax,
-            current_hp = pk.Stat_HPCurrent
+            tm_flags_base_game = pk.RecordFlagsBase.ToArray().ToList(),
+            tm_flags_dlc = pk.RecordFlagsDLC.ToArray().ToList(),
+            current_hp = pk.Stat_HPCurrent,
+            obedience_level = pk.ObedienceLevel
         };
     }
 }

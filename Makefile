@@ -163,7 +163,7 @@ pkhex-json:
 	@pnpm oxfmt --write pkhex-json
 
 .PHONY: test-pkhex-json
-test-pkhex-json:
+test-pkhex-json: pkhex-json
 	@cargo test --package pkm_rs --lib --all-features -- compare_pkhex_json
 
 .PHONY: download-item-sprites
