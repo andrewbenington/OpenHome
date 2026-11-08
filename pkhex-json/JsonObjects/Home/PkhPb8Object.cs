@@ -19,7 +19,6 @@ public static class PkhPb8Object
             ability_num = Util.FormatAbilityNum(pk.AbilityNumber),
             moves = Util.AllMoveData(pk, strings),
             relearn_moves = Util.RelearnMoves(pk, strings),
-            tr_flags_swsh = Util.GetFlagIndexes(64, pk.GetMoveRecordFlag),
             egg_location_index = pk.EggLocation,
             met_location_index = pk.MetLocation,
             ball = Util.FormatBall(pk, strings),
