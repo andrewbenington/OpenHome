@@ -232,7 +232,7 @@ impl OriginGame {
             LegendsArceus => Some(GameSetting::Hisui),
 
             Scarlet | Violet => Some(GameSetting::Paldea),
-            LegendsZa => Some(GameSetting::Lumiose),
+            LegendsZa => Some(GameSetting::Kalos),
 
             Go => Some(GameSetting::PokemonGo),
             BattleRevolution | Home => None,
@@ -733,7 +733,6 @@ pub enum GameSetting {
     Galar,
     Hisui,
     Paldea,
-    Lumiose,
 
     Orre,
     PokemonGo,
