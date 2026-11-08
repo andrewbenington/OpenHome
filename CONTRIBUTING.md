@@ -45,6 +45,6 @@ This policy is subject to future change based on developments in the ecosystem a
 
 We are currently transitioning from JavaScript(/TypeScript) implementations of PKM and save file formats to Rust implementations, compiled to Wasm for the frontend. This is being done for the following reasons:
 
-- Rust provides better tools for dealing with binary data, is faster than JavaScript, and gives more control over memory allocation. This is especially helpful for newer game formats, which have multi-MB save files and have heavier encryption algorithms
-- Rust code can be compiled to run on most mainstream devices with no runtime, which really expands the possibilies for companion apps that can share code with OpenHome
+- Rust provides better tools for dealing with binary data, is faster than JavaScript, and gives more control over memory allocation. This is especially helpful for newer game formats, which have multi-MB save files and have heavier encryption algorithms.
+- Rust code can be compiled to run on most mainstream devices with no runtime, which really expands the possibilities for companion apps that can share code with OpenHome.
 - Rust code can interoperate with other languages if the proper bindings are created/generated. This means any game/ROM hack code in OpenHome's pkm_rs library could in theory be used from C, C++, C#, Python, etc.
