@@ -12,6 +12,7 @@ pub mod game_data_pa8;
 pub mod game_data_pa9;
 pub mod game_data_pb7;
 pub mod game_data_pb8;
+pub mod game_data_pc9;
 pub mod game_data_pk8;
 pub mod game_data_pk9;
 

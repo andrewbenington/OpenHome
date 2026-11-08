@@ -108,7 +108,6 @@ impl Randomize for String {
         Alphanumeric.sample_string(rng, 64)
     }
 }
-
 pub trait RandomizeAndFix: Randomize + Sized {
     fn fix<R: Rng>(&mut self, rng: &mut R);
 

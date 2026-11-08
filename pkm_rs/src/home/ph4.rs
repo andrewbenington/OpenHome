@@ -5,10 +5,10 @@ use super::game_data_pb7::HomePb7Data;
 use super::game_data_pb8::HomePb8Data;
 use super::game_data_pk8::HomePk8Data;
 use super::game_data_pk9::HomePk9Data;
+use crate::home::game_data_pc9::HomePc9Data;
 use crate::result::Result;
 use crate::traits::{HasSpeciesAndForm, IsShiny, ModernEvs, PkmBytes};
 
-use arrayref::array_ref;
 use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_resources::species::{FormMetadata, SpeciesMetadata};
 use pkm_rs_resources::stats;
@@ -32,9 +32,6 @@ use pkm_rs_types::{JsResult, TryIntoTs, TsResult};
 #[cfg(feature = "wasm")]
 use tsify::Ts;
 
-#[cfg(feature = "randomize")]
-use pkm_rs_types::randomize::Randomize;
-
 pub enum GameData {
     Pb7(Option<HomePb7Data>),
     Pk8(Option<HomePk8Data>),
@@ -47,7 +44,6 @@ pub enum GameData {
 const GAME_DATA_SIZE_EXPECT: &str = "game_data_size always fits in a u16";
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "PkhWasm"))]
-#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct Ph4 {
     // header
@@ -68,7 +64,7 @@ pub struct Ph4 {
     pub pk9_data: Option<HomePk9Data>,
     #[serde(skip)] // TODO: uncomment to include in pkhex json test
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub pc9_data: Option<[u8; super::HOME_PC9_DATA_SIZE]>,
+    pub pc9_data: Option<HomePc9Data>,
     pub pa9_data: Option<HomePa9Data>,
 }
 
@@ -151,8 +147,10 @@ impl Ph4 {
                 6 => {
                     // this contains Champions data, which is merely tracking information:
                     // https://github.com/kwsch/PKHeX/blob/master/PKHeX.Core/PKM/HOME/GameDataPC9.cs
-                    mon.pc9_data =
-                        Some(*array_ref![bytes, byte_counter, super::HOME_PC9_DATA_SIZE]);
+                    mon.pc9_data = HomePc9Data::try_from_bytes(
+                        &bytes[byte_counter..byte_counter + super::HOME_PC9_DATA_SIZE],
+                    )
+                    .ok();
                     byte_counter += super::HOME_PC9_DATA_SIZE;
                 }
                 7 => {
@@ -367,7 +365,7 @@ impl PkmBytes for Ph4 {
 
             // write data
             let pc9_range_end = pc + super::HOME_PC9_DATA_SIZE;
-            bytes[pc..pc9_range_end].copy_from_slice(&data);
+            bytes[pc..pc9_range_end].copy_from_slice(&data.to_bytes());
 
             pc += super::HOME_PC9_DATA_SIZE;
         }
