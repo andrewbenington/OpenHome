@@ -20,8 +20,8 @@ public static class PkhPb7Object
             resort_event_status = pk.ResortEventState,
             moves = Util.AllMoveData(pk, strings),
             relearn_moves = Util.RelearnMoves(pk, strings),
-            height_absolute = pk.HeightAbsolute,
-            weight_absolute = pk.WeightAbsolute,
+            height_absolute = Util.FormatFloat(pk.HeightAbsolute),
+            weight_absolute = Util.FormatFloat(pk.WeightAbsolute),
             spirit = pk.Spirit,
             mood = pk.Mood,
             fullness = pk.Fullness,
@@ -34,12 +34,12 @@ public static class PkhPb7Object
             received_second = pk.ReceivedSecond,
             enjoyment = pk.Enjoyment,
             geo_padding = pk.GeoPadding,
-            ball = pk.Ball,
-            egg_location = pk.EggLocation,
-            met_location = pk.MetLocation,
+            ball = Util.FormatBall(pk, strings),
+            egg_location_index = pk.EggLocation,
+            met_location_index = pk.MetLocation,
             pokerus = pk.PokerusState,
-            ability_index = pk.Ability,
-            ability_num = pk.AbilityNumber,
+            ability_index = strings.abilitylist.GetValue(pk.Ability),
+            ability_num = Util.FormatAbilityNum(pk.AbilityNumber),
         };
     }
 }

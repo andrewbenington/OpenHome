@@ -189,14 +189,6 @@ impl<S: AsRef<[u8]>> PkhPa8Buffer<S> {
         Stats8::from_bytes(self.gvs_raw())
     }
 
-    pub fn height_absolute_raw(&self) -> [u8; 4] {
-        self.get_array(Offset::HeightAbsolute)
-    }
-
-    pub fn weight_absolute_raw(&self) -> [u8; 4] {
-        self.get_array(Offset::WeightAbsolute)
-    }
-
     pub fn height_absolute(&self) -> f32 {
         self.get_f32_le(Offset::HeightAbsolute)
     }
@@ -318,14 +310,6 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> PkhPa8Buffer<S> {
 
     pub fn set_gvs(&mut self, v: Stats8) {
         self.set_gvs_raw(v.to_bytes());
-    }
-
-    pub fn set_absolute_height_raw(&mut self, v: [u8; 4]) {
-        self.set_array(Offset::HeightAbsolute, &v);
-    }
-
-    pub fn set_absolute_weight_raw(&mut self, v: [u8; 4]) {
-        self.set_array(Offset::WeightAbsolute, &v);
     }
 
     pub fn set_absolute_height(&mut self, v: f32) {

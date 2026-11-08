@@ -1,5 +1,6 @@
 use crate::bytes::{AsBytes, AsBytesMut};
 use crate::result::Result;
+use arrayref::array_ref;
 use pkm_rs_resources::abilities::AbilityIndexWasm;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::{MoveDataOffsets, MoveSlot, MoveSlots, PpUpStorage};
@@ -99,6 +100,11 @@ impl<S: AsRef<[u8]>> PkhPb7Buffer<S> {
         read_u32_le!(self.bytes(), offset)
     }
 
+    fn get_f32_le(&self, offset: Offset) -> f32 {
+        let offset = offset as usize;
+        f32::from_le_bytes(*array_ref![self.bytes(), offset, 4])
+    }
+
     fn get_array<const N: usize>(&self, offset: Offset) -> [u8; N] {
         let offset = offset as usize;
         self.bytes()[offset..offset + N].try_into().unwrap()
@@ -117,6 +123,11 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> PkhPb7Buffer<S> {
     }
 
     fn set_u32_le(&mut self, offset: Offset, v: u32) {
+        let offset = offset as usize;
+        self.bytes_mut()[offset..offset + 4].copy_from_slice(&v.to_le_bytes());
+    }
+
+    fn set_f32_le(&mut self, offset: Offset, v: f32) {
         let offset = offset as usize;
         self.bytes_mut()[offset..offset + 4].copy_from_slice(&v.to_le_bytes());
     }
@@ -161,12 +172,12 @@ impl<S: AsRef<[u8]>> PkhPb7Buffer<S> {
         MoveSlot::from_le_bytes(self.relearn_move_raw(idx))
     }
 
-    pub fn height_absolute_raw(&self) -> [u8; 4] {
-        self.get_array(Offset::HeightAbsolute)
+    pub fn height_absolute(&self) -> f32 {
+        self.get_f32_le(Offset::HeightAbsolute)
     }
 
-    pub fn weight_absolute_raw(&self) -> [u8; 4] {
-        self.get_array(Offset::WeightAbsolute)
+    pub fn weight_absolute(&self) -> f32 {
+        self.get_f32_le(Offset::WeightAbsolute)
     }
 
     pub fn spirit(&self) -> u8 {
@@ -286,12 +297,12 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> PkhPb7Buffer<S> {
         self.set_relearn_move_raw(idx, v.to_le_bytes());
     }
 
-    pub fn set_absolute_height_raw(&mut self, v: [u8; 4]) {
-        self.set_array(Offset::HeightAbsolute, &v);
+    pub fn set_absolute_height(&mut self, v: f32) {
+        self.set_f32_le(Offset::HeightAbsolute, v);
     }
 
-    pub fn set_absolute_weight_raw(&mut self, v: [u8; 4]) {
-        self.set_array(Offset::WeightAbsolute, &v);
+    pub fn set_absolute_weight(&mut self, v: f32) {
+        self.set_f32_le(Offset::WeightAbsolute, v);
     }
 
     pub fn set_spirit(&mut self, v: u8) {
