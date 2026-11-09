@@ -29,20 +29,19 @@
 }
 
 .badge {
+  --badge-height: calc(0.6rem + 0.5rem * var(--badge-size));
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 1.25rem;
-  padding: calc(0.15rem * var(--badge-size));
+  padding: 0.15rem;
+  height: var(--badge-height);
+  aspect-ratio: 1;
   border-radius: var(--border-radius-xs);
 
   img,
   svg {
-    width: calc(0.6rem + 0.4rem * var(--badge-size));
-  }
-
-  svg {
-    height: 40px;
+    width: 100%;
+    max-height: calc(0.9 * var(--badge-height));
   }
 }
 
@@ -82,9 +81,10 @@
 }
 
 .image-badge-with-text {
-  padding: 0px var(--padding-radius-sm-lg);
+  padding: 0.25rem calc(2 * var(--padding-radius-sm-lg));
   align-items: center;
   gap: 0.25rem;
+  text-wrap: nowrap;
 }
 
 @media (prefers-color-scheme: dark) {
