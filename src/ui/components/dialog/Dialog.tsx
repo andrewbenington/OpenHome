@@ -51,4 +51,7 @@ export const Dialog = {
   Actions: (props: React.HTMLAttributes<HTMLDivElement>) => (
     <div {...props} className={styles.Actions} />
   ),
+  Viewport: (props: React.ComponentProps<typeof BaseUiDialog.Viewport>) => (
+    <BaseUiDialog.Viewport className={styles.Viewport} {...props} />
+  ),
 }

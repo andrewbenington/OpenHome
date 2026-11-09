@@ -100,16 +100,17 @@ export default function AppTabs() {
             </Tabs.IconList>
             <Separator className="Separator" orientation="vertical" />
             <Box
+              id="active-tab-content-container"
               style={{
                 flex: 1,
-                width: '100%',
+                width: 'calc(100% - var(--navigation-sidebar-width))',
                 height: '100%',
                 overflowY: 'hidden',
                 position: 'relative',
                 paddingBottom: 'var(--footer-height)',
               }}
             >
-              <div style={{ height: '100%' }}>
+              <div style={{ height: '100%', overflowX: 'auto' }}>
                 <Routes>
                   <Route index path="/" element={homeElement} />
                   <Route path="/home" element={homeElement} />

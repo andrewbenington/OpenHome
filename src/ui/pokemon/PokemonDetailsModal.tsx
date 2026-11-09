@@ -94,49 +94,58 @@ export default function PokemonDetailsModal(props: PokemonDetailsModalProps) {
 
   return (
     <Dialog.Root open onOpenChange={(open) => !open && onClose?.()}>
-      <Dialog.Portal>
+      <Dialog.Portal
+        container={
+          document.getElementById('active-tab-content-container') ?? // dialog should not consider tabs a part of the app width
+          document.getElementById('app-container')
+        }
+      >
         <Dialog.Backdrop />
-        <Dialog.Popup className="pokemon-modal">
-          <VisuallyHidden>
-            <Dialog.Title>Pokémon Details</Dialog.Title>
-            <Dialog.Description>Detailed information about the selected Pokémon</Dialog.Description>
-          </VisuallyHidden>
-          <Fallback>
-            {mon && <ModalContents mon={mon} />}
-            {error && <MessageRibbon type="error">{error}</MessageRibbon>}
-          </Fallback>
-          {mon && (
-            <div className="modal-footer">
-              <Flex gap="1" align="center" minWidth="7rem">
-                <PokemonIcon
-                  nationalDex={mon.nationalDex}
-                  formIndex={mon.formIndex}
-                  style={{ width: '1rem', height: '1rem' }}
-                />
-                {mon.nickname}
-              </Flex>
-              <Flex gap="1" align="center" minWidth="5rem">
-                <Badge.Game
-                  originGame={mon.gameOfOrigin}
-                  plugin={mon.pluginOrigin}
-                  style={{ minWidth: 15, height: 15 }}
-                />
-                {mon.trainerName}
-              </Flex>
-              {mon.personalityValue && (
-                <code>PID {mon.personalityValue.toString(16).padStart(8, '0')}</code>
-              )}
-              <div>Level {mon.getLevel()}</div>
-              <div style={{ flex: 1 }} />
-              {mon instanceof OHPKM && mon.startedTrackingTimestamp && (
-                <>
-                  <div>OpenHome ID: {mon.openhomeId}</div>
-                  <div>Tracked since {mon.startedTrackingTimestamp?.format('MMMM D, YYYY')}</div>
-                </>
-              )}
-            </div>
-          )}
-        </Dialog.Popup>
+        <Dialog.Viewport>
+          <Dialog.Popup className="pokemon-modal">
+            <VisuallyHidden>
+              <Dialog.Title>Pokémon Details</Dialog.Title>
+              <Dialog.Description>
+                Detailed information about the selected Pokémon
+              </Dialog.Description>
+            </VisuallyHidden>
+            <Fallback>
+              {mon && <ModalContents mon={mon} />}
+              {error && <MessageRibbon type="error">{error}</MessageRibbon>}
+            </Fallback>
+            {mon && (
+              <div className="modal-footer">
+                <Flex gap="1" align="center" minWidth="7rem">
+                  <PokemonIcon
+                    nationalDex={mon.nationalDex}
+                    formIndex={mon.formIndex}
+                    style={{ width: '1rem', height: '1rem' }}
+                  />
+                  {mon.nickname}
+                </Flex>
+                <Flex gap="1" align="center" minWidth="5rem">
+                  <Badge.Game
+                    originGame={mon.gameOfOrigin}
+                    plugin={mon.pluginOrigin}
+                    style={{ minWidth: 15, height: 15 }}
+                  />
+                  {mon.trainerName}
+                </Flex>
+                {mon.personalityValue && (
+                  <code>PID {mon.personalityValue.toString(16).padStart(8, '0')}</code>
+                )}
+                <div>Level {mon.getLevel()}</div>
+                <div style={{ flex: 1 }} />
+                {mon instanceof OHPKM && mon.startedTrackingTimestamp && (
+                  <>
+                    <div>OpenHome ID: {mon.openhomeId}</div>
+                    <div>Tracked since {mon.startedTrackingTimestamp?.format('MMMM D, YYYY')}</div>
+                  </>
+                )}
+              </div>
+            )}
+          </Dialog.Popup>
+        </Dialog.Viewport>
         {navigateLeft && (
           <button className="modal-arrow modal-arrow-left" onClick={navigateLeftWithIndicator}>
             <ArrowLeftIcon />

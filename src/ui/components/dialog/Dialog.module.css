@@ -25,13 +25,13 @@
   --alert-padding-y: var(--padding-radius-sm-lg);
 
   box-sizing: border-box;
-  position: fixed;
+  position: absolute;
   top: 50%;
   left: 50%;
   padding: var(--alert-padding-y) var(--alert-padding-x);
   transform: translate(-50%, -50%);
   width: 36rem;
-  max-width: calc(100vw - 3rem);
+  max-width: calc(100%);
   border-radius: var(--border-radius-lg);
   background: var(--color-panel);
   color: var(--color-gray-900);
@@ -59,7 +59,8 @@
 .Title {
   --padding-x-inverted: calc(-1 * var(--alert-padding-x));
   --padding-y-inverted: calc(-1 * var(--alert-padding-y));
-  margin: var(--padding-y-inverted) var(--padding-x-inverted) 0.5rem var(--padding-x-inverted) !important;
+  margin: var(--padding-y-inverted) var(--padding-x-inverted) 0.5rem
+    var(--padding-x-inverted) !important;
   padding: 0.25rem var(--alert-padding-x) 0.15rem var(--alert-padding-x);
   font-size: 1.125rem;
   line-height: 1.75rem;
@@ -82,4 +83,12 @@
   margin-left: auto;
   margin-top: calc(2 * var(--padding-radius-sm-lg));
   gap: var(--padding-radius-sm-lg);
+}
+
+.Viewport {
+  position: absolute !important;
+  left: 0;
+  inset: 0;
+  display: grid;
+  place-items: center;
 }
