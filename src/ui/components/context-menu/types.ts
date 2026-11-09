@@ -1,10 +1,16 @@
-import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { PkmFormSpecifiers } from '@openhome-core/pkm/util/pkmInterface'
 import { Option } from '@openhome-core/util/functional'
-import { OhpkmRowData } from '@openhome-ui/ohpkmGrid'
+import { NowOrLater } from '@openhome-core/util/promise'
 import React, { ReactNode } from 'react'
 import PokemonIcon from '../PokemonIcon'
 
-export type Element = ItemData | Separator | LabelData | SubmenuData | CheckboxData
+export type Element =
+  | ItemData
+  | LoadingItemData
+  | Separator
+  | LabelData
+  | SubmenuData
+  | CheckboxData
 
 type SingleElementBuilder = () => Element
 
@@ -27,15 +33,15 @@ type NoTag<T> = Omit<T, '__cm_type_tag'>
 
 type ItemData = {
   content: ElementContent
-  action?: () => void
+  action?: () => NowOrLater<unknown>
   disabled: boolean
   __cm_type_tag: 'item'
 }
 
 export class Item implements CtxMenuElementBuilder {
   content: ElementContent
-  #action?: () => void
-  #disabled: boolean = true
+  #action?: () => NowOrLater<unknown>
+  #disabled: boolean = false
 
   private constructor(content: ElementContent) {
     this.content = content
@@ -49,12 +55,12 @@ export class Item implements CtxMenuElementBuilder {
     return new Item({ component })
   }
 
-  action(action?: () => void): Item {
+  action(action?: () => NowOrLater<unknown>): Item {
     this.#action = action
     return this
   }
 
-  disabled(disabled: boolean): Item {
+  disabledIf(disabled: boolean): Item {
     this.#disabled = disabled
     return this
   }
@@ -63,8 +69,54 @@ export class Item implements CtxMenuElementBuilder {
     return {
       content: this.content,
       action: this.#action,
-      disabled: this.#action === undefined,
+      disabled: this.#action === undefined || this.#disabled,
       __cm_type_tag: 'item',
+    }
+  }
+}
+
+// //* LOADING ITEM *//
+
+type LoadingItemData = {
+  content: ElementContent
+  action?: () => Promise<void>
+  disabled: boolean
+  __cm_type_tag: 'loading_item'
+}
+
+export class LoadingItem implements CtxMenuElementBuilder {
+  content: ElementContent
+  #action?: () => Promise<void>
+  #disabled: boolean = true
+
+  private constructor(content: ElementContent) {
+    this.content = content
+  }
+
+  static label(label: string): LoadingItem {
+    return new LoadingItem({ label })
+  }
+
+  static component(component: ReactNode): LoadingItem {
+    return new LoadingItem({ component })
+  }
+
+  action(action?: () => Promise<void>): LoadingItem {
+    this.#action = action
+    return this
+  }
+
+  disabledIf(disabled: boolean): LoadingItem {
+    this.#disabled = disabled
+    return this
+  }
+
+  build(): LoadingItemData {
+    return {
+      content: this.content,
+      action: this.#action,
+      disabled: this.#action === undefined || this.#disabled,
+      __cm_type_tag: 'loading_item',
     }
   }
 }
@@ -85,6 +137,8 @@ type LabelData = {
   __cm_type_tag: 'label'
 }
 
+type LabelMon = PkmFormSpecifiers & { nickname: string }
+
 export class Label implements CtxMenuElementBuilder {
   data: NoTag<LabelData>
 
@@ -100,7 +154,7 @@ export class Label implements CtxMenuElementBuilder {
     return new Label({ component })
   }
 
-  static mon(mon: PKMInterface | OhpkmRowData): Label {
+  static mon(mon: LabelMon): Label {
     return Label.component(
       React.createElement(
         React.Fragment,
@@ -163,7 +217,7 @@ export class Submenu implements CtxMenuElementBuilder {
     return this
   }
 
-  disabled(disabled: boolean): Submenu {
+  disabledIf(disabled: boolean): Submenu {
     this.#disabled = disabled
     return this
   }
@@ -218,7 +272,7 @@ export class Checkbox implements CtxMenuElementBuilder {
     return this
   }
 
-  disabled(disabled: boolean): Checkbox {
+  disabledIf(disabled: boolean): Checkbox {
     this.#disabled = disabled
     return this
   }

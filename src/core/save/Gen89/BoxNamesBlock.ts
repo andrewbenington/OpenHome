@@ -1,5 +1,5 @@
 import { utf16BytesToString } from '@openhome-core/util/stringConversion'
-import { ArrayBlock } from '../encryption/SwishCrypto/SwishCrypto'
+import { ArrayBlock } from '@pkm-rs/pkg'
 
 const BOX_COUNT = 32
 const BOX_NAME_LENGTH = 0x22
@@ -8,7 +8,7 @@ export class BoxNamesBlock {
   dataView: DataView<ArrayBuffer>
 
   constructor(scBlock: ArrayBlock) {
-    this.dataView = new DataView(scBlock.data.Array.bytes.buffer)
+    this.dataView = new DataView(scBlock.bytes.buffer)
   }
 
   public getBoxName(index: number): string {

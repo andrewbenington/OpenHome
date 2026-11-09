@@ -1,5 +1,6 @@
 import BackendInterface, {
   BankOrBoxChange,
+  ItemBag,
   LogEntry,
   LogsResponse,
   MenuEvent,
@@ -163,6 +164,7 @@ export const TauriBackend: BackendInterface = {
       }))
     ),
   registerInPokedex: Commands.updatePokedex,
+  syncPokedex: Commands.syncPokedex,
 
   /* openhome boxes */
   loadHomeBanks: () => Commands.loadBanks().then(R.map(deserializeBankData)),
@@ -287,13 +289,12 @@ export const TauriBackend: BackendInterface = {
 
   /* bag */
   loadItemBag: async () => {
-    return (await Commands.get_storage_file_json('item-bag.json')) as Errorable<
-      Record<string, number>
-    >
+    const result = (await Commands.get_storage_file_json('item-bag.json')) as Result<ItemBag>
+    // tanstack query will catch and return the error
+    return R.assert(result)
   },
 
-  saveItemBag: async (items: Record<string, number>) =>
-    Commands.write_storage_file_json('item-bag.json', items),
+  saveItemBag: async (items: ItemBag) => Commands.write_storage_file_json('item-bag.json', items),
   /* transactions */
   startTransaction: Commands.startTransaction,
   commitTransaction: Commands.commitTransaction,
@@ -319,10 +320,14 @@ export const TauriBackend: BackendInterface = {
   getState: Commands.getState,
   getSettings: async () =>
     Commands.get_storage_file_json('settings.json').then(
-      R.map((partialSettings) => ({
-        ...defaultSettings,
-        ...partialSettings,
-      }))
+      R.map((partialSettings) =>
+        Array.isArray(partialSettings)
+          ? defaultSettings
+          : {
+              ...defaultSettings,
+              ...partialSettings,
+            }
+      )
     ),
   updateSettings: async (settings: Settings) =>
     Commands.write_storage_file_json('settings.json', settings as unknown as JSONObject),
@@ -357,7 +362,7 @@ export const TauriBackend: BackendInterface = {
 
   registerListeners: (listeners) => {
     const unlistenPromises: Promise<UnlistenFn>[] = [
-      listen('tauri://drag-drop', (e: OnDropEvent) => {
+      listen('tauri://drag-drop', async (e: OnDropEvent) => {
         const allFilesPromise: Promise<{
           filePath: string
           stat: FileInfo
@@ -368,7 +373,7 @@ export const TauriBackend: BackendInterface = {
           bytes: await readFile(filePath),
         }))
 
-        Promise.all(allFilesPromise).then(async (fileData) => {
+        return await Promise.all(allFilesPromise).then(async (fileData) => {
           const filesWithData = fileData.map(
             ({ filePath, stat, bytes }) =>
               new File([bytes as Uint8Array<ArrayBuffer>], filePath, {

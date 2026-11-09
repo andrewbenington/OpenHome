@@ -1,10 +1,9 @@
 import { toBase64 } from '@openhome-core/util'
-import { writeBlock } from '@pkm-rs/pkg/pkm_rs'
+import { Block, writeBlock } from '@pkm-rs/pkg'
 import { expect, test } from 'vitest'
-import { BoolBlock, ObjectBlock } from './SwishCrypto'
 
 test('write sc block', () => {
-  const block: ObjectBlock = {
+  const block: Block = {
     data: { Object: { bytes: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]) } },
     key: 0xdeadbeef,
   }
@@ -16,7 +15,7 @@ test('write sc block', () => {
   offset = writeBlock(block, buffer, offset)
   expect(offset).toBe(17)
 
-  const block2: ObjectBlock = {
+  const block2: Block = {
     data: { Object: { bytes: new Uint8Array([5, 7, 5]) } },
     key: 0xefe00efe,
   }
@@ -24,7 +23,7 @@ test('write sc block', () => {
   offset = writeBlock(block2, buffer, offset)
   expect(offset).toBe(29)
 
-  const block3: BoolBlock = {
+  const block3: Block = {
     key: 0xefe00efe,
     data: { Bool: 'Bool1' },
   }

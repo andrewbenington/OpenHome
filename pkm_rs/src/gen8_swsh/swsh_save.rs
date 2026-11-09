@@ -1,0 +1,684 @@
+#[cfg(feature = "wasm")]
+use std::collections::BTreeMap;
+
+use super::swsh_save_blocks::{BoxBlock, MyStatusBlock, SwordShieldBlocks};
+use super::{BOX_COLS, BOX_ROWS, BoxName, MAX_BOX_COUNT, Pk8, Pk8Buffer};
+use crate::checksum::RefreshChecksum;
+use crate::convert_strategy::ConvertStrategy;
+use crate::encryption::swish_crypto;
+use crate::encryption::swish_crypto::{NumericBlock, SwishBlocks};
+use crate::gen8_swsh::{BoxIndex, BoxSlot};
+use crate::result::{Error, Result};
+use crate::traits::PkmBytes;
+
+#[cfg(feature = "wasm")]
+use arbitrary_int::traits::Integer;
+use pkm_rs_types::strings::SizedUtf16String;
+use pkm_rs_types::{BinaryGender, Language};
+#[cfg(feature = "wasm")]
+use strum::IntoEnumIterator;
+
+#[cfg(feature = "wasm")]
+use crate::gen8_swsh::swsh_save_blocks::SwShBlockKey;
+#[cfg(feature = "wasm")]
+use crate::items::{ItemDataTs, SwshItemPouch, SwshItemStorage};
+#[cfg(feature = "wasm")]
+use crate::result::StdResult;
+#[cfg(feature = "wasm")]
+use pkm_rs_types::{BoundViolated, JsResult, NationalDex, OriginGame, TryIntoTs, TsResult};
+#[cfg(feature = "wasm")]
+use tsify::Ts;
+#[cfg(feature = "wasm")]
+use tsify::Tsify;
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
+
+const SAVE_SIZE_BYTES_MIN: usize = 0x171500;
+const SAVE_SIZE_BYTES_MAX: usize = 0x187800;
+
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = SwordShieldSaveRust))]
+#[derive(Debug)]
+pub struct SwordShieldSave {
+    blocks: SwordShieldBlocks,
+    byte_length: usize,
+}
+
+impl SwordShieldSave {
+    pub fn from_bytes(bytes: Box<[u8]>) -> Result<Self> {
+        let byte_length = bytes.len();
+
+        if byte_length < SAVE_SIZE_BYTES_MIN {
+            return Err(Error::buffer_size_with_source(
+                "sword/shield save file min",
+                SAVE_SIZE_BYTES_MIN,
+                byte_length,
+            ));
+        } else if byte_length > SAVE_SIZE_BYTES_MAX {
+            return Err(Error::buffer_size_with_source(
+                "sword/shield save file max",
+                SAVE_SIZE_BYTES_MAX,
+                byte_length,
+            ));
+        }
+
+        let blocks = SwordShieldBlocks::from_blocks(
+            SwishBlocks::from_bytes(bytes)
+                .map_err(|e| Error::other(&format!("SwishBlocks from_bytes: {e}")))?,
+        )?;
+
+        Ok(Self {
+            blocks,
+            byte_length,
+        })
+    }
+
+    const fn my_status(&self) -> &MyStatusBlock {
+        &self.blocks.my_status
+    }
+
+    const fn box_data(&self) -> &BoxBlock {
+        &self.blocks.pokemon_boxes
+    }
+
+    const fn box_data_mut(&mut self) -> &mut BoxBlock {
+        &mut self.blocks.pokemon_boxes
+    }
+
+    fn box_name(&self, box_index: BoxIndex) -> BoxName {
+        self.blocks.box_layouts.get_box_name(box_index)
+    }
+
+    pub fn box_mon_count(&self, box_index: BoxIndex) -> usize {
+        BoxSlot::all()
+            .filter(|&box_slot| !Pk8::is_empty_slot(&self.get_mon_bytes_raw(box_index, box_slot)))
+            .count()
+    }
+
+    pub fn pc_mon_count(&self) -> usize {
+        BoxIndex::all()
+            .map(|box_index| self.box_mon_count(box_index))
+            .sum()
+    }
+
+    pub fn trainer_name(&self) -> SizedUtf16String<{ MyStatusBlock::NAME_BYTE_LENGTH }> {
+        self.my_status().trainer_name()
+    }
+
+    pub fn trainer_id(&self) -> u16 {
+        self.my_status().trainer_id()
+    }
+
+    pub fn secret_id(&self) -> u16 {
+        self.my_status().secret_id()
+    }
+
+    fn language(&self) -> Language {
+        self.my_status().language().unwrap_or_default()
+    }
+
+    fn copy_pokemon_bytes_to(&mut self, box_index: BoxIndex, box_slot: BoxSlot, data: &[u8]) {
+        self.box_data_mut()
+            .mon_bytes_at_mut(box_index, box_slot)
+            .copy_from_slice(data)
+    }
+
+    fn get_mon_bytes_decrypted(&self, box_index: BoxIndex, box_slot: BoxSlot) -> Box<[u8]> {
+        let mut pokemon_bytes = self.get_mon_bytes_raw(box_index, box_slot);
+        Pk8Buffer::new_mut(&mut pokemon_bytes).decrypt();
+
+        pokemon_bytes
+    }
+
+    fn get_mon_bytes_raw(&self, box_index: BoxIndex, box_slot: BoxSlot) -> Box<[u8]> {
+        Box::from(self.box_data().mon_bytes_at(box_index, box_slot))
+    }
+
+    fn get_mon_at(&self, box_index: BoxIndex, box_slot: BoxSlot) -> Option<Pk8> {
+        let decrypted_bytes = self.get_mon_bytes_decrypted(box_index, box_slot);
+        let national_dex = Pk8Buffer::new(&decrypted_bytes).species_ndex();
+
+        if national_dex > 0 {
+            Pk8::from_bytes(&decrypted_bytes)
+                // .inspect_err(|err| {
+                //     crate::log!("malformed pkm at box {box_index}, slot {box_slot}: {err}")
+                // })
+                .ok()
+        } else {
+            None
+        }
+    }
+
+    fn set_mon_at(&mut self, box_index: BoxIndex, box_slot: BoxSlot, mut mon: Option<Pk8>) {
+        let mon_bytes = if let Some(mon) = &mut mon {
+            // stored stats and checksum should always be up-to-date in the box data
+            mon.recalculate_stats();
+            mon.refresh_checksum();
+
+            mon.to_box_bytes_encrypted()
+        } else {
+            Self::empty_box_slot_bytes()
+        };
+
+        // write bytes to box slot
+        self.copy_pokemon_bytes_to(box_index, box_slot, &mon_bytes);
+    }
+
+    pub fn empty_box_slot_bytes() -> Box<[u8]> {
+        // ANY CHANGES TO THIS MUST BE TESTED IN A SWORD/SHIELD SAVE FILE
+        // ensure moving a Pokémon from a save slot in OpenHome such that
+        // its previous slot is made empty does not result in a Bad Egg
+        // being left in the slot
+        let mut bytes = Box::new([0u8; Pk8::BOX_SIZE]);
+        let mut buffer = Pk8Buffer::new_mut(bytes.as_mut_slice());
+
+        buffer.refresh_checksum();
+        buffer.encrypt();
+
+        bytes
+    }
+
+    #[cfg(feature = "wasm")]
+    pub fn prepare_bytes_for_saving(&self) -> Vec<u8> {
+        let mut blocks: Vec<_> = self.blocks.to_blocks().into_values().collect();
+        swish_crypto::encrypt_blocks(&mut blocks, self.byte_length)
+    }
+
+    fn convert_ohpkm(
+        &self,
+        ohpkm: crate::ohpkm::OhpkmV2,
+        strategy: crate::convert_strategy::ConvertStrategy,
+    ) -> Result<Pk8> {
+        use crate::ohpkm::OhpkmConvert;
+        Pk8::from_ohpkm(&ohpkm, strategy)
+    }
+
+    const fn is_save(bytes: &[u8]) -> bool {
+        bytes.len() >= SAVE_SIZE_BYTES_MIN && bytes.len() <= SAVE_SIZE_BYTES_MAX
+    }
+
+    fn display_tid(&self) -> String {
+        crate::util::six_digit_trainer_id_from_full(self.blocks.my_status.tid_sid_u32())
+    }
+
+    fn game_of_origin(&self) -> Option<OriginGame> {
+        self.my_status().origin_game()
+    }
+
+    const fn current_pc_box_idx(&self) -> usize {
+        if let NumericBlock::UInt8(current_box) = self.blocks.current_box
+            && current_box < MAX_BOX_COUNT
+        {
+            current_box as usize
+        } else {
+            0
+        }
+    }
+
+    const fn set_current_pc_box_idx(&mut self, value: u8) {
+        if value < MAX_BOX_COUNT
+            && let NumericBlock::UInt8(current_box) = &mut self.blocks.current_box
+        {
+            *current_box = value
+        }
+    }
+
+    fn includes_origin(origin: OriginGame) -> bool {
+        origin.is_swsh()
+    }
+}
+
+// fn display_bytes(bytes: &[u8]) -> String {
+//     bytes
+//         .iter()
+//         .map(|b| format!("{:02x}", b))
+//         .collect::<Vec<_>>()
+//         .join(",")
+// }
+
+fn display_u16_hex(value: impl Into<u16>) -> String {
+    format!("0x{:04x}", value.into())
+}
+
+fn add_field(
+    obj: &js_sys::Object,
+    key: impl Into<JsValue>,
+    value: impl Into<JsValue>,
+) -> StdResult<bool, JsValue> {
+    js_sys::Reflect::set(obj, &key.into(), &value.into())
+}
+
+fn add_string(
+    obj: &js_sys::Object,
+    key: impl Into<JsValue>,
+    value: impl ToString,
+) -> StdResult<bool, JsValue> {
+    js_sys::Reflect::set(obj, &key.into(), &value.to_string().into())
+}
+
+fn add_u16_hex(
+    obj: &js_sys::Object,
+    key: impl Into<JsValue>,
+    value: impl Into<u16>,
+) -> StdResult<bool, JsValue> {
+    js_sys::Reflect::set(obj, &key.into(), &display_u16_hex(value).into())
+}
+
+#[cfg(feature = "wasm")]
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_class = SwordShieldSaveRust))]
+#[allow(clippy::missing_const_for_fn)]
+impl SwordShieldSave {
+    #[wasm_bindgen(js_name = getMonAt)]
+    pub fn get_mon_at_wasm(&self, box_index: u8, box_slot: u8) -> Option<Pk8> {
+        self.get_mon_at(box_index.try_into().ok()?, box_slot.try_into().ok()?)
+    }
+
+    #[wasm_bindgen(js_name = setMonAt)]
+    pub fn set_mon_at_wasm(&mut self, box_index: u8, box_slot: u8, mon: Option<Pk8>) {
+        if let Ok(box_index) = box_index.try_into()
+            && let Ok(box_slot) = box_slot.try_into()
+        {
+            self.set_mon_at(box_index, box_slot, mon)
+        }
+    }
+
+    #[wasm_bindgen(js_name = emptyBoxSlotBytes)]
+    pub fn empty_box_slot_bytes_wasm() -> Box<[u8]> {
+        Self::empty_box_slot_bytes()
+    }
+
+    #[wasm_bindgen(js_name = getBoxName)]
+    pub fn box_name_wasm(&mut self, box_index: u8) -> std::result::Result<String, JsError> {
+        match BoxIndex::check_bound(box_index) {
+            Ok(index) => Ok(self.box_name(index).to_string()),
+            Err(BoundViolated) => Err(BoundViolated.into()),
+        }
+    }
+
+    #[wasm_bindgen(js_name = convertOhpkm)]
+    pub fn convert_ohpkm_wasm(
+        &self,
+        ohpkm: crate::ohpkm::OhpkmV2,
+        strategy: Ts<ConvertStrategy>,
+    ) -> Result<Pk8> {
+        self.convert_ohpkm(ohpkm, strategy.to_rust()?)
+    }
+
+    #[wasm_bindgen(js_name = fromBytes)]
+    pub fn from_byte_vector(bytes: Box<[u8]>) -> Result<Self> {
+        Self::from_bytes(bytes)
+    }
+
+    #[wasm_bindgen(js_name = isValidSave)]
+    pub fn is_valid_save_wasm(bytes: &[u8]) -> bool {
+        Self::is_save(bytes)
+    }
+
+    #[wasm_bindgen(getter = displayId)]
+    pub fn display_tid_wasm(&self) -> String {
+        self.display_tid()
+    }
+
+    #[wasm_bindgen(getter = trainerName)]
+    pub fn trainer_name_wasm(&self) -> String {
+        self.trainer_name().to_string()
+    }
+
+    #[wasm_bindgen(getter = trainerId)]
+    pub fn trainer_id_wasm(&self) -> u16 {
+        self.trainer_id()
+    }
+
+    #[wasm_bindgen(getter = secretId)]
+    pub fn secret_id_wasm(&self) -> u16 {
+        self.secret_id()
+    }
+
+    #[wasm_bindgen(getter = trainerGender)]
+    pub fn trainer_gender_wasm(&self) -> BinaryGender {
+        self.my_status().trainer_gender()
+    }
+
+    #[wasm_bindgen(getter = MAX_BOX_COUNT)]
+    pub fn max_box_count() -> u8 {
+        MAX_BOX_COUNT
+    }
+
+    #[wasm_bindgen(getter = BOX_ROWS)]
+    pub fn box_rows() -> u8 {
+        BOX_ROWS
+    }
+
+    #[wasm_bindgen(getter = BOX_COLS)]
+    pub fn box_cols() -> u8 {
+        BOX_COLS
+    }
+
+    #[wasm_bindgen(getter = SLOTS_PER_BOX)]
+    pub fn box_size() -> u8 {
+        BOX_COLS * BOX_ROWS
+    }
+
+    #[wasm_bindgen(getter = currentPcBoxIdx)]
+    pub fn current_pc_box_idx_wasm(&self) -> usize {
+        self.current_pc_box_idx()
+    }
+
+    #[wasm_bindgen(setter = currentPcBoxIdx)]
+    pub fn set_current_pc_box_idx_wasm(&mut self, value: u8) {
+        self.set_current_pc_box_idx(value)
+    }
+
+    #[wasm_bindgen(js_name = getBoxMonCount)]
+    pub fn box_mon_count_wasm(&mut self, box_index: u8) -> std::result::Result<usize, JsError> {
+        match BoxIndex::check_bound(box_index) {
+            Ok(index) => Ok(self.box_mon_count(index)),
+            Err(BoundViolated) => Err(BoundViolated.into()),
+        }
+    }
+
+    #[wasm_bindgen(js_name = getPcMonCount)]
+    pub fn pc_mon_count_wasm(&mut self) -> usize {
+        self.pc_mon_count()
+    }
+
+    #[wasm_bindgen(getter = gameOfOrigin)]
+    pub fn game_of_origin_wasm(&self) -> OriginGame {
+        self.game_of_origin().unwrap_or_default()
+    }
+
+    #[wasm_bindgen(getter = language)]
+    pub fn language_wasm(&self) -> Language {
+        self.language()
+    }
+
+    #[wasm_bindgen(js_name = getPokedexOwned)]
+    pub fn pokedex_owned_wasm(&self) -> Result<u16> {
+        match self.blocks.trainer_card.fields() {
+            Ok(fields) => Ok(fields.pokedex_owned.get()),
+            Err(err) => Err(Error::Other(format!("error reading pokedex_owned: {err}"))),
+        }
+    }
+
+    #[wasm_bindgen(js_name = getDisplayData)]
+    pub fn display_data(&self) -> StdResult<js_sys::Object, JsValue> {
+        // let mut map = BTreeMap::new();
+        // map.insert("pokedexOwned", 3);
+
+        // let serializer = Serializer::new().serialize_maps_as_objects(true);
+        // map.serialize(&serializer).map_err(Into::into)
+        let obj = js_sys::Object::new();
+        let trainer_card = self
+            .blocks
+            .trainer_card
+            .fields()
+            .map_err(|e| e.to_string())?;
+
+        // add_field(&obj, "Language", trainer_card.language)?;
+        add_u16_hex(&obj, "Trainer ID", trainer_card.trainer_id.get())?;
+        add_u16_hex(&obj, "Secret ID", trainer_card.secret_id.get())?;
+        add_field(
+            &obj,
+            "Pokédex Entries Registered",
+            trainer_card.pokedex_owned.get(),
+        )?;
+        add_field(
+            &obj,
+            "Shiny Pokémon Found",
+            trainer_card.shiny_pokemon_found.get(),
+        )?;
+        add_string(
+            &obj,
+            "Player Character",
+            if trainer_card.gender {
+                "Gloria"
+            } else {
+                "Victor"
+            },
+        )?;
+        add_string(
+            &obj,
+            "Starter",
+            NationalDex::Grookey
+                .try_add(trainer_card.starter_index)
+                .map(pkm_rs_resources::species_name_en)
+                .unwrap_or("Invalid Starter Index"),
+        )?;
+
+        add_string(&obj, "Version", SwordShieldVersion::detect(&self.blocks))?;
+
+        Ok(obj)
+    }
+
+    #[wasm_bindgen(getter = saveVersion)]
+    pub fn save_version_wasm(&self) -> TsResult<SwordShieldVersion> {
+        SwordShieldVersion::detect(&self.blocks).try_into_ts()
+    }
+
+    #[wasm_bindgen(js_name = includesOrigin)]
+    pub fn includes_origin_wasm(origin: OriginGame) -> bool {
+        Self::includes_origin(origin)
+    }
+
+    #[wasm_bindgen(js_name = fileIsSave)]
+    pub fn file_is_save_wasm(bytes: &[u8]) -> bool {
+        Self::is_save(bytes)
+    }
+
+    #[wasm_bindgen(js_name = getItemInventory)]
+    pub fn item_inventory_wasm(&self) -> Vec<Ts<ItemDataTs>> {
+        let mut item_data: BTreeMap<u16, ItemDataTs> = self
+            .blocks
+            .items
+            .0
+            .all()
+            .map(|item| (item.get_index().as_u16(), item.to_ts()))
+            .collect();
+
+        for item_index in SwshItemPouch::iter()
+            .flat_map(SwshItemStorage::items_by_pouch)
+            .flatten()
+            .copied()
+        {
+            item_data
+                .entry(item_index)
+                .or_insert_with(|| ItemDataTs::new_unobtained(item_index));
+        }
+
+        item_data
+            .values()
+            .filter_map(|item| item.into_ts().ok())
+            .collect()
+    }
+
+    #[wasm_bindgen(js_name = "updateItemData")]
+    pub fn update_item_inventory_wasm(&mut self, v: Ts<ItemDataTs>) -> JsResult<()> {
+        self.blocks.items.update_item_from_ts(v.to_rust()?);
+
+        Ok(())
+    }
+
+    #[wasm_bindgen(js_name = prepareBytesForSaving)]
+    pub fn prepare_bytes_for_saving_wasm(&self) -> Vec<u8> {
+        self.prepare_bytes_for_saving()
+    }
+}
+
+#[cfg_attr(feature = "wasm", derive(Tsify, serde::Serialize, serde::Deserialize))]
+#[derive(Debug, Clone, Copy, strum::Display)]
+pub enum SwordShieldVersion {
+    #[serde(rename = "Base Game")]
+    BaseGame,
+    #[serde(rename = "Isle of Armor")]
+    IsleOfArmor,
+    #[serde(rename = "Crown Tundra")]
+    CrownTundra,
+}
+
+impl SwordShieldVersion {
+    fn detect(blocks: &SwordShieldBlocks) -> Self {
+        let other_blocks = &blocks.other_blocks;
+        if other_blocks.has_block(SwShBlockKey::ZukanR2) {
+            Self::CrownTundra
+        } else if other_blocks.has_block(SwShBlockKey::ZukanR1) {
+            Self::IsleOfArmor
+        } else {
+            Self::BaseGame
+        }
+    }
+}
+
+#[cfg(feature = "wasm")]
+#[cfg(test)]
+mod tests {
+    use std::collections::HashMap;
+    use std::path::Path;
+
+    use super::*;
+    use crate::convert_strategy::ConvertStrategy;
+    use crate::ohpkm::{OhpkmConvert, OhpkmV2};
+    use crate::tests;
+
+    #[test]
+    fn block_count_is_expected() -> std::result::Result<(), Box<dyn std::error::Error>> {
+        let save_path = Path::new("gen8-swsh").join("sword");
+        let mut save_bytes = tests::save_bytes_from_file(&save_path)?;
+        let block_vec = swish_crypto::decrypt_blocks(&mut save_bytes)?;
+
+        let mut original_blocks_by_key: HashMap<u32, swish_crypto::Block> = HashMap::new();
+        for block in &block_vec {
+            original_blocks_by_key.insert(block.key(), block.clone());
+        }
+
+        assert_eq!(block_vec.len(), 4741);
+
+        Ok(())
+    }
+
+    #[test]
+    fn blocks_identical_after_serde() -> std::result::Result<(), Box<dyn std::error::Error>> {
+        let save_path = Path::new("gen8-swsh").join("sword");
+        let save_bytes = tests::save_bytes_from_file(&save_path)?;
+
+        let mut block_bytes = save_bytes.clone();
+        let block_vec = swish_crypto::decrypt_blocks(&mut block_bytes)?;
+
+        let mut original_blocks_by_key: HashMap<u32, swish_crypto::Block> = HashMap::new();
+        for block in &block_vec {
+            original_blocks_by_key.insert(block.key(), block.clone());
+        }
+
+        let save = SwordShieldSave::from_bytes(save_bytes.into_boxed_slice())?;
+
+        let after_serialized_bytes = save.prepare_bytes_for_saving();
+
+        let block_vec =
+            swish_crypto::decrypt_blocks(&mut after_serialized_bytes.into_boxed_slice())?;
+        for block in &block_vec {
+            let key = block.key();
+            let Some(original_block) = original_blocks_by_key.get(&key) else {
+                return Err(format!("Block missing for key {key}").into());
+            };
+
+            tests::assert_unchanged(
+                &block,
+                &original_block,
+                Some(tests::context(
+                    &format!("SwishCrypto block with key {key}"),
+                    &save_path,
+                )),
+            )?;
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn pkm_checksum_calculation_is_correct() -> Result<()> {
+        use crate::checksum::Checksum;
+
+        let save_path = Path::new("gen8-swsh").join("sword");
+        let save_bytes = tests::save_bytes_from_file(&save_path)?;
+        let save = SwordShieldSave::from_bytes(save_bytes.into_boxed_slice())?;
+
+        for box_index in BoxIndex::all() {
+            for box_slot in BoxSlot::all() {
+                let mon_bytes = save.get_mon_bytes_decrypted(box_index, box_slot);
+                let buffer = Pk8Buffer::new(&mon_bytes);
+                if buffer.checksum() != buffer.calculate_checksum() {
+                    return Err(Error::other(&format!(
+                        "Invalid checksum for mon at box {box_index}, slot {box_slot}: expected {:#06x}, got {:#06x}",
+                        buffer.calculate_checksum(),
+                        buffer.checksum()
+                    )));
+                }
+            }
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn current_box_is_expected() -> Result<()> {
+        let save_path = Path::new("gen8-swsh").join("sword");
+        let save_bytes = tests::save_bytes_from_file(&save_path)?;
+        let save = SwordShieldSave::from_bytes(save_bytes.into_boxed_slice())?;
+
+        assert_eq!(save.current_pc_box_idx(), 15);
+
+        Ok(())
+    }
+
+    #[test]
+    fn pokemon_is_same_before_after_setting_in_box() -> Result<()> {
+        let save_bytes = tests::save_bytes_from_file(&Path::new("gen8-swsh").join("sword"))?;
+        let mut save = SwordShieldSave::from_bytes(save_bytes.into_boxed_slice())?;
+
+        let ohpkm =
+            tests::pkm_from_file::<OhpkmV2>(&Path::new("ohpkm").join("cinderace-mint.ohpkm"))?;
+
+        let pk8 = Pk8::from_ohpkm(&ohpkm.0, ConvertStrategy::default())?;
+
+        let box_index = BoxIndex::check_bound(0).expect("should be valid");
+        let box_slot = BoxSlot::check_bound(9).expect("should be valid");
+
+        save.set_mon_at(box_index, box_slot, Some(pk8));
+        let retrieved_pk8 = save
+            .get_mon_at(box_index, box_slot)
+            .expect("ribbon master is present");
+
+        if retrieved_pk8.calculate_checksum() != pk8.calculate_checksum() {
+            return Err(Error::other(
+                "pokemon changed between setting and retrieving",
+            ));
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn empty_slot_bytes_write_read_are_expected() -> tests::TestResult<()> {
+        let save_bytes = tests::save_bytes_from_file(&Path::new("gen8-swsh").join("sword2"))?;
+        let mut save = SwordShieldSave::from_bytes(save_bytes.into_boxed_slice())?;
+
+        let initially_full_box_index = BoxIndex::check_bound(1).expect("should be valid");
+        let initially_full_slot = BoxSlot::check_bound(1).expect("should be valid");
+
+        assert!(
+            save.get_mon_at(initially_full_box_index, initially_full_slot)
+                .is_some()
+        );
+
+        save.set_mon_at(initially_full_box_index, initially_full_slot, None);
+        assert!(
+            save.get_mon_at(initially_full_box_index, initially_full_slot)
+                .is_none()
+        );
+
+        let mut expected_bytes = SwordShieldSave::empty_box_slot_bytes();
+        let mut actual_bytes =
+            save.get_mon_bytes_raw(initially_full_box_index, initially_full_slot);
+        Pk8Buffer::new_mut(&mut expected_bytes).decrypt();
+        Pk8Buffer::new_mut(&mut actual_bytes).decrypt();
+
+        tests::assert_ranges_match(&actual_bytes, &expected_bytes, None)
+    }
+}

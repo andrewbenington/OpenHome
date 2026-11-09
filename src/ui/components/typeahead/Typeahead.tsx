@@ -79,17 +79,13 @@ export default function Typeahead<Option>(props: TypeaheadProps<Option>) {
   )
 
   useEffect(() => {
-    // oxlint-disable-next-line react-you-might-not-need-an-effect/no-pass-data-to-parent
     dispatchState(['set-options', options])
   }, [dispatchState, options])
 
   useEffect(() => {
-    // oxlint-disable-next-line react-you-might-not-need-an-effect/no-pass-data-to-parent
     if (propValue && !isOptionEmpty(propValue)) {
-      // oxlint-disable-next-line react-you-might-not-need-an-effect/no-pass-data-to-parent
       dispatchState(['set-input', getOptionString(propValue)])
     } else if (!state.expanded) {
-      // oxlint-disable-next-line react-you-might-not-need-an-effect/no-pass-data-to-parent
       dispatchState(['set-input', ''])
     }
   }, [

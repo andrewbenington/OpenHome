@@ -2,21 +2,21 @@ import useBackend from '@openhome-core/backend/useBackend'
 import { getMoveMaxPP } from '@openhome-core/pkm'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import {
-  getMonFileIdentifier,
   getMonGen12Identifier,
   getMonGen345Identifier,
   OhpkmIdentifier,
+  tryCalculateIdentifier,
 } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
-import { SAVClass } from '@openhome-core/save/util'
+import { SAVClass } from '@openhome-core/save/types'
 import { Filter, PaginationCursor } from '@openhome-core/tauri/spectaCommands'
 import { expectExhaustive } from '@openhome-core/util'
 import { $R, Option, PromisedResultBox, R, Result } from '@openhome-core/util/functional'
 import { LRUCache } from '@openhome-core/util/lruCache'
 import { isThenable, NowOrLater } from '@openhome-core/util/promise'
 import { FourMoves } from '@openhome-core/util/types'
-import useDisplayError from '@openhome-ui/hooks/displayError'
+import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import { Lookup, MarkingsSixShapesColors, ModernRibbon, OriginGames } from '@pkm-rs/pkg/pkm_rs'
 import dayjs from 'dayjs'
 import { useCallback } from 'react'
@@ -30,23 +30,23 @@ export type MoveSlotIndex = 0 | 1 | 2 | 3
 
 export type OhpkmLookupResult = Result<OHPKM, IdentifierNotPresentError>
 export type OhpkmBatchLookupResults = Map<OhpkmIdentifier, OhpkmLookupResult>
+type OhpkmCallback = (data: Option<OHPKM>) => void
+type OhpkmWithIdCallback = (id: OhpkmIdentifier, data: Option<OHPKM>) => void
 
 function createOhpkmStore(capacity: number) {
   const cache = new LRUCache<OhpkmIdentifier, OHPKM>(capacity)
-  const listeners = new Map<OhpkmIdentifier, Set<() => void>>()
-  const globalListeners = new Set<() => void>()
+  const listeners = new Map<OhpkmIdentifier, Set<OhpkmCallback>>()
+  const globalListeners = new Set<OhpkmWithIdCallback>()
 
   function notify(id: OhpkmIdentifier) {
-    listeners.get(id)?.forEach((l) => l())
-    globalListeners.forEach((l) => l())
+    listeners.get(id)?.forEach((callback) => callback(cache.get(id)))
+    globalListeners.forEach((callback) => callback(id, cache.get(id)))
   }
 
   return {
     get: (id: OhpkmIdentifier) => cache.get(id),
-    peek: (id: OhpkmIdentifier) => cache.peek(id),
     set: (id: OhpkmIdentifier, pkm: OHPKM) => {
-      const evicted = cache.set(id, pkm)
-      if (evicted !== undefined) notify(evicted) // let evicted entry's subscribers know
+      cache.insert(id, pkm)
       notify(id)
     },
     delete: (id: OhpkmIdentifier) => {
@@ -54,12 +54,12 @@ function createOhpkmStore(capacity: number) {
       if (existed) notify(id)
       return existed
     },
-    subscribe: (id: OhpkmIdentifier, cb: () => void) => {
+    subscribe: (id: OhpkmIdentifier, cb: OhpkmCallback) => {
       if (!listeners.has(id)) listeners.set(id, new Set())
       listeners.get(id)?.add(cb)
       return () => listeners.get(id)?.delete(cb)
     },
-    subscribeAll: (cb: () => void) => {
+    subscribeAll: (cb: OhpkmWithIdCallback) => {
       globalListeners.add(cb)
       return () => globalListeners.delete(cb)
     },
@@ -76,7 +76,14 @@ export function useOhpkmStore() {
   const backend = useBackend()
   const displayError = useDisplayError()
 
-  const updateStore = backend.addToOhpkmStore
+  async function updateStore(updates: OhpkmStoreData): Promise<Result<null>> {
+    for (const [id, ohpkm] of Object.entries(updates)) {
+      ohpkmCache.set(id, ohpkm)
+    }
+    await backend.addToOhpkmStore(updates)
+
+    return R.Ok(null)
+  }
 
   const getById = useCallback(
     (id: string): NowOrLater<Option<OHPKM>> => {
@@ -195,8 +202,8 @@ export function useOhpkmStore() {
   }
 
   // the async tasks are left to run here because otherwise the box UI lags to wait for them
-  function updateAndConvertForSave<P extends PKMInterface>(ohpkm: OHPKM, save: SAV<P>) {
-    handleLookupsUpdate(ohpkm, save)
+  async function updateAndConvertForSave<P extends PKMInterface>(ohpkm: OHPKM, save: SAV<P>) {
+    await handleLookupsUpdate(ohpkm, save)
       .then(() => insertOrUpdate(ohpkm))
       .then(() => handleLookupsUpdate(ohpkm, save))
       .catch((error) =>
@@ -300,7 +307,7 @@ export function useOhpkmStore() {
     return R.Ok(mon)
   }
 
-  async function startTrackingNewMon<P extends PKMInterface>(
+  function startTrackingNewMon<P extends PKMInterface>(
     mon: P,
     sourceSave: Option<SAV<P>>,
     destSave: Option<SAV>
@@ -308,13 +315,19 @@ export function useOhpkmStore() {
     const ohpkm = sourceSave ? OHPKM.fromMonInSave(mon, sourceSave) : OHPKM.fromMonUnknownSave(mon)
     ohpkm.startedTrackingTimestamp = dayjs()
 
-    backend.log('INFO', `Starting to track ${mon.nickname} (${ohpkm.openhomeId})`)
-
+    backend
+      .log('INFO', `Starting to track ${mon.nickname} (${ohpkm.openhomeId})`)
+      .catch((error) =>
+        displayError('Error Logging Event', [
+          `When trying to log event "Starting to track ${mon.nickname} (${ohpkm.openhomeId})", an error was encountered:`,
+          String(error),
+        ])
+      )
     if (destSave) {
-      await handleLookupsUpdate(ohpkm, destSave)
+      void handleLookupsUpdate(ohpkm, destSave)
     }
 
-    await insertOrUpdate(ohpkm).catch((error) => {
+    void insertOrUpdate(ohpkm).catch((error) => {
       console.error(error)
       displayError('Error Updating Lookup File for Save', [
         `When updating the lookup entry for the OHPKM ${ohpkm.openhomeId} (${ohpkm.nickname}), an error was encountered:`,
@@ -367,8 +380,9 @@ export function useOhpkmStore() {
       case 'PB8LUMI':
       case 'PK9':
       case 'PK9Compass':
-      case 'PA9': {
-        return getMonFileIdentifier(mon)
+      case 'PA9':
+      case 'PH4': {
+        return tryCalculateIdentifier(mon)
       }
       default:
         expectExhaustive(mon.format, `unrecognized format: ${mon.format}`)
@@ -385,7 +399,7 @@ export function useOhpkmStore() {
     sourceSave: Option<SAV>,
     destSave: Option<SAV>
   ) {
-    return (await loadIfTracked(mon)) ?? (await startTrackingNewMon(mon, sourceSave, destSave))
+    return (await loadIfTracked(mon)) ?? startTrackingNewMon(mon, sourceSave, destSave)
   }
 
   async function monOrOhpkmIfTracked<P extends PKMInterface>(mon: P): Promise<OHPKM | P> {
@@ -407,7 +421,7 @@ export function useOhpkmStore() {
     mon: PKMInterface,
     save?: SAV
   ): PromisedResultBox<OHPKM, IdentifierNotPresentError> {
-    return R.after(tryLoadFromId(ohpkmId)).awaitMap(async (trackedData) => {
+    return R.after(tryLoadFromId(ohpkmId)).map((trackedData) => {
       const updates = trackedData.syncWithGameData(mon, save)
 
       if (updates.length > 0) {
@@ -439,23 +453,29 @@ export function useOhpkmStore() {
   }
 
   async function scanFullStoreAndFixHandlers(save: SAV) {
-    return R.after(backend.getOhpkmIdsMatchingUnknownHandler(save)).then(async (ohpkmIds) => {
-      for (const result of (await tryLoadBatch(ohpkmIds)).values()) {
-        await $R(result).match(
-          async (mon) => fixMissingHandlerIfPresent(save, mon),
-          async ({ identifier }) => {
-            return await backend.log(
-              'ERROR',
-              `Could not find OHPKM with identifier ${identifier}`,
-              {
-                ohpkm_id: identifier,
-                event: 'fix_unknown_handler_scan',
-              }
-            )
-          }
-        )
-      }
-    })
+    return R.after(backend.getOhpkmIdsMatchingUnknownHandler(save))
+      .awaitMap(async (ohpkmIds) => {
+        for (const result of (await tryLoadBatch(ohpkmIds)).values()) {
+          await $R(result).match(
+            async (mon) => fixMissingHandlerIfPresent(save, mon),
+            async ({ identifier }) => {
+              return await backend.log(
+                'ERROR',
+                `Could not find OHPKM with identifier ${identifier}`,
+                {
+                  ohpkm_id: identifier,
+                  event: 'fix_unknown_handler_scan',
+                }
+              )
+            }
+          )
+        }
+      })
+      .await()
+  }
+
+  function clearCache() {
+    ohpkmCache.reset()
   }
 
   function clearCache() {
@@ -478,6 +498,7 @@ export function useOhpkmStore() {
     replaceHeldItem,
     setMonNickname,
     setMonMove,
+    subscribeAllUpdates: ohpkmCache.subscribeAll,
 
     searchStore,
     updateAndConvertForSave,

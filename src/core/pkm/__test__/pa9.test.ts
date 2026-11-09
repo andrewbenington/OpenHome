@@ -141,3 +141,16 @@ describe("pa9 - ohpkm sync doesn't crash", async () => {
     })
   }
 })
+
+const RELIC_SONG = 547
+const PRECIPICE_BLADES = 619
+
+describe('pa9 - invalid greninja has expected moves', async () => {
+  await initializeWasm()
+
+  test(`greninja has expected plus flags`, () => {
+    const mon = pa9FromTestFile('invalid-greninja.pa9')
+    expect(Array.from(mon.plusMovesLza).includes(RELIC_SONG))
+    expect(Array.from(mon.plusMovesLza).includes(PRECIPICE_BLADES))
+  })
+})

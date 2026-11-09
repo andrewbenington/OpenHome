@@ -353,3 +353,21 @@ const ALL_NATURES: [&NatureMetadata; 25] = [
     &HASTY, &SERIOUS, &JOLLY, &NAIVE, &MODEST, &MILD, &QUIET, &BASHFUL, &RASH, &CALM, &GENTLE,
     &SASSY, &CAREFUL, &QUIRKY,
 ];
+
+pub trait WithNature {
+    fn nature(&self) -> NatureIndex;
+
+    fn mint_nature(&self) -> Option<NatureIndex> {
+        None
+    }
+}
+
+pub trait PotentialNature {
+    fn potential_nature(&self) -> NatureIndex;
+}
+
+impl WithNature for NatureIndex {
+    fn nature(&self) -> NatureIndex {
+        *self
+    }
+}

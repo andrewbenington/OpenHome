@@ -1,4 +1,6 @@
 #[cfg(feature = "wasm")]
+mod ph4;
+#[cfg(feature = "wasm")]
 mod pk3;
 #[cfg(feature = "wasm")]
 mod pk7;
@@ -10,6 +12,12 @@ mod pk9;
 mod pkcblmn;
 
 use crate::convert_strategy::ConvertStrategy;
+use crate::ohpkm::v2_sections::LearnedMoves;
+use crate::ohpkm::v2_sections::LegendsArceusData;
+use crate::ohpkm::v2_sections::LegendsZaData;
+use crate::ohpkm::v2_sections::PluginData;
+use crate::ohpkm::v2_sections::ScarletVioletData;
+use crate::ohpkm::v2_sections::SwordShieldData;
 use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
 use crate::result::Result;
 use crate::traits::Pkm;
@@ -38,6 +46,18 @@ pub trait OhpkmConvert: Pkm {
     }
 
     fn to_cobblemon_data(&self) -> Option<CobblemonData> {
+        None
+    }
+
+    fn to_lza_data(&self) -> Option<LegendsZaData> {
+        None
+    }
+
+    fn to_learned_moves(&self) -> Option<LearnedMoves> {
+        None
+    }
+
+    fn to_plugin_data(&self) -> Option<PluginData> {
         None
     }
 

@@ -234,10 +234,11 @@ pub static ALL_BALLS: [Ball; BALL_COUNT] = [
     Ball::Origin,
 ];
 
-#[cfg_attr(feature = "wasm", wasm_bindgen(getter_with_clone))]
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[allow(clippy::missing_const_for_fn)]
 pub struct BallMetadata {
     pub index: u8,
+    #[wasm_bindgen(getter_with_clone)]
     pub name: String,
 }
 

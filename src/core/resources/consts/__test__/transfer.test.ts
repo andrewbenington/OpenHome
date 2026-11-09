@@ -47,7 +47,7 @@ const allTransferRestrictions: Record<string, TransferRestrictions> = {
 }
 
 describe('no repeated dex nums', () => {
-  for (let [restriction, data] of Object.entries(allTransferRestrictions)) {
+  for (const [restriction, data] of Object.entries(allTransferRestrictions)) {
     test(restriction, () => {
       const present: Record<number, boolean> = {}
 
@@ -70,7 +70,7 @@ const strictSuperSets: Record<string, [TransferRestrictions, TransferRestriction
 }
 
 describe('strict supersets', () => {
-  for (let [testName, [superset, subset]] of Object.entries(strictSuperSets)) {
+  for (const [testName, [superset, subset]] of Object.entries(strictSuperSets)) {
     test(testName, () => {
       if (!superset.transferableDexNums || !subset.transferableDexNums) return
 
@@ -84,7 +84,7 @@ describe('strict supersets', () => {
 })
 
 describe('no duplicates', () => {
-  for (let [name, restrictions] of Object.entries(allTransferRestrictions)) {
+  for (const [name, restrictions] of Object.entries(allTransferRestrictions)) {
     test(`no duplicates in ${name}`, () => {
       if (restrictions.transferableDexNums) {
         for (const nationalDex of restrictions.transferableDexNums) {

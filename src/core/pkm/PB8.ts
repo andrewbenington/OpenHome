@@ -23,7 +23,7 @@ import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { MoveFilter } from '../util/util'
 import { PkmConverter } from './conversion/converter'
-import { PkmConstructorOptions } from './PKM'
+import { PkmConstructorOptions } from './types'
 import { modernStatCalc } from './util'
 import * as encryption from './util/encryption'
 import { filterRibbons } from './util/ribbonLogic'
@@ -32,7 +32,7 @@ export default class PB8 {
   static getFormat() {
     return 'PB8' as const
   }
-  format: 'PB8' = 'PB8'
+  format = 'PB8' as const
   static getBoxSize() {
     return 344
   }

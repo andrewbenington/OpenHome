@@ -40,7 +40,7 @@ function assertIndicesMatchKeys(boxMap: BoxMap) {
 describe('banks and boxes store', () => {
   const store = buildTestStore()
 
-  test('should initialize state with expected bank/box names', async () => {
+  test('should initialize state with expected bank/box names', () => {
     expect(store.getState().getCurrentBank().name).toBe('test bank')
 
     expect(store.getState().getCurrentBank().boxes.get(3)?.name).toBe('TestBox3')
@@ -50,7 +50,7 @@ describe('banks and boxes store', () => {
 describe('box insertion', () => {
   const store = buildTestStore()
 
-  test('inserting box at start', async () => {
+  test('inserting box at start', () => {
     store.getState().addBoxCurrentBank('start', 'My New Box')
 
     expect(store.getState().getCurrentBank().boxes.get(0)?.name).toBe('My New Box')
@@ -58,7 +58,7 @@ describe('box insertion', () => {
     assertIndicesMatchKeys(store.getState().getCurrentBank().boxes)
   })
 
-  test('appending box to end', async () => {
+  test('appending box to end', () => {
     store.getState().addBoxCurrentBank('end', 'My New Box')
 
     const boxes = store.getState().getCurrentBank().boxes
@@ -67,7 +67,7 @@ describe('box insertion', () => {
     assertIndicesMatchKeys(store.getState().getCurrentBank().boxes)
   })
 
-  test('insert box before index', async () => {
+  test('insert box before index', () => {
     store.getState().addBoxCurrentBank(['before', 5], 'My New Box')
 
     const boxes = store.getState().getCurrentBank().boxes
@@ -76,7 +76,7 @@ describe('box insertion', () => {
     assertIndicesMatchKeys(store.getState().getCurrentBank().boxes)
   })
 
-  test('insert box after index', async () => {
+  test('insert box after index', () => {
     store.getState().addBoxCurrentBank(['after', 5], 'My New Box')
 
     const boxes = store.getState().getCurrentBank().boxes
@@ -89,7 +89,7 @@ describe('box insertion', () => {
 describe('box deletion', () => {
   const store = buildTestStore()
 
-  test('delete box', async () => {
+  test('delete box', () => {
     const thirdBoxId = store.getState().getCurrentBank().boxes.get(2)?.id
     assert(thirdBoxId !== undefined)
 

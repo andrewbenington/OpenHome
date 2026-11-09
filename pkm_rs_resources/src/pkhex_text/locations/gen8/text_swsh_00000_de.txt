@@ -1,247 +1,247 @@
 －－－－－－－－－－
 
-Mysteriöser Ort
+an einem mysteriösen Ort
 
-Ferner Ort
+an einem fernen Ort
 
-Furlongham
+in Furlongham
 
-Schlummerwald
+im Schlummerwald
 
 
 
-Route 1
+auf Route 1
 
-Brassbury
+in Brassbury
 
-Brassbury-Bahnhof
+am Brassbury-Bahnhof
 
-Route 2
+auf Route 2
 
-Engine City
+in Engine City
 
-Engine-City-Bahnhof
+am Engine-City-Bahnhof
 
-Engine-Stadion
+im Engine-Stadion
 
 
 
-Route 3
+auf Route 3
 
-Galar-Mine 1
+in der Galar-Mine 1
 
-Route 4
+auf Route 4
 
-Turffield
+in Turffield
 
-Turffield-Stadion
+im Turffield-Stadion
 
 
 
-Route 5
+auf Route 5
 
 
 
-Keelton
+in Keelton
 
-Keelton-Bahnhof
+am Keelton-Bahnhof
 
-Keelton-Stadion
+im Keelton-Stadion
 
 
 
-Engine-Ortsrand
+am Engine-Ortsrand
 
-Galar-Mine 2
+in der Galar-Mine 2
 
-Claw City
+in Claw City
 
-Claw-City-Bahnhof
+am Claw-City-Bahnhof
 
-Claw-Stadion
+im Claw-Stadion
 
 
 
-Energiewerk
+im Energiewerk
 
-Turmspitze
+auf der Turmspitze
 
-Route 6
+auf Route 6
 
-Passbeck
+in Passbeck
 
-Passbeck-Stadion
+im Passbeck-Stadion
 
 
 
-Wirrschein-Wald
+im Wirrschein-Wald
 
-Fairballey
+in Fairballey
 
-Fairballey-Stadion
+im Fairballey-Stadion
 
 
 
-Route 7
+auf Route 7
 
-Route 8
+auf Route 8
 
-Route 8
-Dampfschwaden-Pfad
-Route 9
+auf Route 8
+auf dem Dampfschwaden-Pfad
+auf Route 9
 
-Route 9
-Circhester-Bucht
-Route 9
-Spikeford-Ortsrand
-Circhester
+auf Route 9
+in der Circhester-Bucht
+auf Route 9
+am Spikeford-Ortsrand
+in Circhester
 
-Circhester-Stadion
+im Circhester-Stadion
 
 
 
-Spikeford
-
-Route-9-Tunnel
-
-Route 10
-
-White-Hill-Bahnhof
-
-Score City
-
-Score-City-Bahnhof
-
-Score-Stadion
-Liga-Hauptquartier
-Score-Stadion
-Wartebereich
-Score-Stadion
-
-Treffpunkt
-Naturzone
-Wonnewiesen
-Naturzone
-Wipfelscheinwald
-Naturzone
-Wachturmruine
-Naturzone
-Milza-See (Osten)
-Naturzone
-Milza-See (Westen)
-Naturzone
-Milza-See (Auge)
-Naturzone
-Milotic-See (Süden)
-Naturzone
-Sitz des Giganten
-Naturzone
-Milotic-See (Norden)
-Naturzone
-Engine-Flussufer
-Naturzone
-Brückental
-Naturzone
-Megalithen-Ebene
-Naturzone
-Sandsturmkessel
-Naturzone
-Spiegel des Giganten
-Naturzone
-Claw-Plateau
-Naturzone
-Hut des Giganten
-Naturzone
-Wutanfall-See
-Naturzone
-Naturzonen-Bahnhof
-
-Kampfturm
-
-Rose Tower
+in Spikeford
+
+im Route-9-Tunnel
+
+auf Route 10
+
+am White-Hill-Bahnhof
+
+in Score City
+
+am Score-City-Bahnhof
+
+im Score-Stadion
+im Liga-Hauptquartier
+im Score-Stadion
+im Wartebereich
+im Score-Stadion
+
+am Treffpunkt
+in der Naturzone
+auf den Wonnewiesen
+in der Naturzone
+im Wipfelscheinwald
+in der Naturzone
+bei der Wachturmruine
+in der Naturzone
+am Milza-See (Osten)
+in der Naturzone
+am Milza-See (Westen)
+in der Naturzone
+am Milza-See (Auge)
+in der Naturzone
+am Milotic-See (Süden)
+in der Naturzone
+beim Sitz des Giganten
+in der Naturzone
+am Milotic-See (Norden)
+in der Naturzone
+am Engine-Flussufer
+in der Naturzone
+im Brückental
+in der Naturzone
+auf der Megalithen-Ebene
+in der Naturzone
+im Sandsturmkessel
+in der Naturzone
+beim Spiegel des Giganten
+in der Naturzone
+auf dem Claw-Plateau
+in der Naturzone
+beim Hut des Giganten
+in der Naturzone
+am Wutanfall-See
+in der Naturzone
+am Naturzonen-Bahnhof
+
+im Kampfturm
+
+am Rose Tower
 
 Ein Pokémon-Nest
 
-Grußgefilde
-Rüstungsinsel
-Balsamsumpf
-Rüstungsinsel
-Fokusforst
-Rüstungsinsel
-Strand der Prüfung
-Rüstungsinsel
-Kämpfergrotte
-Rüstungsinsel
-Pfad der Prüfung
-Rüstungsinsel
-Tapferkeitshöhle
-Rüstungsinsel
-Ringbucht
-Rüstungsinsel
-Fleißebene
-Rüstungsinsel
-Aufwärmtunnel
-Rüstungsinsel
-Wüstensenke
-Rüstungsinsel
-Fitnessmeer
-Rüstungsinsel
-Inselkettenmeer
-Rüstungsinsel
-Fernarchipel
-Rüstungsinsel
-Wabenmeer
-Rüstungsinsel
-Wabeninsel
-Rüstungsinsel
-Master-Dojo
+im Grußgefilde
+auf der Rüstungsinsel
+im Balsamsumpf
+auf der Rüstungsinsel
+im Fokusforst
+auf der Rüstungsinsel
+am Strand der Prüfung
+auf der Rüstungsinsel
+in der Kämpfergrotte
+auf der Rüstungsinsel
+auf dem Pfad der Prüfung
+auf der Rüstungsinsel
+in der Tapferkeitshöhle
+auf der Rüstungsinsel
+bei der Ringbucht
+auf der Rüstungsinsel
+auf der Fleißebene
+auf der Rüstungsinsel
+im Aufwärmtunnel
+auf der Rüstungsinsel
+in der Wüstensenke
+auf der Rüstungsinsel
+am Fitnessmeer
+bei der Rüstungsinsel
+am Inselkettenmeer
+bei der Rüstungsinsel
+beim Fernarchipel
+bei der Rüstungsinsel
+am Wabenmeer
+bei der Rüstungsinsel
+auf der Wabeninsel
+bei der Rüstungsinsel
+im Master-Dojo
 
-Turm des Unlichts
+am Turm des Unlichts
 
-Turm des Wassers
+am Turm des Wassers
 
-Rüstungs-Station
+in der Rüstungs-Station
 
-Schlitterfeld
-Kronen-Schneelande
-Freezedale
-Kronen-Schneelande
-Frostfeld
-Kronen-Schneelande
-Bett des Giganten
-Kronen-Schneelande
-Uralter Friedhof
-Kronen-Schneelande
-Schneeschlucht
-Kronen-Schneelande
-Aufstiegstunnel
-Kronen-Schneelande
-Schneegipfelpfad
-Kronen-Schneelande
-Kronentempel
-Kronen-Schneelande
-Sohle des Giganten
-Kronen-Schneelande
-Rauschende Höhlen
-Kronen-Schneelande
-Schollenmeer
-Kronen-Schneelande
-Dreiwegpass
-Kronen-Schneelande
-Ballsee-Ufer
-Kronen-Schneelande
-Ballsee-Höhle
-Kronen-Schneelande
-Hügel des Dyna-Baums
-Kronen-Schneelande
-Gipfelruinen
+auf dem Schlitterfeld
+in den Kronen-Schneelanden
+in Freezedale
+in den Kronen-Schneelanden
+auf dem Frostfeld
+in den Kronen-Schneelanden
+am Bett des Giganten
+in den Kronen-Schneelanden
+auf dem Uralten Friedhof
+in den Kronen-Schneelanden
+in der Schneeschlucht
+in den Kronen-Schneelanden
+im Aufstiegstunnel
+in den Kronen-Schneelanden
+auf dem Schneegipfelpfad
+in den Kronen-Schneelanden
+am Kronentempel
+in den Kronen-Schneelanden
+an der Sohle des Giganten
+in den Kronen-Schneelanden
+in den Rauschenden Höhlen
+in den Kronen-Schneelanden
+am Schollenmeer
+in den Kronen-Schneelanden
+auf dem Dreiwegpass
+in den Kronen-Schneelanden
+am Ballsee-Ufer
+in den Kronen-Schneelanden
+in der Ballsee-Höhle
+in den Kronen-Schneelanden
+auf dem Hügel des Dyna-Baums
+in den Kronen-Schneelanden
+in den Gipfelruinen
 
-Eisberg-Ruinen
+in den Eisberg-Ruinen
 
-Eisen-Ruinen
+in den Eisen-Ruinen
 
-Zwiespaltruinen
+in den Zwiespaltruinen
 
-Dyna-Riesennest
+im Dyna-Riesennest
 
-Kronen-Bahnhof
+im Kronen-Bahnhof

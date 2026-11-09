@@ -8,7 +8,7 @@ use arbitrary_int::u3;
 use arbitrary_int::u7;
 use pkm_rs_resources::abilities::AbilityIndexWasm;
 use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots, PpUpStorage};
+use pkm_rs_resources::moves::{MoveDataOffsets, MoveSlot, MoveSlots, PpUpStorage};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::ModernRibbonSet;
 use pkm_rs_resources::species::SpeciesForm;
@@ -382,8 +382,8 @@ impl<S: AsRef<[u8]>> Pk7Buffer<S> {
         self.bytes()[off..off + 2].try_into().unwrap()
     }
 
-    pub fn relearn_move(&self, idx: usize) -> MoveIndex {
-        MoveIndex::from_le_bytes(self.relearn_move_raw(idx))
+    pub fn relearn_move(&self, idx: usize) -> MoveSlot {
+        MoveSlot::from_le_bytes(self.relearn_move_raw(idx))
     }
 
     pub fn secret_super_training_unlocked(&self) -> bool {
@@ -678,7 +678,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk7Buffer<S> {
         self.set_u16_le(Offset::NationalDex, v);
     }
 
-    pub fn set_forme_index(&mut self, v: u8) {
+    pub fn set_form_index(&mut self, v: u8) {
         pkm_rs_types::write_uint5_to_bits(
             v,
             &mut self.bytes_mut()[Offset::FormIndexFatefulEncounterGender as usize],
@@ -688,7 +688,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk7Buffer<S> {
 
     pub fn set_species_and_form(&mut self, v: SpeciesForm) {
         self.set_species_ndex(v.get_ndex() as u16);
-        self.set_forme_index(v.get_forme_index() as u8);
+        self.set_form_index(v.get_form_index() as u8);
     }
 
     pub fn set_held_item_index(&mut self, v: u16) {
@@ -820,7 +820,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk7Buffer<S> {
         self.bytes_mut()[off..off + 2].copy_from_slice(&v);
     }
 
-    pub fn set_relearn_move(&mut self, idx: usize, v: MoveIndex) {
+    pub fn set_relearn_move(&mut self, idx: usize, v: MoveSlot) {
         self.set_relearn_move_raw(idx, v.to_le_bytes());
     }
 

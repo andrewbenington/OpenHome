@@ -1,21 +1,31 @@
 use crate::data_controller::ToDataController;
+use crate::util;
 use crate::version;
-use crate::{logging, util};
 use openhome_core::data_controller::{DataController, DataDir, MONS_V2_DIR};
 use openhome_core::lookup::{GEN12_FILENAME, GEN345_FILENAME};
 use openhome_core::pkm_storage::StoredBankData;
 use openhome_core::{Error, Result};
-use std::path::Path;
-use tauri::{App, Emitter, Manager};
+use tauri::{App, Manager};
 
 const BANKS_FILENAME: &str = "banks.json";
+#[cfg(not(feature = "uitest"))]
 const LOGS_DIR: &str = "logs";
+
+#[cfg(not(feature = "uitest"))]
+use crate::logging;
+#[cfg(not(feature = "uitest"))]
+use std::path::Path;
+#[cfg(not(feature = "uitest"))]
+use tauri::Emitter;
 
 #[cfg(not(target_os = "linux"))]
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 
 pub fn run_app_startup(app: &App) -> Result<Vec<version::UpdateFeatures>> {
+    #[cfg(not(feature = "uitest"))]
     let handle = app.handle().clone();
+
+    #[cfg(not(feature = "uitest"))]
     logging::init_logging(
         &Path::join(
             &tauri::Manager::path(&handle)

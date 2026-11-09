@@ -6,8 +6,8 @@ use std::sync::Mutex;
 
 use crate::commands::{CommandError, CommandResult};
 use crate::data_controller::ToDataController;
-use crate::state::PokedexState;
 use crate::version::UpdateFeatures;
+use openhome_core::PokedexState;
 use openhome_core::{Error, Result};
 
 fn without_tmp_extension(path: &Path) -> PathBuf {

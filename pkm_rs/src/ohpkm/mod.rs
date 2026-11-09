@@ -18,12 +18,6 @@ pub use v2::OhpkmV2;
 pub use v2_sections::UnknownHandlerSave;
 
 #[cfg(feature = "wasm")]
-use wasm_bindgen::JsValue;
-
-#[cfg(feature = "wasm")]
-type JsResult<T> = core::result::Result<T, JsValue>;
-
-#[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
 #[cfg(feature = "wasm")]

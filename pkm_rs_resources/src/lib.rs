@@ -17,7 +17,9 @@ pub mod ribbons;
 pub mod species;
 pub mod stats;
 pub mod text_resource;
+pub mod variants;
 
+pub use pkhex_text::species_names::*;
 pub use result::*;
 
 #[cfg(target_arch = "wasm32")]
@@ -80,4 +82,10 @@ impl<T, E: std::error::Error> ExpectLog<T> for std::result::Result<T, E> {
             Err(e) => fatal_log(format!("{}: {}", msg.to_string(), e)),
         }
     }
+}
+
+#[cfg(target_arch = "wasm32")]
+#[wasm_bindgen(start, js_name = pkmRsResourcesInit)]
+pub fn init() {
+    console_error_panic_hook::set_once();
 }

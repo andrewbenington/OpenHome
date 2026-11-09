@@ -99,7 +99,7 @@ export default function useTrackedDataRecovery() {
         return R.Ok(null)
       })
       .catch((err) => ({ message: 'Identifier not found', data: err }))
-      .get()
+      .await()
   }
 
   function cancelRecovery() {

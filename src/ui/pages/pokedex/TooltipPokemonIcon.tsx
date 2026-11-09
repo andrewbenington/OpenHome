@@ -5,13 +5,13 @@ import { Tooltip } from '@radix-ui/themes'
 const ICON_SIZE = 32
 
 export type TooltipPokemonIconProps = PokemonIconProps & {
-  onClick?: (nationalDex: number, formeNumber: number) => void
+  onClick?: (nationalDex: number, formNumber: number) => void
 }
 
 export default function TooltipPokemonIcon(props: TooltipPokemonIconProps) {
   const { onClick, ...pkmIconProps } = props
   return (
-    <Tooltip content={MetadataSummaryLookup(props.nationalDex, props.formIndex ?? 0)?.formeName}>
+    <Tooltip content={MetadataSummaryLookup(props.nationalDex, props.formIndex ?? 0)?.formName}>
       <PokemonIcon
         {...pkmIconProps}
         onClick={() => onClick?.(props.nationalDex, props.formIndex ?? 0)}

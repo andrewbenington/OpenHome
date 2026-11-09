@@ -11,10 +11,11 @@ import {
   PluginMetadata,
 } from '@openhome-core/tauri/spectaCommands'
 import { Errorable, Option, Result } from '@openhome-core/util/functional'
+import { NowOrLater } from '@openhome-core/util/promise'
 import { LoadSaveResponse, LookupMap, SaveRef } from '@openhome-core/util/types'
 import { LogFilter } from '@openhome-ui/pages/logs'
 import { AppTheme, Settings } from '@openhome-ui/state/appInfo'
-import { ConvertStrategies } from '@openhome-ui/state/convert-strategies/ConvertStrategiesProvider'
+import { ConvertStrategies } from '@openhome-ui/state/convert-strategies'
 import { OhpkmBatchLookupResults } from '@openhome-ui/state/ohpkm'
 import { Pokedex, PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { Dayjs } from 'dayjs'
@@ -63,6 +64,8 @@ export type StoredLookups = { gen12: LookupMap; gen345: LookupMap }
 
 export type OhpkmStore = Record<string, OHPKM>
 
+export type ItemBag = Record<string, number>
+
 export default interface BackendInterface {
   /* past gen identifier lookups */
   loadLookups: () => Promise<Errorable<StoredLookups>>
@@ -93,6 +96,7 @@ export default interface BackendInterface {
   /* past gen identifier lookups */
   loadPokedex: () => Promise<Errorable<Pokedex>>
   registerInPokedex: (updates: PokedexUpdate[]) => Promise<Errorable<null>>
+  syncPokedex: () => Promise<Errorable<null>>
 
   /* openhome banks/boxes */
   loadHomeBanks: () => Promise<Errorable<StoredBankData>>
@@ -113,8 +117,8 @@ export default interface BackendInterface {
   upsertSaveFolder: (folderPath: string, label: string) => Promise<Errorable<null>>
 
   /* item bag */
-  loadItemBag: () => Promise<Errorable<Record<string, number>>>
-  saveItemBag: (items: Record<string, number>) => Promise<Errorable<null>>
+  loadItemBag: () => Promise<ItemBag>
+  saveItemBag: (items: ItemBag) => Promise<Errorable<null>>
 
   /* transactions */
   startTransaction: () => Promise<Errorable<null>>
@@ -131,7 +135,9 @@ export default interface BackendInterface {
   getPlatform: () => string
   registerListeners: (listeners: Partial<BackendListeners>) => () => void
   onMenuEvent: (event: MenuEvent, listener: () => void) => () => void
-  onMenuEvents: (eventsAndCallbacks: Partial<Record<MenuEvent, () => void>>) => () => void
+  onMenuEvents: (
+    eventsAndCallbacks: Partial<Record<MenuEvent, () => NowOrLater<unknown>>>
+  ) => () => void
   getState: () => Promise<Errorable<AppState>>
   getSettings: () => Promise<Errorable<Settings>>
   updateSettings: (settings: Settings) => Promise<Errorable<null>>

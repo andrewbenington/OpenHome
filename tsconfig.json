@@ -4,32 +4,16 @@
     "composite": true,
     "target": "ESNext",
     "useDefineForClassFields": true,
-    "lib": [
-      "ESNext",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
-    "types": [
-      "node"
-    ],
+    "types": ["node", "mocha"],
     "paths": {
-      "@openhome-ui/*": [
-        "./src/ui/*"
-      ],
-      "@openhome-core/*": [
-        "./src/core/*"
-      ],
-      "@openhome-core/resources/*": [
-        "./src/core/resources/*"
-      ],
-      "@pkm-rs/*": [
-        "./pkm_rs/*"
-      ],
-      "@pkm-rs": [
-        "./pkm_rs"
-      ]
+      "@openhome-ui/*": ["./src/ui/*"],
+      "@openhome-core/*": ["./src/core/*"],
+      "@openhome-core/resources/*": ["./src/core/resources/*"],
+      "@pkm-rs/*": ["./pkm_rs/*"],
+      "@pkm-rs": ["./pkm_rs"]
     },
     "typeRoots": ["./src/types", "./node_modules/@types"],
     /* Bundler mode */
@@ -51,5 +35,6 @@
     "src/types/pkm-resources-types.d.ts",
     "scripts",
     "__mocks__",
-  ],
+    "ui-tests"
+  ]
 }

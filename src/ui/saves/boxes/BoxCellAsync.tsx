@@ -1,24 +1,30 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
-import { $R, isResult, Option } from '@openhome-core/util/functional'
+import { $R, ErrorOf, isResult, Option, Result } from '@openhome-core/util/functional'
 import { NowOrLater } from '@openhome-core/util/promise'
 import { CtxMenuElementBuilder } from '@openhome-ui/components/context-menu'
 import MissingOhpkmIdPrompt from '@openhome-ui/pokemon/MissingOhpkmId'
+import SlotPokemonError from '@openhome-ui/pokemon/SlotPokemonError'
 import { OhpkmLookupResult } from '@openhome-ui/state/ohpkm'
 import { MonLocation } from '@openhome-ui/state/saves'
 import { CSSProperties, Suspense, use } from 'react'
 import '../style.css'
-import BoxCell from './BoxCell'
+import BoxCell, { BoxCellMon } from './BoxCell'
+
+export type BoxSlotResult = Result<Option<PKMInterface>> | OhpkmLookupResult
+export type BoxSlotContents = NowOrLater<Option<BoxSlotResult>>
+export type BoxSlotError = ErrorOf<BoxSlotResult>
 
 export type BoxSlotContents = NowOrLater<Option<PKMInterface | OhpkmLookupResult>>
 
 interface BoxCellAsyncProps {
   title?: string
   onClick: () => void
-  monPlaceholder?: Option<PKMInterface>
+  monPlaceholder?: Option<BoxCellMon>
   monPromise?: BoxSlotContents
+  loading?: boolean
   onDrop: (_: PKMInterface[]) => void
-  isDisabled?: (mon: Option<PKMInterface>) => boolean
+  isDisabled?: (mon: Option<BoxCellMon>) => boolean
   disabledReason?: string
   openhomeId?: OhpkmIdentifier
   borderColor?: CSSProperties['color']
@@ -31,6 +37,28 @@ interface BoxCellAsyncProps {
 }
 
 function BoxCellAsync(props: BoxCellAsyncProps) {
+  if (props.loading)
+    return (
+      <div
+        className="box-cell box-cell-loading"
+        style={{
+          backgroundColor: '#6662',
+        }}
+      >
+        <img
+          src="/items/index/0000.png"
+          alt=""
+          aria-hidden
+          draggable={false}
+          style={{
+            width: 'calc(0.7 * var(--box-cell-size))',
+            aspectRatio: 1,
+            padding: '0.25rem',
+          }}
+        />
+      </div>
+    )
+
   return props.monPromise ? (
     <Suspense
       fallback={
@@ -73,25 +101,29 @@ function BoxCellAsyncInner(props: BoxCellAsyncProps & { monPromise: BoxSlotConte
   const { monPromise, isDisabled, ...boxCellProps } = props
   const awaitedContents = isThenable(monPromise) ? use(monPromise) : monPromise
 
-  if (awaitedContents && isResult(awaitedContents)) {
-    return $R(awaitedContents).match(
-      (ohpkm) => (
-        <BoxCell
-          {...boxCellProps}
-          mon={ohpkm}
-          disabled={isDisabled?.(ohpkm)}
-          borderColor={props.borderColor}
-        />
-      ),
-      ({ identifier }) => {
-        return (
-          <MissingOhpkmIdPrompt
-            location={props.location.isHome ? props.location : undefined}
-            openhomeId={identifier}
+  if (awaitedContents) {
+    if (isResult(awaitedContents)) {
+      return $R<Option<PKMInterface>, BoxSlotError>(awaitedContents).match(
+        (mon) => (
+          <BoxCell
+            {...boxCellProps}
+            mon={mon}
+            disabled={isDisabled?.(mon)}
+            borderColor={props.borderColor}
           />
-        )
-      }
-    )
+        ),
+        (error) => {
+          return typeof error === 'object' ? (
+            <MissingOhpkmIdPrompt
+              location={props.location.isHome ? props.location : undefined}
+              openhomeId={error.identifier}
+            />
+          ) : (
+            <SlotPokemonError errorTitle="Malformed Pokémon" errorDescription={error} />
+          )
+        }
+      )
+    }
   }
 
   const mon: Option<PKMInterface> = awaitedContents

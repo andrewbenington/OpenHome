@@ -9,6 +9,8 @@ test(`Surfing Pikachu keeps its form`, () => {
   pikachuSurfing.extraFormIndex = ExtraFormIndex.PikachuSurfing
 
   const pk3ub = R.assert(PK3UB.fromOhpkm(pikachuSurfing, getDefaultConvertStrategy()))
+  expect(pk3ub.extraFormIndex).toBe(ExtraFormIndex.PikachuSurfing)
+
   const pk3ubRoundTrip = PK3UB.fromBytes(pk3ub.toBytes())
 
   expect(pk3ubRoundTrip.extraFormIndex).toBe(ExtraFormIndex.PikachuSurfing)

@@ -1,18 +1,12 @@
-import { PkmOrOhpkmFormat } from '@openhome-core/pkm/util'
-import { Option } from '@openhome-core/util/functional'
-import { ExtraFormIndex } from '@pkm-rs/pkg'
+import { FormSpecifiersForFormat } from '@openhome-core/pkm/util/pkmInterface'
 import { Reducer, createContext } from 'react'
 import { PluginState } from './PluginProvider'
 
-export interface MonSpriteData {
-  nationalDex: number
-  formIndex: number
-  format: PkmOrOhpkmFormat
+export type MonSpriteData = FormSpecifiersForFormat & {
   formArgument?: number
   heldItemIndex?: number
   isFemale?: boolean
   isShiny?: boolean
-  extraFormIndex: Option<ExtraFormIndex>
 }
 
 export interface OpenHomePlugin {

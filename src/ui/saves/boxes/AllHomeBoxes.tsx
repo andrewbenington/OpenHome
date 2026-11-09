@@ -321,7 +321,7 @@ function useBoxContextActions(box: SimpleOpenHomeBox): CtxMenuElementBuilder[][]
           Item.label(`By ${sortType}`).action(() => sortHomeBox(box.index, sortType))
         )
       )
-      .disabled(boxIsEmpty),
+      .disabledIf(boxIsEmpty),
     Submenu.label('Sort all boxes...').with(
       ...SortTypes.map((sortType) =>
         Item.label(`By ${sortType}`).action(() => sortAllHomeBoxes(sortType))
@@ -329,7 +329,7 @@ function useBoxContextActions(box: SimpleOpenHomeBox): CtxMenuElementBuilder[][]
     ),
     Item.label('Delete Box')
       .action(() => deleteBoxCurrentBank(box.id))
-      .disabled(!boxIsEmpty),
+      .disabledIf(!boxIsEmpty),
   ]
 
   const addBoxActions = [

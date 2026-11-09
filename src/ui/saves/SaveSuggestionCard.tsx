@@ -1,7 +1,7 @@
 import { getSaveRef, SAV } from '@openhome-core/save/interfaces'
 import { R } from '@openhome-core/util/functional'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
-import useDisplayError from '@openhome-ui/hooks/displayError'
+import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import { Spinner } from '@radix-ui/themes'
 import { useState } from 'react'
 import SaveCard from './SaveCard'
@@ -43,7 +43,8 @@ export default function SaveSuggestionCard(props: SaveSuggestionCardProps) {
         (err) => {
           if (!error) setError(err)
         }
-      )
+      ),
+      (e) => setError(String(e))
     )
   }
 

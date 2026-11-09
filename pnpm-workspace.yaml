@@ -1,10 +1,8 @@
 allowBuilds:
   better-sqlite3: true
+  edgedriver: true
   esbuild: true
-
-onlyBuiltDependencies:
-  - better-sqlite3
-  - esbuild
+  geckodriver: true
 
 overrides:
   ajv@<6.14.0: '>=6.14.0'
@@ -13,3 +11,6 @@ overrides:
 trustPolicy: no-downgrade
 trustPolicyExclude:
   - 'semver@6.3.1'
+  - 'chokidar@4.0.3'
+  - 'undici-types@6.21.0'
+  - '@wdio/repl@9.16.2'

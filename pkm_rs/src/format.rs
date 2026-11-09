@@ -1,6 +1,10 @@
 use super::location::{LinkTradeIndex, Location};
 use crate::location::{self, MetData};
 use crate::ohpkm::OhpkmV2;
+#[cfg(feature = "wasm")]
+use pkm_rs_types::JsResult;
+#[cfg(feature = "wasm")]
+use pkm_rs_types::TryIntoTs;
 
 use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_types::{Generation, OriginGame};
@@ -12,12 +16,11 @@ use strum::EnumIter;
 #[cfg(feature = "wasm")]
 use strum::IntoEnumIterator;
 #[cfg(feature = "wasm")]
-use tsify::Tsify;
+use tsify::{Ts, Tsify};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Serialize, Deserialize, EnumIter))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PkmFormat {
     PK1,
@@ -37,6 +40,7 @@ pub enum PkmFormat {
     PB8,
     PK9,
     PA9,
+    PH4,
 
     PK3RR,
     PK3UB,
@@ -69,6 +73,7 @@ impl PkmFormat {
             Self::PB8 => OriginGame::BrilliantDiamond,
             Self::PK9 => OriginGame::Scarlet,
             Self::PA9 => OriginGame::LegendsZa,
+            Self::PH4 => OriginGame::Home,
             Self::PK3RR | Self::PK3UB => OriginGame::FireRed,
             Self::PB8LUMI => OriginGame::BrilliantDiamond,
             Self::PK9Compass => OriginGame::Scarlet,
@@ -92,6 +97,7 @@ impl PkmFormat {
             Self::PB8 => origin.is_bdsp(),
             Self::PK9 => origin.is_scarlet_violet(),
             Self::PA9 => origin == OriginGame::LegendsZa,
+            Self::PH4 => origin == OriginGame::Home,
 
             Self::PK3RR | Self::PK3UB | Self::PB8LUMI | Self::PK9Compass | Self::PkCblmn => false,
         }
@@ -107,7 +113,7 @@ impl PkmFormat {
             Self::PK6 => Generation::G6,
             Self::PK7 | Self::PB7 => Generation::G7,
             Self::PK8 | Self::PA8 | Self::PB8 => Generation::G8,
-            Self::PK9 | Self::PA9 => Generation::G9,
+            Self::PK9 | Self::PA9 | Self::PH4 => Generation::G9,
 
             Self::PK3RR | Self::PK3UB => Generation::G3,
             Self::PB8LUMI => Generation::G8,
@@ -126,7 +132,8 @@ impl PkmFormat {
             | Self::PK9
             | Self::PK9Compass
             | Self::PA9
-            | Self::PkCblmn => true,
+            | Self::PkCblmn
+            | Self::PH4 => true,
             Self::PK1
             | Self::PK2
             | Self::PK3
@@ -164,7 +171,8 @@ impl PkmFormat {
             | Self::PA8
             | Self::PB8
             | Self::PK9
-            | Self::PA9 => LinkTradeIndex::Pkm3dsSwitch as u16,
+            | Self::PA9
+            | Self::PH4 => LinkTradeIndex::Pkm3dsSwitch as u16,
 
             Self::PK3RR | Self::PK3UB => LinkTradeIndex::PkmGen3 as u16,
             Self::PB8LUMI | Self::PK9Compass => LinkTradeIndex::Pkm3dsSwitch as u16,
@@ -189,12 +197,12 @@ impl PkmFormat {
             Self::PK7 => origin <= OriginGame::Crystal,
             Self::PB7 => origin.is_lets_go() || origin == OriginGame::Go,
             Self::PK8 => origin <= OriginGame::Shield,
-            Self::PA8 | Self::PB8 => origin <= OriginGame::LegendsArceus,
-            Self::PK9 => origin <= OriginGame::Violet,
-            Self::PA9 => origin <= OriginGame::LegendsZa,
+            Self::PH4 | Self::PA8 | Self::PB8 | Self::PK9 | Self::PA9 => {
+                origin <= OriginGame::LeafGreenSwitch
+            }
             Self::PK3RR => origin.generation() == Generation::G3,
             Self::PK3UB => origin.generation() == Generation::G3,
-            Self::PB8LUMI => origin <= OriginGame::LegendsArceus,
+            Self::PB8LUMI => origin <= OriginGame::ShiningPearl,
             Self::PK9Compass => origin <= OriginGame::Violet,
         }
     }
@@ -215,9 +223,10 @@ impl PkmFormat {
 
         match self {
             Self::PK1 | Self::PK2 | Self::PkCblmn => origin, // doesn't matter; these games don't store origin
+            Self::PH4 => origin,                             // all origins are legal in HOME
             Self::PK3 | Self::ColoPkm | Self::XdPkm => match origin {
-                Red | Yellow | LetsGoPikachu => FireRed,
-                BlueGreen | BlueJpn | LetsGoEevee => LeafGreen,
+                FireRedSwitch | Red | Yellow | LetsGoPikachu => FireRed,
+                LeafGreenSwitch | BlueGreen | BlueJpn | LetsGoEevee => LeafGreen,
 
                 AlphaSapphire => Sapphire,
                 OmegaRuby => Ruby,
@@ -225,8 +234,8 @@ impl PkmFormat {
                 _ => Emerald,
             },
             Self::PK4 => match origin {
-                Red | Yellow | LetsGoPikachu => FireRed,
-                BlueGreen | BlueJpn | LetsGoEevee => LeafGreen,
+                FireRedSwitch | Red | Yellow | LetsGoPikachu => FireRed,
+                LeafGreenSwitch | BlueGreen | BlueJpn | LetsGoEevee => LeafGreen,
 
                 AlphaSapphire => Sapphire,
                 OmegaRuby => Ruby,
@@ -241,8 +250,8 @@ impl PkmFormat {
                 _ => SoulSilver,
             },
             Self::PK5 => match origin {
-                Red | Yellow | LetsGoPikachu => FireRed,
-                BlueGreen | BlueJpn | LetsGoEevee => LeafGreen,
+                FireRedSwitch | Red | Yellow | LetsGoPikachu => FireRed,
+                LeafGreenSwitch | BlueGreen | BlueJpn | LetsGoEevee => LeafGreen,
 
                 AlphaSapphire => Sapphire,
                 OmegaRuby => Ruby,
@@ -257,8 +266,8 @@ impl PkmFormat {
                 _ => White2,
             },
             Self::PK6 => match origin {
-                Red | Yellow | LetsGoPikachu => FireRed,
-                BlueGreen | BlueJpn | LetsGoEevee => LeafGreen,
+                FireRedSwitch | Red | Yellow | LetsGoPikachu => FireRed,
+                LeafGreenSwitch | BlueGreen | BlueJpn | LetsGoEevee => LeafGreen,
 
                 BrilliantDiamond => Diamond,
                 ShiningPearl => Pearl,
@@ -272,8 +281,8 @@ impl PkmFormat {
                 _ => Y,
             },
             Self::PK7 => match origin {
-                LetsGoPikachu => FireRed,
-                LetsGoEevee => LeafGreen,
+                FireRedSwitch | LetsGoPikachu => FireRed,
+                LeafGreenSwitch | LetsGoEevee => LeafGreen,
 
                 BrilliantDiamond => Diamond,
                 ShiningPearl => Pearl,
@@ -284,17 +293,19 @@ impl PkmFormat {
                 _ => UltraMoon,
             },
             Self::PB7 => match origin {
-                FireRed | Red | Yellow => LetsGoPikachu,
+                FireRed | FireRedSwitch | Red | Yellow => LetsGoPikachu,
 
                 _ => LetsGoEevee,
             },
-            Self::PK8 => Sword, // Pokémon HOME does this for all post-SwSh Pokémon transferred in
+            // Pokémon HOME's game of origin handling is replicated for officially-supported transfer methods
+            Self::PK8 => match origin {
+                // all transfers from future games of origin always set SwSh origin, likely to permit Battle Stadium usage without wiping moves
+                ShiningPearl | Violet | LegendsZa | LeafGreenSwitch => Shield,
+                _ => Sword,
+            },
             Self::PA8 => LegendsArceus,
             Self::PB8 => ShiningPearl,
-            Self::PK9 => match origin {
-                LegendsZa => X,
-                _ => Violet,
-            },
+            Self::PK9 => Violet,
             Self::PA9 => LegendsZa,
             Self::PK3RR => FireRed,
             Self::PK3UB => FireRed,
@@ -330,6 +341,31 @@ impl PkmFormat {
             return super::location::POKE_TRANSFER_MET_LOCATION_GEN_5;
         }
 
+        if self == Self::PK8 {
+            return if original_origin >= OriginGame::LegendsArceus {
+                match original_origin {
+                    OriginGame::LeafGreenSwitch => 59994,
+                    OriginGame::FireRedSwitch => 59995,
+                    OriginGame::Violet => 59996,
+                    OriginGame::Scarlet => 59997,
+                    OriginGame::ShiningPearl => 59998,
+                    OriginGame::BrilliantDiamond => 59999,
+                    OriginGame::LegendsArceus => 60000,
+                    _ => super::location::FARAWAY_PLACE_SWSH,
+                }
+            } else {
+                met_location_index
+            };
+        }
+
+        if matches!(self, Self::PA8 | Self::PB8 | Self::PK9 | Self::PA9) {
+            return if original_origin.is_frlg_switch() {
+                super::location::DISTANT_LAND_FRLG_SWITCH
+            } else {
+                met_location_index
+            };
+        }
+
         let origin_was_changed = original_origin != legalized_origin;
         if !origin_was_changed {
             return met_location_index;
@@ -347,7 +383,7 @@ impl PkmFormat {
 
     pub const fn location_index_of(&self, location: Location) -> Option<u16> {
         match self {
-            Self::PK1 | Self::PkCblmn => None,
+            Self::PK1 | Self::PH4 | Self::PkCblmn => None,
             Self::PK2 => location::gen2::index_of(location),
             Self::PK3 => location::gen3_gba::index_of(location),
             Self::ColoPkm | Self::XdPkm => match location {
@@ -908,6 +944,7 @@ impl PkmFormat {
             | PkmFormat::PK6
             | PkmFormat::PK7
             | PkmFormat::PB7
+            | PkmFormat::PH4
             | PkmFormat::PK8
             | PkmFormat::PA8
             | PkmFormat::PB8
@@ -950,7 +987,7 @@ impl PkmFormat {
             Self::PK6 => MetadataSource::XY,
             Self::PK7 => MetadataSource::SunMoon,
             Self::PB7 => MetadataSource::LetsGoPikachuEevee,
-            Self::PK8 => MetadataSource::SwordShield,
+            Self::PK8 | Self::PH4 => MetadataSource::SwordShield,
             Self::PA8 => MetadataSource::LegendsArceus,
             Self::PB8 => MetadataSource::BrilliantDiamondShiningPearl,
             Self::PK9 => MetadataSource::ScarletViolet,
@@ -966,8 +1003,8 @@ impl PkmFormat {
 
 #[cfg(feature = "wasm")]
 #[wasm_bindgen(js_name = "formatMatchesOrigin")]
-pub fn format_matches_origin(format: PkmFormat, origin: OriginGame) -> bool {
-    format.matches_origin(origin)
+pub fn format_matches_origin(format: Ts<PkmFormat>, origin: OriginGame) -> JsResult<bool> {
+    Ok(format.to_rust()?.matches_origin(origin))
 }
 
 #[cfg(feature = "wasm")]
@@ -979,12 +1016,14 @@ pub struct PkmFormats;
 #[cfg(feature = "wasm")]
 impl PkmFormats {
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getMetadataSource"))]
-    pub fn metadata_source_wasm(value: PkmFormat) -> MetadataSource {
-        value.metadata_source()
+    pub fn metadata_source_wasm(value: Ts<PkmFormat>) -> JsResult<MetadataSource> {
+        Ok(value.to_rust()?.metadata_source())
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen)]
-    pub fn all() -> Vec<PkmFormat> {
-        PkmFormat::iter().collect()
+    pub fn all() -> Vec<Ts<PkmFormat>> {
+        PkmFormat::iter()
+            .filter_map(|fmt| fmt.try_into_ts().ok())
+            .collect()
     }
 }

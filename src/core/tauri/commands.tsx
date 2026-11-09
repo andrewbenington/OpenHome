@@ -52,7 +52,7 @@ export const Commands: OhTauriApiNoThrow = {
     return invokeAndCatch('write_storage_file_json', { relativePath, data })
   },
 
-  log(level: LogLevel, message: string, context?: Record<string, unknown | undefined>) {
+  log(level: LogLevel, message: string, context?: Record<string, unknown>) {
     return invokeAndCatch('log', { entry: { level, message, context } })
   },
 }

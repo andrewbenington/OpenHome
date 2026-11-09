@@ -13,8 +13,8 @@ export default function NotesDisplay(props: { mon: OHPKM }) {
     setNotesText(mon.notes ?? '')
   }, [mon])
 
-  const debouncedNotesUpdate = useDebounce((notes: string) => {
-    updateMonNotes(mon.openhomeId, notes || undefined)
+  const debouncedNotesUpdate = useDebounce(async (notes: string) => {
+    await updateMonNotes(mon.openhomeId, notes || undefined)
   }, 500)
 
   return (

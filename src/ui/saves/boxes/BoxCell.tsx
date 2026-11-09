@@ -1,22 +1,25 @@
 import useBackend from '@openhome-core/backend/useBackend'
 import { bytesToPKM } from '@openhome-core/pkm/FileImport'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { displayIndexAdder, isBattleFormeItem } from '@openhome-core/pkm/util'
+import { DisplayDataOhpkm } from '@openhome-core/pkm/util/pkmInterface'
+import { TopRightBadgeMon } from '@openhome-ui/components/badge/TopRightBadge'
 import {
   CtxMenuElementBuilder,
   Item,
   Label,
+  LoadingItem,
   OpenHomeCtxMenu,
   Submenu,
 } from '@openhome-ui/components/context-menu'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
-import useDisplayError from '@openhome-ui/hooks/displayError'
+import { useDisplayError, useTitledErrorDisplay } from '@openhome-ui/hooks/displayError'
 import { useMonDisplay } from '@openhome-ui/hooks/monDisplay'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
-import { filterApplies } from '@openhome-ui/util/filter'
-import { PokedexUpdate } from '@openhome-ui/util/pokedex'
+import { FilterableMon, filterApplies } from '@openhome-ui/util/filter'
+import { PokedexUpdate, updatesFromMon } from '@openhome-ui/util/pokedex'
 import { DISPLAY_COLOR_PRESETS, TAG_PRESETS } from '@openhome-ui/util/tags'
 import { Lookup } from '@pkm-rs/pkg'
 import { Flex, TextField } from '@radix-ui/themes'
@@ -27,8 +30,8 @@ import DroppableSpace from './DroppableSpace'
 
 type MonWithOpenHomeId = PKMInterface & { openhomeId: string }
 
-function hasOpenHomeId(mon: PKMInterface): mon is MonWithOpenHomeId {
-  return typeof (mon as { openhomeId?: unknown }).openhomeId === 'string'
+function hasOpenHomeId(mon: { openhomeId?: string }): mon is MonWithOpenHomeId {
+  return typeof mon.openhomeId === 'string'
 }
 
 interface BoxCellProps {
@@ -38,7 +41,7 @@ interface BoxCellProps {
   disabled?: boolean
   loading?: boolean
   disabledReason?: string
-  mon: PKMInterface | undefined
+  mon: BoxCellMon | undefined
   borderColor?: string
   dragID: string
   location: MonLocation
@@ -49,12 +52,27 @@ interface BoxCellProps {
   style?: CSSProperties
 }
 
+export type BoxCellMon = FilterableMon &
+  TopRightBadgeMon &
+  DisplayDataOhpkm & {
+    heldItemIndex: number
+    nickname: string
+
+    isNicknamed?: boolean
+    isShiny: () => boolean
+    formArgument?: number
+
+    openhomeId?: OhpkmIdentifier
+  }
+
 function BoxCell(props: BoxCellProps) {
   const { onClick, onDrop, disabled, disabledReason, mon, borderColor, dragID } = props
   const { location, isSelected, onToggleSelect, multiSelectEnabled } = props
   const { filter, topRightIndicator, showItem, showShiny } = useMonDisplay()
   const backend = useBackend()
   const displayError = useDisplayError()
+  const displayTitledError = useTitledErrorDisplay()
+
   const { releaseMonAtLocation, moveMonItemToBag } = useSaves()
   const ohpkmStore = useOhpkmStore()
   const { updateMonTags, updateMonDisplayColor, setMonNickname } = ohpkmStore
@@ -82,26 +100,13 @@ function BoxCell(props: BoxCellProps) {
 
         try {
           const mon = bytesToPKM(bytes, extension.toUpperCase())
-
           importedMons.push(mon)
-          pokedexUpdates.push({
-            nationalDex: mon.nationalDex,
-            formIndex: mon.formIndex,
-            status: mon.isShiny() ? 'ShinyCaught' : 'Caught',
-          })
-
-          if (isBattleFormeItem(mon.nationalDex, mon.heldItemIndex)) {
-            pokedexUpdates.push({
-              nationalDex: mon.nationalDex,
-              formIndex: displayIndexAdder(mon.heldItemIndex)(mon.formIndex),
-              status: mon.isShiny() ? 'ShinyCaught' : 'Caught',
-            })
-          }
+          pokedexUpdates.push(...updatesFromMon(mon))
         } catch (e) {
-          displayError('Error Importing Pokémon', `${e}`)
+          displayError('Error Importing Pokémon', `${String(e)}`)
         }
 
-        backend.registerInPokedex(pokedexUpdates)
+        await backend.registerInPokedex(pokedexUpdates)
       }
       onDrop(importedMons)
     },
@@ -126,9 +131,9 @@ function BoxCell(props: BoxCellProps) {
     setRenameOpen(true)
   }, [mon])
 
-  const confirmRename = useCallback(() => {
+  const confirmRename = useCallback(async () => {
     if (!(mon instanceof OHPKM)) return
-    setMonNickname(
+    await setMonNickname(
       mon.openhomeId,
       renameValue.trim() || Lookup.speciesName(mon.nationalDex, mon.language)
     )
@@ -168,7 +173,7 @@ function BoxCell(props: BoxCellProps) {
         tagSubmenu,
         displayColorSubmenu,
         mon.heldItemIndex > 0
-          ? Item.label('Move Item to Bag').action(() => moveMonItemToBag(location))
+          ? LoadingItem.label('Move Item to Bag').action(() => moveMonItemToBag(location))
           : undefined,
         Item.label('Move To Release Area').action(() => releaseMonAtLocation(location)),
       ]
@@ -179,12 +184,14 @@ function BoxCell(props: BoxCellProps) {
     [location, mon]
   )
 
+  const monDisplayColor = mon?.displayColor
+
   const cellBackgroundColor = useMemo(() => {
     if (disabled || isFilteredOut) return '#555'
     if (isSelected) return '#4ade8080'
-    if (mon?.displayColor && showBackgroundColor) return mon.displayColor
+    if (monDisplayColor && showBackgroundColor) return monDisplayColor
     return '#6662'
-  }, [disabled, isFilteredOut, isSelected, mon?.displayColor, showBackgroundColor])
+  }, [disabled, isFilteredOut, isSelected, monDisplayColor, showBackgroundColor])
 
   const handleClick = useCallback(() => {
     if (multiSelectEnabled && mon && onToggleSelect) {
@@ -224,7 +231,7 @@ function BoxCell(props: BoxCellProps) {
           onDrop={(e) => {
             e.preventDefault()
             e.stopPropagation()
-            onDropFromFiles(e.dataTransfer.files)
+            onDropFromFiles(e.dataTransfer.files).catch(displayTitledError('Error importing file'))
           }}
           onMouseEnter={handleMouseEnter}
           title={disabledReason}
@@ -232,6 +239,7 @@ function BoxCell(props: BoxCellProps) {
           {mon ? (
             <DroppableSpace dropID={dragID} dropData={location} disabled={disabled}>
               <DraggableMon
+                className="draggable-mon"
                 onClick={handleClick}
                 mon={mon}
                 style={{
@@ -268,8 +276,10 @@ function BoxCell(props: BoxCellProps) {
               />
               <Dialog.Actions>
                 <Dialog.Close>Cancel</Dialog.Close>
-                <Dialog.Action onClick={() => setRenameValue('')}>Reset</Dialog.Action>
-                <Dialog.Close color="theme" onClick={confirmRename}>
+                <Dialog.Action type="reset" onClick={() => setRenameValue('')}>
+                  Reset
+                </Dialog.Action>
+                <Dialog.Close type="submit" onClickAsync={confirmRename}>
                   Save
                 </Dialog.Close>
               </Dialog.Actions>

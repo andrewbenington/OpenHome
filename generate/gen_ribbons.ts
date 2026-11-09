@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 
 function removeDiacritics(str: string) {
-  return str.normalize('NFD').replace(/[\u0300-\u036f,\(,\))]/g, '')
+  return str.normalize('NFD').replace(/[\u0300-\u036f,(,))]/g, '')
 }
 
 function convertToPascalCase(input: string): string {
@@ -144,7 +144,6 @@ impl From<usize> for ModernRibbon {
 `
   fs.mkdirSync('pkm_rs_resources/src/resources/ribbons', { recursive: true })
   fs.writeFileSync('pkm_rs_resources/src/resources/ribbons/modern.rs', output)
-  console.log('Rust code written to pkm_rs_resources/src/resources/ribbons/modern.rs')
 }
 
 main()

@@ -1,4 +1,4 @@
-VERSION=1.18.0
+VERSION=1.18.1
 
 .PHONY: help
 help: # Display this help.
@@ -39,9 +39,16 @@ check: wasm-compile
 	@cd generate && pnpm run lint
 	@cd generate && pnpm run format
 
-.PHONY: test
-test: ensure-dependencies
+.PHONY: non-ui-test
+non-ui-test:
 	@pnpm run test
+
+.PHONY: ui-test
+ui-test: target/release/OpenHomeUiTesting
+	@./scripts/run-ui-tests.sh
+
+.PHONY: test
+test: ensure-dependencies non-ui-test ui-test
 
 .PHONY: check-rs
 check-rs:
@@ -71,7 +78,7 @@ ensure-dependencies: ensure-pnpm ensure-wasm-pack ensure-nextest
 .PHONY: set-version
 set-version:
 	@jq --arg new_version "$(VERSION)" '.version = "$(VERSION)"' "src-tauri/tauri.conf.json" > version.tmp.json && mv version.tmp.json src-tauri/tauri.conf.json
-	@npx prettier --write src-tauri/tauri.conf.json
+	@pnpm oxfmt src-tauri/tauri.conf.json
 	@cargo install cargo-edit
 	@cd src-tauri && cargo set-version $(VERSION)
 	@cd pkm_rs && cargo set-version $(VERSION)
@@ -137,26 +144,26 @@ generate: gen-wasm gen-tauri-commands
 
 .PHONY: gen-wasm
 gen-wasm:
-# 	@node generate/gen_ribbons.ts
-# 	@ts-node generate/gen_abilities.ts
-	@ts-node generate/gen_abilities.ts
-	@ts-node generate/gen_items.ts
-	@ts-node generate/gen_moves.ts
-	@ts-node generate/gen_species_data.ts
+	@node generate/gen_abilities.ts
+	@node generate/gen_items.ts
+	@node generate/gen_moves.ts
+	@node generate/gen_species_data.ts
 	@cd pkm_rs_resources && cargo fmt
 
 .PHONY: gen-tauri-commands
 gen-tauri-commands:
 	@cargo test --package OpenHome --lib -- tests::export_typescript_bindings --exact --nocapture --include-ignored
-	@npx eslint --fix ./src/core/tauri/spectaCommands.ts
+	@npx oxlint --fix --fix-suggestions --no-ignore ./src/core/tauri/spectaCommands.ts --suppress-all
+	@rm -f oxlint-suppressions.json
+	@npx oxfmt ./src/core/tauri/spectaCommands.ts
 
 .PHONY: pkhex-json
 pkhex-json:
 	@cd pkhex-json && dotnet run GeneratePkhexJson.cs
-	@npx prettier --write pkhex-json
+	@pnpm oxfmt --write pkhex-json
 
 .PHONY: test-pkhex-json
-test-pkhex-json:
+test-pkhex-json: pkhex-json
 	@cargo test --package pkm_rs --lib --all-features -- compare_pkhex_json
 
 .PHONY: download-item-sprites
@@ -173,3 +180,18 @@ schema:
 .PHONY: git-fix-pnpm
 git-fix-pnpm:
 	@pnpm i --merge-git-branch-lockfiles
+
+.PHONY: .
+.:
+	pnpm tauri build --release
+
+.PHONY: run-ui-test-build
+run-ui-test-build:
+	@UI_TEST_DATA_FOLDER='ui-tests/ui-tests-data-dir' ./target/release/OpenHomeUiTesting
+
+rust_files = $(shell find src -type f -name '*.rs')
+ts_files = $(shell find src -type f -name '*.ts')
+tsx_files = $(shell find src -type f -name '*.tsx')
+
+target/release/OpenHomeUiTesting: $(rust_files) $(ts_files) $(tsx_files)
+	@pnpm ui-test-build

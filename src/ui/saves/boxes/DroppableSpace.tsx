@@ -55,6 +55,7 @@ const DroppableSpace = ({
 
   return (
     <div
+      id={dropID}
       className={cssClass('droppable-space').with(className).build()}
       style={{
         ...getBackgroundDetails(disabled),

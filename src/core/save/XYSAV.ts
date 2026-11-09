@@ -24,8 +24,8 @@ export class XYSAV extends G6SAV {
     return PC_CHECKSUM_OFFSET
   }
 
-  supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
-    return !isRestricted(XY_TRANSFER_RESTRICTIONS, nationalDex, formeNumber, extraFormIndex)
+  supportsMon(nationalDex: number, formNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    return !isRestricted(XY_TRANSFER_RESTRICTIONS, nationalDex, formNumber, extraFormIndex)
   }
 
   supportsItem(itemIndex: number) {

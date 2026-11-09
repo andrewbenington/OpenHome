@@ -11,7 +11,7 @@ import MiniButton from '@openhome-ui/components/MiniButton'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { Popover } from '@openhome-ui/components/popover/Popover'
 import ToggleButton from '@openhome-ui/components/ToggleButton'
-import useDisplayError, { ErrorDisplayFn } from '@openhome-ui/hooks/displayError'
+import { ErrorDisplayFn, useDisplayError } from '@openhome-ui/hooks/displayError'
 import useSimpleVirtualizer from '@openhome-ui/hooks/simpleVirtualizer'
 import PokemonDetailsModal from '@openhome-ui/pokemon/PokemonDetailsModal'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
@@ -126,7 +126,9 @@ export default function LogsPage(props: LogsPageProps) {
                   onOhpkmClick={(identifier) => {
                     const result = ohpkmStore.getById(identifier)
                     if (isThenable(result)) {
-                      result.then(setSelectedMon)
+                      result
+                        .then(setSelectedMon)
+                        .catch((err) => displayError('Error getting OHPKM data', err))
                     } else {
                       setSelectedMon(result)
                     }

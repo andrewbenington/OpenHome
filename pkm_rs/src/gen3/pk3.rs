@@ -23,19 +23,21 @@ use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_resources::moves::MoveSlots;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::Gen3RibbonSet;
-use pkm_rs_resources::species::{FormMetadata, SpeciesForm, SpeciesMetadata};
+use pkm_rs_resources::species::{BaseForm, FormMetadata, SpeciesForm, SpeciesMetadata};
 use pkm_rs_resources::{lookup, stats};
 #[cfg(feature = "wasm")]
 use pkm_rs_types::AbilityNumber;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 use pkm_rs_types::{
-    BinaryGender, ContestStats, Language, MarkingsFourShapes, NationalDex, OriginGame, Pokerus,
-    SimpleAbilityNumber, Stats8, Stats16Le,
+    BinaryGender, ContestStats, JsResult, Language, MarkingsFourShapes, NationalDex, OriginGame,
+    Pokerus, SimpleAbilityNumber, Stats8, Stats16Le, TryIntoTs, TsResult,
 };
 use pkm_rs_types::{Gender, Ivs};
 use serde::{Serialize, Serializer};
 
+#[cfg(feature = "wasm")]
+use tsify::Ts;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -57,12 +59,14 @@ pub struct Pk3 {
     pub is_bad_egg: bool,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ability_num: SimpleAbilityNumber,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub markings: MarkingsFourShapes,
     pub personality_value: u32,
     pub is_fateful_encounter: bool,
     pub gender: Gender,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub evs: Stats8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub contest: ContestStats,
     pub pokerus: Pokerus,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
@@ -89,6 +93,7 @@ pub struct Pk3 {
     #[cfg_attr(feature = "randomize", randomize(skip))]
     pub current_hp: u16,
     #[cfg_attr(feature = "randomize", randomize(skip))]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub stats: Stats16Le,
 }
 
@@ -116,8 +121,10 @@ impl Pk3 {
             markings: buf.markings(),
             personality_value: buf.personality_value(),
             is_fateful_encounter: buf.is_fateful_encounter(),
-            gender: SpeciesForm::base_form(pokemon_index.to_national_dex())
-                .get_forme_metadata()
+            gender: pokemon_index
+                .to_national_dex()
+                .base_form()
+                .get_form_metadata()
                 .gender_from_pid(personality_value),
             evs: buf.evs(),
             contest: buf.contest(),
@@ -334,13 +341,13 @@ impl HasSpeciesAndForm for Pk3 {
         self.species_and_form().get_species_metadata()
     }
 
-    fn get_forme_metadata(&self) -> &'static FormMetadata {
-        self.species_and_form().get_forme_metadata()
+    fn get_form_metadata(&self) -> &'static FormMetadata {
+        self.species_and_form().get_form_metadata()
     }
 
     fn calculate_level(&self) -> u8 {
         self.get_species_metadata()
-            .level_up_type
+            .experience_growth
             .calculate_level(self.exp)
     }
 }
@@ -350,26 +357,23 @@ impl HasSpeciesAndForm for Pk3 {
 #[allow(clippy::missing_const_for_fn)]
 impl Pk3 {
     #[wasm_bindgen(js_name = fromOhpkmBytes)]
-    pub fn from_ohpkm_bytes(
-        bytes: Vec<u8>,
-        strategy: ConvertStrategy,
-    ) -> core::result::Result<Pk3, JsValue> {
-        let ohpkm = OhpkmV2::from_bytes(&bytes).map_err(JsValue::from)?;
-        Pk3::from_ohpkm(&ohpkm, strategy).map_err(JsValue::from)
+    pub fn from_ohpkm_bytes(bytes: Vec<u8>, strategy: Ts<ConvertStrategy>) -> JsResult<Self> {
+        let ohpkm = OhpkmV2::from_bytes(&bytes)?;
+        Ok(Self::from_ohpkm(&ohpkm, strategy.to_rust()?)?)
     }
 
     #[wasm_bindgen(js_name = fromBytes)]
-    pub fn from_byte_vector(bytes: Vec<u8>) -> core::result::Result<Pk3, JsValue> {
-        Pk3::from_bytes(&bytes).map_err(JsValue::from)
+    pub fn from_byte_vector(bytes: Vec<u8>) -> core::result::Result<Self, JsValue> {
+        Self::from_bytes(&bytes).map_err(JsValue::from)
     }
 
     #[wasm_bindgen(js_name = fromEncryptedBytes)]
-    pub fn take_from_encrypted_bytes(mut bytes: Box<[u8]>) -> core::result::Result<Pk3, JsValue> {
-        Pk3::from_encrypted_bytes(&mut bytes).map_err(JsValue::from)
+    pub fn take_from_encrypted_bytes(mut bytes: Box<[u8]>) -> core::result::Result<Self, JsValue> {
+        Self::from_encrypted_bytes(&mut bytes).map_err(JsValue::from)
     }
 
     #[wasm_bindgen(js_name = fromSlotBytes)]
-    pub fn from_slot_bytes_js(bytes: Box<[u8]>) -> core::result::Result<Option<Pk3>, JsValue> {
+    pub fn from_slot_bytes_wasm(bytes: Box<[u8]>) -> core::result::Result<Option<Self>, JsValue> {
         Self::from_slot_bytes(bytes).map_err(JsValue::from)
     }
 
@@ -384,28 +388,28 @@ impl Pk3 {
     }
 
     #[wasm_bindgen(getter = nationalDex)]
-    pub fn national_dex_js(&self) -> NationalDex {
+    pub fn national_dex_wasm(&self) -> NationalDex {
         self.get_national_dex()
     }
 
     #[wasm_bindgen(setter = nationalDex)]
-    pub fn set_national_dex_js(&mut self, v: u16) -> Result<()> {
+    pub fn set_national_dex_wasm(&mut self, v: u16) -> Result<()> {
         self.pokemon_index = Gen3PokemonIndex::from_national_dex(v)?;
         Ok(())
     }
 
     #[wasm_bindgen(getter = formIndex)]
-    pub fn form_index_js(&self) -> u16 {
-        self.species_and_form().get_forme_index()
+    pub fn form_index_wasm(&self) -> u16 {
+        self.species_and_form().get_form_index()
     }
 
     #[wasm_bindgen(getter = isNicknamed)]
-    pub fn is_nicknamed_js(&self) -> bool {
+    pub fn is_nicknamed_wasm(&self) -> bool {
         self.is_nicknamed()
     }
 
     #[wasm_bindgen(getter = heldItemIndex)]
-    pub fn held_item_index_js(&self) -> u16 {
+    pub fn held_item_index_wasm(&self) -> u16 {
         match self.modern_held_item() {
             Some(item) => item.get(),
             None => 0,
@@ -413,44 +417,42 @@ impl Pk3 {
     }
 
     #[wasm_bindgen(setter = heldItemIndex)]
-    pub fn set_held_item_index_js(&mut self, v: u16) {
+    pub fn set_held_item_index_wasm(&mut self, v: u16) {
         self.held_item_index = ItemGen3::from_modern_index(v)
     }
 
     #[wasm_bindgen(getter = heldItemName)]
-    pub fn held_item_name_js(&self) -> Option<String> {
+    pub fn held_item_name_wasm(&self) -> Option<String> {
         self.held_item_index.map(|item| item.get_metadata().name())
     }
 
     #[wasm_bindgen(getter = ivs)]
-    pub fn ivs_js(&self) -> Stats16Le {
-        self.ivs.into()
-    }
-    #[wasm_bindgen(setter = ivs)]
-    pub fn set_ivs_js(&mut self, v: Stats16Le) {
-        self.ivs = v.to_ivs_capped();
+    pub fn ivs_wasm(&self) -> TsResult<Stats16Le> {
+        Stats16Le::from(self.ivs).try_into_ts()
     }
 
     #[wasm_bindgen(getter = abilityNum)]
-    pub fn ability_num_js(&self) -> AbilityNumber {
+    pub fn ability_num_wasm(&self) -> AbilityNumber {
         self.ability_num.into()
     }
     #[wasm_bindgen(setter = abilityNum)]
-    pub fn set_ability_num_js(&mut self, v: AbilityNumber) {
+    pub fn set_ability_num_wasm(&mut self, v: AbilityNumber) {
         self.ability_num = v.into()
     }
 
     #[wasm_bindgen(getter = evs)]
-    pub fn evs_js(&self) -> Stats16Le {
-        self.evs.into()
+    pub fn evs_wasm(&self) -> TsResult<Stats16Le> {
+        Stats16Le::from(self.evs).try_into_ts()
     }
     #[wasm_bindgen(setter = evs)]
-    pub fn set_evs_js(&mut self, v: Stats16Le) {
-        self.evs = v.try_into().expect("evs should not exceed 255 each");
+    pub fn set_evs_wasm(&mut self, v: Ts<Stats16Le>) -> JsResult<()> {
+        self.evs = v.to_rust()?.to_stats8_truncated();
+
+        Ok(())
     }
 
     #[wasm_bindgen(getter = nature)]
-    pub fn nature_js(&self) -> NatureIndex {
+    pub fn nature_wasm(&self) -> NatureIndex {
         self.nature()
     }
 
@@ -494,33 +496,33 @@ impl Pk3 {
     }
 
     #[wasm_bindgen(setter = ribbons)]
-    pub fn set_ribbons_js(&mut self, v: Vec<String>) {
+    pub fn set_ribbons_wasm(&mut self, v: Vec<String>) {
         self.ribbons = Gen3RibbonSet::from_names(v);
     }
 
     #[wasm_bindgen(getter = nickname)]
-    pub fn nickname_js(&self) -> String {
+    pub fn nickname_wasm(&self) -> String {
         self.nickname.convert_to_string()
     }
 
     #[wasm_bindgen(setter = nickname)]
-    pub fn set_nickname_js(&mut self, v: String) {
+    pub fn set_nickname_wasm(&mut self, v: String) {
         self.nickname = Gen3String::from_stringlike(v, Gen3Encoding::from_language(self.language))
     }
 
     #[wasm_bindgen(getter = trainerName)]
-    pub fn trainer_name_js(&self) -> String {
+    pub fn trainer_name_wasm(&self) -> String {
         self.trainer_name.convert_to_string()
     }
 
     #[wasm_bindgen(setter = trainerName)]
-    pub fn set_trainer_name_js(&mut self, v: String) {
+    pub fn set_trainer_name_wasm(&mut self, v: String) {
         self.trainer_name =
             Gen3String::from_stringlike(v, Gen3Encoding::from_language(self.language))
     }
 
     #[wasm_bindgen(js_name = refreshChecksum)]
-    pub fn refresh_checksum_js(&mut self) {
+    pub fn refresh_checksum_wasm(&mut self) {
         self.refresh_checksum();
     }
 
@@ -535,27 +537,39 @@ impl Pk3 {
     }
 
     #[wasm_bindgen(js_name = isEmptySlot)]
-    pub fn is_empty_slot_js(bytes: Vec<u8>) -> bool {
+    pub fn is_empty_slot_wasm(bytes: Vec<u8>) -> bool {
         Self::is_empty_slot(&bytes)
     }
 
     #[wasm_bindgen(js_name = calculateChecksum)]
-    pub fn calculate_checksum_js(&self) -> u16 {
+    pub fn calculate_checksum_wasm(&self) -> u16 {
         self.calculate_checksum()
     }
 
     #[wasm_bindgen(js_name = calculateLevel)]
-    pub fn calculate_level_js(&self) -> u8 {
+    pub fn calculate_level_wasm(&self) -> u8 {
         self.calculate_level()
     }
 
     #[wasm_bindgen(js_name = calculateStats)]
-    pub fn calculate_stats_js(&self) -> Stats16Le {
-        self.calculate_stats()
+    pub fn calculate_stats_wasm(&self) -> TsResult<Stats16Le> {
+        self.calculate_stats().try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = contest)]
+    pub fn contest_stats_wasm(&self) -> TsResult<ContestStats> {
+        self.contest.try_into_ts()
+    }
+
+    #[wasm_bindgen(setter = contest)]
+    pub fn set_contest_stats_wasm(&mut self, v: Ts<ContestStats>) -> JsResult<()> {
+        self.contest = v.to_rust()?;
+
+        Ok(())
     }
 
     #[wasm_bindgen(js_name = recalculateStats)]
-    pub fn recalculate_stats_js(&mut self) {
+    pub fn recalculate_stats_wasm(&mut self) {
         self.recalculate_stats()
     }
 
@@ -564,6 +578,11 @@ impl Pk3 {
         Ok(serde_json::to_value(self)
             .map_err(|e| Error::Other(e.to_string()))?
             .to_string())
+    }
+
+    #[wasm_bindgen(getter = markings)]
+    pub fn markings_wasm(&self) -> TsResult<MarkingsFourShapes> {
+        self.markings.try_into_ts()
     }
 }
 
@@ -580,6 +599,7 @@ pub fn form_index_from_pid(national_dex: NationalDex, pid: u32) -> u8 {
 
     unown_form_from_pid_gen3(pid)
 }
+
 #[cfg(test)]
 impl PkhexJson for Pk3 {
     fn to_pkhex_json_value(&self) -> std::result::Result<serde_json::Value, serde_json::Error> {

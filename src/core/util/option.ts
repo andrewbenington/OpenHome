@@ -25,10 +25,10 @@ function nullToUndefined<T>(v: NullableOption<T>): Option<T> {
 type NullableOptionNowOrLater<T> = NullableOption<Promise<NullableOption<T>>>
 
 // Wrapper class for a Promise<Option> utility
-class PromisedOptionBox<T> {
+export class PromisedOptionBox<T> {
   constructor(private readonly v: NullableOptionNowOrLater<T>) {}
 
-  then<R>(onSome: OnSome<T, R>): PromisedOptionBox<R> {
+  map<R>(onSome: OnSome<T, R>): PromisedOptionBox<R> {
     return O.after(this.v?.then(map(onSome)))
   }
 
@@ -40,7 +40,7 @@ class PromisedOptionBox<T> {
     return this.v?.then($O) ?? Promise.resolve(OptionBox.empty())
   }
 
-  thenBoxed<U>(onOk: (v: T) => Promise<U>): PromisedOptionBox<U> {
+  mapBoxed<U>(onOk: (v: T) => Promise<U>): PromisedOptionBox<U> {
     return new PromisedOptionBox(
       Promise.resolve(this.v).then(O.map(async (value) => await onOk(value)))
     )
@@ -75,6 +75,10 @@ export class OptionBox<T> {
 
   flatMap<R>(onSome: OnSome<T, Option<R>>): OptionBox<R> {
     return $O(map(onSome)(this.v))
+  }
+
+  isSomeAnd(onSome: OnSome<T, boolean>): boolean {
+    return $O(map(onSome)(this.v)).v === true
   }
 
   update<R>(onSome: OnSome<T, OptionBox<R>>): OptionBox<R> {

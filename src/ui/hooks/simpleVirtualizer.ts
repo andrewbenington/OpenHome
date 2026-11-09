@@ -1,21 +1,29 @@
-import { useVirtualizer } from '@tanstack/react-virtual'
+import { ReactVirtualizerOptions, useVirtualizer } from '@tanstack/react-virtual'
 import { RefObject, useEffect, useState } from 'react'
+
+type SimpleVirtualizerOptions = Omit<
+  Partial<ReactVirtualizerOptions<HTMLElement, Element>>,
+  'count' | 'estimateSize' | 'getScrollElement'
+>
 
 export default function useSimpleVirtualizer(
   count: number,
   estimateSize: (index: number, baseFontSize: number) => number,
-  scrollRef: RefObject<HTMLElement | null>
+  scrollRef: RefObject<HTMLElement | null>,
+  options?: SimpleVirtualizerOptions
 ) {
   const [baseFontSize, setBaseFontSize] = useState(() =>
     parseFloat(getComputedStyle(document.documentElement).fontSize)
   )
 
+  // oxlint-disable-next-line react/incompatible-library
   const virtualizer = useVirtualizer({
     count,
     getScrollElement: () => scrollRef.current,
     estimateSize: (index) => estimateSize(index, baseFontSize),
     overscan: 100,
     directDomUpdates: true,
+    ...options,
   })
 
   useEffect(() => {

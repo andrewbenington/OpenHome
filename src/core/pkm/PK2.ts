@@ -19,13 +19,13 @@ import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { MoveFilter } from '../util/util'
 import { PkmConverter } from './conversion/converter'
-import { PkmConstructorOptions } from './PKM'
+import { PkmConstructorOptions } from './types'
 
 export default class PK2 {
   static getFormat() {
     return 'PK2' as const
   }
-  format: 'PK2' = 'PK2'
+  format = 'PK2' as const
   static getBoxSize() {
     return 32
   }
@@ -117,7 +117,7 @@ export default class PK2 {
       if (dataView.byteLength >= 70) {
         this.nickname = stringLogic.readGameBoyStringFromBytes(dataView, 0x3b, 11)
       } else {
-        this.nickname = this.metadata?.formeName ?? ''
+        this.nickname = this.metadata?.formName ?? ''
       }
       this.trainerGender = byteLogic.getGenderFlag(dataView, 0x1e, 7)
     } else {

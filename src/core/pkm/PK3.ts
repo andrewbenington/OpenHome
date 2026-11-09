@@ -7,15 +7,15 @@ import {
   ContestStats,
   ConvertStrategies,
   ConvertStrategy,
-  MarkingsFourShapes,
   MetadataSummaryLookup,
+  OhpkmWasm,
   OriginGame,
   Pk3Wasm,
   Pokerus,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import { FourMoves, Stats, ToBytesOptions } from '../util/types'
-import { PkmConstructorOptions } from './PKM'
+import { PkmConstructorOptions } from './types'
 import * as encryption from './util/encryption'
 
 export default class PK3 implements PKMInterface {
@@ -56,6 +56,10 @@ export default class PK3 implements PKMInterface {
 
   static fromWasm(pk3: Pk3Wasm): PK3 {
     return new PK3(pk3, {})
+  }
+
+  intoOhpkmWasm(): OhpkmWasm {
+    return this.inner.toOhpkm()
   }
 
   toBytes(options?: ToBytesOptions): ArrayBuffer {
@@ -130,9 +134,6 @@ export default class PK3 implements PKMInterface {
 
   get markings() {
     return this.inner.markings
-  }
-  set markings(value: MarkingsFourShapes) {
-    this.inner.markings = value
   }
 
   get personalityValue() {
@@ -232,9 +233,6 @@ export default class PK3 implements PKMInterface {
 
   get ivs() {
     return this.inner.ivs
-  }
-  set ivs(value: Stats) {
-    this.inner.ivs = value
   }
 
   get isEgg() {

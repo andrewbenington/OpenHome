@@ -23,7 +23,7 @@ import * as types from '../util/types'
 import { MoveFilter } from '../util/util'
 import * as conversion from './conversion'
 import { PkmConverter } from './conversion/converter'
-import { PkmConstructorOptions } from './PKM'
+import { PkmConstructorOptions } from './types'
 
 const BOX_SIZE_WESTERN = 69
 const BOX_SIZE_JAPAN = 59
@@ -32,7 +32,7 @@ export default class PK1 {
   static getFormat() {
     return 'PK1' as const
   }
-  format: 'PK1' = 'PK1'
+  format = 'PK1' as const
   static getBoxSize() {
     return 33
   }

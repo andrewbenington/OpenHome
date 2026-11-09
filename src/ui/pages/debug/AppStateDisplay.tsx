@@ -3,7 +3,8 @@ import { InfoGrid } from '@openhome-ui/components/InfoGrid'
 import { useTransactionState } from '@openhome-ui/state/app-state'
 import { AppInfoContext, AppInfoState } from '@openhome-ui/state/appInfo'
 import { ErrorContext } from '@openhome-ui/state/error'
-import { ItemBagContext, ItemBagState } from '@openhome-ui/state/items'
+import { useItemBag } from '@openhome-ui/state/items'
+import { ItemBagState } from '@openhome-ui/state/items/reducer'
 import { Item } from '@pkm-rs/pkg'
 import { Card, Flex, Heading, Separator } from '@radix-ui/themes'
 import { useContext } from 'react'
@@ -13,7 +14,7 @@ export default function AppStateDisplay() {
   const transactionState = useTransactionState()
   const [appInfoState] = useContext(AppInfoContext)
   const [errorState, dispatchErrorState] = useContext(ErrorContext)
-  const [bagState] = useContext(ItemBagContext)
+  const itemBag = useItemBag()
 
   return (
     <Flex direction="column">
@@ -27,7 +28,7 @@ export default function AppStateDisplay() {
       <Card className="flex-row" style={{ margin: 8, gap: 8 }}>
         <DebugDataDisplay data={appInfoDisplay(appInfoState)} label="App Info State" />
         <DebugDataDisplay data={useBanksAndBoxesDisplay()} label="Saves/Mons State" />
-        <DebugDataDisplay data={bagDisplay(bagState)} label="Bag State" />
+        <DebugDataDisplay data={bagDisplay(itemBag)} label="Bag State" />
         <DebugDataDisplay data={errorState} label="Error State" />
         <button
           onClick={() =>
@@ -63,7 +64,6 @@ function useBanksAndBoxesDisplay() {
 
 function bagDisplay(state: ItemBagState) {
   return {
-    Loaded: state.loaded,
     Modified: state.modified,
     Error: state.error ?? 'None',
     Items: Object.entries(state.itemCounts).map(([indexStr, qty]) => ({

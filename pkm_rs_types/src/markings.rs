@@ -11,7 +11,6 @@ use wasm_bindgen::prelude::*;
 use pkm_rs_types::randomize::Randomize;
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct MarkingsFourShapes {
@@ -65,7 +64,6 @@ impl From<MarkingsSixShapesColors> for MarkingsFourShapes {
 }
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct MarkingsSixShapes {
@@ -128,7 +126,6 @@ impl From<MarkingsSixShapesColors> for MarkingsSixShapes {
 }
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub enum MarkingValue {
@@ -182,7 +179,6 @@ impl MarkingValue {
 }
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct MarkingsSixShapesColors {

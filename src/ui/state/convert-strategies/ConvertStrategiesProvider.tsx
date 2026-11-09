@@ -6,11 +6,7 @@ import { SyncedStateController, useSyncedState } from '@openhome-ui/state/synced
 import { PropsWithChildren } from 'react'
 import { ConversionSettingsContext } from '.'
 import SyncedStateProvider from '../synced-state/SyncedStateProvider'
-
-export type ConvertStrategies = {
-  strategies_by_id: Partial<Record<string, NamedStrategy>>
-  default_strategy_id: string
-}
+import { ConvertStrategies } from './useConvertStrategies'
 
 function useConvertStrategiesTauri() {
   return useSyncedState(useSyncedConvertState())
@@ -32,7 +28,7 @@ function stateReducer(
   prev: Option<ConvertStrategies>,
   action: ConvertStrategyEntries
 ): ConvertStrategies {
-  let strategies_by_id = { ...prev?.strategies_by_id }
+  const strategies_by_id = { ...prev?.strategies_by_id }
   action.ids_and_strategies.forEach(([id, strategy]) => {
     strategies_by_id[id] = strategy
   })
@@ -43,7 +39,7 @@ function stateReducer(
   }
 }
 
-function useSyncedConvertState(): SyncedStateController<
+export function useSyncedConvertState(): SyncedStateController<
   ConvertStrategies,
   ConvertStrategyEntries,
   ConvertStrategies

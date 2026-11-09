@@ -22,8 +22,8 @@ import {
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { MoveFilter } from '../util/util'
-import { PkmConstructorOptions } from './PKM'
 import { PkmConverter } from './conversion/converter'
+import { PkmConstructorOptions } from './types'
 import { modernStatCalc } from './util'
 import {
   filterRibbons,
@@ -35,7 +35,7 @@ export default class COLOPKM {
   static getFormat() {
     return 'COLOPKM' as const
   }
-  format: 'COLOPKM' = 'COLOPKM'
+  format = 'COLOPKM' as const
   static getBoxSize() {
     return 312
   }

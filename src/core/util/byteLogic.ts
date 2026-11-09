@@ -1,4 +1,5 @@
 import { BinaryGender } from '@pkm-rs/pkg/pkm_rs'
+import { lowestToHighest } from './sort'
 
 const bytesToNumberBigEndian = (bytes: Uint8Array) => {
   let value = 0
@@ -118,7 +119,7 @@ export function setFlagIndexes(
   bitOffset: number,
   indexes: number[]
 ) {
-  const sortedIndexes = indexes.sort()
+  const sortedIndexes = indexes.sort(lowestToHighest)
   let i = 0
 
   sortedIndexes.forEach((index) => {
@@ -145,7 +146,7 @@ export function getByteIndexes(dataView: DataView, byteOffset: number, rangeByte
 }
 
 export function setByteIndexes(dataView: DataView, byteOffset: number, indexes: number[]) {
-  const sortedIndexes = indexes.sort()
+  const sortedIndexes = indexes.sort(lowestToHighest)
   let i = 0
 
   sortedIndexes.forEach((index) => {

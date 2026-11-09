@@ -15,10 +15,7 @@ const AttributeRow = (props: {
 
   return (
     <div className="attribute-row" style={style}>
-      <div
-        className="attribute-row-label"
-        style={{ '--indent': `${indent ?? 0}px` } as React.CSSProperties}
-      >
+      <div className="attribute-row-label" style={{ '--indent': `${indent ?? 0}px` }}>
         <div className="attribute-row-label-text">{label}</div>
       </div>
       <div

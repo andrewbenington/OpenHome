@@ -106,6 +106,8 @@ export type MultiSelectState = {
   selectedLocations: MonLocation[]
 }
 
+export type MultiSelectController = ReturnType<typeof useMultiSelect>
+
 export function defaultMultiSelectState(): MultiSelectState {
   return {
     multiSelectEnabled: false,

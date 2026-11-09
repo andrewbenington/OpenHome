@@ -7,7 +7,10 @@ export default function useIsDebug(): boolean {
   const backend = useBackend()
 
   useEffect(() => {
-    backend.getState().then(R.map((state) => setIsDebug(state.is_dev)))
+    backend
+      .getState()
+      .then(R.map((state) => setIsDebug(state.is_dev)))
+      .catch(console.error)
   }, [backend])
 
   return isDebug

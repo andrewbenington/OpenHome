@@ -1,18 +1,13 @@
+use num_enum::IntoPrimitive;
+use num_enum::TryFromPrimitive;
 use pkm_rs_resources::ExpectLog;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::metadata_source::MetadataSource;
-use pkm_rs_resources::species::EggGroup;
-use pkm_rs_resources::species::FormMetadata;
-use pkm_rs_resources::species::GenderRatio;
-use pkm_rs_resources::species::MegaEvolutionMetadata;
-use pkm_rs_resources::species::SpeciesForm;
-use pkm_rs_resources::species::SpeciesMetadata;
 use pkm_rs_resources::species::metadata_table::types_lookup;
-use pkm_rs_types::AbilityNumber;
-use pkm_rs_types::GameSetting;
-use pkm_rs_types::Generation;
-use pkm_rs_types::TeraType;
-use pkm_rs_types::{NationalDex, PkmType};
+use pkm_rs_resources::species::{
+    EggGroup, FormMetadata, GenderRatio, MegaEvolutionMetadata, SpeciesForm, SpeciesMetadata,
+};
+use pkm_rs_types::{AbilityNumber, GameSetting, Generation, NationalDex, PkmType, TeraType};
 use serde::Serialize;
 use strum::EnumIter;
 use strum::IntoEnumIterator;
@@ -20,7 +15,9 @@ use strum::IntoEnumIterator;
 #[cfg(feature = "wasm")]
 use pkm_rs_resources::species::metadata_table::current_base_stats;
 #[cfg(feature = "wasm")]
-use pkm_rs_types::{Gender, Stats16Le};
+use pkm_rs_types::{Gender, JsResult, Stats16Le, TryIntoTs, TsResult};
+#[cfg(feature = "wasm")]
+use tsify::Ts;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -28,7 +25,10 @@ use wasm_bindgen::prelude::*;
 use rand::seq::IteratorRandom;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, EnumIter)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, EnumIter, TryFromPrimitive, IntoPrimitive,
+)]
+#[repr(u64)]
 pub enum ExtraFormIndex {
     /* Cosplay Pikachu */
     PikachuRockStar = 1,
@@ -652,12 +652,19 @@ pub fn extra_form_sprite_name(form: ExtraFormIndex) -> Option<String> {
 
 #[cfg(feature = "wasm")]
 #[wasm_bindgen(js_name = "extraFormTypeOverride")]
-pub fn extra_form_type_override(form: ExtraFormIndex) -> Option<Vec<PkmType>> {
-    match form.type_overrides() {
-        Some((t1, Some(t2))) => Some(vec![t1, t2]),
-        Some((t1, None)) => Some(vec![t1]),
+pub fn extra_form_type_override(form: ExtraFormIndex) -> JsResult<Option<Vec<Ts<PkmType>>>> {
+    Ok(match form.type_overrides() {
+        Some((t1, Some(t2))) => {
+            let t1 = t1.try_into_ts()?;
+            let t2 = t2.try_into_ts()?;
+            Some(vec![t1, t2])
+        }
+        Some((t1, None)) => {
+            let t1 = t1.try_into_ts()?;
+            Some(vec![t1])
+        }
         None => None,
-    }
+    })
 }
 
 #[cfg(feature = "wasm")]
@@ -784,12 +791,12 @@ impl ExtraFormMetadata {
         }
     }
 
-    pub const fn forme_ref(&self) -> SpeciesForm {
+    pub const fn species_form(&self) -> SpeciesForm {
         unsafe { SpeciesForm::unchecked_form(self.national_dex, self.form_index) }
     }
 
     pub const fn species_metadata(&self) -> &SpeciesMetadata {
-        self.forme_ref().get_species_metadata()
+        self.species_form().get_species_metadata()
     }
 
     pub fn get_ability(&self, ability_num: AbilityNumber) -> AbilityIndexBounded {
@@ -802,8 +809,8 @@ impl ExtraFormMetadata {
 
     pub fn get_base_evolution(&self) -> SpeciesForm {
         match self.pre_evolution {
-            None => self.forme_ref(),
-            Some(forme_ref) => forme_ref.get_base_evolution(),
+            None => self.species_form(),
+            Some(species_form) => species_form.get_base_evolution(),
         }
     }
 
@@ -817,6 +824,30 @@ impl ExtraFormMetadata {
                 self.national_dex, self.form_index
             )),
         )
+    }
+
+    pub fn type_1(&self) -> PkmType {
+        self.types_from_source_or_latest(None).0
+    }
+
+    pub fn type_1_with_source(&self, source: MetadataSource) -> Option<PkmType> {
+        Some(self.types_from_source_or_latest(Some(source)).0)
+    }
+
+    pub fn type_1_index(&self) -> u8 {
+        self.types_from_source_or_latest(None).0 as u8
+    }
+
+    pub fn type_2(&self) -> Option<PkmType> {
+        self.types_from_source_or_latest(None).1
+    }
+
+    pub fn type_2_with_source(&self, source: MetadataSource) -> Option<PkmType> {
+        self.types_from_source_or_latest(Some(source)).1
+    }
+
+    pub fn type_2_index(&self) -> Option<u8> {
+        self.types_from_source_or_latest(None).1.map(|t| t as u8)
     }
 
     /// Tera Type assigned by Pokémon HOME for the species when not originally
@@ -838,41 +869,55 @@ impl ExtraFormMetadata {
         self.mega_evolution_data.to_vec()
     }
 
+    #[wasm_bindgen(js_name = getMegaBaseForm)]
+    pub fn get_mega_base_forme(&self) -> Option<FormMetadata> {
+        None
+    }
+
     #[wasm_bindgen(getter = type1)]
-    pub fn type_1(&self) -> PkmType {
-        self.types_from_source_or_latest(None).0
+    pub fn type_1_wasm(&self) -> TsResult<PkmType> {
+        self.types_from_source_or_latest(None).0.try_into_ts()
     }
 
     #[wasm_bindgen(js_name = type1WithSource)]
-    pub fn type_1_with_source(&self, source: MetadataSource) -> Option<PkmType> {
-        Some(self.types_from_source_or_latest(Some(source)).0)
+    pub fn type_1_with_source_wasm(&self, source: MetadataSource) -> JsResult<Option<Ts<PkmType>>> {
+        self.types_from_source_or_latest(Some(source))
+            .0
+            .try_into_ts()
+            .map(Some)
     }
 
     #[wasm_bindgen(getter = type1Index)]
-    pub fn type_1_index(&self) -> u8 {
+    pub fn type_1_index_wasm(&self) -> u8 {
         self.types_from_source_or_latest(None).0 as u8
     }
 
     #[wasm_bindgen(getter = type2)]
-    pub fn type_2(&self) -> Option<PkmType> {
-        self.types_from_source_or_latest(None).1
+    pub fn type_2_wasm(&self) -> JsResult<Option<Ts<PkmType>>> {
+        self.types_from_source_or_latest(None)
+            .1
+            .map(|t| t.try_into_ts())
+            .transpose()
     }
 
     #[wasm_bindgen(js_name = type2WithSource)]
-    pub fn type_2_with_source(&self, source: MetadataSource) -> Option<PkmType> {
-        self.types_from_source_or_latest(Some(source)).1
+    pub fn type_2_with_source_wasm(&self, source: MetadataSource) -> JsResult<Option<Ts<PkmType>>> {
+        self.types_from_source_or_latest(Some(source))
+            .1
+            .map(|t| t.try_into_ts())
+            .transpose()
     }
 
     #[wasm_bindgen(getter = type2Index)]
-    pub fn type_2_index(&self) -> Option<u8> {
+    pub fn type_2_index_wasm(&self) -> Option<u8> {
         self.types_from_source_or_latest(None).1.map(|t| t as u8)
     }
 
     #[wasm_bindgen(getter = eggGroups)]
-    pub fn egg_groups(&self) -> Vec<String> {
+    pub fn egg_groups(&self) -> Vec<EggGroup> {
         match self.egg_groups.1 {
-            Some(egg_group_1) => vec![self.egg_groups.0.to_string(), egg_group_1.to_string()],
-            None => vec![self.egg_groups.0.to_string()],
+            Some(egg_group_1) => vec![self.egg_groups.0, egg_group_1],
+            None => vec![self.egg_groups.0],
         }
     }
 
@@ -881,7 +926,7 @@ impl ExtraFormMetadata {
         self.evolutions.to_vec()
     }
 
-    #[wasm_bindgen(getter = formeName)]
+    #[wasm_bindgen(getter = formName)]
     pub fn form_name(&self) -> String {
         self.form_name.to_owned()
     }
@@ -916,11 +961,17 @@ impl ExtraFormMetadata {
         self.gender_ratio.gender_for_pid(pid)
     }
 
+    #[wasm_bindgen(getter = genderRatioDisplay)]
+    pub fn gender_ratio_display(&self) -> String {
+        self.gender_ratio.to_string()
+    }
+
     #[wasm_bindgen(getter = baseStats)]
-    pub fn get_base_stats(&self) -> Stats16Le {
+    pub fn get_base_stats(&self) -> TsResult<Stats16Le> {
         current_base_stats(self.national_dex, self.form_index)
+            .map(Stats16Le::from)
             .unwrap_or_default()
-            .into()
+            .try_into_ts()
     }
 }
 
@@ -928,112 +979,13 @@ impl ExtraFormMetadata {
 #[wasm_bindgen(js_name = "extraFormMetadata")]
 pub fn extra_form_metadata_js(form: ExtraFormIndex) -> ExtraFormMetadata {
     let base_form_metadata = SpeciesForm::base_form(form.national_dex())
-        .get_forme_metadata()
+        .get_form_metadata()
         .clone();
 
     ExtraFormMetadata::from_base_metadata(base_form_metadata, form)
 }
 
 pub struct InvalidExtraFormIndex;
-
-impl TryFrom<u64> for ExtraFormIndex {
-    type Error = InvalidExtraFormIndex;
-
-    fn try_from(value: u64) -> Result<Self, Self::Error> {
-        match value {
-            1 => Ok(Self::PikachuRockStar),
-            2 => Ok(Self::PikachuBelle),
-            3 => Ok(Self::PikachuPopStar),
-            4 => Ok(Self::PikachuPhD),
-            5 => Ok(Self::PikachuLibre),
-            6 => Ok(Self::PikachuCosplay),
-            7 => Ok(Self::PikachuSurfing),
-            8 => Ok(Self::PikachuFlying),
-            9 => Ok(Self::CharizardGiga),
-            10 => Ok(Self::ButterfreeGiga),
-            11 => Ok(Self::PikachuGiga),
-            12 => Ok(Self::MeowthGiga),
-            13 => Ok(Self::MachampGiga),
-            14 => Ok(Self::GengarGiga),
-            15 => Ok(Self::KinglerGiga),
-            16 => Ok(Self::LaprasGiga),
-            17 => Ok(Self::EeveeGiga),
-            18 => Ok(Self::SnorlaxGiga),
-            19 => Ok(Self::GarbodorGiga),
-            20 => Ok(Self::MelmetalGiga),
-            21 => Ok(Self::CorviknightGiga),
-            22 => Ok(Self::OrbeetleGiga),
-            23 => Ok(Self::DrednawGiga),
-            24 => Ok(Self::CoalossalGiga),
-            25 => Ok(Self::FlappleGiga),
-            26 => Ok(Self::AppletunGiga),
-            27 => Ok(Self::SandacondaGiga),
-            28 => Ok(Self::ToxtricityGiga),
-            29 => Ok(Self::ToxtricityLowKeyGiga),
-            30 => Ok(Self::CentiskorchGiga),
-            31 => Ok(Self::HattereneGiga),
-            32 => Ok(Self::GrimmsnarlGiga),
-            33 => Ok(Self::AlcremieGiga),
-            34 => Ok(Self::CopperajahGiga),
-            35 => Ok(Self::DuraludonGiga),
-
-            36 => Ok(Self::VenusaurGiga),
-            37 => Ok(Self::BlastoiseGiga),
-            38 => Ok(Self::RillaboomGiga),
-            39 => Ok(Self::CinderaceGiga),
-            40 => Ok(Self::InteleonGiga),
-            41 => Ok(Self::UrsifuSingleGiga),
-            42 => Ok(Self::UrsifuRapidGiga),
-            43 => Ok(Self::EternatusEternamax),
-
-            44 => Ok(Self::VenusaurClone),
-            45 => Ok(Self::CharizardClone),
-            46 => Ok(Self::BlastoiseClone),
-            47 => Ok(Self::PikachuClone),
-
-            48 => Ok(Self::EeveeBandana),
-            49 => Ok(Self::GengarStitched),
-            50 => Ok(Self::OnixCrystal),
-
-            51 => Ok(Self::MewtwoArmorMk1),
-            52 => Ok(Self::MewtwoArmorMk2),
-
-            53 => Ok(Self::DoduoSevii),
-            54 => Ok(Self::DodrioSevii),
-            55 => Ok(Self::TeddiursaSevii),
-            56 => Ok(Self::UrsaringSevii),
-            57 => Ok(Self::MantykeSevii),
-            58 => Ok(Self::MantineSevii),
-            59 => Ok(Self::FeebasSevii),
-            60 => Ok(Self::MiloticSevii),
-            61 => Ok(Self::CarnivineSevii),
-            62 => Ok(Self::BlitzleSevii),
-            63 => Ok(Self::ZebstrikaSevii),
-            64 => Ok(Self::ClauncherSevii),
-            65 => Ok(Self::ClawitzerSevii),
-            66 => Ok(Self::NoibatSevii),
-            67 => Ok(Self::NoivernSevii),
-            68 => Ok(Self::WishiwashiSevii),
-            69 => Ok(Self::WishiwashiSeviiSchool),
-            70 => Ok(Self::DhelmiseSevii),
-            71 => Ok(Self::SizzlipedeSevii),
-            72 => Ok(Self::CentiskorchSevii),
-            73 => Ok(Self::CentiskorchSeviiGiga),
-            74 => Ok(Self::NymbleSevii),
-            75 => Ok(Self::LokixSevii),
-
-            76 => Ok(Self::DialgaPrimal),
-
-            _ => Err(InvalidExtraFormIndex),
-        }
-    }
-}
-
-impl From<ExtraFormIndex> for u64 {
-    fn from(value: ExtraFormIndex) -> Self {
-        value as u64
-    }
-}
 
 #[test]
 fn try_from_u64() {

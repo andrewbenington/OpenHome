@@ -27,7 +27,7 @@ import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { MoveFilter } from '../util/util'
 import { PkmConverter } from './conversion/converter'
-import { PkmConstructorOptions } from './PKM'
+import { PkmConstructorOptions } from './types'
 import { modernStatCalc } from './util'
 import * as encryption from './util/encryption'
 import { filterRibbons } from './util/ribbonLogic'
@@ -36,7 +36,7 @@ export default class PK6 {
   static getFormat() {
     return 'PK6' as const
   }
-  format: 'PK6' = 'PK6'
+  format = 'PK6' as const
   static getBoxSize() {
     return 232
   }

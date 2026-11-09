@@ -18,16 +18,21 @@ export default function BanksAndBoxesProvider(props: PropsWithChildren) {
 
   useEffect(() => {
     let cancelled = false
-    backend.loadHomeBanks().then(
-      R.match(
-        (banks) => {
-          if (!cancelled) setInitialData(banks)
-        },
-        (err) => {
-          if (!cancelled) setError(err)
-        }
+    backend
+      .loadHomeBanks()
+      .then(
+        R.match(
+          (banks) => {
+            if (!cancelled) setInitialData(banks)
+          },
+          (err) => {
+            if (!cancelled) setError(err)
+          }
+        )
       )
-    )
+      .catch((err) => {
+        if (!cancelled) setError(err)
+      })
     return () => {
       cancelled = true
     }

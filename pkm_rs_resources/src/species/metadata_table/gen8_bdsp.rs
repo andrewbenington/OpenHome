@@ -6,8 +6,11 @@ const BDSP_ENTRY_SIZE: usize = 0x44;
 
 type GameMetadataBdsp = GameMetadata<PersonalInfoBdsp, BDSP_ENTRY_SIZE>;
 
-pub static METADATA_TABLE_BDSP: GameMetadataBdsp =
-    GameMetadataBdsp::from_binary(BDSP_PERSONAL_FILE, BDSP_LEVELUP_PKL);
+pub static METADATA_TABLE_BDSP: GameMetadataBdsp = GameMetadataBdsp::from_binary(
+    BDSP_PERSONAL_FILE,
+    BDSP_LEVELUP_PKL,
+    "Brilliant Diamond/Shining Pearl",
+);
 
 #[derive(Debug, Clone, Copy)]
 pub struct PersonalInfoBdsp([u8; BDSP_ENTRY_SIZE]);
@@ -76,5 +79,31 @@ impl PersonalInfo for PersonalInfoBdsp {
 
     fn source_name(&self) -> &'static str {
         "Brilliant Diamond/Shining Pearl"
+    }
+
+    fn form_is_present_in_game(&self, _national_dex: u16, _form_index: u16) -> bool {
+        self.is_present_in_game()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use pkm_rs_types::form;
+
+    use crate::species::metadata_table::MetadataTable;
+
+    use super::*;
+
+    #[test]
+    fn cap_pikachu_not_present() {
+        let index =
+            METADATA_TABLE_BDSP.get_game_index(NationalDex::Pikachu as u16, form::PIKACHU_STARTER);
+
+        assert!(index.is_none());
+
+        assert!(
+            !METADATA_TABLE_BDSP
+                .form_is_present(NationalDex::Pikachu as u16, form::PIKACHU_STARTER)
+        );
     }
 }

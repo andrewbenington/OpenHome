@@ -24,6 +24,7 @@ pub use util::*;
 
 extern crate self as pkm_rs_types;
 
+pub mod form;
 pub mod log;
 pub mod pkl_file;
 pub mod strings;

@@ -66,7 +66,6 @@ impl Serialize for DsGen3RibbonSet {
 }
 
 #[cfg_attr(feature = "wasm", derive(Tsify))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Serialize, PartialEq, Eq, Clone, Copy)]
 #[repr(u8)]
 pub enum DsGen3Ribbon {
@@ -388,7 +387,6 @@ impl FromIterator<Gen4StandardRibbon> for Gen4StandardRibbonSet {
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[repr(u8)]
 #[cfg_attr(feature = "wasm", derive(Tsify))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 pub enum Gen4StandardRibbon {
     SinnohChampion,
     Ability,
@@ -658,7 +656,6 @@ impl FromIterator<Gen4ContestRibbon> for Gen4ContestRibbonSet {
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "wasm", derive(Tsify))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[repr(u8)]
 pub enum Gen4ContestRibbon {
     #[serde(rename = "Cool (Sinnoh)")]

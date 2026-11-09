@@ -1,8 +1,9 @@
 import { getMoveMaxPP } from '@openhome-core/pkm'
 import { PkmConverter } from '@openhome-core/pkm/conversion/converter'
 import { PluginPKMInterface, RomHackFormat } from '@openhome-core/pkm/interfaces'
-import { PkmConstructorOptions } from '@openhome-core/pkm/PKM'
+import { PkmConstructorOptions } from '@openhome-core/pkm/types'
 import { modernStatCalc } from '@openhome-core/pkm/util'
+import { PluginIdentifier } from '@openhome-core/tauri/spectaCommands'
 import {
   generatePersonalityValuePreservingAttributes,
   getFlag,
@@ -43,7 +44,7 @@ import {
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
 import { Errorable, Option, R } from '../../util/functional'
-import { PluginIdentifier } from '../interfaces'
+import { pluginGameName } from '../interfaces'
 import { CfruSpeciesAndForm } from './conversion/util'
 
 const INTERNAL_ORIGIN_NON_RR = OriginGame.Invalid6
@@ -132,7 +133,7 @@ export default abstract class PK3CFRU implements PluginPKMInterface {
 
   constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
     if (arg instanceof ArrayBuffer) {
-      let buffer = arg
+      const buffer = arg
       this.originalBytes = buffer
       const dataView = new DataView(buffer)
 
@@ -170,8 +171,9 @@ export default abstract class PK3CFRU implements PluginPKMInterface {
       this.extraFormIndex = speciesData.extraFormIndex
 
       if (speciesData.nationalDex < 0) {
-        this.nationalDex = 0
-        this.formIndex = 0
+        throw Error(
+          `Unknown ${pluginGameName(this.getPluginIdentifier())} species index: ${this.internalSpeciesIndex}`
+        )
       } else if (speciesData.nationalDex === NationalDex.Unown) {
         this.nationalDex = NationalDex.Unown
         this.formIndex = unownFormFromPid(this.personalityValue)
@@ -299,7 +301,7 @@ export default abstract class PK3CFRU implements PluginPKMInterface {
         this.pluginOrigin = other.pluginOrigin
       }
 
-      if (other.ball && other.ball <= Ball.Beast && other.ball !== Ball.Sport) {
+      if (other.ball <= Ball.Beast && other.ball !== Ball.Sport) {
         this.ball = other.ball
       } else {
         this.ball = Ball.Poke

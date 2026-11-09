@@ -83,14 +83,14 @@ impl SvPokemonIndex {
     }
 
     pub fn from_species_and_form(species_and_form: SpeciesForm) -> Result<Self, Error> {
-        if let Some(sv_index) = national_dex_to_sv(species_and_form.get_ndex_wasm()) {
+        if let Some(sv_index) = national_dex_to_sv(species_and_form.get_ndex() as u16) {
             NonZeroU16::new(sv_index)
                 .map(Self)
                 .ok_or(InvalidSvPokemonIndex(sv_index).into())
         } else {
             Err(Error::NationalDex {
-                value: species_and_form.get_ndex_wasm(),
-                source: PokemonIndexType::ScarletViolet,
+                value: species_and_form.get_ndex() as u16,
+                converting_from: PokemonIndexType::ScarletViolet,
             })
         }
     }
@@ -107,7 +107,7 @@ impl SvPokemonIndex {
             .and_then(NonZeroU16::new)
             .ok_or(Error::NationalDex {
                 value: ndex as u16,
-                source: PokemonIndexType::ScarletViolet,
+                converting_from: PokemonIndexType::ScarletViolet,
             })
             .map(Self)
     }
@@ -147,7 +147,7 @@ impl From<InvalidSvPokemonIndex> for Error {
     fn from(error: InvalidSvPokemonIndex) -> Self {
         Error::PokemonGameIndex {
             value: error.0,
-            source: PokemonIndexType::ScarletViolet,
+            converting_from: PokemonIndexType::ScarletViolet,
         }
     }
 }

@@ -1,6 +1,5 @@
 import { PathData } from '@openhome-core/save/util/path'
 import { BinaryGender, Gender, OriginGame, Stats16Le } from '@pkm-rs/pkg'
-import { PluginIdentifier } from '../save/interfaces'
 
 export type Type =
   | 'Fire'
@@ -44,7 +43,7 @@ export type LoadSaveResponse = {
   createdDate?: Date
 }
 
-export interface PKMFormeRef {
+export interface PKMFormRef {
   nationalDex: number
   formIndex: number
 }
@@ -53,7 +52,7 @@ export type JSONValue = string | number | boolean | null | undefined | JSONArray
 
 export interface JSONObject extends Record<string, JSONValue> {}
 
-export interface JSONArray extends Array<JSONValue> {}
+export type JSONArray = JSONValue[]
 
 export function displayGender(gender: Gender | BinaryGender): string {
   switch (gender) {
@@ -70,6 +69,7 @@ export function displayGender(gender: Gender | BinaryGender): string {
   }
 }
 
+import { PluginIdentifier } from '@openhome-core/tauri/spectaCommands'
 import {
   ContestStats,
   Geolocation,

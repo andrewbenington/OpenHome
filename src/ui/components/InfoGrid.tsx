@@ -47,7 +47,7 @@ function InfoGridItem(props: InfoGridItemProps) {
 
   if (!isPrimitive(value)) {
     if (Array.isArray(value) && isPythonTupleList(value)) {
-      let newValue: Record<string, string> = {}
+      const newValue: Record<string, string> = {}
 
       value.forEach((innerVal) => {
         newValue[innerVal._1] = innerVal._2

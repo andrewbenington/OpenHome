@@ -12,12 +12,12 @@ import {
   movesFromSwshTrFlags,
   SWSH_TR_BYTE_COUNT,
 } from '@openhome-core/resources/moves/flags'
+import { PluginIdentifier } from '@openhome-core/tauri/spectaCommands'
 import {
   expectExhaustive,
   getFlag,
   getHeightCalculated,
   getWeightCalculated,
-  runningInTest,
   setFlag,
 } from '@openhome-core/util'
 import { intersection, Option, unique } from '@openhome-core/util/functional'
@@ -36,12 +36,15 @@ import {
   BinaryGender,
   Gender,
   generatePk3CompatiblePid,
+  getDefaultConvertStrategy,
   Item,
   Language,
   Lookup,
   MetadataSummaryLookup,
   NatureIndex,
+  OhpkmWasm,
   OriginGames,
+  PidGenerationParametersJs,
   PkmFormat,
   PlusMoveFlags,
   PokeDate,
@@ -58,8 +61,8 @@ import {
 } from '@pkm-rs/pkg'
 import dayjs, { Dayjs } from 'dayjs'
 import Prando from 'prando'
-import { OhpkmV2 as OhpkmV2Wasm } from '../../../pkm_rs/pkg'
-import { PluginIdentifier, SAV } from '../save/interfaces'
+import { SAV } from '../save/interfaces'
+import { PkmConverter } from './conversion/converter'
 import { isEvolution } from './Lookup'
 import {
   adjustMovePPBetweenFormats,
@@ -72,11 +75,11 @@ import {
 import { AllPKMFields } from './util/pkmInterface'
 import { convertPokeDate, convertPokeDateOptional } from './wasm/convert'
 
-export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
+export class OHPKM extends OhpkmWasm implements PKMInterface {
   static getFormat() {
     return 'OHPKM'
   }
-  format: 'OHPKM' = 'OHPKM'
+  format = 'OHPKM' as const
 
   private constructor(arg: Uint8Array | AllPKMFields) {
     if (arg instanceof Uint8Array) {
@@ -86,6 +89,8 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     } else {
       const other = arg
       super(new Uint8Array())
+
+      this.startedTrackingTimestamp = dayjs()
 
       let prng: Prando
 
@@ -115,8 +120,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
             .concat(`${hp}~${atk}~${def}~${spc}~${spe}`)
             .concat(other.trainerID.toString())
         )
-
-        this.personalityValue = prng.nextInt(0, 0xffffffff)
       } else {
         prng = new Prando(other.trainerName.concat(other.trainerID.toString()))
       }
@@ -137,9 +140,9 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.secretID = other.secretID
       this.exp = other.exp
 
-      this.moves = other.moves as FourMoves
+      this.moves = other.moves
       this.movePP = adjustMovePPBetweenFormats(this, other)
-      this.movePPUps = other.movePPUps as FourMoves
+      this.movePPUps = other.movePPUps
 
       this.nickname = other.nickname
       if (this.nicknameMatchesSpeciesIgnoreCase()) {
@@ -169,7 +172,21 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
           Gender.Genderless
         this.nature = other.nature ?? NatureIndex.newFromModulo(other.exp)
 
-        this.personalityValue = this.generatePk3CompatiblePid()
+        this.personalityValue = generatePk3CompatiblePid(
+          PidGenerationParametersJs.new(
+            other.nationalDex,
+            other.formIndex,
+            other.nature,
+            other.gender,
+            other.isShiny(),
+            other.formIndex,
+            other.trainerID,
+            other.secretID
+          ),
+          new PkmConverter(other.format, getDefaultConvertStrategy()).pidModificationStrategy(
+            'Odds8192'
+          )
+        )
       } else {
         this.abilityNum = other.abilityNum ?? 0
         this.gender =
@@ -190,14 +207,23 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.ball = other.ball !== undefined ? other.ball : Ball.Poke
       this.markings = markingsSixShapesWithColorFromOther(other.markings)
 
-      this.metLocationIndex = other.metLocationIndex ?? 0
+      if (
+        // handle FRLG (Switch) met location
+        ['PB8', 'PA8', 'PA9'].includes(other.format) &&
+        OriginGames.isFrlgSwitch(other.gameOfOrigin) &&
+        other.metLocationIndex === 30007
+      ) {
+        this.metLocationIndex = 254
+      } else {
+        this.metLocationIndex = other.metLocationIndex ?? 0
+      }
+
       this.metLevel = other.metLevel ?? 0
 
       if (other.dvs && other.evsG12) {
         this.setGameboyData(other.dvs, other.metTimeOfDay ?? 0, other.evsG12)
       }
 
-      this.metLocationIndex = other.metLocationIndex ?? 0
       this.ability =
         other.ability ??
         getAbilityFromNumber(this.nationalDex, this.formIndex, this.abilityNum) ??
@@ -381,12 +407,12 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   static defaultWithSpecies(nationalDex: number, formIndex: number) {
-    const bytes = OhpkmV2Wasm.defaultWithSpecies(nationalDex, formIndex).toByteArray()
+    const bytes = OhpkmWasm.defaultWithSpecies(nationalDex, formIndex).toByteArray()
     return OHPKM.fromBytes(bytes.buffer)
   }
 
   private static fromWasmImpl(mon: WasmPkmFormat): OHPKM {
-    return new OHPKM(mon.inner.toOhpkm().toByteArray())
+    return new OHPKM(mon.intoOhpkmWasm().toByteArray())
   }
 
   // getters / setters
@@ -644,12 +670,12 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     this.tradeToSaveWasm(save.origin)
 
     const isOriginalSave = this.isFrom(save)
-    if (!runningInTest()) {
-      console.debug(
-        { isOriginalSave, ohpkm_id: this.openhomeId, event: 'trade_to_save' },
-        'Traded Pokémon to save file'
-      )
-    }
+    // if (!runningInTest()) {
+    //   console.debug(
+    //     { isOriginalSave, ohpkm_id: this.openhomeId, event: 'trade_to_save' },
+    //     'Traded Pokémon to save file'
+    //   )
+    // }
 
     this.isCurrentHandler = !isOriginalSave
     if (isOriginalSave) {
@@ -1077,7 +1103,8 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   generatePk3CompatiblePid(): number {
-    return generatePk3CompatiblePid(OhpkmV2Wasm.fromByteVectorFixingErrors(this.toByteArray()))
+    const converter = new PkmConverter('PK3', getDefaultConvertStrategy())
+    return converter.personalityValue(this, 'Odds8192')
   }
 }
 
@@ -1101,6 +1128,8 @@ function monFormatToOriginalDataTag(format: PkmFormat): Option<Tag> {
       return Tag.Pb7
     case 'PK8':
       return Tag.Pk8
+    case 'PH4':
+      return Tag.Ph4
     case 'PA8':
       return Tag.Pa8
     case 'PB8':
@@ -1145,6 +1174,8 @@ export function originalDataTagToMonFormat(tag: Tag): PkmFormat {
       return 'PB7'
     case Tag.Pk8:
       return 'PK8'
+    case Tag.Ph4:
+      return 'PH4'
     case Tag.Pa8:
       return 'PA8'
     case Tag.Pb8:
@@ -1266,7 +1297,7 @@ function deepEqual(first?: object, second?: object): boolean {
   return first === second
 }
 
-type IndexableObject = object & Record<string, any>
+type IndexableObject = object & Record<string, unknown>
 
 function objectsEqual(object1: IndexableObject, object2: IndexableObject) {
   if (object1 === null || object2 === null) {

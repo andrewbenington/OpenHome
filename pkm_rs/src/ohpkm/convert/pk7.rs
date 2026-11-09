@@ -97,7 +97,7 @@ impl OhpkmConvert for Pk7 {
     }
 
     fn from_ohpkm(ohpkm: &OhpkmV2, strategy: ConvertStrategy) -> Result<Self> {
-        let form_metadata = ohpkm.get_forme_metadata();
+        let form_metadata = ohpkm.get_form_metadata();
         let converter = PkmConverter::new(PkmFormat::PK7, strategy);
         let met_data = converter.met_data(ohpkm);
 
@@ -112,18 +112,12 @@ impl OhpkmConvert for Pk7 {
             exp: ohpkm.exp(),
             ability_index: ohpkm.ability_index().change_bound().unwrap_or(
                 form_metadata
-                    .get_ability(ohpkm.ability_num())
-                    .change_bound()
-                    .unwrap_or(
-                        form_metadata
-                            .get_ability(AbilityNumber::First)
-                            .change_bound()
-                            .ok_or(Error::AbilityIndex {
-                                ability_index: form_metadata
-                                    .get_ability(AbilityNumber::First)
-                                    .to_u16(),
-                            })?,
-                    ),
+                    .ability_bounded(ohpkm.ability_num())
+                    .unwrap_or(form_metadata.ability_bounded(AbilityNumber::First).ok_or(
+                        Error::AbilityIndex(
+                            form_metadata.get_ability(AbilityNumber::First).to_u16(),
+                        ),
+                    )?),
             ),
             ability_num: ohpkm.ability_num(),
             markings: ohpkm.markings(),
@@ -221,14 +215,14 @@ impl OhpkmConvert for Pk7 {
                 .map(StoredPkmBytes::Pk7);
         }
         bytes
-            .try_into()
-            .map_err(|_| {
-                Error::buffer_size_with_source(
-                    "Pk7::OhpkmConvert::bytes_to_stored",
-                    gen7_alola::PARTY_SIZE,
-                    bytes.len(),
-                )
-            })
+            .as_array()
+            .ok_or(Error::buffer_size_with_source(
+                "Pk7::OhpkmConvert::bytes_to_stored",
+                gen7_alola::PARTY_SIZE,
+                bytes.len(),
+            ))
+            .copied()
+            .map(Box::new)
             .map(StoredPkmBytes::Pk7)
     }
 }

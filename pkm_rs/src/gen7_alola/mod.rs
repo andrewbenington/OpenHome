@@ -32,6 +32,7 @@ const NEUROFORCE: u16 = 233;
 pub type Pk7AbilityIndex = AbilityIndexBounded<NEUROFORCE>;
 
 #[derive(Debug, Clone, Copy, Default)]
+#[cfg_attr(feature = "wasm", derive(tsify::Tsify))]
 pub struct Pk7SpeciesAndForm(SpeciesForm);
 
 impl Pk7SpeciesAndForm {
@@ -39,7 +40,7 @@ impl Pk7SpeciesAndForm {
         if source_has_form_metadata(
             MetadataSource::UltraSunUltraMoon,
             species_and_form.get_ndex() as u16,
-            species_and_form.get_forme_index(),
+            species_and_form.get_form_index(),
         ) {
             Some(Self(species_and_form))
         } else {
@@ -87,7 +88,9 @@ type BoxSlot = pkm_rs_types::BoundedU8<{ BOX_SLOTS - 1 }>;
 
 #[cfg(test)]
 mod tests {
-    use super::{BOX_COUNT, BOX_SLOTS, BoxIndex, BoxSlot};
+    use pkm_rs_types::NationalDex;
+
+    use super::*;
     use crate::result::{Error, Result};
 
     #[test]
@@ -100,6 +103,13 @@ mod tests {
             BoxSlot::check_bound(slot).or(Err(Error::BoxSlot(slot)))?;
         }
 
+        Ok(())
+    }
+
+    #[test]
+    fn vivillon_valid() -> Result<()> {
+        Pk7SpeciesAndForm::try_new(SpeciesForm::new_valid_ndex(NationalDex::Vivillon, 7).unwrap())
+            .expect("vivillon is valid");
         Ok(())
     }
 }

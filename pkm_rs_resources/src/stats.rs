@@ -1,12 +1,15 @@
 #[cfg(feature = "wasm")]
 use crate::natures::NatureIndex;
 use crate::natures::NatureMetadata;
-use crate::species::SpeciesForm;
 use crate::species::metadata_table::BaseStats;
+use crate::species::{BaseForm, SpeciesForm};
 use crate::{metadata_source::MetadataSource, species::metadata_table::MetadataTableReader};
 
-use pkm_rs_types::{HyperTraining, NationalDex, Stat, Stats, Stats16Le, StatsPreSplit};
+use pkm_rs_types::{
+    HyperTraining, NationalDex, Stat, Stats, Stats16Le, StatsPreSplit, TryIntoTs, TsResult,
+};
 
+use tsify::Ts;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -131,29 +134,30 @@ pub fn calculate_all_modern<I: Stats, E: Stats>(
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = calculateStats))]
 pub fn calculate_modern_stats_wasm(
     species_form: SpeciesForm,
-    ivs: &Stats16Le,
-    evs: &Stats16Le,
+    ivs: Ts<Stats16Le>,
+    evs: Ts<Stats16Le>,
     level: u16,
     nature: &NatureIndex, // this must be a reference or JavaScript will move the value and cause errors
-    hyper_training: Option<HyperTraining>,
+    hyper_training: Option<Ts<HyperTraining>>,
     metadata_source: Option<MetadataSource>,
-) -> Stats16Le {
+) -> TsResult<Stats16Le> {
     let Some(metadata_reader) = (match metadata_source {
         Some(source) => species_form.metadata_reader_for_source(source),
         None => Some(species_form.current_metadata_reader()),
     }) else {
-        return Stats16Le::default();
+        return Stats16Le::default().try_into_ts();
     };
 
     calculate_all_modern(
         metadata_reader,
-        ivs,
-        evs,
+        &ivs.to_rust()?,
+        &evs.to_rust()?,
         level,
         nature.get_metadata(),
-        hyper_training,
+        hyper_training.map(|ht| ht.to_rust()).transpose()?,
     )
     .unwrap_or_default()
+    .try_into_ts()
 }
 
 pub const fn calculate_hp_modern(
@@ -213,8 +217,9 @@ pub fn calculate_stats_gen1(
     evs: &StatsPreSplit,
     level: u16,
 ) -> Option<StatsPreSplit> {
-    let BaseStats::PreSplit(base) =
-        SpeciesForm::base_form(national_dex).get_base_stats_from(MetadataSource::Yellow)?
+    let BaseStats::PreSplit(base) = national_dex
+        .base_form()
+        .get_base_stats_from(MetadataSource::Yellow)?
     else {
         panic!("Pokémon Yellow base stats should have a unified Special stat")
     };
@@ -254,27 +259,31 @@ pub fn calculate_stats_gen2(
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = calculateStatsGen1))]
 pub fn calculate_stats_gen1_wasm(
     national_dex: u16,
-    dvs: &StatsPreSplit,
-    evs: &StatsPreSplit,
+    dvs: Ts<StatsPreSplit>,
+    evs: Ts<StatsPreSplit>,
     level: u16,
-) -> StatsPreSplit {
+) -> TsResult<StatsPreSplit> {
     let Ok(national_dex) = NationalDex::try_from(national_dex) else {
-        return Default::default();
+        return StatsPreSplit::default().try_into_ts();
     };
-    calculate_stats_gen1(national_dex, dvs, evs, level).unwrap_or_default()
+    calculate_stats_gen1(national_dex, &dvs.to_rust()?, &evs.to_rust()?, level)
+        .unwrap_or_default()
+        .try_into_ts()
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = calculateStatsGen2))]
 pub fn calculate_stats_gen2_wasm(
     national_dex: u16,
-    dvs: &StatsPreSplit,
-    evs: &StatsPreSplit,
+    dvs: Ts<StatsPreSplit>,
+    evs: Ts<StatsPreSplit>,
     level: u16,
-) -> Stats16Le {
+) -> TsResult<Stats16Le> {
     let Ok(national_dex) = NationalDex::try_from(national_dex) else {
-        return Default::default();
+        return Stats16Le::default().try_into_ts();
     };
-    calculate_stats_gen2(national_dex, dvs, evs, level).unwrap_or_default()
+    calculate_stats_gen2(national_dex, &dvs.to_rust()?, &evs.to_rust()?, level)
+        .unwrap_or_default()
+        .try_into_ts()
 }
 
 #[cfg(test)]

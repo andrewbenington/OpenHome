@@ -82,3 +82,21 @@ impl Serialize for Error {
 }
 
 pub type Result<T> = core::result::Result<T, Error>;
+
+// for types T that can be natively converted to JavaScript
+#[cfg(feature = "wasm")]
+pub type JsResult<T> = core::result::Result<T, wasm_bindgen::JsError>;
+
+// for types T that can't be natively converted to JavaScript but implement Tsify
+#[cfg(feature = "wasm")]
+pub type TsResult<T> = JsResult<tsify::Ts<T>>;
+
+#[cfg(feature = "wasm")]
+pub trait TryIntoTs: tsify::Tsify + Sized + serde::Serialize {
+    fn try_into_ts(&self) -> TsResult<Self> {
+        Ok(self.into_ts()?)
+    }
+}
+
+#[cfg(feature = "wasm")]
+impl<T> TryIntoTs for T where T: tsify::Tsify + Sized + serde::Serialize {}

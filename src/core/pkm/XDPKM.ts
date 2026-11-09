@@ -23,7 +23,7 @@ import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { MoveFilter } from '../util/util'
 import { PkmConverter } from './conversion/converter'
-import { PkmConstructorOptions } from './PKM'
+import { PkmConstructorOptions } from './types'
 import { modernStatCalc } from './util'
 import {
   filterRibbons,
@@ -35,7 +35,7 @@ export default class XDPKM {
   static getFormat() {
     return 'XDPKM' as const
   }
-  format: 'XDPKM' = 'XDPKM'
+  format = 'XDPKM' as const
   static getBoxSize() {
     return 196
   }

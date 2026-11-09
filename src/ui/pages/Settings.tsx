@@ -20,7 +20,7 @@ import {
 import { Flex, RadioGroup, Select, Separator } from '@radix-ui/themes'
 import { ReactNode, useEffect, useState } from 'react'
 import PromptDialog from '../components/dialog/PromptDialog'
-import useDisplayError from '../hooks/displayError'
+import { useTitledErrorDisplay } from '../hooks/displayError'
 import { ConvertStrategyKey, useConvertStrategies } from '../state/convert-strategies'
 import './Settings.css'
 
@@ -40,6 +40,11 @@ export default function SettingsPage() {
           display: 'PKM Conversion',
           component: <PKMConversion />,
         },
+        {
+          route: 'developer',
+          display: 'Developer',
+          component: <DeveloperSettings />,
+        },
       ]}
     />
   )
@@ -49,11 +54,16 @@ function GeneralSettings() {
   const { settings, extraSaveTypes, updateSettings, updateMonDisplayState } = useSettings()
   const backend = useBackend()
   const [dataDirPath, setDataDirPath] = useState<string>()
-  const displayError = useDisplayError()
+  const displayTitledError = useTitledErrorDisplay()
+
+  const displaySettingsError = displayTitledError('Error updating settings')
 
   useEffect(() => {
-    backend.getDataDirPath().then(R.match((value) => setDataDirPath(value), console.error))
-  }, [backend, displayError])
+    backend
+      .getDataDirPath()
+      .then(R.match((value) => setDataDirPath(value), displaySettingsError))
+      .catch(displaySettingsError)
+  }, [backend, displaySettingsError])
 
   return (
     <ContentCard>
@@ -65,13 +75,13 @@ function GeneralSettings() {
               <label className="flex-row" key={saveType.saveTypeName}>
                 <input
                   type="checkbox"
-                  onChange={async (e) => {
-                    await updateSettings({
+                  onChange={(e) => {
+                    updateSettings({
                       enabledSaveTypes: {
                         ...settings.enabledSaveTypes,
                         [saveType.saveTypeID]: e.target.checked,
                       },
-                    })
+                    }).catch(displaySettingsError)
                   }}
                   checked={settings.enabledSaveTypes[saveType.saveTypeID]}
                 />
@@ -83,10 +93,12 @@ function GeneralSettings() {
         <div>
           <GroupHeader name="App Theme" />
           <RadioGroup.Root
-            onValueChange={async (newValue: AppTheme) => {
+            onValueChange={(newValue: AppTheme) => {
               if (!newValue) return
-              await backend.setTheme(newValue)
-              await updateSettings({ appTheme: newValue })
+              Promise.all([
+                backend.setTheme(newValue),
+                updateSettings({ appTheme: newValue }),
+              ]).catch(displayTitledError('Error updating app theme'))
             }}
             value={settings.appTheme}
             style={{ margin: 8 }}
@@ -99,11 +111,11 @@ function GeneralSettings() {
         <div>
           <GroupHeader name="Box Icon Sprites" />
           <RadioGroup.Root
-            onValueChange={async (newValue: string) => {
+            onValueChange={(newValue: string) => {
               if (!newValue) return
-              await updateMonDisplayState({
+              updateMonDisplayState({
                 boxIconSprites: newValue as BoxIconSpriteType,
-              })
+              }).catch(displaySettingsError)
             }}
             value={$O(settings.monDisplayState.boxIconSprites).orElse('default')}
             style={{ margin: 8 }}
@@ -130,13 +142,10 @@ function GeneralSettings() {
                   { uniqueLabel: 'Cancel', action: () => {}, type: 'cancel' },
                   {
                     uniqueLabel: 'Select Directory...',
-                    action: () => {
+                    action: () =>
                       backend
                         .promptChangeDataDir()
-                        .then(
-                          R.mapErr((err) => displayError('Error switching data directory', err))
-                        )
-                    },
+                        .then(R.mapErr(displayTitledError('Error switching data directory'))),
                   },
                 ]}
               />
@@ -148,17 +157,46 @@ function GeneralSettings() {
                   { uniqueLabel: 'Cancel', action: () => {}, type: 'cancel' },
                   {
                     uniqueLabel: 'Select New Directory...',
-                    action: () => {
+                    action: () =>
                       backend
                         .promptMoveDataDir()
-                        .then(R.mapErr((err) => displayError('Error moving data', err)))
-                    },
+                        .then(R.mapErr(displayTitledError('Error moving data'))),
                     type: 'destructive',
                   },
                 ]}
               />
             </Flex>
           </Flex>
+        </div>
+      </div>
+    </ContentCard>
+  )
+}
+
+function DeveloperSettings() {
+  const { developerSettings, setDeveloperFlag } = useSettings()
+  const displayTitledError = useTitledErrorDisplay()
+
+  return (
+    <ContentCard>
+      <div className="settings-content-inner">
+        <div>
+          <GroupHeader name="Debug" />
+          <div className="single-setting-container">
+            <span className="settings-checkbox-flex">
+              <p>Show Move IDs</p>
+              <input
+                type="checkbox"
+                onChange={(e) => {
+                  setDeveloperFlag('show_move_ids', e.target.checked).catch(
+                    displayTitledError('Error updating settings')
+                  )
+                }}
+                checked={developerSettings.flags.includes('show_move_ids')}
+              />
+            </span>
+            <p className="setting-description">Show internal move ID numbers with moves</p>
+          </div>
         </div>
       </div>
     </ContentCard>
@@ -178,7 +216,7 @@ function PKMConversion() {
   const schema = getConvertSettingsSchema().settings_schema
 
   const grouped = Object.groupBy(schema.entries(), ([identifier]) => {
-    return ConvertStrategies.getCategoryName(identifier as ConvertStrategyKey)
+    return ConvertStrategies.getCategoryName(identifier)
   })
 
   return (
@@ -192,7 +230,7 @@ function PKMConversion() {
               {settings?.map(([identifier, setting]) => (
                 <PKMConversionSettingControl
                   key={identifier}
-                  identifier={identifier as ConvertStrategyKey}
+                  identifier={identifier}
                   descriptor={setting}
                 />
               ))}
@@ -270,21 +308,22 @@ function PKMBoolConversionSettingControl({
   descriptor,
 }: PKMBoolConversionSettingControlProps) {
   const { defaultConvertStrategy, updateDefaultConvertStrategy } = useConvertStrategies()
+  const displayTitledError = useTitledErrorDisplay()
+
   return (
     <div className="single-setting-container">
       <span className="settings-checkbox-flex">
         <p>{ConvertStrategies.getSettingName(identifier)}</p>
         <input
           type="checkbox"
-          onChange={(e) =>
+          onChange={(e) => {
             updateDefaultConvertStrategy({
               ...defaultConvertStrategy,
               [identifier]: e.target.checked,
-            })
-          }
+            }).catch(displayTitledError('Error updating settings'))
+          }}
           checked={
-            (defaultConvertStrategy[identifier as keyof ConvertStrategy] as boolean | undefined) ??
-            descriptor.default
+            (defaultConvertStrategy[identifier] as boolean | undefined) ?? descriptor.default
           }
         />
       </span>
@@ -304,19 +343,22 @@ function PKMStringConversionSettingControl({
   descriptor,
 }: PKMStringConversionSettingControlProps) {
   const { defaultConvertStrategy, updateDefaultConvertStrategy } = useConvertStrategies()
+  const displayTitledError = useTitledErrorDisplay()
+
   const value = defaultConvertStrategy[identifier] as string | undefined
+
   return (
     <div className="single-setting-container">
       <p>{ConvertStrategies.getSettingName(identifier)}</p>
       <p className="setting-description">{ConvertStrategies.getDescription(identifier)}</p>
       <Select.Root
         value={value}
-        onValueChange={(newValue) =>
+        onValueChange={(newValue) => {
           updateDefaultConvertStrategy({
             ...defaultConvertStrategy,
             [identifier]: newValue,
-          })
-        }
+          }).catch(displayTitledError('Error updating settings'))
+        }}
         size="1"
       >
         <Select.Trigger />

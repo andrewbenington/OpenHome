@@ -6,8 +6,11 @@ const LGPE_ENTRY_SIZE: usize = 0x54;
 
 type GameMetadataLgpe = GameMetadata<PersonalInfoLgpe, LGPE_ENTRY_SIZE>;
 
-pub static METADATA_TABLE_LGPE: GameMetadataLgpe =
-    GameMetadataLgpe::from_binary(LGPE_PERSONAL_FILE, LGPE_LEVELUP_PKL);
+pub static METADATA_TABLE_LGPE: GameMetadataLgpe = GameMetadataLgpe::from_binary(
+    LGPE_PERSONAL_FILE,
+    LGPE_LEVELUP_PKL,
+    "Let's Go Pikachu/Eevee",
+);
 
 #[derive(Debug, Clone, Copy)]
 pub struct PersonalInfoLgpe([u8; LGPE_ENTRY_SIZE]);
@@ -74,5 +77,17 @@ impl PersonalInfo for PersonalInfoLgpe {
 
     fn source_name(&self) -> &'static str {
         "Gen 7 (Let's Go)"
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn pichu_not_present() {
+        let index = METADATA_TABLE_LGPE.get_game_index(NationalDex::Pichu as u16, 0);
+
+        assert!(index.is_none());
     }
 }

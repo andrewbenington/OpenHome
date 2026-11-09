@@ -4,7 +4,7 @@ use pkm_rs_resources::{items::ItemGen3, lookup};
 use pkm_rs_types::{AbilityNumber, Generation, PokeDate, SimpleAbilityNumber, Stats16Le};
 
 use super::OhpkmConvert;
-use crate::convert_strategy::{ConvertStrategy, PidModificationStrategy, PkmConverter};
+use crate::convert_strategy::{ConvertStrategy, PkmConverter, ShinyOdds};
 use crate::gen3::{Gen3PokemonIndex, PK3_MAX_ABILITY, Pk3};
 use crate::ohpkm::OhpkmV2;
 use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
@@ -15,7 +15,7 @@ use crate::{gen3, ohpkm, util::personality_value};
 
 impl OhpkmConvert for Pk3 {
     fn to_main_data(&self) -> ohpkm::v2_sections::MainDataV2 {
-        let form_metadata = self.get_forme_metadata();
+        let form_metadata = self.get_form_metadata();
 
         let ability_index_unchecked = form_metadata.get_ability(self.ability_num.into());
         let ability_index = if ability_index_unchecked.to_u16() > PK3_MAX_ABILITY {
@@ -111,7 +111,7 @@ impl OhpkmConvert for Pk3 {
         // if the nickname has been otherwise unchanged, use a copy of the original data's nickname
         // to preserve trash bytes
         if let Some(StoredPkmBytes::Pk3(original_bytes)) = ohpkm.original_data_bytes()
-            && let Ok(original_pk3) = Pk3::try_from_bytes(&original_bytes)
+            && let Ok(original_pk3) = Pk3::try_from_bytes(original_bytes.as_ref())
             && original_pk3
                 .nickname
                 .identical_until_terminator(&nickname_gen3)
@@ -120,14 +120,14 @@ impl OhpkmConvert for Pk3 {
         }
 
         let personality_value = if ohpkm.game_of_origin().generation() != Generation::G3 {
-            PidModificationStrategy::default().get_modified_pid(ohpkm)
+            converter.personality_value(ohpkm, ShinyOdds::Odds8192)
         } else if ohpkm.pid_bit_flipped_for_shiny() {
             personality_value::flip_most_significant_bit(ohpkm.personality_value())
         } else {
             ohpkm.personality_value()
         };
 
-        let form_metadata = ohpkm.get_forme_metadata();
+        let form_metadata = ohpkm.get_form_metadata();
 
         let ability_index_unchecked = form_metadata.get_ability(ohpkm.ability_num());
         let ability_num = if ability_index_unchecked.to_u16() <= PK3_MAX_ABILITY {
@@ -206,14 +206,14 @@ impl OhpkmConvert for Pk3 {
                 .map(StoredPkmBytes::Pk3);
         }
         bytes
-            .try_into()
-            .map_err(|_| {
-                Error::buffer_size_with_source(
-                    "Pk3::OhpkmConvert::bytes_to_stored",
-                    gen3::PARTY_SIZE,
-                    bytes.len(),
-                )
-            })
+            .as_array()
+            .ok_or(Error::buffer_size_with_source(
+                "Pk3::OhpkmConvert::bytes_to_stored",
+                gen3::PARTY_SIZE,
+                bytes.len(),
+            ))
+            .copied()
+            .map(Box::new)
             .map(StoredPkmBytes::Pk3)
     }
 }

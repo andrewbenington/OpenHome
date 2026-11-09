@@ -10,25 +10,17 @@ use pkm_rs_types::{Gender, OriginGame, TrainerMemory};
 use serde::Serialize;
 use std::num::NonZeroU16;
 
-#[cfg(feature = "wasm")]
-use wasm_bindgen::prelude::*;
-
 #[deprecated(since = "1.10.4", note = "please use `PastHandlerDataV2` instead")]
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Default, Serialize, Clone)]
 pub struct PastHandlerDataV1 {
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub id: Option<NonZeroU16>,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub secret_id: Option<NonZeroU16>,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub name: SizedUtf16String<26>,
     pub friendship: u8,
     pub memory: TrainerMemory,
     pub affection: u8,
     pub gender: Gender,
     pub origin_game: Option<OriginGame>,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(getter_with_clone))]
     pub origin_plugin: Option<String>,
 }
 
@@ -65,62 +57,6 @@ impl PastHandlerDataV1 {
         self.affection = other.affection;
         self.origin_game = other.origin_game;
         self.origin_plugin = plugin;
-    }
-}
-
-#[cfg(feature = "wasm")]
-#[wasm_bindgen]
-#[allow(clippy::missing_const_for_fn)]
-#[allow(clippy::too_many_arguments)]
-impl PastHandlerDataV1 {
-    #[wasm_bindgen(getter)]
-    pub fn id(&self) -> Option<u16> {
-        self.id.map(NonZeroU16::get)
-    }
-
-    #[wasm_bindgen(setter)]
-    pub fn set_id(&mut self, value: u16) {
-        self.id = NonZeroU16::new(value)
-    }
-
-    #[wasm_bindgen(getter)]
-    pub fn name(&self) -> String {
-        self.name.to_string()
-    }
-
-    #[wasm_bindgen(getter = secretId)]
-    pub fn secret_id(&self) -> u16 {
-        self.secret_id.map(NonZeroU16::get).unwrap_or(0)
-    }
-
-    #[wasm_bindgen(setter = secretId)]
-    pub fn set_secret_id(&mut self, value: u16) {
-        self.secret_id = NonZeroU16::new(value)
-    }
-
-    #[wasm_bindgen(constructor)]
-    pub fn new(
-        id: Option<u16>,
-        secret_id: Option<u16>,
-        name: String,
-        friendship: u8,
-        memory: Option<TrainerMemory>,
-        affection: u8,
-        gender: Gender,
-        origin_game: Option<OriginGame>,
-        origin_plugin: Option<String>,
-    ) -> Self {
-        Self {
-            id: id.and_then(NonZeroU16::new),
-            secret_id: secret_id.and_then(NonZeroU16::new),
-            name: name.into(),
-            friendship,
-            memory: memory.unwrap_or_default(),
-            affection,
-            gender,
-            origin_game,
-            origin_plugin,
-        }
     }
 }
 

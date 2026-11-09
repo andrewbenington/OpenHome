@@ -42,8 +42,6 @@ impl ContestStatMarker for Tough {
 }
 
 #[cfg_attr(feature = "randomize", derive(Randomize))]
-#[cfg_attr(feature = "wasm", derive(Tsify))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Default, Debug, Clone, Copy)]
 pub struct Gen3RibbonSet {
     cool: Gen3ContestRibbons<Cool>,
@@ -253,7 +251,6 @@ impl Gen3ContestRibbonLevel {
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "wasm", derive(Tsify))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[repr(u8)]
 pub enum Gen3Ribbon {
     #[serde(rename = "Cool (Hoenn)")]

@@ -19,7 +19,18 @@ use wasm_bindgen::describe::*;
 
 const TERMINATOR: u16 = 0x0000;
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    zerocopy::FromBytes,
+    zerocopy::Unaligned,
+    zerocopy::IntoBytes,
+    zerocopy::KnownLayout,
+    zerocopy::Immutable,
+)]
+#[repr(C)]
 pub struct SizedUtf16String<const N: usize> {
     raw_le: [u8; N],
 }

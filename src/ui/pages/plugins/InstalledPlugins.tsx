@@ -1,6 +1,6 @@
 import useBackend from '@openhome-core/backend/useBackend'
 import { R } from '@openhome-core/util/functional'
-import useDisplayError from '@openhome-ui/hooks/displayError'
+import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import { AppInfoContext, Settings as SettingsType } from '@openhome-ui/state/appInfo'
 import { OpenHomePlugin, PluginContext } from '@openhome-ui/state/plugin/reducer'
 import { Badge, Spinner } from '@radix-ui/themes'
@@ -42,7 +42,8 @@ function InstalledPluginCard(props: { metadata: OpenHomePlugin; onDelete: (id: s
       R.match(
         (pluginPath) => setIconPath(convertLocalImagePath(`${pluginPath}/icon.png`)),
         (error) => displayErrorEvent('Error Getting Plugin Path', error)
-      )
+      ),
+      (error) => displayErrorEvent('Error Getting Plugin Path', error)
     )
   }, [metadata.id])
 
@@ -57,12 +58,14 @@ function InstalledPluginCard(props: { metadata: OpenHomePlugin; onDelete: (id: s
     await backend.updateSettings(updated).catch(console.error)
   }
 
-  const handleCardClick = () => {
+  const handleCardClick = async () => {
     dispatchAppInfoState({
       type: 'set_plugin_enabled',
       payload: { pluginID: metadata.id, enabled: !enabled },
     })
-    updateSettings({ enabledPlugins: { ...settings.enabledPlugins, [metadata.id]: !enabled } })
+    return await updateSettings({
+      enabledPlugins: { ...settings.enabledPlugins, [metadata.id]: !enabled },
+    })
   }
 
   return (

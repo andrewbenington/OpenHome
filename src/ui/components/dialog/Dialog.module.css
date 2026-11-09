@@ -1,58 +1,3 @@
-.Button {
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 1.5rem;
-  margin: 0;
-  outline: 0;
-  border-radius: 0.15rem;
-  background-color: var(--gray-10);
-  font-family: inherit;
-  color: var(--color-gray-900);
-  user-select: none;
-  color: white;
-  min-width: 3rem;
-  width: fit-content;
-
-  &[data-color='red'] {
-    background-color: var(--color-destructive);
-  }
-
-  &[data-color='theme'] {
-    background-color: var(--accent-9);
-  }
-
-  @media (hover: hover) {
-    &:hover {
-      background-color: var(--gray-9);
-      &[data-color='red'] {
-        background-color: var(--tomato-8);
-      }
-
-      &[data-color='theme'] {
-        background-color: var(--accent-8);
-      }
-    }
-  }
-
-  &:active {
-    background-color: var(--gray-11);
-    &[data-color='red'] {
-      background-color: var(--tomato-11);
-    }
-
-    &[data-color='theme'] {
-      background-color: var(--accent-11);
-    }
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--color-blue);
-    outline-offset: -1px;
-  }
-}
-
 .Backdrop {
   position: fixed;
   min-height: 100dvh;
@@ -109,10 +54,6 @@
   }
 
   filter: brightness(calc(1 - var(--nested-dialogs) * 0.5));
-}
-
-.ModalPopup {
-  background: var(--background-gradient);
 }
 
 .Title {

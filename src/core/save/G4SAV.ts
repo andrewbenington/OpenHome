@@ -11,7 +11,7 @@ import { ConvertStrategy, ExtraFormIndex, Language, OriginGame } from '@pkm-rs/p
 import { OHPKM } from '../pkm/OHPKM'
 import { Errorable, Option } from '../util/functional'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
-import { LookupType } from './util'
+import { LookupType } from './types'
 import { PathData } from './util/path'
 
 const PKM_BOX_SIZE = 136
@@ -193,7 +193,7 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
   }
 
   static emptySlotBytes(): Uint8Array<ArrayBuffer> {
-    const shuffledBytes = encryption.shuffleBlocksGen45(emptySlotBytes().buffer)
+    const shuffledBytes = encryption.shuffleBlocksGen45(gen45EmptySlotBytes().buffer)
     return new Uint8Array(encryption.decryptByteArrayGen45(shuffledBytes))
   }
 
@@ -203,7 +203,7 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
 
   abstract supportsMon(
     nationalDex: number,
-    formeNumber: number,
+    formNumber: number,
     extraFormIndex?: ExtraFormIndex
   ): boolean
 
@@ -245,4 +245,4 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
 }
 
 // return new array so mutations don't happen
-const emptySlotBytes = () => new Uint8Array(136)
+export const gen45EmptySlotBytes = () => new Uint8Array(136)

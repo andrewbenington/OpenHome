@@ -2,10 +2,10 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { SortTypes } from '@openhome-core/pkm/sort'
 import { mapToObject } from '@openhome-core/util'
-import { $R, isResult, Option, R, range } from '@openhome-core/util/functional'
-import { isThenable, NowOrLater } from '@openhome-core/util/promise'
+import { $R, Option, R, range } from '@openhome-core/util/functional'
+import { isThenable } from '@openhome-core/util/promise'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
-import { Item, Separator, Submenu } from '@openhome-ui/components/context-menu/types'
+import { Item, LoadingItem, Separator, Submenu } from '@openhome-ui/components/context-menu/types'
 import { DebugDataDisplay } from '@openhome-ui/components/DebugDataDisplay'
 import DebugOnly from '@openhome-ui/components/DebugOnly'
 import PromptDialog from '@openhome-ui/components/dialog/PromptDialog'
@@ -21,14 +21,13 @@ import {
 import SearchFields from '@openhome-ui/components/search/SearchFields'
 import PokemonSearchModal from '@openhome-ui/components/search/SearchModal'
 import ToggleButton from '@openhome-ui/components/ToggleButton'
-import useDisplayError from '@openhome-ui/hooks/displayError'
-import MissingOhpkmIdPrompt from '@openhome-ui/pokemon/MissingOhpkmId'
+import { useDisplayError, useTitledErrorDisplay } from '@openhome-ui/hooks/displayError'
 import PokemonDetailsModal from '@openhome-ui/pokemon/PokemonDetailsModal'
 import {
   useDragSourceSupportsMon,
   useIsDraggingActive,
 } from '@openhome-ui/state-zustand/drag-and-drop/dragStore'
-import { OhpkmLookupResult, useOhpkmStore } from '@openhome-ui/state/ohpkm'
+import useOhpkmBatchIdLookup from '@openhome-ui/state/ohpkm/useOhpkmIdBatchLookup'
 import useTrackedDataRecovery from '@openhome-ui/state/ohpkm/useTrackedDataRecovery'
 import { EMPTY_SLOT, HomeMonLocation, useSaves } from '@openhome-ui/state/saves'
 import { cssClass } from '@openhome-ui/util/style'
@@ -47,7 +46,7 @@ import useMultiSelect from '../../state/drag-and-drop/useMultiSelect'
 import { useOpenHomeBoxNavigator } from '../util'
 import AllHomeBoxes from './AllHomeBoxes'
 import ArrowButton from './ArrowButton'
-import BoxCellAsync from './BoxCellAsync'
+import BoxCellAsync, { BoxSlotResult } from './BoxCellAsync'
 import DroppableSpace from './DroppableSpace'
 import './style.css'
 
@@ -249,14 +248,15 @@ export default function HomeBoxDisplay() {
 }
 
 type SlotData = {
-  monPromise: NowOrLater<OhpkmLookupResult> | PKMInterface | undefined
+  monPromise: Option<BoxSlotResult>
   location: HomeMonLocation
   identifier: Option<OhpkmIdentifier>
+  loading?: boolean
 }
 
 function SingleBoxMonDisplay() {
-  const ohpkmStore = useOhpkmStore()
   const displayError = useDisplayError()
+  const displayTitledError = useTitledErrorDisplay()
   const { importMonsToLocation, getPendingMon } = useSaves()
   const { getCurrentBox, getCurrentBank, removeAllHomeDupes } = useBanksAndBoxes()
   const { multiSelectState: dragState, isSelected, toggleSelection } = useMultiSelect()
@@ -270,11 +270,6 @@ function SingleBoxMonDisplay() {
   } = useOpenHomeBoxNavigator()
 
   const currentBox = getCurrentBox()
-  const getById = ohpkmStore.tryLoadFromId
-  const lookupOhpkmById = useCallback(
-    (identifier: OhpkmIdentifier) => getById(identifier),
-    [getById]
-  )
 
   const TrackedDataRecovery = useTrackedDataRecovery()
   const dataRecoverySearchModal = {
@@ -292,7 +287,11 @@ function SingleBoxMonDisplay() {
     () => [
       Submenu.label('Sort this box...').with(
         ...SortTypes.map((sortType) =>
-          Item.label(`By ${sortType}`).action(() => sortHomeBox(currentBox.index, sortType))
+          LoadingItem.label(`By ${sortType}`).action(async () => {
+            await sortHomeBox(currentBox.index, sortType).then(
+              R.peekErr(displayTitledError('Error sorting box'))
+            )
+          })
         )
       ),
       Submenu.label('Sort all boxes...').with(
@@ -301,13 +300,17 @@ function SingleBoxMonDisplay() {
         )
       ),
     ],
-    [currentBox, sortAllHomeBoxes, sortHomeBox]
+    [currentBox, sortAllHomeBoxes, sortHomeBox, displayTitledError]
   )
 
   const removeDupesItem = Item.label('Remove duplicates from this box').action(removeAllHomeDupes)
 
   const currentBankIndex = getCurrentBank().index
   const currentBoxIndex = getCurrentBox().index
+
+  const { batchResults: ohpkmsById, loading } = useOhpkmBatchIdLookup(
+    Array.from(currentBox.identifiers.values())
+  )
 
   const slots: SlotData[] = useMemo(
     () =>
@@ -322,7 +325,7 @@ function SingleBoxMonDisplay() {
           }
 
           let identifier = storedId
-          let monPromise: NowOrLater<OhpkmLookupResult> | PKMInterface | undefined = undefined
+          let monPromise: BoxSlotResult = R.Ok(undefined) as BoxSlotResult
 
           // pendingMon means this slot is in the process of being updated, but needs to wait
           // for the OHPKM data to be registered. In the meantime the pendingMon should be displayed
@@ -335,61 +338,47 @@ function SingleBoxMonDisplay() {
               identifier = pendingMon
             } else {
               identifier = undefined
-              monPromise = pendingMon
+              monPromise = R.Ok(pendingMon) as BoxSlotResult
             }
           }
 
           if (identifier) {
-            // const lookupResult = lookupOhpkmById(identifier)
-            // if (isThenable(lookupResult)) {
-            //   monPromise = lookupResult
-            // }
-            monPromise ??= lookupOhpkmById(identifier)
+            const lookupResult = ohpkmsById?.get(identifier)
+            monPromise =
+              lookupResult ?? (loading ? (R.Ok(undefined) as BoxSlotResult) : R.Err({ identifier }))
           }
 
-          return { monPromise, location, identifier }
+          const monPresentButLoading =
+            (loading && identifier !== undefined && monPromise !== undefined) ||
+            pendingMon !== undefined
+          return { monPromise, location, identifier, loading: monPresentButLoading }
         }),
-    [currentBankIndex, currentBox.identifiers, currentBoxIndex, getPendingMon, lookupOhpkmById]
+    [currentBankIndex, currentBox.identifiers, currentBoxIndex, getPendingMon, ohpkmsById, loading]
   )
 
   return (
     <>
       <OpenHomeCtxMenu sections={[contextElements, [removeDupesItem]]}>
         <div className="home-box-grid">
-          {slots.map(({ monPromise, location, identifier }, index) => {
+          {slots.map(({ monPromise, location, identifier, loading }, index) => {
             // if underlying data changes but this key doesn't, the box cell will be stale and may not display the correct species
-            let uniqueKey = identifier ?? `${currentBoxIndex}-${index}`
+            const uniqueKey = identifier ?? `${currentBoxIndex}-${index}`
 
-            let monNowOrLater: Option<PKMInterface> = undefined
-
-            if (monPromise && !isThenable(monPromise) && isResult(monPromise)) {
-              if (R.isOk(monPromise)) {
-                monNowOrLater = monPromise.data
-              } else {
-                const { identifier } = monPromise.error
-                console.error(identifier)
-                return (
-                  <MissingOhpkmIdPrompt
-                    key={uniqueKey}
-                    openhomeId={identifier}
-                    location={location}
-                  />
-                )
-              }
-            }
+            const monNowOrLater: Option<PKMInterface> = undefined
 
             return (
               <BoxCellAsync
                 key={uniqueKey}
                 monPlaceholder={!isThenable(monNowOrLater) ? monNowOrLater : undefined}
                 monPromise={monPromise}
+                loading={loading}
                 onClick={() => setSelectedIndex(index)}
                 dragID={`home_${currentBoxIndex}_${index}`}
                 location={location}
                 openhomeId={identifier}
-                onDrop={(importedMons) => {
+                onDrop={async (importedMons) => {
                   if (importedMons) {
-                    importMonsToLocation(importedMons, location)
+                    await importMonsToLocation(importedMons, location)
                   }
                 }}
                 // don't allow a swap with a pokémon not supported by the source save

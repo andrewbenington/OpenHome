@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3'
 import * as fs from 'fs'
 import {
+  itemEmeraldExpnGetAll,
   itemGen1GetAll,
   type ItemGen1GetAllRow,
   itemGen2GetAll,
@@ -35,25 +36,25 @@ async function generateModern() {
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-pub const ITEM_MAX: usize = ${allItems.length};
+pub const ITEM_MAX: usize = ALL_ITEMS.len() - 1;
 
 #[allow(clippy::missing_const_for_fn)]
 #[wasm_bindgen(js_name = "getAllItems")]
 #[cfg(feature = "wasm")]
 pub fn get_all_items() -> Vec<ItemMetadata> {
-    ALL_ITEMS.into_iter().copied().collect()
+    ALL_ITEMS.to_vec()
 }
 
 `
 
   output +=
-    `pub static ALL_ITEMS: [&ItemMetadata; ITEM_MAX] = [\n` +
-    allItems.map(({ id, name }) => '&' + convertItem(id, name)).join(',\n') +
+    `pub static ALL_ITEMS: &[ItemMetadata] = &[\n` +
+    allItems.map(({ id, name }) => convertItem(id, name)).join(',\n') +
     '];'
 
   const filename = 'pkm_rs_resources/src/items/modern.rs'
   fs.writeFileSync(filename, output)
-  console.log(`Rust code written to ${filename}`)
+  console.info(`Rust code written to ${filename}`)
 }
 
 function convertItemPastGen(
@@ -109,7 +110,7 @@ impl ItemGen1 {
 
   const filename = 'pkm_rs_resources/src/items/gen1.rs'
   fs.writeFileSync(filename, output)
-  console.log(`Rust code written to ${filename}`)
+  console.info(`Rust code written to ${filename}`)
 }
 
 async function generateGen2() {
@@ -155,7 +156,7 @@ impl ItemGen2 {
 
   const filename = 'pkm_rs_resources/src/items/gen2.rs'
   fs.writeFileSync(filename, output)
-  console.log(`Rust code written to ${filename}`)
+  console.info(`Rust code written to ${filename}`)
 }
 
 async function generateGen3() {
@@ -214,7 +215,7 @@ impl Randomize for ItemGen3 {
 
   const filename = 'pkm_rs_resources/src/items/gen3.rs'
   fs.writeFileSync(filename, output)
-  console.log(`Rust code written to ${filename}`)
+  console.info(`Rust code written to ${filename}`)
 }
 
 async function generateRadicalRed() {
@@ -251,7 +252,7 @@ impl ItemRadicalRed {
 
   const filename = 'pkm_rs_resources/src/items/radical_red.rs'
   fs.writeFileSync(filename, output)
-  console.log(`Rust code written to ${filename}`)
+  console.info(`Rust code written to ${filename}`)
 }
 
 async function generateUnbound() {
@@ -288,12 +289,53 @@ impl ItemUnbound {
 
   const filename = 'pkm_rs_resources/src/items/unbound.rs'
   fs.writeFileSync(filename, output)
-  console.log(`Rust code written to ${filename}`)
+  console.info(`Rust code written to ${filename}`)
 }
 
-generateModern()
-generateGen1()
-generateGen2()
-generateGen3()
-generateRadicalRed()
-generateUnbound()
+// oxlint-disable-next-line no-unused-vars
+async function generateEmeraldExpn() {
+  const allItems = await itemEmeraldExpnGetAll(new Database('generate/pkm.db'))
+
+  let output = `use crate::items::ItemMetadataPastGen;
+use crate::items::types_extra::ItemEmeraldExpn;
+
+pub const ITEM_MAX_EMERALD_EXPN: usize = ${allItems.length};
+
+impl ItemEmeraldExpn {
+    pub fn from_modern_index(modern_index: u16) -> Option<Self> {
+        match modern_index {`
+
+  const alreadyProcessed: Set<number> = new Set()
+  for (const item of allItems.toSorted((a, b) => (a.modernId ?? 0) - (b.modernId ?? 0))) {
+    if (item.modernId && !alreadyProcessed.has(item.modernId)) {
+      output += `
+            ${item.modernId} => Self::new(${item.id}),`
+      alreadyProcessed.add(item.modernId)
+    }
+  }
+  output += ` _ => None,
+         }
+    }
+}
+
+`
+
+  output +=
+    `pub static ALL_ITEMS_EMERALD_EXPN: [&ItemMetadataPastGen; ITEM_MAX_EMERALD_EXPN] = [\n` +
+    allItems.map(convertItemPastGen).join(',\n') +
+    '];'
+
+  const filename = 'pkm_rs_resources/src/items/emerald_expn_2.rs'
+  fs.writeFileSync(filename, output)
+  console.info(`Rust code written to ${filename}`)
+}
+
+await Promise.all([
+  generateModern(),
+  generateGen1(),
+  generateGen2(),
+  generateGen3(),
+  generateRadicalRed(),
+  generateUnbound(),
+  // generateEmeraldExpn(),
+])
