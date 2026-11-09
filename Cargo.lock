@@ -2571,15 +2571,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "nbt"
-version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e8fdda7897c3987bd1d2058225c4e7a6bc45e82b821bf0247a8a6a9671244407"
-dependencies = [
- "flate2",
-]
-
-[[package]]
 name = "ndk"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3217,7 +3208,6 @@ dependencies = [
  "getrandom 0.4.3",
  "hex",
  "js-sys",
- "nbt",
  "num",
  "num_enum",
  "phf",

@@ -23,21 +23,15 @@ use num_enum::{IntoPrimitive, TryFromPrimitive};
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::{MoveIndex, MoveSlot, MoveSlots, la_tutor, lza_tm, sv_tm, swsh_tr};
-use pkm_rs_resources::moves::{MoveIndex, MoveSlots, la_tutor, lza_tm, sv_tm, swsh_tr};
-use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::natures::{NatureIndex, WithNature};
-use pkm_rs_resources::ribbons::{
-    CobblemonRibbon, CobblemonRibbonSet, ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet,
-};
-use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
+use pkm_rs_resources::ribbons::{CobblemonRibbon, ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_resources::species::SpeciesMetadata;
-use pkm_rs_resources::species::{SpeciesForm, SpeciesMetadata};
 use pkm_rs_types::Dvs;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
-    AbilityNumber, BinaryGender, ContestStats, Dvs, FlagSet, Gender, Geolocations, HyperTraining,
-    Ivs, Language, MarkingsSixShapesColors, NationalDex, OriginGame, PkmType, PokeDate, Pokerus,
+    AbilityNumber, BinaryGender, ContestStats, FlagSet, Gender, Geolocations, HyperTraining, Ivs,
+    Language, MarkingsSixShapesColors, NationalDex, OriginGame, PkmType, PokeDate, Pokerus,
     ShinyLeaves, Stats8, Stats16Le, StatsPreSplit, TeraType, TrainerData, TrainerMemory,
 };
 use serde::Serialize;

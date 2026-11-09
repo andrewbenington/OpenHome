@@ -2,14 +2,13 @@ use std::num::NonZeroU32;
 
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::metadata_source::MetadataSource;
-use pkm_rs_resources::metadata_source::ribbons::OpenHomeRibbonSet;
 use pkm_rs_resources::ribbons::{CobblemonRibbon, CobblemonRibbonSet, OpenHomeRibbonSet};
 use pkm_rs_types::{HyperTraining, Pokerus, Stat, Stats, Stats8, TeraType};
 
 use super::OhpkmConvert;
 use crate::convert_strategy::{ConvertStrategy, PidModificationStrategy, PkmConverter};
-use crate::ohpkm::ExtraFormMetadata;
 use crate::ohpkm::OhpkmV2;
+use crate::ohpkm::extra_form::ExtraFormMetadata;
 use crate::ohpkm::id::OpenHomeId;
 use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
 use crate::ohpkm::v2_sections::{
@@ -25,19 +24,19 @@ impl OhpkmConvert for PkCblmn {
     fn to_main_data(&self) -> ohpkm::v2_sections::MainDataV2 {
         ohpkm::v2_sections::MainDataV2 {
             // TODO: fill all this out
-            openhome_id,
+            openhome_id: todo!(),
             //openhome_id: OpenHomeId::new(
             //    self.species_and_form.into_inner().get_ndex(),
             //    trainer_id,
             //    secret_id,
             //    personality_value,
             //),
-            species_and_form,
+            species_and_form: todo!(),
             held_item_index: self.held_item_index,
-            personality_value,   // generate PID if necessary
-            encryption_constant, // use generated PID as encryption constant?
+            personality_value: todo!(),   // generate PID if necessary
+            encryption_constant: todo!(), // use generated PID as encryption constant?
             exp: self.exp,
-            ability_index,
+            ability_index: todo!(),
             ability_num: self.ability_num,
             markings: self.markings,
             nature: self.nature,
@@ -49,19 +48,19 @@ impl OhpkmConvert for PkCblmn {
             gender: self.gender,
             evs: self.evs,
             pokerus: Pokerus::default(),
-            ribbons,
+            ribbons: todo!(),
             moves: self
                 .moves
                 .to_pp_adjusted(MetadataSource::Cobblemon, ohpkm::MOVE_METADATA_SOURCE),
             nickname: self.nickname,
             ivs: self.ivs,
-            fullness: 0,    // TODO
-            affixed_ribbon, // TODO
-            trainer_name,   // TODO
+            fullness: 0,             // TODO
+            affixed_ribbon: todo!(), // TODO
+            trainer_name: todo!(),   // TODO
             trainer_friendship: self.trainer_friendship,
             ball: Ball::from(self.ball),
-            hyper_training, // TODO
-            scale: 128,     // TODO
+            hyper_training: todo!(), // TODO
+            scale: 128,              // TODO
             ..Default::default()
         }
     }
@@ -89,8 +88,8 @@ impl OhpkmConvert for PkCblmn {
     fn to_sv_data(&self) -> Option<ScarletVioletData> {
         // TODO: handle tera type conversion
         Some(ScarletVioletData {
-            tera_type_original,
-            tera_type_override,
+            tera_type_original: todo!(),
+            tera_type_override: todo!(),
             ..Default::default()
         })
     }
@@ -120,16 +119,16 @@ impl OhpkmConvert for PkCblmn {
         let mut mon = Self {
             species_and_form: ohpkm.species_and_form().try_into()?,
             ability_num: ohpkm.ability_num(),
-            ability_index,     // TODO from Cobblemon species index/map
-            held_item_index,   // TODO from Cobblemon item index/map
-            held_item_visible, // TODO from Cobblemon data
+            ability_index: todo!(),   // TODO from Cobblemon species index/map
+            held_item_index: todo!(), // TODO from Cobblemon item index/map
+            held_item_visible: todo!(), // TODO from Cobblemon data
             exp: ohpkm.exp(),
             nature: ohpkm.nature(),
             mint_nature: ohpkm.mint_nature(),
             gender: ohpkm.gender(),
             evs: ohpkm.evs(),
             pokerus: ohpkm.pokerus(),
-            ride_boosts, // TODO from Cobblemon data
+            ride_boosts: todo!(), // TODO from Cobblemon data
             ribbons: CobblemonRibbonSet::from_ribbons(ohpkm.ribbons()),
             affixed_ribbon: CobblemonRibbon::from_openhome_if_present(
                 ohpkm.affixed_ribbon().copied(),

@@ -1,6 +1,6 @@
-use crate::ohpkm::v2::OhpkmSectionTag;
 use crate::rom_hacks::cobblemon::conversion::ball::ball_map::CobblemonBall;
 use crate::util;
+use crate::{ohpkm::v2::OhpkmSectionTag, result::Error};
 
 use pkm_rs_resources::moves::MoveIndex;
 use pkm_rs_types::{Ivs, TeraType};
