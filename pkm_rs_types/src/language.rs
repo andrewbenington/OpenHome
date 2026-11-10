@@ -1,6 +1,6 @@
 use serde::Serialize;
 
-use strum::Display;
+use strum_macros::Display;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 

@@ -304,3 +304,22 @@ export async function itemEmeraldExpnGetAll(
   const result = stmt.all()
   return camelcaseKeys(result) as ItemEmeraldExpnGetAllRow[]
 }
+
+export const megaEvolutionGetAllQuery = `-- name: MegaEvolutionGetAll :many
+SELECT
+  national_dex, form_index, base_form_index, mega_stone_id
+FROM
+  mega_evolution`
+
+export interface MegaEvolutionGetAllRow {
+  nationalDex: number
+  formIndex: number
+  baseFormIndex: number
+  megaStoneId: number | null
+}
+
+export async function megaEvolutionGetAll(database: Database): Promise<MegaEvolutionGetAllRow[]> {
+  const stmt = database.prepare(megaEvolutionGetAllQuery)
+  const result = stmt.all()
+  return camelcaseKeys(result) as MegaEvolutionGetAllRow[]
+}
