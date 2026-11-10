@@ -1,13 +1,11 @@
 import { Separator } from '@base-ui/react/separator'
 import { Badge, Box, Flex, ThemePanel } from '@radix-ui/themes'
-import { PropsWithChildren, useContext, useState } from 'react'
+import { PropsWithChildren, useContext } from 'react'
 import { Route, Routes, useLocation, useNavigate } from 'react-router'
-import { PKM_RS_WASM } from '../init'
+import { AppFooter } from './AppFooter'
 import DebugOnly from './components/DebugOnly'
 import Fallback from './components/Fallback'
 import { AppTabIconsActive, AppTabIconsInactive } from './components/Icons'
-import OhoButton from './components/OhoButton'
-import OhoFlex from './components/OhoFlex'
 import { Tabs } from './components/Tabs'
 import useIsDebug from './hooks/isDebug'
 import AppStateDisplay from './pages/debug/AppStateDisplay'
@@ -21,16 +19,9 @@ import SortPokemon from './pages/sort/SortPokemon'
 import TrackedPokemonPage from './pages/tracked/TrackedPokemonPage'
 import { PluginContext } from './state/plugin/reducer'
 
-function wasmSizeDisplay() {
-  return PKM_RS_WASM
-    ? (PKM_RS_WASM.memory.buffer.byteLength / 1024 / 1024).toFixed(1) + ' MB'
-    : 'loading...'
-}
-
 export default function AppTabs() {
   const tab = useLocation().pathname.split('/')[1] || 'home'
   const { outdatedPluginCount } = useContext(PluginContext)
-  const [wasmSize, setWasmSize] = useState(wasmSizeDisplay())
 
   const homeElement = <Home />
 
@@ -136,18 +127,7 @@ export default function AppTabs() {
                   </Tabs.Panel>
                 </DebugOnly>
               </div>
-              <div className="app-footer">
-                <OhoFlex.Spacer />
-                <p style={{ fontSize: '0.8rem' }}>WASM memory usage:</p>
-                <code>{wasmSize}</code>
-                <OhoButton
-                  size="1"
-                  onClick={() => setWasmSize(wasmSizeDisplay())}
-                  style={{ fontSize: '0.7rem', padding: '0.15rem', height: 'fit-content' }}
-                >
-                  Refresh
-                </OhoButton>
-              </div>
+              <AppFooter />
             </Box>
           </Flex>
         </Tabs.Root>

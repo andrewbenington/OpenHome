@@ -6,7 +6,7 @@ import { R } from '@openhome-core/util/functional'
 import AppTabs from '@openhome-ui/AppTabs'
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
 import { useTitledErrorDisplay } from '@openhome-ui/hooks/displayError'
-import { TransactionStateProvider } from '@openhome-ui/state/app-state'
+import { AppStateProvider } from '@openhome-ui/state/app-state'
 import { AppInfoContext, appInfoInitialState, appInfoReducer } from '@openhome-ui/state/appInfo'
 import PokemonDndContext from '@openhome-ui/state/drag-and-drop/PokemonDndContext'
 import { ErrorContext, errorReducer } from '@openhome-ui/state/error'
@@ -170,7 +170,7 @@ function AppWithBackend() {
   return (
     <AppInfoContext value={[appInfoState, appInfoDispatch, getEnabledSaveTypes]}>
       <PluginsProvider>
-        <TransactionStateProvider>
+        <AppStateProvider>
           <MouseContext value={[mouseState, mouseDispatch]}>
             <LookupsProvider>
               <ConvertStrategiesProvider>
@@ -196,7 +196,7 @@ function AppWithBackend() {
               </ConvertStrategiesProvider>
             </LookupsProvider>
           </MouseContext>
-        </TransactionStateProvider>
+        </AppStateProvider>
       </PluginsProvider>
     </AppInfoContext>
   )

@@ -1,11 +1,11 @@
-import { useTransactionState } from '@openhome-ui/state/app-state'
-import { Heading, ScrollArea } from '@radix-ui/themes'
+import { useAppState } from '@openhome-ui/state/app-state'
+import { Heading } from '@radix-ui/themes'
 import { useState } from 'react'
 import { Dialog } from '../components/dialog/Dialog'
 
 export default function UpdateMessageModal() {
   const [acknowledged, setAcknowledged] = useState(false)
-  const appState = useTransactionState()
+  const appState = useAppState()
 
   const newFeatures = appState.new_features_since_update
 
@@ -18,7 +18,7 @@ export default function UpdateMessageModal() {
       style={{ maxHeight: '85vh' }}
     >
       <Dialog.Title>OpenHome has been updated!</Dialog.Title>
-      <ScrollArea>
+      <div className="dialog-scroll-container">
         {newFeatures.toReversed().map(({ version, feature_messages }) => (
           <div key={version} style={{ marginTop: 8 }}>
             <Heading size="3">New in {version}:</Heading>
@@ -29,7 +29,7 @@ export default function UpdateMessageModal() {
             </ul>
           </div>
         ))}
-      </ScrollArea>
+      </div>
       <Dialog.Actions>
         <Dialog.Close>Ok</Dialog.Close>
       </Dialog.Actions>

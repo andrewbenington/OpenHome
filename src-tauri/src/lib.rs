@@ -67,6 +67,7 @@ pub fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
         synced_state::ohpkm_store::get_ohpkm_bytes_by_id,
         synced_state::ohpkm_store::get_ohpkm_bytes_by_id_batch,
         synced_state::ohpkm_store::permanently_delete_ohpkms,
+        synced_state::ohpkm_store::get_ohpkm_count,
         logging::get_logs_today,
         logging::clear_logs_for_range,
     ])

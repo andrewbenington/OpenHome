@@ -1,11 +1,11 @@
-import { AppState as TransactionState } from '@openhome-core/backend/backendInterface'
+import { AppState } from '@openhome-core/backend/backendInterface'
 import useBackend from '@openhome-core/backend/useBackend'
 import { R } from '@openhome-core/util/functional'
 import { createContext, useContext, useEffect, useState } from 'react'
 
-type PossiblyLoadedTransactionState =
+type PossiblyLoadedAppState =
   | {
-      state: TransactionState
+      state: AppState
       loaded: true
       error?: undefined
     }
@@ -15,27 +15,27 @@ type PossiblyLoadedTransactionState =
       error?: string
     }
 
-export const TransactionStateContext = createContext<TransactionState | null>(null)
+export const AppStateContext = createContext<AppState | null>(null)
 
-export function useTransactionState(): TransactionState {
-  const appState = useContext(TransactionStateContext)
+export function useAppState(): AppState {
+  const appState = useContext(AppStateContext)
 
-  // TransactionStateProvider should only render children once state is loaded. If state is not loaded, this was called outside TransactionStateProvider.
+  // AppStateProvider should only render children once state is loaded. If state is not loaded, this was called outside AppStateProvider.
   if (!appState) {
-    throw new Error('useTransactionState() called outside of TransactionStateProvider')
+    throw new Error('useAppState() called outside of AppStateProvider')
   }
 
   return appState
 }
 
-export function usePossiblyLoadedTxState(): PossiblyLoadedTransactionState {
-  const [transactionState, setTransactionState] = useState<TransactionState>()
+export function usePossiblyLoadedAppState(): PossiblyLoadedAppState {
+  const [appState, setAppState] = useState<AppState>()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string>()
   const backend = useBackend()
 
   useEffect(() => {
-    if (loading || error || transactionState) return
+    if (loading || error || appState) return
 
     setLoading(true)
     backend
@@ -43,7 +43,7 @@ export function usePossiblyLoadedTxState(): PossiblyLoadedTransactionState {
       .then(
         R.match(
           (state) => {
-            setTransactionState(state)
+            setAppState(state)
             setError(undefined)
           },
           (err) => {
@@ -59,11 +59,11 @@ export function usePossiblyLoadedTxState(): PossiblyLoadedTransactionState {
       .finally(() => {
         setLoading(false)
       })
-  }, [backend, error, loading, transactionState])
+  }, [backend, error, loading, appState])
 
-  if (!transactionState) {
+  if (!appState) {
     return { error, loaded: false }
   } else {
-    return { state: transactionState, loaded: true }
+    return { state: appState, loaded: true }
   }
 }

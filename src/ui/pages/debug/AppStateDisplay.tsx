@@ -1,6 +1,6 @@
 import { DebugDataDisplay } from '@openhome-ui/components/DebugDataDisplay'
 import { InfoGrid } from '@openhome-ui/components/InfoGrid'
-import { useTransactionState } from '@openhome-ui/state/app-state'
+import { useAppState } from '@openhome-ui/state/app-state'
 import { AppInfoContext, AppInfoState } from '@openhome-ui/state/appInfo'
 import { ErrorContext } from '@openhome-ui/state/error'
 import { useItemBag } from '@openhome-ui/state/items'
@@ -11,7 +11,7 @@ import { useContext } from 'react'
 import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 
 export default function AppStateDisplay() {
-  const transactionState = useTransactionState()
+  const appState = useAppState()
   const [appInfoState] = useContext(AppInfoContext)
   const [errorState, dispatchErrorState] = useContext(ErrorContext)
   const itemBag = useItemBag()
@@ -22,7 +22,7 @@ export default function AppStateDisplay() {
         <Flex direction="column" gap="2">
           <Heading size="4">Backend Transaction State</Heading>
           <Separator style={{ width: '100%', color: 'inherit' }} />
-          <InfoGrid data={transactionState ?? {}} />
+          <InfoGrid data={appState ?? {}} />
         </Flex>
       </Card>
       <Card className="flex-row" style={{ margin: 8, gap: 8 }}>

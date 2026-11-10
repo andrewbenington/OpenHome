@@ -11,7 +11,7 @@ export const Dialog = {
     <BaseUiDialog.Trigger {...props} />
   ),
   Portal: (props: React.ComponentProps<typeof BaseUiDialog.Portal>) => (
-    <BaseUiDialog.Portal container={document.getElementById('app-container')} {...props} />
+    <BaseUiDialog.Portal container={findDialogPortalContainer()} {...props} />
   ),
   Backdrop: (props: React.ComponentProps<typeof BaseUiDialog.Backdrop>) => (
     <BaseUiDialog.Backdrop {...props} className={styles.Backdrop} />
@@ -27,7 +27,7 @@ export const Dialog = {
     const { open, onOpenChange, ...popupProps } = props
     return (
       <Dialog.Root open={open} onOpenChange={onOpenChange}>
-        <Dialog.Portal>
+        <Dialog.Portal container={findDialogPortalContainer()}>
           <Dialog.Backdrop />
           <Dialog.Popup {...popupProps} />
         </Dialog.Portal>
@@ -54,4 +54,11 @@ export const Dialog = {
   Viewport: (props: React.ComponentProps<typeof BaseUiDialog.Viewport>) => (
     <BaseUiDialog.Viewport className={styles.Viewport} {...props} />
   ),
+}
+
+function findDialogPortalContainer() {
+  return (
+    document.getElementById('active-tab-content-container') ?? // dialog should not consider tabs a part of the app width
+    document.getElementById('app-container')
+  )
 }

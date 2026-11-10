@@ -181,7 +181,7 @@ export default class PK4 {
       // G3 mons transferred via Pal Park had their met location erased.
       if (this.metLocationIndex === DP_PAL_PARK) {
         if (OriginGames.isGba(this.gameOfOrigin)) {
-          this.metLocationIndex = 0xFE // (in-game trade)
+          this.metLocationIndex = 0xfe // (in-game trade)
         } else if (this.gameOfOrigin === OriginGame.ColosseumXd) {
           this.metLocationIndex = 0x0 // will display in-game as distant land
         }

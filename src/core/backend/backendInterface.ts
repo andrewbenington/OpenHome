@@ -10,7 +10,7 @@ import {
   PaginationCursor,
   PluginMetadata,
 } from '@openhome-core/tauri/spectaCommands'
-import { Errorable, Option, Result } from '@openhome-core/util/functional'
+import { Option, Result } from '@openhome-core/util/functional'
 import { NowOrLater } from '@openhome-core/util/promise'
 import { LoadSaveResponse, LookupMap, SaveRef } from '@openhome-core/util/types'
 import { LogFilter } from '@openhome-ui/pages/logs'
@@ -68,69 +68,70 @@ export type ItemBag = Record<string, number>
 
 export default interface BackendInterface {
   /* past gen identifier lookups */
-  loadLookups: () => Promise<Errorable<StoredLookups>>
-  addToLookups: (new_entries: StoredLookups) => Promise<Errorable<null>>
-  removeDangling: () => Promise<Errorable<null>>
+  loadLookups: () => Promise<Result<StoredLookups>>
+  addToLookups: (new_entries: StoredLookups) => Promise<Result<null>>
+  removeDangling: () => Promise<Result<null>>
 
   /* ohpkm bytes store by identifier */
   searchOhpkmStore(
     cursor: PaginationCursor,
     filters: Filter[]
-  ): Promise<Errorable<PaginatedPage<OHPKM>>>
-  getOhpkmIdsMatchingUnknownHandler(save: SAV): Promise<Errorable<OhpkmIdentifier[]>>
-  lookupOhpkmById: (id: OhpkmIdentifier) => Promise<Errorable<Option<OHPKM>>>
+  ): Promise<Result<PaginatedPage<OHPKM>>>
+  getOhpkmIdsMatchingUnknownHandler(save: SAV): Promise<Result<OhpkmIdentifier[]>>
+  lookupOhpkmById: (id: OhpkmIdentifier) => Promise<Result<Option<OHPKM>>>
   lookupOhpkmBatch: (ids: OhpkmIdentifier[]) => Promise<Result<OhpkmBatchLookupResults>>
-  addToOhpkmStore: (updates: OhpkmStore) => Promise<Errorable<null>>
-  deleteHomeMons: (identifiers: string[]) => Promise<Errorable<null>>
+  addToOhpkmStore: (updates: OhpkmStore) => Promise<Result<null>>
+  deleteHomeMons: (identifiers: string[]) => Promise<Result<null>>
+  getOhpkmCount: () => Promise<Result<number>>
 
   /* prompt user to select new data directory location, then restart using that location */
-  promptChangeDataDir: () => Promise<Errorable<null>>
+  promptChangeDataDir: () => Promise<Result<null>>
   /* prompt user to select new data directory location, copy all data there, and restart using that location */
-  promptMoveDataDir: () => Promise<Errorable<null>>
+  promptMoveDataDir: () => Promise<Result<null>>
   /* get the current data directory path */
-  getDataDirPath: () => Promise<Errorable<string>>
+  getDataDirPath: () => Promise<Result<string>>
 
   /* write synced state to disk during save */
-  saveSyncedState: () => Promise<Errorable<null>>
+  saveSyncedState: () => Promise<Result<null>>
 
   /* past gen identifier lookups */
-  loadPokedex: () => Promise<Errorable<Pokedex>>
-  registerInPokedex: (updates: PokedexUpdate[]) => Promise<Errorable<null>>
-  syncPokedex: () => Promise<Errorable<null>>
+  loadPokedex: () => Promise<Result<Pokedex>>
+  registerInPokedex: (updates: PokedexUpdate[]) => Promise<Result<null>>
+  syncPokedex: () => Promise<Result<null>>
 
   /* openhome banks/boxes */
-  loadHomeBanks: () => Promise<Errorable<StoredBankData>>
-  writeHomeBanks: (bankData: StoredBankData) => Promise<Errorable<null>>
+  loadHomeBanks: () => Promise<Result<StoredBankData>>
+  writeHomeBanks: (bankData: StoredBankData) => Promise<Result<null>>
 
   /* game saves */
-  loadSaveFile: (filePath: PathData) => Promise<Errorable<LoadSaveResponse>>
-  writeSaveFile: (path: string, bytes: Uint8Array) => Promise<Errorable<null>>
-  writeAllSaveFiles: (saveWriters: SaveWriter[]) => Promise<Errorable<null>[]>
+  loadSaveFile: (filePath: PathData) => Promise<Result<LoadSaveResponse>>
+  writeSaveFile: (path: string, bytes: Uint8Array) => Promise<Result<null>>
+  writeAllSaveFiles: (saveWriters: SaveWriter[]) => Promise<Result<null>[]>
 
   /* game save management */
-  getRecentSaves: () => Promise<Errorable<Record<string, SaveRef>>>
-  addRecentSave: (save: SaveRef) => Promise<Errorable<null>>
-  removeRecentSave: (filePath: string) => Promise<Errorable<null>>
-  findSuggestedSaves: () => Promise<Errorable<PossibleSaves>>
-  getSaveFolders: () => Promise<Errorable<SaveFolder[]>>
-  removeSaveFolder: (path: string) => Promise<Errorable<null>>
-  upsertSaveFolder: (folderPath: string, label: string) => Promise<Errorable<null>>
+  getRecentSaves: () => Promise<Result<Record<string, SaveRef>>>
+  addRecentSave: (save: SaveRef) => Promise<Result<null>>
+  removeRecentSave: (filePath: string) => Promise<Result<null>>
+  findSuggestedSaves: () => Promise<Result<PossibleSaves>>
+  getSaveFolders: () => Promise<Result<SaveFolder[]>>
+  removeSaveFolder: (path: string) => Promise<Result<null>>
+  upsertSaveFolder: (folderPath: string, label: string) => Promise<Result<null>>
 
   /* item bag */
   loadItemBag: () => Promise<ItemBag>
-  saveItemBag: (items: ItemBag) => Promise<Errorable<null>>
+  saveItemBag: (items: ItemBag) => Promise<Result<null>>
 
   /* transactions */
-  startTransaction: () => Promise<Errorable<null>>
-  commitTransaction: () => Promise<Errorable<null>>
-  rollbackTransaction: () => Promise<Errorable<null>>
+  startTransaction: () => Promise<Result<null>>
+  commitTransaction: () => Promise<Result<null>>
+  rollbackTransaction: () => Promise<Result<null>>
 
   /* application */
-  pickFile: () => Promise<Errorable<PathData | undefined>>
-  pickFolder: () => Promise<Errorable<string | undefined>>
+  pickFile: () => Promise<Result<PathData | undefined>>
+  pickFolder: () => Promise<Result<string | undefined>>
   getResourcesPath: () => Promise<string>
-  openDirectory: (directory: string) => Promise<Errorable<null>>
-  openFileLocation: (filePath: string) => Promise<Errorable<null>>
+  openDirectory: (directory: string) => Promise<Result<null>>
+  openFileLocation: (filePath: string) => Promise<Result<null>>
   convertLocalImagePath: (absolutePath: string) => string
   getPlatform: () => string
   registerListeners: (listeners: Partial<BackendListeners>) => () => void
@@ -138,27 +139,27 @@ export default interface BackendInterface {
   onMenuEvents: (
     eventsAndCallbacks: Partial<Record<MenuEvent, () => NowOrLater<unknown>>>
   ) => () => void
-  getState: () => Promise<Errorable<AppState>>
-  getSettings: () => Promise<Errorable<Settings>>
-  updateSettings: (settings: Settings) => Promise<Errorable<null>>
-  getConvertStrategies: () => Promise<Errorable<ConvertStrategies>>
-  updateConvertStrategies: (strategies: ConvertStrategyEntries) => Promise<Errorable<null>>
-  setTheme(appTheme: AppTheme): Promise<Errorable<null>>
-  saveLocalFile: (bytes: Uint8Array, suggestedName: string) => Promise<Errorable<null>>
+  getState: () => Promise<Result<AppState>>
+  getSettings: () => Promise<Result<Settings>>
+  updateSettings: (settings: Settings) => Promise<Result<null>>
+  getConvertStrategies: () => Promise<Result<ConvertStrategies>>
+  updateConvertStrategies: (strategies: ConvertStrategyEntries) => Promise<Result<null>>
+  setTheme(appTheme: AppTheme): Promise<Result<null>>
+  saveLocalFile: (bytes: Uint8Array, suggestedName: string) => Promise<Result<null>>
   emitMenuEvent: (menuEventId: string) => Promise<void>
 
   /* logging */
-  getLogs(filter: LogFilter): Promise<Errorable<LogsResponse>>
-  log(level: LogLevel, message: string, context?: Record<string, unknown>): Promise<Errorable<void>>
-  clearLogsForRange(start: Dayjs, end: Dayjs): Promise<Errorable<null>>
+  getLogs(filter: LogFilter): Promise<Result<LogsResponse>>
+  log(level: LogLevel, message: string, context?: Record<string, unknown>): Promise<Result<void>>
+  clearLogsForRange(start: Dayjs, end: Dayjs): Promise<Result<null>>
   onNewLog: (callback: (notification: NewLogNotification) => void) => () => void
 
   /* plugins */
-  listInstalledPlugins: () => Promise<Errorable<PluginMetadata[]>>
-  getPluginPath: (pluginId: string) => Promise<Errorable<string>>
-  downloadPlugin(remoteUrl: string): Promise<Errorable<string>>
-  loadPluginCode(pluginId: string): Promise<Errorable<string>>
-  deletePlugin(pluginId: string): Promise<Errorable<null>>
+  listInstalledPlugins: () => Promise<Result<PluginMetadata[]>>
+  getPluginPath: (pluginId: string) => Promise<Result<string>>
+  downloadPlugin(remoteUrl: string): Promise<Result<string>>
+  loadPluginCode(pluginId: string): Promise<Result<string>>
+  deletePlugin(pluginId: string): Promise<Result<null>>
 }
 
 export type BankOrBoxChange = { bank: number; box: number }
