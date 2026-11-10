@@ -94,12 +94,7 @@ export default function PokemonDetailsModal(props: PokemonDetailsModalProps) {
 
   return (
     <Dialog.Root open onOpenChange={(open) => !open && onClose?.()}>
-      <Dialog.Portal
-        container={
-          document.getElementById('active-tab-content-container') ?? // dialog should not consider tabs a part of the app width
-          document.getElementById('app-container')
-        }
-      >
+      <Dialog.Portal>
         <Dialog.Backdrop />
         <Dialog.Viewport>
           <Dialog.Popup className="pokemon-modal">

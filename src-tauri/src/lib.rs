@@ -13,14 +13,12 @@ mod version;
 
 use crate::data_controller::ToDataController;
 use crate::synced_state::AllSyncedState;
-use crate::version::UpdateFeatures;
 use openhome_core::convert_strategies::{ConvertStrategies, NamedStrategy};
 use openhome_core::lookup::LookupState;
 use openhome_core::ohpkm_store::OhpkmBytesStore;
 use openhome_core::{Error, Result};
 use pkm_rs::convert_strategy::ShinyOdds;
 use pkm_rs::ohpkm::OhpkmV2;
-use semver::Version;
 use std::env;
 use tauri::Manager;
 
@@ -105,7 +103,7 @@ pub fn run() {
             app.manage(startup_config_state);
 
             let update_features_r = startup::run_app_startup(app);
-            let Ok(mut update_features) = update_features_r else {
+            let Ok(update_features) = update_features_r else {
                 let launch_error = update_features_r.unwrap_err();
                 match launch_error {
                     Error::OutdatedVersion { .. } => app.handle().exit(1),
@@ -117,10 +115,6 @@ pub fn run() {
                 };
                 std::process::exit(1);
             };
-            update_features.push(UpdateFeatures::new(
-                Version::new(1, 2, 3),
-                vec!["hewfh", "weeee"],
-            ));
 
             let controller = app.handle().controller();
 
