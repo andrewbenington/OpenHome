@@ -1,19 +1,19 @@
-use crate::gen7_alola::{Pk7AbilityIndex, Pk7SpeciesAndForm};
+use crate::gen7_alola::Pk7SpeciesAndForm;
 use boilermates::boilermates;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::{MoveSlot, MoveSlots};
 use pkm_rs_resources::natures::NatureIndex;
-use pkm_rs_resources::ribbons::ModernRibbonSet;
+use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
-    AbilityNumber, BinaryGender, ContestStats, Gender, Geolocations, HyperTraining, Ivs, Language,
-    MarkingsSixShapesColors, OriginGame, PokeDate, Pokerus, Stats8, Stats16Le, TrainerMemory,
+  AbilityNumber, BinaryGender, ContestStats, Gender, Geolocations, HyperTraining, Ivs, Language,
+  MarkingsSixShapesColors, OriginGame, PokeDate, Pokerus, Stats16Le, Stats8, TrainerMemory,
 };
 use serde::{Deserialize, Serialize};
 
-/**
-* A Pokémon within a main-series Pokemon Game or rom hack.
-*/
+
+pub const MAX_RIBBON : usize = ModernRibbon::Partner as usize;
+
 #[boilermates("PK2PolishedCrystal")]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Pkm {
@@ -49,11 +49,12 @@ pub struct Pkm {
     pub super_training_flags: u32,
     pub super_training_dist_flags: u8,
 
+
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub contest: ContestStats,
     pub resort_event_status: u8,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub ribbons: ModernRibbonSet<7, crate::gen7_alola::pk7::MAX_RIBBON_ALOLA>,
+    pub ribbons: ModernRibbonSet<7, MAX_RIBBON>,
     pub contest_memory_count: u8,
     pub battle_memory_count: u8,
     pub form_argument: u32,
@@ -63,7 +64,7 @@ pub struct Pkm {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub relearn_moves: [MoveSlot; 4],
 
-    #[boilermates(not_in("Pk2PolishedCrystal"))]
+    #[boilermates(not_in("PK2PolishedCrystal"))]
     pub secret_super_training_unlocked: bool,
 
 
@@ -113,7 +114,6 @@ pub struct Pkm {
     pub form_argument_elapsed: u8,
     #[cfg_attr(feature = "randomize", randomize(skip))]
     pub current_hp: u16,
-    #[cfg_attr(feature = "randomize", randomize(skip))]
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub stats: Stats16Le,
 }

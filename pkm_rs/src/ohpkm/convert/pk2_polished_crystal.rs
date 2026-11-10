@@ -6,7 +6,6 @@ use crate::format::PkmFormat;
 use crate::ohpkm;
 use crate::ohpkm::OhpkmV2;
 use crate::result::Error;
-use crate::rom_hacks::polished_crystal::pk2_polished_crystal::Pk2PolishedCrystal;
 use crate::traits::HasSpeciesAndForm;
 
 impl Pk2PolishedCrystal {

@@ -16,7 +16,7 @@ use pkm_rs_resources::species::metadata_table::source_has_form_metadata;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 pub(crate) const BOX_SIZE: usize = 232;
 pub(crate) const PARTY_SIZE: usize = 260;
@@ -31,7 +31,7 @@ const MAX_RIBBON_ALOLA: usize = ModernRibbon::BattleTreeMaster as usize;
 const NEUROFORCE: u16 = 233;
 pub type Pk7AbilityIndex = AbilityIndexBounded<NEUROFORCE>;
 
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Deserialize, Clone, Copy, Default)]
 #[cfg_attr(feature = "wasm", derive(tsify::Tsify))]
 pub struct Pk7SpeciesAndForm(SpeciesForm);
 
