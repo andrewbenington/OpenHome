@@ -18,6 +18,8 @@ import SettingsPage from './pages/Settings'
 import SortPokemon from './pages/sort/SortPokemon'
 import TrackedPokemonPage from './pages/tracked/TrackedPokemonPage'
 import { PluginContext } from './state/plugin/reducer'
+import ErrorMessageModal from './top-level/ErrorMessageModal'
+import UpdateMessageModal from './top-level/UpdateMessageModal'
 
 export default function AppTabs() {
   const tab = useLocation().pathname.split('/')[1] || 'home'
@@ -128,6 +130,8 @@ export default function AppTabs() {
                 </DebugOnly>
               </div>
               <AppFooter />
+              <UpdateMessageModal />
+              <ErrorMessageModal />
             </Box>
           </Flex>
         </Tabs.Root>
