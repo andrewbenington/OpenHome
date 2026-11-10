@@ -6,7 +6,6 @@ mod pk7;
 mod pk8;
 #[cfg(feature = "wasm")]
 mod pk9;
-pub mod pk2_polished_crystal;
 
 use crate::convert_strategy::ConvertStrategy;
 use crate::ohpkm::v2_sections::ScarletVioletData;

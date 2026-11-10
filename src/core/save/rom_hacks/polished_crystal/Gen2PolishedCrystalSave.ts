@@ -61,5 +61,9 @@ export class Gen2PolishedCrystalSave extends WasmPluginSave<Pk2PolishedCrystalWa
   monFromWasm(wasmMon: Pk2PolishedCrystalWasm): PK2PolishedCrystal {
     return PK2PolishedCrystal.fromWasm(wasmMon)
   }
+
+  getPluginIdentifier() {
+    return this.pluginIdentifier;
+  }
 }
 

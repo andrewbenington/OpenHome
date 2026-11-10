@@ -1,10 +1,10 @@
 import {
   AbilityIndex, BinaryGender,
-  ContestStats, ConvertStrategies,
+  ContestStats, ConvertStrategies, ConvertStrategy,
   ExtraFormIndex, FormMetadata,
   Gender,
   Geolocations, HyperTraining, Language, NatureIndex,
-  Pk2PolishedCrystalWasm, PlusMoveFlags, ShinyLeaves, Stats16Le,
+  Pk2PolishedCrystalWasm, Pk7Wasm, PlusMoveFlags, ShinyLeaves, Stats16Le,
   StatsPreSplit, TeraType, TrainerMemory
 } from "@pkm-rs/pkg";
 import {modernStatCalc, PkmOrOhpkmFormat} from "@openhome-core/pkm";
@@ -17,14 +17,15 @@ import {Data} from "ts-lombok-kit/markers";
 import { PkmConstructorOptions } from "@openhome-core/pkm/PKM";
 import {OHPKM} from "@openhome-core/pkm/OHPKM.ts";
 import PK2PolishedCrystal from "@openhome-core/pkm/rom_hacks/polished_crystal/PK2PolishedCrystal.ts";
+import {Errorable, R} from "@openhome-core/util/functional.ts";
 
 @Data
-export default class PKMBase<T extends PKMBaseWASM> {
-  private inner: OHPKM | T;
-  constructor(arg: OHPKM | T, options: PkmConstructorOptions) {
+export default class PKMBase {
+  public inner: OHPKM | PKMBaseWasm;
+  constructor(arg: OHPKM | PKMBaseWasm, options: PkmConstructorOptions) {
 
 
-    if (arg instanceof T) {
+    if (arg instanceof PKMBaseWasm) {
       this.inner = this.setFields(arg);
     } else {
       const ohpkmBytes = new Uint8Array(arg.toBytes())
@@ -182,12 +183,20 @@ export default class PKMBase<T extends PKMBaseWASM> {
   isSquareShiny: () => boolean = () => false
   toBytes: ((_options?: types.ToBytesOptions) => ArrayBuffer) | (() => ArrayBuffer) = () => new ArrayBuffer()
 
-  public getStats() {
+  public getStats() : StatsPreSplit | Stats16Le {
 
     throw new Error("Cannot call getStats() directly on PKMBase.");
   }
 
-  private setFields(arg: OHPKM | PKMBaseWasm) {
+  private setFields(arg: OHPKM | PKMBaseWASM) {
     return arg;
+  }
+
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PKMBase> {
+    return R.tryFrom(() => new PKMBase(ohpkm, { strategy }))
+  }
+
+  static fromWasm(pkmWasm: PKMBaseWASM): PKMBase<PKMBaseWASM> {
+    return new PKMBase(pkmWasm, {})
   }
 }

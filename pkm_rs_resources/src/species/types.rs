@@ -13,7 +13,7 @@ use crate::{abilities::AbilityIndexBounded, levelup::LearnsetMoveJs};
 use pkm_rs_types::{
     AbilityNumber, GameSetting, Generation, NationalDex, PkmType, TeraType, TryIntoTs,
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use strum_macros::{Display, EnumString};
 
 #[cfg(feature = "randomize")]
@@ -697,7 +697,7 @@ impl SpeciesMetadata {
     }
 }
 
-#[derive(Debug, Default, PartialEq, Eq, Clone, Copy, Serialize)]
+#[derive(Debug, Deserialize, Default, PartialEq, Eq, Clone, Copy, Serialize)]
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct SpeciesForm {
     national_dex: NationalDex,

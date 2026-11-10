@@ -1,5 +1,3 @@
-// noinspection TypeScriptUnresolvedReference
-
 export function addMissingFunctions() {
   if (!Uint8Array.prototype.toHex) {
     Uint8Array.prototype.toHex = function () {

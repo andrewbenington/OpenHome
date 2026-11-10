@@ -5,7 +5,7 @@ use crate::location::{Location, MetData};
 use crate::ohpkm::OhpkmV2;
 
 use pkm_rs_resources::lookup;
-use pkm_rs_types::Ivs;
+use pkm_rs_types::{Dvs, Ivs};
 
 #[cfg(feature = "wasm")]
 use crate::convert_strategy::personality_value::PidGenerationParametersJs;
@@ -22,6 +22,12 @@ use wasm_bindgen::prelude::*;
 pub struct PkmConverter {
     dest_pkm_format: PkmFormat,
     strategy: ConvertStrategy,
+}
+
+impl PkmConverter {
+  pub(crate) fn dvs(&self, _p0: &OhpkmV2) -> Dvs {
+    todo!()
+  }
 }
 
 impl PkmConverter {

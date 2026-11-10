@@ -30,7 +30,7 @@ class StatsObj {
 
 }
 
-export default class PK2PolishedCrystal extends PKMBase<Pk2PolishedCrystalWasm> {
+export default class PK2PolishedCrystal extends PKMBase {
 
 }
 
