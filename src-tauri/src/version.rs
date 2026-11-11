@@ -184,6 +184,7 @@ pub enum SignificantUpdate {
     V1_17_1,
     V1_18_0,
     V1_18_1,
+    V1_19_0,
 }
 
 impl SignificantUpdate {
@@ -224,6 +225,7 @@ impl SignificantUpdate {
             Self::V1_17_1 => Version::parse("1.17.1"),
             Self::V1_18_0 => Version::parse("1.18.0"),
             Self::V1_18_1 => Version::parse("1.18.1"),
+            Self::V1_19_0 => Version::parse("1.19.0"),
         }
         .expect("all versions are valid semver")
     }
@@ -414,6 +416,23 @@ impl SignificantUpdate {
                 "Error indicators will now show when a Pokémon is considered malformed in a PC box for the following save files: Gen 3 (GBA), Radical Red, and Unbound.",
                 "A bug in preserving shininess when going to Gameboy formats has been fixed.",
                 "A bug causing bugged empty slots in Gen 5 games has been fixed.",
+            ]),
+            Self::V1_19_0 => Some(vec![
+                "Scarlet and Violet, Sword and Shield, and Compass now allow you to view and move items between those games' Bags and OpenHome's Item Bag.",
+                "You can now drag-and-drop Pokémon dumped from Pokémon HOME in .ph4 format. All data for that Pokémon is saved, including its per-game movesets.",
+                "Pokémon caught in the Gen 4 games now describe how they were caught in the Met tab (e.g. \"Resurrected\" for fossil Pokémon) when viewed in the OpenHome format.",
+                "Pokémon caught in the Game Boy games now show special text in the Met tab for supported formats.",
+                "Certain Pokémon met in the GameCube games (starters and Duking's trades) now have special text in the Met tab.",
+                "Save reading code for Scarlet and Violet and Compass have been fully migrated to Rust, improving performance.",
+                "Fixed Hisuian Pokemon being incompatible with Legends: Arceus.",
+                "Fixed some Pokemon being incorrectly considered compatible with Legends: Arceus.",
+                "Hisuian Pokemon now have the Alpha indicator in the Pokedex. This was just a visual issue; if you obtained that Pokemon's Alpha variant in a previous version, it should now show as registered.",
+                "Fixed Arceus's forms not being tagged as Mythical, and showing the Alpha indicator in the Pokedex.",
+                "Fixed the Japanese character \"ー\" not being encoded correctly.",
+                "Pokemon from the Game Boy games that don't have a met location now show what region they're from in the Met tab.",
+                "Pokemon that were migrated to other games using Pal Park or Poke Transfer now have a \"default\" met location set.",
+                "Fixed Pokemon met in Legends: Z-A displaying as being met \"in the Lumiose region\".",
+                "Further improvements to overall system stability and other minor adjustments have been made to enhance the user experience.",
             ]),
             _ => None,
         }
