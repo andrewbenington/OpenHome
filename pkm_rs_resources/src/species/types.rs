@@ -2,7 +2,7 @@ use crate::ExpectLog;
 #[cfg(feature = "wasm")]
 use crate::levelup::LevelupLearnsetMove;
 use crate::levelup::{LearnsetReader, LevelupLearnsetReader};
-use crate::species::GetSpeciesMetadata;
+use crate::species::get_species_metadata;
 use crate::species::metadata_table::{
     BaseStats, MetadataTableReader, base_stats_lookup, current_metadata_reader,
     metadata_reader_for, move_mastery_la_lookup, plus_moves_lza_lookup,
@@ -20,8 +20,6 @@ use strum_macros::{Display, EnumString};
 use pkm_rs_types::randomize::Randomize;
 #[cfg(feature = "randomize")]
 use rand::RngExt;
-#[cfg(feature = "wasm")]
-use tsify::Ts;
 
 #[cfg(feature = "wasm")]
 use crate::species::metadata_table::current_base_stats;
@@ -29,6 +27,8 @@ use crate::species::metadata_table::current_base_stats;
 use pkm_rs_types::{Gender, Stats16Le, TsResult};
 #[cfg(feature = "wasm")]
 use pkm_rs_types::{JsResult, Stat};
+#[cfg(feature = "wasm")]
+use tsify::Ts;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -706,17 +706,15 @@ pub struct SpeciesForm {
 
 impl SpeciesForm {
     pub fn new(national_dex: u16, form_index: u16) -> Result<SpeciesForm> {
-        let national_dex = NationalDex::new(national_dex)?;
-
-        if national_dex.get_species_metadata().forms.len() <= form_index as usize {
+        if get_species_metadata(national_dex).forms.len() <= form_index as usize {
             return Err(Error::FormIndex {
-                national_dex,
+                national_dex: NationalDex::new(national_dex)?,
                 form_index,
             });
         }
 
         Ok(SpeciesForm {
-            national_dex,
+            national_dex: NationalDex::new(national_dex)?,
             form_index,
         })
     }
@@ -756,7 +754,14 @@ impl SpeciesForm {
     ///
     /// - `national_dex` must be greater than zero and at most the maximum National Dex number supported by this version of the library.
     /// - `form_index` must be less than the total number of forms for the Pokémon with the given `national_dex` number
-    pub unsafe fn new_unchecked(national_dex: u16, form_index: u16) -> SpeciesForm {
+    pub const unsafe fn new_unchecked(national_dex: u16, form_index: u16) -> SpeciesForm {
+        SpeciesForm {
+            national_dex: NationalDex::assert_valid(national_dex),
+            form_index,
+        }
+    }
+
+    pub const fn assert_new(national_dex: u16, form_index: u16) -> SpeciesForm {
         SpeciesForm {
             national_dex: NationalDex::assert_valid(national_dex),
             form_index,
@@ -951,6 +956,9 @@ impl SpeciesForm {
         Self::new(national_dex, form_index).ok()
     }
 }
+
+#[cfg(feature = "randomize")]
+use crate::species::GetSpeciesMetadata;
 
 #[cfg(feature = "randomize")]
 impl Randomize for SpeciesForm {

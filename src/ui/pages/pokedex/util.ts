@@ -96,3 +96,6 @@ export function isExtraFormMetadata(
 ): metadata is ExtraFormMetadata {
   return 'extraFormIndex' in metadata
 }
+
+export const MOST_CURRENT_SOURCE = '$CURRENT'
+export type MostCurrentSource = typeof MOST_CURRENT_SOURCE

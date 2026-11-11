@@ -1,16 +1,18 @@
-use super::save_blocks::{BoxData, MyStatusFields, SvBlocks};
+use super::sv_save_blocks::{BoxData, MyStatusFields, SvBlocks};
 use super::{BOX_COLS, BOX_ROWS, BoxName, MAX_BOX_COUNT, Pk9, Pk9Buffer};
 use crate::checksum::RefreshChecksum;
 use crate::convert_strategy::ConvertStrategy;
 use crate::encryption::swish_crypto::{self, NumericBlock, SwishBlocks};
-use crate::gen9_sv::save_blocks::SvBlockKey;
+#[cfg(feature = "wasm")]
+use crate::gen9_sv::sv_save_blocks::SvBlockKey;
 use crate::gen9_sv::{BoxIndex, BoxSlot};
+use crate::items::ItemDataTs;
 use crate::result::{Error, Result, StdResult};
 use crate::traits::PkmBytes;
+use pkm_rs_types::{BinaryGender, Language, OriginGame};
 
 #[cfg(feature = "wasm")]
 use pkm_rs_types::strings::SizedUtf16String;
-use pkm_rs_types::{BinaryGender, Language, OriginGame};
 #[cfg(feature = "wasm")]
 use pkm_rs_types::{BoundViolated, JsResult, TryIntoTs, TsResult};
 use tsify::Ts;
@@ -32,24 +34,17 @@ pub struct ScarletVioletSave {
 
 impl ScarletVioletSave {
     pub fn from_bytes(bytes: Box<[u8]>) -> Result<Self> {
-        let byte_length = bytes.len();
-        if byte_length < SAVE_SIZE_BYTES_MIN {
-            return Err(Error::buffer_size_with_source(
+        match bytes.len() {
+            byte_length @ ..SAVE_SIZE_BYTES_MIN => Err(Error::buffer_size_with_source(
                 "scarlet/violet save file min",
                 SAVE_SIZE_BYTES_MIN,
                 byte_length,
-            ));
+            )),
+            byte_length => Ok(Self {
+                blocks: SvBlocks::from_blocks(SwishBlocks::from_bytes(bytes)?)?,
+                byte_length,
+            }),
         }
-
-        let blocks = SvBlocks::from_blocks(
-            SwishBlocks::from_bytes(bytes)
-                .map_err(|e| Error::other(&format!("SwishBlocks from_bytes: {e}")))?,
-        )?;
-
-        Ok(Self {
-            blocks,
-            byte_length,
-        })
     }
 
     const fn my_status(&self) -> &MyStatusFields {
@@ -346,6 +341,24 @@ impl ScarletVioletSave {
         Self::is_save(bytes)
     }
 
+    #[wasm_bindgen(js_name = getItemInventory)]
+    pub fn item_inventory_wasm(&self) -> Vec<Ts<ItemDataTs>> {
+        self.blocks
+            .items
+            .0
+            .all()
+            .enumerate()
+            .filter_map(|(index, item)| item.to_ts(index as u16).into_ts().ok())
+            .collect()
+    }
+
+    #[wasm_bindgen(js_name = "updateItemData")]
+    pub fn update_item_inventory_wasm(&mut self, v: Ts<ItemDataTs>) -> JsResult<()> {
+        self.blocks.items.update_item_from_ts(v.to_rust()?);
+
+        Ok(())
+    }
+
     #[wasm_bindgen(js_name = prepareBytesForSaving)]
     pub fn prepare_bytes_for_saving_wasm(&self) -> Vec<u8> {
         self.prepare_bytes_for_saving()
@@ -353,11 +366,6 @@ impl ScarletVioletSave {
 
     #[wasm_bindgen(js_name = getDisplayData)]
     pub fn display_data(&self) -> StdResult<js_sys::Object, JsValue> {
-        // let mut map = BTreeMap::new();
-        // map.insert("pokedexOwned", 3);
-
-        // let serializer = Serializer::new().serialize_maps_as_objects(true);
-        // map.serialize(&serializer).map_err(Into::into)
         let obj = js_sys::Object::new();
         let MyStatusFields {
             trainer_id,
@@ -477,7 +485,6 @@ mod tests {
         assert_eq!(block_vec.len(), 6242);
 
         let slice = save_bytes.into_boxed_slice();
-        dbg!(slice.len());
 
         let save = ScarletVioletSave::from_bytes(slice)?;
 

@@ -1,5 +1,5 @@
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
-import { Option } from '@openhome-core/util/functional'
+import { Option, R } from '@openhome-core/util/functional'
 import { isThenable } from '@openhome-core/util/promise'
 import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import { useEffect, useEffectEvent, useState } from 'react'
@@ -16,9 +16,9 @@ export default function useOhpkmIdBatchLookup(
   const [loading, setLoading] = useState(true)
   const ohpkmStore = useOhpkmStore()
   const [batchResults, setBatchResults] = useState<Option<OhpkmBatchLookupResults>>()
-
   const loadBatch = useEffectEvent(() => ohpkmStore.tryLoadBatch(openhomeIds))
-  const openhomeIdsKey = hashStrings(openhomeIds)
+  const subscribeOhpkmUpdates = useEffectEvent(ohpkmStore.subscribeAllUpdates)
+  const openhomeIdsKey = openhomeIds.join()
   const displayError = useEffectEvent(useDisplayError())
 
   useEffect(() => {
@@ -30,12 +30,13 @@ export default function useOhpkmIdBatchLookup(
     if (isThenable(batchResult)) {
       batchResult
         .then((result) => {
+          setLoading(false)
           if (!ignore) {
             setBatchResults(result)
-            setLoading(false)
           }
         })
         .catch((error) => displayError('Error loading OHPKM batch', `Error: '${error}'`))
+        .finally(() => setLoading(false))
     } else {
       setBatchResults(batchResult)
       setLoading(false)
@@ -46,15 +47,25 @@ export default function useOhpkmIdBatchLookup(
     }
   }, [openhomeIdsKey])
 
-  return { loading, batchResults }
-}
+  useEffect(() => {
+    if (!batchResults) return
 
-function hashStrings(strings: string[]) {
-  let hash = 5381
-  for (const str of strings) {
-    for (let i = 0; i < str.length; i++) {
-      hash = (hash * 33) ^ str.charCodeAt(i)
+    // if this effect is cleaned up before the results return, the ignore flag tells the callback that it is outdated and should set the results
+    let ignore = false
+
+    const cancel = subscribeOhpkmUpdates((id, ohpkm) => {
+      if (ignore || !batchResults.has(id)) return
+
+      const newResults = new Map(batchResults)
+      newResults.set(id, ohpkm ? R.Ok(ohpkm) : R.Err({ identifier: id }))
+      setBatchResults(newResults)
+    })
+
+    return () => {
+      ignore = true
+      cancel()
     }
-  }
-  return hash >>> 0 // convert to unsigned 32-bit integer
+  }, [batchResults, openhomeIdsKey])
+
+  return { loading: loading || !batchResults, batchResults }
 }

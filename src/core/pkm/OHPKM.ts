@@ -12,6 +12,7 @@ import {
   movesFromSwshTrFlags,
   SWSH_TR_BYTE_COUNT,
 } from '@openhome-core/resources/moves/flags'
+import { PluginIdentifier } from '@openhome-core/tauri/spectaCommands'
 import {
   expectExhaustive,
   getFlag,
@@ -60,7 +61,7 @@ import {
 } from '@pkm-rs/pkg'
 import dayjs, { Dayjs } from 'dayjs'
 import Prando from 'prando'
-import { PluginIdentifier, SAV } from '../save/interfaces'
+import { SAV } from '../save/interfaces'
 import { PkmConverter } from './conversion/converter'
 import { isEvolution } from './Lookup'
 import {
@@ -1127,6 +1128,8 @@ function monFormatToOriginalDataTag(format: PkmFormat): Option<Tag> {
       return Tag.Pb7
     case 'PK8':
       return Tag.Pk8
+    case 'PH4':
+      return Tag.Ph4
     case 'PA8':
       return Tag.Pa8
     case 'PB8':
@@ -1171,6 +1174,8 @@ export function originalDataTagToMonFormat(tag: Tag): PkmFormat {
       return 'PB7'
     case Tag.Pk8:
       return 'PK8'
+    case Tag.Ph4:
+      return 'PH4'
     case Tag.Pa8:
       return 'PA8'
     case Tag.Pb8:

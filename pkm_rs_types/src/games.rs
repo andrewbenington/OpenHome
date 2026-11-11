@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use serde::{Deserialize, Serialize};
-use strum_macros::{Display, EnumString};
+use strum_macros::{Display, EnumString, IntoStaticStr};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -30,8 +30,8 @@ pub enum ColosseumOrXd {
     Copy,
     Serialize,
     Deserialize,
-    strum::EnumString,
-    strum::IntoStaticStr,
+    EnumString,
+    IntoStaticStr,
 )]
 #[repr(u8)]
 pub enum OriginGame {
@@ -232,7 +232,7 @@ impl OriginGame {
             LegendsArceus => Some(GameSetting::Hisui),
 
             Scarlet | Violet => Some(GameSetting::Paldea),
-            LegendsZa => Some(GameSetting::Lumiose),
+            LegendsZa => Some(GameSetting::Kalos),
 
             Go => Some(GameSetting::PokemonGo),
             BattleRevolution | Home => None,
@@ -733,7 +733,6 @@ pub enum GameSetting {
     Galar,
     Hisui,
     Paldea,
-    Lumiose,
 
     Orre,
     PokemonGo,

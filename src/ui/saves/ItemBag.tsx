@@ -1,4 +1,5 @@
 import { stringSorter } from '@openhome-core/util/sort'
+import { OpenHomeItemTransfer } from '@openhome-ui/items/types'
 import { useItemBag } from '@openhome-ui/state/items'
 import { Item } from '@pkm-rs/pkg'
 import { Flex, Grid } from '@radix-ui/themes'
@@ -13,12 +14,12 @@ export default function ItemBag() {
       <DroppableSpace dropID="item-bag" className="item-bag-area">
         <Grid columns="6" gap="var(--padding-radius-sm-lg)">
           {Object.entries(itemCounts)
-            .filter(([indexStr]) => parseInt(indexStr) > 0)
-            .map(([indexStr, count]) => {
-              const index = parseInt(indexStr)
-              const validatedIndex = Item.fromIndex(index)
-              return { validatedIndex, count, index }
-            })
+            .map(([indexStr, count]) => [parseInt(indexStr), count] as const)
+            .map(([index, count]) => [index, Item.fromIndex(index), count] as const)
+            .filter(
+              ([index, item]) => item !== undefined && OpenHomeItemTransfer.maxAllowed(index) !== 1
+            )
+            .map(([index, item, count]) => ({ validatedIndex: item, count, index }))
             .sort(stringSorter(({ validatedIndex }) => validatedIndex?.name))
             .map(({ validatedIndex, count, index }) => (
               <Flex className="item-bag-slot" key={index} align="center" justify="center">

@@ -17,7 +17,7 @@ import {
   Pokerus,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
-import { PkmConstructorOptions } from './PKM'
+import { PkmConstructorOptions } from './types'
 import { modernStatCalc } from './util'
 import {
   decryptByteArrayGen67,

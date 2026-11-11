@@ -14,6 +14,7 @@ var pkmClassByDir = new Dictionary<string, Func<byte[], PKM>>
     { "pk7", bytes => new PK7(bytes) },
     { "pk8", bytes => new PK8(bytes) },
     { "pk9", bytes => new PK9(bytes) },
+    { "ph4", bytes => new PKH(bytes) },
 };
 
 static object PkmToJsonObject(PKM pk)
@@ -34,6 +35,10 @@ static object PkmToJsonObject(PKM pk)
     {
         return Pk9Object.Build(pk9);
     }
+    else if (pk is PKH pkh)
+    {
+        return PkhObject.Build(pkh);
+    }
     else
     {
         return new { };
@@ -42,7 +47,16 @@ static object PkmToJsonObject(PKM pk)
 
 static byte[] PkmToEncryptedBytes(PKM pk)
 {
-    return pk is PK9 pk9 ? pk9.EncryptedPartyData : null;
+    if (pk is PK9 pk9)
+    {
+    var data = new byte[pk.SIZE_PARTY];
+    pk.WriteEncryptedDataParty(data);
+    return data;
+        
+    } else
+    {
+        return null;
+    }
 }
 
 foreach (var dir in pkmFileDirs)
@@ -55,7 +69,7 @@ foreach (var dir in pkmFileDirs)
     }
     var factory = pkmClassByDir[Path.GetFileName(dir)];
 
-    foreach (var path in Directory.EnumerateFiles(dir, "*.pk*", SearchOption.AllDirectories))
+    foreach (var path in Directory.EnumerateFiles(dir, "*.p*", SearchOption.AllDirectories))
     {
         Console.WriteLine($"Processing: {path}");
         var pk = factory(File.ReadAllBytes(path));

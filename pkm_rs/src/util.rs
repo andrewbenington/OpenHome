@@ -93,3 +93,31 @@ mod tests {
         );
     }
 }
+
+#[cfg(feature = "wasm")]
+use crate::result::StdResult;
+#[cfg(feature = "wasm")]
+use zerocopy::{FromBytes, Unaligned};
+
+#[cfg(feature = "wasm")]
+/// Reinterprets an owned byte buffer as a `Box<T>` without copying.
+/// Returns the original Vec if the length doesn't match exactly.
+pub fn vec_into_box<T>(v: Vec<u8>) -> StdResult<Box<T>, Vec<u8>>
+where
+    T: FromBytes + Unaligned,
+{
+    if v.len() != size_of::<T>() {
+        return Err(v);
+    }
+
+    // Shrinks capacity to len. This is a no-op (no realloc) if cap == len already.
+    let boxed: Box<[u8]> = v.into_boxed_slice();
+    let ptr: *mut T = Box::into_raw(boxed).cast::<T>();
+
+    // SAFETY:
+    // - The allocation has layout (size = len = size_of::<T>(), align = 1),
+    //   which is exactly Layout::new::<T>() because T: Unaligned.
+    // - T: FromBytes means every initialized byte pattern is a valid T.
+    // - Ownership is transferred; the Box<[u8]> was consumed by into_raw.
+    Ok(unsafe { Box::from_raw(ptr) })
+}

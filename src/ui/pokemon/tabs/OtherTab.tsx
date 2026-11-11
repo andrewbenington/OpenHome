@@ -27,8 +27,8 @@ import {
   SWSH_TRANSFER_RESTRICTIONS_CT,
   USUM_TRANSFER_RESTRICTIONS,
 } from '@openhome-core/resources/consts/TransferRestrictions'
-import { PluginIdentifier } from '@openhome-core/save/interfaces'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
+import { PluginIdentifier } from '@openhome-core/tauri/spectaCommands'
 import { getDisplayID, getHeightCalculated, getWeightCalculated } from '@openhome-core/util'
 import * as types from '@openhome-core/util/types'
 import { FourMoves, Stats } from '@openhome-core/util/types'
@@ -102,7 +102,7 @@ const OtherDisplay = (props: { mon: OtherDisplayPkmData }) => {
           value={
             mon.metLocationIndex === undefined
               ? '(not present)'
-              : `${getLocationStringOrOrigin(mon.gameOfOrigin, mon.metLocationIndex, mon.format, Language.English)} (${mon.metLocationIndex})` // todo: i18n
+              : `${getLocationStringOrOrigin(mon.gameOfOrigin, mon.metLocationIndex, mon.format, mon.nationalDex, mon.trainerID, mon.trainerName, Language.English)} (${mon.metLocationIndex})` // todo: i18n
           }
         />
         {mon.encryptionConstant !== undefined && (

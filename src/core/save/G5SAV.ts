@@ -12,7 +12,8 @@ import { BinaryGender, ConvertStrategy, ExtraFormIndex, Language, OriginGame } f
 import { OHPKM } from '../pkm/OHPKM'
 import { gen45EmptySlotBytes } from './G4SAV'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
-import { hasDesmumeFooter, LookupType } from './util'
+import { LookupType } from './types'
+import { hasDesmumeFooter } from './util'
 import { PathData } from './util/path'
 
 const PC_OFFSET = 0x400

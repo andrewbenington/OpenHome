@@ -17,6 +17,7 @@ import { getDetailsOfficialSave, getDetailsPluginSave } from '@openhome-ui/saves
 import useOhpkmBatchIdLookup from '@openhome-ui/state/ohpkm/useOhpkmIdBatchLookup'
 import { useSaves } from '@openhome-ui/state/saves'
 import { HomeMonLocation, SaveMonLocation } from '@openhome-ui/state/saves/reducer'
+import { OPENHOME_COLOR } from '@openhome-ui/util/color'
 import { OriginGames } from '@pkm-rs/pkg'
 import { Button, Callout, Flex, Badge as RadixBadge } from '@radix-ui/themes'
 import { useCallback, useMemo, useState } from 'react'
@@ -34,8 +35,6 @@ function getInnerSortFunction(
 }
 
 type MonWithColors = { mon: PKMInterface; color: string; isHome: boolean }
-
-const OPENHOME_COLOR = '#7DCEAB'
 
 export default function SortPokemon() {
   const savesAndBanks = useSaves()

@@ -8,6 +8,20 @@
   color: black;
 }
 
+@media (prefers-color-scheme: light) {
+  .contrast-filter {
+    filter: brightness(0);
+    color: black;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .contrast-filter {
+    filter: brightness(0) invert(1);
+    color: white;
+  }
+}
+
 .extra-badge {
   position: absolute;
   right: var(--padding-radius-xs-sm);

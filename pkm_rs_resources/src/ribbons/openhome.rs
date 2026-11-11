@@ -481,6 +481,14 @@ impl<const MODERN_BYTE_COUNT: usize> OpenHomeRibbonSet<MODERN_BYTE_COUNT> {
             OpenHomeRibbon::Obs(ribbon) => self.obsolete.get_ribbons().contains(&ribbon),
         }
     }
+
+    pub const fn includes_raw_modern(&self, ribbon: usize) -> bool {
+        self.modern.includes_raw(ribbon)
+    }
+
+    pub const fn set_raw_modern(&mut self, ribbon: usize, v: bool) {
+        self.modern.set_ribbon_raw(ribbon, v)
+    }
 }
 
 impl<const N: usize> Serialize for OpenHomeRibbonSet<N> {

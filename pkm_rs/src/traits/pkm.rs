@@ -7,18 +7,9 @@ use serde::Serialize;
 use crate::result::Result;
 use crate::traits::IsShiny;
 
-#[cfg(feature = "randomize")]
-use pkm_rs_types::randomize::Randomize;
-
-#[cfg(not(feature = "randomize"))]
 pub trait Pkm: PkmBytes + Serialize + IsShiny + Sized {}
-#[cfg(feature = "randomize")]
-pub trait Pkm: PkmBytes + Serialize + IsShiny + Sized + Randomize {}
 
-#[cfg(not(feature = "randomize"))]
 impl<T: PkmBytes + Serialize + IsShiny + Sized> Pkm for T {}
-#[cfg(feature = "randomize")]
-impl<T: PkmBytes + Serialize + IsShiny + Sized + Randomize> Pkm for T {}
 
 pub trait HasSpeciesAndForm: Pkm {
     fn get_species_metadata(&self) -> &'static SpeciesMetadata;

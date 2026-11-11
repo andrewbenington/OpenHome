@@ -1,6 +1,6 @@
-import { displayIndexAdder, isBattleFormItem } from '@openhome-core/pkm'
+import { displayIndexAdder, isBattleFormItem, isMegaStone } from '@openhome-core/pkm'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { isPluginGame, PluginIdentifier, SAV } from '@openhome-core/save/interfaces'
+import { isPluginGame, SAV } from '@openhome-core/save/interfaces'
 import * as SpectaGenerated from '@openhome-core/tauri/spectaCommands'
 import { OriginGameStr } from '@openhome-core/tauri/spectaCommands'
 import { Option } from '@openhome-core/util/functional'
@@ -8,6 +8,7 @@ import {
   acquirableTotemBaseForm,
   Gender,
   isAcquirableTotemForm,
+  megaFormsForStone,
   OriginGame,
   OriginGames,
 } from '@pkm-rs/pkg'
@@ -102,7 +103,7 @@ function pokedexFlagsFromMon(mon: PKMInterface): SpectaGenerated.PokedexFlag[] {
 
 export function updatesFromMon(
   mon: PKMInterface,
-  game?: OriginGame | PluginIdentifier
+  game?: OriginGame | SpectaGenerated.PluginIdentifier
 ): PokedexUpdate[] {
   const pokedexUpdates: PokedexUpdate[] = []
   pokedexUpdates.push({
@@ -110,6 +111,29 @@ export function updatesFromMon(
     formIndex: mon.formIndex,
     data: pokedexCaughtEntryFromMon(mon, game),
   })
+
+  if (isMegaStone(mon.heldItemIndex)) {
+    const megasForStone = megaFormsForStone(mon.heldItemIndex)
+    if (megasForStone.length) {
+      const usePluginGame = game && isPluginGame(game)
+      const gameString = typeof game === 'number' ? OriginGame[game] : undefined
+      const originGame = gameString && isOriginGameStr(gameString) ? gameString : undefined
+
+      for (const mega of megasForStone) {
+        pokedexUpdates.push({
+          nationalDex: mega.nationalDex,
+          formIndex: mega.formIndex,
+          data: {
+            level: 'Caught',
+            games: originGame && !usePluginGame ? [originGame] : [],
+            extra: usePluginGame ? [game] : [],
+            flags: [],
+            shiny_leaves: 0,
+          },
+        })
+      }
+    }
+  }
 
   if (isBattleFormItem(mon.nationalDex, mon.heldItemIndex)) {
     pokedexUpdates.push({
