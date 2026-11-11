@@ -273,36 +273,3 @@ impl OhpkmConvert for CompassPk9 {
             .map(StoredPkmBytes::Pk9)
     }
 }
-
-impl OhpkmConvert for CompassPk9 {
-    fn to_main_data(&self) -> ohpkm::v2_sections::MainDataV2 {
-        self.into_pk9().to_main_data()
-    }
-
-    fn to_sv_data(&self) -> Option<ScarletVioletData> {
-        self.into_pk9().to_sv_data()
-    }
-
-    fn to_plugin_data(&self) -> Option<PluginData> {
-        Some(PluginData {
-            plugin_origin: PluginIdentifier::Compass.to_string(),
-        })
-    }
-
-    fn from_ohpkm(ohpkm: &crate::ohpkm::OhpkmV2, strategy: ConvertStrategy) -> Result<Self> {
-        Pk9::from_ohpkm(ohpkm, strategy).map(Self::from_pk9)
-    }
-
-    fn bytes_to_stored(bytes: &[u8]) -> Result<StoredPkmBytes> {
-        bytes
-            .try_into()
-            .map_err(|_| {
-                Error::buffer_size_with_source(
-                    "CompassPk9::OhpkmConvert::bytes_to_stored",
-                    gen8_swsh::PKM_DATA_SIZE,
-                    bytes.len(),
-                )
-            })
-            .map(StoredPkmBytes::Pk9Compass)
-    }
-}
