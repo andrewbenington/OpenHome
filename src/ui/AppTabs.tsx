@@ -1,13 +1,11 @@
 import { Separator } from '@base-ui/react/separator'
 import { Badge, Box, Flex, ThemePanel } from '@radix-ui/themes'
-import { PropsWithChildren, useContext, useState } from 'react'
+import { PropsWithChildren, useContext } from 'react'
 import { Route, Routes, useLocation, useNavigate } from 'react-router'
-import { PKM_RS_WASM } from '../init'
+import { AppFooter } from './AppFooter'
 import DebugOnly from './components/DebugOnly'
 import Fallback from './components/Fallback'
 import { AppTabIconsActive, AppTabIconsInactive } from './components/Icons'
-import OhoButton from './components/OhoButton'
-import OhoFlex from './components/OhoFlex'
 import { Tabs } from './components/Tabs'
 import useIsDebug from './hooks/isDebug'
 import AppStateDisplay from './pages/debug/AppStateDisplay'
@@ -20,17 +18,12 @@ import SettingsPage from './pages/Settings'
 import SortPokemon from './pages/sort/SortPokemon'
 import TrackedPokemonPage from './pages/tracked/TrackedPokemonPage'
 import { PluginContext } from './state/plugin/reducer'
-
-function wasmSizeDisplay() {
-  return PKM_RS_WASM
-    ? (PKM_RS_WASM.memory.buffer.byteLength / 1024 / 1024).toFixed(1) + ' MB'
-    : 'loading...'
-}
+import ErrorMessageModal from './top-level/ErrorMessageModal'
+import UpdateMessageModal from './top-level/UpdateMessageModal'
 
 export default function AppTabs() {
   const tab = useLocation().pathname.split('/')[1] || 'home'
   const { outdatedPluginCount } = useContext(PluginContext)
-  const [wasmSize, setWasmSize] = useState(wasmSizeDisplay())
 
   const homeElement = <Home />
 
@@ -43,7 +36,7 @@ export default function AppTabs() {
           value={tab}
           orientation="vertical"
           onValueChange={(tab) => navigate(tab)}
-          style={{ flex: 1, maxHeight: 'calc(100vh - var(--footer-height)' }}
+          style={{ flex: 1, maxHeight: '100vh' }}
         >
           <Flex style={{ height: '100%', flexGrow: 1 }}>
             <Tabs.IconList className="tab-sidebar" direction="column">
@@ -99,8 +92,18 @@ export default function AppTabs() {
               <Tabs.Indicator />
             </Tabs.IconList>
             <Separator className="Separator" orientation="vertical" />
-            <Box style={{ flex: 1, width: '100%', height: '100%', overflowY: 'hidden' }}>
-              <div style={{ height: '100%' }}>
+            <Box
+              id="active-tab-content-container"
+              style={{
+                flex: 1,
+                width: 'calc(100% - var(--navigation-sidebar-width))',
+                height: '100%',
+                overflowY: 'hidden',
+                position: 'relative',
+                paddingBottom: 'var(--footer-height)',
+              }}
+            >
+              <div style={{ height: '100%', overflowX: 'auto' }}>
                 <Routes>
                   <Route index path="/" element={homeElement} />
                   <Route path="/home" element={homeElement} />
@@ -126,23 +129,12 @@ export default function AppTabs() {
                   </Tabs.Panel>
                 </DebugOnly>
               </div>
+              <AppFooter />
+              <UpdateMessageModal />
+              <ErrorMessageModal />
             </Box>
           </Flex>
         </Tabs.Root>
-        <DebugOnly>
-          <div className="modal-footer">
-            <OhoFlex.Spacer />
-            <p style={{ fontSize: '0.8rem' }}>WASM memory usage:</p>
-            <code>{wasmSize}</code>
-            <OhoButton
-              size="1"
-              onClick={() => setWasmSize(wasmSizeDisplay())}
-              style={{ fontSize: '0.7rem', padding: '0.15rem', height: 'fit-content' }}
-            >
-              Refresh
-            </OhoButton>
-          </div>
-        </DebugOnly>
       </Flex>
     </Fallback>
   )

@@ -535,3 +535,23 @@ svg {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
+
+.app-footer {
+  height: var(--footer-height);
+  background-color: var(--color-bar);
+  padding: 0.2rem 0.5rem;
+  font-size: 0.75rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+  box-sizing: border-box;
+  border-top: var(--soft-border);
+  position: absolute;
+  width: 100%;
+}
+
+.dialog-scroll-container {
+  max-height: 20rem;
+  overflow: auto;
+}

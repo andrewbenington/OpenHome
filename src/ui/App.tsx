@@ -6,15 +6,13 @@ import { R } from '@openhome-core/util/functional'
 import AppTabs from '@openhome-ui/AppTabs'
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
 import { useTitledErrorDisplay } from '@openhome-ui/hooks/displayError'
-import { TransactionStateProvider } from '@openhome-ui/state/app-state'
+import { AppStateProvider } from '@openhome-ui/state/app-state'
 import { AppInfoContext, appInfoInitialState, appInfoReducer } from '@openhome-ui/state/appInfo'
 import PokemonDndContext from '@openhome-ui/state/drag-and-drop/PokemonDndContext'
 import { ErrorContext, errorReducer } from '@openhome-ui/state/error'
 import { LookupsProvider } from '@openhome-ui/state/lookups'
 import { MouseContext, mouseReducer } from '@openhome-ui/state/mouse'
 import { SavesProvider } from '@openhome-ui/state/saves'
-import ErrorMessageModal from '@openhome-ui/top-level/ErrorMessageModal'
-import UpdateMessageModal from '@openhome-ui/top-level/UpdateMessageModal'
 import { Flex, Text, Theme } from '@radix-ui/themes'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useCallback, useEffect, useEffectEvent, useReducer, useState } from 'react'
@@ -170,7 +168,7 @@ function AppWithBackend() {
   return (
     <AppInfoContext value={[appInfoState, appInfoDispatch, getEnabledSaveTypes]}>
       <PluginsProvider>
-        <TransactionStateProvider>
+        <AppStateProvider>
           <MouseContext value={[mouseState, mouseDispatch]}>
             <LookupsProvider>
               <ConvertStrategiesProvider>
@@ -187,8 +185,6 @@ function AppWithBackend() {
                         ) : (
                           <AppTabs />
                         )}
-                        <ErrorMessageModal />
-                        <UpdateMessageModal />
                       </PokemonDndContext>
                     </MultiSelectContext>
                   </SavesProvider>
@@ -196,7 +192,7 @@ function AppWithBackend() {
               </ConvertStrategiesProvider>
             </LookupsProvider>
           </MouseContext>
-        </TransactionStateProvider>
+        </AppStateProvider>
       </PluginsProvider>
     </AppInfoContext>
   )
