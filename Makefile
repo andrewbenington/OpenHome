@@ -148,6 +148,7 @@ gen-wasm:
 	@node generate/gen_items.ts
 	@node generate/gen_moves.ts
 	@node generate/gen_species_data.ts
+	@node generate/gen_megas.ts
 	@cd pkm_rs_resources && cargo fmt
 
 .PHONY: gen-tauri-commands

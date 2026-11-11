@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use serde::{Deserialize, Serialize};
-use strum_macros::{Display, EnumString};
+use strum_macros::{Display, EnumString, IntoStaticStr};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -30,8 +30,8 @@ pub enum ColosseumOrXd {
     Copy,
     Serialize,
     Deserialize,
-    strum::EnumString,
-    strum::IntoStaticStr,
+    EnumString,
+    IntoStaticStr,
 )]
 #[repr(u8)]
 pub enum OriginGame {
