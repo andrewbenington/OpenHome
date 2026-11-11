@@ -13,11 +13,13 @@ import {
   ConvertStrategy,
   ExtraFormIndex,
   isCompassSave,
+  ItemDataTs,
   OriginGame,
   Pk9Wasm,
   ScarletVioletSaveRust,
   SvVersion,
 } from '@pkm-rs/pkg'
+import { ScarletVioletItemDatabase } from '../Gen89/ScarletVioletSave'
 import PK9Compass from './PK9Compass'
 
 const COMPASS_LEVELCAP_BLOCK = 0xcc806ed6
@@ -142,4 +144,10 @@ export class CompassSave extends WasmPluginSave<Pk9Wasm, PK9Compass, ScarletViol
   static getPluginIdentifier() {
     return 'compass' as const
   }
+
+  getItemInventory = () => this.inner.getItemInventory()
+
+  updateItemData = (itemData: ItemDataTs) => this.inner.updateItemData(itemData)
+
+  getItemDatabase = () => ScarletVioletItemDatabase
 }
