@@ -118,7 +118,7 @@ export class ScarletVioletSave extends WasmOfficialSave<Pk9Wasm, PK9, ScarletVio
   }
 }
 
-const ScarletVioletItemDatabase: ItemTransferDatabase = {
+export const ScarletVioletItemDatabase: ItemTransferDatabase = {
   categoryIndexes: () => Array.from(SvItemStorage.pouchIndexes()),
   categoryName: SvItemStorage.pouchName,
   maxAllowed: SvItemStorage.maxAllowed,
