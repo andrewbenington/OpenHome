@@ -19,6 +19,7 @@ type OhTauriApi = {
   get_file_bytes(absolutePath: string): number[]
   write_storage_file_json(relativePath: string, value: JSONValue): null
   get_storage_file_json(relativePath: string): JSONObject | JSONArray
+  get_storage_file_json_create_if_nonexistent(relativePath: string): JSONObject | JSONArray
   add_to_ohpkm_store(updates: StringToBytes): null
   log(level: LogLevel, message: string, fields?: Record<string, unknown>): void
 }
@@ -46,6 +47,10 @@ export const Commands: OhTauriApiNoThrow = {
 
   get_storage_file_json(relativePath: string) {
     return invokeAndCatch('get_storage_file_json', { relativePath })
+  },
+
+  get_storage_file_json_create_if_nonexistent(relativePath: string) {
+    return invokeAndCatch('get_storage_file_json_create_if_nonexistent', { relativePath })
   },
 
   write_storage_file_json(relativePath: string, data: JSONValue) {
