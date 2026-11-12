@@ -82,7 +82,10 @@ const MetDataTab = (props: { mon: PKMInterface }) => {
         message = `${mon.trainerName}'s old friend, met` // todo: i18n
       }
     }
-    if ((['PK1', 'PK2'].includes(mon.format) && !OriginGames.isGameboy(mon.gameOfOrigin)) || (mon.format === 'PK3' && mon.metLocationIndex === 254)) {
+    if (
+      (['PK1', 'PK2'].includes(mon.format) && !OriginGames.isGameboy(mon.gameOfOrigin)) ||
+      (mon.format === 'PK3' && mon.metLocationIndex === 254)
+    ) {
       message = `Obtained in a trade` // todo: i18n
     }
     if (mon.format === 'OHPKM') {

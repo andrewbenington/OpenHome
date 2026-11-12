@@ -692,11 +692,11 @@ impl Geolocations {
 }
 
 pub trait BitSet {
-    fn set_bit(&mut self, bit_index: u8, value: bool);
+    fn set_bit_at(&mut self, bit_index: u8, value: bool);
 }
 
 impl BitSet for u8 {
-    fn set_bit(&mut self, bit_index: u8, value: bool) {
+    fn set_bit_at(&mut self, bit_index: u8, value: bool) {
         if value {
             *self |= 1 << bit_index;
         } else {
