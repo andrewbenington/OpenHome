@@ -48,7 +48,9 @@
     "precommit": "pnpm typecheck && pnpm format && pnpm lint",
     "postinstall": "pnpm wasm-compile-dev",
     "ui-test": "./scripts/run-ui-tests.sh",
-    "wdio": "UI_TEST_DATA_FOLDER='ui-tests/sample-data-dir' wdio run ./wdio.conf.ts"
+    "wdio-basic": "UI_TEST_DATA_FOLDER='ui-tests/sample-data-dir' wdio run ./ui-tests/wdio.basic.conf.ts",
+    "wdio-first-launch": "UI_TEST_DATA_FOLDER='ui-tests/first-launch-dir' wdio run ./ui-tests/wdio.first-launch.conf.ts",
+    "wdio": "pnpm wdio-basic; pnpm wdio-first-launch"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

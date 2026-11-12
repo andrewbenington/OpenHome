@@ -16,5 +16,5 @@
     "noFallthroughCasesInSwitch": true
   },
   "extends": "../tsconfig.json",
-  "include": ["specs", "../wdio.conf.ts", "../src"]
+  "include": ["specs", "wdio.*conf.ts", "../src", "wdio.first-launch.conf.ts"]
 }

@@ -1,9 +1,8 @@
 export const config: WebdriverIO.Config = {
   runner: 'local',
-  specs: ['./ui-tests/specs/**/*.spec.ts'],
+  specs: [], // override in child configs
   maxInstances: 1,
 
-  // Tauri
   services: [
     [
       '@wdio/tauri-service',
@@ -18,7 +17,6 @@ export const config: WebdriverIO.Config = {
     ],
   ],
 
-  // Capabilities
   capabilities: [
     {
       browserName: 'tauri',
@@ -28,7 +26,6 @@ export const config: WebdriverIO.Config = {
     },
   ],
 
-  // Logging
   logLevel: 'info',
   bail: 0,
   baseUrl: 'http://localhost:4444',
@@ -36,7 +33,6 @@ export const config: WebdriverIO.Config = {
   connectionRetryTimeout: 90000,
   connectionRetryCount: 3,
 
-  // Test configuration
   framework: 'mocha',
   mochaOpts: {
     ui: 'bdd',

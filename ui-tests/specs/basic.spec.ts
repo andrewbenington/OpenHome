@@ -11,6 +11,8 @@ function saveTestFilePath(...pathElements: string[]): string {
   return path.join(__dirname, '..', 'sample-data-dir', 'test_saves', ...pathElements)
 }
 
+process.env.UI_TEST_DATA_FOLDER = 'ui-tests/empty-data-dir'
+
 export let crystalSaveFile: G2SAV
 
 describe('Accessing a save mon', () => {

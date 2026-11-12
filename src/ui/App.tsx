@@ -25,7 +25,7 @@ import {
   MultiSelectContext,
   MultiSelectState,
 } from './state/drag-and-drop/useMultiSelect'
-import { ItemBagProvider } from './state/items/provider'
+import { ItemBagProvider } from './state/items/ItemBagProvider'
 import PluginsProvider from './state/plugin/PluginProvider'
 
 const ZOOM_CHANGE_PCT = 5
