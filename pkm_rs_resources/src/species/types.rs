@@ -705,16 +705,18 @@ pub struct SpeciesForm {
 }
 
 impl SpeciesForm {
-    pub fn new(national_dex: u16, form_index: u16) -> Result<SpeciesForm> {
-        if get_species_metadata(national_dex).forms.len() <= form_index as usize {
+    pub fn new(national_dex_u16: u16, form_index: u16) -> Result<SpeciesForm> {
+        let national_dex = NationalDex::new(national_dex_u16)?;
+
+        if get_species_metadata(national_dex_u16).forms.len() <= form_index as usize {
             return Err(Error::FormIndex {
-                national_dex: NationalDex::new(national_dex)?,
+                national_dex,
                 form_index,
             });
         }
 
         Ok(SpeciesForm {
-            national_dex: NationalDex::new(national_dex)?,
+            national_dex,
             form_index,
         })
     }
