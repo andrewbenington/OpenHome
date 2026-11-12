@@ -29,7 +29,7 @@ export function getLocationStringOrOrigin(
     return 'in Pokémon GO' // todo: i18n
   } else if (format === 'OHPKM' || formatMatchesOrigin(format, game)) {
     return getLocationString(game, index, nationalDex, trainerID, trainerName, language, egg)
-  } else if (format === 'PK2' && !(game >= OriginGame.Gold && game <= OriginGame.Crystal)) {
+  } else if (format === 'PK2' && !OriginGames.isGameboy(game)) {
     return GEN3_TRADE_STRING
   } else if (format === 'PK3' && !OriginGames.isGba(game)) {
     return GEN3_TRADE_STRING
