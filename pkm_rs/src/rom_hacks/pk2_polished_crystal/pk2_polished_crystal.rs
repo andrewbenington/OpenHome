@@ -1,5 +1,3 @@
-use super::Pk2PolishedCrystalBuffer;
-use super::pk2_buffer::Pk2PolishedCrystalBufferMut;
 use super::{Pk2PolishedCrystalAbilityIndex, Pk2PolishedCrystalSpeciesAndForm};
 use crate::checksum::{Checksum, RefreshChecksum};
 use crate::convert_strategy::ConvertStrategy;
@@ -26,6 +24,7 @@ use pkm_rs_types::{
 use pkm_rs_types::{Gender, Geolocations, PokeDate, TrainerMemory};
 use serde::Serialize;
 
+
 use tsify::Ts;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
@@ -37,6 +36,7 @@ use pkm_rs_resources::abilities::AbilityIndexWasm;
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
+use crate::rom_hacks::pk2_polished_crystal::pk2_polished_crystal_buffer::{Pk2PolishedCrystalBuffer, Pk2PolishedCrystalBufferMut};
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = Pk2PolishedCrystalWasm))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
@@ -642,8 +642,6 @@ mod tests {
   use std::path::PathBuf;
 
   use crate::convert_strategy::ConvertStrategy;
-  use crate::gen7_alola::Pk2PolishedCrystal;
-  use crate::gen7_alola::pk2_buffer::Pk2PolishedCrystalBuffer;
   use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 
   use crate::result::Error;
@@ -656,6 +654,8 @@ mod tests {
   use pkm_rs_types::randomize::Randomize;
   #[cfg(feature = "randomize")]
   use rand::{SeedableRng, rngs::StdRng};
+  use crate::rom_hacks::pk2_polished_crystal::pk2_polished_crystal_buffer::Pk2PolishedCrystalBuffer;
+  use crate::rom_hacks::pk2_polished_crystal::Pk2PolishedCrystal;
 
   #[test]
   fn to_from_bytes() -> TestResult<()> {

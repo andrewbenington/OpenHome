@@ -1,4 +1,10 @@
-use super::{BOX_COLS, BOX_COUNT, BOX_ROWS, BOX_SLOTS, BoxIndex, BoxSlot, Pk2PolishedCrystal, Pk2PolishedCrystalBuffer};
+use super::Pk2PolishedCrystal;
+use super::BoxSlot;
+use super::BoxIndex;
+use super::BOX_SLOTS;
+use super::BOX_ROWS;
+use super::BOX_COUNT;
+use super::BOX_COLS;
 use crate::encryption;
 use crate::log;
 use crate::result::{Error, Result};
@@ -27,24 +33,25 @@ use pkm_rs_types::JsResult;
 
 #[cfg(feature = "wasm")]
 use crate::encryption::MemeCrypto;
+use crate::rom_hacks::pk2_polished_crystal::pk2_polished_crystal_buffer::Pk2PolishedCrystalBuffer;
 
-const POLISHED_CRYSTAL_SIZE_BYTES: usize = todo!();
+const POLISHED_CRYSTAL_SIZE_BYTES: usize = 300;
 
-const POLISHED_CRYSTAL_TRAINER_DATA_OFFSET: usize = todo!();
-const TRAINER_DATA_SIZE: usize = todo!();
+const POLISHED_CRYSTAL_TRAINER_DATA_OFFSET: usize = 300;
+const TRAINER_DATA_SIZE: usize = 300;
 
-const NUM_BOXES = 32;
+const NUM_BOXES: i32 = 32;
 
-const POLISHED_CRYSTAL_BOX_DATA_OFFSET: usize = todo!();
-const POLISHED_CRYSTAL_BOX_NAMES_OFFSET: usize = todo!();
+const POLISHED_CRYSTAL_BOX_DATA_OFFSET: usize = 300;
+const POLISHED_CRYSTAL_BOX_NAMES_OFFSET: usize = 300;
 
-const BOX_DATA_SIZE: usize = todo!();
-const BOX_NAME_BYTE_LENGTH: usize = todo!();
+const BOX_DATA_SIZE: usize = 300;
+const BOX_NAME_BYTE_LENGTH: usize = 300;
 
 type BoxName = SizedUtf16String<BOX_NAME_BYTE_LENGTH>;
 
 #[cfg(feature = "wasm")]
-const POLISHED_CRYSTAL_PC_CHECKSUM_OFFSET: usize = todo!();
+const POLISHED_CRYSTAL_PC_CHECKSUM_OFFSET: usize = 300;
 
 
 #[derive(Serialize, Debug)]
@@ -173,7 +180,7 @@ impl Gen2PolishedCrystalSave {
       POLISHED_CRYSTAL_SIZE_BYTES => Self::from_bytes_polished_crystal(bytes),
       _ => Err(Error::buffer_size_with_source(
         "The loaded Gen 2 Polished Crystal save file did not have the right expected size!",
-        SM_SIZE_BYTES,
+        POLISHED_CRYSTAL_SIZE_BYTES,
         bytes.len(),
       )),
     }
@@ -252,7 +259,7 @@ impl Gen2PolishedCrystalSave {
   }
 
   const fn is_save(bytes: &[u8]) -> bool {
-    bytes.len() == SM_SIZE_BYTES || bytes.len() == USUM_SIZE_BYTES
+    bytes.len() == POLISHED_CRYSTAL_SIZE_BYTES || bytes.len() == POLISHED_CRYSTAL_SIZE_BYTES
   }
 
   fn display_tid(&self) -> String {
@@ -465,7 +472,6 @@ mod tests {
 
   use crate::checksum::Checksum;
   use crate::convert_strategy::ConvertStrategy;
-  use crate::gen7_alola::pk7_buffer::Pk2PolishedCrystalBuffer;
   use crate::ohpkm::{OhpkmConvert, OhpkmV2};
   use crate::result::Result;
   use crate::tests::{pkm_from_file, save_bytes_from_file};
@@ -538,18 +544,18 @@ mod tests {
     let ribbon_master_ohpkm =
       pkm_from_file::<OhpkmV2>(&Path::new("ohpkm").join("ribbon-master.ohpkm"))?;
 
-    let ribbon_master_pk7 =
+    let ribbon_master_pk2_polished_crystal =
       Pk2PolishedCrystal::from_ohpkm(&ribbon_master_ohpkm.0, ConvertStrategy::default())?;
 
     let box_index = BoxIndex::check_bound(0).expect("should be valid");
     let box_slot = BoxSlot::check_bound(9).expect("should be valid");
 
-    save.set_mon_at(box_index, box_slot, Some(ribbon_master_pk7));
+    save.set_mon_at(box_index, box_slot, Some(ribbon_master_pk2_polished_crystal));
     let retrieved_ribbon_master = save
       .get_mon_at(box_index, box_slot)?
       .expect("ribbon master is present");
 
-    if retrieved_ribbon_master.calculate_checksum() != ribbon_master_pk7.calculate_checksum() {
+    if retrieved_ribbon_master.calculate_checksum() != ribbon_master_pk2_polished_crystal.calculate_checksum() {
       return Err(Error::other(
         "pokemon changed between setting and retrieving",
       ));

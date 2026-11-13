@@ -116,7 +116,7 @@ impl From<PkmFormat> for Option<Tag> {
             PkmFormat::PK3UB => Some(Tag::Pk3Ub),
             PkmFormat::PB8LUMI => Some(Tag::Pb8Lumi),
             PkmFormat::PK9Compass => Some(Tag::Pk9Compass),
-          PkmFormat::PK2PolishedCrystal => Some(Tag::Pk2PolishedCrystal)
+          PkmFormat::Pk2PolishedCrystal => Some(Tag::Pk2PolishedCrystal)
         }
     }
 }

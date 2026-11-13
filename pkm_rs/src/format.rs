@@ -46,7 +46,7 @@ pub enum PkmFormat {
     PK3UB,
     PB8LUMI,
     PK9Compass,
-    PK2PolishedCrystal
+  Pk2PolishedCrystal,
 }
 
 impl PkmFormat {
@@ -77,7 +77,7 @@ impl PkmFormat {
             Self::PK3RR | Self::PK3UB => OriginGame::FireRed,
             Self::PB8LUMI => OriginGame::BrilliantDiamond,
             Self::PK9Compass => OriginGame::Scarlet,
-          PkmFormat::PK2PolishedCrystal => OriginGame::Crystal
+          PkmFormat::Pk2PolishedCrystal => OriginGame::Crystal
         }
     }
 
@@ -100,7 +100,7 @@ impl PkmFormat {
             Self::PH4 => origin == OriginGame::Home,
 
             Self::PK3RR | Self::PK3UB | Self::PB8LUMI | Self::PK9Compass => false,
-          PkmFormat::PK2PolishedCrystal => OriginGame::Crystal == origin
+          PkmFormat::Pk2PolishedCrystal => OriginGame::Crystal == origin
         }
     }
 
@@ -119,7 +119,7 @@ impl PkmFormat {
             Self::PK3RR | Self::PK3UB => Generation::G3,
             Self::PB8LUMI => Generation::G8,
             Self::PK9Compass => Generation::G9,
-          PkmFormat::PK2PolishedCrystal => Generation::G2
+          PkmFormat::Pk2PolishedCrystal => Generation::G2
         }
     }
 
@@ -145,7 +145,7 @@ impl PkmFormat {
             | Self::PK5
             | Self::PK6
             | Self::PB7 => false,
-          PkmFormat::PK2PolishedCrystal => false
+          PkmFormat::Pk2PolishedCrystal => false
         }
     }
 }
@@ -177,7 +177,7 @@ impl PkmFormat {
 
             Self::PK3RR | Self::PK3UB => LinkTradeIndex::PkmGen3 as u16,
             Self::PB8LUMI | Self::PK9Compass => LinkTradeIndex::Pkm3dsSwitch as u16,
-          PkmFormat::PK2PolishedCrystal => location::CANT_TELL_GEN2
+          PkmFormat::Pk2PolishedCrystal => location::CANT_TELL_GEN2
         }
     }
 
@@ -204,7 +204,7 @@ impl PkmFormat {
             Self::PK3UB => origin.generation() == Generation::G3,
             Self::PB8LUMI => origin <= OriginGame::ShiningPearl,
             Self::PK9Compass => origin <= OriginGame::Violet,
-          PkmFormat::PK2PolishedCrystal => false
+          PkmFormat::Pk2PolishedCrystal => false
         }
     }
 
@@ -312,7 +312,7 @@ impl PkmFormat {
             Self::PK3UB => FireRed,
             Self::PB8LUMI => ShiningPearl,
             Self::PK9Compass => Scarlet,
-          PkmFormat::PK2PolishedCrystal => Crystal
+          PkmFormat::Pk2PolishedCrystal => Crystal
         }
     }
 
@@ -911,7 +911,7 @@ impl PkmFormat {
             },
 
           // todo!() Register new locations in Polished Crystal
-          PkmFormat::PK2PolishedCrystal => location::gen2::index_of(location)
+          PkmFormat::Pk2PolishedCrystal => location::gen2::index_of(location)
         }
     }
 
@@ -924,7 +924,7 @@ impl PkmFormat {
         }
 
         match self {
-            PkmFormat::PK1 | PkmFormat::PK2 | PkmFormat::PK2PolishedCrystal => {
+            PkmFormat::PK1 | PkmFormat::PK2 | PkmFormat::Pk2PolishedCrystal => {
                 MetData::new(source_origin, location::CANT_TELL_GEN2)
             }
             PkmFormat::PK3 => {
@@ -980,7 +980,7 @@ impl PkmFormat {
     pub const fn metadata_source(self) -> MetadataSource {
         match self {
             Self::PK1 => MetadataSource::RedBlue,
-            Self::PK2 | Self::PK2PolishedCrystal => MetadataSource::GoldSilver,
+            Self::PK2 | Self::Pk2PolishedCrystal => MetadataSource::GoldSilver,
             Self::PK3 => MetadataSource::RubySapphire,
             Self::ColoPkm | Self::XdPkm => MetadataSource::RubySapphire,
             Self::PK4 => MetadataSource::DiamondPearl,
