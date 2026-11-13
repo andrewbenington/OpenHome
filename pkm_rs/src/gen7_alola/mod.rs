@@ -1,7 +1,7 @@
 mod pk7;
 
-mod pk7_buffer;
-use pk7_buffer::Pk7Buffer;
+pub(crate) mod pk7_buffer;
+pub(crate) use pk7_buffer::Pk7Buffer;
 
 mod save;
 use pkm_rs_resources::metadata_source::MetadataSource;
