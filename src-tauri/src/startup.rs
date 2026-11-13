@@ -86,22 +86,23 @@ fn initialize_storage(data_controller: &impl DataController) -> Result<()> {
     ];
 
     for obj_file in obj_files {
-        data_controller.create_default_json_file_if_not_exists::<&str, serde_json::Map<_, _>>(
-            DataDir::Storage,
-            &obj_file,
-        )?;
+        data_controller
+            .create_default_json_file_if_missing_or_null::<&str, serde_json::Map<_, _>>(
+                DataDir::Storage,
+                &obj_file,
+            )?;
     }
 
     let arr_files = ["save-folders.json"];
 
     for arr_file in arr_files {
-        data_controller.create_default_json_file_if_not_exists::<&str, Vec<String>>(
+        data_controller.create_default_json_file_if_missing_or_null::<&str, Vec<String>>(
             DataDir::Storage,
             &arr_file,
         )?;
     }
 
-    data_controller.create_default_json_file_if_not_exists::<&'static str, StoredBankData>(
+    data_controller.create_default_json_file_if_missing_or_null::<&'static str, StoredBankData>(
         DataDir::Storage,
         &BANKS_FILENAME,
     )?;
