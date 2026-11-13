@@ -347,7 +347,8 @@ export function useOhpkmStore() {
         if (!(mon instanceof OHPKM)) throw Error('Non-OHPKM has OHPKM format')
         return mon.openhomeId
       case 'PK1':
-      case 'PK2': {
+      case 'PK2':
+      case 'PK2PolishedCrystal': {
         const gen12Identifier = getMonGen12Identifier(mon)
         if (!gen12Identifier) {
           throw Error(`unable to calculate gen 1/2 identifier for ${mon.nickname} (${mon.format})`)

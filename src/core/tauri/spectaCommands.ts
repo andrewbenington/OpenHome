@@ -530,7 +530,7 @@ export type PkmType =
   | 'Dragon'
   | 'Dark'
   | 'Fairy'
-export type PluginIdentifier = 'radical_red' | 'unbound' | 'luminescent_platinum' | 'compass'
+export type PluginIdentifier = 'radical_red' | 'unbound' | 'luminescent_platinum' | 'compass' | 'polished_crystal'
 export type PluginMetadata = { id: string; name: string; version: string; api_version: number }
 export type Pokedex = { byDexNumber: Partial<{ [key in number]: PokedexEntry }> }
 export type PokedexEntry = { forms: Partial<{ [key in number]: FormEntry }> }
