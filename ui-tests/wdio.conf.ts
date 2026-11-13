@@ -23,7 +23,7 @@ export const config: WebdriverIO.Config = {
       'tauri:options': {
         application: './target/release/OpenHomeUiTesting',
       },
-    },
+    } as WebdriverIO.Capabilities,
   ],
 
   logLevel: 'info',
@@ -38,16 +38,4 @@ export const config: WebdriverIO.Config = {
     ui: 'bdd',
     timeout: 60000,
   },
-}
-
-declare global {
-  namespace WebdriverIO {
-    interface Capabilities {
-      'tauri:options'?: {
-        application: string
-        args?: string[]
-        webviewOptions?: Record<string, unknown>
-      }
-    }
-  }
 }

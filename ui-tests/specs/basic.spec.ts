@@ -2,7 +2,6 @@ import { initializeWasm } from '@openhome-core/pkm/__test__/init'
 import { G2SAV } from '@openhome-core/save/G2SAV'
 import { emptyPathData } from '@openhome-core/save/util/path'
 import { browser, expect } from '@wdio/globals'
-import '@wdio/tauri-service' // adds the browser.tauri typings
 import fs from 'node:fs'
 import path from 'node:path'
 import ui from './helpers'
@@ -10,8 +9,6 @@ import ui from './helpers'
 function saveTestFilePath(...pathElements: string[]): string {
   return path.join(__dirname, '..', 'sample-data-dir', 'test_saves', ...pathElements)
 }
-
-process.env.UI_TEST_DATA_FOLDER = 'ui-tests/empty-data-dir'
 
 export let crystalSaveFile: G2SAV
 

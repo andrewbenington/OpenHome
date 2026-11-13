@@ -1,6 +1,5 @@
 import { initializeWasm } from '@openhome-core/pkm/__test__/init'
 import { $, expect } from '@wdio/globals'
-import '@wdio/tauri-service'
 
 describe('Launching for the first time', () => {
   before(async () => {
