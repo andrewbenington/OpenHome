@@ -252,11 +252,7 @@ impl LogFilter {
             return false;
         };
 
-        if timestamp < self.start || timestamp > self.end {
-            return false;
-        }
-
-        true
+        timestamp >= self.start && timestamp <= self.end
     }
 
     fn advanced_one_day(&self) -> Self {
