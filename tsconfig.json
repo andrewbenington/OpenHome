@@ -34,7 +34,6 @@
     "src-tauri/pokemon-wasm",
     "src/types/pkm-resources-types.d.ts",
     "scripts",
-    "__mocks__",
-    "ui-tests"
+    "__mocks__"
   ]
 }

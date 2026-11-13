@@ -1,6 +1,5 @@
 import { SAV, saveToStringIdentifier } from '@openhome-core/save/interfaces'
 import { browser, expect } from '@wdio/globals'
-import '@wdio/tauri-service' // adds the browser.tauri typings
 import { ChainablePromiseElement } from 'webdriverio'
 
 export type FindOptions = { expectedText?: string }

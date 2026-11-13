@@ -11,6 +11,7 @@ export type MessageRibbonProps = {
   type?: RibbonType
   size?: Responsive<'1' | '2' | '3'>
   variant?: Callout.RootProps['variant']
+  title?: string
 }
 
 type TypeData = {
@@ -22,7 +23,7 @@ const TYPE_DATA: Record<RibbonType, TypeData> = {
   info: { icon: InfoIcon, color: 'cyan' },
   success: { icon: SuccessIcon, color: 'green' },
   warning: { icon: ErrorIcon, color: 'orange' },
-  error: { icon: ErrorIcon, color: 'crimson' },
+  error: { icon: ErrorIcon, color: 'tomato' },
 }
 
 export default function MessageRibbon(props: MessageRibbonProps) {
@@ -30,10 +31,11 @@ export default function MessageRibbon(props: MessageRibbonProps) {
   const { icon: IconComponent, color } = TYPE_DATA[type]
 
   return (
-    <Callout.Root color={color} size={size} variant={variant}>
+    <Callout.Root className={`message-ribbon-${type}`} color={color} size={size} variant={variant}>
       <Callout.Icon>
         <IconComponent fontSize={24} />
       </Callout.Icon>
+      {props.title && <Callout.Text weight="bold">{props.title}</Callout.Text>}
       <Callout.Text>{children}</Callout.Text>
     </Callout.Root>
   )

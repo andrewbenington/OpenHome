@@ -1,14 +1,13 @@
-import { initializeWasm } from '@openhome-core/pkm/__test__/init';
-import { G2SAV } from '@openhome-core/save/G2SAV';
-import { emptyPathData } from '@openhome-core/save/util/path';
-import { browser, expect } from '@wdio/globals';
-import '@wdio/tauri-service'; // adds the browser.tauri typings
-import fs from 'node:fs';
-import path from 'node:path';
-import ui from './helpers';
+import { initializeWasm } from '@openhome-core/pkm/__test__/init'
+import { G2SAV } from '@openhome-core/save/G2SAV'
+import { emptyPathData } from '@openhome-core/save/util/path'
+import { browser, expect } from '@wdio/globals'
+import fs from 'node:fs'
+import path from 'node:path'
+import ui from './helpers'
 
 function saveTestFilePath(...pathElements: string[]): string {
-  return path.join(__dirname, '..', 'ui-tests-data-dir', 'test_saves', ...pathElements)
+  return path.join(__dirname, '..', 'sample-data-dir', 'test_saves', ...pathElements)
 }
 
 export let crystalSaveFile: G2SAV
@@ -22,11 +21,12 @@ describe('Accessing a save mon', () => {
 
   afterEach(async () => {
     await browser.refresh()
+    await new Promise((r) => setTimeout(r, 500))
   })
 
   it('should display a Pokémon in a save and switch to the stats tab successfully', async () => {
     await ui.openAnySave()
-    
+
     await ui.findAndClick('.draggable-mon')
     await ui.findAndClick('button=Stats')
 
