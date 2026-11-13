@@ -2,6 +2,8 @@
 mod checksum;
 #[cfg(feature = "wasm")]
 mod encryption;
+#[cfg(feature = "wasm")]
+mod items;
 mod rom_hacks;
 mod strings;
 mod util;
@@ -18,6 +20,8 @@ pub mod gen7_alola;
 pub mod gen8_swsh;
 pub mod gen9_lza;
 pub mod gen9_sv;
+#[cfg(feature = "wasm")]
+pub mod home;
 pub mod location;
 pub mod ohpkm;
 pub mod result;

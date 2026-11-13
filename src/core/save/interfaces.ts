@@ -2,17 +2,19 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { PluginIdentifier as RustPluginIdentifier } from '@openhome-core/tauri/spectaCommands'
 import { Errorable, Option, R, range, Result } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
+import { ItemTransferDatabase } from '@openhome-ui/items/types'
 import {
   BinaryGender,
   ConvertStrategy,
   ExtraFormIndex,
+  ItemDataTs,
   Language,
   OriginGame,
   OriginGames,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
 import { filterUndefined } from '../util/sort'
-import { LookupType, SAVClass } from './util'
+import { LookupType, SAVClass } from './types'
 import { PathData } from './util/path'
 import { TransferRestrictions } from './util/TransferRestrictions'
 
@@ -92,6 +94,9 @@ interface BaseSAV<P extends PKMInterface = PKMInterface> {
   getDisplayData(): Record<string, string | number | undefined> | undefined
   getDisplayPkms(): DisplayPkm<P>[]
   convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<P>
+  getItemInventory?: () => ItemDataTs[]
+  updateItemData?: (itemData: ItemDataTs) => void
+  getItemDatabase?: () => ItemTransferDatabase
 
   free?: () => void
 }
@@ -119,6 +124,9 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   abstract supportsItem(itemIndex: number): boolean
   abstract prepareForSaving(): void
   abstract convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<P>
+  getItemInventory?: () => ItemDataTs[]
+  updateItemData?: (itemData: ItemDataTs) => void
+  getItemDatabase?: () => ItemTransferDatabase
 
   prepareWriter(): SaveWriter {
     this.prepareForSaving()
@@ -245,6 +253,9 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   abstract getSlotMetadata?: ((boxNum: number, boxSlot: number) => SlotMetadata) | undefined
   abstract prepareForSaving(): void
   abstract convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<P>
+  getItemInventory?: () => ItemDataTs[]
+  updateItemData?: (itemData: ItemDataTs) => void
+  getItemDatabase?: () => ItemTransferDatabase
 
   prepareWriter(): SaveWriter {
     this.prepareForSaving()
@@ -413,6 +424,8 @@ export interface WasmSaveInner<P> {
   getPcMonCount(): number
 
   getBoxName(box_num: number): string
+
+  free(): void
 }
 
 type WasmPkmInterface<P> = PKMInterface & { inner: P }
@@ -431,6 +444,130 @@ export abstract class WasmOfficialSave<
   P extends WasmPkmInterface<WasmP>,
   WasmSave extends WasmSaveInner<WasmP>,
 > extends OfficialSAV<P> {
+  inner: WasmSave
+  boxes: Array<Box<P>> = []
+  currentPCBox: number
+
+  constructor(inner: WasmSave) {
+    super()
+    this.inner = inner
+    this.currentPCBox = inner.currentPcBoxIdx
+  }
+
+  abstract WASM_SAVE_CLASS: WasmSaveClass<WasmSave>
+
+  get name() {
+    return this.inner.trainerName
+  }
+
+  get tid() {
+    return this.inner.trainerId
+  }
+
+  get sid() {
+    return this.inner.secretId
+  }
+
+  get displayID() {
+    return this.inner.displayId
+  }
+
+  get trainerGender() {
+    return this.inner.trainerGender
+  }
+
+  saveCurrentPcBox() {
+    this.inner.currentPcBoxIdx = this.currentPCBox
+  }
+
+  get origin() {
+    return this.inner.gameOfOrigin
+  }
+
+  get language() {
+    return this.inner.language
+  }
+
+  get bytes() {
+    return this.inner.prepareBytesForSaving()
+  }
+
+  abstract monFromWasm(wasmMon: WasmP): P
+
+  get MAX_BOX_COUNT(): number {
+    return this.WASM_SAVE_CLASS.MAX_BOX_COUNT
+  }
+
+  get SLOTS_PER_BOX(): number {
+    return this.WASM_SAVE_CLASS.SLOTS_PER_BOX
+  }
+
+  get boxRows() {
+    return this.WASM_SAVE_CLASS.BOX_ROWS
+  }
+
+  get boxColumns() {
+    return this.WASM_SAVE_CLASS.BOX_COLS
+  }
+
+  getMonAt(boxNum: number, boxSlot: number): Option<P> {
+    const wasmMon = this.inner.getMonAt(boxNum, boxSlot)
+    return wasmMon ? this.monFromWasm(wasmMon) : undefined
+  }
+
+  tryGetMonAt(boxNum: number, boxSlot: number): Result<Option<P>> {
+    const wasmMon = this.inner.getMonAt(boxNum, boxSlot)
+    return R.Ok(wasmMon ? this.monFromWasm(wasmMon) : undefined)
+  }
+
+  setMonAt(boxIndex: number, boxSlot: number, mon: Option<P>): void {
+    this.inner.setMonAt(boxIndex, boxSlot, mon?.inner)
+  }
+
+  getAllMons() {
+    const boxCount = this.MAX_BOX_COUNT
+    const slotCount = this.SLOTS_PER_BOX
+    return range(boxCount)
+      .flatMap((boxIndex) => range(slotCount).map((boxSlot) => ({ boxIndex, boxSlot })))
+      .map(({ boxIndex, boxSlot }) => this.getMonAt(boxIndex, boxSlot))
+      .filter(filterUndefined)
+  }
+
+  getBoxMonCount(boxIndex: number): number {
+    return this.inner.getBoxMonCount(boxIndex)
+  }
+  getPcMonCount(): number {
+    return this.inner.getPcMonCount()
+  }
+
+  prepareForSaving(): Uint8Array {
+    return this.inner.prepareBytesForSaving()
+  }
+
+  getBoxCount(): number {
+    return this.MAX_BOX_COUNT
+  }
+
+  get boxSlotCount(): number {
+    return this.SLOTS_PER_BOX
+  }
+
+  getBoxName(boxIndex: number): string {
+    return this.inner.getBoxName(boxIndex)
+  }
+
+  free() {
+    if ('__wbg_ptr' in this.inner && this.inner.__wbg_ptr !== 0) {
+      this.inner.free()
+    }
+  }
+}
+
+export abstract class WasmPluginSave<
+  WasmP,
+  P extends WasmPkmInterface<WasmP>,
+  WasmSave extends WasmSaveInner<WasmP>,
+> extends PluginSAV<P> {
   inner: WasmSave
   boxes: Array<Box<P>> = []
   currentPCBox: number

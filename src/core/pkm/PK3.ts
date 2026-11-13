@@ -8,13 +8,14 @@ import {
   ConvertStrategies,
   ConvertStrategy,
   MetadataSummaryLookup,
+  OhpkmWasm,
   OriginGame,
   Pk3Wasm,
   Pokerus,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import { FourMoves, Stats, ToBytesOptions } from '../util/types'
-import { PkmConstructorOptions } from './PKM'
+import { PkmConstructorOptions } from './types'
 import * as encryption from './util/encryption'
 
 export default class PK3 implements PKMInterface {
@@ -55,6 +56,10 @@ export default class PK3 implements PKMInterface {
 
   static fromWasm(pk3: Pk3Wasm): PK3 {
     return new PK3(pk3, {})
+  }
+
+  intoOhpkmWasm(): OhpkmWasm {
+    return this.inner.toOhpkm()
   }
 
   toBytes(options?: ToBytesOptions): ArrayBuffer {

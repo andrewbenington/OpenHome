@@ -1,5 +1,7 @@
 #[cfg(feature = "wasm")]
 use crate::checksum::RefreshChecksum;
+#[cfg(feature = "wasm")]
+use crate::encryption::swish_crypto::SwishBlocks;
 use crate::result::Error;
 #[cfg(feature = "wasm")]
 use pk9_buffer::Pk9Buffer;
@@ -15,6 +17,10 @@ use pkm_rs_resources::species::metadata_table::source_has_form_metadata;
 use pkm_rs_types::randomize::Randomize;
 
 #[cfg(feature = "wasm")]
+mod compass;
+#[cfg(feature = "wasm")]
+pub use compass::*;
+#[cfg(feature = "wasm")]
 mod pk9;
 #[cfg(feature = "wasm")]
 pub use pk9::*;
@@ -23,9 +29,11 @@ mod pk9_buffer;
 #[cfg(feature = "wasm")]
 mod pokemon_index;
 #[cfg(feature = "wasm")]
-mod save_blocks;
-#[cfg(feature = "wasm")]
 mod sv_save;
+#[cfg(feature = "wasm")]
+mod sv_save_blocks;
+#[cfg(feature = "wasm")]
+mod wasm;
 
 #[cfg(feature = "wasm")]
 use pkm_rs_types::strings::SizedUtf16String;
@@ -153,4 +161,10 @@ mod tests {
 
         Ok(())
     }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_name = isCompassSave)]
+pub fn is_compass_save(bytes: Box<[u8]>, key: u32) -> bool {
+    SwishBlocks::<u32>::from_bytes(bytes).is_ok_and(|blocks| blocks.has_raw_key(key))
 }

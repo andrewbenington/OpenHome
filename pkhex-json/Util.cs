@@ -8,7 +8,12 @@ using PKHeX.Core;
 public static partial class Util
 {
 
-  public static object SpeciesForm(PKM pk)
+  public static string FormatFloat(float value)
+  {
+    return value.ToString("F5");
+  }
+
+  public static object SpeciesForm(ISpeciesForm pk)
   {
     return new { national_dex = pk.Species, form_index = pk.Form };
   }
@@ -76,10 +81,41 @@ public static partial class Util
     return new { hp = pk.IV_HP, atk = pk.IV_ATK, def = pk.IV_DEF, spa = pk.IV_SPA, spd = pk.IV_SPD, spe = pk.IV_SPE };
   }
 
+  public static object IVs(GameDataCore pk)
+  {
+    return new { hp = pk.IV_HP, atk = pk.IV_ATK, def = pk.IV_DEF, spa = pk.IV_SPA, spd = pk.IV_SPD, spe = pk.IV_SPE };
+  }
+
   public static object EVs(PKM pk)
   {
     return new { hp = pk.EV_HP, atk = pk.EV_ATK, def = pk.EV_DEF, spa = pk.EV_SPA, spd = pk.EV_SPD, spe = pk.EV_SPE };
   }
+
+  public static object EVs(GameDataCore pk)
+  {
+    return new { hp = pk.EV_HP, atk = pk.EV_ATK, def = pk.EV_DEF, spa = pk.EV_SPA, spd = pk.EV_SPD, spe = pk.EV_SPE };
+  }
+
+  public static object GVs(IGanbaru pk)
+  {
+    return new { hp = pk.GV_HP, atk = pk.GV_ATK, def = pk.GV_DEF, spa = pk.GV_SPA, spd = pk.GV_SPD, spe = pk.GV_SPE };
+  }
+
+  public static object GVs(GameDataPA8 pk)
+  {
+    return new { hp = pk.GV_HP, atk = pk.GV_ATK, def = pk.GV_DEF, spa = pk.GV_SPA, spd = pk.GV_SPD, spe = pk.GV_SPE };
+  }
+
+  public static object AVs(IAwakened pk)
+  {
+    return new { hp = pk.AV_HP, atk = pk.AV_ATK, def = pk.AV_DEF, spa = pk.AV_SPA, spd = pk.AV_SPD, spe = pk.AV_SPE };
+  }
+
+  public static object AVs(GameDataPB7 pk)
+  {
+    return new { hp = pk.AV_HP, atk = pk.AV_ATK, def = pk.AV_DEF, spa = pk.AV_SPA, spd = pk.AV_SPD, spe = pk.AV_SPE };
+  }
+
 
   public static object Stats(PKM pk)
   {
@@ -91,7 +127,7 @@ public static partial class Util
     return new { cool = pk.ContestCool, beauty = pk.ContestBeauty, cute = pk.ContestCute, smart = pk.ContestSmart, tough = pk.ContestTough, sheen = pk.ContestSheen };
   }
 
-  static object FormatMoveName(int moveId, GameStrings strings)
+  public static object FormatMoveName(int moveId, GameStrings strings)
   {
     try
     {
@@ -104,7 +140,8 @@ public static partial class Util
     }
   }
 
-  static object MoveData(PKM pk, int moveIndex, GameStrings strings)
+  static object MoveData<T>(T pk, int moveIndex, GameStrings strings)
+   where T : IGameDataSide, IGameDataSidePP
   {
     var moveId = moveIndex switch
     {
@@ -138,7 +175,61 @@ public static partial class Util
     return [MoveData(pk, 1, strings), MoveData(pk, 2, strings), MoveData(pk, 3, strings), MoveData(pk, 4, strings)];
   }
 
+  static object MoveData(PKM pk, int moveIndex, GameStrings strings)
+  {
+    var moveId = moveIndex switch
+    {
+      1 => FormatMoveName(pk.Move1, strings),
+      2 => FormatMoveName(pk.Move2, strings),
+      3 => FormatMoveName(pk.Move3, strings),
+      4 => FormatMoveName(pk.Move4, strings),
+      _ => throw new ArgumentException($"Unexpected move index: {moveIndex}"),
+    };
+    var movePp = moveIndex switch
+    {
+      1 => pk.Move1_PP,
+      2 => pk.Move2_PP,
+      3 => pk.Move3_PP,
+      4 => pk.Move4_PP,
+      _ => throw new ArgumentException($"Unexpected move index: {moveIndex}"),
+    };
+    var movePpUps = moveIndex switch
+    {
+      1 => pk.Move1_PPUps,
+      2 => pk.Move2_PPUps,
+      3 => pk.Move3_PPUps,
+      4 => pk.Move4_PPUps,
+      _ => throw new ArgumentException($"Unexpected move index: {moveIndex}"),
+    };
+    return new { move_index = moveId, pp = movePp, pp_ups = movePpUps };
+  }
+
+  public static object[] AllMoveData<T>(T pk, GameStrings strings) where T : IGameDataSide, IGameDataSidePP
+  {
+    return [MoveData(pk, 1, strings), MoveData(pk, 2, strings), MoveData(pk, 3, strings), MoveData(pk, 4, strings)];
+  }
+
+  public static object[] AllMoveNames(GameDataPA9 pk, GameStrings strings)
+  {
+    return [FormatMoveName(pk.Move1, strings), FormatMoveName(pk.Move2, strings), FormatMoveName(pk.Move3, strings), FormatMoveName(pk.Move4, strings)];
+  }
+
+
+
   static object RelearnMove(int moveIndex, PKM pk, GameStrings strings)
+  {
+    var moveId = moveIndex switch
+    {
+      1 => pk.RelearnMove1,
+      2 => pk.RelearnMove2,
+      3 => pk.RelearnMove3,
+      4 => pk.RelearnMove4,
+      _ => throw new ArgumentException($"Unexpected relearn move index: {moveIndex}"),
+    };
+    return FormatMoveName(moveId, strings);
+  }
+
+  static object RelearnMove(int moveIndex, IGameDataSide pk, GameStrings strings)
   {
     var moveId = moveIndex switch
     {
@@ -154,6 +245,30 @@ public static partial class Util
   public static object[] RelearnMoves(PKM pk, GameStrings strings)
   {
     return [RelearnMove(1, pk, strings), RelearnMove(2, pk, strings), RelearnMove(3, pk, strings), RelearnMove(4, pk, strings)];
+  }
+
+  public static object[] RelearnMoves<T>(T pk, GameStrings strings) where T : IGameDataSide, IGameDataSidePP
+  {
+    return [RelearnMove(1, pk, strings), RelearnMove(2, pk, strings), RelearnMove(3, pk, strings), RelearnMove(4, pk, strings)];
+  }
+
+  public static object[] RelearnMoves(GameDataPA9 pk, GameStrings strings)
+  {
+    return [RelearnMove(1, pk, strings), RelearnMove(2, pk, strings), RelearnMove(3, pk, strings), RelearnMove(4, pk, strings)];
+  }
+
+
+  public static List<string> GetRibbonNames(object pk)
+  {
+    var riblist = new List<string>();
+    var names = ReflectUtil.GetPropertiesStartWithPrefix(pk.GetType(), "Ribbon");
+    foreach (var name in names)
+    {
+      var value = ReflectUtil.GetValue(pk, name);
+      if (value is bool isPresent && isPresent)
+        riblist.Add(ReformatRibbonName(name));
+    }
+    return riblist;
   }
 
   static string ReformatRibbonName(string s)
@@ -281,6 +396,12 @@ public static partial class Util
     return strings.balllist.GetValue(pk.Ball).ToString().Replace(" Ball", "").Replace("Poke", "Poké");
   }
 
+  public static object FormatBall(IGameDataSide pk, GameStrings strings)
+  {
+    return strings.balllist.GetValue(pk.Ball).ToString().Replace(" Ball", "").Replace("Poke", "Poké");
+  }
+
+
   public static object FormatGame(GameVersion version, GameStrings strings) => version switch
   {
     GameVersion.GN => "BlueGreen",
@@ -329,4 +450,22 @@ public static partial class Util
 
   [GeneratedRegex(@"(?=[A-Z])")]
   private static partial Regex RibbonRegex();
+
+  public static List<int> GetFlagIndexes(int flagCount, Func<int, bool> isSet)
+  {
+    var result = new List<int>();
+    for (int i = 0; i < flagCount; i++)
+    {
+      if (isSet(i))
+        result.Add(i);
+    }
+    return result;
+  }
+
+
+  public static string NullableDateStrFromParts(int yearsSince2000, int month, int day)
+  {
+    DateOnly? date = month != 0 && day != 0 && DateUtil.IsValidDate(yearsSince2000 + 2000, month, day) ? new DateOnly(yearsSince2000 + 2000, month, day) : null;
+    return date != null ? $"{date:M/d/yyyy}" : null;
+  }
 }

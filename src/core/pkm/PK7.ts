@@ -10,13 +10,14 @@ import {
   Item,
   MetadataSummaryLookup,
   NatureIndex,
+  OhpkmWasm,
   OriginGame,
   Pk7Wasm,
   PokeDate,
   Pokerus,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
-import { PkmConstructorOptions } from './PKM'
+import { PkmConstructorOptions } from './types'
 import { modernStatCalc } from './util'
 import {
   decryptByteArrayGen67,
@@ -70,6 +71,10 @@ export default class PK7 {
 
   static fromWasm(pk7: Pk7Wasm): PK7 {
     return new PK7(pk7, {})
+  }
+
+  intoOhpkmWasm(): OhpkmWasm {
+    return this.inner.toOhpkm()
   }
 
   get sanity() {

@@ -1,0 +1,804 @@
+use super::core_data::HomeCoreData;
+use super::game_data_pa8::HomePa8Data;
+use super::game_data_pa9::HomePa9Data;
+use super::game_data_pb7::HomePb7Data;
+use super::game_data_pb8::HomePb8Data;
+use super::game_data_pk8::HomePk8Data;
+use super::game_data_pk9::HomePk9Data;
+use crate::home::game_data_pc9::HomePc9Data;
+use crate::result::Result;
+use crate::traits::{HasSpeciesAndForm, IsShiny, ModernEvs, PkmBytes};
+
+use pkm_rs_resources::metadata_source::MetadataSource;
+use pkm_rs_resources::species::{FormMetadata, SpeciesMetadata};
+use pkm_rs_resources::stats;
+use pkm_rs_types::{OriginGame, Stats8, Stats16Le};
+use pkm_rs_types::{read_u16_le, read_u32_le, read_u64_le};
+use serde::Serialize;
+
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
+
+#[cfg(feature = "wasm")]
+use crate::convert_strategy::ConvertStrategy;
+#[cfg(feature = "wasm")]
+use crate::ohpkm::{OhpkmConvert, OhpkmV2};
+#[cfg(feature = "wasm")]
+use pkm_rs_resources::abilities::AbilityIndexWasm;
+#[cfg(feature = "wasm")]
+use pkm_rs_types::{ContestStats, HyperTraining, MarkingsSixShapesColors, TeraType, TrainerMemory};
+#[cfg(feature = "wasm")]
+use pkm_rs_types::{JsResult, TryIntoTs, TsResult};
+#[cfg(feature = "wasm")]
+use tsify::Ts;
+
+pub enum GameData {
+    Pb7(Option<HomePb7Data>),
+    Pk8(Option<HomePk8Data>),
+    Pa8(Option<HomePa8Data>),
+    Pb8(Option<HomePb8Data>),
+    Pk9(Option<HomePk9Data>),
+    Pa9(Option<HomePa9Data>),
+}
+
+const GAME_DATA_SIZE_EXPECT: &str = "game_data_size always fits in a u16";
+
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "PkhWasm"))]
+#[derive(Debug, Default, Serialize, Clone, Copy)]
+pub struct Ph4 {
+    // header
+    pub data_version: u16,
+    pub encryption_seed: u64,
+    pub checksum: u32,
+    pub encoded_data_size: u16,
+    pub core_data_size: u16,
+    pub game_data_size: u16,
+
+    pub core_data: HomeCoreData,
+
+    // game data
+    pub pb7_data: Option<HomePb7Data>,
+    pub pk8_data: Option<HomePk8Data>,
+    pub pa8_data: Option<HomePa8Data>,
+    pub pb8_data: Option<HomePb8Data>,
+    pub pk9_data: Option<HomePk9Data>,
+    pub pc9_data: Option<HomePc9Data>,
+    pub pa9_data: Option<HomePa9Data>,
+}
+
+impl Ph4 {
+    pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
+        let core_data_size = read_u16_le!(bytes, 0x10); // 0xC4
+        let game_data_size_offset = 0x12 + core_data_size as usize; // 0xD6
+
+        let mut mon = Ph4 {
+            data_version: read_u16_le!(bytes, 0x00),
+            encryption_seed: read_u64_le!(bytes, 0x02),
+            checksum: read_u32_le!(bytes, 0x0A),
+            encoded_data_size: read_u16_le!(bytes, 0x0E),
+            core_data_size,
+            game_data_size: read_u16_le!(bytes, game_data_size_offset),
+            core_data: HomeCoreData::try_from_bytes(&bytes[0x12..game_data_size_offset])?,
+            // initialize game data fields
+            pb7_data: None,
+            pk8_data: None,
+            pa8_data: None,
+            pb8_data: None,
+            pk9_data: None,
+            pc9_data: None,
+            pa9_data: None,
+        };
+
+        // read game data header
+        let mut byte_counter = game_data_size_offset + 2;
+
+        loop {
+            // check if we are past game_data_size
+            if byte_counter > game_data_size_offset + 1 + mon.game_data_size as usize {
+                break;
+            }
+            // check if we are about to read out of bounds
+            let eof_check = bytes.get(byte_counter + 16);
+            if eof_check.is_none() {
+                break;
+            }
+
+            // https://github.com/kwsch/PKHeX/blob/master/PKHeX.Core/PKM/HOME/HomeGameDataFormat.cs
+            let game_data_type = bytes[byte_counter];
+            byte_counter += 3; // read game data
+            match game_data_type {
+                1 => {
+                    mon.pb7_data = HomePb7Data::try_from_bytes(
+                        &bytes[byte_counter..byte_counter + super::HOME_PB7_DATA_SIZE],
+                    )
+                    .ok();
+                    byte_counter += super::HOME_PB7_DATA_SIZE;
+                }
+                2 => {
+                    mon.pk8_data = HomePk8Data::try_from_bytes(
+                        &bytes[byte_counter..byte_counter + super::HOME_PK8_DATA_SIZE],
+                    )
+                    .ok();
+                    byte_counter += super::HOME_PK8_DATA_SIZE;
+                }
+                3 => {
+                    mon.pa8_data = HomePa8Data::try_from_bytes(
+                        &bytes[byte_counter..byte_counter + super::HOME_PA8_DATA_SIZE],
+                    )
+                    .ok();
+                    byte_counter += super::HOME_PA8_DATA_SIZE;
+                }
+                4 => {
+                    mon.pb8_data = HomePb8Data::try_from_bytes(
+                        &bytes[byte_counter..byte_counter + super::HOME_PB8_DATA_SIZE],
+                    )
+                    .ok();
+                    byte_counter += super::HOME_PB8_DATA_SIZE;
+                }
+                5 => {
+                    mon.pk9_data = HomePk9Data::try_from_bytes(
+                        &bytes[byte_counter..byte_counter + super::HOME_PK9_DATA_SIZE],
+                    )
+                    .ok();
+                    byte_counter += super::HOME_PK9_DATA_SIZE;
+                }
+                6 => {
+                    // this contains Champions data, which is merely tracking information:
+                    // https://github.com/kwsch/PKHeX/blob/master/PKHeX.Core/PKM/HOME/GameDataPC9.cs
+                    mon.pc9_data = HomePc9Data::try_from_bytes(
+                        &bytes[byte_counter..byte_counter + super::HOME_PC9_DATA_SIZE],
+                    )
+                    .ok();
+                    byte_counter += super::HOME_PC9_DATA_SIZE;
+                }
+                7 => {
+                    mon.pa9_data = HomePa9Data::try_from_bytes(
+                        &bytes[byte_counter..byte_counter + super::HOME_PA9_DATA_SIZE],
+                    )
+                    .ok();
+                    byte_counter += super::HOME_PA9_DATA_SIZE;
+                }
+                _ => {
+                    panic!(
+                        "Invalid byte read as game type. Counter: {:?}",
+                        byte_counter
+                    );
+                }
+            }
+        }
+
+        Ok(mon)
+    }
+
+    pub fn get_origin_game_data(&self) -> GameData {
+        if self.pb7_data.is_some()
+            && (self.core_data.game_of_origin.is_lets_go()
+                || self.core_data.game_of_origin == OriginGame::Go)
+        {
+            GameData::Pb7(self.pb7_data)
+        } else if self.pk8_data.is_some()
+            && (self.core_data.game_of_origin.is_swsh()
+                || self.core_data.game_of_origin <= OriginGame::Crystal // Bank
+                || self.core_data.game_of_origin == OriginGame::Go // GO via GO Transporter
+                || self.core_data.game_of_origin.is_frlg_switch())
+        {
+            GameData::Pk8(self.pk8_data)
+        } else if self.pa8_data.is_some()
+            && self.core_data.game_of_origin == OriginGame::LegendsArceus
+        {
+            GameData::Pa8(self.pa8_data)
+        } else if self.pb8_data.is_some() && self.core_data.game_of_origin.is_bdsp() {
+            GameData::Pb8(self.pb8_data)
+        } else if self.pk9_data.is_some() && self.core_data.game_of_origin.is_scarlet_violet() {
+            GameData::Pk9(self.pk9_data)
+        } else if self.pa9_data.is_some() && self.core_data.game_of_origin == OriginGame::LegendsZa
+        {
+            GameData::Pa9(self.pa9_data)
+        } else {
+            // Pokemon must have at least one game's data. Fall back to PK8.
+            GameData::Pk8(self.pk8_data)
+        }
+    }
+
+    pub fn calculate_stats(&self) -> Stats16Le {
+        if MetadataSource::ScarletViolet.supports_form(self.core_data.species_and_form) {
+            stats::calculate_all_modern_for_source(
+                MetadataSource::ScarletViolet,
+                self.core_data.species_and_form,
+                &self.core_data.ivs,
+                &self.core_data.evs,
+                self.calculate_level() as u16,
+                self.core_data.mint_nature.get_metadata(),
+                Some(self.core_data.hyper_training),
+            )
+            .expect("Species is supported by SV metadata source")
+        } else if MetadataSource::SwordShield.supports_form(self.core_data.species_and_form) {
+            stats::calculate_all_modern_for_source(
+                MetadataSource::SwordShield,
+                self.core_data.species_and_form,
+                &self.core_data.ivs,
+                &self.core_data.evs,
+                self.calculate_level() as u16,
+                self.core_data.mint_nature.get_metadata(),
+                Some(self.core_data.hyper_training),
+            )
+            .expect("Species is supported by SwSh metadata source")
+        } else if MetadataSource::BrilliantDiamondShiningPearl
+            .supports_form(self.core_data.species_and_form)
+        {
+            stats::calculate_all_modern_for_source(
+                MetadataSource::BrilliantDiamondShiningPearl,
+                self.core_data.species_and_form,
+                &self.core_data.ivs,
+                &self.core_data.evs,
+                self.calculate_level() as u16,
+                self.core_data.mint_nature.get_metadata(),
+                Some(self.core_data.hyper_training),
+            )
+            .expect("Species is supported by BDSP metadata source")
+        } else {
+            // fall back to USUM for Pokemon that haven't yet been in a "traditional" Gen 8+ core series game
+            stats::calculate_all_modern_for_source(
+                MetadataSource::UltraSunUltraMoon,
+                self.core_data.species_and_form,
+                &self.core_data.ivs,
+                &self.core_data.evs,
+                self.calculate_level() as u16,
+                self.core_data.mint_nature.get_metadata(),
+                Some(self.core_data.hyper_training),
+            )
+            .expect("Species is supported by USUM metadata source")
+        }
+    }
+}
+
+impl PkmBytes for Ph4 {
+    const BOX_SIZE: usize = super::PH4_PKM_MAX_SIZE;
+
+    fn from_bytes(bytes: &[u8]) -> Result<Self> {
+        Self::from_bytes(bytes)
+    }
+
+    fn write_box_bytes(&self, bytes: &mut [u8]) {
+        bytes[0..2].copy_from_slice(&self.data_version.to_le_bytes());
+        bytes[2..10].copy_from_slice(&self.encryption_seed.to_le_bytes());
+        bytes[10..14].copy_from_slice(&self.checksum.to_le_bytes());
+        bytes[14..16].copy_from_slice(&self.encoded_data_size.to_le_bytes());
+        bytes[16..18].copy_from_slice(&self.core_data_size.to_le_bytes());
+
+        let core_range_end = 18 + self.core_data_size as usize;
+        bytes[18..core_range_end].copy_from_slice(&self.core_data.to_bytes());
+        let mut pc = core_range_end + 2;
+        bytes[core_range_end..pc].copy_from_slice(&self.game_data_size.to_le_bytes());
+
+        if let Some(data) = self.pb7_data {
+            // write headers
+            bytes[pc] = 1;
+            bytes[pc + 1..pc + 3].copy_from_slice(
+                &u16::try_from(super::HOME_PB7_DATA_SIZE)
+                    .expect(GAME_DATA_SIZE_EXPECT)
+                    .to_le_bytes(),
+            );
+            pc += 3;
+
+            // write data
+            let pb7_range_end = pc + super::HOME_PB7_DATA_SIZE;
+            bytes[pc..pb7_range_end].copy_from_slice(&data.to_bytes());
+
+            pc += super::HOME_PB7_DATA_SIZE;
+        }
+        if let Some(data) = self.pk8_data {
+            // write headers
+            bytes[pc] = 2;
+            bytes[pc + 1..pc + 3].copy_from_slice(
+                &u16::try_from(super::HOME_PK8_DATA_SIZE)
+                    .expect(GAME_DATA_SIZE_EXPECT)
+                    .to_le_bytes(),
+            );
+            pc += 3;
+
+            // write data
+            let pk8_range_end = pc + super::HOME_PK8_DATA_SIZE;
+            bytes[pc..pk8_range_end].copy_from_slice(&data.to_bytes());
+
+            pc += super::HOME_PK8_DATA_SIZE;
+        }
+        if let Some(data) = self.pa8_data {
+            // write headers
+            bytes[pc] = 3;
+            bytes[pc + 1..pc + 3].copy_from_slice(
+                &u16::try_from(super::HOME_PA8_DATA_SIZE)
+                    .expect(GAME_DATA_SIZE_EXPECT)
+                    .to_le_bytes(),
+            );
+            pc += 3;
+
+            // write data
+            let pa8_range_end = pc + super::HOME_PA8_DATA_SIZE;
+            bytes[pc..pa8_range_end].copy_from_slice(&data.to_bytes());
+
+            pc += super::HOME_PA8_DATA_SIZE;
+        }
+        if let Some(data) = self.pb8_data {
+            // write headers
+            bytes[pc] = 4;
+            bytes[pc + 1..pc + 3].copy_from_slice(
+                &u16::try_from(super::HOME_PB8_DATA_SIZE)
+                    .expect(GAME_DATA_SIZE_EXPECT)
+                    .to_le_bytes(),
+            );
+            pc += 3;
+
+            // write data
+            let pb8_range_end = pc + super::HOME_PB8_DATA_SIZE;
+            bytes[pc..pb8_range_end].copy_from_slice(&data.to_bytes());
+
+            pc += super::HOME_PB8_DATA_SIZE;
+        }
+        if let Some(data) = self.pk9_data {
+            // write headers
+            bytes[pc] = 5;
+            bytes[pc + 1..pc + 3].copy_from_slice(
+                &u16::try_from(super::HOME_PK9_DATA_SIZE)
+                    .expect(GAME_DATA_SIZE_EXPECT)
+                    .to_le_bytes(),
+            );
+            pc += 3;
+
+            // write data
+            let pk9_range_end = pc + super::HOME_PK9_DATA_SIZE;
+            bytes[pc..pk9_range_end].copy_from_slice(&data.to_bytes());
+
+            pc += super::HOME_PK9_DATA_SIZE;
+        }
+        if let Some(data) = self.pc9_data {
+            // write headers
+            bytes[pc] = 6;
+            bytes[pc + 1..pc + 3].copy_from_slice(
+                &u16::try_from(super::HOME_PC9_DATA_SIZE)
+                    .expect(GAME_DATA_SIZE_EXPECT)
+                    .to_le_bytes(),
+            );
+            pc += 3;
+
+            // write data
+            let pc9_range_end = pc + super::HOME_PC9_DATA_SIZE;
+            bytes[pc..pc9_range_end].copy_from_slice(&data.to_bytes());
+
+            pc += super::HOME_PC9_DATA_SIZE;
+        }
+        if let Some(data) = self.pa9_data {
+            // write headers
+            bytes[pc] = 7;
+            bytes[pc + 1..pc + 3].copy_from_slice(
+                &u16::try_from(super::HOME_PA9_DATA_SIZE)
+                    .expect(GAME_DATA_SIZE_EXPECT)
+                    .to_le_bytes(),
+            );
+            pc += 3;
+
+            // write data
+            let pa9_range_end = pc + super::HOME_PA9_DATA_SIZE;
+            bytes[pc..pa9_range_end].copy_from_slice(&data.to_bytes());
+
+            pc += super::HOME_PA9_DATA_SIZE;
+        }
+
+        // pad to nearest 0x10
+        let mut remainder = bytes[0..pc].len() & 0xF;
+        if remainder != 0 {
+            remainder = 0x10 - remainder;
+        }
+        let inner_size = pc + remainder;
+        bytes[pc..inner_size].fill(remainder as u8);
+    }
+
+    fn to_box_bytes(&self) -> Box<[u8]> {
+        let mut bytes = Box::new([0u8; Self::BOX_SIZE]);
+        self.write_box_bytes(bytes.as_mut_slice());
+
+        bytes
+    }
+}
+
+impl HasSpeciesAndForm for Ph4 {
+    fn get_species_metadata(&self) -> &'static SpeciesMetadata {
+        self.core_data.species_and_form.get_species_metadata()
+    }
+
+    fn get_form_metadata(&self) -> &'static FormMetadata {
+        self.core_data.species_and_form.get_form_metadata()
+    }
+
+    fn calculate_level(&self) -> u8 {
+        self.get_species_metadata()
+            .experience_growth
+            .calculate_level(self.core_data.exp)
+    }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_class = "PkhWasm")]
+#[allow(clippy::missing_const_for_fn)]
+impl Ph4 {
+    #[wasm_bindgen(js_name = fromOhpkmBytes)]
+    pub fn from_ohpkm_bytes(
+        bytes: Vec<u8>,
+        strategy: tsify::Ts<ConvertStrategy>,
+    ) -> JsResult<Self> {
+        Ok(Ph4::from_ohpkm(
+            &OhpkmV2::from_bytes(&bytes)?,
+            strategy.to_rust()?,
+        )?)
+    }
+
+    #[wasm_bindgen(js_name = fromBytes)]
+    pub fn from_byte_vector(bytes: Vec<u8>) -> core::result::Result<Ph4, JsValue> {
+        Ph4::from_bytes(&bytes).map_err(JsValue::from)
+    }
+
+    #[wasm_bindgen(js_name = toBytes)]
+    pub fn to_bytes_wasm(&self) -> Box<[u8]> {
+        self.to_box_bytes()
+    }
+
+    #[wasm_bindgen(js_name = calculateStats)]
+    pub fn calculate_stats_wasm(&self) -> TsResult<Stats16Le> {
+        self.calculate_stats().try_into_ts()
+    }
+
+    #[wasm_bindgen(js_name = getPresentSections)]
+    pub fn get_present_section_names(&self) -> Vec<String> {
+        let mut names: Vec<String> = Vec::new();
+
+        if self.pb7_data.is_some() {
+            names.push("Let's Go Pikachu/Eevee".to_owned());
+        }
+        if self.pk8_data.is_some() {
+            names.push("Sword/Shield".to_owned());
+        }
+        if self.pb8_data.is_some() {
+            names.push("Brilliant Diamond/Shining Pearl".to_owned());
+        }
+        if self.pa8_data.is_some() {
+            names.push("Legends: Arceus".to_owned());
+        }
+        if self.pk9_data.is_some() {
+            names.push("Scarlet/Violet".to_owned());
+        }
+        if self.pa9_data.is_some() {
+            names.push("Legends: Z-A".to_owned());
+        }
+        if self.pc9_data.is_some() {
+            names.push("Champions".to_owned());
+        }
+
+        names
+    }
+
+    // Core data
+
+    #[wasm_bindgen(getter = abilityIndex)]
+    pub fn ability_index(&self) -> Option<AbilityIndexWasm> {
+        let ability_index_u16 = match self.get_origin_game_data() {
+            GameData::Pb7(Some(home_pb7_data)) => return Some(home_pb7_data.ability_index),
+            GameData::Pk8(Some(home_pk8_data)) => home_pk8_data.ability_index.to_u16(),
+            GameData::Pa8(Some(home_pa8_data)) => home_pa8_data.ability_index.to_u16(),
+            GameData::Pb8(Some(home_pb8_data)) => home_pb8_data.ability_index.to_u16(),
+            GameData::Pk9(Some(home_pk9_data)) => home_pk9_data.ability_index.to_u16(),
+            GameData::Pa9(Some(home_pa9_data)) => home_pa9_data.ability_index.to_u16(),
+            GameData::Pb7(None)
+            | GameData::Pk8(None)
+            | GameData::Pa8(None)
+            | GameData::Pb8(None)
+            | GameData::Pk9(None)
+            | GameData::Pa9(None) => 0,
+        };
+
+        AbilityIndexWasm::new(ability_index_u16)
+    }
+
+    #[wasm_bindgen(getter = markings)]
+    pub fn markings_wasm(&self) -> TsResult<MarkingsSixShapesColors> {
+        self.core_data.markings.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = evs)]
+    pub fn evs_wasm(&self) -> TsResult<Stats16Le> {
+        Stats16Le::from(self.core_data.evs).try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = ivs)]
+    pub fn ivs_wasm(&self) -> TsResult<Stats16Le> {
+        Stats16Le::from(self.core_data.ivs).try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = contest)]
+    pub fn contest_wasm(&self) -> TsResult<ContestStats> {
+        self.core_data.contest.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = ribbons)]
+    pub fn ribbons_wasm(&self) -> Vec<String> {
+        self.core_data
+            .ribbons
+            .into_iter()
+            .map(|r| {
+                let ribbon_name = r.to_string();
+                if ribbon_name.ends_with(" Ribbon") {
+                    ribbon_name.strip_suffix(" Ribbon").unwrap().to_owned()
+                } else {
+                    ribbon_name
+                }
+            })
+            .collect()
+    }
+
+    #[wasm_bindgen(getter = handlerMemory)]
+    pub fn handler_memory_wasm(&self) -> TsResult<TrainerMemory> {
+        self.core_data.handler_memory.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = trainerMemory)]
+    pub fn trainer_memory_wasm(&self) -> TsResult<TrainerMemory> {
+        self.core_data.trainer_memory.try_into_ts()
+    }
+
+    #[wasm_bindgen(getter = hyperTraining)]
+    pub fn hyper_training_wasm(&self) -> TsResult<HyperTraining> {
+        self.core_data.hyper_training.try_into_ts()
+    }
+
+    // Lets Go Pikachu/Eevee
+
+    #[wasm_bindgen(getter = relearnMovesLgpe)]
+    pub fn relearn_move_indices_lgpe(&self) -> Option<Vec<u16>> {
+        self.pb7_data
+            .map(|data| data.relearn_moves.into_iter().map(u16::from).collect())
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn avs(&self) -> JsResult<Option<Ts<Stats16Le>>> {
+        self.pb7_data
+            .map(|data| Stats16Le::from(data.avs).try_into_ts())
+            .transpose()
+    }
+
+    // Legends Arceus
+
+    #[wasm_bindgen(getter = gvs)]
+    pub fn gvs_wasm(&self) -> JsResult<Option<Ts<Stats16Le>>> {
+        let unwrap = self.pa8_data.unwrap_or_default().gvs;
+        Some(
+            Stats16Le::new(
+                unwrap.hp.into(),
+                unwrap.atk.into(),
+                unwrap.def.into(),
+                unwrap.spa.into(),
+                unwrap.spd.into(),
+                unwrap.spe.into(),
+            )
+            .try_into_ts(),
+        )
+        .transpose()
+    }
+
+    #[wasm_bindgen(getter = alphaMove)]
+    pub fn alpha_move(&self) -> Option<u16> {
+        self.pa8_data?.alpha_move.to_raw()
+    }
+
+    #[wasm_bindgen(getter = movesLa)]
+    pub fn move_flags_la(&self) -> Option<Vec<u16>> {
+        Some(self.pa8_data?.moves.indices())
+    }
+
+    #[wasm_bindgen(getter = movePpLa)]
+    pub fn move_pp_la(&self) -> Option<Vec<u8>> {
+        Some(self.pa8_data?.moves.pp())
+    }
+
+    #[wasm_bindgen(getter = tutorFlagsLa)]
+    pub fn tutor_flags_la(&self) -> Option<Vec<u8>> {
+        Some(self.pa8_data?.tutor_flags_la.bytes().copied().collect())
+    }
+
+    #[wasm_bindgen(getter = masterFlagsLa)]
+    pub fn master_flags_la(&self) -> Option<Vec<u8>> {
+        Some(self.pa8_data?.master_flags_la.bytes().copied().collect())
+    }
+
+    #[wasm_bindgen(getter = isNoble)]
+    pub fn is_noble(&self) -> Option<bool> {
+        Some(self.pa8_data?.is_noble)
+    }
+
+    #[wasm_bindgen(getter = isAlpha)]
+    pub fn is_alpha(&self) -> bool {
+        self.pa8_data.is_some_and(|data| data.is_alpha)
+            || self.pa9_data.is_some_and(|data| data.is_alpha)
+    }
+
+    // Scarlet/Violet
+
+    #[wasm_bindgen(getter = teraTypeOriginal)]
+    pub fn tera_type_original(&self) -> JsResult<Option<Ts<TeraType>>> {
+        self.pk9_data
+            .map(|d| d.tera_type_original.try_into_ts())
+            .transpose()
+    }
+
+    #[wasm_bindgen(getter = teraTypeOverride)]
+    pub fn tera_type_override(&self) -> JsResult<Option<Ts<TeraType>>> {
+        self.pk9_data
+            .and_then(|d| d.tera_type_override)
+            .map(|t| t.try_into_ts())
+            .transpose()
+    }
+
+    #[wasm_bindgen(js_name = toOhpkm)]
+    pub fn to_ohpkm(&self) -> Result<OhpkmV2> {
+        OhpkmV2::convert_with_backup(self, &self.to_box_bytes())
+    }
+}
+
+impl ModernEvs for Ph4 {
+    fn get_evs(&self) -> Stats8 {
+        self.core_data.evs
+    }
+}
+
+impl IsShiny for Ph4 {
+    fn is_shiny(&self) -> bool {
+        self.core_data.is_shiny()
+    }
+
+    fn is_square_shiny(&self) -> bool {
+        self.core_data.is_square_shiny()
+    }
+}
+
+#[cfg(test)]
+impl crate::tests::PkhexJson for Ph4 {
+    fn to_pkhex_json_value(&self) -> std::result::Result<serde_json::Value, serde_json::Error> {
+        let mut value = serde_json::to_value(self)?;
+        value["core_data"]["nickname_trash"] = serde_json::json!(
+            self.core_data
+                .nickname
+                .bytes()
+                .iter()
+                .map(|b| format!("{:02X}", b))
+                .collect::<String>()
+        );
+
+        Ok(value)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Ph4;
+    use crate::tests::{self, TestResult};
+    use crate::traits::IsShiny;
+    use std::path::PathBuf;
+
+    #[test]
+    fn is_shiny() -> TestResult<()> {
+        let mon = tests::pkm_from_file::<Ph4>(
+            &PathBuf::from("ph4").join("0447 ★ - Citra 4FD4CD0A5AF75E4B.ph4"),
+        )?
+        .0;
+        assert!(mon.is_shiny());
+
+        Ok(())
+    }
+
+    #[test]
+    fn compare_pkhex_json() -> TestResult<()> {
+        tests::compare_pkhex_json_all_in_dir::<Ph4>(&PathBuf::from("ph4"))
+    }
+
+    #[test]
+    fn ohpkm_preserves_moves() -> TestResult<()> {
+        let mon = tests::pkm_from_file::<Ph4>(
+            &PathBuf::from("ph4").join("0447 ★ - Citra 4FD4CD0A5AF75E4B.ph4"),
+        )?
+        .0;
+
+        let ohpkm = mon.to_ohpkm()?;
+
+        if let Some(data) = mon.pb7_data {
+            for lgpe_move in data.moves {
+                if let Some(index) = lgpe_move.move_index.index() {
+                    assert!(
+                        ohpkm.get_learned_moves().contains(&index),
+                        "LGPE move is preserved"
+                    )
+                }
+            }
+        }
+        if let Some(data) = mon.pk8_data {
+            for pk8_move in data.moves {
+                if let Some(index) = pk8_move.move_index.index() {
+                    assert!(
+                        ohpkm.get_learned_moves().contains(&index),
+                        "PK8 move is preserved"
+                    )
+                }
+            }
+        }
+        if let Some(data) = mon.pa8_data {
+            for pa8_move in data.moves {
+                if let Some(index) = pa8_move.move_index.index() {
+                    assert!(
+                        ohpkm.get_learned_moves().contains(&index),
+                        "PLA move is preserved"
+                    )
+                }
+            }
+        }
+        if let Some(data) = mon.pb8_data {
+            for pb8_move in data.moves {
+                if let Some(index) = pb8_move.move_index.index() {
+                    assert!(
+                        ohpkm.get_learned_moves().contains(&index),
+                        "BDSP move is preserved"
+                    )
+                }
+            }
+        }
+        if let Some(data) = mon.pk9_data {
+            for pk9_move in data.moves {
+                if let Some(index) = pk9_move.move_index.index() {
+                    assert!(
+                        ohpkm.get_learned_moves().contains(&index),
+                        "SV move is preserved"
+                    )
+                }
+            }
+        }
+        if let Some(data) = mon.pa9_data {
+            for pa9_move in data.moves {
+                if let Some(index) = pa9_move.index() {
+                    assert!(
+                        ohpkm.get_learned_moves().contains(&index),
+                        "Z-A move is preserved"
+                    )
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn ohpkm_preserves_alpha() -> TestResult<()> {
+        let pla_ph4 = tests::pkm_from_file::<Ph4>(
+            &PathBuf::from("ph4").join("0067 - Machoke 21BA513FF9AC69EE.ph4"),
+        )?
+        .0;
+        let pla_ohpkm = pla_ph4.to_ohpkm()?;
+        if let Some(data) = pla_ph4.pa8_data {
+            assert_eq!(
+                data.is_alpha,
+                pla_ohpkm.is_alpha(),
+                "PLA Alpha status is preserved"
+            )
+        }
+
+        let za_ph4 = tests::pkm_from_file::<Ph4>(
+            &PathBuf::from("ph4").join("0583 ★ - Vanillish 0275338D6E345BEE.ph4"),
+        )?
+        .0;
+        let za_ohpkm = za_ph4.to_ohpkm()?;
+        if let Some(data) = za_ph4.pa9_data {
+            assert_eq!(
+                data.is_alpha,
+                za_ohpkm.is_alpha(),
+                "Z-A Alpha status is preserved"
+            )
+        }
+
+        Ok(())
+    }
+}

@@ -12,6 +12,7 @@ import {
   movesFromSwshTrFlags,
   SWSH_TR_BYTE_COUNT,
 } from '@openhome-core/resources/moves/flags'
+import { PluginIdentifier } from '@openhome-core/tauri/spectaCommands'
 import {
   expectExhaustive,
   getFlag,
@@ -41,6 +42,7 @@ import {
   Lookup,
   MetadataSummaryLookup,
   NatureIndex,
+  OhpkmWasm,
   OriginGames,
   PidGenerationParametersJs,
   PkmFormat,
@@ -59,8 +61,7 @@ import {
 } from '@pkm-rs/pkg'
 import dayjs, { Dayjs } from 'dayjs'
 import Prando from 'prando'
-import { OhpkmV2 as OhpkmV2Wasm } from '../../../pkm_rs/pkg'
-import { PluginIdentifier, SAV } from '../save/interfaces'
+import { SAV } from '../save/interfaces'
 import { PkmConverter } from './conversion/converter'
 import { isEvolution } from './Lookup'
 import {
@@ -74,7 +75,7 @@ import {
 import { AllPKMFields } from './util/pkmInterface'
 import { convertPokeDate, convertPokeDateOptional } from './wasm/convert'
 
-export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
+export class OHPKM extends OhpkmWasm implements PKMInterface {
   static getFormat() {
     return 'OHPKM'
   }
@@ -406,12 +407,12 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   static defaultWithSpecies(nationalDex: number, formIndex: number) {
-    const bytes = OhpkmV2Wasm.defaultWithSpecies(nationalDex, formIndex).toByteArray()
+    const bytes = OhpkmWasm.defaultWithSpecies(nationalDex, formIndex).toByteArray()
     return OHPKM.fromBytes(bytes.buffer)
   }
 
   private static fromWasmImpl(mon: WasmPkmFormat): OHPKM {
-    return new OHPKM(mon.inner.toOhpkm().toByteArray())
+    return new OHPKM(mon.intoOhpkmWasm().toByteArray())
   }
 
   // getters / setters
@@ -1127,6 +1128,8 @@ function monFormatToOriginalDataTag(format: PkmFormat): Option<Tag> {
       return Tag.Pb7
     case 'PK8':
       return Tag.Pk8
+    case 'PH4':
+      return Tag.Ph4
     case 'PA8':
       return Tag.Pa8
     case 'PB8':
@@ -1171,6 +1174,8 @@ export function originalDataTagToMonFormat(tag: Tag): PkmFormat {
       return 'PB7'
     case Tag.Pk8:
       return 'PK8'
+    case Tag.Ph4:
+      return 'PH4'
     case Tag.Pa8:
       return 'PA8'
     case Tag.Pb8:

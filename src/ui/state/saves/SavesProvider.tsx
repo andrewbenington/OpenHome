@@ -1,5 +1,6 @@
 import useBackend from '@openhome-core/backend/useBackend'
-import { SAVClass } from '@openhome-core/save/util'
+import { SAVClass } from '@openhome-core/save/types'
+import { TauriBackend } from '@openhome-core/tauri/backend'
 import { $R, Option, R, range, Result } from '@openhome-core/util/functional'
 import { NowOrLater } from '@openhome-core/util/promise'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
@@ -10,7 +11,6 @@ import { Button, Callout, Flex } from '@radix-ui/themes'
 import {
   ReactNode,
   useCallback,
-  useContext,
   useEffect,
   useEffectEvent,
   useReducer,
@@ -20,7 +20,7 @@ import {
 import { useNavigate } from 'react-router'
 import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import { useConvertStrategies } from '../convert-strategies'
-import { ItemBagContext } from '../items/reducer'
+import { useItemBag } from '../items/ItemBagProvider'
 import { useOhpkmStore } from '../ohpkm'
 import { openSavesReducer, SavesContext } from './reducer'
 import {
@@ -40,7 +40,7 @@ type SaveTypeCallback = (saveType?: NowOrLater<SAVClass>) => unknown
 
 export default function SavesProvider({ children }: SavesProviderProps) {
   const backend = useBackend()
-  const [itemBagState, bagDispatch] = useContext(ItemBagContext)
+
   const [releaseWarningDisplayed, setReleaseWarningDisplayed] = useState(false)
   const [saving, setSaving] = useState(false)
   const [changesSavedDisplayed, setChangesSavedDisplayed] = useState(false)
@@ -56,6 +56,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
   const navigate = useNavigate()
   const ohpkmStore = useOhpkmStore()
   const { reloadBankStore } = useBanksAndBoxes()
+  const itemBag = useItemBag()
 
   const promptDisambiguation = useCallback(async (possibleSaveTypes: SAVClass[]) => {
     setDisambiguationSaveTypes(possibleSaveTypes)
@@ -122,15 +123,15 @@ export default function SavesProvider({ children }: SavesProviderProps) {
         ),
       ]
 
-      if (itemBagState.modified) {
-        const saveBagResult = await backend.saveItemBag(itemBagState.itemCounts)
+      if (itemBag.modified) {
+        const saveBagResult = await backend.saveItemBag(itemBag.itemCounts)
         if (R.isErr(saveBagResult)) {
           displayError('Error Saving Bag', saveBagResult.error)
           await backend.rollbackTransaction()
           setSaving(false)
           return R.Err([SaveItemBagData(saveBagResult.error)])
         }
-        bagDispatch({ type: 'clear_modified' })
+        await itemBag.refetchStoredBag()
       }
 
       const results = (await Promise.all(promises)).flat()
@@ -169,45 +170,26 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       backend,
       allOpenSaves,
       openSavesState.monsToRelease,
-      itemBagState.modified,
-      itemBagState.itemCounts,
+      itemBag,
       displayError,
       ohpkmStore,
       defaultConvertStrategy,
-      bagDispatch,
     ]
   )
 
-  // load bag
-  useEffect(() => {
-    if (!itemBagState.loaded && !itemBagState.error) {
-      backend
-        .loadItemBag()
-        .then(
-          R.match(
-            (bagObj) => {
-              bagDispatch({ type: 'load_item_bag', payload: bagObj })
-            },
-            (err) => {
-              bagDispatch({ type: 'set_error', payload: err })
-            }
-          )
-        )
-        .catch((err) => {
-          bagDispatch({ type: 'set_error', payload: err })
-        })
-    }
-  }, [backend, itemBagState.loaded, itemBagState.error, bagDispatch])
-
   const clearOhpkmCache = useEffectEvent(ohpkmStore.clearCache)
+  const reloadItemBag = useEffectEvent(itemBag.refetchStoredBag)
+  const saveChangesEvent = useEffectEvent(saveChanges)
 
   useEffect(() => {
+    let ignore = false
     // returns a function to stop listening
-    const stopListening = backend.onMenuEvents({
-      save: () => saveChanges(false),
+    const stopListening = TauriBackend.onMenuEvents({
+      save: () => saveChangesEvent(false),
       reset: async () => {
+        if (ignore) return
         openSavesDispatch({ type: 'clear_mons_to_release' })
-        await reloadBankStore()
+        await Promise.all([reloadBankStore(), reloadItemBag()])
         clearOhpkmCache()
         openSavesDispatch({ type: 'close_all_saves' })
       },
@@ -216,9 +198,10 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     // the "stop listening" function should be called when the effect returns,
     // otherwise duplicate listeners will exist
     return () => {
+      ignore = true
       stopListening()
     }
-  }, [backend, saveChanges, openSavesDispatch, bagDispatch, reloadBankStore])
+  }, [openSavesDispatch, reloadBankStore])
 
   if (openSavesState.error) {
     return (

@@ -140,9 +140,6 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
           <Badge.Gigantamax showIf={mon.canGigantamax} showLabel />
           <Badge.Pokerus pokerusByte={mon.pokerusByte} showLabel />
           <Badge.Alpha showIf={mon.isAlpha} showLabel />
-          {mon instanceof OHPKM && mon.unconvertedPkm && (
-            <Badge.Image label="Has Unconverted PKM" color="white" backgroundColor="blue" />
-          )}
           {mon.isNoble && <Badge.Image label="Noble" backgroundColor="#cccc00" color="white" />}
           <Badge.Image
             label="Shadow"

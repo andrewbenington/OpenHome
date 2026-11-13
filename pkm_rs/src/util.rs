@@ -11,6 +11,8 @@ pub fn get_flag(bytes: &[u8], byte_offset: usize, bit_index: usize) -> bool {
     bit_is_set(bytes[byte_index], bit_index)
 }
 
+use pkm_rs_types::BitSet;
+
 pub fn set_flag(bytes: &mut [u8], byte_offset: usize, bit_index: usize, value: impl Into<bool>) {
     let byte_index = byte_offset + (bit_index / 8);
     if byte_index >= bytes.len() {
@@ -21,25 +23,11 @@ pub fn set_flag(bytes: &mut [u8], byte_offset: usize, bit_index: usize, value: i
         );
     }
     let bit_index: u8 = (bit_index % 8).try_into().unwrap();
-    bytes[byte_index].set_bit(bit_index, value.into());
+    bytes[byte_index].set_bit_at(bit_index, value.into());
 }
 
 pub const fn bit_is_set(byte: u8, bit_index: u8) -> bool {
     ((byte >> bit_index) & 1) == 1
-}
-
-pub trait BitSet {
-    fn set_bit(&mut self, bit_index: u8, value: bool);
-}
-
-impl BitSet for u8 {
-    fn set_bit(&mut self, bit_index: u8, value: bool) {
-        if value {
-            *self |= 1 << bit_index;
-        } else {
-            *self &= !(1 << bit_index);
-        }
-    }
 }
 
 #[cfg(feature = "wasm")]
@@ -92,4 +80,32 @@ mod tests {
             "412948"
         );
     }
+}
+
+#[cfg(feature = "wasm")]
+use crate::result::StdResult;
+#[cfg(feature = "wasm")]
+use zerocopy::{FromBytes, Unaligned};
+
+#[cfg(feature = "wasm")]
+/// Reinterprets an owned byte buffer as a `Box<T>` without copying.
+/// Returns the original Vec if the length doesn't match exactly.
+pub fn vec_into_box<T>(v: Vec<u8>) -> StdResult<Box<T>, Vec<u8>>
+where
+    T: FromBytes + Unaligned,
+{
+    if v.len() != size_of::<T>() {
+        return Err(v);
+    }
+
+    // Shrinks capacity to len. This is a no-op (no realloc) if cap == len already.
+    let boxed: Box<[u8]> = v.into_boxed_slice();
+    let ptr: *mut T = Box::into_raw(boxed).cast::<T>();
+
+    // SAFETY:
+    // - The allocation has layout (size = len = size_of::<T>(), align = 1),
+    //   which is exactly Layout::new::<T>() because T: Unaligned.
+    // - T: FromBytes means every initialized byte pattern is a valid T.
+    // - Ownership is transferred; the Box<[u8]> was consumed by into_raw.
+    Ok(unsafe { Box::from_raw(ptr) })
 }

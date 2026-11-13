@@ -150,6 +150,8 @@
 
   --ohpkm-cell-border-color: var(--primitive-teal-450);
 
+  --color-panel-nested: rgb(201, 220, 203);
+
   .radix-themes {
     --color-panel: var(--primitive-teal-100);
     --color-bar: var(--color-panel);
@@ -192,6 +194,7 @@
     --ohpkm-cell-border-color: var(--primitive-teal-700);
 
     --hyper-train-color: #fccb59;
+    --color-panel-nested: #1c262f;
 
     .radix-themes {
       --color-panel: var(--primitive-navy-900);
@@ -467,33 +470,6 @@ label {
   );
 }
 
-.mini-button {
-  padding: var(--padding-radius-xs-sm);
-  aspect-ratio: 1;
-  height: var(--height-mini-button);
-  width: fit-content;
-  transition: none;
-  border-radius: var(--border-radius-sm);
-  background-color: var(--gray-a7);
-  box-shadow: none;
-  display: grid;
-
-  svg {
-    height: 1rem;
-    width: 1rem;
-  }
-}
-
-.mini-button-icon-only {
-  width: auto;
-  min-width: fit-content !important;
-  padding: 0;
-
-  display: grid;
-  align-items: center;
-  justify-content: center;
-}
-
 svg {
   height: 1rem;
   width: 1rem;
@@ -553,9 +529,10 @@ svg {
       color(display-p3 0.192 0.192 0.192) 25%
     );
 }
-.panel-lg-radius > ::-webkit-scrollbar-thumb,
-.dark-scrollbar > ::-webkit-scrollbar-thumb {
-  background-color: var(--dark-scrollbar);
+
+.panel-lg-radius ::-webkit-scrollbar-thumb,
+.dark-scrollbar ::-webkit-scrollbar-thumb {
+  background-color: var(--dark-scrollbar) !important;
 }
 
 .card-lg-radius {
@@ -582,4 +559,29 @@ svg {
 
 .no-overflow {
   overflow: hidden;
+}
+
+.flat-bottom {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.app-footer {
+  height: var(--footer-height);
+  background-color: var(--color-bar);
+  padding: 0.2rem 0.5rem;
+  font-size: 0.75rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+  box-sizing: border-box;
+  border-top: var(--soft-border);
+  position: absolute;
+  width: 100%;
+}
+
+.dialog-scroll-container {
+  max-height: 20rem;
+  overflow: auto;
 }

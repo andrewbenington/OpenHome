@@ -177,6 +177,7 @@
   align-items: center;
   gap: var(--padding-radius-xs-sm);
   height: 100%;
+  padding-right: var(--padding-radius-sm-lg);
 }
 
 .save-header-game {
@@ -188,6 +189,7 @@
   align-items: center;
   border-top-left-radius: var(--border-radius-lg);
   height: 100%;
+  flex-shrink: 0;
 }
 
 .save-menu-buttons-right {

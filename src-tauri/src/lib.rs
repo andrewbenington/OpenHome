@@ -26,6 +26,7 @@ const RAW_HANDLER: fn(tauri::ipc::Invoke<tauri::Wry>) -> bool = tauri::generate_
     commands::get_file_bytes,
     commands::get_storage_file_json,
     commands::write_storage_file_json,
+    commands::get_storage_file_json_create_if_nonexistent,
     synced_state::ohpkm_store::add_to_ohpkm_store,
     logging::log,
 ];
@@ -68,6 +69,7 @@ pub fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
         synced_state::ohpkm_store::get_ohpkm_bytes_by_id,
         synced_state::ohpkm_store::get_ohpkm_bytes_by_id_batch,
         synced_state::ohpkm_store::permanently_delete_ohpkms,
+        synced_state::ohpkm_store::get_ohpkm_count,
         logging::get_logs_today,
         logging::clear_logs_for_range,
     ])
@@ -250,6 +252,7 @@ pub fn run() {
         .invoke_handler(move |invoke| match invoke.message.command() {
             "get_file_bytes"
             | "get_storage_file_json"
+            | "get_storage_file_json_create_if_nonexistent"
             | "write_storage_file_json"
             | "add_to_ohpkm_store"
             | "log" => RAW_HANDLER(invoke),

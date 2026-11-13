@@ -1,6 +1,6 @@
 import { Option } from '@openhome-core/util/functional'
 import { cssClass } from '@openhome-ui/util/style'
-import { Badge as RadixBadge, Tooltip } from '@radix-ui/themes'
+import { Tooltip } from '@radix-ui/themes'
 import { Responsive } from '@radix-ui/themes/props'
 import { PropsWithChildren } from 'react'
 
@@ -18,17 +18,17 @@ export function BaseBadge(props: BaseBadgeProps) {
   const { className, tooltip, backgroundColor, color, children, style } = props
 
   const badgeElement = (
-    <RadixBadge
-      className={cssClass(`badge badge-size-${props.size ? JSON.stringify(props.size) : '1'}`)
+    <div
+      // oxlint-disable-next-line typescript/no-base-to-string
+      className={cssClass(`badge badge-size-${props.size ? String(props.size) : '1'}`)
         .with(className)
         .with('badge-disabled')
         .if(props.inactive) // only disable if activeIf function is provided and false
         .build()}
       style={{ backgroundColor, color, ...style }}
-      variant="solid"
     >
       {children}
-    </RadixBadge>
+    </div>
   )
   return tooltip ? <Tooltip content={tooltip}>{badgeElement}</Tooltip> : badgeElement
 }

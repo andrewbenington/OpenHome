@@ -5,12 +5,13 @@ import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
 import PK3RR from '@openhome-core/save/radicalred/PK3RR'
 import PK3UB from '@openhome-core/save/unbound/PK3UB'
 import { Errorable } from '@openhome-core/util/functional'
-import { ConvertStrategy, PkmFormat } from '@pkm-rs/pkg'
+import { ConvertStrategy, OhpkmWasm, PkmFormat } from '@pkm-rs/pkg'
 import COLOPKM from './COLOPKM'
 import PA8 from './PA8'
 import PA9 from './PA9'
 import PB7 from './PB7'
 import PB8 from './PB8'
+import PH4 from './PH4'
 import PK1 from './PK1'
 import PK2 from './PK2'
 import PK3 from './PK3'
@@ -20,6 +21,7 @@ import PK6 from './PK6'
 import PK7 from './PK7'
 import PK8 from './PK8'
 import PK9 from './PK9'
+import { PkmConstructorOptions } from './types'
 import XDPKM from './XDPKM'
 
 export type PKM =
@@ -38,10 +40,18 @@ export type PKM =
   | PB8
   | PK9
   | PA9
+  | PH4
 
-const WasmPkmFormats = [PK3, PK7, PK8, PK9, PK9Compass]
+export interface WasmPkmInterface extends PKMInterface {
+  intoOhpkmWasm(): OhpkmWasm
+}
+type WasmPkmClass = {
+  new (arg: OHPKM, options: PkmConstructorOptions): WasmPkmInterface
+}
+
+const WasmPkmFormats: WasmPkmClass[] = [PK3, PK7, PK8, PK9, PH4, PK9Compass]
+
 export type WasmPkmFormat = InstanceType<(typeof WasmPkmFormats)[number]>
-
 export function isWasmFormat(pkm: PKMInterface): pkm is WasmPkmFormat {
   return WasmPkmFormats.some((P) => pkm instanceof P)
 }
@@ -53,16 +63,6 @@ export type PkmClass<P extends PKMInterface> = {
   fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<P>
   getFormat(): PkmFormat
 }
-
-export type PkmConstructorOptions =
-  | {
-      encrypted?: boolean
-      strategy?: never
-    }
-  | {
-      encrypted?: never
-      strategy: ConvertStrategy
-    }
 
 export function isRomHackFormat(format: string): format is 'PK3RR' | 'PK3UB' | 'PB8LUMI' {
   return format === 'PK3RR' || format === 'PK3UB' || format === 'PB8LUMI'

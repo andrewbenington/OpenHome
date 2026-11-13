@@ -1,5 +1,6 @@
 import BackendInterface, {
   BankOrBoxChange,
+  ItemBag,
   LogEntry,
   LogsResponse,
   MenuEvent,
@@ -12,7 +13,7 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV, SaveWriter } from '@openhome-core/save/interfaces'
 import { PathData, PossibleSaves } from '@openhome-core/save/util/path'
 import { SaveFolder, SimpleOpenHomeBox, StoredBankData } from '@openhome-core/save/util/storage'
-import { Errorable, Option, R, Result } from '@openhome-core/util/functional'
+import { Option, R, Result } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
 import { JSONObject, LoadSaveResponse, SaveRef } from '@openhome-core/util/types'
 import { LogFilter } from '@openhome-ui/pages/logs'
@@ -90,7 +91,7 @@ export const TauriBackend: BackendInterface = {
   searchOhpkmStore: async function (
     cursor: PaginationCursor,
     filters: Filter[]
-  ): Promise<Errorable<PaginatedPage<OHPKM>>> {
+  ): Promise<Result<PaginatedPage<OHPKM>>> {
     return Commands.searchOhpkmStore(cursor, filters).then(
       R.map((PaginatedPage) => ({
         ...PaginatedPage,
@@ -106,7 +107,7 @@ export const TauriBackend: BackendInterface = {
       save.trainerGender === BinaryGender.Female ? 'Female' : 'Male',
       save.origin
     ),
-  lookupOhpkmById: async function (id: OhpkmIdentifier): Promise<Errorable<Option<OHPKM>>> {
+  lookupOhpkmById: async function (id: OhpkmIdentifier): Promise<Result<Option<OHPKM>>> {
     return Commands.getOhpkmBytesById(id).then(
       R.map((bytes) => (bytes ? OHPKM.fromBytes(new Uint8Array(bytes).buffer) : undefined))
     )
@@ -132,14 +133,14 @@ export const TauriBackend: BackendInterface = {
     )
   },
   removeDangling: Commands.removeDangling,
-  addToOhpkmStore: function (updates: OhpkmStore): Promise<Errorable<null>> {
+  addToOhpkmStore: function (updates: OhpkmStore): Promise<Result<null>> {
     return Commands.add_to_ohpkm_store(
       Object.fromEntries(
         Object.entries(updates).map(([identifier, ohpkm]) => [identifier, ohpkm.toByteArray()])
       )
     )
   },
-  deleteHomeMons: async function (identifiers: string[]): Promise<Errorable<null>> {
+  deleteHomeMons: async function (identifiers: string[]): Promise<Result<null>> {
     return Commands.permanentlyDeleteOhpkms(identifiers).then(
       R.map((deletionResults) => {
         for (const [file, error] of Object.entries(deletionResults)) {
@@ -151,6 +152,7 @@ export const TauriBackend: BackendInterface = {
       })
     )
   },
+  getOhpkmCount: Commands.getOhpkmCount,
 
   /* prompt user to select new data directory location, then restart using that location */
   promptChangeDataDir: () => Commands.changeDataDir(false),
@@ -177,7 +179,7 @@ export const TauriBackend: BackendInterface = {
   writeHomeBanks: (bankData: StoredBankData) => Commands.writeBanks(serializeBankData(bankData)),
 
   /* game saves */
-  loadSaveFile: async (pathData: PathData): Promise<Errorable<LoadSaveResponse>> => {
+  loadSaveFile: async (pathData: PathData): Promise<Result<LoadSaveResponse>> => {
     if (IS_ANDROID) {
       const fileBytes = await readFile(pathData.raw) // Commands.get_file_bytes(pathData.raw)
       return R.Ok({
@@ -185,6 +187,11 @@ export const TauriBackend: BackendInterface = {
         fileBytes,
         createdDate: new Date(),
       })
+    }
+
+    const bytesResult = await Commands.get_file_bytes(pathData.raw)
+    if (R.isErr(bytesResult)) {
+      return bytesResult
     }
 
     try {
@@ -271,7 +278,7 @@ export const TauriBackend: BackendInterface = {
         return saves
       })
     ),
-  addRecentSave: (saveRef: SaveRef): Promise<Errorable<null>> =>
+  addRecentSave: (saveRef: SaveRef): Promise<Result<null>> =>
     Commands.get_storage_file_json('recent_saves.json').then(
       R.asyncFlatMap((recentSaves) => {
         if (Array.isArray(recentSaves)) {
@@ -284,7 +291,7 @@ export const TauriBackend: BackendInterface = {
         return Commands.write_storage_file_json('recent_saves.json', recentSaves)
       })
     ),
-  removeRecentSave: (filePath: string): Promise<Errorable<null>> =>
+  removeRecentSave: (filePath: string): Promise<Result<null>> =>
     Commands.get_storage_file_json('recent_saves.json').then(
       R.asyncFlatMap((recentSaves) => {
         if (Array.isArray(recentSaves)) {
@@ -297,7 +304,7 @@ export const TauriBackend: BackendInterface = {
         return Commands.write_storage_file_json('recent_saves.json', recentSaves)
       })
     ),
-  findSuggestedSaves: async (): Promise<Errorable<PossibleSaves>> =>
+  findSuggestedSaves: async (): Promise<Result<PossibleSaves>> =>
     Commands.get_storage_file_json('save-folders.json').then(
       R.asyncFlatMap((saveFolders) => {
         if (!Array.isArray(saveFolders)) {
@@ -310,7 +317,7 @@ export const TauriBackend: BackendInterface = {
         )
       })
     ),
-  getSaveFolders: async (): Promise<Errorable<SaveFolder[]>> =>
+  getSaveFolders: async (): Promise<Result<SaveFolder[]>> =>
     Commands.get_storage_file_json('save-folders.json').then(
       R.flatMap((saveFolders) => {
         if (!Array.isArray(saveFolders)) {
@@ -319,7 +326,7 @@ export const TauriBackend: BackendInterface = {
         return R.Ok(saveFolders as unknown as SaveFolder[])
       })
     ),
-  removeSaveFolder: async (pathToRemove: string): Promise<Errorable<null>> =>
+  removeSaveFolder: async (pathToRemove: string): Promise<Result<null>> =>
     Commands.get_storage_file_json('save-folders.json').then(
       R.asyncFlatMap((fileContent) => {
         if (!Array.isArray(fileContent)) {
@@ -334,7 +341,7 @@ export const TauriBackend: BackendInterface = {
         )
       })
     ),
-  upsertSaveFolder: (folderPath: string, label: string): Promise<Errorable<null>> =>
+  upsertSaveFolder: (folderPath: string, label: string): Promise<Result<null>> =>
     Commands.get_storage_file_json('save-folders.json').then(
       R.asyncFlatMap((fileContent) => {
         if (!Array.isArray(fileContent)) {
@@ -352,26 +359,27 @@ export const TauriBackend: BackendInterface = {
 
   /* bag */
   loadItemBag: async () => {
-    return (await Commands.get_storage_file_json('item-bag.json')) as Errorable<
-      Record<string, number>
-    >
+    const result = (await Commands.get_storage_file_json_create_if_nonexistent(
+      'item-bag.json'
+    )) as Result<ItemBag>
+    // tanstack query will catch and return the error
+    return R.assert(result)
   },
 
-  saveItemBag: async (items: Record<string, number>) =>
-    Commands.write_storage_file_json('item-bag.json', items),
+  saveItemBag: async (items: ItemBag) => Commands.write_storage_file_json('item-bag.json', items),
   /* transactions */
   startTransaction: Commands.startTransaction,
   commitTransaction: Commands.commitTransaction,
   rollbackTransaction: Commands.rollbackTransaction,
 
   /* application */
-  pickFile: async (): Promise<Errorable<PathData | undefined>> => {
-    let filePath = await fileDialog({ directory: false, title: 'Select File' })
+  pickFile: async (): Promise<Result<PathData | undefined>> => {
+    const filePath = await fileDialog({ directory: false, title: 'Select File' })
     if (!filePath) return R.Ok(undefined)
 
     return R.Ok(await pathDataFromRaw(filePath))
   },
-  pickFolder: async (): Promise<Errorable<string | undefined>> => {
+  pickFolder: async (): Promise<Result<string | undefined>> => {
     const path = await fileDialog({ directory: true, title: 'Select Folder' })
     return R.Ok(path ?? undefined)
   },

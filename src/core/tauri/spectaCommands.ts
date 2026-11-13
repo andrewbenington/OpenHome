@@ -313,6 +313,14 @@ export const commands = {
       else return { status: 'error', error: e as any }
     }
   },
+  async getOhpkmCount(): Promise<Result<number, CommandError>> {
+    try {
+      return { status: 'ok', data: await TAURI_INVOKE('get_ohpkm_count') }
+    } catch (e) {
+      if (e instanceof Error) throw e
+      else return { status: 'error', error: e as any }
+    }
+  },
   async getLogsToday(filter: LogFilterJs): Promise<Result<LogsResponse, CommandError>> {
     try {
       return { status: 'ok', data: await TAURI_INVOKE('get_logs_today', { filter }) }

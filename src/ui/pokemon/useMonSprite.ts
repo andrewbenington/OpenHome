@@ -22,7 +22,7 @@ export function findPluginSprite(
     try {
       const spritePath = plugin.getMonSpritePath?.({
         dexNum: mon.nationalDex,
-        formeNum: mon.formIndex, // do not change until plugins v4
+        formNum: mon.formIndex, // do not change until plugins v4
         ...mon,
       })
 

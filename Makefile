@@ -148,6 +148,7 @@ gen-wasm:
 	@node generate/gen_items.ts
 	@node generate/gen_moves.ts
 	@node generate/gen_species_data.ts
+	@node generate/gen_megas.ts
 	@cd pkm_rs_resources && cargo fmt
 
 .PHONY: gen-tauri-commands
@@ -163,7 +164,7 @@ pkhex-json:
 	@pnpm oxfmt --write pkhex-json
 
 .PHONY: test-pkhex-json
-test-pkhex-json:
+test-pkhex-json: pkhex-json
 	@cargo test --package pkm_rs --lib --all-features -- compare_pkhex_json
 
 .PHONY: download-item-sprites
@@ -200,7 +201,7 @@ stream-android-logs:
 
 .PHONY: run-ui-test-build
 run-ui-test-build:
-	@UI_TEST_DATA_FOLDER='ui-tests/ui-tests-data-dir' ./target/release/OpenHomeUiTesting
+	@UI_TEST_DATA_FOLDER='ui-tests/sample-data-dir' ./target/release/OpenHomeUiTesting
 
 rust_files = $(shell find src -type f -name '*.rs')
 ts_files = $(shell find src -type f -name '*.ts')
