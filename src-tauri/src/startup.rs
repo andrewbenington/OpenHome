@@ -82,6 +82,7 @@ fn initialize_storage(data_controller: &impl DataController) -> Result<()> {
         "pokedex.json",
         "recent_saves.json",
         "settings.json",
+        "item-bag.json",
     ];
 
     for obj_file in obj_files {
