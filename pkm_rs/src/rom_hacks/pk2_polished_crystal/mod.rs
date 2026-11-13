@@ -1,0 +1,107 @@
+pub mod pk2_polished_crystal;
+
+
+pub mod save;
+pub mod pk2_polished_crystal_buffer;
+
+use pkm_rs_resources::metadata_source::MetadataSource;
+pub use save::Gen2PolishedCrystalSave;
+
+pub use pk2_polished_crystal::*;
+use pkm_rs_resources;
+use pkm_rs_resources::abilities::AbilityIndexBounded;
+use pkm_rs_resources::ribbons::ModernRibbon;
+use pkm_rs_resources::species::metadata_table::source_has_form_metadata;
+use pkm_rs_resources::species::SpeciesForm;
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+
+use serde::Serialize;
+
+pub(crate) const BOX_SIZE: usize = 232;
+pub(crate) const PARTY_SIZE: usize = 260;
+
+pub const BOX_COUNT: u8 = 20;
+pub const BOX_ROWS: u8 = 4;
+pub const BOX_COLS: u8 = 5;
+pub const BOX_SLOTS: u8 = BOX_ROWS * BOX_COLS;
+
+const MAX_RIBBON_ALOLA: usize = ModernRibbon::BattleTreeMaster as usize;
+
+const NEUROFORCE: u16 = 233;
+pub type Pk2PolishedCrystalAbilityIndex = AbilityIndexBounded<NEUROFORCE>;
+
+#[derive(Debug, Clone, Copy, Default)]
+#[cfg_attr(feature = "wasm", derive(tsify::Tsify))]
+pub struct Pk2PolishedCrystalSpeciesAndForm(SpeciesForm);
+
+impl Pk2PolishedCrystalSpeciesAndForm {
+  fn try_new(species_and_form: SpeciesForm) -> Option<Self> {
+    if source_has_form_metadata(
+      MetadataSource::UltraSunUltraMoon,
+      species_and_form.get_ndex() as u16,
+      species_and_form.get_form_index(),
+    ) {
+      Some(Self(species_and_form))
+    } else {
+      None
+    }
+  }
+
+  pub const fn into_inner(self) -> SpeciesForm {
+    self.0
+  }
+}
+
+impl Serialize for Pk2PolishedCrystalSpeciesAndForm {
+  fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+  where
+    S: serde::Serializer,
+  {
+    self.0.serialize(serializer)
+  }
+}
+
+#[cfg(feature = "randomize")]
+impl Randomize for Pk2PolishedCrystalSpeciesAndForm {
+  fn randomized<R: rand::prelude::Rng>(rng: &mut R) -> Self {
+    loop {
+      if let Some(randomized) = Self::try_new(SpeciesForm::randomized(rng)) {
+        return randomized;
+      }
+    }
+  }
+}
+
+use crate::result::Error;
+
+impl TryFrom<SpeciesForm> for Pk2PolishedCrystalSpeciesAndForm {
+  type Error = Error;
+
+  fn try_from(value: SpeciesForm) -> Result<Self, Self::Error> {
+    Self::try_new(value).ok_or(Error::form_index(value))
+  }
+}
+
+type BoxIndex = pkm_rs_types::BoundedU8<{ BOX_COUNT - 1 }>;
+type BoxSlot = pkm_rs_types::BoundedU8<{ BOX_SLOTS - 1 }>;
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+  use crate::result::{Error, Result};
+
+  #[test]
+  fn all_boxes_valid() -> Result<()> {
+    for index in 0..BOX_COUNT {
+      BoxIndex::check_bound(index).or(Err(Error::BoxIndex(index)))?;
+    }
+
+    for slot in 0..BOX_SLOTS {
+      BoxSlot::check_bound(slot).or(Err(Error::BoxSlot(slot)))?;
+    }
+
+    Ok(())
+  }
+
+}
