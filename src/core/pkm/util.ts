@@ -178,6 +178,7 @@ function MetadataSourceByFormat(
     case 'PK1':
       return MetadataSource.Yellow
     case 'PK2':
+    case 'PK2PolishedCrystal':
       return MetadataSource.Crystal
     case 'PK3':
     case 'COLOPKM':

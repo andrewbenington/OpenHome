@@ -1,0 +1,785 @@
+use super::Pk2PolishedCrystalBuffer;
+use super::pk2_buffer::Pk2PolishedCrystalBufferMut;
+use super::{Pk2PolishedCrystalAbilityIndex, Pk2PolishedCrystalSpeciesAndForm};
+use crate::checksum::{Checksum, RefreshChecksum};
+use crate::convert_strategy::ConvertStrategy;
+use crate::result::{Error, Result};
+use crate::traits::ModernEvs;
+use crate::traits::{HasSpeciesAndForm, PkmBytes};
+#[cfg(feature = "wasm")]
+use pkm_rs_types::JsResult;
+
+use pkm_rs_derive::IsShiny4096;
+use pkm_rs_resources::abilities::AbilityIndexBounded;
+use pkm_rs_resources::ball::Ball;
+use pkm_rs_resources::metadata_source::MetadataSource;
+use pkm_rs_resources::moves::{MoveSlot, MoveSlots};
+use pkm_rs_resources::natures::NatureIndex;
+use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
+use pkm_rs_resources::species::{FormMetadata, SpeciesForm, SpeciesMetadata};
+use pkm_rs_resources::stats;
+use pkm_rs_types::strings::SizedUtf16String;
+use pkm_rs_types::{
+  AbilityNumber, BinaryGender, ContestStats, HyperTraining, Ivs, Language,
+  MarkingsSixShapesColors, OriginGame, Pokerus, Stats8, Stats16Le, TryIntoTs, TsResult,
+};
+use pkm_rs_types::{Gender, Geolocations, PokeDate, TrainerMemory};
+use serde::Serialize;
+
+use tsify::Ts;
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
+
+#[cfg(feature = "wasm")]
+use crate::ohpkm::{OhpkmConvert, OhpkmV2};
+#[cfg(feature = "wasm")]
+use pkm_rs_resources::abilities::AbilityIndexWasm;
+
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = Pk2PolishedCrystalWasm))]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
+#[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
+pub struct Pk2PolishedCrystal {
+  pub encryption_constant: u32,
+  pub sanity: u16,
+  pub checksum: u16,
+  #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+  pub species_and_form: Pk2PolishedCrystalSpeciesAndForm,
+  pub held_item_index: u16,
+  pub trainer_id: u16,
+  pub secret_id: u16,
+  pub exp: u32,
+  #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+  pub ability_index: Pk2PolishedCrystalAbilityIndex,
+  pub ability_num: AbilityNumber,
+  #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+  pub markings: MarkingsSixShapesColors,
+  pub personality_value: u32,
+  pub nature: NatureIndex,
+  pub is_fateful_encounter: bool,
+  pub gender: Gender,
+  #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+  pub evs: Stats8,
+  #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+  pub contest: ContestStats,
+  pub resort_event_status: u8,
+  pub pokerus: Pokerus,
+  pub super_training_flags: u32,
+  #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+  pub ribbons: ModernRibbonSet<7, MAX_RIBBON_ALOLA>,
+  pub contest_memory_count: u8,
+  pub battle_memory_count: u8,
+  pub super_training_dist_flags: u8,
+  pub form_argument: u32,
+  pub nickname: SizedUtf16String<26>,
+  #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+  pub moves: MoveSlots,
+  #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+  pub relearn_moves: [MoveSlot; 4],
+  pub secret_super_training_unlocked: bool,
+  pub secret_super_training_complete: bool,
+  #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+  pub ivs: Ivs,
+  pub is_egg: bool,
+  pub is_nicknamed: bool,
+  pub handler_name: SizedUtf16String<26>,
+  pub handler_gender: BinaryGender,
+  pub is_current_handler: bool,
+  #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+  pub geolocations: Geolocations,
+  pub handler_friendship: u8,
+  pub handler_affection: u8,
+  #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+  pub handler_memory: TrainerMemory,
+  pub fullness: u8,
+  pub enjoyment: u8,
+  pub trainer_name: SizedUtf16String<26>,
+  pub trainer_friendship: u8,
+  pub trainer_affection: u8,
+  #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+  pub trainer_memory: TrainerMemory,
+  pub egg_date: Option<PokeDate>,
+  pub met_date: PokeDate,
+  pub egg_location_index: u16,
+  pub met_location_index: u16,
+  pub ball: Ball,
+  pub met_level: u8,
+  pub trainer_gender: BinaryGender,
+  #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+  pub hyper_training: HyperTraining,
+  pub game_of_origin: OriginGame,
+  pub country: u8,
+  pub region: u8,
+  pub console_region: u8,
+  pub language: Language,
+  pub status_condition: u32,
+  #[cfg_attr(feature = "randomize", randomize(skip))]
+  pub stat_level: u8,
+  #[cfg_attr(feature = "randomize", randomize(skip))]
+  pub form_argument_remain: u8,
+  #[cfg_attr(feature = "randomize", randomize(skip))]
+  pub form_argument_elapsed: u8,
+  #[cfg_attr(feature = "randomize", randomize(skip))]
+  pub current_hp: u16,
+  #[cfg_attr(feature = "randomize", randomize(skip))]
+  #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+  pub stats: Stats16Le,
+}
+
+const MAX_RIBBON_ALOLA: usize = ModernRibbon::BattleTreeMaster as usize;
+
+impl Pk2PolishedCrystal {
+  // ------------------------------------------------------------------
+  // Deserialise from a Pk2PolishedCrystalBuffer (the single source of all byte offsets)
+  // ------------------------------------------------------------------
+
+  pub fn from_buffer<S: AsRef<[u8]>>(buf: &Pk2PolishedCrystalBuffer<S>) -> Result<Self> {
+    let mut mon = Pk2PolishedCrystal {
+      encryption_constant: buf.encryption_constant(),
+      sanity: buf.sanity(),
+      checksum: buf.checksum(),
+      species_and_form: buf.species_and_form()?,
+      held_item_index: buf.held_item_index(),
+      trainer_id: buf.trainer_id(),
+      secret_id: buf.secret_id(),
+      exp: buf.exp(),
+      ability_index: AbilityIndexBounded::try_from(buf.ability_index_raw())?,
+      ability_num: buf.ability_num()?,
+      markings: buf.markings(),
+      personality_value: buf.personality_value(),
+      nature: buf.nature()?,
+      is_fateful_encounter: buf.is_fateful_encounter(),
+      gender: buf.gender(),
+      evs: buf.evs(),
+      contest: buf.contest(),
+      resort_event_status: buf.resort_event_status(),
+      pokerus: buf.pokerus(),
+      super_training_flags: buf.super_training_flags(),
+      ribbons: buf.ribbons(),
+      contest_memory_count: buf.contest_memory_count(),
+      battle_memory_count: buf.battle_memory_count(),
+      super_training_dist_flags: buf.super_training_dist_flags(),
+      form_argument: buf.form_argument(),
+      nickname: buf.nickname(),
+      moves: buf.move_slots(),
+      relearn_moves: [
+        buf.relearn_move(0),
+        buf.relearn_move(1),
+        buf.relearn_move(2),
+        buf.relearn_move(3),
+      ],
+      secret_super_training_unlocked: buf.secret_super_training_unlocked(),
+      secret_super_training_complete: buf.secret_super_training_complete(),
+      ivs: buf.ivs(),
+      is_egg: buf.is_egg(),
+      is_nicknamed: buf.is_nicknamed(),
+      handler_name: buf.handler_name(),
+      handler_gender: buf.handler_gender(),
+      is_current_handler: buf.is_current_handler(),
+      geolocations: buf.geolocations(),
+      handler_friendship: buf.handler_friendship(),
+      handler_affection: buf.handler_affection(),
+      handler_memory: buf.handler_memory(),
+      fullness: buf.fullness(),
+      enjoyment: buf.enjoyment(),
+      trainer_name: buf.trainer_name(),
+      trainer_friendship: buf.trainer_friendship(),
+      trainer_affection: buf.trainer_affection(),
+      trainer_memory: buf.trainer_memory(),
+      egg_date: buf.egg_date(),
+      met_date: buf.met_date(),
+      egg_location_index: buf.egg_location_index(),
+      met_location_index: buf.met_location_index(),
+      ball: buf.ball(),
+      met_level: buf.met_level(),
+      trainer_gender: buf.trainer_gender(),
+      hyper_training: buf.hyper_training(),
+      game_of_origin: buf.game_of_origin(),
+      country: buf.country(),
+      region: buf.region(),
+      console_region: buf.console_region(),
+      language: buf.language()?,
+      ..Default::default()
+    };
+
+    mon.stat_level = mon.calculate_level();
+    mon.stats = mon.calculate_stats();
+    mon.current_hp = mon.stats.hp;
+
+    if buf.is_party() {
+      mon.status_condition = buf.status_condition();
+      mon.form_argument_remain = buf.form_argument_remain();
+      mon.form_argument_elapsed = buf.form_argument_elapsed();
+    }
+
+    Ok(mon)
+  }
+
+  pub fn write_to_box_buffer(&self, buf: &mut Pk2PolishedCrystalBufferMut) {
+    buf.set_encryption_constant(self.encryption_constant);
+    buf.reset_sanity();
+    buf.set_species_and_form(self.species_and_form.0);
+    buf.set_held_item_index(self.held_item_index);
+    buf.set_trainer_id(self.trainer_id);
+    buf.set_secret_id(self.secret_id);
+    buf.set_exp(self.exp);
+    buf.set_ability_index(self.ability_index);
+    buf.set_ability_num(self.ability_num);
+    buf.set_markings(self.markings);
+    buf.set_personality_value(self.personality_value);
+    buf.set_nature(self.nature);
+    buf.set_gender(self.gender);
+    buf.set_is_fateful_encounter(self.is_fateful_encounter);
+    buf.set_evs(self.evs);
+    buf.set_contest(self.contest);
+    buf.set_resort_event_status(self.resort_event_status);
+    buf.set_pokerus(self.pokerus);
+    buf.set_super_training_flags(self.super_training_flags);
+    buf.set_ribbons(self.ribbons);
+    buf.set_contest_memory_count(self.contest_memory_count);
+    buf.set_battle_memory_count(self.battle_memory_count);
+    buf.set_super_training_dist_flags(self.super_training_dist_flags);
+    buf.set_form_argument(self.form_argument);
+    buf.set_nickname(&self.nickname);
+    buf.set_move_slots(&self.moves);
+    buf.set_relearn_move(0, self.relearn_moves[0]);
+    buf.set_relearn_move(1, self.relearn_moves[1]);
+    buf.set_relearn_move(2, self.relearn_moves[2]);
+    buf.set_relearn_move(3, self.relearn_moves[3]);
+    buf.set_secret_super_training_unlocked(self.secret_super_training_unlocked);
+    buf.set_secret_super_training_complete(self.secret_super_training_complete);
+    buf.set_ivs(&self.ivs);
+    buf.set_is_egg(self.is_egg);
+    buf.set_is_nicknamed(self.is_nicknamed);
+    buf.set_handler_name(&self.handler_name);
+    buf.set_handler_gender(self.handler_gender);
+    buf.set_is_current_handler(self.is_current_handler);
+    buf.set_geolocations(self.geolocations);
+    buf.set_handler_friendship(self.handler_friendship);
+    buf.set_handler_affection(self.handler_affection);
+    buf.set_handler_memory(self.handler_memory);
+    buf.set_fullness(self.fullness);
+    buf.set_enjoyment(self.enjoyment);
+    buf.set_trainer_name(&self.trainer_name);
+    buf.set_trainer_friendship(self.trainer_friendship);
+    buf.set_trainer_affection(self.trainer_affection);
+    buf.set_trainer_memory(self.trainer_memory);
+    buf.set_egg_date(self.egg_date);
+    buf.set_met_date(self.met_date);
+    buf.set_egg_location_index(self.egg_location_index);
+    buf.set_met_location_index(self.met_location_index);
+    buf.set_ball(self.ball);
+    buf.set_met_level(self.met_level);
+    buf.set_trainer_gender(self.trainer_gender);
+    buf.set_hyper_training(self.hyper_training);
+    buf.set_game_of_origin(self.game_of_origin);
+    buf.set_country(self.country);
+    buf.set_region(self.region);
+    buf.set_console_region(self.console_region);
+    buf.set_language(self.language);
+
+    buf.refresh_checksum();
+  }
+
+  pub fn write_to_party_buffer(&self, buf: &mut Pk2PolishedCrystalBufferMut) {
+    self.write_to_box_buffer(buf);
+    buf.set_status_condition(self.status_condition);
+    buf.set_stat_level(self.stat_level);
+    buf.set_form_argument_remain(self.form_argument_remain);
+    buf.set_form_argument_elapsed(self.form_argument_elapsed);
+    buf.set_current_hp(self.current_hp);
+    buf.set_stats(self.stats);
+  }
+
+  pub fn try_from_bytes(bytes: &[u8]) -> Result<Self> {
+    let size = bytes.len();
+    match size {
+      Self::BOX_SIZE => Self::from_buffer(&Pk2PolishedCrystalBuffer::box_span(bytes)),
+      Self::PARTY_SIZE => Self::from_buffer(&Pk2PolishedCrystalBuffer::party_span(bytes)),
+      _ => Err(Error::buffer_size(Self::BOX_SIZE, size)),
+    }
+  }
+
+  pub fn from_encrypted_bytes(mut bytes: Box<[u8]>) -> Result<Self> {
+    Self::from_buffer(Pk2PolishedCrystalBuffer::box_or_party_span_mut(&mut bytes).decrypted())
+  }
+
+  pub fn to_box_bytes_encrypted(self) -> Box<[u8]> {
+    let mut bytes = self.to_box_bytes();
+    Pk2PolishedCrystalBuffer::box_span_mut(&mut bytes).encrypt();
+
+    bytes
+  }
+
+  pub fn calculate_checksum(&self) -> u16 {
+    let mut bytes = [0u8; Self::BOX_SIZE];
+    self.write_box_bytes(&mut bytes);
+    Pk2PolishedCrystalBuffer::box_span(&bytes).calculate_checksum()
+  }
+
+  pub fn refresh_checksum(&mut self) {
+    self.checksum = self.calculate_checksum();
+  }
+
+  pub fn calculate_stats(&self) -> Stats16Le {
+    stats::calculate_all_modern_for_source(
+      MetadataSource::UltraSunUltraMoon,
+      self.species_and_form.0,
+      &self.ivs,
+      &self.evs,
+      self.calculate_level() as u16,
+      self.nature.get_metadata(),
+      Some(self.hyper_training),
+    )
+      .unwrap_or_else(|| {
+        panic!(
+          "pk2 has species/form present in ultra sun + moon: {:#?}",
+          self.species_and_form.0
+        )
+      })
+  }
+
+  pub fn recalculate_stats(&mut self) {
+    self.stats = self.calculate_stats();
+  }
+
+  pub fn empty_box_slot_bytes(trainer_name: &SizedUtf16String<26>) -> Box<[u8]> {
+    let mut bytes = Box::new([0u8; Self::BOX_SIZE]);
+    let mut buffer = Pk2PolishedCrystalBufferMut::box_span_mut(bytes.as_mut_slice());
+
+    buffer.set_handler_name(trainer_name);
+    buffer.set_is_current_handler(true);
+    buffer.refresh_checksum();
+
+    buffer.encrypt();
+
+    bytes
+  }
+
+  pub fn is_empty_slot(bytes: &[u8]) -> bool {
+    let mut owned = bytes.to_owned();
+    let mut buffer = Pk2PolishedCrystalBuffer::box_span_mut(&mut owned);
+    buffer.decrypt();
+
+    buffer.species_ndex() == 0
+  }
+}
+
+impl PkmBytes for Pk2PolishedCrystal {
+  const BOX_SIZE: usize = 232;
+  const PARTY_SIZE: usize = 260;
+
+  fn from_bytes(bytes: &[u8]) -> Result<Self> {
+    Self::try_from_bytes(bytes)
+  }
+
+  fn write_box_bytes(&self, bytes: &mut [u8]) {
+    self.write_to_box_buffer(&mut Pk2PolishedCrystalBufferMut::box_span_mut(bytes))
+  }
+
+  fn write_party_bytes(&self, bytes: &mut [u8]) {
+    let mut buffer = Pk2PolishedCrystalBufferMut::party_span_mut(bytes);
+    self.write_to_box_buffer(&mut buffer);
+    self.write_to_party_buffer(&mut buffer);
+  }
+
+  fn to_box_bytes(&self) -> Box<[u8]> {
+    let mut bytes = Box::new([0u8; Self::BOX_SIZE]);
+    self.write_box_bytes(bytes.as_mut_slice());
+
+    bytes
+  }
+
+  fn to_party_bytes(&self) -> Box<[u8]> {
+    let mut bytes = Box::new([0u8; Self::PARTY_SIZE]);
+    self.write_party_bytes(bytes.as_mut_slice());
+
+    bytes
+  }
+}
+
+impl HasSpeciesAndForm for Pk2PolishedCrystal {
+  fn get_species_metadata(&self) -> &'static SpeciesMetadata {
+    self.species_and_form.0.get_species_metadata()
+  }
+
+  fn get_form_metadata(&self) -> &'static FormMetadata {
+    self.species_and_form.0.get_form_metadata()
+  }
+
+  fn calculate_level(&self) -> u8 {
+    self.get_species_metadata()
+      .experience_growth
+      .calculate_level(self.exp)
+  }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_class = Pk2PolishedCrystalWasm)]
+#[allow(clippy::missing_const_for_fn)]
+impl Pk2PolishedCrystal {
+  #[wasm_bindgen(js_name = fromOhpkmBytes)]
+  pub fn from_ohpkm_bytes(bytes: Vec<u8>, strategy: Ts<ConvertStrategy>) -> JsResult<Self> {
+    let ohpkm = OhpkmV2::from_bytes(&bytes)?;
+    Ok(Self::from_ohpkm(&ohpkm, strategy.to_rust()?)?)
+  }
+
+  #[wasm_bindgen(js_name = fromDecryptedBytes)]
+  pub fn from_bytes_wasm(bytes: Box<[u8]>) -> core::result::Result<Self, JsValue> {
+    Self::from_bytes(&bytes).map_err(JsValue::from)
+  }
+
+  #[wasm_bindgen(js_name = fromEncryptedBytes)]
+  pub fn take_from_encrypted_bytes(bytes: Box<[u8]>) -> core::result::Result<Self, JsValue> {
+    Self::from_encrypted_bytes(bytes).map_err(JsValue::from)
+  }
+
+  #[wasm_bindgen(js_name = toBytes)]
+  pub fn get_bytes_wasm(&self) -> Box<[u8]> {
+    self.to_box_bytes()
+  }
+
+  #[wasm_bindgen(getter = abilityIndex)]
+  pub fn ability_index(&self) -> AbilityIndexWasm {
+    AbilityIndexWasm::try_from(self.ability_index.to_u16())
+      .expect("AbilityIndexWasm should accept any valid ability index")
+  }
+
+  #[wasm_bindgen(setter = abilityIndex)]
+  pub fn set_ability_index(&mut self, value: AbilityIndexWasm) -> Result<()> {
+    self.ability_index = AbilityIndexBounded::try_from(value.to_u16())?;
+    Ok(())
+  }
+
+  #[wasm_bindgen(getter)]
+  pub fn move_indices(&self) -> Vec<u16> {
+    self.moves.indices()
+  }
+
+  #[wasm_bindgen(setter)]
+  pub fn set_move_indices(&mut self, value: &[u16]) {
+    self.moves.set_indices(value);
+  }
+
+  #[wasm_bindgen(getter)]
+  pub fn move_pp(&self) -> Vec<u8> {
+    self.moves.pp()
+  }
+
+  #[wasm_bindgen(setter)]
+  pub fn set_move_pp(&mut self, value: &[u8]) {
+    self.moves.set_pp(value);
+  }
+
+  #[wasm_bindgen(getter)]
+  pub fn move_pp_ups(&self) -> Vec<u8> {
+    self.moves.pp_ups()
+  }
+
+  #[wasm_bindgen(setter)]
+  pub fn set_move_pp_ups(&mut self, value: &[u8]) {
+    self.moves.set_pp_ups(value);
+  }
+
+  #[wasm_bindgen(getter)]
+  pub fn relearn_move_indices(&self) -> Vec<u16> {
+    self.relearn_moves.into_iter().map(u16::from).collect()
+  }
+
+  #[wasm_bindgen(setter)]
+  pub fn set_relearn_move_indices(&mut self, value: Vec<u16>) {
+    self.relearn_moves = [
+      MoveSlot::from(value[0]),
+      MoveSlot::from(value[1]),
+      MoveSlot::from(value[2]),
+      MoveSlot::from(value[3]),
+    ]
+  }
+
+  #[wasm_bindgen(getter)]
+  pub fn ribbons(&self) -> Vec<String> {
+    self.ribbons
+      .get_ribbons()
+      .iter()
+      .map(|ribbon| ribbon.to_string())
+      .collect()
+  }
+
+  #[wasm_bindgen(getter)]
+  pub fn ribbon_bytes(&self) -> Vec<u8> {
+    self.ribbons.to_bytes().into_iter().collect()
+  }
+
+  #[wasm_bindgen(setter)]
+  pub fn set_ribbon_indices(&mut self, indices: Vec<usize>) {
+    self.ribbons
+      .set_ribbons(indices.into_iter().filter_map(ModernRibbon::from_index));
+  }
+
+  #[wasm_bindgen]
+  pub fn set_species_and_form(
+    &mut self,
+    national_dex: u16,
+    form_index: u16,
+  ) -> core::result::Result<(), JsValue> {
+    match SpeciesForm::new(national_dex, form_index) {
+      Ok(species_and_form) => {
+        self.species_and_form = species_and_form.try_into()?;
+        Ok(())
+      }
+      Err(e) => Err(JsValue::from_str(&e.to_string())),
+    }
+  }
+
+  #[wasm_bindgen(getter = nationalDex)]
+  pub fn national_dex_wasm(&self) -> u16 {
+    self.species_and_form.0.get_ndex() as u16
+  }
+
+  #[wasm_bindgen(getter = formIndex)]
+  pub fn form_index_wasm(&self) -> u16 {
+    self.species_and_form.0.get_form_index()
+  }
+
+  #[wasm_bindgen(getter = evs)]
+  pub fn evs_wasm(&self) -> TsResult<Stats16Le> {
+    Stats16Le::from(self.evs).try_into_ts()
+  }
+
+  #[wasm_bindgen(getter = ivs)]
+  pub fn ivs_wasm(&self) -> TsResult<Stats16Le> {
+    Stats16Le::from(self.ivs).try_into_ts()
+  }
+
+  #[wasm_bindgen(js_name = toOhpkm)]
+  pub fn to_ohpkm(&self) -> Result<OhpkmV2> {
+    OhpkmV2::convert_with_backup(self, &self.to_party_bytes())
+  }
+
+  #[wasm_bindgen(js_name = isEmptySlot)]
+  pub fn is_empty_slot_wasm(bytes: Vec<u8>) -> bool {
+    Self::is_empty_slot(&bytes)
+  }
+
+  #[wasm_bindgen(js_name = calculateChecksum)]
+  pub fn calculate_checksum_wasm(&self) -> u16 {
+    self.calculate_checksum()
+  }
+
+  #[wasm_bindgen(js_name = calculateLevel)]
+  pub fn calculate_level_wasm(&self) -> u8 {
+    self.calculate_level()
+  }
+
+  #[wasm_bindgen(js_name = calculateStats)]
+  pub fn calculate_stats_wasm(&self) -> TsResult<Stats16Le> {
+    self.calculate_stats().try_into_ts()
+  }
+
+  #[wasm_bindgen(js_name = recalculateStats)]
+  pub fn recalculate_stats_wasm(&mut self) {
+    self.recalculate_stats()
+  }
+
+  #[wasm_bindgen(getter)]
+  pub fn geolocations(&self) -> Result<Ts<Geolocations>> {
+    Ok(Ts::from_rust(&self.geolocations)?)
+  }
+
+  #[wasm_bindgen(getter = markings)]
+  pub fn markings_wasm(&self) -> TsResult<MarkingsSixShapesColors> {
+    self.markings.try_into_ts()
+  }
+
+  #[wasm_bindgen(getter = trainerMemory)]
+  pub fn trainer_memory_wasm(&self) -> TsResult<TrainerMemory> {
+    self.trainer_memory.try_into_ts()
+  }
+
+  #[wasm_bindgen(getter = handlerMemory)]
+  pub fn handler_memory_wasm(&self) -> TsResult<TrainerMemory> {
+    self.handler_memory.try_into_ts()
+  }
+
+  #[wasm_bindgen(getter = contest)]
+  pub fn contest_stats_wasm(&self) -> TsResult<ContestStats> {
+    self.contest.try_into_ts()
+  }
+
+  #[wasm_bindgen(getter = hyperTraining)]
+  pub fn hyper_training_wasm(&self) -> TsResult<HyperTraining> {
+    self.hyper_training.try_into_ts()
+  }
+}
+
+impl ModernEvs for Pk2PolishedCrystal {
+  fn get_evs(&self) -> Stats8 {
+    self.evs
+  }
+}
+
+#[cfg(test)]
+impl crate::tests::PkhexJson for Pk2PolishedCrystal {
+  fn to_pkhex_json_value(&self) -> std::result::Result<serde_json::Value, serde_json::Error> {
+    let mut value = serde_json::to_value(self)?;
+    value["nickname_trash"] = serde_json::json!(
+            self.nickname
+                .bytes()
+                .iter()
+                .map(|b| format!("{:02X}", b))
+                .collect::<String>()
+        );
+    value["level"] = serde_json::json!(self.calculate_level());
+
+    Ok(value)
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use std::path::PathBuf;
+
+  use crate::convert_strategy::ConvertStrategy;
+  use crate::gen7_alola::Pk2PolishedCrystal;
+  use crate::gen7_alola::pk2_buffer::Pk2PolishedCrystalBuffer;
+  use crate::ohpkm::{OhpkmConvert, OhpkmV2};
+
+  use crate::result::Error;
+  #[cfg(feature = "randomize")]
+  use crate::tests::TestErrorWithSeed;
+  use crate::tests::{self, TestResult};
+  use crate::traits::IsShiny;
+
+  #[cfg(feature = "randomize")]
+  use pkm_rs_types::randomize::Randomize;
+  #[cfg(feature = "randomize")]
+  use rand::{SeedableRng, rngs::StdRng};
+
+  #[test]
+  fn to_from_bytes() -> TestResult<()> {
+    tests::to_from_bytes_all_in_dir::<Pk2PolishedCrystal>(
+      &PathBuf::from("test-files").join("pkm-files").join("pk2"),
+    )
+  }
+
+  #[cfg(feature = "randomize")]
+  #[test]
+  fn to_from_bytes_random() -> std::result::Result<(), TestErrorWithSeed> {
+    for seed in 0..=1000 {
+      let mon = Pk2PolishedCrystal::randomized(&mut StdRng::seed_from_u64(seed));
+      tests::find_inconsistencies_to_from_bytes(mon)
+        .map_err(|error| TestErrorWithSeed { seed, error })?;
+    }
+
+    Ok(())
+  }
+
+  #[test]
+  fn is_shiny() -> TestResult<()> {
+    let path = PathBuf::from("pk2").join("slowpoke-shiny.pk2");
+    let mon = tests::pkm_from_file::<Pk2PolishedCrystal>(&path)?.0;
+    assert!(mon.is_shiny());
+
+    Ok(())
+  }
+
+  #[test]
+  fn compare_pkhex_json() -> TestResult<()> {
+    tests::compare_pkhex_json_all_in_dir::<Pk2PolishedCrystal>(&PathBuf::from("pk2"))
+  }
+
+  #[test]
+  fn nickname_garbage_preserved() -> TestResult<()> {
+    let (mon, bytes) =
+      tests::pkm_from_file::<Pk2PolishedCrystal>(&PathBuf::from("pk2").join("pelipper-garbage-bytes.pk2"))?;
+
+    // 'r' at position 14 should be leftover from 'Pelipper'
+    assert_eq!(mon.nickname.bytes()[14], b'r');
+
+    let mon_recreated = Pk2PolishedCrystal::from_ohpkm(
+      &OhpkmV2::convert_with_backup(&mon, &bytes)?,
+      ConvertStrategy::default(),
+    )?;
+
+    // leftover 'r' should be preserved after conversion to/from OHPKM
+    assert_eq!(mon_recreated.nickname.bytes()[14], b'r');
+
+    Ok(())
+  }
+
+  #[test]
+  fn checksum() -> TestResult<()> {
+    let mon =
+      tests::pkm_from_file::<Pk2PolishedCrystal>(&PathBuf::from("pk2").join("primarina-garbage-bytes.pk2"))?
+        .0;
+    assert_eq!(mon.checksum, mon.calculate_checksum());
+
+    Ok(())
+  }
+
+  #[test]
+  fn from_ohpkm() -> TestResult<()> {
+    let mon = tests::pkm_from_file::<OhpkmV2>(&PathBuf::from("ohpkm").join("Machamp.ohpkm"))?.0;
+
+    let _ = Pk2PolishedCrystal::from_ohpkm(&mon, ConvertStrategy::default());
+
+    Ok(())
+  }
+
+  const STEADFAST: u16 = 80;
+  const SHARPNESS: u16 = 292;
+
+  #[test]
+  fn from_ohpkm_ability_change() -> TestResult<()> {
+    let mon = tests::pkm_from_file::<OhpkmV2>(
+      &PathBuf::from("ohpkm").join("gallade-sharpness-alpha.ohpkm"),
+    )?
+      .0;
+
+    assert_eq!(mon.ability_index().to_u16(), SHARPNESS);
+
+    let converted_pk2 = Pk2PolishedCrystal::from_ohpkm(&mon, ConvertStrategy::default())?;
+
+    // Gallade's Sharpness should be converted to Steadfast when converting to Pk2PolishedCrystal, since Sharpness is Gen 8+ and Pk2PolishedCrystal can only represent Gen 7 abilities
+    assert_eq!(converted_pk2.ability_index.to_u16(), STEADFAST);
+
+    Ok(())
+  }
+
+  #[test]
+  fn to_from_ohpkm() -> TestResult<()> {
+    tests::to_from_ohpkm_all_in_dir::<Pk2PolishedCrystal>(
+      &PathBuf::from("test-files").join("pkm-files").join("pk2"),
+    )
+  }
+
+  #[test]
+  fn empty_slot_checksum() -> TestResult<()> {
+    let empty_slot = Pk2PolishedCrystal::empty_box_slot_bytes(&"RoC".into());
+    if Pk2PolishedCrystalBuffer::box_span(&empty_slot).checksum() != 0x0204 {
+      return Err(Error::other(&format!(
+        "Empty slot checksum should be 0x0204; received {:#06x}",
+        Pk2PolishedCrystalBuffer::box_span(&empty_slot).checksum()
+      ))
+        .into());
+    }
+    Ok(())
+  }
+
+  const LYCANROC_ENCRYPTED_BYTES_HEX: &str = "46b5261b000034558854d9175f75d4867d2c35edcaad2fb725c21bdbde411d0c3a219f5425e8407615970cdaa2333d6af8fe0544f39714db0fd9b6e2fc16435f80a10ce841891d669619ef0e9c2eda9fdb780cb3e97d7c3985b858283fae77dbfd705a99c39c94ff4df68176ed33eece7aad275b586c1d81a1d3333602b85e6e77163c6c7e6905fa95cc219becc09b136bafe58bfe8d77327551d35e85eae6c5adc3e95503df2c60401e73e17ebc348d6ae22fd24cfbf5c2671e42daead18cd923e6408a537ec3fc136855986f4ac0f1d741480cf38be75d1d71a1d26bdbb87d2919dcc6b479c80d";
+
+  #[test]
+  fn encrypted_bytes_match_expected() -> TestResult<()> {
+    let path = PathBuf::from("pk2").join("lycanroc-alola-champion.pk2");
+    let mon = tests::pkm_from_file::<Pk2PolishedCrystal>(&path)?.0;
+
+    let encrypted_bytes = mon.to_box_bytes_encrypted();
+    let encrypted_hex_str = tests::bytes_to_hex_string(&encrypted_bytes);
+
+    assert_eq!(encrypted_hex_str, LYCANROC_ENCRYPTED_BYTES_HEX);
+
+    Ok(())
+  }
+}
