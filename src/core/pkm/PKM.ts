@@ -1,11 +1,11 @@
-import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import {PKMInterface} from '@openhome-core/pkm/interfaces'
+import {OHPKM} from '@openhome-core/pkm/OHPKM'
 import PK9Compass from '@openhome-core/save/compass/PK9Compass'
 import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
 import PK3RR from '@openhome-core/save/radicalred/PK3RR'
 import PK3UB from '@openhome-core/save/unbound/PK3UB'
-import { Errorable } from '@openhome-core/util/functional'
-import { ConvertStrategy, OhpkmWasm, PkmFormat } from '@pkm-rs/pkg'
+import {Errorable} from '@openhome-core/util/functional'
+import {ConvertStrategy, OhpkmWasm, PkmFormat} from '@pkm-rs/pkg'
 import COLOPKM from './COLOPKM'
 import PA8 from './PA8'
 import PA9 from './PA9'
@@ -21,7 +21,7 @@ import PK6 from './PK6'
 import PK7 from './PK7'
 import PK8 from './PK8'
 import PK9 from './PK9'
-import { PkmConstructorOptions } from './types'
+import {PkmConstructorOptions} from './types'
 import XDPKM from './XDPKM'
 
 export type PKM =
@@ -45,13 +45,15 @@ export type PKM =
 export interface WasmPkmInterface extends PKMInterface {
   intoOhpkmWasm(): OhpkmWasm
 }
+
 type WasmPkmClass = {
-  new (arg: OHPKM, options: PkmConstructorOptions): WasmPkmInterface
+  new(arg: OHPKM, options: PkmConstructorOptions): WasmPkmInterface
 }
 
 const WasmPkmFormats: WasmPkmClass[] = [PK3, PK7, PK8, PK9, PH4, PK9Compass]
 
 export type WasmPkmFormat = InstanceType<(typeof WasmPkmFormats)[number]>
+
 export function isWasmFormat(pkm: PKMInterface): pkm is WasmPkmFormat {
   return WasmPkmFormats.some((P) => pkm instanceof P)
 }
@@ -64,6 +66,6 @@ export type PkmClass<P extends PKMInterface> = {
   getFormat(): PkmFormat
 }
 
-export function isRomHackFormat(format: string): format is 'PK3RR' | 'PK3UB' | 'PB8LUMI' {
-  return format === 'PK3RR' || format === 'PK3UB' || format === 'PB8LUMI'
+export function isRomHackFormat(format: string): format is 'PK3RR' | 'PK3UB' | 'PB8LUMI' | 'PK9COMPASS' | 'PK2PolishedCrystal' {
+  return format === 'PK3RR' || format === 'PK3UB' || format === 'PB8LUMI' || format === 'PK9COMPASS' || format === 'PK2PolishedCrystal'
 }

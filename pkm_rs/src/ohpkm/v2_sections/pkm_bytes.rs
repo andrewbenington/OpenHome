@@ -7,6 +7,8 @@ use strum_macros::Display;
 
 const PK1_PARTY_SIZE: usize = 66;
 const PK2_PARTY_SIZE: usize = 73;
+
+const PK2_POLISHED_CRYSTAL_PARTY_SIZE : usize = 73;
 const PK3_PARTY_SIZE: usize = 100;
 const PK4_PARTY_SIZE: usize = 236;
 const PK5_PARTY_SIZE: usize = 236;
@@ -50,6 +52,7 @@ pub enum Tag {
     Pk3Ub = 0xfffd,
     Pb8Lumi = 0xfffc,
     Pk9Compass = 0xfffb,
+    Pk2PolishedCrystal = 0xfffa
 }
 
 impl Tag {
@@ -113,6 +116,7 @@ impl From<PkmFormat> for Option<Tag> {
             PkmFormat::PK3UB => Some(Tag::Pk3Ub),
             PkmFormat::PB8LUMI => Some(Tag::Pb8Lumi),
             PkmFormat::PK9Compass => Some(Tag::Pk9Compass),
+          PkmFormat::PK2PolishedCrystal => Some(Tag::Pk2PolishedCrystal)
         }
     }
 }
@@ -139,6 +143,7 @@ impl Tag {
             Self::Pk3Ub => PK3CFRU_PARTY_SIZE,
             Self::Pb8Lumi => PB8LUMI_SIZE,
             Self::Pk9Compass => PK9_SIZE,
+          Tag::Pk2PolishedCrystal => PK2_POLISHED_CRYSTAL_PARTY_SIZE
         }
     }
 }
@@ -164,6 +169,7 @@ pub enum StoredPkmBytes {
     Pk3Ub(Box<[u8; PK3CFRU_PARTY_SIZE]>),
     Pb8Lumi(Box<[u8; PB8_SIZE]>),
     Pk9Compass(Box<[u8; PK9_SIZE]>),
+    Pk2PolishedCrystal(Box<[u8; PK2_POLISHED_CRYSTAL_PARTY_SIZE]>),
 }
 
 const LENGTH_CHECKED_MESSAGE: &str = "data length checked above";
@@ -190,6 +196,7 @@ impl StoredPkmBytes {
             Self::Pk3Ub(bytes) => bytes.as_ref(),
             Self::Pb8Lumi(bytes) => bytes.as_ref(),
             Self::Pk9Compass(bytes) => bytes.as_ref(),
+          StoredPkmBytes::Pk2PolishedCrystal(bytes) => bytes.as_ref()
         };
         bytes
     }
@@ -215,6 +222,7 @@ impl StoredPkmBytes {
             Self::Pk3Ub(_) => Tag::Pk3Ub,
             Self::Pb8Lumi(_) => Tag::Pb8Lumi,
             Self::Pk9Compass(_) => Tag::Pk9Compass,
+          StoredPkmBytes::Pk2PolishedCrystal(_) => Tag::Pk2PolishedCrystal
         }
     }
 
@@ -247,6 +255,7 @@ impl StoredPkmBytes {
             Tag::Pk3Ub => Ok(Self::Pk3Ub(Box::new(copy_to_sized_array(data)))),
             Tag::Pb8Lumi => Ok(Self::Pb8Lumi(Box::new(copy_to_sized_array(data)))),
             Tag::Pk9Compass => Ok(Self::Pk9Compass(Box::new(copy_to_sized_array(data)))),
+          Tag::Pk2PolishedCrystal => Ok(Self::Pk2PolishedCrystal(Box::new(copy_to_sized_array(data))))
         }
     }
 
@@ -309,10 +318,10 @@ impl OriginalBackup {
 }
 
 impl DataSection for OriginalBackup {
-    type TagType = OhpkmSectionTag;
-    const TAG: Self::TagType = OhpkmSectionTag::OriginalBackup;
+  type ErrorType = Error;
+  type TagType = OhpkmSectionTag;
 
-    type ErrorType = Error;
+  const TAG: Self::TagType = OhpkmSectionTag::OriginalBackup;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
         Ok(Self(StoredPkmBytes::from_bytes(bytes)?))

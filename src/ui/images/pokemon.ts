@@ -99,6 +99,7 @@ function getImageSource(format: PkmOrOhpkmFormat): PokemonImageSource {
     case 'PA9':
     case 'PH4':
     case 'OHPKM':
+    case 'PK2PolishedCrystal': // Temporary measure while we add the Gen 2 sprites for future Pokemon
       return HomeSprites
   }
 }

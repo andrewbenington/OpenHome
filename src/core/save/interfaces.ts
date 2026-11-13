@@ -369,6 +369,8 @@ export function pluginGameName(
       return type === 'full' ? 'Luminescent Platinum' : 'Lumi. Platinum'
     case 'compass':
       return 'Compass'
+    case 'polished_crystal':
+      return 'Polished Crystal'
     default:
       return 'Unknown Plugin'
   }
@@ -430,7 +432,7 @@ export interface WasmSaveInner<P> {
 
 type WasmPkmInterface<P> = PKMInterface & { inner: P }
 
-type WasmSaveClass<S> = {
+export type WasmSaveClass<S> = {
   fromBytes(bytes: Uint8Array): S
 
   readonly BOX_COLS: number

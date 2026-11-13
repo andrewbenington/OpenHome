@@ -26,6 +26,7 @@ import { PkmFormat } from '@pkm-rs/pkg/pkm_rs'
 import PK9Compass from '../save/compass/PK9Compass'
 import PH4 from './PH4'
 import { isPkmFormat, PkmOrOhpkmFormat } from './util'
+import PK2PolishedCrystal from "@openhome-core/pkm/rom_hacks/polished_crystal/PK2PolishedCrystal.ts";
 
 type AnyPkmClass = SavePkmClass | typeof OHPKM
 
@@ -58,6 +59,8 @@ export function fileTypeFromStringNonOhpkm(type: PkmFormat): SavePkmClass | unde
       return PK1
     case 'PK2':
       return PK2
+    case 'PK2POLISHEDCRYSTAL':
+      return PK2PolishedCrystal
     case 'PK3':
       return PK3
     case 'PK3RR':
@@ -94,6 +97,7 @@ export function fileTypeFromStringNonOhpkm(type: PkmFormat): SavePkmClass | unde
       return PK9Compass
     case 'PA9':
       return PA9
+
   }
 }
 
