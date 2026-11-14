@@ -22,7 +22,6 @@ import { FourMoves } from '@openhome-core/util/types'
 import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import { Lookup, MarkingsSixShapesColors, ModernRibbon, OriginGames } from '@pkm-rs/pkg/pkm_rs'
 import dayjs from 'dayjs'
-import { useCallback } from 'react'
 import { OhpkmStoreData } from '.'
 import { useConvertStrategies } from '../convert-strategies'
 import { LookupsController, useLookups } from '../lookups'
@@ -329,57 +328,6 @@ export function useOhpkmStore() {
   const backend = useBackend()
   const displayError = useDisplayError()
 
-  async function updateStore(updates: OhpkmStoreData): Promise<Result<null>> {
-    for (const [id, ohpkm] of Object.entries(updates)) {
-      ohpkmCache.set(id, ohpkm)
-    }
-    await backend.addToOhpkmStore(updates)
-
-    return R.Ok(null)
-  }
-
-  const getById = useCallback(
-    (id: string): NowOrLater<Option<OHPKM>> => {
-      const cached = ohpkmCache.get(id)
-      if (cached) return cached
-
-      return backend
-        .lookupOhpkmById(id)
-        .then(R.dropError)
-        .then((ohpkm) => {
-          if (ohpkm) {
-            ohpkmCache.set(ohpkm.openhomeId, ohpkm)
-          }
-          return ohpkm
-        })
-    },
-    [backend]
-  )
-
-  function tryLoadFromId(id: string): NowOrLater<OhpkmLookupResult> {
-    const cached = ohpkmCache.get(id)
-    if (cached) return R.Ok(cached)
-
-    return backend
-      .lookupOhpkmById(id)
-      .then(R.mapErr(() => IdentifierNotPresent(id)))
-      .then(R.flatMap((ohpkm) => (ohpkm ? R.Ok(ohpkm) : R.Err(IdentifierNotPresent(id)))))
-      .then(R.peek((ohpkm) => ohpkmCache.set(ohpkm.openhomeId, ohpkm)))
-  }
-
-  async function monIsStored(id: string): Promise<boolean> {
-    const result = getById(id)
-    return Boolean(isThenable(result) ? await result : result)
-  }
-
-  async function insertOrUpdate(mon: OHPKM) {
-    await updateStore({ [mon.openhomeId]: mon.clone() })
-  }
-
-  async function insertOrUpdateAll(mons: OhpkmStoreData) {
-    return updateStore(mons)
-  }
-
   async function replaceHeldItem(mon: OHPKM) {
     const replacedItem = mon.heldItemIndex
     mon.heldItemIndex = 0
@@ -391,49 +339,9 @@ export function useOhpkmStore() {
     return backend.searchOhpkmStore(cursor, filters)
   }
 
-  async function handleLookupsUpdate(ohpkm: OHPKM, save: SAV) {
-    const lookupType = (save.constructor as SAVClass).lookupType
-    const ohpkmIdentifier = ohpkm.openhomeId
-
-    if (lookupType === 'gen12') {
-      const gen12Identifier = getMonGen12Identifier(ohpkm)
-      if (!gen12Identifier) {
-        throw Error(`could not build gen 1/2 identifier for mon ${ohpkmIdentifier}`)
-      }
-
-      await lookupsController.updateLookups({
-        ...lookups,
-        gen12: { ...lookups.gen12, [gen12Identifier]: ohpkmIdentifier },
-      })
-      await backend.log('DEBUG', `added ${ohpkm.nickname} to gen 1/2 lookup`, {
-        ohpkm_id: ohpkm.openhomeId,
-        event: 'lookups_update',
-        gen12Identifier,
-      })
-    } else if (lookupType === 'gen345') {
-      // If original generation, keep the original PID
-      const isOriginalGen =
-        OriginGames.generation(ohpkm.gameOfOrigin) === OriginGames.generation(save.origin)
-      const gen345Identifier = getMonGen345Identifier(ohpkm, isOriginalGen)
-      if (!gen345Identifier) {
-        throw Error(`could not build gen 3/4/5 identifier for mon ${ohpkmIdentifier}`)
-      }
-
-      await lookupsController.updateLookups({
-        ...lookups,
-        gen345: { ...lookups.gen345, [gen345Identifier]: ohpkmIdentifier },
-      })
-      await backend.log('DEBUG', `added ${ohpkm.nickname} to gen 3/4/5 lookup`, {
-        ohpkm_id: ohpkm.openhomeId,
-        event: 'lookups_update',
-        gen345Identifier,
-      })
-    }
-  }
-
   // the async tasks are left to run here because otherwise the box UI lags to wait for them
   async function updateAndConvertForSave<P extends PKMInterface>(ohpkm: OHPKM, save: SAV<P>) {
-    void handleLookupsUpdate(ohpkm, save)
+    void handleLookupsUpdate(ohpkm, save, lookupsController)
       .then(() => insertOrUpdate(ohpkm))
       // .then(() => handleLookupsUpdate(ohpkm, save, lookupsController))
       .catch((error) =>
@@ -554,7 +462,7 @@ export function useOhpkmStore() {
         ])
       )
     if (destSave) {
-      void handleLookupsUpdate(ohpkm, destSave)
+      void handleLookupsUpdate(ohpkm, destSave, lookupsController)
     }
 
     void insertOrUpdate(ohpkm).catch((error) => {
