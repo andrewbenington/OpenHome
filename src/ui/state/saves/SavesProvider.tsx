@@ -1,8 +1,8 @@
+import { AppBackend } from '@openhome-core/backend/appBackend'
 import useBackend from '@openhome-core/backend/useBackend'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAVClass } from '@openhome-core/save/types'
-import { TauriBackend } from '@openhome-core/tauri/backend'
 import { $R, Option, R, range, Result } from '@openhome-core/util/functional'
 import { NowOrLater } from '@openhome-core/util/promise'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
@@ -178,7 +178,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
   useEffect(() => {
     let ignore = false
     // returns a function to stop listening
-    const stopListening = TauriBackend.onMenuEvents({
+    const stopListening = AppBackend.onMenuEvents({
       save: () => saveChangesEvent(false),
       reset: async () => {
         if (ignore) return

@@ -1,7 +1,7 @@
 import { BackendContext } from '@openhome-core/backend'
+import { AppBackend } from '@openhome-core/backend/appBackend'
 import BackendInterface from '@openhome-core/backend/backendInterface'
 import useBackend from '@openhome-core/backend/useBackend'
-import { TauriBackend } from '@openhome-core/tauri/backend'
 import { R } from '@openhome-core/util/functional'
 import AppTabs from '@openhome-ui/AppTabs'
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
@@ -49,7 +49,7 @@ export default function App() {
       radius="small"
     >
       <div id="app-container" className="root">
-        <BackendContext value={TauriBackend}>
+        <BackendContext value={AppBackend}>
           <ErrorContext value={[errorState, errorDispatch]}>
             <QueryClientProvider client={queryClient}>
               <BanksAndBoxesProvider>

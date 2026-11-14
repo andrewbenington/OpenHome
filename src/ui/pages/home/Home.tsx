@@ -1,8 +1,8 @@
+import { AppBackend } from '@openhome-core/backend/appBackend'
 import { bytesToPKM } from '@openhome-core/pkm/FileImport'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { tryCalculateIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { TauriBackend } from '@openhome-core/tauri/backend'
 import { range } from '@openhome-core/util/functional'
 import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import PokemonDetailsModal from '@openhome-ui/pokemon/PokemonDetailsModal'
@@ -28,7 +28,7 @@ const Home = () => {
 
   useEffect(() => {
     // returns a function to stop listening
-    const stopListening = TauriBackend.onMenuEvent('open', () => setOpenSaveDialog(true))
+    const stopListening = AppBackend.onMenuEvent('open', () => setOpenSaveDialog(true))
 
     // the "stop listening" function should be called when the effect returns,
     // otherwise duplicate listeners will exist

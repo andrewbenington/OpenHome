@@ -1,3 +1,4 @@
+import { AppBackend } from '@openhome-core/backend/appBackend'
 import useBackend from '@openhome-core/backend/useBackend'
 import { getMoveMaxPP } from '@openhome-core/pkm'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
@@ -10,7 +11,6 @@ import {
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
 import { SAVClass } from '@openhome-core/save/types'
-import { TauriBackend } from '@openhome-core/tauri/backend'
 import { Filter, PaginationCursor } from '@openhome-core/tauri/spectaCommands'
 import { expectExhaustive } from '@openhome-core/util'
 import { $R, Option, PromisedResultBox, R, Result } from '@openhome-core/util/functional'
@@ -75,7 +75,7 @@ const getById = (id: string): NowOrLater<Option<OHPKM>> => {
   const cached = ohpkmCache.get(id)
   if (cached) return cached
 
-  return TauriBackend.lookupOhpkmById(id)
+  return AppBackend.lookupOhpkmById(id)
     .then(R.dropError)
     .then((ohpkm) => {
       if (ohpkm) {
@@ -91,7 +91,7 @@ async function updateStore(updates: OhpkmStoreData): Promise<Result<null>> {
   for (const [id, ohpkm] of Object.entries(updates)) {
     ohpkmCache.set(id, ohpkm)
   }
-  await TauriBackend.addToOhpkmStore(updates)
+  await AppBackend.addToOhpkmStore(updates)
 
   return R.Ok(null)
 }
@@ -100,7 +100,7 @@ function tryLoadFromId(id: string): NowOrLater<OhpkmLookupResult> {
   const cached = ohpkmCache.get(id)
   if (cached) return R.Ok(cached)
 
-  return TauriBackend.lookupOhpkmById(id)
+  return AppBackend.lookupOhpkmById(id)
     .then(R.mapErr(() => IdentifierNotPresent(id)))
     .then(R.flatMap((ohpkm) => (ohpkm ? R.Ok(ohpkm) : R.Err(IdentifierNotPresent(id)))))
     .then(R.peek((ohpkm) => ohpkmCache.set(ohpkm.openhomeId, ohpkm)))
@@ -120,7 +120,7 @@ async function tryLoadBatch(ids: OhpkmIdentifier[]): Promise<Result<OhpkmBatchLo
 
   if (uncachedIds.length === 0) return R.Ok(batchResults)
 
-  return TauriBackend.lookupOhpkmBatch(uncachedIds).then(
+  return AppBackend.lookupOhpkmBatch(uncachedIds).then(
     R.map((results) => {
       results.entries().forEach(([id, result]) => batchResults.set(id, result))
       return batchResults
@@ -149,7 +149,7 @@ async function replaceHeldItem(mon: OHPKM) {
 }
 
 async function searchStore(cursor: PaginationCursor, filters: Filter[]) {
-  return TauriBackend.searchOhpkmStore(cursor, filters)
+  return AppBackend.searchOhpkmStore(cursor, filters)
 }
 
 async function updateMonTags(
@@ -247,7 +247,7 @@ async function handleLookupsUpdate(ohpkm: OHPKM, save: SAV, lookupsController: L
       ...lookups,
       gen12: { ...lookups.gen12, [gen12Identifier]: ohpkmIdentifier },
     })
-    await TauriBackend.log('DEBUG', `added ${ohpkm.nickname} to gen 1/2 lookup`, {
+    await AppBackend.log('DEBUG', `added ${ohpkm.nickname} to gen 1/2 lookup`, {
       ohpkm_id: ohpkm.openhomeId,
       event: 'lookups_update',
       gen12Identifier,
@@ -265,7 +265,7 @@ async function handleLookupsUpdate(ohpkm: OHPKM, save: SAV, lookupsController: L
       ...lookups,
       gen345: { ...lookups.gen345, [gen345Identifier]: ohpkmIdentifier },
     })
-    await TauriBackend.log('DEBUG', `added ${ohpkm.nickname} to gen 3/4/5 lookup`, {
+    await AppBackend.log('DEBUG', `added ${ohpkm.nickname} to gen 3/4/5 lookup`, {
       ohpkm_id: ohpkm.openhomeId,
       event: 'lookups_update',
       gen345Identifier,
@@ -309,7 +309,7 @@ function syncOhpkmIfTracked(
     const updates = trackedData.syncWithGameData(mon, save)
 
     if (updates.length > 0) {
-      void TauriBackend.log('DEBUG', `synced ${mon.nickname} with game data`, {
+      void AppBackend.log('DEBUG', `synced ${mon.nickname} with game data`, {
         ohpkm_id: trackedData.openhomeId,
         event: 'game_data_sync',
         updates,
