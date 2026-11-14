@@ -1,6 +1,6 @@
 import { Callout } from '@radix-ui/themes'
 import type { Responsive } from '@radix-ui/themes/props'
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import type { IconType } from 'react-icons'
 import { ErrorIcon, InfoIcon, SuccessIcon } from './Icons'
 
@@ -12,6 +12,7 @@ export type MessageRibbonProps = {
   size?: Responsive<'1' | '2' | '3'>
   variant?: Callout.RootProps['variant']
   title?: string
+  style?: CSSProperties
 }
 
 type TypeData = {
@@ -27,11 +28,12 @@ const TYPE_DATA: Record<RibbonType, TypeData> = {
 }
 
 export default function MessageRibbon(props: MessageRibbonProps) {
-  const { children, type = 'info', size = '1', variant = 'surface' } = props
+  const { children, style, type = 'info', size = '1', variant = 'surface' } = props
   const { icon: IconComponent, color } = TYPE_DATA[type]
 
+  const className = `message-ribbon-${type}`
   return (
-    <Callout.Root className={`message-ribbon-${type}`} color={color} size={size} variant={variant}>
+    <Callout.Root className={className} color={color} size={size} variant={variant} style={style}>
       <Callout.Icon>
         <IconComponent fontSize={24} />
       </Callout.Icon>

@@ -85,6 +85,7 @@ export default function OhoButton(props: OhoButtonProps) {
 
   const button = (
     <Button
+      className={props.className}
       size="1"
       color={color}
       // @ts-expect-error Radix UI is no longer maintained, this is likely an issue with the library
