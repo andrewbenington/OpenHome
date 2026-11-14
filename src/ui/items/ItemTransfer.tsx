@@ -4,6 +4,7 @@ import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import Fallback from '@openhome-ui/components/Fallback'
 import { ArrowUpIcon, RegisteredIcon } from '@openhome-ui/components/Icons'
 import LabelledInput from '@openhome-ui/components/input/LabelledInput'
+import MessageRibbon from '@openhome-ui/components/MessageRibbon'
 import OhoButton from '@openhome-ui/components/OhoButton'
 import OhoFlex from '@openhome-ui/components/OhoFlex'
 import { Item } from '@pkm-rs/pkg'
@@ -66,12 +67,14 @@ export function ItemTransfer(props: ItemTransferProps) {
           {selectedItem?.index &&
           selectedSourceController.database.maxAllowed(selectedItem.index) === 1 ? (
             <KeyItemRegisterControls
+              key={selectedItem?.index}
               sourceController={selectedSourceController}
               destController={unselectedSourceController}
               side={selectedSourceId === 'source1' ? 'right' : 'left'}
             />
           ) : (
             <ItemTransferControls
+              key={selectedItem?.index}
               sourceController={selectedSourceController}
               destController={unselectedSourceController}
               side={selectedSourceId === 'source1' ? 'right' : 'left'}
@@ -183,9 +186,21 @@ function ItemTransferControls(props: ItemTransferControlsProps) {
             autoFocus
           />
           <code>/</code>
-          <code style={{ width: '3rem' }}>
+          <OhoButton
+            className="item-transfer-max-button"
+            variant="ghost"
+            size="1"
+            style={{
+              marginLeft: props.side === 'right' ? '0.25rem' : undefined,
+              marginRight: props.side === 'left' ? '0.25rem' : undefined,
+            }}
+            onClick={() =>
+              props.sourceController?.selectedItem?.count &&
+              setMoveCount(props.sourceController?.selectedItem?.count)
+            }
+          >
             {props.sourceController?.selectedItem?.count ?? '--'}
-          </code>
+          </OhoButton>
         </OhoFlex.Row>
       </div>
       {props.side === 'right' && button}
@@ -208,26 +223,33 @@ function KeyItemRegisterControls(props: ItemTransferControlsProps) {
   return (
     <OhoFlex.Row gap="1" direction={props.side === 'left' ? 'row' : 'row-reverse'}>
       <OhoFlex.RowCentered width="50%" height="2.6rem" mt="var(--padding-radius-xs-sm)">
-        {sourceItem && props.destController.database.maxAllowed(sourceItem.index) === 1 && (
-          <OhoButton
-            size="3"
-            color="red"
-            variant="classic"
-            style={{ fontWeight: 'bold', width: 'fit-content' }}
-            onClick={() => {
-              if (registeredForSource && sourceItem && !registeredForDest) {
-                props.destController.source.addItems(sourceItem?.index, 1)
-              }
-            }}
-            disabled={!registeredForSource || registeredForDest}
-          >
-            {props.side === 'right' ? null : registeredForDest ? registeredIcon : <ArrowUpIcon />}
-            {registeredForDest ? 'Registered' : 'Register'}
-            {sourceItem && !registeredForDest && (
-              <Badge.Item item={sourceItem} showLabel backgroundColor="var(--gray-11)" />
-            )}
-            {props.side === 'left' ? null : registeredForDest ? registeredIcon : <ArrowUpIcon />}
-          </OhoButton>
+        {props.destController.source.sourceType === 'OpenHome' ? (
+          sourceItem &&
+          props.destController.database.maxAllowed(sourceItem.index) === 1 && (
+            <OhoButton
+              size="2"
+              color="red"
+              variant="classic"
+              style={{ fontWeight: 'bold', width: 'fit-content' }}
+              onClick={() => {
+                if (registeredForSource && sourceItem && !registeredForDest) {
+                  props.destController.source.addItems(sourceItem?.index, 1)
+                }
+              }}
+              disabled={!registeredForSource || registeredForDest}
+            >
+              {props.side === 'right' ? null : registeredForDest ? registeredIcon : <ArrowUpIcon />}
+              {registeredForDest ? 'Registered' : 'Register'}
+              {sourceItem && !registeredForDest && (
+                <Badge.Item item={sourceItem} showLabel backgroundColor="var(--gray-11)" />
+              )}
+              {props.side === 'left' ? null : registeredForDest ? registeredIcon : <ArrowUpIcon />}
+            </OhoButton>
+          )
+        ) : (
+          <MessageRibbon style={{ padding: '0.5rem' }} type="warning">
+            Key items cannot be sent to a save file.
+          </MessageRibbon>
         )}
       </OhoFlex.RowCentered>
     </OhoFlex.Row>

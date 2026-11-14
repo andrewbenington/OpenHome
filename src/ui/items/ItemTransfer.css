@@ -33,3 +33,11 @@
   flex-direction: row;
   grid-column: 1 / span 2;
 }
+
+.item-transfer-max-button {
+  width: 3rem;
+  min-width: 0rem !important;
+  padding-left: 0;
+  padding-right: 0;
+  text-align: start;
+}
