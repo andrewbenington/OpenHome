@@ -48,10 +48,8 @@ export default function PokemonDetailsModal(props: PokemonDetailsModalProps) {
   const { onClose, navigateLeft, navigateRight, boxIndicatorProps } = props
   const [boxIndicatorVisible, setBoxIndicatorVisible] = useState(false)
   const [boxIndicatorTimeout, setBoxIndicatorTimeout] = useState<NodeJS.Timeout>()
-  console.log('PokemonDetailsModal')
 
   const showTemporaryBoxIndicator = () => {
-    console.log('showTemporaryBoxIndicator')
     setBoxIndicatorVisible(true)
     if (boxIndicatorTimeout) {
       clearTimeout(boxIndicatorTimeout)
