@@ -146,9 +146,7 @@ impl ScarletVioletSave {
 
     #[cfg(feature = "wasm")]
     pub fn prepare_bytes_for_saving(&self) -> Vec<u8> {
-        crate::log!("before getting blocks");
         let mut blocks: Vec<_> = self.blocks.to_blocks().into_values().collect();
-        crate::log!("after getting blocks");
         swish_crypto::encrypt_blocks(&mut blocks, self.byte_length)
     }
 
