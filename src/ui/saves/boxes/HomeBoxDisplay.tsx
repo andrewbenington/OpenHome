@@ -348,10 +348,7 @@ function SingleBoxMonDisplay() {
               lookupResult ?? (loading ? (R.Ok(undefined) as BoxSlotResult) : R.Err({ identifier }))
           }
 
-          const monPresentButLoading =
-            (loading && identifier !== undefined && monPromise !== undefined) ||
-            pendingMon !== undefined
-          return { monPromise, location, identifier, loading: monPresentButLoading }
+          return { monPromise, location, identifier }
         }),
     [currentBankIndex, currentBox.identifiers, currentBoxIndex, getPendingMon, ohpkmsById, loading]
   )
