@@ -185,6 +185,7 @@ pub enum SignificantUpdate {
     V1_18_0,
     V1_18_1,
     V1_19_0,
+    V1_19_1,
 }
 
 impl SignificantUpdate {
@@ -226,6 +227,7 @@ impl SignificantUpdate {
             Self::V1_18_0 => Version::parse("1.18.0"),
             Self::V1_18_1 => Version::parse("1.18.1"),
             Self::V1_19_0 => Version::parse("1.19.0"),
+            Self::V1_19_1 => Version::parse("1.19.1"),
         }
         .expect("all versions are valid semver")
     }
@@ -437,6 +439,10 @@ impl SignificantUpdate {
                 "Pokémon that were migrated to other games using Pal Park or Poké Transfer now have a \"default\" met location set.",
                 "Fixed Pokémon met in Legends: Z-A displaying as being met \"in the Lumiose region\".",
                 "Further improvements to overall system stability and other minor adjustments have been made to enhance the user experience.",
+            ]),
+            Self::V1_19_1 => Some(vec![
+                "A performance issue caused by the Pokédex in v1.19.0 has been fixed.",
+                "The OHPKM count display has been temporarily removed until an issue with it is fixed.",
             ]),
             _ => None,
         }
