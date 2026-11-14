@@ -426,6 +426,7 @@ impl SignificantUpdate {
                 "Pokémon caught in the Game Boy games now show special text in the Met tab for supported formats.",
                 "Certain Pokémon met in the GameCube games (starters and Duking's trades) now have special text in the Met tab when viewed in OpenHome format.",
                 "Save reading code for Scarlet and Violet and Compass have been fully migrated to Rust, improving performance.",
+                "Fixed moves not visually updating after being changed.",
                 "Fixed Hisuian Pokémon being incompatible with Legends: Arceus.",
                 "Fixed some Pokémon being incorrectly considered compatible with Legends: Arceus.",
                 "Hisuian Pokémon now have the Alpha indicator in the Pokédex. This was just a visual issue; if you obtained that Pokémon's Alpha variant in a previous version, it should now show as registered.",
