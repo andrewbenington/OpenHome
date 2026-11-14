@@ -328,17 +328,6 @@ export function useOhpkmStore() {
   const backend = useBackend()
   const displayError = useDisplayError()
 
-  async function replaceHeldItem(mon: OHPKM) {
-    const replacedItem = mon.heldItemIndex
-    mon.heldItemIndex = 0
-    await insertOrUpdate(mon)
-    return replacedItem
-  }
-
-  async function searchStore(cursor: PaginationCursor, filters: Filter[]) {
-    return backend.searchOhpkmStore(cursor, filters)
-  }
-
   // the async tasks are left to run here because otherwise the box UI lags to wait for them
   async function updateAndConvertForSave<P extends PKMInterface>(ohpkm: OHPKM, save: SAV<P>) {
     void handleLookupsUpdate(ohpkm, save, lookupsController)
@@ -352,97 +341,6 @@ export function useOhpkmStore() {
       )
 
     return save.convertOhpkm(ohpkm, defaultConvertStrategy)
-  }
-
-  async function updateMonMarkings(monId: string, markings: MarkingsSixShapesColors) {
-    const result = await tryLoadFromId(monId)
-    if (R.isErr(result)) return result
-
-    const mon = result.data
-    mon.markings = { ...markings }
-
-    await insertOrUpdate(mon)
-    return R.Ok(mon)
-  }
-
-  async function updateMonNotes(monId: string, notes: string | undefined) {
-    const result = await tryLoadFromId(monId)
-    if (R.isErr(result)) return result
-
-    const mon = result.data
-    mon.notes = notes
-
-    await insertOrUpdate(mon)
-    return R.Ok(mon)
-  }
-
-  async function updateMonTags(
-    monId: string,
-    tags: { label: string; color: string; icon?: string }[] | undefined
-  ) {
-    const result = await tryLoadFromId(monId)
-    if (R.isErr(result)) return result
-
-    const mon = result.data
-    mon.setTags(tags ?? [])
-
-    await insertOrUpdate(mon)
-    return R.Ok(mon)
-  }
-
-  async function updateMonDisplayColor(monId: string, color: string | undefined) {
-    const result = await tryLoadFromId(monId)
-    if (R.isErr(result)) return result
-
-    const mon = result.data
-    mon.displayColor = color
-
-    await insertOrUpdate(mon)
-    return R.Ok(mon)
-  }
-
-  async function updateMonAffixedRibbon(monId: string, affixedRibbon: Option<ModernRibbon>) {
-    const result = await tryLoadFromId(monId)
-    if (R.isErr(result)) return result
-
-    const mon = result.data
-    mon.affixedRibbon = affixedRibbon
-
-    await insertOrUpdate(mon)
-    return R.Ok(mon)
-  }
-
-  async function setMonMove(monId: string, moveId: Option<number>, slot: MoveSlotIndex) {
-    const result = await tryLoadFromId(monId)
-    if (R.isErr(result)) return result
-
-    const mon = result.data
-    const newMoves: FourMoves = [...mon.moves]
-
-    newMoves[slot] = moveId ?? 0
-
-    mon.moves = fixMoveSlots(newMoves, newMoves)
-
-    mon.movePP = [
-      getMoveMaxPP(mon.moves[0], 'OHPKM', mon.movePPUps[0]) ?? 0,
-      getMoveMaxPP(mon.moves[1], 'OHPKM', mon.movePPUps[1]) ?? 0,
-      getMoveMaxPP(mon.moves[2], 'OHPKM', mon.movePPUps[2]) ?? 0,
-      getMoveMaxPP(mon.moves[3], 'OHPKM', mon.movePPUps[3]) ?? 0,
-    ]
-
-    await insertOrUpdate(mon)
-    return R.Ok(mon)
-  }
-
-  async function setMonNickname(monId: string, nickname: Option<string>) {
-    const result = await tryLoadFromId(monId)
-    if (R.isErr(result)) return result
-
-    const mon = result.data
-    mon.nickname = nickname || Lookup.speciesName(mon.nationalDex, mon.language)
-
-    await insertOrUpdate(mon)
-    return R.Ok(mon)
   }
 
   function startTrackingNewMon<P extends PKMInterface>(
