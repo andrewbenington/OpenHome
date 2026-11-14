@@ -60,7 +60,7 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
   // value, thus ensuring the selected value is always an <option> and will be visible
   const dropdownFormats =
     baseFormat === 'OHPKM'
-      ? Array.from(new Set([currentFormat, ...supportedFormats]))
+      ? Array.from(new Set(['OHPKM', ...supportedFormats]))
       : ['OHPKM', baseFormat]
 
   return (

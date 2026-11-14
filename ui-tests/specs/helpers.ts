@@ -1,6 +1,5 @@
 import { SAV, saveToStringIdentifier } from '@openhome-core/save/interfaces'
 import { browser, expect } from '@wdio/globals'
-import '@wdio/tauri-service' // adds the browser.tauri typings
 import { ChainablePromiseElement } from 'webdriverio'
 
 export type FindOptions = { expectedText?: string }
@@ -11,7 +10,7 @@ const OpenHomeUi = {
   },
 
   async findChainable(selector: string, options?: FindOptions): Promise<ChainablePromiseElement> {
-    const element = browser.$(selector)
+    const element = browser.$(selector, { strict: false })
     await element.waitForDisplayed()
 
     if (options?.expectedText) {
@@ -22,7 +21,7 @@ const OpenHomeUi = {
   },
 
   async findHomeSlot(box: number, slot: number): Promise<WebdriverIO.Element> {
-    return (await this.find(`#home_${box}_${slot}`)).getElement()
+    return (await this.find(`#droppable-home_${box}_${slot}`)).getElement()
   },
 
   async homeMonElement(box: number, slot: number): Promise<WebdriverIO.Element> {
@@ -30,7 +29,9 @@ const OpenHomeUi = {
   },
 
   async findSaveSlot(save: SAV, box: number, slot: number): Promise<WebdriverIO.Element> {
-    return (await this.find(`[id="${saveToStringIdentifier(save)}_${box}_${slot}"]`)).getElement()
+    return (
+      await this.find(`[id="droppable-${saveToStringIdentifier(save)}_${box}_${slot}"]`)
+    ).getElement()
   },
 
   async saveMonElement(save: SAV, box: number, slot: number): Promise<WebdriverIO.Element> {

@@ -188,7 +188,7 @@ git-fix-pnpm:
 
 .PHONY: run-ui-test-build
 run-ui-test-build:
-	@UI_TEST_DATA_FOLDER='ui-tests/ui-tests-data-dir' ./target/release/OpenHomeUiTesting
+	@UI_TEST_DATA_FOLDER='ui-tests/sample-data-dir' ./target/release/OpenHomeUiTesting
 
 rust_files = $(shell find src -type f -name '*.rs')
 ts_files = $(shell find src -type f -name '*.ts')
