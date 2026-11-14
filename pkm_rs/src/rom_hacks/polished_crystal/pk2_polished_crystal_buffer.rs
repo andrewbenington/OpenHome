@@ -1,7 +1,6 @@
 use super::{Pk2PolishedCrystalAbilityIndex, Pk2PolishedCrystalSpeciesAndForm};
 use crate::bytes::{AsBytes, AsBytesMut};
 use crate::checksum::{Checksum, ChecksumU16Le, RefreshChecksum};
-use crate::encryption::BlockCrypto;
 use crate::result::{Error, Result};
 use crate::util;
 use arbitrary_int::u3;
@@ -19,6 +18,7 @@ use pkm_rs_types::{
 };
 use pkm_rs_types::{Language, Stats16Le};
 use pkm_rs_types::{read_u16_le, read_u32_le};
+use crate::encryption::BlockCrypto;
 
 const CHECKSUM_OFFSET: usize = 6;
 const MOVE_DATA_OFFSETS: MoveDataOffsets = MoveDataOffsets {

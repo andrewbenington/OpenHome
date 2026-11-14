@@ -3,7 +3,7 @@
 // pub mod ub;
 
 pub mod save;
-pub mod pk2_polished_crystal;
+pub mod polished_crystal;
 
 use std::str::FromStr;
 
