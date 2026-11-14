@@ -184,6 +184,7 @@ pub enum SignificantUpdate {
     V1_17_1,
     V1_18_0,
     V1_18_1,
+    V1_19_0,
 }
 
 impl SignificantUpdate {
@@ -224,6 +225,7 @@ impl SignificantUpdate {
             Self::V1_17_1 => Version::parse("1.17.1"),
             Self::V1_18_0 => Version::parse("1.18.0"),
             Self::V1_18_1 => Version::parse("1.18.1"),
+            Self::V1_19_0 => Version::parse("1.19.0"),
         }
         .expect("all versions are valid semver")
     }
@@ -414,6 +416,26 @@ impl SignificantUpdate {
                 "Error indicators will now show when a Pokémon is considered malformed in a PC box for the following save files: Gen 3 (GBA), Radical Red, and Unbound.",
                 "A bug in preserving shininess when going to Gameboy formats has been fixed.",
                 "A bug causing bugged empty slots in Gen 5 games has been fixed.",
+            ]),
+            Self::V1_19_0 => Some(vec![
+                "You can now access the Bag in Scarlet and Violet, Sword and Shield, and Compass, and move items between those games' Bags and OpenHome's Item Bag. More games will support this feature in the future.",
+                "A button has been added to view extra data about a save file. (This could already be done by right-clicking, but a button is more obvious.)",
+                "You can now view (but not withdraw) the ride Koraidon/Miraidon in Scarlet and Violet.",
+                "You can now drag-and-drop Pokémon dumped from Pokémon HOME in .ph4 format. All data for that Pokémon is saved, including its per-game movesets.",
+                "Pokémon caught in the Gen 4 games now describe how they were encountered in the Met tab (e.g. \"Resurrected\" for fossil Pokémon) when viewed in the OpenHome format.",
+                "Pokémon caught in the Game Boy games now show special text in the Met tab for supported formats.",
+                "Certain Pokémon met in the GameCube games (starters and Duking's trades) now have special text in the Met tab when viewed in OpenHome format.",
+                "Save reading code for Scarlet and Violet and Compass have been fully migrated to Rust, improving performance.",
+                "Fixed Hisuian Pokémon being incompatible with Legends: Arceus.",
+                "Fixed some Pokémon being incorrectly considered compatible with Legends: Arceus.",
+                "Hisuian Pokémon now have the Alpha indicator in the Pokédex. This was just a visual issue; if you obtained that Pokémon's Alpha variant in a previous version, it should now show as registered.",
+                "Fixed Arceus's forms not being tagged as Mythical, and showing the Alpha indicator in the Pokédex.",
+                "Fixed Mega Evolutions not being registered in the Pokédex when a Pokémon holding a Mega Stone is detected.",
+                "Fixed the Japanese character \"ー\" not being encoded correctly.",
+                "Pokémon from the Game Boy games that don't have a met location now show what region they're from in the Met tab.",
+                "Pokémon that were migrated to other games using Pal Park or Poké Transfer now have a \"default\" met location set.",
+                "Fixed Pokémon met in Legends: Z-A displaying as being met \"in the Lumiose region\".",
+                "Further improvements to overall system stability and other minor adjustments have been made to enhance the user experience.",
             ]),
             _ => None,
         }
