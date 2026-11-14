@@ -5,14 +5,20 @@ html {
 body {
   margin: 0;
   font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell',
-    'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+    "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(355deg, rgba(83, 180, 165, 1) 0%, rgba(125, 206, 171, 1) 85%);
+  background: linear-gradient(
+    355deg,
+    rgba(83, 180, 165, 1) 0%,
+    rgba(125, 206, 171, 1) 85%
+  );
   min-height: 100vh;
   --dark-color: #333;
   padding-bottom: 32px;
+
+  --discord-blurple: #5865f2;
 }
 
 a {
@@ -120,7 +126,7 @@ td:nth-child(1) {
 }
 
 .downloads-table a:before {
-  content: url('download.svg');
+  content: url("download.svg");
   display: inline-block;
   vertical-align: middle;
   width: 12px;
@@ -160,15 +166,21 @@ td:nth-child(1) {
   text-decoration: none;
 }
 
-.header-links a:not(.github-button) {
+.header-links a:not(.header-button) {
   display: inline-block;
 }
 
-.header-links a:hover:not(.active):not(.github-button) {
+.header-links a:hover:not(.active):not(.header-button) {
   background-color: #688;
 }
 
-.github-button {
+.header-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
+.header-button {
   img {
     height: 24px;
   }
@@ -183,6 +195,14 @@ td:nth-child(1) {
   padding: 8px;
   border-radius: 8px;
   text-decoration: none;
+}
+
+.discord-button {
+  background-color: var(--discord-blurple);
+}
+
+.github-button {
+  background-color: #333;
 }
 
 .npm-button {
@@ -291,7 +311,7 @@ td:nth-child(1) {
 }
 
 .download-buttons > a:not(.disabled)::after {
-  content: url('download-white.svg');
+  content: url("download-white.svg");
   display: inline-block;
   vertical-align: middle;
   text-align: end;
@@ -362,7 +382,7 @@ img {
 }
 
 .issue-button::after {
-  content: 'Thanks';
+  content: "Thanks";
   height: 50px;
   width: 150px;
   background-color: #008080;
@@ -397,11 +417,11 @@ img {
 }
 
 .ibbug.issue-button::before {
-  content: 'Bug';
+  content: "Bug";
 }
 
 .ibfeature.issue-button::before {
-  content: 'Feature';
+  content: "Feature";
 }
 
 .issue-button:hover::after {
