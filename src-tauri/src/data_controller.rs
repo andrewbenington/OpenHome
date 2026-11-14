@@ -301,7 +301,7 @@ pub mod tests {
             }
         }
 
-        fn create_default_json_file_if_not_exists<P, T>(
+        fn create_default_json_file_if_missing_or_null<P, T>(
             &self,
             dir: DataDir,
             relative_path: &P,
@@ -328,7 +328,7 @@ pub mod tests {
             T: serde::de::DeserializeOwned + serde::ser::Serialize + Default,
         {
             let default_file_created =
-                self.create_default_json_file_if_not_exists::<P, T>(dir, &relative_path)?;
+                self.create_default_json_file_if_missing_or_null::<P, T>(dir, &relative_path)?;
 
             if default_file_created {
                 Ok(T::default())
