@@ -3,6 +3,7 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { getMoveMaxPP } from '@openhome-core/pkm/util'
 import { Moves } from '@openhome-core/resources'
+import { FourMoves } from '@openhome-core/util/types'
 import { EditIcon } from '@openhome-ui/components/Icons'
 import OhoFlex from '@openhome-ui/components/OhoFlex'
 import MoveCard from '@openhome-ui/components/pokemon/MoveCard'
@@ -18,6 +19,9 @@ export default function MovesTab(props: { mon: PKMInterface }) {
   const [editing, setEditing] = useState(false)
   const ohpkmStore = useOhpkmStore()
 
+  // updated immediately, so ui doesnt have to wait for ohpkm store to update moves before reflecting changes
+  const [pendingMoves, setPendingMoves] = useState<FourMoves>(mon.moves)
+
   return (
     <Flex className="pokemon-modal-content" direction="column" height="100%">
       <div className="pokemon-modal-card pokemon-moves-card">
@@ -29,17 +33,19 @@ export default function MovesTab(props: { mon: PKMInterface }) {
           <Separator />
         </Inset>
         <Flex className="pokemon-moves-card-content" direction="row" justify="between" gap="0.5rem">
-          {mon.moves?.map((move, i) =>
+          {pendingMoves?.map((move, i) =>
             editing && mon instanceof OHPKM ? (
               <MoveSelect
                 key={`move_slot_${i}`}
-                currentMoveIds={mon.moves}
+                currentMoveIds={pendingMoves}
                 learnedMoveIds={Array.from(mon.learnedMovesWasm)}
                 uniqueFieldId={`move_slot_${i}`}
                 value={move}
-                onChange={(moveId) =>
-                  ohpkmStore.setMonMove(mon.openhomeId, moveId, i as MoveSlotIndex)
-                }
+                onChange={async (moveId) => {
+                  pendingMoves[i] = moveId ?? 0
+                  setPendingMoves(pendingMoves)
+                  await ohpkmStore.setMonMove(mon.openhomeId, moveId, i as MoveSlotIndex)
+                }}
               />
             ) : (
               <MoveCard
