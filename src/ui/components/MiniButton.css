@@ -5,7 +5,6 @@
   width: fit-content;
   transition: none;
   border-radius: var(--border-radius-sm);
-  background-color: var(--gray-a7);
   box-shadow: none;
   display: grid;
 
@@ -19,6 +18,10 @@
     width: 1.25rem;
     filter: brightness(0) invert(0.9);
   }
+}
+
+.mini-button-untoggled {
+  background-color: var(--gray-a7);
 }
 
 .mini-button-icon-only {
