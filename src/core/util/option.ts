@@ -77,6 +77,10 @@ export class OptionBox<T> {
     return $O(map(onSome)(this.v))
   }
 
+  isSomeAnd(onSome: OnSome<T, boolean>): boolean {
+    return $O(map(onSome)(this.v)).v === true
+  }
+
   update<R>(onSome: OnSome<T, OptionBox<R>>): OptionBox<R> {
     return this.v ? onSome(this.v) : (this as unknown as OptionBox<R>) // v is null/undefined, so reuse the same object
   }

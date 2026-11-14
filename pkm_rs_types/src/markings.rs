@@ -32,10 +32,10 @@ impl MarkingsFourShapes {
 
     pub fn to_byte(self) -> u8 {
         let mut byte = 0u8;
-        byte.set_bit(0, self.circle);
-        byte.set_bit(1, self.square);
-        byte.set_bit(2, self.triangle);
-        byte.set_bit(3, self.heart);
+        byte.set_bit_at(0, self.circle);
+        byte.set_bit_at(1, self.square);
+        byte.set_bit_at(2, self.triangle);
+        byte.set_bit_at(3, self.heart);
 
         byte
     }
@@ -89,12 +89,12 @@ impl MarkingsSixShapes {
 
     pub fn to_byte(self) -> u8 {
         let mut byte = 0u8;
-        byte.set_bit(0, self.circle);
-        byte.set_bit(1, self.square);
-        byte.set_bit(2, self.triangle);
-        byte.set_bit(3, self.heart);
-        byte.set_bit(4, self.star);
-        byte.set_bit(5, self.diamond);
+        byte.set_bit_at(0, self.circle);
+        byte.set_bit_at(1, self.square);
+        byte.set_bit_at(2, self.triangle);
+        byte.set_bit_at(3, self.heart);
+        byte.set_bit_at(4, self.star);
+        byte.set_bit_at(5, self.diamond);
 
         byte
     }

@@ -1,4 +1,5 @@
 import { Flex, type FlexProps } from '@radix-ui/themes'
+import { Ref } from 'react'
 import './OhoFlex.css'
 
 type OhoFlexProps = {} & FlexProps
@@ -19,7 +20,7 @@ function Row(props: OhoFlexProps) {
   return <Flex direction="row" align="center" gap="2" {...props} />
 }
 
-function RowEqualSized(props: OhoFlexProps) {
+function RowEqualSized(props: OhoFlexProps & { ref?: Ref<HTMLDivElement> }) {
   return <Flex className="flex-equal-size" direction="row" align="center" gap="2" {...props} />
 }
 

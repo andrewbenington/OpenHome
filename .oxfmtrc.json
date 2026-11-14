@@ -3,5 +3,5 @@
   "semi": false,
   "trailingComma": "es5",
   "printWidth": 100,
-  "ignorePatterns": ["ui-tests/*"]
+  "ignorePatterns": ["ui-tests/**/*.json"]
 }

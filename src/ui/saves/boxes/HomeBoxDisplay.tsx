@@ -5,7 +5,7 @@ import { mapToObject } from '@openhome-core/util'
 import { $R, Option, R, range } from '@openhome-core/util/functional'
 import { isThenable } from '@openhome-core/util/promise'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
-import { Item, Separator, Submenu } from '@openhome-ui/components/context-menu/types'
+import { Item, LoadingItem, Separator, Submenu } from '@openhome-ui/components/context-menu/types'
 import { DebugDataDisplay } from '@openhome-ui/components/DebugDataDisplay'
 import DebugOnly from '@openhome-ui/components/DebugOnly'
 import PromptDialog from '@openhome-ui/components/dialog/PromptDialog'
@@ -21,7 +21,7 @@ import {
 import SearchFields from '@openhome-ui/components/search/SearchFields'
 import PokemonSearchModal from '@openhome-ui/components/search/SearchModal'
 import ToggleButton from '@openhome-ui/components/ToggleButton'
-import { useDisplayError } from '@openhome-ui/hooks/displayError'
+import { useDisplayError, useTitledErrorDisplay } from '@openhome-ui/hooks/displayError'
 import PokemonDetailsModal from '@openhome-ui/pokemon/PokemonDetailsModal'
 import {
   useDragSourceSupportsMon,
@@ -256,6 +256,7 @@ type SlotData = {
 
 function SingleBoxMonDisplay() {
   const displayError = useDisplayError()
+  const displayTitledError = useTitledErrorDisplay()
   const { importMonsToLocation, getPendingMon } = useSaves()
   const { getCurrentBox, getCurrentBank, removeAllHomeDupes } = useBanksAndBoxes()
   const { multiSelectState: dragState, isSelected, toggleSelection } = useMultiSelect()
@@ -286,7 +287,11 @@ function SingleBoxMonDisplay() {
     () => [
       Submenu.label('Sort this box...').with(
         ...SortTypes.map((sortType) =>
-          Item.label(`By ${sortType}`).action(() => sortHomeBox(currentBox.index, sortType))
+          LoadingItem.label(`By ${sortType}`).action(async () => {
+            await sortHomeBox(currentBox.index, sortType).then(
+              R.peekErr(displayTitledError('Error sorting box'))
+            )
+          })
         )
       ),
       Submenu.label('Sort all boxes...').with(
@@ -295,7 +300,7 @@ function SingleBoxMonDisplay() {
         )
       ),
     ],
-    [currentBox, sortAllHomeBoxes, sortHomeBox]
+    [currentBox, sortAllHomeBoxes, sortHomeBox, displayTitledError]
   )
 
   const removeDupesItem = Item.label('Remove duplicates from this box').action(removeAllHomeDupes)

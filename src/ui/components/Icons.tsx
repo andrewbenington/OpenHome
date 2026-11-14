@@ -2,7 +2,13 @@ import { IconBaseProps } from 'react-icons'
 import { AiFillEdit } from 'react-icons/ai'
 import { BiMove } from 'react-icons/bi'
 import { BsGrid3X3Gap, BsGrid3X3GapFill } from 'react-icons/bs'
-import { FaDumbbell } from 'react-icons/fa'
+import {
+  FaDumbbell,
+  FaSortAlphaDown,
+  FaSortAlphaDownAlt,
+  FaSortAmountDown,
+  FaSortAmountDownAlt,
+} from 'react-icons/fa'
 import { IoGrid } from 'react-icons/io5'
 import {
   MdArrowBack,
@@ -51,6 +57,7 @@ export const EditIcon = AiFillEdit
 export const MoveIcon = BiMove
 export const AddIcon = TiPlus
 export const ClearIcon = MdClear
+export const RegisteredIcon = MdCheckCircle
 
 export const GridIcon = MdGrid4X4
 export const CardsIcon = IoGrid
@@ -61,6 +68,10 @@ export const ArrowUpIcon = MdArrowUpward
 export const ArrowLeftRightIcon = MdCompareArrows
 export const DropdownArrowIcon = MdArrowDropDown
 export const FilterIcon = MdFilterListAlt
+export const SortAlphaDownIcon = FaSortAlphaDown
+export const SortAlphaUpcon = FaSortAlphaDownAlt
+export const SortAmountDownIcon = FaSortAmountDown
+export const SortAmountUpIcon = FaSortAmountDownAlt
 export const FavoriteIcon = MdStar
 
 export const ExpandArrowIcon = MdArrowForwardIos

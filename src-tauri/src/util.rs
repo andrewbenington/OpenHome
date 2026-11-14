@@ -79,11 +79,7 @@ where
             continue;
         };
 
-        let Some(filename) = enclosed_name.file_name() else {
-            continue;
-        };
-
-        let outpath = Path::new(output_dir).join(filename);
+        let outpath = Path::new(output_dir).join(enclosed_name);
 
         if file.is_dir() {
             create_directory(&outpath)?;

@@ -102,7 +102,7 @@ const OtherDisplay = (props: { mon: OtherDisplayPkmData }) => {
           value={
             mon.metLocationIndex === undefined
               ? '(not present)'
-              : `${getLocationStringOrOrigin(mon.gameOfOrigin, mon.metLocationIndex, mon.format, Language.English)} (${mon.metLocationIndex})` // todo: i18n
+              : `${getLocationStringOrOrigin(mon.gameOfOrigin, mon.metLocationIndex, mon.format, mon.nationalDex, mon.trainerID, mon.trainerName, Language.English)} (${mon.metLocationIndex})` // todo: i18n
           }
         />
         {mon.encryptionConstant !== undefined && (

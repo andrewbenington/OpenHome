@@ -1,7 +1,7 @@
 use num_enum::TryFromPrimitive;
 use pkm_rs_derive::EnumMax;
 use serde::Deserialize;
-use std::fmt::Display;
+use std::{fmt::Display, mem};
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
@@ -20,10 +20,10 @@ impl NationalDex {
             }))
     }
 
-    pub fn assert_valid(index: u16) -> NationalDex {
-        index
-            .try_into()
-            .expect("NationalDex initiated with invalid value")
+    pub const fn assert_valid(index: u16) -> NationalDex {
+        assert!(index != 0);
+        assert!(index as usize <= NationalDex::MAX);
+        unsafe { mem::transmute(index) }
     }
 
     pub fn from_le_bytes(bytes: [u8; 2]) -> crate::Result<NationalDex> {

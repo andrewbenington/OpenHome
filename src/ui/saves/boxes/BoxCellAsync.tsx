@@ -67,12 +67,7 @@ function BoxCellAsync(props: BoxCellAsyncProps) {
             disabled={props.isDisabled?.(props.monPlaceholder)}
           />
         ) : (
-          <div
-            className="box-cell box-cell-loading"
-            style={{
-              backgroundColor: '#6662',
-            }}
-          >
+          <div className="box-cell box-cell-loading" style={{ backgroundColor: '#6662' }}>
             <img
               src="/items/index/0000.png"
               alt=""

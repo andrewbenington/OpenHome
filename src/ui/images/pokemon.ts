@@ -97,6 +97,7 @@ function getImageSource(format: PkmOrOhpkmFormat): PokemonImageSource {
     case 'PB8':
     case 'PB8LUMI':
     case 'PA9':
+    case 'PH4':
     case 'OHPKM':
       return HomeSprites
   }

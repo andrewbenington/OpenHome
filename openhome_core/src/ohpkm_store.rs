@@ -186,6 +186,10 @@ impl OhpkmBytesStore {
     pub fn all_entries(&self) -> impl Iterator<Item = (&OpenHomeId, &Vec<u8>)> {
         self.0.iter()
     }
+
+    pub fn count(&self) -> usize {
+        self.0.len()
+    }
 }
 
 #[derive(Debug, thiserror::Error)]

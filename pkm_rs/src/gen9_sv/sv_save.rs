@@ -1,10 +1,10 @@
-use super::save_blocks::{BoxData, MyStatusFields, SvBlocks};
+use super::sv_save_blocks::{BoxData, MyStatusFields, SvBlocks};
 use super::{BOX_COLS, BOX_ROWS, BoxName, MAX_BOX_COUNT, Pk9, Pk9Buffer};
 use crate::checksum::RefreshChecksum;
 use crate::convert_strategy::ConvertStrategy;
 use crate::encryption::swish_crypto::{self, NumericBlock, SwishBlocks};
 #[cfg(feature = "wasm")]
-use crate::gen9_sv::save_blocks::SvBlockKey;
+use crate::gen9_sv::sv_save_blocks::SvBlockKey;
 use crate::gen9_sv::{BoxIndex, BoxSlot};
 use crate::items::ItemDataTs;
 use crate::result::{Error, Result, StdResult};
@@ -368,11 +368,6 @@ impl ScarletVioletSave {
 
     #[wasm_bindgen(js_name = getDisplayData)]
     pub fn display_data(&self) -> StdResult<js_sys::Object, JsValue> {
-        // let mut map = BTreeMap::new();
-        // map.insert("pokedexOwned", 3);
-
-        // let serializer = Serializer::new().serialize_maps_as_objects(true);
-        // map.serialize(&serializer).map_err(Into::into)
         let obj = js_sys::Object::new();
         let MyStatusFields {
             trainer_id,
@@ -492,7 +487,6 @@ mod tests {
         assert_eq!(block_vec.len(), 6242);
 
         let slice = save_bytes.into_boxed_slice();
-        dbg!(slice.len());
 
         let save = ScarletVioletSave::from_bytes(slice)?;
 

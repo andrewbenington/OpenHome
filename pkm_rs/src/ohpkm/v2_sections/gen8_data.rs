@@ -4,7 +4,7 @@ use crate::result::{Error, Result};
 use crate::sectioned_data::DataSection;
 use crate::util;
 
-use pkm_rs_resources::moves::la_tutor;
+use pkm_rs_resources::moves::{MoveSlot, la_tutor};
 use pkm_rs_types::FlagSet;
 use pkm_rs_types::OriginGame;
 use pkm_rs_types::Stats8;
@@ -84,6 +84,7 @@ impl DataSection for SwordShieldData {
     }
 }
 
+#[allow(deprecated)]
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
@@ -96,15 +97,21 @@ pub struct LegendsArceusData {
     pub tutor_flags: FlagSet<8>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub master_flags: FlagSet<8>,
+    #[deprecated(
+        since = "1.19.0",
+        note = "the alpha mark in main_data is used instead. this is no longer set on writes."
+    )]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub is_alpha: bool,
     pub is_noble: bool,
-    pub alpha_move: u16,
+    pub alpha_move: MoveSlot,
     pub flag2: bool,
     pub unknown_a0: u32,
     pub unknown_f3: u8,
 }
 
 impl LegendsArceusData {
+    #[allow(deprecated)]
     pub fn from_v1(old: crate::ohpkm::v1::OhpkmV1) -> Option<Self> {
         if old.game_of_origin != OriginGame::LegendsArceus
             && !old.is_alpha
@@ -117,7 +124,7 @@ impl LegendsArceusData {
         } else {
             Some(Self {
                 gvs: old.gvs,
-                alpha_move: old.alpha_move,
+                alpha_move: old.alpha_move.into(),
                 move_flags: FlagSet::from_bytes(old.move_flags_la),
                 tutor_flags: FlagSet::from_bytes(old.tutor_flags_la),
                 master_flags: FlagSet::from_bytes(old.master_flags_la),
@@ -149,10 +156,11 @@ impl DataSection for LegendsArceusData {
         // try_into() will always succeed thanks to the buffer size check
         Ok(Self {
             gvs: Stats8::from_bytes(bytes[0..6].try_into().unwrap()),
-            alpha_move: u16::from_le_bytes(bytes[6..8].try_into().unwrap()),
+            alpha_move: MoveSlot::from_le_bytes(bytes[6..8].try_into().unwrap()),
             move_flags: FlagSet::from_bytes(bytes[8..22].try_into().unwrap()),
             tutor_flags: FlagSet::from_bytes(bytes[22..30].try_into().unwrap()),
             master_flags: FlagSet::from_bytes(bytes[30..38].try_into().unwrap()),
+            #[allow(deprecated)]
             is_alpha: util::get_flag(bytes, 38, 0),
             is_noble: util::get_flag(bytes, 38, 1),
             flag2: util::get_flag(bytes, 38, 2),
@@ -169,7 +177,7 @@ impl DataSection for LegendsArceusData {
         bytes[8..22].copy_from_slice(&self.move_flags.to_bytes());
         bytes[22..30].copy_from_slice(&self.tutor_flags.to_bytes());
         bytes[30..38].copy_from_slice(&self.master_flags.to_bytes());
-        util::set_flag(&mut bytes, 38, 0, self.is_alpha);
+        util::set_flag(&mut bytes, 38, 0, false);
         util::set_flag(&mut bytes, 38, 1, self.is_noble);
         util::set_flag(&mut bytes, 38, 2, self.flag2);
         bytes[39] = self.unknown_f3;
@@ -179,8 +187,7 @@ impl DataSection for LegendsArceusData {
     }
 
     fn is_empty(&self) -> bool {
-        !self.is_alpha
-            && !self.is_noble
+        !self.is_noble
             && self.move_flags.is_empty()
             && self.master_flags.is_empty()
             && self.tutor_flags.is_empty()

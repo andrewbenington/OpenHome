@@ -22,6 +22,7 @@ import { FourMoves } from '@openhome-core/util/types'
 import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import { Lookup, MarkingsSixShapesColors, ModernRibbon, OriginGames } from '@pkm-rs/pkg/pkm_rs'
 import dayjs from 'dayjs'
+import { useCallback } from 'react'
 import { OhpkmStoreData } from '.'
 import { useConvertStrategies } from '../convert-strategies'
 import { LookupsController, useLookups } from '../lookups'
@@ -328,9 +329,134 @@ export function useOhpkmStore() {
   const backend = useBackend()
   const displayError = useDisplayError()
 
+  async function updateStore(updates: OhpkmStoreData): Promise<Result<null>> {
+    for (const [id, ohpkm] of Object.entries(updates)) {
+      ohpkmCache.set(id, ohpkm)
+    }
+    await backend.addToOhpkmStore(updates)
+
+    return R.Ok(null)
+  }
+
+  const getById = useCallback(
+    (id: string): NowOrLater<Option<OHPKM>> => {
+      const cached = ohpkmCache.get(id)
+      if (cached) return cached
+
+      return backend
+        .lookupOhpkmById(id)
+        .then(R.dropError)
+        .then((ohpkm) => {
+          if (ohpkm) {
+            ohpkmCache.set(ohpkm.openhomeId, ohpkm)
+          }
+          return ohpkm
+        })
+    },
+    [backend]
+  )
+
+  function tryLoadFromId(id: string): NowOrLater<OhpkmLookupResult> {
+    const cached = ohpkmCache.get(id)
+    if (cached) return R.Ok(cached)
+
+    return backend
+      .lookupOhpkmById(id)
+      .then(R.mapErr(() => IdentifierNotPresent(id)))
+      .then(R.flatMap((ohpkm) => (ohpkm ? R.Ok(ohpkm) : R.Err(IdentifierNotPresent(id)))))
+      .then(R.peek((ohpkm) => ohpkmCache.set(ohpkm.openhomeId, ohpkm)))
+  }
+
+  function tryLoadBatch(ids: OhpkmIdentifier[]): NowOrLater<OhpkmBatchLookupResults> {
+    const batchResults: OhpkmBatchLookupResults = new Map()
+
+    const pendingMons: Promise<[string, OhpkmLookupResult]>[] = []
+    for (const identifier of ids) {
+      const resultOrPromise = tryLoadFromId(identifier)
+      if (!isThenable(resultOrPromise)) {
+        batchResults.set(identifier, resultOrPromise)
+      } else {
+        pendingMons.push(resultOrPromise.then((ohpkm) => [identifier, ohpkm]))
+      }
+    }
+
+    if (pendingMons.length === 0) {
+      return batchResults
+    }
+
+    return Promise.all(pendingMons).then((results) => {
+      results.forEach(([id, ohpkm]) => batchResults.set(id, ohpkm))
+      return batchResults
+    })
+  }
+
+  async function monIsStored(id: string): Promise<boolean> {
+    const result = getById(id)
+    return Boolean(isThenable(result) ? await result : result)
+  }
+
+  async function insertOrUpdate(mon: OHPKM) {
+    await updateStore({ [mon.openhomeId]: mon.clone() })
+  }
+
+  async function insertOrUpdateAll(mons: OhpkmStoreData) {
+    return updateStore(mons)
+  }
+
+  async function replaceHeldItem(mon: OHPKM) {
+    const replacedItem = mon.heldItemIndex
+    mon.heldItemIndex = 0
+    await insertOrUpdate(mon)
+    return replacedItem
+  }
+
+  async function searchStore(cursor: PaginationCursor, filters: Filter[]) {
+    return backend.searchOhpkmStore(cursor, filters)
+  }
+
+  async function handleLookupsUpdate(ohpkm: OHPKM, save: SAV) {
+    const lookupType = (save.constructor as SAVClass).lookupType
+    const ohpkmIdentifier = ohpkm.openhomeId
+
+    if (lookupType === 'gen12') {
+      const gen12Identifier = getMonGen12Identifier(ohpkm)
+      if (!gen12Identifier) {
+        throw Error(`could not build gen 1/2 identifier for mon ${ohpkmIdentifier}`)
+      }
+
+      await lookupsController.updateLookups({
+        ...lookups,
+        gen12: { ...lookups.gen12, [gen12Identifier]: ohpkmIdentifier },
+      })
+      await backend.log('DEBUG', `added ${ohpkm.nickname} to gen 1/2 lookup`, {
+        ohpkm_id: ohpkm.openhomeId,
+        event: 'lookups_update',
+        gen12Identifier,
+      })
+    } else if (lookupType === 'gen345') {
+      // If original generation, keep the original PID
+      const isOriginalGen =
+        OriginGames.generation(ohpkm.gameOfOrigin) === OriginGames.generation(save.origin)
+      const gen345Identifier = getMonGen345Identifier(ohpkm, isOriginalGen)
+      if (!gen345Identifier) {
+        throw Error(`could not build gen 3/4/5 identifier for mon ${ohpkmIdentifier}`)
+      }
+
+      await lookupsController.updateLookups({
+        ...lookups,
+        gen345: { ...lookups.gen345, [gen345Identifier]: ohpkmIdentifier },
+      })
+      await backend.log('DEBUG', `added ${ohpkm.nickname} to gen 3/4/5 lookup`, {
+        ohpkm_id: ohpkm.openhomeId,
+        event: 'lookups_update',
+        gen345Identifier,
+      })
+    }
+  }
+
   // the async tasks are left to run here because otherwise the box UI lags to wait for them
   async function updateAndConvertForSave<P extends PKMInterface>(ohpkm: OHPKM, save: SAV<P>) {
-    void handleLookupsUpdate(ohpkm, save, lookupsController)
+    void handleLookupsUpdate(ohpkm, save)
       .then(() => insertOrUpdate(ohpkm))
       // .then(() => handleLookupsUpdate(ohpkm, save, lookupsController))
       .catch((error) =>
@@ -343,7 +469,98 @@ export function useOhpkmStore() {
     return save.convertOhpkm(ohpkm, defaultConvertStrategy)
   }
 
-  async function startTrackingNewMon<P extends PKMInterface>(
+  async function updateMonMarkings(monId: string, markings: MarkingsSixShapesColors) {
+    const result = await tryLoadFromId(monId)
+    if (R.isErr(result)) return result
+
+    const mon = result.data
+    mon.markings = { ...markings }
+
+    await insertOrUpdate(mon)
+    return R.Ok(mon)
+  }
+
+  async function updateMonNotes(monId: string, notes: string | undefined) {
+    const result = await tryLoadFromId(monId)
+    if (R.isErr(result)) return result
+
+    const mon = result.data
+    mon.notes = notes
+
+    await insertOrUpdate(mon)
+    return R.Ok(mon)
+  }
+
+  async function updateMonTags(
+    monId: string,
+    tags: { label: string; color: string; icon?: string }[] | undefined
+  ) {
+    const result = await tryLoadFromId(monId)
+    if (R.isErr(result)) return result
+
+    const mon = result.data
+    mon.setTags(tags ?? [])
+
+    await insertOrUpdate(mon)
+    return R.Ok(mon)
+  }
+
+  async function updateMonDisplayColor(monId: string, color: string | undefined) {
+    const result = await tryLoadFromId(monId)
+    if (R.isErr(result)) return result
+
+    const mon = result.data
+    mon.displayColor = color
+
+    await insertOrUpdate(mon)
+    return R.Ok(mon)
+  }
+
+  async function updateMonAffixedRibbon(monId: string, affixedRibbon: Option<ModernRibbon>) {
+    const result = await tryLoadFromId(monId)
+    if (R.isErr(result)) return result
+
+    const mon = result.data
+    mon.affixedRibbon = affixedRibbon
+
+    await insertOrUpdate(mon)
+    return R.Ok(mon)
+  }
+
+  async function setMonMove(monId: string, moveId: Option<number>, slot: MoveSlotIndex) {
+    const result = await tryLoadFromId(monId)
+    if (R.isErr(result)) return result
+
+    const mon = result.data
+    const newMoves: FourMoves = [...mon.moves]
+
+    newMoves[slot] = moveId ?? 0
+
+    mon.moves = fixMoveSlots(newMoves, newMoves)
+
+    mon.movePP = [
+      getMoveMaxPP(mon.moves[0], 'OHPKM', mon.movePPUps[0]) ?? 0,
+      getMoveMaxPP(mon.moves[1], 'OHPKM', mon.movePPUps[1]) ?? 0,
+      getMoveMaxPP(mon.moves[2], 'OHPKM', mon.movePPUps[2]) ?? 0,
+      getMoveMaxPP(mon.moves[3], 'OHPKM', mon.movePPUps[3]) ?? 0,
+    ]
+
+    await insertOrUpdate(mon)
+    return R.Ok(mon)
+  }
+
+  async function setMonNickname(monId: string, nickname: Option<string>) {
+    const result = await tryLoadFromId(monId)
+    if (R.isErr(result)) return result
+
+    const mon = result.data
+    mon.nickname = nickname || Lookup.speciesName(mon.nationalDex, mon.language)
+
+    await insertOrUpdate(mon)
+    return R.Ok(mon)
+  }
+
+  function startTrackingNewMon<P extends PKMInterface>(
     mon: P,
     sourceSave: Option<SAV<P>>,
     destSave: Option<SAV>
@@ -360,7 +577,7 @@ export function useOhpkmStore() {
         ])
       )
     if (destSave) {
-      void handleLookupsUpdate(ohpkm, destSave, lookupsController)
+      void handleLookupsUpdate(ohpkm, destSave)
     }
 
     void insertOrUpdate(ohpkm).catch((error) => {
@@ -416,7 +633,8 @@ export function useOhpkmStore() {
       case 'PB8LUMI':
       case 'PK9':
       case 'PK9Compass':
-      case 'PA9': {
+      case 'PA9':
+      case 'PH4': {
         return tryCalculateIdentifier(mon)
       }
       default:

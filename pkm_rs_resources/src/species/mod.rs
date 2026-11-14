@@ -5,6 +5,7 @@ mod types;
 pub use metadata::*;
 use pkm_rs_types::NationalDex;
 pub use types::*;
+pub mod mega_evolutions;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;

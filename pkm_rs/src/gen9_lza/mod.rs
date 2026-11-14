@@ -26,6 +26,16 @@ pub struct PlusMoveFlags {
 }
 
 impl PlusMoveFlags {
+    pub const fn from_flag_sets(
+        block_0xd6: FlagSet<LZA_PLUS_MOVES_0XD6_BYTES>,
+        block_0x94: FlagSet<LZA_PLUS_MOVES_0X94_BYTES>,
+    ) -> Self {
+        Self {
+            block_0xd6,
+            block_0x94,
+        }
+    }
+
     pub const fn from_byte_blocks(
         block_0xd6: &[u8; LZA_PLUS_MOVES_0XD6_BYTES],
         block_0x94: &[u8; LZA_PLUS_MOVES_0X94_BYTES],

@@ -1,29 +1,20 @@
-use crate::BitSet;
-
-pub fn get_flag(bytes: &[u8], byte_offset: usize, bit_index: usize) -> bool {
+pub const fn get_flag(bytes: &[u8], byte_offset: usize, bit_index: usize) -> bool {
     let byte_index = byte_offset + (bit_index / 8);
-    if byte_index >= bytes.len() {
-        panic!(
-            "attempting to read flag out of range (byte {} of {})",
-            byte_index,
-            bytes.len()
-        );
-    }
-    let bit_index: u8 = (bit_index % 8).try_into().unwrap();
+    let bit_index: u8 = (bit_index % 8) as u8;
     bit_is_set(bytes[byte_index], bit_index)
 }
 
-pub fn set_flag(bytes: &mut [u8], byte_offset: usize, bit_index: usize, value: bool) {
+pub const fn set_flag(bytes: &mut [u8], byte_offset: usize, bit_index: usize, value: bool) {
     let byte_index = byte_offset + (bit_index / 8);
-    if byte_index >= bytes.len() {
-        panic!(
-            "attempting to read flag out of range (byte {} of {})",
-            byte_index,
-            bytes.len()
-        );
-    }
-    let bit_index: u8 = (bit_index % 8).try_into().unwrap();
-    bytes[byte_index].set_bit(bit_index, value);
+    let bit_index: u8 = (bit_index % 8) as u8;
+    bytes[byte_index] = set_bit(bytes[byte_index], bit_index, value);
+}
+
+/// Sets or clears a bit depending on `on`.
+pub const fn set_bit(data: u8, bit: u8, value: bool) -> u8 {
+    assert!(bit < (u8::BITS as u8), "bit index out of range");
+    let mask = 1 << bit;
+    if value { data | mask } else { data & !mask }
 }
 
 pub const fn bit_is_set(byte: u8, bit_index: u8) -> bool {
@@ -111,6 +102,18 @@ macro_rules! read_u64_le {
             $bytes[$start + 5],
             $bytes[$start + 6],
             $bytes[$start + 7],
+        ])
+    };
+}
+
+#[macro_export]
+macro_rules! read_f32_le {
+    ($bytes:expr, $start:expr) => {
+        u32::from_le_bytes([
+            $bytes[$start],
+            $bytes[$start + 1],
+            $bytes[$start + 2],
+            $bytes[$start + 3],
         ])
     };
 }

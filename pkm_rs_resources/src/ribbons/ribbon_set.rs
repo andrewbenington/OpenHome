@@ -51,6 +51,12 @@ impl<const N: usize, RIBBON: Ribbon, const MAX: usize> RibbonSet<N, RIBBON, MAX>
         }
     }
 
+    pub const fn set_ribbon_raw(&mut self, ribbon: usize, value: bool) {
+        if ribbon <= MAX {
+            self.0.set_flag_raw(ribbon, value);
+        }
+    }
+
     pub const fn clear(&mut self) {
         self.0.clear();
     }
@@ -91,6 +97,10 @@ impl<const N: usize, RIBBON: Ribbon, const MAX: usize> RibbonSet<N, RIBBON, MAX>
         truncated_bytes.copy_from_slice(&self.to_bytes()[0..min_size]);
 
         RibbonSet::<M, RIBBON, MAX>::from_bytes(truncated_bytes)
+    }
+
+    pub const fn includes_raw(&self, ribbon: usize) -> bool {
+        self.0.get_flag_raw(ribbon)
     }
 
     pub fn includes(&self, ribbon: RIBBON) -> bool {
@@ -146,6 +156,15 @@ impl<const N: usize, RIBBON: Ribbon, const MAX: usize> From<RibbonSet<N, RIBBON,
 impl<const N: usize, RIBBON: Ribbon, const MAX: usize> Default for RibbonSet<N, RIBBON, MAX> {
     fn default() -> Self {
         Self(Default::default())
+    }
+}
+
+impl<const N: usize, RIBBON: Ribbon, const MAX: usize> IntoIterator for RibbonSet<N, RIBBON, MAX> {
+    type Item = RIBBON;
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.get_ribbons().into_iter()
     }
 }
 

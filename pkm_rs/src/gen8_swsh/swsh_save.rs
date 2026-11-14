@@ -1,25 +1,34 @@
-use super::save_blocks::{BoxBlock, MyStatusBlock, SwordShieldBlocks};
+#[cfg(feature = "wasm")]
+use std::collections::BTreeMap;
+
+use super::swsh_save_blocks::{BoxBlock, MyStatusBlock, SwordShieldBlocks};
 use super::{BOX_COLS, BOX_ROWS, BoxName, MAX_BOX_COUNT, Pk8, Pk8Buffer};
 use crate::checksum::RefreshChecksum;
 use crate::convert_strategy::ConvertStrategy;
 use crate::encryption::swish_crypto;
 use crate::encryption::swish_crypto::{NumericBlock, SwishBlocks};
-#[cfg(feature = "wasm")]
-use crate::gen8_swsh::save_blocks::SwShBlockKey;
 use crate::gen8_swsh::{BoxIndex, BoxSlot};
-#[cfg(feature = "wasm")]
-use crate::result::StdResult;
 use crate::result::{Error, Result};
 use crate::traits::PkmBytes;
 
+#[cfg(feature = "wasm")]
+use arbitrary_int::traits::Integer;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{BinaryGender, Language};
+#[cfg(feature = "wasm")]
+use strum::IntoEnumIterator;
 
 #[cfg(feature = "wasm")]
-use pkm_rs_types::{BoundViolated, NationalDex, OriginGame, TryIntoTs, TsResult};
+use crate::gen8_swsh::swsh_save_blocks::SwShBlockKey;
+#[cfg(feature = "wasm")]
+use crate::items::{ItemDataTs, SwshItemPouch, SwshItemStorage};
+#[cfg(feature = "wasm")]
+use crate::result::StdResult;
+#[cfg(feature = "wasm")]
+use pkm_rs_types::{BoundViolated, JsResult, NationalDex, OriginGame, TryIntoTs, TsResult};
 #[cfg(feature = "wasm")]
 use tsify::Ts;
-
+#[cfg(feature = "wasm")]
 use tsify::Tsify;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
@@ -453,6 +462,39 @@ impl SwordShieldSave {
     #[wasm_bindgen(js_name = fileIsSave)]
     pub fn file_is_save_wasm(bytes: &[u8]) -> bool {
         Self::is_save(bytes)
+    }
+
+    #[wasm_bindgen(js_name = getItemInventory)]
+    pub fn item_inventory_wasm(&self) -> Vec<Ts<ItemDataTs>> {
+        let mut item_data: BTreeMap<u16, ItemDataTs> = self
+            .blocks
+            .items
+            .0
+            .all()
+            .map(|item| (item.get_index().as_u16(), item.to_ts()))
+            .collect();
+
+        for item_index in SwshItemPouch::iter()
+            .flat_map(SwshItemStorage::items_by_pouch)
+            .flatten()
+            .copied()
+        {
+            item_data
+                .entry(item_index)
+                .or_insert_with(|| ItemDataTs::new_unobtained(item_index));
+        }
+
+        item_data
+            .values()
+            .filter_map(|item| item.into_ts().ok())
+            .collect()
+    }
+
+    #[wasm_bindgen(js_name = "updateItemData")]
+    pub fn update_item_inventory_wasm(&mut self, v: Ts<ItemDataTs>) -> JsResult<()> {
+        self.blocks.items.update_item_from_ts(v.to_rust()?);
+
+        Ok(())
     }
 
     #[wasm_bindgen(js_name = prepareBytesForSaving)]

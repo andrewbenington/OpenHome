@@ -106,10 +106,9 @@ impl DataSection for MostRecentSave {
 }
 
 #[cfg_attr(feature = "randomize", derive(Randomize))]
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "wasm", derive(tsify::Tsify))]
 #[derive(Debug, Default, Clone, Serialize)]
 pub struct PluginData {
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub plugin_origin: String,
 }
 
@@ -130,21 +129,6 @@ impl PluginData {
 
     const fn from_origin(plugin_origin: String) -> Self {
         Self { plugin_origin }
-    }
-}
-
-#[cfg(feature = "wasm")]
-#[wasm_bindgen]
-#[allow(clippy::missing_const_for_fn)]
-impl PluginData {
-    #[wasm_bindgen(getter = pluginOrigin)]
-    pub fn plugin_origin(&self) -> String {
-        self.plugin_origin.clone()
-    }
-
-    #[wasm_bindgen(setter = pluginOrigin)]
-    pub fn set_plugin_origin(&mut self, value: String) {
-        self.plugin_origin = value;
     }
 }
 

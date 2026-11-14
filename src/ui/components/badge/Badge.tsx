@@ -2,9 +2,10 @@ import { PluginIdentifier } from '@openhome-core/tauri/spectaCommands'
 import { pluralize } from '@openhome-core/util/format'
 import { Nullable, Option } from '@openhome-core/util/functional'
 import { getPublicImageURL } from '@openhome-ui/images/images'
+import { getItemIconPath } from '@openhome-ui/images/items'
 import { getDetailsOfficialSave, getDetailsPluginSave } from '@openhome-ui/saves/util'
 import { OPENHOME_COLOR } from '@openhome-ui/util/color'
-import { Pokerus } from '@pkm-rs/pkg'
+import { Item, Pokerus } from '@pkm-rs/pkg'
 import { memo } from 'react'
 import { HyperTrainIcon } from '../Icons'
 import { BaseBadge, BaseBadgeProps } from './BaseBadge'
@@ -66,6 +67,21 @@ function AlphaBadge(props: Omit<BadgeProps, 'backgroundColor'>) {
       src={getPublicImageURL('icons/Alpha.png')}
       backgroundColor="#f2352d"
       label={label}
+      {...props}
+    />
+  )
+}
+
+export type ItemBadgeProps = BadgeProps & { item: Option<Item> }
+
+function ItemBadge(props: ItemBadgeProps) {
+  const label = labelIf(props.showLabel, props.item?.name ?? 'No Item')
+  return (
+    <ImageBadge
+      src={props.item ? getItemIconPath(props.item?.index) : '/icons/no-icon.png'}
+      backgroundColor={props.backgroundColor}
+      label={label}
+      noSillhouette
       {...props}
     />
   )
@@ -217,6 +233,7 @@ const Badge = {
   Gigantamax: memo(GigantamaxBadge),
   HyperTrain: memo(HyperTrainBadge),
   Image: memo(ImageBadge),
+  Item: memo(ItemBadge),
   Numeric: memo(NumericBadge),
   NsPokemon: memo(NsPokemonBadge),
   Pokerus: memo(PokerusBadge),

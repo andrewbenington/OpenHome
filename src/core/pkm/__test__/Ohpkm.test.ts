@@ -357,7 +357,14 @@ describe('OHPKM conversion strategies', () => {
       'Alpha Sapphire converted to Sapphire in PK4 (location match strategy)'
     ).toEqual(OriginGame.Sapphire)
     expect(
-      getFormatLocationString(pk4.metLocationIndex, 'PK4', Language.English),
+      getFormatLocationString(
+        pk4.metLocationIndex,
+        'PK4',
+        pk4.nationalDex,
+        pk4.trainerID,
+        pk4.trainerName,
+        Language.English
+      ),
       'Alpha Sapphire -> PK4 location is Hoenn with location match strategy'
     ).toContain('Hoenn')
 
@@ -367,7 +374,14 @@ describe('OHPKM conversion strategies', () => {
       'Alpha Sapphire converted to Sapphire in PK4 (legality strategy)'
     ).toEqual(OriginGame.Sapphire)
     expect(
-      getFormatLocationString(pk4.metLocationIndex, 'PK4', Language.English),
+      getFormatLocationString(
+        pk4.metLocationIndex,
+        'PK4',
+        pk4.nationalDex,
+        pk4.trainerID,
+        pk4.trainerName,
+        Language.English
+      ),
       'Alpha Sapphire -> PK4 location is Pal Park with legality strategy'
     ).toContain('Pal Park')
   })
@@ -382,7 +396,14 @@ describe('OHPKM conversion strategies', () => {
       OriginGame.Diamond
     )
     expect(
-      getFormatLocationString(pk4.metLocationIndex, 'PK4', Language.English),
+      getFormatLocationString(
+        pk4.metLocationIndex,
+        'PK4',
+        pk4.nationalDex,
+        pk4.trainerID,
+        pk4.trainerName,
+        Language.English
+      ),
       'Diamond -> Original location preserved with legality strategy'
     ).toContain('Jubilife City')
 
@@ -391,7 +412,14 @@ describe('OHPKM conversion strategies', () => {
       OriginGame.Diamond
     )
     expect(
-      getFormatLocationString(pk4.metLocationIndex, 'PK4', Language.English),
+      getFormatLocationString(
+        pk4.metLocationIndex,
+        'PK4',
+        pk4.nationalDex,
+        pk4.trainerID,
+        pk4.trainerName,
+        Language.English
+      ),
       'Diamond -> Original location preserved with location match strategy'
     ).toContain('Jubilife City')
   })
@@ -415,7 +443,14 @@ describe('OHPKM conversion strategies', () => {
       OriginGame.OmegaRuby
     )
     expect(
-      getFormatLocationString(pk7.metLocationIndex, 'PK7', Language.English),
+      getFormatLocationString(
+        pk7.metLocationIndex,
+        'PK7',
+        pk7.nationalDex,
+        pk7.trainerID,
+        pk7.trainerName,
+        Language.English
+      ),
       'Omega Ruby -> PK7 location index is Hoenn with location match strategy'
     ).toContain('Hoenn')
   })

@@ -143,3 +143,11 @@ pub fn permanently_delete_ohpkms(
 
     Ok(results)
 }
+
+#[tauri::command]
+#[specta::specta]
+pub fn get_ohpkm_count(
+    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
+) -> CommandResult<usize> {
+    Ok(synced_state.0.lock()?.ohpkm_store.0.count())
+}

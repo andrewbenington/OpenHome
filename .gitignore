@@ -3,6 +3,7 @@
 /pkm_rs_resources/generate/node_modules
 /pkm_rs/generate/node_modules
 /generate/node_modules
+/generate/scrape-assets/downloaded-pages/*
 
 /.pnp
 .pnp.js
@@ -12,6 +13,7 @@ tsconfig.tsbuildinfo
 /coverage
 tester.sh
 test-files/openhome/storage/recent_saves.json
+ui-tests/first-launch-dir
 
 # production
 /out

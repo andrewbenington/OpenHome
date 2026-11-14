@@ -5,7 +5,7 @@ import dayjs, { Dayjs } from 'dayjs'
 import { ReactNode } from 'react'
 import type { Column } from 'react-data-grid'
 
-export type Sorter<T> = (a: T, b: T) => number
+export type ComparisonFunction<T> = (a: T, b: T) => number
 
 export type SortType = 'string' | 'number' | 'dayjs' | 'boolean'
 
@@ -58,6 +58,11 @@ export function numericSorter<T, N extends number = number>(func: (val: T) => N 
 const identity = <T>(v: T) => v
 
 export const lowestToHighest = numericSorter<number>(identity)
+
+export const inverted =
+  <T>(c: ComparisonFunction<T>) =>
+  (a: T, b: T) =>
+    -c(a, b)
 
 function originGameOrderValue(origin?: OriginGame): number {
   if (!origin) return Number.POSITIVE_INFINITY
@@ -112,7 +117,7 @@ export function dayjsSorter<T>(func: (val: T) => Dayjs | undefined, recentFirst:
   }
 }
 
-export function multiSorter<T>(...sorters: Sorter<T>[]): Sorter<T> {
+export function multiSorter<T>(...sorters: ComparisonFunction<T>[]): ComparisonFunction<T> {
   return (a: T, b: T) => {
     for (const sorter of sorters) {
       const diff = sorter(a, b)

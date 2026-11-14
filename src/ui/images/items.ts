@@ -92,20 +92,23 @@ export const getItemIconPath = (item: number): string => {
   if (item > 0) {
     if (itemName.startsWith('HM') || (itemName.startsWith('TM') && itemName.charAt(2) !== 'V')) {
       return 'items/tm/normal.png'
-    }
-    if (itemName.startsWith('TR')) {
+    } else if (itemName.startsWith('TR')) {
       return 'items/tr/normal.png'
-    }
-    if (itemName.startsWith('★')) {
+    } else if (itemName.startsWith('★')) {
       return 'items/shared/dynamax-crystal.png'
     }
+
     const svPouch = SvItemStorage.pouchForItem(item)
     if (svPouch === 'Materials') {
       return 'items/shared/tm-material.png'
-    }
-    if (svPouch === 'Picnic') {
+    } else if (svPouch === 'Picnic') {
       return 'items/shared/picnic-set.png'
+    } else if (itemName.startsWith('Lost Satchel')) {
+      return 'items/shared/lost-satchel.png'
+    } else if (itemName.startsWith('Old Verse')) {
+      return 'items/shared/old-verse.png'
     }
+
     for (let i = 0; i < SharedItemSpritePrefixes.length; i++) {
       const prefix = SharedItemSpritePrefixes[i]
 

@@ -1,9 +1,10 @@
-//! Item storage for Generation 9 (Scarlet / Violet).
+//! Item storage for Pokémon Scarlet / Violet.
 //!
 //! Port of PKHeX's `PKHeX.Core/Items/ItemStorage9SV.cs`.
 
 use crate::items::availability::Availability;
 use crate::items::category::OpenhomeItemCategory;
+use crate::items::merge_dedup::is_strictly_ascending;
 
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use pkm_rs_types::TryIntoTs;
@@ -267,23 +268,6 @@ impl SvItemStorage {
         }
     }
 
-    #[cfg(test)]
-    const fn capacity(ty: OpenhomeItemCategory) -> Option<u16> {
-        match ty {
-            OpenhomeItemCategory::KeyItems => Some(1),
-            OpenhomeItemCategory::Items
-            | OpenhomeItemCategory::TechnicalMachines
-            | OpenhomeItemCategory::Medicine
-            | OpenhomeItemCategory::Berries
-            | OpenhomeItemCategory::Balls
-            | OpenhomeItemCategory::BattleItems
-            | OpenhomeItemCategory::Treasure
-            | OpenhomeItemCategory::Food // 999 (depends on item)
-            | OpenhomeItemCategory::SpeciesItems => Some(999),
-            _ => None,
-        }
-    }
-
     pub fn availability_of(item_index: u16) -> Availability {
         if Self::pouch_for(item_index).is_none() {
             Availability::Unsupported
@@ -340,8 +324,8 @@ impl SvItemStorage {
 
     #[cfg(feature = "wasm")]
     #[wasm_bindgen(js_name = pouchIndexToOpenHome)]
-    pub fn sv_category_to_openhome_category(sv_pouch: u32) -> TsResult<OpenhomeItemCategory> {
-        OpenhomeItemCategory::from(SvItemPouch::try_from(sv_pouch).unwrap_or(SvItemPouch::Other))
+    pub fn pouch_index_to_openhome_category(pouch: u32) -> TsResult<OpenhomeItemCategory> {
+        OpenhomeItemCategory::from(SvItemPouch::try_from(pouch).unwrap_or(SvItemPouch::Other))
             .try_into_ts()
     }
 
@@ -352,17 +336,6 @@ impl SvItemStorage {
     ) -> JsResult<Option<u32>> {
         Ok(SvItemPouch::from_openhome(openhome_category.to_rust()?).map(u32::from))
     }
-}
-
-const fn is_strictly_ascending(s: &[u16]) -> bool {
-    let mut i = 1;
-    while i < s.len() {
-        if s[i - 1] >= s[i] {
-            return false;
-        }
-        i += 1;
-    }
-    true
 }
 
 const _: () = {
@@ -410,18 +383,5 @@ mod tests {
             Some(OpenhomeItemCategory::SpeciesItems)
         );
         assert_eq!(SvItemStorage::category_for(9999), None);
-    }
-
-    #[test]
-    fn max_counts() {
-        assert_eq!(
-            SvItemStorage::capacity(OpenhomeItemCategory::KeyItems),
-            Some(1)
-        );
-        assert_eq!(
-            SvItemStorage::capacity(OpenhomeItemCategory::Berries),
-            Some(999)
-        );
-        assert_eq!(SvItemStorage::capacity(OpenhomeItemCategory::None), None);
     }
 }
