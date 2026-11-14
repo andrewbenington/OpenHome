@@ -13,9 +13,13 @@ export function usePokedex(): PokedexManager {
   const [loading, setLoading] = useState(false)
   const backend = useBackend()
 
-  backend.registerListeners({
-    onPokedexUpdate: setPokedexCache,
-  })
+  useEffect(() => {
+    const unlisten = backend.registerListeners({
+      onPokedexUpdate: setPokedexCache,
+    })
+
+    return unlisten
+  }, [backend])
 
   const loadAndCachePokedex = useCallback(async () => {
     if (pokedexCache) {

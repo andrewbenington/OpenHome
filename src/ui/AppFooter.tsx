@@ -1,22 +1,19 @@
-import useBackend from '@openhome-core/backend/useBackend'
-import { $R, Result } from '@openhome-core/util/functional'
-import { Spinner } from '@radix-ui/themes'
-import { Suspense, use, useState } from 'react'
+import { useState } from 'react'
 import { PKM_RS_WASM } from '../init'
 import OhoButton from './components/OhoButton'
 import OhoFlex from './components/OhoFlex'
 
 export function AppFooter() {
   const [wasmSize, setWasmSize] = useState(wasmSizeDisplay())
-  const backend = useBackend()
-  const ohpkmCountResult = backend.getOhpkmCount()
+  // const backend = useBackend()
+  // const ohpkmCountResult = backend.getOhpkmCount()
 
   return (
     <div className="app-footer">
-      OHPKM Count:{' '}
+      {/* OHPKM Count:{' '}
       <Suspense fallback={<Spinner />}>
         <OhpkmCount promise={ohpkmCountResult} />
-      </Suspense>
+      </Suspense> */}
       <OhoFlex.Spacer />
       <p style={{ fontSize: '0.8rem' }}>WASM memory usage:</p>
       <code>{wasmSize}</code>
@@ -37,15 +34,15 @@ function wasmSizeDisplay() {
     : 'loading...'
 }
 
-type OhpkmCountProps = {
-  promise: Promise<Result<number>>
-}
+// type OhpkmCountProps = {
+//   promise: Promise<Result<number>>
+// }
 
-function OhpkmCount({ promise }: OhpkmCountProps) {
-  const result = use(promise)
+// function OhpkmCount({ promise }: OhpkmCountProps) {
+//   const result = use(promise)
 
-  return $R(result).match(
-    (count) => <code>{count}</code>,
-    (error) => <div>{error}</div>
-  )
-}
+//   return $R(result).match(
+//     (count) => <code>{count}</code>,
+//     (error) => <div>{error}</div>
+//   )
+// }
