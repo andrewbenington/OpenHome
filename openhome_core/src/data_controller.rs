@@ -127,8 +127,8 @@ pub trait DataController {
         Some(read_file_json(&full_path))
     }
 
-    // returns true if the file was created
-    fn create_default_json_file_if_not_exists<P, T>(
+    // returns true if the file was created or it was previously null
+    fn create_default_json_file_if_missing_or_null<P, T>(
         &self,
         dir: DataDir,
         relative_path: &P,
@@ -141,6 +141,14 @@ pub trait DataController {
             let default = T::default();
             self.write_file_json(dir, relative_path, &default)?;
             Ok(true)
+        } else if let Some(Ok(value)) =
+            self.read_file_json_if_exists::<&P, serde_json::Value>(dir, relative_path)
+            && matches!(value, serde_json::Value::Null)
+        {
+            // if the file exists but just contains 'null', replace it with the default
+            self.write_file_json(dir, relative_path, T::default())?;
+
+            Ok(true)
         } else {
             Ok(false)
         }
@@ -152,7 +160,7 @@ pub trait DataController {
         T: serde::de::DeserializeOwned + serde::ser::Serialize + Default,
     {
         let default_file_created =
-            self.create_default_json_file_if_not_exists::<P, T>(dir, &relative_path)?;
+            self.create_default_json_file_if_missing_or_null::<P, T>(dir, &relative_path)?;
 
         if default_file_created {
             Ok(T::default())

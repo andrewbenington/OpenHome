@@ -83,16 +83,6 @@ pub fn get_storage_file_json(
 }
 
 #[tauri::command]
-pub fn get_storage_file_json_create_if_nonexistent(
-  app_handle: tauri::AppHandle,
-  relative_path: PathBuf,
-) -> Result<Value> {
-  app_handle
-    .controller()
-    .read_or_create_default_json_file(DataDir::Storage, &relative_path)
-}
-
-#[tauri::command]
 #[specta::specta]
 pub fn write_file_bytes(
     state: tauri::State<'_, AppState>,

@@ -290,9 +290,7 @@ export const TauriBackend: BackendInterface = {
 
   /* bag */
   loadItemBag: async () => {
-    const result = (await Commands.get_storage_file_json_create_if_nonexistent(
-      'item-bag.json'
-    )) as Result<ItemBag>
+    const result = (await Commands.get_storage_file_json('item-bag.json')) as Result<ItemBag>
     // tanstack query will catch and return the error
     return R.assert(result)
   },
