@@ -367,29 +367,6 @@ export function useOhpkmStore() {
       .then(R.peek((ohpkm) => ohpkmCache.set(ohpkm.openhomeId, ohpkm)))
   }
 
-  function tryLoadBatch(ids: OhpkmIdentifier[]): NowOrLater<OhpkmBatchLookupResults> {
-    const batchResults: OhpkmBatchLookupResults = new Map()
-
-    const pendingMons: Promise<[string, OhpkmLookupResult]>[] = []
-    for (const identifier of ids) {
-      const resultOrPromise = tryLoadFromId(identifier)
-      if (!isThenable(resultOrPromise)) {
-        batchResults.set(identifier, resultOrPromise)
-      } else {
-        pendingMons.push(resultOrPromise.then((ohpkm) => [identifier, ohpkm]))
-      }
-    }
-
-    if (pendingMons.length === 0) {
-      return batchResults
-    }
-
-    return Promise.all(pendingMons).then((results) => {
-      results.forEach(([id, ohpkm]) => batchResults.set(id, ohpkm))
-      return batchResults
-    })
-  }
-
   async function monIsStored(id: string): Promise<boolean> {
     const result = getById(id)
     return Boolean(isThenable(result) ? await result : result)
