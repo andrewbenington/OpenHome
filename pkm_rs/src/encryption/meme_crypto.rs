@@ -10,7 +10,6 @@ use sha2::Sha256;
 pub enum MemeCrypto {
     SunMoon,
     UltraSunUltraMoon,
-  PolishedCrystal,
 }
 
 impl MemeCrypto {

@@ -1,4 +1,4 @@
-use crate::rom_hacks::pk2_polished_crystal::BOX_SIZE;
+use crate::rom_hacks::polished_crystal::{BOX_SIZE, PARTY_SIZE};
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::{metadata_source::MetadataSource, ribbons::OpenHomeRibbonSet};
 use pkm_rs_types::{AbilityNumber, Stats16Le};
@@ -9,13 +9,13 @@ use crate::format::PkmFormat;
 use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
 use crate::result::{Error, Result};
 use crate::{
-    ohpkm::OhpkmV2,
-    traits::HasSpeciesAndForm,
+  ohpkm::OhpkmV2,
+  traits::HasSpeciesAndForm,
 };
 
-use super::{pk2_polished_crystal, OhpkmConvert};
+use super::OhpkmConvert;
 use crate::ohpkm;
-use crate::rom_hacks::pk2_polished_crystal::Pk2PolishedCrystal;
+use crate::rom_hacks::polished_crystal::Pk2PolishedCrystal;
 
 impl OhpkmConvert for Pk2PolishedCrystal {
     fn to_main_data(&self) -> ohpkm::v2_sections::MainDataV2 {
@@ -139,7 +139,7 @@ impl OhpkmConvert for Pk2PolishedCrystal {
             nickname: ohpkm.nickname(),
             moves: ohpkm.moves().to_pp_adjusted(
                 ohpkm::MOVE_METADATA_SOURCE,
-                MetadataSource::UltraSunUltraMoon,
+                MetadataSource::Crystal,
             ),
             relearn_moves: ohpkm.relearn_moves(),
             secret_super_training_unlocked: ohpkm
@@ -201,7 +201,7 @@ impl OhpkmConvert for Pk2PolishedCrystal {
     fn bytes_to_stored(bytes: &[u8]) -> Result<StoredPkmBytes> {
         if bytes.len() == BOX_SIZE {
             let mut extended = bytes.to_vec();
-            extended.resize(pk2_polished_crystal::PARTY_SIZE, 0);
+            extended.resize(PARTY_SIZE, 0);
             let extended_len = extended.len();
 
             return extended
@@ -209,7 +209,7 @@ impl OhpkmConvert for Pk2PolishedCrystal {
                 .map_err(|_| {
                     Error::buffer_size_with_source(
                         "Pk2PolishedCrystal::OhpkmConvert::bytes_to_stored",
-                        pk2_polished_crystal::PARTY_SIZE,
+                        PARTY_SIZE,
                         extended_len,
                     )
                 })
@@ -219,7 +219,7 @@ impl OhpkmConvert for Pk2PolishedCrystal {
             .as_array()
             .ok_or(Error::buffer_size_with_source(
                 "Pk2PolishedCrystal::OhpkmConvert::bytes_to_stored",
-                gen2_polished_crystal::PARTY_SIZE,
+                PARTY_SIZE,
                 bytes.len(),
             ))
             .copied()

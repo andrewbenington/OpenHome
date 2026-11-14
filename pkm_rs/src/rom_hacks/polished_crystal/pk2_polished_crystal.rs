@@ -1,5 +1,4 @@
 use super::{Pk2PolishedCrystalAbilityIndex, Pk2PolishedCrystalSpeciesAndForm};
-use crate::checksum::{Checksum, RefreshChecksum};
 use crate::convert_strategy::ConvertStrategy;
 use crate::result::{Error, Result};
 use crate::traits::ModernEvs;
@@ -36,7 +35,8 @@ use pkm_rs_resources::abilities::AbilityIndexWasm;
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
-use crate::rom_hacks::pk2_polished_crystal::pk2_polished_crystal_buffer::{Pk2PolishedCrystalBuffer, Pk2PolishedCrystalBufferMut};
+use crate::checksum::{Checksum, RefreshChecksum};
+use crate::rom_hacks::polished_crystal::pk2_polished_crystal_buffer::{Pk2PolishedCrystalBuffer, Pk2PolishedCrystalBufferMut};
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = Pk2PolishedCrystalWasm))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
@@ -654,8 +654,8 @@ mod tests {
   use pkm_rs_types::randomize::Randomize;
   #[cfg(feature = "randomize")]
   use rand::{SeedableRng, rngs::StdRng};
-  use crate::rom_hacks::pk2_polished_crystal::pk2_polished_crystal_buffer::Pk2PolishedCrystalBuffer;
-  use crate::rom_hacks::pk2_polished_crystal::Pk2PolishedCrystal;
+  use crate::rom_hacks::polished_crystal::pk2_polished_crystal_buffer::Pk2PolishedCrystalBuffer;
+  use crate::rom_hacks::polished_crystal::Pk2PolishedCrystal;
 
   #[test]
   fn to_from_bytes() -> TestResult<()> {

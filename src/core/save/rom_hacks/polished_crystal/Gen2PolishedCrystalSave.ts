@@ -8,7 +8,7 @@ import {
   WasmPluginSave, WasmSaveClass, WasmSaveInner
 } from "@openhome-core/save/interfaces.ts";
 
-import Gen2PolishedCrystalSaveRust, {
+import Gen2PolishedCrystalSaveWasm, {
   ConvertStrategy,
   ExtraFormIndex,
   Gen7AlolaSaveRust,

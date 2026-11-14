@@ -1,22 +1,21 @@
-use super::Pk2PolishedCrystal;
-use super::BoxSlot;
 use super::BoxIndex;
-use super::BOX_SLOTS;
-use super::BOX_ROWS;
-use super::BOX_COUNT;
+use super::BoxSlot;
+use super::Pk2PolishedCrystal;
 use super::BOX_COLS;
-use crate::encryption;
-use crate::log;
+use super::BOX_COUNT;
+use super::BOX_ROWS;
+use super::BOX_SLOTS;
 use crate::result::{Error, Result};
 use crate::traits::PkmBytes;
 use crate::util;
+use crate::{encryption, log};
 
+use pkm_rs_types::read_u16_le;
+use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::BinaryGender;
 use pkm_rs_types::BoundViolated;
 use pkm_rs_types::Language;
 use pkm_rs_types::OriginGame;
-use pkm_rs_types::read_u16_le;
-use pkm_rs_types::strings::SizedUtf16String;
 
 use serde::Serialize;
 
@@ -27,13 +26,8 @@ use wasm_bindgen::prelude::*;
 #[cfg(feature = "wasm")]
 use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 
-#[cfg(feature = "wasm")]
-use pkm_rs_types::JsResult;
 
-
-#[cfg(feature = "wasm")]
-use crate::encryption::MemeCrypto;
-use crate::rom_hacks::pk2_polished_crystal::pk2_polished_crystal_buffer::Pk2PolishedCrystalBuffer;
+use crate::rom_hacks::polished_crystal::pk2_polished_crystal_buffer::Pk2PolishedCrystalBuffer;
 
 const POLISHED_CRYSTAL_SIZE_BYTES: usize = 300;
 
@@ -90,11 +84,6 @@ impl SaveType {
     }
   }
 
-  const fn meme_crypto(&self) -> MemeCrypto {
-    match self {
-      SaveType::PolishedCrystal => MemeCrypto::PolishedCrystal,
-    }
-  }
 
   const fn box_names_offset(&self) -> usize {
     match self {
@@ -140,7 +129,6 @@ impl Gen2PolishedCrystalSave {
     let pc_checksum_offset = self.save_type.pc_checksum_offset();
     bytes[pc_checksum_offset..pc_checksum_offset + 2]
       .copy_from_slice(&self.calc_checksum().to_le_bytes());
-    self.save_type.meme_crypto().sign_in_place(&mut bytes);
 
     bytes
   }
@@ -243,7 +231,7 @@ impl Gen2PolishedCrystalSave {
 
   fn convert_ohpkm(
     &self,
-    ohpkm: crate::ohpkm::OhpkmV2,
+    ohpkm: OhpkmV2,
     strategy: crate::convert_strategy::ConvertStrategy,
   ) -> Result<Pk2PolishedCrystal> {
     use crate::ohpkm::OhpkmConvert;
@@ -264,7 +252,7 @@ impl Gen2PolishedCrystalSave {
 
   fn display_tid(&self) -> String {
     let trainer_data = self.get_trainer_data();
-    crate::util::six_digit_trainer_id_from_parts(
+    util::six_digit_trainer_id_from_parts(
       trainer_data.trainer_id,
       trainer_data.secret_id,
     )
@@ -279,7 +267,7 @@ impl Gen2PolishedCrystalSave {
 }
 
 #[cfg(feature = "wasm")]
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_class = Gen2PolishedCrystalSaveRust))]
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_class = Gen2PolishedCrystalSaveWasm))]
 #[allow(clippy::missing_const_for_fn)]
 impl Gen2PolishedCrystalSave {
   #[wasm_bindgen(js_name = getMonAt)]
@@ -315,7 +303,7 @@ impl Gen2PolishedCrystalSave {
   #[wasm_bindgen(js_name = convertOhpkm)]
   pub fn convert_ohpkm_wasm(
     &self,
-    ohpkm: crate::ohpkm::OhpkmV2,
+    ohpkm: OhpkmV2,
     strategy: Ts<crate::convert_strategy::ConvertStrategy>,
   ) -> Result<Pk2PolishedCrystal> {
     self.convert_ohpkm(ohpkm, strategy.to_rust()?)
