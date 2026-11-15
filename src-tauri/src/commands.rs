@@ -5,7 +5,7 @@ use crate::{menu, util};
 use openhome_core::data_controller::{DataController, DataDir};
 use openhome_core::error::{Error, Result};
 use openhome_core::pkm_storage::StoredBankDataWasm;
-use openhome_core::pokedex::{Pokedex, PokedexState, PokedexUpdate};
+use openhome_core::pokedex::{Pokedex, PokedexState, PokedexUpdateWasm};
 use openhome_core::saves::{self, SaveFileSearch};
 use pkm_rs::ohpkm::OhpkmV2;
 use serde_json::Value;
@@ -272,7 +272,7 @@ pub fn get_pokedex(pokedex_state: tauri::State<'_, PokedexState>) -> CommandResu
 pub fn update_pokedex(
     app_handle: tauri::AppHandle,
     pokedex_state: tauri::State<'_, PokedexState>,
-    updates: Vec<PokedexUpdate>,
+    updates: Vec<PokedexUpdateWasm>,
 ) -> CommandResult<()> {
     let mut pokedex = pokedex_state.lock()?;
     for update in updates {
