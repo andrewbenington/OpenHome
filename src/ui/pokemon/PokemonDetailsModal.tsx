@@ -18,7 +18,7 @@ import SideTabs from '@openhome-ui/components/side-tabs/SideTabs'
 import MiniBoxIndicator, { MiniBoxIndicatorProps } from '@openhome-ui/saves/boxes/MiniBoxIndicator'
 import { ConvertStrategy, OriginalDataJs, PkmFormat } from '@pkm-rs/pkg'
 import { Flex, Switch, VisuallyHidden } from '@radix-ui/themes'
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { MdDownload } from 'react-icons/md'
 import PokemonIcon from '../components/PokemonIcon'
 import LogsPage from '../pages/logs/LogsPage'
@@ -49,7 +49,7 @@ export default function PokemonDetailsModal(props: PokemonDetailsModalProps) {
   const [boxIndicatorVisible, setBoxIndicatorVisible] = useState(false)
   const [boxIndicatorTimeout, setBoxIndicatorTimeout] = useState<NodeJS.Timeout>()
 
-  const showTemporaryBoxIndicator = () => {
+  const showTemporaryBoxIndicator = useCallback(() => {
     setBoxIndicatorVisible(true)
     if (boxIndicatorTimeout) {
       clearTimeout(boxIndicatorTimeout)
@@ -57,35 +57,35 @@ export default function PokemonDetailsModal(props: PokemonDetailsModalProps) {
     const timeout = setTimeout(() => setBoxIndicatorVisible(false), 1000)
 
     setBoxIndicatorTimeout(timeout)
-  }
+  }, [boxIndicatorTimeout])
 
-  const navigateLeftWithIndicator = () => {
+  const navigateLeftWithIndicator = useCallback(() => {
     if (navigateLeft) {
       navigateLeft()
       showTemporaryBoxIndicator()
     }
-  }
+  }, [navigateLeft, showTemporaryBoxIndicator])
 
-  const navigateRightWithIndicator = () => {
+  const navigateRightWithIndicator = useCallback(() => {
     if (navigateRight) {
       navigateRight()
       showTemporaryBoxIndicator()
     }
-  }
+  }, [navigateRight, showTemporaryBoxIndicator])
 
-  // useEffect(() => {
-  //   const handler = (e: KeyboardEvent) => {
-  //     if (e.key === 'ArrowLeft') {
-  //       e.stopPropagation()
-  //       navigateLeftWithIndicator?.()
-  //     } else if (e.key === 'ArrowRight') {
-  //       e.stopPropagation()
-  //       navigateRightWithIndicator?.()
-  //     }
-  //   }
-  //   window.addEventListener('keydown', handler, true) // true = capture
-  //   return () => window.removeEventListener('keydown', handler, true)
-  // }, [navigateLeftWithIndicator, navigateRightWithIndicator])
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        e.stopPropagation()
+        navigateLeftWithIndicator?.()
+      } else if (e.key === 'ArrowRight') {
+        e.stopPropagation()
+        navigateRightWithIndicator?.()
+      }
+    }
+    window.addEventListener('keydown', handler, true) // true = capture
+    return () => window.removeEventListener('keydown', handler, true)
+  }, [navigateLeftWithIndicator, navigateRightWithIndicator])
 
   const mon = props.mon && isResult(props.mon) ? $R(props.mon).dropError() : props.mon
   const error = props.mon && isResult(props.mon) ? $R(props.mon).err() : undefined
