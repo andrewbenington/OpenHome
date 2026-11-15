@@ -466,3 +466,33 @@ impl PartialEq<ItemIndex> for Item {
         self.get() == *other as u16
     }
 }
+
+impl PartialEq<u16> for ItemIndex {
+    fn eq(&self, other: &u16) -> bool {
+        *self as u16 == *other
+    }
+}
+
+impl PartialOrd<u16> for ItemIndex {
+    fn partial_cmp(&self, other: &u16) -> Option<std::cmp::Ordering> {
+        (*self as u16).partial_cmp(other)
+    }
+}
+impl PartialEq<ItemIndex> for u16 {
+    fn eq(&self, other: &ItemIndex) -> bool {
+        *self == *other as u16
+    }
+}
+
+impl PartialOrd<ItemIndex> for u16 {
+    fn partial_cmp(&self, other: &ItemIndex) -> Option<std::cmp::Ordering> {
+        self.partial_cmp(&(*other as u16))
+    }
+}
+
+pub fn is_mega_stone(item_index: u16) -> bool {
+    (item_index >= ItemIndex::Gengarite && item_index <= ItemIndex::Latiosite)
+        || (item_index >= ItemIndex::Swampertite && item_index <= ItemIndex::Beedrillite)
+        || (item_index >= ItemIndex::Clefablite && item_index <= ItemIndex::Falinksite)
+        || (item_index >= ItemIndex::RaichuniteX && item_index <= ItemIndex::Glimmoranite)
+}

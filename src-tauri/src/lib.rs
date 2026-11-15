@@ -16,7 +16,7 @@ use crate::synced_state::AllSyncedState;
 use openhome_core::convert_strategies::{ConvertStrategies, NamedStrategy};
 use openhome_core::lookup::LookupState;
 use openhome_core::ohpkm_store::OhpkmBytesStore;
-use openhome_core::{Error, Result};
+use openhome_core::{Error, PokedexLevel, Result};
 use pkm_rs::convert_strategy::ShinyOdds;
 use pkm_rs::ohpkm::OhpkmV2;
 use std::env;
@@ -162,7 +162,6 @@ pub fn run() {
 
             let synced_state =
                 AllSyncedState::from_states(lookup_state, ohpkm_store, conversion_settings);
-            app.manage(synced_state);
 
             let pokedex_state = match openhome_core::PokedexState::load_from_storage(&controller) {
                 Ok(pokedex) => pokedex,
@@ -173,6 +172,20 @@ pub fn run() {
                     std::process::exit(1);
                 }
             };
+
+            if let Ok(mut pokedex_state_mut) = pokedex_state.lock() {
+                synced_state.for_each_ohpkm_stored(|id, bytes| {
+                    match OhpkmV2::from_bytes(bytes) {
+                        Ok(ohpkm) => {
+                            pokedex_state_mut.update_from_ohpkm(&ohpkm, PokedexLevel::Caught)
+                        }
+                        Err(err) => tracing::error!("error building OHPKM with id {id}: {err}"),
+                    }
+                })?;
+            }
+
+            app.manage(synced_state);
+
             app.manage(pokedex_state);
 
             app.manage(state::AppState::from_update_features(update_features));
