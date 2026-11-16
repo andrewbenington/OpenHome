@@ -8,6 +8,8 @@ use super::BOX_SLOTS;
 use crate::result::{Error, Result};
 use crate::traits::PkmBytes;
 use crate::util;
+
+#[cfg(feature = "wasm")]
 use crate::{encryption, log};
 
 use pkm_rs_types::read_u16_le;
@@ -24,9 +26,12 @@ use tsify::Ts;
 use wasm_bindgen::prelude::*;
 
 #[cfg(feature = "wasm")]
-use crate::ohpkm::{OhpkmConvert, OhpkmV2};
+use crate::ohpkm::{OhpkmConvert};
+
+use crate::traits::OhpkmV2;
 
 
+#[cfg(feature = "wasm")]
 use crate::rom_hacks::polished_crystal::pk2_polished_crystal_buffer::Pk2PolishedCrystalBuffer;
 
 const POLISHED_CRYSTAL_SIZE_BYTES: usize = 300;
@@ -53,6 +58,8 @@ enum SaveType {
   PolishedCrystal
 }
 
+#[cfg(feature = "wasm")]
+
 impl SaveType {
   const fn file_size_bytes(&self) -> usize {
     match self {
@@ -72,12 +79,15 @@ impl SaveType {
     }
   }
 
+  #[cfg(feature = "wasm")]
+
   const fn mon_byte_offset(&self, box_index: BoxIndex, box_slot: BoxSlot) -> usize {
     let box_offset =
       self.box_data_offset() + box_index.to_usize() * BOX_SLOTS as usize * (Pk2PolishedCrystal::BOX_SIZE);
     box_offset + box_slot.to_usize() * Pk2PolishedCrystal::BOX_SIZE
   }
 
+  #[cfg(feature = "wasm")]
   const fn pc_checksum_offset(&self) -> usize {
     match self {
       SaveType::PolishedCrystal => POLISHED_CRYSTAL_PC_CHECKSUM_OFFSET,
@@ -101,6 +111,7 @@ pub struct Gen2PolishedCrystalSave {
   size: usize,
 }
 
+#[cfg(feature = "wasm")]
 impl Gen2PolishedCrystalSave {
   fn from_bytes_for_type(bytes: &[u8], save_type: SaveType) -> Result<Self> {
     if bytes.len() < save_type.file_size_bytes() {
@@ -174,6 +185,8 @@ impl Gen2PolishedCrystalSave {
     }
   }
 
+
+  #[cfg(feature = "wasm")]
   fn get_mon_at(&self, box_index: BoxIndex, box_slot: BoxSlot) -> Result<Option<Pk2PolishedCrystal>> {
     let decrypted_bytes = self.get_mon_bytes_decrypted(box_index, box_slot);
     let national_dex = read_u16_le!(decrypted_bytes, 8);
@@ -250,6 +263,7 @@ impl Gen2PolishedCrystalSave {
     bytes.len() == POLISHED_CRYSTAL_SIZE_BYTES || bytes.len() == POLISHED_CRYSTAL_SIZE_BYTES
   }
 
+  #[cfg(feature = "wasm")]
   fn display_tid(&self) -> String {
     let trainer_data = self.get_trainer_data();
     util::six_digit_trainer_id_from_parts(

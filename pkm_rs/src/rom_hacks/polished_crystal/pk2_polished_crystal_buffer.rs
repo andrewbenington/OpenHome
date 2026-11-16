@@ -1,5 +1,7 @@
 use super::{Pk2PolishedCrystalAbilityIndex, Pk2PolishedCrystalSpeciesAndForm};
 use crate::bytes::{AsBytes, AsBytesMut};
+
+#[cfg(feature = "wasm")]
 use crate::checksum::{Checksum, ChecksumU16Le, RefreshChecksum};
 use crate::result::{Error, Result};
 use crate::util;
@@ -18,6 +20,8 @@ use pkm_rs_types::{
 };
 use pkm_rs_types::{Language, Stats16Le};
 use pkm_rs_types::{read_u16_le, read_u32_le};
+
+#[cfg(feature = "wasm")]
 use crate::encryption::BlockCrypto;
 
 const CHECKSUM_OFFSET: usize = 6;
@@ -110,14 +114,17 @@ impl From<Offset> for usize {
 //   Pk2PolishedCrystalBufferMut<'a>  = Pk2PolishedCrystalBuffer<&'a mut [u8]>   — read + write
 // ---------------------------------------------------------------------------
 
+#[cfg(feature = "wasm")]
 pub type Pk2PolishedCrystalBufferMut<'a> = Pk2PolishedCrystalBuffer<&'a mut [u8]>;
 
+#[cfg(feature = "wasm")]
 #[derive(Default, Clone, Copy)]
 pub struct Pk2PolishedCrystalBuffer<S: AsRef<[u8]>>(S);
 
 // ------------------------------------------------------------------
 // Constructors — immutable
 // ------------------------------------------------------------------
+#[cfg(feature = "wasm")]
 
 impl<'a> Pk2PolishedCrystalBuffer<&'a [u8]> {
   pub fn box_span(span: &'a [u8]) -> Self {
@@ -139,7 +146,7 @@ impl<'a> Pk2PolishedCrystalBuffer<&'a [u8]> {
 // ------------------------------------------------------------------
 // Constructors — mutable
 // ------------------------------------------------------------------
-
+#[cfg(feature = "wasm")]
 impl<'a> Pk2PolishedCrystalBuffer<&'a mut [u8]> {
   pub fn box_span_mut(span: &'a mut [u8]) -> Self {
     assert_eq!(span.len(), super::BOX_SIZE);
@@ -161,6 +168,7 @@ impl<'a> Pk2PolishedCrystalBuffer<&'a mut [u8]> {
 // Accessors
 // ------------------------------------------------------------------
 
+#[cfg(feature = "wasm")]
 impl<S: AsRef<[u8]>> Pk2PolishedCrystalBuffer<S> {
   fn get_u8(&self, offset: Offset) -> u8 {
     let offset = offset as usize;
@@ -187,6 +195,7 @@ impl<S: AsRef<[u8]>> Pk2PolishedCrystalBuffer<S> {
   }
 }
 
+#[cfg(feature = "wasm")]
 impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk2PolishedCrystalBuffer<S> {
   fn set_u8(&mut self, offset: Offset, v: u8) {
     let offset = offset as usize;
@@ -218,6 +227,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk2PolishedCrystalBuffer<S> {
 // Shared methods
 // ------------------------------------------------------------------
 
+#[cfg(feature = "wasm")]
 impl<S: AsRef<[u8]>> Pk2PolishedCrystalBuffer<S> {
   fn bytes(&self) -> &[u8] {
     self.0.as_ref()
@@ -640,6 +650,7 @@ impl<S: AsRef<[u8]>> Pk2PolishedCrystalBuffer<S> {
   // Encryption
   // ------------------------------------------------------------------
 
+  #[cfg(feature = "wasm")]
   fn block_crypto(&self) -> BlockCrypto {
     BlockCrypto::gen67(self.encryption_constant())
   }
@@ -657,6 +668,7 @@ impl<S: AsRef<[u8]>> Pk2PolishedCrystalBuffer<S> {
 // Setters  (available only on Pk2PolishedCrystalBufferMut)
 // ==================================================================
 
+#[cfg(feature = "wasm")]
 impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk2PolishedCrystalBuffer<S> {
   fn bytes_mut(&mut self) -> &mut [u8] {
     self.0.as_mut()
@@ -1096,24 +1108,28 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk2PolishedCrystalBuffer<S> {
 // Trait impls
 // ==================================================================
 
+#[cfg(feature = "wasm")]
 impl<S: AsRef<[u8]>> AsBytes for Pk2PolishedCrystalBuffer<S> {
   fn as_bytes(&self) -> &[u8] {
     self.0.as_ref()
   }
 }
 
+#[cfg(feature = "wasm")]
 impl<S: AsRef<[u8]> + AsMut<[u8]>> AsBytesMut for Pk2PolishedCrystalBuffer<S> {
   fn as_bytes_mut(&mut self) -> &mut [u8] {
     self.0.as_mut()
   }
 }
 
+#[cfg(feature = "wasm")]
 impl<S: AsRef<[u8]>> Checksum for Pk2PolishedCrystalBuffer<S> {
   type A = ChecksumU16Le;
   const SPAN_START: usize = 8;
   const SPAN_END: usize = super::BOX_SIZE;
 }
 
+#[cfg(feature = "wasm")]
 impl<S: AsRef<[u8]> + AsMut<[u8]>> RefreshChecksum for Pk2PolishedCrystalBuffer<S> {
   const STORED_OFFSET: usize = CHECKSUM_OFFSET;
 }
