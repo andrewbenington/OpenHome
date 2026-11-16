@@ -159,4 +159,16 @@ mod tests {
             None
         );
     }
+
+    #[test]
+    fn supports_non_base_vivillon() {
+        use pkm_rs_types::form::VIVILLON_MEADOW;
+
+        let metadata = &METADATA_TABLE_XY;
+        assert!(
+            metadata
+                .get_game_index(NationalDex::Vivillon as u16, VIVILLON_MEADOW)
+                .is_some()
+        );
+    }
 }
