@@ -1,5 +1,5 @@
 use crate::pkhex_bin::{ORAS_LEVELUP_PKL, ORAS_PERSONAL_FILE, XY_LEVELUP_PKL, XY_PERSONAL_FILE};
-use crate::species::metadata_table::{BaseStats, GameMetadata, PersonalInfo};
+use crate::species::metadata_table::{BaseStats, FormExistsCheck, GameMetadata, PersonalInfo};
 use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
 const XY_ENTRY_SIZE: usize = 0x40;
@@ -58,6 +58,7 @@ impl PersonalInfoXy {
 }
 
 impl PersonalInfo for PersonalInfoXy {
+    const BASE_FORM_PERSONAL_INFO: FormExistsCheck = FormExistsCheck::BaseInfo;
     const MAX_NATIONAL_DEX: NationalDex = NationalDex::Volcanion;
 
     fn from_pkl_bytes(bytes: &'static [u8]) -> Self {
