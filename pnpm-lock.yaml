@@ -333,6 +333,9 @@ importers:
       '@wdio/types':
         specifier: ^10.2.0
         version: 10.2.0
+      better-sqlite3:
+        specifier: ^13.2.0
+        version: 13.2.0
       chalk:
         specifier: ^6.0.1
         version: 6.0.1
@@ -2888,6 +2891,10 @@ packages:
   before-after-hook@4.0.0:
     resolution: {integrity: sha512-q6tR3RPqIB1pMiTRMFcZwuG5T8vwp+vUvEG0vuI6B+Rikh5BfPp2fQ82c925FOs+b0lcFQ8CFrL+KbilfZFhOQ==}
 
+  better-sqlite3@13.2.0:
+    resolution: {integrity: sha512-Z8Q/9x/uNyKxA1v4FNodyItRVRw1TeKBrmj32JhxhR0ceNcBY+wMobt/Bv7M7TzwPAXjnZRtNaEsATnUZSKWZQ==}
+    engines: {node: '>=22'}
+
   bidi-js@1.1.0:
     resolution: {integrity: sha512-fX1Onk0tdVPC7obPWB5EbJ1z7NVhLq4m2xZLq2YXBkxzMXIGRpNMU88n0EPgWseKl12J7zXs7qrDxPK4sRs2fg==}
 
@@ -3678,6 +3685,10 @@ packages:
     resolution: {integrity: sha512-uKdg2G3GNCKQn9byYOpxbGqrT2fGO5KRt5J/8b3pok8rT6qxGWF6hxMyJiEYtAf+FVyYuD9hRaDqX5uPFYJ4ZQ==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
+
+  node-addon-api@8.9.2:
+    resolution: {integrity: sha512-VijLXbi3UACN69I0JVXJsX4tjACjNoQDgv2gTF6sx2wWEi8tkSg2eX8p5gSIFi8z2+DL3oHmY6OyKce38SDolg==}
+    engines: {node: ^18 || ^20 || >= 21}
 
   non-error@0.1.0:
     resolution: {integrity: sha512-TMB1uHiGsHRGv1uYclfhivcnf0/PdFp2pNqRxXjncaAsjYMoisaQJI+SSZCqRq+VliwRTC8tsMQfmrWjDMhkPQ==}
@@ -6872,6 +6883,10 @@ snapshots:
 
   before-after-hook@4.0.0: {}
 
+  better-sqlite3@13.2.0:
+    dependencies:
+      node-addon-api: 8.9.2
+
   bidi-js@1.1.0:
     dependencies:
       require-from-string: 2.0.2
@@ -7657,6 +7672,8 @@ snapshots:
   mute-stream@4.0.0: {}
 
   nanoid@3.3.20: {}
+
+  node-addon-api@8.9.2: {}
 
   non-error@0.1.0: {}
 
