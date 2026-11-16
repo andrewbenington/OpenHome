@@ -1,8 +1,8 @@
 use pkm_rs_types::{
     NationalDex, OriginGame,
     form::{
-        BASE_FORM, FLOETTE_ETERNAL, MAGEARNA_ORIGINAL, URSALUNA_BLOODMOON, VIVILLON_FANCY,
-        VIVILLON_GARDEN, VIVILLON_MARINE, VIVILLON_MEADOW, VIVILLON_POKEBALL,
+        BASE_FORM, FLOETTE_ETERNAL, LEGENDARY_BIRD_GALAR, MAGEARNA_ORIGINAL, URSALUNA_BLOODMOON,
+        VIVILLON_FANCY, VIVILLON_GARDEN, VIVILLON_MARINE, VIVILLON_MEADOW, VIVILLON_POKEBALL,
     },
 };
 use serde::{Deserialize, Serialize};
@@ -208,6 +208,23 @@ impl MetadataSource {
             use NationalDex as ND;
             // this should handle all non-breedable mons + games without breeding
             match species_form.split() {
+                (ND::Articuno | ND::Zapdos | ND::Moltres, BASE_FORM) => matches!(
+                    self,
+                    Self::RedBlue
+                        | Self::Yellow
+                        | Self::FireRedLeafGreen
+                        | Self::Platinum
+                        | Self::HeartGoldSoulSilver
+                        | Self::XY
+                        | Self::UltraSunUltraMoon
+                        | Self::LetsGoPikachuEevee
+                        | Self::SwordShield
+                        | Self::BrilliantDiamondShiningPearl
+                        | Self::ScarletViolet
+                ),
+                (ND::Articuno | ND::Zapdos | ND::Moltres, LEGENDARY_BIRD_GALAR) => {
+                    matches!(self, Self::SwordShield)
+                }
                 (ND::Mewtwo, _) => matches!(
                     self,
                     Self::RedBlue
@@ -236,7 +253,6 @@ impl MetadataSource {
                         self,
                         Self::GoldSilver
                             | Self::Crystal
-                            | Self::FireRedLeafGreen // Switch version doesn't require event
                             | Self::HeartGoldSoulSilver
                             | Self::OmegaRubyAlphaSapphire
                             | Self::UltraSunUltraMoon
@@ -245,7 +261,7 @@ impl MetadataSource {
                             | Self::ScarletViolet
                     )
                 }
-                (ND::Celebi, _) => matches!(self, Self::Crystal), // Virtual console
+                (ND::Celebi, _) => false, // Virtual console only
                 (ND::Regirock | ND::Regice | ND::Registeel, _) => {
                     matches!(
                         self,
@@ -291,11 +307,7 @@ impl MetadataSource {
                     matches!(self, Self::BrilliantDiamondShiningPearl) // Sword/Shield save data gift
                 }
                 (ND::Deoxys, _) => {
-                    matches!(
-                        self,
-                        Self::FireRedLeafGreen  // Switch version doesn't require event
-                        | Self::OmegaRubyAlphaSapphire
-                    )
+                    matches!(self, Self::OmegaRubyAlphaSapphire)
                 }
                 (ND::Uxie | ND::Mesprit | ND::Azelf, _) => {
                     matches!(
@@ -600,9 +612,13 @@ impl MetadataSources {
     )]
     pub fn form_obtainable_with_origin_without_events(
         source: MetadataSource,
-        species_form: SpeciesForm,
+        national_dex: u16,
+        form_index: u16,
     ) -> bool {
-        source.form_obtainable_with_origin_without_events(species_form)
+        match SpeciesForm::new(national_dex, form_index) {
+            Ok(species_form) => source.form_obtainable_with_origin_without_events(species_form),
+            Err(_) => false,
+        }
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "all"))]

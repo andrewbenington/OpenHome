@@ -5,6 +5,7 @@ pub const VULPIX_ALOLA: u16 = 1;
 pub const NINETALES_ALOLA: u16 = 1;
 pub const PONYTA_GALAR: u16 = 1;
 pub const CLEFABLE_MEGA: u16 = 1;
+pub const LEGENDARY_BIRD_GALAR: u16 = 1;
 
 pub const TYPHLOSION_HISUI: u16 = 1;
 pub const PICHU_SPIKY_EARED: u16 = 1;
