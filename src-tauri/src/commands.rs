@@ -131,7 +131,7 @@ pub fn validate_recent_saves(
 #[tauri::command]
 #[specta::specta]
 pub fn open_directory(absolute_path: String) -> CommandResult<()> {
-    Ok(util::open_directory(&PathBuf::from(absolute_path))?)
+    Ok(util::open_directory(PathBuf::from(absolute_path))?)
 }
 
 #[tauri::command]
