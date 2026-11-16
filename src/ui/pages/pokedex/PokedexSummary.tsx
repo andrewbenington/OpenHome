@@ -70,7 +70,8 @@ export default function PokedexSummary(props: PokedexSummaryProps) {
   const type2 = isExtraForm ? selectedForm.type2 : reader.type2()
   const stats = reader.baseStats()
 
-  const orderedGameSets = compatibleGamesPrioritizeCaught(selectedForm)
+  const selectedFormCaughtGames = dexEntry?.games.map(parseOriginGame).filter(filterUndefined) ?? []
+  const orderedGameSets = obtainableOrCaughtGameSets(selectedForm, selectedFormCaughtGames)
   const extraGames = extraSaveTypes.filter(
     (saveType) =>
       !isRestricted(
@@ -176,8 +177,9 @@ export default function PokedexSummary(props: PokedexSummaryProps) {
   )
 }
 
-function compatibleGamesPrioritizeCaught(
-  selectedForm: FormMetadata | ExtraFormMetadata
+function obtainableOrCaughtGameSets(
+  selectedForm: FormMetadata | ExtraFormMetadata,
+  caughtGames: OriginGame[]
 ): OriginGame[][] {
   if (!selectedForm) return []
 
@@ -188,8 +190,12 @@ function compatibleGamesPrioritizeCaught(
           source === MetadataSource.OmegaRubyAlphaSapphire &&
           orasFormIndexIfSupported(selectedForm.extraFormIndex) !== undefined
         )
+      } else if (
+        MetadataSources.originGamesFor(source).some((game) => caughtGames.includes(game))
+      ) {
+        return true
       } else {
-        return MetadataSources.supportsForm(
+        return MetadataSources.formObtainableWithOriginWithoutEvents(
           source,
           selectedForm.nationalDex,
           selectedForm.formIndex
