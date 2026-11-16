@@ -1,17 +1,5 @@
-import useBackend from '@openhome-core/backend/useBackend'
-import { R } from '@openhome-core/util/functional'
-import { useEffect, useState } from 'react'
+import { useAppState } from '@openhome-ui/state/app-state'
 
 export default function useIsDebug(): boolean {
-  const [isDebug, setIsDebug] = useState<boolean>(false)
-  const backend = useBackend()
-
-  useEffect(() => {
-    backend
-      .getState()
-      .then(R.map((state) => setIsDebug(state.is_dev)))
-      .catch(console.error)
-  }, [backend])
-
-  return isDebug
+  return useAppState().is_dev
 }
