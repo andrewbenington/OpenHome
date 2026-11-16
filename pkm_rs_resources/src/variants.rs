@@ -2,6 +2,8 @@ use crate::metadata_source::MetadataSource;
 use crate::species::BaseForm;
 use crate::species::SpeciesForm;
 
+use pkm_rs_types::form::FLOETTE_ETERNAL;
+use pkm_rs_types::form::GRENINJA_BATTLE_BOND;
 use pkm_rs_types::{GameSetting, NationalDex};
 
 #[cfg(feature = "wasm")]
@@ -24,9 +26,6 @@ pub fn can_be_alpha_la(species_form: SpeciesForm) -> bool {
             .regional
             .is_some_and(|setting| setting == GameSetting::Alola) // Alolan Vulpix cannot be alpha
 }
-
-const FLOETTE_ETERNAL: u16 = 5;
-const GRENINJA_BATTLE_BOND: u16 = 1;
 
 pub fn can_be_alpha_lza(species_form: SpeciesForm) -> bool {
     let form_metadata = species_form.get_form_metadata();
