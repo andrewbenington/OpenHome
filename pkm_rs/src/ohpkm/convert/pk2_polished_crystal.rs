@@ -1,3 +1,5 @@
+
+
 use crate::rom_hacks::polished_crystal::{BOX_SIZE, PARTY_SIZE};
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::{metadata_source::MetadataSource, ribbons::OpenHomeRibbonSet};
@@ -17,7 +19,9 @@ use super::OhpkmConvert;
 use crate::ohpkm;
 use crate::rom_hacks::polished_crystal::Pk2PolishedCrystal;
 
+#[cfg(feature = "wasm")]
 impl OhpkmConvert for Pk2PolishedCrystal {
+
     fn to_main_data(&self) -> ohpkm::v2_sections::MainDataV2 {
         ohpkm::v2_sections::MainDataV2 {
             personality_value: self.personality_value,

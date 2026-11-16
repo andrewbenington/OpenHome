@@ -35,7 +35,11 @@ use pkm_rs_resources::abilities::AbilityIndexWasm;
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
+
+#[cfg(feature = "wasm")]
 use crate::checksum::{Checksum, RefreshChecksum};
+
+#[cfg(feature = "wasm")]
 use crate::rom_hacks::polished_crystal::pk2_polished_crystal_buffer::{Pk2PolishedCrystalBuffer, Pk2PolishedCrystalBufferMut};
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = Pk2PolishedCrystalWasm))]
@@ -129,6 +133,8 @@ pub struct Pk2PolishedCrystal {
 }
 
 const MAX_RIBBON_ALOLA: usize = ModernRibbon::BattleTreeMaster as usize;
+
+#[cfg(feature = "wasm")]
 
 impl Pk2PolishedCrystal {
   // ------------------------------------------------------------------
@@ -367,6 +373,7 @@ impl Pk2PolishedCrystal {
   }
 }
 
+#[cfg(feature = "wasm")]
 impl PkmBytes for Pk2PolishedCrystal {
   const BOX_SIZE: usize = 232;
   const PARTY_SIZE: usize = 260;
@@ -400,6 +407,7 @@ impl PkmBytes for Pk2PolishedCrystal {
   }
 }
 
+#[cfg(feature = "wasm")]
 impl HasSpeciesAndForm for Pk2PolishedCrystal {
   fn get_species_metadata(&self) -> &'static SpeciesMetadata {
     self.species_and_form.0.get_species_metadata()
