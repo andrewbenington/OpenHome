@@ -81,7 +81,7 @@
 }
 
 .image-badge-with-text {
-  padding: 0.25rem calc(2 * var(--padding-radius-sm-lg));
+  padding: 0.15rem calc(2 * var(--padding-radius-sm-lg));
   align-items: center;
   gap: 0.25rem;
   text-wrap: nowrap;
