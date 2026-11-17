@@ -1,5 +1,6 @@
 import { PKMDate } from '@openhome-core/util/types'
 import dayjs from 'dayjs'
+import './AttributeRow.css'
 
 export type AttributeRowValue = string | number | PKMDate | undefined
 
