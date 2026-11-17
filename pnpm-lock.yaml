@@ -336,9 +336,6 @@ importers:
       better-sqlite3:
         specifier: ^13.2.0
         version: 13.2.0
-      camelcase-keys:
-        specifier: ^10.0.3
-        version: 10.0.3
       chalk:
         specifier: ^6.0.1
         version: 6.0.1
