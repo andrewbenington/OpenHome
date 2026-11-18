@@ -29,6 +29,10 @@ export function pkmTestFilePath(...pathElements: string[]): string {
   return path.join(__dirname, 'pkm-files', ...pathElements)
 }
 
+function pkmTestFileBytes(...pathElements: string[]): Uint8Array {
+  return new Uint8Array(fs.readFileSync(pkmTestFilePath(...pathElements)))
+}
+
 export function saveTestFilePath(...pathElements: string[]): string {
   return path.join(__dirname, 'save-files', ...pathElements)
 }
@@ -112,6 +116,32 @@ describe('gen 3 conversion to OHPKM V2 and back is lossless', async () => {
     expect(v2.personalityValue, 'ohpkm PID').toEqual(1713820591)
     expect(v2.pidBitFlippedForShiny).toBe(true)
     expect(roundTrip.personalityValue, 'roundTrip PID').toEqual(3861304239)
+  })
+})
+
+describe('pk4 serialization and deserialization is correct', async () => {
+  test(`no extra ribbons are added when serializing/deserializing`, () => {
+    const feraligatrBytes = pkmTestFileBytes('ohpkm', 'feraligatr.ohpkm')
+
+    const feraligatrOhpkm = OHPKM.fromBytes(feraligatrBytes.buffer)
+    expect(feraligatrOhpkm.ribbons).toEqual(['Alola Champion', 'Battle Tree Great'])
+
+    const feraligatrPk4 = R.assert(PK4.fromOhpkm(feraligatrOhpkm, getDefaultConvertStrategy()))
+    expect(feraligatrPk4.ribbons).toEqual([])
+
+    const feraligatrToFromBytes = PK4.fromBytes(feraligatrPk4.toBytes())
+
+    expect(feraligatrToFromBytes.ribbons).toEqual([])
+  })
+
+  test(`nickname is properly truncated`, () => {
+    const feraligatrBytes = pkmTestFileBytes('ohpkm', 'feraligatr.ohpkm')
+
+    const feraligatrOhpkm = OHPKM.fromBytes(feraligatrBytes.buffer)
+    expect(feraligatrOhpkm.nickname).toEqual('Cap’n Crunch')
+
+    const feraligatrPk4 = R.assert(PK4.fromOhpkm(feraligatrOhpkm, getDefaultConvertStrategy()))
+    expect(feraligatrPk4.nickname).toEqual('Cap’n Crun')
   })
 })
 
