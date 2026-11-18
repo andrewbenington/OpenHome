@@ -1,5 +1,4 @@
 import {OHPKM} from '@openhome-core/pkm/OHPKM'
-import {ModernRibbons} from '@openhome-core/resources'
 import {Errorable, R} from '@openhome-core/util/functional'
 import {FourMoves, PKMDate} from '@openhome-core/util/types'
 import {
@@ -11,11 +10,11 @@ import {
   NatureIndex,
   OhpkmWasm,
   OriginGame,
+  PK2PolishedCrystalWasm,
   PokeDate,
   Pokerus,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
-import Pk2PolishedCrystalWasm from "@pkm-rs/pkg"
 import {convertPokeDate, convertPokeDateOptional} from "@openhome-core/pkm/wasm/convert.ts";
 import {modernStatCalc} from "@openhome-core/pkm";
 import {
@@ -24,25 +23,20 @@ import {
   shuffleBlocksGen67
 } from "@openhome-core/pkm/util/encryption.ts";
 import {PkmConstructorOptions} from "@openhome-core/pkm/types.ts";
-import {PKMInterface} from "@openhome-core/pkm/interfaces.ts";
-import {BoxAndSlot, WasmOfficialSave} from "@openhome-core/save/interfaces.ts";
-import PK7 from "../../PK7.ts";
-import {PathData} from "@openhome-core/save/util/path.ts"
-import {Gen2PolishedCrystalSave} from "@openhome-core/save/rom_hacks/polished_crystal/Gen2PolishedCrystalSave.ts";
 
 
 export default class PK2PolishedCrystal {
   format = 'PK2PolishedCrystal' as const
 
-  inner: Pk2PolishedCrystalWasm
+  inner: PK2PolishedCrystalWasm
 
-  constructor(arg: OHPKM | Pk2PolishedCrystalWasm, options: PkmConstructorOptions) {
-    if (arg instanceof Pk2PolishedCrystalWasm) {
+  constructor(arg: OHPKM | PK2PolishedCrystalWasm, options: PkmConstructorOptions) {
+    if (arg instanceof PK2PolishedCrystalWasm) {
       this.inner = arg
     } else {
       const ohpkmBytes = new Uint8Array(arg.toBytes())
 
-      this.inner = Pk2PolishedCrystalWasm.fromOhpkmBytes(
+      this.inner = PK2PolishedCrystalWasm.fromOhpkmBytes(
         ohpkmBytes,
         options.strategy || ConvertStrategies.getDefault()
       )
@@ -567,8 +561,8 @@ export default class PK2PolishedCrystal {
   static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PK2PolishedCrystal {
     return PK2PolishedCrystal.fromWasm(
       encrypted
-        ? Pk2PolishedCrystalWasm.fromEncryptedBytes(new Uint8Array(buffer))
-        : Pk2PolishedCrystalWasm.fromDecryptedBytes(new Uint8Array(buffer))
+        ? PK2PolishedCrystalWasm.fromEncryptedBytes(new Uint8Array(buffer))
+        : PK2PolishedCrystalWasm.fromDecryptedBytes(new Uint8Array(buffer))
     )
   }
 
@@ -576,7 +570,7 @@ export default class PK2PolishedCrystal {
     return R.tryFrom(() => new PK2PolishedCrystal(ohpkm, {strategy}))
   }
 
-  static fromWasm(pk2PolishedCrystal: Pk2PolishedCrystalWasm): PK2PolishedCrystal {
+  static fromWasm(pk2PolishedCrystal: PK2PolishedCrystalWasm): PK2PolishedCrystal {
     return new PK2PolishedCrystal(pk2PolishedCrystal, {})
   }
 

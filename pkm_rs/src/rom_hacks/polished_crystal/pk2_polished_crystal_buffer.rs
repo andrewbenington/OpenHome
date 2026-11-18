@@ -1,4 +1,4 @@
-use super::{Pk2PolishedCrystalAbilityIndex, Pk2PolishedCrystalSpeciesAndForm};
+use super::{PK2PolishedCrystalAbilityIndex, PK2PolishedCrystalSpeciesAndForm};
 use crate::bytes::{AsBytes, AsBytesMut};
 
 #[cfg(feature = "wasm")]
@@ -107,26 +107,26 @@ impl From<Offset> for usize {
 }
 
 // ---------------------------------------------------------------------------
-// Pk2PolishedCrystalBuffer<S> — generic over the byte storage so that a single impl block
+// PK2PolishedCrystalBuffer<S> — generic over the byte storage so that a single impl block
 // covers all getters, and a second (narrower) block covers setters.
 //
-//   Pk2PolishedCrystalBufferRef<'a>  = Pk2PolishedCrystalBuffer<&'a [u8]>       — read-only
-//   Pk2PolishedCrystalBufferMut<'a>  = Pk2PolishedCrystalBuffer<&'a mut [u8]>   — read + write
+//   PK2PolishedCrystalBufferRef<'a>  = PK2PolishedCrystalBuffer<&'a [u8]>       — read-only
+//   PK2PolishedCrystalBufferMut<'a>  = PK2PolishedCrystalBuffer<&'a mut [u8]>   — read + write
 // ---------------------------------------------------------------------------
 
 #[cfg(feature = "wasm")]
-pub type Pk2PolishedCrystalBufferMut<'a> = Pk2PolishedCrystalBuffer<&'a mut [u8]>;
+pub type PK2PolishedCrystalBufferMut<'a> = PK2PolishedCrystalBuffer<&'a mut [u8]>;
 
 #[cfg(feature = "wasm")]
 #[derive(Default, Clone, Copy)]
-pub struct Pk2PolishedCrystalBuffer<S: AsRef<[u8]>>(S);
+pub struct PK2PolishedCrystalBuffer<S: AsRef<[u8]>>(S);
 
 // ------------------------------------------------------------------
 // Constructors — immutable
 // ------------------------------------------------------------------
 #[cfg(feature = "wasm")]
 
-impl<'a> Pk2PolishedCrystalBuffer<&'a [u8]> {
+impl<'a> PK2PolishedCrystalBuffer<&'a [u8]> {
   pub fn box_span(span: &'a [u8]) -> Self {
     debug_assert_eq!(span.len(), super::BOX_SIZE);
     Self(span)
@@ -147,7 +147,7 @@ impl<'a> Pk2PolishedCrystalBuffer<&'a [u8]> {
 // Constructors — mutable
 // ------------------------------------------------------------------
 #[cfg(feature = "wasm")]
-impl<'a> Pk2PolishedCrystalBuffer<&'a mut [u8]> {
+impl<'a> PK2PolishedCrystalBuffer<&'a mut [u8]> {
   pub fn box_span_mut(span: &'a mut [u8]) -> Self {
     assert_eq!(span.len(), super::BOX_SIZE);
     Self(span)
@@ -169,7 +169,7 @@ impl<'a> Pk2PolishedCrystalBuffer<&'a mut [u8]> {
 // ------------------------------------------------------------------
 
 #[cfg(feature = "wasm")]
-impl<S: AsRef<[u8]>> Pk2PolishedCrystalBuffer<S> {
+impl<S: AsRef<[u8]>> PK2PolishedCrystalBuffer<S> {
   fn get_u8(&self, offset: Offset) -> u8 {
     let offset = offset as usize;
     self.bytes()[offset]
@@ -196,7 +196,7 @@ impl<S: AsRef<[u8]>> Pk2PolishedCrystalBuffer<S> {
 }
 
 #[cfg(feature = "wasm")]
-impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk2PolishedCrystalBuffer<S> {
+impl<S: AsRef<[u8]> + AsMut<[u8]>> PK2PolishedCrystalBuffer<S> {
   fn set_u8(&mut self, offset: Offset, v: u8) {
     let offset = offset as usize;
     self.bytes_mut()[offset] = v;
@@ -228,7 +228,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk2PolishedCrystalBuffer<S> {
 // ------------------------------------------------------------------
 
 #[cfg(feature = "wasm")]
-impl<S: AsRef<[u8]>> Pk2PolishedCrystalBuffer<S> {
+impl<S: AsRef<[u8]>> PK2PolishedCrystalBuffer<S> {
   fn bytes(&self) -> &[u8] {
     self.0.as_ref()
   }
@@ -257,10 +257,10 @@ impl<S: AsRef<[u8]>> Pk2PolishedCrystalBuffer<S> {
     pkm_rs_types::read_uint5_from_bits(self.get_u8(Offset::FormIndexFatefulEncounterGender), 3)
   }
 
-  pub fn species_and_form(&self) -> Result<Pk2PolishedCrystalSpeciesAndForm> {
+  pub fn species_and_form(&self) -> Result<PK2PolishedCrystalSpeciesAndForm> {
     let species_and_form = SpeciesForm::new(self.species_ndex(), self.form_index().into())?;
 
-    Pk2PolishedCrystalSpeciesAndForm::try_new(species_and_form).ok_or(Error::form_index(species_and_form))
+    PK2PolishedCrystalSpeciesAndForm::try_new(species_and_form).ok_or(Error::form_index(species_and_form))
   }
 
   pub fn held_item_index(&self) -> u16 {
@@ -665,11 +665,11 @@ impl<S: AsRef<[u8]>> Pk2PolishedCrystalBuffer<S> {
 }
 
 // ==================================================================
-// Setters  (available only on Pk2PolishedCrystalBufferMut)
+// Setters  (available only on PK2PolishedCrystalBufferMut)
 // ==================================================================
 
 #[cfg(feature = "wasm")]
-impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk2PolishedCrystalBuffer<S> {
+impl<S: AsRef<[u8]> + AsMut<[u8]>> PK2PolishedCrystalBuffer<S> {
   fn bytes_mut(&mut self) -> &mut [u8] {
     self.0.as_mut()
   }
@@ -723,7 +723,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk2PolishedCrystalBuffer<S> {
     self.set_u8(Offset::AbilityIndex, v);
   }
 
-  pub fn set_ability_index(&mut self, v: Pk2PolishedCrystalAbilityIndex) {
+  pub fn set_ability_index(&mut self, v: PK2PolishedCrystalAbilityIndex) {
     self.set_ability_index_raw(u8::from(v));
   }
 
@@ -1109,27 +1109,27 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk2PolishedCrystalBuffer<S> {
 // ==================================================================
 
 #[cfg(feature = "wasm")]
-impl<S: AsRef<[u8]>> AsBytes for Pk2PolishedCrystalBuffer<S> {
+impl<S: AsRef<[u8]>> AsBytes for PK2PolishedCrystalBuffer<S> {
   fn as_bytes(&self) -> &[u8] {
     self.0.as_ref()
   }
 }
 
 #[cfg(feature = "wasm")]
-impl<S: AsRef<[u8]> + AsMut<[u8]>> AsBytesMut for Pk2PolishedCrystalBuffer<S> {
+impl<S: AsRef<[u8]> + AsMut<[u8]>> AsBytesMut for PK2PolishedCrystalBuffer<S> {
   fn as_bytes_mut(&mut self) -> &mut [u8] {
     self.0.as_mut()
   }
 }
 
 #[cfg(feature = "wasm")]
-impl<S: AsRef<[u8]>> Checksum for Pk2PolishedCrystalBuffer<S> {
+impl<S: AsRef<[u8]>> Checksum for PK2PolishedCrystalBuffer<S> {
   type A = ChecksumU16Le;
   const SPAN_START: usize = 8;
   const SPAN_END: usize = super::BOX_SIZE;
 }
 
 #[cfg(feature = "wasm")]
-impl<S: AsRef<[u8]> + AsMut<[u8]>> RefreshChecksum for Pk2PolishedCrystalBuffer<S> {
+impl<S: AsRef<[u8]> + AsMut<[u8]>> RefreshChecksum for PK2PolishedCrystalBuffer<S> {
   const STORED_OFFSET: usize = CHECKSUM_OFFSET;
 }

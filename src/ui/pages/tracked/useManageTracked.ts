@@ -17,7 +17,7 @@ import {
   HGSS_TRANSFER_RESTRICTIONS,
   LA_TRANSFER_RESTRICTIONS,
   LGPE_TRANSFER_RESTRICTIONS,
-  ORAS_TRANSFER_RESTRICTIONS,
+  ORAS_TRANSFER_RESTRICTIONS, POLISHED_CRYSTAL_TRANSFER_RESTRICTIONS,
   SV_TRANSFER_RESTRICTIONS_ID,
   SWSH_TRANSFER_RESTRICTIONS_CT,
   USUM_TRANSFER_RESTRICTIONS,
@@ -311,6 +311,8 @@ function monPossiblySupported(
     return isSupported(UB_TRANSFER_RESTRICTIONS)
   } else if (saveRef.pluginIdentifier === 'luminescent_platinum') {
     return isSupported(LP_TRANSFER_RESTRICTIONS)
+  } else if (saveRef.pluginIdentifier === 'polished_crystal') {
+    return isSupported(POLISHED_CRYSTAL_TRANSFER_RESTRICTIONS)
   }
 
   switch (OriginGames.generation(saveRef.game)) {

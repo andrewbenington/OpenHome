@@ -1,4 +1,4 @@
-use super::{Pk2PolishedCrystalAbilityIndex, Pk2PolishedCrystalSpeciesAndForm};
+use super::{PK2PolishedCrystalAbilityIndex, PK2PolishedCrystalSpeciesAndForm};
 use crate::convert_strategy::ConvertStrategy;
 use crate::result::{Error, Result};
 use crate::traits::ModernEvs;
@@ -40,23 +40,23 @@ use pkm_rs_types::randomize::Randomize;
 use crate::checksum::{Checksum, RefreshChecksum};
 
 #[cfg(feature = "wasm")]
-use crate::rom_hacks::polished_crystal::pk2_polished_crystal_buffer::{Pk2PolishedCrystalBuffer, Pk2PolishedCrystalBufferMut};
+use crate::rom_hacks::polished_crystal::pk2_polished_crystal_buffer::{PK2PolishedCrystalBuffer, PK2PolishedCrystalBufferMut};
 
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = Pk2PolishedCrystalWasm))]
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = PK2PolishedCrystalWasm))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
-pub struct Pk2PolishedCrystal {
+pub struct PK2PolishedCrystal {
   pub encryption_constant: u32,
   pub sanity: u16,
   pub checksum: u16,
   #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-  pub species_and_form: Pk2PolishedCrystalSpeciesAndForm,
+  pub species_and_form: PK2PolishedCrystalSpeciesAndForm,
   pub held_item_index: u16,
   pub trainer_id: u16,
   pub secret_id: u16,
   pub exp: u32,
   #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-  pub ability_index: Pk2PolishedCrystalAbilityIndex,
+  pub ability_index: PK2PolishedCrystalAbilityIndex,
   pub ability_num: AbilityNumber,
   #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
   pub markings: MarkingsSixShapesColors,
@@ -136,13 +136,13 @@ const MAX_RIBBON_ALOLA: usize = ModernRibbon::BattleTreeMaster as usize;
 
 #[cfg(feature = "wasm")]
 
-impl Pk2PolishedCrystal {
+impl PK2PolishedCrystal {
   // ------------------------------------------------------------------
-  // Deserialise from a Pk2PolishedCrystalBuffer (the single source of all byte offsets)
+  // Deserialise from a PK2PolishedCrystalBuffer (the single source of all byte offsets)
   // ------------------------------------------------------------------
 
-  pub fn from_buffer<S: AsRef<[u8]>>(buf: &Pk2PolishedCrystalBuffer<S>) -> Result<Self> {
-    let mut mon = Pk2PolishedCrystal {
+  pub fn from_buffer<S: AsRef<[u8]>>(buf: &PK2PolishedCrystalBuffer<S>) -> Result<Self> {
+    let mut mon = PK2PolishedCrystal {
       encryption_constant: buf.encryption_constant(),
       sanity: buf.sanity(),
       checksum: buf.checksum(),
@@ -223,7 +223,7 @@ impl Pk2PolishedCrystal {
     Ok(mon)
   }
 
-  pub fn write_to_box_buffer(&self, buf: &mut Pk2PolishedCrystalBufferMut) {
+  pub fn write_to_box_buffer(&self, buf: &mut PK2PolishedCrystalBufferMut) {
     buf.set_encryption_constant(self.encryption_constant);
     buf.reset_sanity();
     buf.set_species_and_form(self.species_and_form.0);
@@ -289,7 +289,7 @@ impl Pk2PolishedCrystal {
     buf.refresh_checksum();
   }
 
-  pub fn write_to_party_buffer(&self, buf: &mut Pk2PolishedCrystalBufferMut) {
+  pub fn write_to_party_buffer(&self, buf: &mut PK2PolishedCrystalBufferMut) {
     self.write_to_box_buffer(buf);
     buf.set_status_condition(self.status_condition);
     buf.set_stat_level(self.stat_level);
@@ -302,19 +302,19 @@ impl Pk2PolishedCrystal {
   pub fn try_from_bytes(bytes: &[u8]) -> Result<Self> {
     let size = bytes.len();
     match size {
-      Self::BOX_SIZE => Self::from_buffer(&Pk2PolishedCrystalBuffer::box_span(bytes)),
-      Self::PARTY_SIZE => Self::from_buffer(&Pk2PolishedCrystalBuffer::party_span(bytes)),
+      Self::BOX_SIZE => Self::from_buffer(&PK2PolishedCrystalBuffer::box_span(bytes)),
+      Self::PARTY_SIZE => Self::from_buffer(&PK2PolishedCrystalBuffer::party_span(bytes)),
       _ => Err(Error::buffer_size(Self::BOX_SIZE, size)),
     }
   }
 
   pub fn from_encrypted_bytes(mut bytes: Box<[u8]>) -> Result<Self> {
-    Self::from_buffer(Pk2PolishedCrystalBuffer::box_or_party_span_mut(&mut bytes).decrypted())
+    Self::from_buffer(PK2PolishedCrystalBuffer::box_or_party_span_mut(&mut bytes).decrypted())
   }
 
   pub fn to_box_bytes_encrypted(self) -> Box<[u8]> {
     let mut bytes = self.to_box_bytes();
-    Pk2PolishedCrystalBuffer::box_span_mut(&mut bytes).encrypt();
+    PK2PolishedCrystalBuffer::box_span_mut(&mut bytes).encrypt();
 
     bytes
   }
@@ -322,7 +322,7 @@ impl Pk2PolishedCrystal {
   pub fn calculate_checksum(&self) -> u16 {
     let mut bytes = [0u8; Self::BOX_SIZE];
     self.write_box_bytes(&mut bytes);
-    Pk2PolishedCrystalBuffer::box_span(&bytes).calculate_checksum()
+    PK2PolishedCrystalBuffer::box_span(&bytes).calculate_checksum()
   }
 
   pub fn refresh_checksum(&mut self) {
@@ -353,7 +353,7 @@ impl Pk2PolishedCrystal {
 
   pub fn empty_box_slot_bytes(trainer_name: &SizedUtf16String<26>) -> Box<[u8]> {
     let mut bytes = Box::new([0u8; Self::BOX_SIZE]);
-    let mut buffer = Pk2PolishedCrystalBufferMut::box_span_mut(bytes.as_mut_slice());
+    let mut buffer = PK2PolishedCrystalBufferMut::box_span_mut(bytes.as_mut_slice());
 
     buffer.set_handler_name(trainer_name);
     buffer.set_is_current_handler(true);
@@ -366,7 +366,7 @@ impl Pk2PolishedCrystal {
 
   pub fn is_empty_slot(bytes: &[u8]) -> bool {
     let mut owned = bytes.to_owned();
-    let mut buffer = Pk2PolishedCrystalBuffer::box_span_mut(&mut owned);
+    let mut buffer = PK2PolishedCrystalBuffer::box_span_mut(&mut owned);
     buffer.decrypt();
 
     buffer.species_ndex() == 0
@@ -374,7 +374,7 @@ impl Pk2PolishedCrystal {
 }
 
 #[cfg(feature = "wasm")]
-impl PkmBytes for Pk2PolishedCrystal {
+impl PkmBytes for PK2PolishedCrystal {
   const BOX_SIZE: usize = 232;
   const PARTY_SIZE: usize = 260;
 
@@ -383,11 +383,11 @@ impl PkmBytes for Pk2PolishedCrystal {
   }
 
   fn write_box_bytes(&self, bytes: &mut [u8]) {
-    self.write_to_box_buffer(&mut Pk2PolishedCrystalBufferMut::box_span_mut(bytes))
+    self.write_to_box_buffer(&mut PK2PolishedCrystalBufferMut::box_span_mut(bytes))
   }
 
   fn write_party_bytes(&self, bytes: &mut [u8]) {
-    let mut buffer = Pk2PolishedCrystalBufferMut::party_span_mut(bytes);
+    let mut buffer = PK2PolishedCrystalBufferMut::party_span_mut(bytes);
     self.write_to_box_buffer(&mut buffer);
     self.write_to_party_buffer(&mut buffer);
   }
@@ -408,7 +408,7 @@ impl PkmBytes for Pk2PolishedCrystal {
 }
 
 #[cfg(feature = "wasm")]
-impl HasSpeciesAndForm for Pk2PolishedCrystal {
+impl HasSpeciesAndForm for PK2PolishedCrystal {
   fn get_species_metadata(&self) -> &'static SpeciesMetadata {
     self.species_and_form.0.get_species_metadata()
   }
@@ -425,9 +425,9 @@ impl HasSpeciesAndForm for Pk2PolishedCrystal {
 }
 
 #[cfg(feature = "wasm")]
-#[wasm_bindgen(js_class = Pk2PolishedCrystalWasm)]
+#[wasm_bindgen(js_class = PK2PolishedCrystalWasm)]
 #[allow(clippy::missing_const_for_fn)]
-impl Pk2PolishedCrystal {
+impl PK2PolishedCrystal {
   #[wasm_bindgen(js_name = fromOhpkmBytes)]
   pub fn from_ohpkm_bytes(bytes: Vec<u8>, strategy: Ts<ConvertStrategy>) -> JsResult<Self> {
     let ohpkm = OhpkmV2::from_bytes(&bytes)?;
@@ -622,14 +622,14 @@ impl Pk2PolishedCrystal {
   }
 }
 
-impl ModernEvs for Pk2PolishedCrystal {
+impl ModernEvs for PK2PolishedCrystal {
   fn get_evs(&self) -> Stats8 {
     self.evs
   }
 }
 
 #[cfg(test)]
-impl crate::tests::PkhexJson for Pk2PolishedCrystal {
+impl crate::tests::PkhexJson for PK2PolishedCrystal {
   fn to_pkhex_json_value(&self) -> std::result::Result<serde_json::Value, serde_json::Error> {
     let mut value = serde_json::to_value(self)?;
     value["nickname_trash"] = serde_json::json!(
@@ -662,12 +662,12 @@ mod tests {
   use pkm_rs_types::randomize::Randomize;
   #[cfg(feature = "randomize")]
   use rand::{SeedableRng, rngs::StdRng};
-  use crate::rom_hacks::polished_crystal::pk2_polished_crystal_buffer::Pk2PolishedCrystalBuffer;
-  use crate::rom_hacks::polished_crystal::Pk2PolishedCrystal;
+  use crate::rom_hacks::polished_crystal::pk2_polished_crystal_buffer::PK2PolishedCrystalBuffer;
+  use crate::rom_hacks::polished_crystal::PK2PolishedCrystal;
 
   #[test]
   fn to_from_bytes() -> TestResult<()> {
-    tests::to_from_bytes_all_in_dir::<Pk2PolishedCrystal>(
+    tests::to_from_bytes_all_in_dir::<PK2PolishedCrystal>(
       &PathBuf::from("test-files").join("pkm-files").join("pk2"),
     )
   }
@@ -676,7 +676,7 @@ mod tests {
   #[test]
   fn to_from_bytes_random() -> std::result::Result<(), TestErrorWithSeed> {
     for seed in 0..=1000 {
-      let mon = Pk2PolishedCrystal::randomized(&mut StdRng::seed_from_u64(seed));
+      let mon = PK2PolishedCrystal::randomized(&mut StdRng::seed_from_u64(seed));
       tests::find_inconsistencies_to_from_bytes(mon)
         .map_err(|error| TestErrorWithSeed { seed, error })?;
     }
@@ -687,7 +687,7 @@ mod tests {
   #[test]
   fn is_shiny() -> TestResult<()> {
     let path = PathBuf::from("pk2").join("slowpoke-shiny.pk2");
-    let mon = tests::pkm_from_file::<Pk2PolishedCrystal>(&path)?.0;
+    let mon = tests::pkm_from_file::<PK2PolishedCrystal>(&path)?.0;
     assert!(mon.is_shiny());
 
     Ok(())
@@ -695,18 +695,18 @@ mod tests {
 
   #[test]
   fn compare_pkhex_json() -> TestResult<()> {
-    tests::compare_pkhex_json_all_in_dir::<Pk2PolishedCrystal>(&PathBuf::from("pk2"))
+    tests::compare_pkhex_json_all_in_dir::<PK2PolishedCrystal>(&PathBuf::from("pk2"))
   }
 
   #[test]
   fn nickname_garbage_preserved() -> TestResult<()> {
     let (mon, bytes) =
-      tests::pkm_from_file::<Pk2PolishedCrystal>(&PathBuf::from("pk2").join("pelipper-garbage-bytes.pk2"))?;
+      tests::pkm_from_file::<PK2PolishedCrystal>(&PathBuf::from("pk2").join("pelipper-garbage-bytes.pk2"))?;
 
     // 'r' at position 14 should be leftover from 'Pelipper'
     assert_eq!(mon.nickname.bytes()[14], b'r');
 
-    let mon_recreated = Pk2PolishedCrystal::from_ohpkm(
+    let mon_recreated = PK2PolishedCrystal::from_ohpkm(
       &OhpkmV2::convert_with_backup(&mon, &bytes)?,
       ConvertStrategy::default(),
     )?;
@@ -720,7 +720,7 @@ mod tests {
   #[test]
   fn checksum() -> TestResult<()> {
     let mon =
-      tests::pkm_from_file::<Pk2PolishedCrystal>(&PathBuf::from("pk2").join("primarina-garbage-bytes.pk2"))?
+      tests::pkm_from_file::<PK2PolishedCrystal>(&PathBuf::from("pk2").join("primarina-garbage-bytes.pk2"))?
         .0;
     assert_eq!(mon.checksum, mon.calculate_checksum());
 
@@ -731,7 +731,7 @@ mod tests {
   fn from_ohpkm() -> TestResult<()> {
     let mon = tests::pkm_from_file::<OhpkmV2>(&PathBuf::from("ohpkm").join("Machamp.ohpkm"))?.0;
 
-    let _ = Pk2PolishedCrystal::from_ohpkm(&mon, ConvertStrategy::default());
+    let _ = PK2PolishedCrystal::from_ohpkm(&mon, ConvertStrategy::default());
 
     Ok(())
   }
@@ -748,9 +748,9 @@ mod tests {
 
     assert_eq!(mon.ability_index().to_u16(), SHARPNESS);
 
-    let converted_pk2 = Pk2PolishedCrystal::from_ohpkm(&mon, ConvertStrategy::default())?;
+    let converted_pk2 = PK2PolishedCrystal::from_ohpkm(&mon, ConvertStrategy::default())?;
 
-    // Gallade's Sharpness should be converted to Steadfast when converting to Pk2PolishedCrystal, since Sharpness is Gen 8+ and Pk2PolishedCrystal can only represent Gen 7 abilities
+    // Gallade's Sharpness should be converted to Steadfast when converting to PK2PolishedCrystal, since Sharpness is Gen 8+ and PK2PolishedCrystal can only represent Gen 7 abilities
     assert_eq!(converted_pk2.ability_index.to_u16(), STEADFAST);
 
     Ok(())
@@ -758,18 +758,18 @@ mod tests {
 
   #[test]
   fn to_from_ohpkm() -> TestResult<()> {
-    tests::to_from_ohpkm_all_in_dir::<Pk2PolishedCrystal>(
+    tests::to_from_ohpkm_all_in_dir::<PK2PolishedCrystal>(
       &PathBuf::from("test-files").join("pkm-files").join("pk2"),
     )
   }
 
   #[test]
   fn empty_slot_checksum() -> TestResult<()> {
-    let empty_slot = Pk2PolishedCrystal::empty_box_slot_bytes(&"RoC".into());
-    if Pk2PolishedCrystalBuffer::box_span(&empty_slot).checksum() != 0x0204 {
+    let empty_slot = PK2PolishedCrystal::empty_box_slot_bytes(&"RoC".into());
+    if PK2PolishedCrystalBuffer::box_span(&empty_slot).checksum() != 0x0204 {
       return Err(Error::other(&format!(
         "Empty slot checksum should be 0x0204; received {:#06x}",
-        Pk2PolishedCrystalBuffer::box_span(&empty_slot).checksum()
+        PK2PolishedCrystalBuffer::box_span(&empty_slot).checksum()
       ))
         .into());
     }
@@ -781,7 +781,7 @@ mod tests {
   #[test]
   fn encrypted_bytes_match_expected() -> TestResult<()> {
     let path = PathBuf::from("pk2").join("lycanroc-alola-champion.pk2");
-    let mon = tests::pkm_from_file::<Pk2PolishedCrystal>(&path)?.0;
+    let mon = tests::pkm_from_file::<PK2PolishedCrystal>(&path)?.0;
 
     let encrypted_bytes = mon.to_box_bytes_encrypted();
     let encrypted_hex_str = tests::bytes_to_hex_string(&encrypted_bytes);

@@ -3197,6 +3197,7 @@ dependencies = [
  "arbitrary-int",
  "arrayref",
  "assert-json-diff",
+ "byteorder",
  "console_error_panic_hook",
  "getrandom 0.4.3",
  "hex",

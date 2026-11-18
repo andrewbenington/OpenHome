@@ -397,6 +397,8 @@ export function pluginOriginMarkPath(identifier: PluginIdentifier): string | und
       return '/origin_marks/Bdsp.png'
     case 'compass':
       return '/origin_marks/Tera.png'
+    case 'polished_crystal':
+      return '/origin_marks/GameBoy.png'
     default:
       return undefined
   }

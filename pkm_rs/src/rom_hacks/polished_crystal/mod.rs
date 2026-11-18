@@ -29,13 +29,13 @@ pub const BOX_SLOTS: u8 = BOX_ROWS * BOX_COLS;
 const MAX_RIBBON_ALOLA: usize = ModernRibbon::BattleTreeMaster as usize;
 
 const NEUROFORCE: u16 = 233;
-pub type Pk2PolishedCrystalAbilityIndex = AbilityIndexBounded<NEUROFORCE>;
+pub type PK2PolishedCrystalAbilityIndex = AbilityIndexBounded<NEUROFORCE>;
 
 #[derive(Debug, Clone, Copy, Default)]
 #[cfg_attr(feature = "wasm", derive(tsify::Tsify))]
-pub struct Pk2PolishedCrystalSpeciesAndForm(SpeciesForm);
+pub struct PK2PolishedCrystalSpeciesAndForm(SpeciesForm);
 
-impl Pk2PolishedCrystalSpeciesAndForm {
+impl PK2PolishedCrystalSpeciesAndForm {
   fn try_new(species_and_form: SpeciesForm) -> Option<Self> {
     if source_has_form_metadata(
       MetadataSource::UltraSunUltraMoon,
@@ -53,7 +53,7 @@ impl Pk2PolishedCrystalSpeciesAndForm {
   }
 }
 
-impl Serialize for Pk2PolishedCrystalSpeciesAndForm {
+impl Serialize for PK2PolishedCrystalSpeciesAndForm {
   fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
   where
     S: serde::Serializer,
@@ -63,7 +63,7 @@ impl Serialize for Pk2PolishedCrystalSpeciesAndForm {
 }
 
 #[cfg(feature = "randomize")]
-impl Randomize for Pk2PolishedCrystalSpeciesAndForm {
+impl Randomize for PK2PolishedCrystalSpeciesAndForm {
   fn randomized<R: rand::prelude::Rng>(rng: &mut R) -> Self {
     loop {
       if let Some(randomized) = Self::try_new(SpeciesForm::randomized(rng)) {
@@ -75,7 +75,7 @@ impl Randomize for Pk2PolishedCrystalSpeciesAndForm {
 
 use crate::result::Error;
 
-impl TryFrom<SpeciesForm> for Pk2PolishedCrystalSpeciesAndForm {
+impl TryFrom<SpeciesForm> for PK2PolishedCrystalSpeciesAndForm {
   type Error = Error;
 
   fn try_from(value: SpeciesForm) -> Result<Self, Self::Error> {
