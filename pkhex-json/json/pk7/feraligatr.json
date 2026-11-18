@@ -1,0 +1,166 @@
+{
+  "encryption_constant": 2413093311,
+  "sanity": 0,
+  "checksum": 36528,
+  "species_and_form": {
+    "national_dex": 160,
+    "form_index": 0
+  },
+  "held_item_index": 270,
+  "trainer_id": 29140,
+  "secret_id": 51153,
+  "exp": 1059860,
+  "ability_index": "Sheer Force",
+  "ability_num": "Hidden",
+  "markings": {
+    "circle": "blue",
+    "square": "blue",
+    "triangle": "red",
+    "heart": "red",
+    "star": "blue",
+    "diamond": "red"
+  },
+  "personality_value": 2995482679,
+  "nature": "Adamant",
+  "is_fateful_encounter": false,
+  "gender": "Male",
+  "evs": {
+    "hp": 0,
+    "atk": 252,
+    "def": 0,
+    "spa": 0,
+    "spd": 6,
+    "spe": 252
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "resort_event_status": 16,
+  "pokerus": 0,
+  "super_training_flags": 0,
+  "ribbons": ["Alola Champion Ribbon", "Battle Tree Great Ribbon"],
+  "contest_memory_count": 0,
+  "battle_memory_count": 0,
+  "super_training_dist_flags": 0,
+  "form_argument": 0,
+  "nickname": "Cap\u2019n Crunch",
+  "nickname_trash": "43006100700019206E0020004300720075006E00630068000000",
+  "moves": [
+    {
+      "move_index": "Swords Dance",
+      "pp": 20,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Waterfall",
+      "pp": 15,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Crunch",
+      "pp": 15,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Ice Punch",
+      "pp": 15,
+      "pp_ups": 0
+    }
+  ],
+  "relearn_moves": ["Metal Claw", "Aqua Jet", "Crunch", "Ice Punch"],
+  "secret_super_training_unlocked": false,
+  "secret_super_training_complete": false,
+  "ivs": {
+    "hp": 31,
+    "atk": 14,
+    "def": 7,
+    "spa": 21,
+    "spd": 7,
+    "spe": 30
+  },
+  "is_egg": false,
+  "is_nicknamed": true,
+  "handler_name": "Bobert",
+  "handler_gender": "Male",
+  "is_current_handler": true,
+  "geolocations": [
+    {
+      "region": 0,
+      "country": 0
+    },
+    {
+      "region": 0,
+      "country": 0
+    },
+    {
+      "region": 0,
+      "country": 0
+    },
+    {
+      "region": 0,
+      "country": 0
+    },
+    {
+      "region": 0,
+      "country": 0
+    }
+  ],
+  "handler_friendship": 127,
+  "handler_affection": 0,
+  "handler_memory": {
+    "intensity": 0,
+    "memory": 0,
+    "feeling": 0,
+    "textVariables": 0
+  },
+  "fullness": 0,
+  "enjoyment": 0,
+  "trainer_name": "MechaCthulhu",
+  "trainer_friendship": 255,
+  "trainer_affection": 118,
+  "trainer_memory": {
+    "intensity": 0,
+    "memory": 0,
+    "feeling": 0,
+    "textVariables": 0
+  },
+  "egg_date": "7/20/2017",
+  "met_date": "7/20/2017",
+  "egg_location_index": 60002,
+  "met_location_index": 54,
+  "ball": "Lure",
+  "met_level": 1,
+  "trainer_gender": "Male",
+  "hyper_training": {
+    "hp": false,
+    "atk": false,
+    "def": false,
+    "spa": false,
+    "spd": false,
+    "spe": false
+  },
+  "game_of_origin": "Sun",
+  "country": 49,
+  "region": 12,
+  "console_region": 1,
+  "language": "English",
+  "status_condition": 0,
+  "stat_level": 100,
+  "form_argument_remain": 0,
+  "form_argument_elapsed": 0,
+  "current_hp": 311,
+  "stats": {
+    "hp": 311,
+    "atk": 321,
+    "def": 212,
+    "spa": 165,
+    "spd": 179,
+    "spe": 254
+  },
+  "level": 100
+}
