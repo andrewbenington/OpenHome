@@ -1147,7 +1147,7 @@ function monFormatToOriginalDataTag(format: PkmFormat): Option<Tag> {
     case 'PK9Compass':
       return Tag.Pk9Compass
     case 'PK2PolishedCrystal':
-      return Tag.Pk2PolishedCrystal;
+      return Tag.PK2PolishedCrystal;
     case 'COLOPKM':
     case 'XDPKM':
       return undefined
@@ -1194,7 +1194,7 @@ export function originalDataTagToMonFormat(tag: Tag): PkmFormat {
       return 'PK3UB'
     case Tag.Pk9Compass:
       return 'PK9Compass'
-    case Tag.Pk2PolishedCrystal:
+    case Tag.PK2PolishedCrystal:
       return 'PK2PolishedCrystal'
     default:
       expectExhaustive(tag, `unrecognized tag: ${tag}`)

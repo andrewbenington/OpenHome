@@ -8,19 +8,18 @@ import {
   WasmPluginSave, WasmSaveClass, WasmSaveInner
 } from "@openhome-core/save/interfaces.ts";
 
-import Gen2PolishedCrystalSaveWasm, {
+import {
   ConvertStrategy,
   ExtraFormIndex,
-  Gen7AlolaSaveRust,
+  Gen2PolishedCrystalSaveWasm,
+  PK2PolishedCrystalWasm,
   OriginGame,
-  Pk7Wasm
 } from "@pkm-rs/pkg"
 import {OHPKM} from "@openhome-core/pkm/OHPKM.ts";
 import {PathData} from "@openhome-core/save/util/path.ts";
-import {Errorable, Result} from "@openhome-core/util/functional.ts";
+import {Result} from "@openhome-core/util/functional.ts";
 import {isRestricted, TransferRestrictions} from "@openhome-core/save/util/TransferRestrictions.ts";
 import {Item} from "@openhome-core/resources/consts/Items.ts";
-import PK3UB from "@openhome-core/save/unbound/PK3UB.ts";
 
 export class Gen2PolishedCrystalSave extends WasmPluginSave<PK2PolishedCrystalWasm, PK2PolishedCrystal,
   Gen2PolishedCrystalSaveWasm> {
@@ -34,7 +33,7 @@ export class Gen2PolishedCrystalSave extends WasmPluginSave<PK2PolishedCrystalWa
   transferRestrictions = POLISHED_CRYSTAL_TRANSFER_RESTRICTIONS
 
   constructor(path: PathData, bytes: Uint8Array) {
-    super(Gen7AlolaSaveRust.fromBytes(bytes))
+    super(Gen2PolishedCrystalSaveWasm.fromBytes(bytes))
     this.filePath = path
   }
 

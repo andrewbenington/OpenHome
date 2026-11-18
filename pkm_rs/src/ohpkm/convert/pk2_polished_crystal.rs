@@ -17,10 +17,10 @@ use crate::{
 
 use super::OhpkmConvert;
 use crate::ohpkm;
-use crate::rom_hacks::polished_crystal::Pk2PolishedCrystal;
+use crate::rom_hacks::polished_crystal::PK2PolishedCrystal;
 
 #[cfg(feature = "wasm")]
-impl OhpkmConvert for Pk2PolishedCrystal {
+impl OhpkmConvert for PK2PolishedCrystal {
 
     fn to_main_data(&self) -> ohpkm::v2_sections::MainDataV2 {
         ohpkm::v2_sections::MainDataV2 {
@@ -34,7 +34,7 @@ impl OhpkmConvert for Pk2PolishedCrystal {
             ability_index: self
                 .ability_index
                 .change_bound()
-                .expect("Pk2PolishedCrystal max ability <= overall max ability"),
+                .expect("PK2PolishedCrystal max ability <= overall max ability"),
             ability_num: self.ability_num,
             markings: self.markings,
             nature: self.nature,
@@ -103,7 +103,7 @@ impl OhpkmConvert for Pk2PolishedCrystal {
 
     fn from_ohpkm(ohpkm: &OhpkmV2, strategy: ConvertStrategy) -> Result<Self> {
         let form_metadata = ohpkm.get_form_metadata();
-        let converter = PkmConverter::new(PkmFormat::Pk2PolishedCrystal, strategy);
+        let converter = PkmConverter::new(PkmFormat::PK2PolishedCrystal, strategy);
         let met_data = converter.met_data(ohpkm);
 
         let mut mon = Self {
@@ -212,22 +212,22 @@ impl OhpkmConvert for Pk2PolishedCrystal {
                 .try_into()
                 .map_err(|_| {
                     Error::buffer_size_with_source(
-                        "Pk2PolishedCrystal::OhpkmConvert::bytes_to_stored",
+                        "PK2PolishedCrystal::OhpkmConvert::bytes_to_stored",
                         PARTY_SIZE,
                         extended_len,
                     )
                 })
-                .map(StoredPkmBytes::Pk2PolishedCrystal);
+                .map(StoredPkmBytes::PK2PolishedCrystal);
         }
         bytes
             .as_array()
             .ok_or(Error::buffer_size_with_source(
-                "Pk2PolishedCrystal::OhpkmConvert::bytes_to_stored",
+                "PK2PolishedCrystal::OhpkmConvert::bytes_to_stored",
                 PARTY_SIZE,
                 bytes.len(),
             ))
             .copied()
             .map(Box::new)
-            .map(StoredPkmBytes::Pk2PolishedCrystal)
+            .map(StoredPkmBytes::PK2PolishedCrystal)
     }
 }
