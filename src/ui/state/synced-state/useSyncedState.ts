@@ -38,10 +38,9 @@ export function useSyncedState<State, Action = State, RustState = State>(
     async (action: Action) => {
       const updatedState = stateReducer(stateCache, action)
       setStateCache(updatedState)
-      console.log('setting state cache', identifier)
       return stateUpdater(updatedState)
     },
-    [stateCache, stateReducer, stateUpdater, identifier]
+    [stateCache, stateReducer, stateUpdater]
   )
 
   useEffect(() => {

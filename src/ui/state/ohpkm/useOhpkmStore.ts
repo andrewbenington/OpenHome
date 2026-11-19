@@ -41,7 +41,6 @@ function createOhpkmStore(capacity: number) {
   const globalListeners = new Set<OhpkmWithIdCallback>()
 
   function notify(id: OhpkmIdentifier) {
-    console.log('NOTIFYING:', id)
     listeners.get(id)?.forEach((callback) => callback(cache.get(id)))
     globalListeners.forEach((callback) => callback(id, cache.get(id)))
   }

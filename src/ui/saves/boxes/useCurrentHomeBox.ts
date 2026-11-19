@@ -30,7 +30,6 @@ export function useCurrentHomeBox() {
   )
 
   const slots: SlotData[] = useMemo(() => {
-    console.log('building slots')
     return range(OPENHOME_BOX_SLOTS)
       .map((index: number) => currentBox.identifiers.get(index))
       .map((storedId, index) => {
