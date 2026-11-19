@@ -245,7 +245,7 @@ export default class PB8 {
       this.sociability = other.sociability
       this.heightScalar = other.heightScalar
       this.weightScalar = other.weightScalar
-      this.nickname = converter.nickname(other)
+      this.nickname = converter.nickname(other, 12)
 
       const moveFilter = MoveFilter.fromPkmClass(PB8)
       this.moves = moveFilter.moves(other)

@@ -239,7 +239,7 @@ export default class PB7 {
       this.heightScalar = other.heightScalar
       this.weightScalar = other.weightScalar
       this.formArgument = other.formArgument
-      this.nickname = converter.nickname(other)
+      this.nickname = converter.nickname(other, 12)
 
       const moveFilter = MoveFilter.fromMoveIndices(LGPE_VALID_MOVES, this.format)
       this.moves = moveFilter.moves(other)

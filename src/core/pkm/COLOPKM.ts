@@ -138,7 +138,7 @@ export default class COLOPKM {
       this.trainerID = other.trainerID
       this.secretID = other.secretID
       this.trainerName = other.trainerName
-      this.nickname = converter.nickname(other)
+      this.nickname = converter.nickname(other, 10)
       this.exp = other.exp
       this.statLevel = 0
 

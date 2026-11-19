@@ -200,7 +200,7 @@ export default class PK4 {
             .getFlagsInBitRange(dataView, 0x60, 0, 20)
             .map((index) => Gen4Ribbons[index + 60])
         )
-      this.nickname = stringLogic.readGen4StringFromBytes(dataView, 0x48, 12)
+      this.nickname = stringLogic.readGen4StringFromBytes(dataView, 0x48, 10)
       this.trainerName = stringLogic.readGen4StringFromBytes(dataView, 0x68, 8)
       this.trainerGender = byteLogic.getGenderFlag(dataView, 0x84, 7)
       this.isFatefulEncounter = byteLogic.getFlag(dataView, 0x40, 0)
@@ -310,7 +310,7 @@ export default class PK4 {
       this.metLevel = other.metLevel
 
       this.ribbons = filterRibbons(other.ribbons ?? [], [Gen4Ribbons], '') ?? []
-      this.nickname = converter.nickname(other)
+      this.nickname = converter.nickname(other, 10)
       this.trainerName = other.trainerName
       this.trainerGender = other.trainerGender
       this.isFatefulEncounter = other.isFatefulEncounter ?? false
@@ -406,7 +406,7 @@ export default class PK4 {
         .map((ribbon) => Gen4Ribbons.indexOf(ribbon) - 60)
         .filter((index) => index > -1 && index < 20)
     )
-    stringLogic.writeGen4StringToBytes(dataView, this.nickname, 0x48, 24)
+    stringLogic.writeGen4StringToBytes(dataView, this.nickname, 0x48, 20)
     stringLogic.writeGen4StringToBytes(dataView, this.trainerName, 0x68, 16)
     byteLogic.setGenderFlag(dataView, 0x84, 7, this.trainerGender)
     byteLogic.setFlag(dataView, 0x40, 0, this.isFatefulEncounter)

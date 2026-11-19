@@ -149,7 +149,7 @@ export default class XDPKM {
       this.isFatefulEncounter = other.isFatefulEncounter
       this.language = other.language
       this.trainerName = other.trainerName
-      this.nickname = converter.nickname(other)
+      this.nickname = converter.nickname(other, 10)
 
       const moveFilter = MoveFilter.fromPkmClass(XDPKM)
       this.moves = moveFilter.moves(other)
