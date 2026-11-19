@@ -22,8 +22,8 @@ export class PkmConverter {
     this._inner = new PkmConverterWasm(format, this.strategy)
   }
 
-  nickname(ohpkm: OHPKM): string {
-    return this._inner.nickname(ohpkm)
+  nickname(ohpkm: OHPKM, maxLength: number): string {
+    return this._inner.nickname(ohpkm).substring(0, maxLength)
   }
 
   ivs(ohpkm: OHPKM): Stats {

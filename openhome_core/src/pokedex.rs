@@ -2,17 +2,21 @@ use crate::Result;
 use crate::data_controller::{DataController, DataDir, JsonDataReader};
 
 use std::collections::HashSet;
+use std::fmt::Display;
 use std::str::FromStr;
 use std::{collections::HashMap, ops::Deref, sync::Mutex};
 
 use pkm_rs::PluginIdentifier;
 use pkm_rs::ohpkm::OhpkmV2;
 use pkm_rs::traits::HasSpeciesAndForm;
+use pkm_rs_resources::items::is_mega_stone;
 use pkm_rs_resources::species::SpeciesForm;
+use pkm_rs_resources::species::mega_evolutions::mega_forms_for_stone;
 use pkm_rs_resources::variants::{acquirable_totem_base_form, is_acquirable_totem_form};
-use pkm_rs_types::{OriginGame, ShinyLeaves};
+use pkm_rs_types::{OriginGame, ShinyLeaves, ShinyLeavesUpdate};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use strum::IntoEnumIterator;
+use serde_json::json;
+use strum::{Display, IntoEnumIterator};
 
 mod storage_format;
 
@@ -52,20 +56,33 @@ pub type FormNumber = u16;
     Deserialize,
     strum::EnumString,
     specta::Type,
+    Display,
 )]
 pub enum PokedexLevel {
     #[default]
     Seen,
     Caught,
+    #[strum(to_string = "Caught (Shiny)")]
     ShinyCaught,
 }
 
 #[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, strum::EnumIter, specta::Type,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    Serialize,
+    Deserialize,
+    strum::EnumIter,
+    specta::Type,
+    strum::Display,
 )]
 pub enum PokedexFlag {
     Male,
     Female,
+    #[strum(to_string = "N's Pokémon")]
     NsPokemon,
     Totem,
     Gigantamax,
@@ -97,6 +114,29 @@ impl PokedexFlag {
     }
 }
 
+#[derive(Debug, Clone, Copy, Serialize)]
+pub enum PokedexUpdate {
+    Level(PokedexLevel),
+    OfficialGame(OriginGame),
+    ExtraGame(PluginIdentifier),
+    Flag(PokedexFlag),
+    ShinyLeaves(ShinyLeavesUpdate),
+}
+
+impl Display for PokedexUpdate {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            PokedexUpdate::Level(pokedex_level) => write!(f, "Level increased to {pokedex_level}"),
+            PokedexUpdate::OfficialGame(origin_game) => write!(f, "Registered for {origin_game}"),
+            PokedexUpdate::ExtraGame(plugin_identifier) => {
+                write!(f, "Registered for {plugin_identifier}")
+            }
+            PokedexUpdate::Flag(pokedex_flag) => write!(f, "{pokedex_flag} variant registered"),
+            PokedexUpdate::ShinyLeaves(shiny_leaves_update) => shiny_leaves_update.fmt(f),
+        }
+    }
+}
+
 #[derive(Debug, Default, Clone, Serialize, Deserialize, specta::Type)]
 pub struct FormEntry {
     pub level: PokedexLevel,
@@ -109,7 +149,36 @@ pub struct FormEntry {
 }
 
 impl FormEntry {
-    pub fn update(&mut self, other: Self) {
+    fn updates_from(&self, other: &Self) -> Vec<PokedexUpdate> {
+        let mut updates = Vec::<PokedexUpdate>::new();
+        if other.level > self.level {
+            updates.push(PokedexUpdate::Level(other.level));
+        }
+
+        for game in other.games_set().difference(&self.games_set()) {
+            updates.push(PokedexUpdate::OfficialGame(*game));
+        }
+
+        for extra_game in other.extra.difference(&self.extra) {
+            updates.push(PokedexUpdate::ExtraGame(*extra_game));
+        }
+
+        for flag in other.flags.difference(&self.flags) {
+            updates.push(PokedexUpdate::Flag(*flag));
+        }
+
+        updates.extend(
+            self.shiny_leaves
+                .updates_from(&other.shiny_leaves)
+                .into_iter()
+                .map(PokedexUpdate::ShinyLeaves),
+        );
+
+        updates
+    }
+
+    pub fn update(&mut self, other: &Self) -> Vec<PokedexUpdate> {
+        let updates = self.updates_from(other);
         self.level = self.level.max(other.level);
         self.extra.extend(&other.extra);
         self.flags.extend(&other.flags);
@@ -117,6 +186,8 @@ impl FormEntry {
 
         self.games
             .extend(other.games_set().difference(&self.games_set()));
+
+        updates
     }
 
     fn games_set(&self) -> HashSet<OriginGame> {
@@ -124,6 +195,14 @@ impl FormEntry {
     }
 
     pub fn from_ohpkm(ohpkm: &OhpkmV2, level: PokedexLevel) -> Self {
+        Self {
+            flags: PokedexFlag::all_from_ohpkm(ohpkm).collect(),
+            shiny_leaves: ohpkm.shiny_leaves().unwrap_or_default(),
+            ..Self::from_ohpkm_no_flags(ohpkm, level)
+        }
+    }
+
+    pub fn from_ohpkm_no_flags(ohpkm: &OhpkmV2, level: PokedexLevel) -> Self {
         let (games, extra) = match ohpkm
             .plugin_origin()
             .and_then(|p_str| PluginIdentifier::from_str(&p_str).ok())
@@ -136,12 +215,11 @@ impl FormEntry {
             level,
             games,
             extra,
-            flags: PokedexFlag::all_from_ohpkm(ohpkm).collect(),
-            shiny_leaves: ohpkm.shiny_leaves().unwrap_or_default(),
+            flags: HashSet::new(),
+            shiny_leaves: ShinyLeaves::new_empty(),
         }
     }
 
-    #[cfg(test)]
     pub fn from_level(level: PokedexLevel) -> Self {
         Self {
             level,
@@ -189,7 +267,30 @@ impl Pokedex {
     pub fn update(&mut self, national_dex: DexNumber, form_index: FormNumber, data: FormEntry) {
         let species_entry = self.by_dex_number.entry(national_dex).or_default();
 
-        species_entry.form_mut(form_index).update(data);
+        let updates = species_entry.form_mut(form_index).update(&data);
+        for update in updates {
+            if let Some(metadata) =
+                pkm_rs_resources::species::metadata_lookup(national_dex, form_index)
+            {
+                let event = Some("pokedex_update");
+                let ohpkm_id: Option<String> = None;
+                let context = json! (
+                {
+                    "national_dex": national_dex,
+                    "form_index": form_index,
+                    "update": update
+                })
+                .to_string();
+
+                tracing::info!(
+                    event,
+                    ohpkm_id,
+                    context,
+                    "Pokédex updated for {}: {update}",
+                    metadata.form_name
+                )
+            }
+        }
 
         // Totem forms have separate indexes, so the totem flag needs to be set for the form the
         // totem is based on.
@@ -206,11 +307,23 @@ impl Pokedex {
 
     pub fn update_from_ohpkm(&mut self, ohpkm: &OhpkmV2, level: PokedexLevel) {
         let (national_dex, form_index) = ohpkm.species_and_form().split();
+        let national_dex = national_dex as u16;
         self.update(
-            national_dex as u16,
+            national_dex,
             form_index,
             FormEntry::from_ohpkm(ohpkm, level),
         );
+
+        let held_item_index = ohpkm.held_item_index();
+        if is_mega_stone(held_item_index) {
+            for mega in mega_forms_for_stone(held_item_index) {
+                self.update(
+                    national_dex,
+                    mega.get_form_index(),
+                    FormEntry::from_level(level),
+                );
+            }
+        }
     }
 
     #[cfg(test)]
@@ -223,7 +336,8 @@ impl Pokedex {
 
 #[derive(Debug, Serialize, Deserialize, Clone, specta::Type)]
 #[serde(rename_all = "camelCase")]
-pub struct PokedexUpdate {
+#[specta(rename = "PokedexUpdate")]
+pub struct PokedexUpdateWasm {
     pub national_dex: DexNumber,
     pub form_index: FormNumber,
     pub data: FormEntry,

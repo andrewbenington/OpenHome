@@ -109,6 +109,8 @@
     "@wdio/tauri-plugin": "^1.5.1",
     "@wdio/tauri-service": "^1.5.1",
     "@wdio/types": "^10.2.0",
+    "better-sqlite3": "^13.2.0",
+    "camelcase-keys": "^10.0.3",
     "chalk": "^6.0.1",
     "execa": "^10.2.1",
     "expect-webdriverio": "^8.1.0",

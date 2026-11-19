@@ -37,6 +37,8 @@ export default function ToggleButton(props: ToggleButtonProps) {
         .with(toggledClassName)
         .if(isToggled)
         .else(untoggledClassName)
+        .with('mini-button-untoggled')
+        .if(!isToggled && !disabled)
         .build()}
       variant={isToggled ? 'solid' : 'outline'}
       color={isToggled ? undefined : 'gray'}

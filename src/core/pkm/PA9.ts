@@ -282,7 +282,7 @@ export default class PA9 {
         other.plusMoveFlags?.clone() ?? PlusMoveFlags.empty()
       ).withAllForSpeciesAtLevel(other.speciesAndForm, other.getLevel())
 
-      this.nickname = converter.nickname(other)
+      this.nickname = converter.nickname(other, 12)
 
       const moveFilter = MoveFilter.fromPkmClass(PA9)
       this.moves = moveFilter.moves(other)

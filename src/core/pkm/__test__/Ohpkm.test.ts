@@ -1,4 +1,4 @@
-import { PA8, PK3, PK4, PK7, PK8, PK9 } from '@openhome-core/pkm'
+import { PA8, PK2, PK3, PK4, PK5, PK7, PK8, PK9 } from '@openhome-core/pkm'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { SwordShieldSave } from '@openhome-core/save/Gen89/SwordShieldSave'
 import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
@@ -27,6 +27,10 @@ beforeAll(initializeWasm)
 
 export function pkmTestFilePath(...pathElements: string[]): string {
   return path.join(__dirname, 'pkm-files', ...pathElements)
+}
+
+function pkmTestFileBytes(...pathElements: string[]): Uint8Array {
+  return new Uint8Array(fs.readFileSync(pkmTestFilePath(...pathElements)))
 }
 
 export function saveTestFilePath(...pathElements: string[]): string {
@@ -113,6 +117,64 @@ describe('gen 3 conversion to OHPKM V2 and back is lossless', async () => {
     expect(v2.pidBitFlippedForShiny).toBe(true)
     expect(roundTrip.personalityValue, 'roundTrip PID').toEqual(3861304239)
   })
+})
+
+describe('nickname is properly truncated in 10-character formats', async () => {
+  test(`pk2`, () => {
+    const feraligatrBytes = pkmTestFileBytes('ohpkm', 'feraligatr.ohpkm')
+
+    const feraligatrOhpkm = OHPKM.fromBytes(feraligatrBytes.buffer)
+    expect(feraligatrOhpkm.nickname).toEqual('Cap’n Crunch')
+
+    const feraligatrPk2 = R.assert(PK2.fromOhpkm(feraligatrOhpkm, getDefaultConvertStrategy()))
+    expect(feraligatrPk2.nickname).toEqual('Cap’n Crun')
+  })
+
+  test(`pk3`, () => {
+    const feraligatrBytes = pkmTestFileBytes('ohpkm', 'feraligatr.ohpkm')
+
+    const feraligatrOhpkm = OHPKM.fromBytes(feraligatrBytes.buffer)
+    expect(feraligatrOhpkm.nickname).toEqual('Cap’n Crunch')
+
+    const feraligatrPk3 = R.assert(PK3.fromOhpkm(feraligatrOhpkm, getDefaultConvertStrategy()))
+    // the apostrophe doesn't currently have a mapping in gen 3. if one is added and this test
+    // starts failing, adjust the nickname below to match the expected gen 3 version of "Cap’n Crun"
+    expect(feraligatrPk3.nickname).toEqual('Capn Crunc')
+  })
+
+  test(`pk4`, () => {
+    const feraligatrBytes = pkmTestFileBytes('ohpkm', 'feraligatr.ohpkm')
+
+    const feraligatrOhpkm = OHPKM.fromBytes(feraligatrBytes.buffer)
+    expect(feraligatrOhpkm.nickname).toEqual('Cap’n Crunch')
+
+    const feraligatrPk4 = R.assert(PK4.fromOhpkm(feraligatrOhpkm, getDefaultConvertStrategy()))
+    expect(feraligatrPk4.nickname).toEqual('Cap’n Crun')
+  })
+
+  test(`pk5`, () => {
+    const feraligatrBytes = pkmTestFileBytes('ohpkm', 'feraligatr.ohpkm')
+
+    const feraligatrOhpkm = OHPKM.fromBytes(feraligatrBytes.buffer)
+    expect(feraligatrOhpkm.nickname).toEqual('Cap’n Crunch')
+
+    const feraligatrPk5 = R.assert(PK5.fromOhpkm(feraligatrOhpkm, getDefaultConvertStrategy()))
+    expect(feraligatrPk5.nickname).toEqual('Cap’n Crun')
+  })
+})
+
+test(`no extra ribbons are added when serializing/deserializing pk4`, () => {
+  const feraligatrBytes = pkmTestFileBytes('ohpkm', 'feraligatr.ohpkm')
+
+  const feraligatrOhpkm = OHPKM.fromBytes(feraligatrBytes.buffer)
+  expect(feraligatrOhpkm.ribbons).toEqual(['Alola Champion', 'Battle Tree Great'])
+
+  const feraligatrPk4 = R.assert(PK4.fromOhpkm(feraligatrOhpkm, getDefaultConvertStrategy()))
+  expect(feraligatrPk4.ribbons).toEqual([])
+
+  const feraligatrToFromBytes = PK4.fromBytes(feraligatrPk4.toBytes())
+
+  expect(feraligatrToFromBytes.ribbons).toEqual([])
 })
 
 describe('evolution and form change update ohpkm', async () => {

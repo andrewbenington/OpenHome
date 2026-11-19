@@ -31,6 +31,9 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+  position: absolute;
+  bottom: var(--padding-radius-sm-lg);
+  left: var(--padding-radius-sm-lg);
 }
 
 .toggle-tabs {
@@ -57,4 +60,57 @@
   gap: 0;
   border-radius: 99px;
   background-color: transparent;
+}
+
+.met-data-left-side {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 1rem;
+}
+
+.met-data-text {
+  font-size: var(--font-size-standard);
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-radius-sm-lg);
+
+  p {
+    max-width: 32rem;
+  }
+}
+
+.game-container {
+  position: relative;
+  width: 100px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-image {
+  width: 100px;
+  height: 60px;
+  object-fit: contain;
+  position: absolute;
+  left: 0;
+  right: 0;
+  opacity: 0.6;
+}
+
+.item-display {
+  background-color: var(--attribute-row-content);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.2rem var(--padding-radius-sm-lg);
+  gap: var(--padding-radius-sm-lg);
+  text-wrap: nowrap;
+
+  img {
+    width: 1rem;
+    height: 1rem;
+  }
 }

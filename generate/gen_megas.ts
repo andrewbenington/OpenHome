@@ -19,10 +19,9 @@ async function generateMegaData() {
     (data) => data.megaStoneId
   )
 
-  let output = `
-  use crate::species::SpeciesForm;
+  let output = `use crate::species::SpeciesForm;
 
-  pub const fn mega_forms_for_stone(stone_item_index: usize) -> &'static [SpeciesForm] {
+  pub const fn mega_forms_for_stone(stone_item_index: u16) -> &'static [SpeciesForm] {
     match stone_item_index {
     \t${Object.entries(megasByStone)
       .map(([indexStr, megas]) =>
@@ -40,7 +39,7 @@ use wasm_bindgen::prelude::*;
 
 #[cfg(feature = "wasm")]
 #[wasm_bindgen(js_name = megaFormsForStone)]
-pub fn mega_forms_for_stone_wasm(stone_item_index: usize) -> Vec<SpeciesForm> {
+pub fn mega_forms_for_stone_wasm(stone_item_index: u16) -> Vec<SpeciesForm> {
     mega_forms_for_stone(stone_item_index).to_vec()
 }
 

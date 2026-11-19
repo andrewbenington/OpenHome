@@ -115,10 +115,34 @@ pub fn delete_directory(directory_path: &Path) -> Result<()> {
         .map_err(|err| Error::other_with_source("Failed to delete directory", err))
 }
 
-pub fn open_directory(directory_path: &Path) -> Result<()> {
-    if let Err(err) = Command::new("open").arg(directory_path).spawn() {
+const OPEN_CMD: &str = cfg_select! {
+    target_os = "macos" => "open",
+    target_os = "linux" => "xdg-open",
+    windows => "explorer",
+    _ => panic!("unsupported target"),
+};
+
+pub fn open_directory<P>(directory_path: P) -> Result<()>
+where
+    P: AsRef<Path>,
+{
+    if let Err(err) = Command::new(OPEN_CMD)
+        .arg(directory_path.as_ref().as_os_str())
+        .spawn()
+    {
         Err(Error::other_with_source(
             "Failed to open directory in file browser",
+            err,
+        ))
+    } else {
+        Ok(())
+    }
+}
+
+pub fn open_url(url: &str) -> Result<()> {
+    if let Err(err) = Command::new(OPEN_CMD).arg(url).spawn() {
+        Err(Error::other_with_source(
+            "Failed to open url in browser",
             err,
         ))
     } else {

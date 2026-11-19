@@ -17,6 +17,7 @@ import {
   RemoveIcon,
   SelectIcon,
 } from '@openhome-ui/components/Icons'
+import MiniButton from '@openhome-ui/components/MiniButton'
 import SearchFields from '@openhome-ui/components/search/SearchFields'
 import PokemonSearchModal from '@openhome-ui/components/search/SearchModal'
 import ToggleButton from '@openhome-ui/components/ToggleButton'
@@ -189,9 +190,7 @@ export default function HomeBoxDisplay() {
             )}
             <DropdownMenu.Root>
               <DropdownMenu.Trigger>
-                <Button className="mini-button" variant="outline" color="gray">
-                  <MenuIcon />
-                </Button>
+                <MiniButton icon={MenuIcon} />
               </DropdownMenu.Trigger>
               <DropdownMenu.Content>
                 {viewMode === 'one' && (

@@ -1,5 +1,3 @@
-use std::process::Command;
-
 use tauri::{App, AppHandle, Emitter, Manager, Wry, image::Image, include_image, menu::*};
 use tracing::{error, info};
 
@@ -9,16 +7,9 @@ use openhome_core::{
 };
 
 use crate::data_controller::ToDataController;
-use crate::synced_state;
+use crate::{synced_state, util};
 
 const APP_ICON: Image<'_> = include_image!("icons/128x128.png");
-
-const OPEN_CMD: &str = cfg_select! {
-    target_os = "macos" => "open",
-    target_os = "linux" => "xdg-open",
-    windows => "explorer",
-    _ => panic!("unsupported target"),
-};
 
 type BoxedError = Box<dyn std::error::Error>;
 
@@ -142,15 +133,6 @@ pub fn create_menu(app: &App) -> Result<Menu<Wry>, BoxedError> {
     Ok(menu)
 }
 
-// Use the command line to show the file/directory in the operating system's default file explorer
-fn command_open(target: &str) {
-    let child = Command::new(OPEN_CMD).arg(target).spawn();
-
-    if let Err(err) = child {
-        tracing::error!("{err}")
-    }
-}
-
 pub fn handle_menu_event(app_handle: &AppHandle, event: MenuEvent) {
     handle_menu_event_id(app_handle, event.id.as_ref());
 }
@@ -174,13 +156,17 @@ pub fn handle_menu_event_id(app_handle: &AppHandle, event_id: &str) {
             Err(err) => {
                 error!["Error getting data directory: {}", err];
             }
-            Ok(dir) => command_open(dir.to_str().unwrap_or_default()),
+            Ok(dir) => {
+                let _ = util::open_directory(dir.to_str().unwrap_or_default());
+            }
         },
         "open-config" => match app_handle.controller().get_config_folder() {
             Err(err) => {
                 error!["Error getting config directory: {}", err];
             }
-            Ok(dir) => command_open(dir.to_str().unwrap_or_default()),
+            Ok(dir) => {
+                let _ = util::open_directory(dir.to_str().unwrap_or_default());
+            }
         },
         "exit" => std::process::exit(0),
 
@@ -196,8 +182,12 @@ pub fn handle_menu_event_id(app_handle: &AppHandle, event_id: &str) {
             .unwrap_or_else(|err| error!("Error emitting 'reset_zoom' event: {err}")),
 
         // Help menu actions
-        "check-updates" => command_open("https://andrewbenington.github.io/OpenHome/download.html"),
-        "visit-github" => command_open("https://github.com/andrewbenington/OpenHome"),
+        "check-updates" => {
+            let _ = util::open_url("https://andrewbenington.github.io/OpenHome/download.html");
+        }
+        "visit-github" => {
+            let _ = util::open_url("https://github.com/andrewbenington/OpenHome");
+        }
 
         _ => (),
     }

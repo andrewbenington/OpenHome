@@ -1,5 +1,5 @@
 use crate::pkhex_bin::{ORAS_LEVELUP_PKL, ORAS_PERSONAL_FILE, XY_LEVELUP_PKL, XY_PERSONAL_FILE};
-use crate::species::metadata_table::{BaseStats, GameMetadata, PersonalInfo};
+use crate::species::metadata_table::{BaseStats, FormExistsCheck, GameMetadata, PersonalInfo};
 use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
 const XY_ENTRY_SIZE: usize = 0x40;
@@ -58,6 +58,7 @@ impl PersonalInfoXy {
 }
 
 impl PersonalInfo for PersonalInfoXy {
+    const BASE_FORM_PERSONAL_INFO: FormExistsCheck = FormExistsCheck::BaseInfo;
     const MAX_NATIONAL_DEX: NationalDex = NationalDex::Volcanion;
 
     fn from_pkl_bytes(bytes: &'static [u8]) -> Self {
@@ -156,6 +157,18 @@ mod tests {
         assert_eq!(
             metadata.get_game_index(NationalDex::Urshifu as u16, 0),
             None
+        );
+    }
+
+    #[test]
+    fn supports_non_base_vivillon() {
+        use pkm_rs_types::form::VIVILLON_MEADOW;
+
+        let metadata = &METADATA_TABLE_XY;
+        assert!(
+            metadata
+                .get_game_index(NationalDex::Vivillon as u16, VIVILLON_MEADOW)
+                .is_some()
         );
     }
 }

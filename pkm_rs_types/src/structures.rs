@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use arbitrary_int::{u3, u4};
 use chrono::Datelike;
 use serde::{Deserialize, Serialize, Serializer};
@@ -710,6 +712,13 @@ impl BitSet for u8 {
 #[derive(Default, Debug, Clone, Copy, Hash, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ShinyLeaves(u8);
 
+#[derive(Debug, Clone, Copy, Serialize, Display)]
+pub enum ShinyLeavesUpdate {
+    #[strum(to_string = "Leaf {0}")]
+    Leaf(u8),
+    Crown,
+}
+
 impl ShinyLeaves {
     pub const fn from_byte(byte: u8) -> Self {
         match byte >> 5 {
@@ -730,6 +739,28 @@ impl ShinyLeaves {
         Self(0b100000)
     }
 
+    pub fn leaf_indexes(&self) -> impl Iterator<Item = u8> {
+        (0u8..=4).filter(|i| self.0 & (1 << i) != 0)
+    }
+
+    // if the value was changed, true is returned
+    pub fn updates_from(&self, other: &Self) -> Vec<ShinyLeavesUpdate> {
+        match (self.has_crown(), other.has_crown()) {
+            (true, _) => vec![],
+            (false, true) => vec![ShinyLeavesUpdate::Crown],
+            (false, false) => {
+                let self_leaves: HashSet<_> = self.leaf_indexes().collect();
+                let other_leaves: HashSet<_> = self.leaf_indexes().collect();
+                other_leaves
+                    .difference(&self_leaves)
+                    .copied()
+                    .map(ShinyLeavesUpdate::Leaf)
+                    .collect()
+            }
+        }
+    }
+
+    // if the value was changed, true is returned
     pub fn update_from(&mut self, other: &Self) {
         if !(self.has_crown() || other.has_crown()) {
             self.0 |= other.0;

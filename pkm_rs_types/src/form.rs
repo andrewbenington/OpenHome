@@ -1,8 +1,11 @@
+pub const BASE_FORM: u16 = 0;
+
 pub const PIKACHU_STARTER: u16 = 8;
 pub const VULPIX_ALOLA: u16 = 1;
 pub const NINETALES_ALOLA: u16 = 1;
 pub const PONYTA_GALAR: u16 = 1;
 pub const CLEFABLE_MEGA: u16 = 1;
+pub const LEGENDARY_BIRD_GALAR: u16 = 1;
 
 pub const TYPHLOSION_HISUI: u16 = 1;
 pub const PICHU_SPIKY_EARED: u16 = 1;
@@ -28,6 +31,14 @@ pub const ARCEUS_CURSE_GEN4: u16 = 9;
 pub const ARCEUS_DARK_GEN4: u16 = 17;
 pub const ARCEUS_LEGEND: u16 = 18;
 
+pub const VIVILLON_GARDEN: u16 = 4;
+pub const VIVILLON_MEADOW: u16 = 6;
+pub const VIVILLON_MARINE: u16 = 8;
+pub const VIVILLON_FANCY: u16 = 18;
+pub const VIVILLON_POKEBALL: u16 = 19;
+pub const FLOETTE_ETERNAL: u16 = 5;
+pub const GRENINJA_BATTLE_BOND: u16 = 1;
+
 pub const SAMUROTT_HISUI: u16 = 1;
 pub const LILLIGANT_HISUI: u16 = 1;
 pub const BASCULIN_WHITE_STRIPE: u16 = 2;
@@ -40,5 +51,7 @@ pub const GOODRA_HISUI: u16 = 1;
 pub const AVALUGG_HISUI: u16 = 1;
 
 pub const DECIDUEYE_HISUI: u16 = 1;
+pub const MAGEARNA_ORIGINAL: u16 = 1;
 
+pub const URSALUNA_BLOODMOON: u16 = 1;
 pub const ENAMORUS_INCARNATE: u16 = 1;

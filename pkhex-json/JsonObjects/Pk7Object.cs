@@ -57,7 +57,7 @@ public static class Pk7Object
             trainer_friendship = pk.OriginalTrainerFriendship,
             trainer_affection = pk.OriginalTrainerAffection,
             trainer_memory = Util.TrainerMemoryData(pk),
-            egg_date = pk.EggMetDate,
+            egg_date = pk.EggMetDate != null ? pk.EggMetDate.ToString() : null,
             met_date = pk.MetDate.ToString(),
             egg_location_index = pk.EggLocation,
             met_location_index = pk.MetLocation,

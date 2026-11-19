@@ -1,4 +1,10 @@
-use pkm_rs_types::OriginGame;
+use pkm_rs_types::{
+    NationalDex, OriginGame,
+    form::{
+        BASE_FORM, FLOETTE_ETERNAL, LEGENDARY_BIRD_GALAR, MAGEARNA_ORIGINAL, URSALUNA_BLOODMOON,
+        VIVILLON_FANCY, VIVILLON_GARDEN, VIVILLON_MARINE, VIVILLON_MEADOW, VIVILLON_POKEBALL,
+    },
+};
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "wasm")]
 use strum::IntoEnumIterator;
@@ -194,6 +200,362 @@ impl MetadataSource {
             species_form.get_form_index(),
         )
     }
+
+    pub fn form_obtainable_with_origin_without_events(&self, species_form: SpeciesForm) -> bool {
+        if !self.supports_form(species_form) {
+            false
+        } else {
+            use NationalDex as ND;
+            // this should handle all non-breedable mons + games without breeding
+            match species_form.split() {
+                (ND::Articuno | ND::Zapdos | ND::Moltres, BASE_FORM) => matches!(
+                    self,
+                    Self::RedBlue
+                        | Self::Yellow
+                        | Self::FireRedLeafGreen
+                        | Self::Platinum
+                        | Self::HeartGoldSoulSilver
+                        | Self::XY
+                        | Self::UltraSunUltraMoon
+                        | Self::LetsGoPikachuEevee
+                        | Self::SwordShield
+                        | Self::BrilliantDiamondShiningPearl
+                        | Self::ScarletViolet
+                ),
+                (ND::Articuno | ND::Zapdos | ND::Moltres, LEGENDARY_BIRD_GALAR) => {
+                    matches!(self, Self::SwordShield)
+                }
+                (ND::Mewtwo, _) => matches!(
+                    self,
+                    Self::RedBlue
+                        | Self::Yellow
+                        | Self::FireRedLeafGreen
+                        | Self::HeartGoldSoulSilver
+                        | Self::XY
+                        | Self::UltraSunUltraMoon
+                        | Self::LetsGoPikachuEevee
+                        | Self::SwordShield
+                        | Self::BrilliantDiamondShiningPearl
+                ),
+                (ND::Mew, _) => matches!(self, Self::BrilliantDiamondShiningPearl), // LGPE save data gift
+                (ND::Unown, _) => !matches!(
+                    self,
+                    Self::RubySapphire
+                        | Self::Emerald
+                        | Self::BlackWhite
+                        | Self::Black2White2
+                        | Self::XY
+                        | Self::SunMoon
+                        | Self::UltraSunUltraMoon
+                ),
+                (ND::HoOh | ND::Lugia, _) => {
+                    matches!(
+                        self,
+                        Self::GoldSilver
+                            | Self::Crystal
+                            | Self::HeartGoldSoulSilver
+                            | Self::OmegaRubyAlphaSapphire
+                            | Self::UltraSunUltraMoon
+                            | Self::SwordShield
+                            | Self::BrilliantDiamondShiningPearl
+                            | Self::ScarletViolet
+                    )
+                }
+                (ND::Celebi, _) => false, // Virtual console only
+                (ND::Regirock | ND::Regice | ND::Registeel, _) => {
+                    matches!(
+                        self,
+                        Self::RubySapphire
+                            | Self::Emerald
+                            // Platinum requires a special event Regigigas
+                            | Self::Black2White2
+                            | Self::OmegaRubyAlphaSapphire
+                            | Self::UltraSunUltraMoon
+                            | Self::SwordShield
+                            | Self::BrilliantDiamondShiningPearl
+                    )
+                }
+                (ND::Latias | ND::Latios, _) => {
+                    matches!(
+                        self,
+                        Self::RubySapphire
+                            | Self::Emerald
+                            | Self::HeartGoldSoulSilver
+                            | Self::Black2White2
+                            | Self::OmegaRubyAlphaSapphire
+                            | Self::UltraSunUltraMoon
+                            | Self::SwordShield
+                            | Self::BrilliantDiamondShiningPearl
+                            | Self::ScarletViolet
+                            | Self::LegendsZa
+                    )
+                }
+                (ND::Kyogre | ND::Groudon | ND::Rayquaza, _) => {
+                    matches!(
+                        self,
+                        Self::RubySapphire
+                            | Self::Emerald
+                            | Self::HeartGoldSoulSilver
+                            | Self::OmegaRubyAlphaSapphire
+                            | Self::UltraSunUltraMoon
+                            | Self::SwordShield
+                            | Self::BrilliantDiamondShiningPearl
+                            | Self::LegendsZa
+                    )
+                }
+                (ND::Jirachi, _) => {
+                    matches!(self, Self::BrilliantDiamondShiningPearl) // Sword/Shield save data gift
+                }
+                (ND::Deoxys, _) => {
+                    matches!(self, Self::OmegaRubyAlphaSapphire)
+                }
+                (ND::Uxie | ND::Mesprit | ND::Azelf, _) => {
+                    matches!(
+                        self,
+                        Self::DiamondPearl
+                            | Self::Platinum
+                            | Self::Black2White2
+                            | Self::OmegaRubyAlphaSapphire
+                            | Self::UltraSunUltraMoon
+                            | Self::SwordShield
+                            | Self::BrilliantDiamondShiningPearl
+                            | Self::LegendsArceus
+                    )
+                }
+                (ND::Dialga | ND::Palkia | ND::Giratina, _) => {
+                    matches!(
+                        self,
+                        Self::DiamondPearl
+                            | Self::Platinum
+                            | Self::OmegaRubyAlphaSapphire
+                            | Self::UltraSunUltraMoon
+                            | Self::SwordShield
+                            | Self::BrilliantDiamondShiningPearl
+                            | Self::LegendsArceus
+                    )
+                }
+                (ND::Heatran, _) => {
+                    matches!(
+                        self,
+                        Self::DiamondPearl
+                            | Self::Platinum
+                            | Self::Black2White2
+                            | Self::OmegaRubyAlphaSapphire
+                            | Self::UltraSunUltraMoon
+                            | Self::SwordShield
+                            | Self::BrilliantDiamondShiningPearl
+                            | Self::LegendsArceus
+                            | Self::LegendsZa
+                    )
+                }
+                (ND::Regigigas | ND::Cresselia, _) => {
+                    matches!(
+                        self,
+                        Self::DiamondPearl
+                            | Self::Platinum
+                            | Self::Black2White2
+                            | Self::OmegaRubyAlphaSapphire
+                            | Self::UltraSunUltraMoon
+                            | Self::SwordShield
+                            | Self::BrilliantDiamondShiningPearl
+                            | Self::LegendsArceus
+                    )
+                }
+                (ND::Manaphy, _) => matches!(self, Self::LegendsArceus),
+                (ND::Darkrai, _) => {
+                    matches!(
+                        self,
+                        Self::LegendsArceus // BDSP save data
+                         | Self::LegendsZa
+                    )
+                }
+                (ND::Shaymin, _) => matches!(self, Self::LegendsArceus), // Sword/Shield save data
+                (ND::Arceus, _) => {
+                    matches!(
+                        self,
+                        Self::BrilliantDiamondShiningPearl  // Legends Arceus completed save data
+                        | Self::LegendsArceus
+                    )
+                }
+                (ND::Victini, _) => false,
+                (ND::Cobalion | ND::Terrakion | ND::Virizion, _) => {
+                    matches!(
+                        self,
+                        Self::BlackWhite
+                            | Self::Black2White2
+                            | Self::OmegaRubyAlphaSapphire
+                            | Self::UltraSunUltraMoon
+                            | Self::SwordShield
+                            | Self::ScarletViolet
+                            | Self::LegendsZa
+                    )
+                }
+                (ND::Tornadus | ND::Thundurus | ND::Landorus, _) => {
+                    matches!(
+                        self,
+                        Self::BlackWhite
+                        // Black 2/White 2 requires Dream Radar
+                            | Self::OmegaRubyAlphaSapphire
+                            | Self::UltraSunUltraMoon
+                            | Self::SwordShield
+                            | Self::LegendsArceus
+                    )
+                }
+                (ND::Reshiram | ND::Zekrom | ND::Kyurem, _) => {
+                    matches!(
+                        self,
+                        Self::BlackWhite
+                            | Self::Black2White2
+                            | Self::OmegaRubyAlphaSapphire
+                            | Self::UltraSunUltraMoon
+                            | Self::SwordShield
+                            | Self::ScarletViolet
+                    )
+                }
+                (ND::Keldeo, _) => matches!(self, Self::SwordShield | Self::LegendsZa),
+                (ND::Meloetta, _) => matches!(self, Self::ScarletViolet | Self::LegendsZa),
+                (ND::Genesect, _) => matches!(self, Self::LegendsZa),
+                (ndex @ (ND::Scatterbug | ND::Spewpa | ND::Vivillon), form_index) => {
+                    match form_index {
+                        VIVILLON_GARDEN | VIVILLON_MEADOW => {
+                            // catchable in Legends Z-A (Lumiose + Hyperspace)
+                            *self != Self::ScarletViolet
+                        }
+                        VIVILLON_MARINE => {
+                            // sidequest Spewpa in Legends Z-A
+                            *self != Self::ScarletViolet
+                                && (ndex != ND::Scatterbug || *self != Self::LegendsZa)
+                        }
+                        VIVILLON_FANCY => *self == Self::ScarletViolet,
+                        VIVILLON_POKEBALL.. => false, // pokedex form and currently invalid values above it
+                        _ => !matches!(self, Self::ScarletViolet | Self::LegendsZa), // all other forms
+                    }
+                }
+                (ND::Floette, FLOETTE_ETERNAL) => matches!(self, Self::LegendsZa),
+                (ND::Xerneas | ND::Yveltal, _) => {
+                    matches!(
+                        self,
+                        Self::XY | Self::UltraSunUltraMoon | Self::SwordShield | Self::LegendsZa
+                    )
+                }
+                (ND::Zygarde, _) => {
+                    matches!(
+                        self,
+                        Self::XY
+                            | Self::SunMoon
+                            | Self::UltraSunUltraMoon
+                            | Self::SwordShield
+                            | Self::LegendsZa
+                    )
+                }
+                (ND::Diancie, _) => false,
+                (ND::Hoopa | ND::Volcanion, _) => matches!(self, Self::LegendsZa),
+                (ND::TapuKoko | ND::TapuLele | ND::TapuBulu | ND::TapuFini, _) => {
+                    matches!(
+                        self,
+                        Self::SunMoon | Self::UltraSunUltraMoon | Self::SwordShield
+                    )
+                }
+                (ND::Cosmog | ND::Cosmoem, _) => {
+                    matches!(
+                        self,
+                        Self::SunMoon | Self::UltraSunUltraMoon | Self::SwordShield
+                    )
+                }
+                (ND::Solgaleo | ND::Lunala | ND::Necrozma, _) => {
+                    matches!(
+                        self,
+                        Self::SunMoon
+                            | Self::UltraSunUltraMoon
+                            | Self::SwordShield
+                            | Self::ScarletViolet
+                    )
+                }
+                (
+                    ND::Nihilego
+                    | ND::Buzzwole
+                    | ND::Pheromosa
+                    | ND::Xurkitree
+                    | ND::Celesteela
+                    | ND::Kartana
+                    | ND::Guzzlord,
+                    _,
+                ) => {
+                    matches!(
+                        self,
+                        Self::SunMoon | Self::UltraSunUltraMoon | Self::SwordShield
+                    )
+                }
+                (ND::Magearna, BASE_FORM) => {
+                    matches!(
+                        self,
+                        Self::SunMoon | Self::UltraSunUltraMoon | Self::LegendsZa
+                    )
+                }
+                (ND::Magearna, MAGEARNA_ORIGINAL) => false,
+                (ND::Marshadow, _) => {
+                    matches!(
+                        self,
+                        Self::SunMoon | Self::UltraSunUltraMoon | Self::LegendsZa
+                    )
+                }
+                (ND::Poipole | ND::Naganadel | ND::Stakataka | ND::Blacephalon, _) => {
+                    matches!(self, Self::UltraSunUltraMoon | Self::SwordShield)
+                }
+                (ND::Zeraora | ND::Meltan | ND::Melmetal, _) => false,
+                (ND::Zacian | ND::Zamazenta | ND::Eternatus | ND::Calyrex, _) => {
+                    matches!(self, Self::SwordShield)
+                }
+                (ND::Kubfu | ND::Urshifu | ND::Glastrier | ND::Spectrier, _) => {
+                    matches!(self, Self::SwordShield | Self::ScarletViolet)
+                }
+                (ND::Zarude, _) => false,
+                (ND::Regieleki | ND::Regidrago, _) => {
+                    matches!(self, Self::SwordShield)
+                }
+                (ND::Ursaluna, URSALUNA_BLOODMOON) => matches!(self, Self::ScarletViolet),
+                (ND::Enamorus, _) => matches!(self, Self::LegendsArceus),
+                (
+                    ND::GreatTusk
+                    | ND::ScreamTail
+                    | ND::BruteBonnet
+                    | ND::FlutterMane
+                    | ND::SlitherWing
+                    | ND::SandyShocks
+                    | ND::IronTreads
+                    | ND::IronBundle
+                    | ND::IronHands
+                    | ND::IronJugulis
+                    | ND::IronMoth
+                    | ND::IronThorns
+                    | ND::RoaringMoon
+                    | ND::IronValiant
+                    | ND::GougingFire
+                    | ND::RagingBolt
+                    | ND::IronBoulder
+                    | ND::IronCrown,
+                    _,
+                ) => matches!(self, Self::ScarletViolet),
+                (ND::WalkingWake | ND::IronLeaves, _) => false, // event only
+                (
+                    ND::WoChien
+                    | ND::ChienPao
+                    | ND::TingLu
+                    | ND::ChiYu
+                    | ND::Koraidon
+                    | ND::Miraidon
+                    | ND::Okidogi
+                    | ND::Munkidori
+                    | ND::Fezandipiti
+                    | ND::Ogerpon
+                    | ND::Terapagos,
+                    _,
+                ) => matches!(self, Self::ScarletViolet), // event only
+                (ND::Pecharunt, _) => false,
+                _ => true,
+            }
+        }
+    }
 }
 
 #[cfg(feature = "wasm")]
@@ -242,6 +604,21 @@ impl MetadataSources {
             })
             .flat_map(MetadataSource::all_origin_games)
             .collect()
+    }
+
+    #[cfg_attr(
+        feature = "wasm",
+        wasm_bindgen(js_name = "formObtainableWithOriginWithoutEvents")
+    )]
+    pub fn form_obtainable_with_origin_without_events(
+        source: MetadataSource,
+        national_dex: u16,
+        form_index: u16,
+    ) -> bool {
+        match SpeciesForm::new(national_dex, form_index) {
+            Ok(species_form) => source.form_obtainable_with_origin_without_events(species_form),
+            Err(_) => false,
+        }
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "all"))]

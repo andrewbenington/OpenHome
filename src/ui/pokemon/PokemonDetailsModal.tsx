@@ -26,14 +26,13 @@ import { useConvertStrategies } from '../state/convert-strategies'
 import './style.css'
 import DebugTab from './tabs/DebugTab'
 import DisplayTab from './tabs/DisplayTab'
-import MetDataTab from './tabs/MetDataTab'
 import MovesTab from './tabs/MovesTab'
 import NotesDisplay from './tabs/NotesTab'
 import OtherDisplay from './tabs/OtherTab'
 import RecentSaveTab from './tabs/RecentSaveTab'
 import RibbonsDisplay from './tabs/RibbonsTab'
 import StatsDisplay from './tabs/StatsTab'
-import SummaryDisplay from './tabs/SummaryTab'
+import SummaryTab from './tabs/SummaryTab'
 import TrainersDisplay from './tabs/TrainersTab'
 
 export type PokemonDetailsModalProps = {
@@ -208,7 +207,6 @@ function ModalContents(props: ModalContentsProps) {
         </Flex>
         <SideTabs.Tab value="summary">Summary</SideTabs.Tab>
         <SideTabs.Tab value="moves">Moves</SideTabs.Tab>
-        <SideTabs.Tab value="met_data">Met Data</SideTabs.Tab>
         <SideTabs.Tab value="stats">Stats</SideTabs.Tab>
         <SideTabs.Tab value="ribbons">Ribbons</SideTabs.Tab>
         <SideTabs.Tab value="other">Other</SideTabs.Tab>
@@ -242,13 +240,10 @@ function ModalContents(props: ModalContentsProps) {
         (mon) => (
           <Fallback>
             <SideTabs.Panel value="summary">
-              <SummaryDisplay mon={mon} />
+              <SummaryTab mon={mon} />
             </SideTabs.Panel>
             <SideTabs.Panel value="moves">
               <MovesTab mon={mon} />
-            </SideTabs.Panel>
-            <SideTabs.Panel value="met_data">
-              <MetDataTab mon={mon} />
             </SideTabs.Panel>
             <SideTabs.Panel value="stats">
               <StatsDisplay mon={mon} />

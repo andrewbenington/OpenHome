@@ -154,7 +154,7 @@ export default class PK1 {
       this.dvs = other.dvs
 
       this.trainerName = other.trainerName
-      this.nickname = converter.nickname(other)
+      this.nickname = converter.nickname(other, 10)
     }
 
     this.level = this.getLevel()
