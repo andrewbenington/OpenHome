@@ -171,7 +171,7 @@ export default class PK2 {
       this.statusCondition = 0
       this.currentHP = other.currentHP ?? 0
       this.trainerName = other.trainerName
-      this.nickname = converter.nickname(other)
+      this.nickname = converter.nickname(other, 10)
       this.trainerGender = other.trainerGender
       this.level = this.getLevel()
     }

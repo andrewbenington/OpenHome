@@ -246,7 +246,7 @@ export default class PK5 {
       this.currentHP = other.currentHP ?? 0
       this.ribbons = filterRibbons(other.ribbons ?? [], [Gen4Ribbons], '')
       this.isFatefulEncounter = other.isFatefulEncounter ?? false
-      this.nickname = converter.nickname(other)
+      this.nickname = converter.nickname(other, 10)
       this.trainerName = other.trainerName
       this.trainerGender = other.trainerGender
     }
@@ -340,7 +340,7 @@ export default class PK5 {
         .filter((index) => index > -1 && index < 20)
     )
     byteLogic.setFlag(dataView, 0x40, 0, this.isFatefulEncounter)
-    stringLogic.writeGen5StringToBytes(dataView, this.nickname, 0x48, 12)
+    stringLogic.writeGen5StringToBytes(dataView, this.nickname, 0x48, 10)
     stringLogic.writeGen5StringToBytes(dataView, this.trainerName, 0x68, 8)
     byteLogic.setGenderFlag(dataView, 0x84, 7, this.trainerGender)
     dataView.setUint16(0x6, this.checksum, true)
