@@ -259,10 +259,10 @@ async function onDragEnd(
           targetSave &&
           !targetSave.supportsItem(currMon.heldItemIndex)
         ) {
-          void savesAndBanks.moveMonItemToBag(sourceLoc)
+          await savesAndBanks.moveMonItemToBag(sourceLoc)
         }
 
-        void savesAndBanks
+        await savesAndBanks
           .moveMon({ ...sourceLoc, mon: currMon }, nextDestination)
           .then(R.mapErr((error) => displayError('Could not move Pokémon', error)))
 
@@ -279,10 +279,10 @@ async function onDragEnd(
         !dest.isHome &&
         !savesAndBanks.saveFromIdentifier(dest.saveIdentifier).supportsItem(mon.heldItemIndex)
       ) {
-        void savesAndBanks.moveMonItemToBag(source)
+        await savesAndBanks.moveMonItemToBag(source)
       }
 
-      void savesAndBanks
+      await savesAndBanks
         .moveMon(source, dest)
         .then(R.mapErr((error) => displayError('Could not move Pokémon', error)))
     }
