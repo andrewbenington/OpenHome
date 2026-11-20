@@ -10,12 +10,12 @@ mod pa9_buffer;
 #[cfg(feature = "wasm")]
 pub use pa9_buffer::Pa9Buffer;
 mod plus_moves;
-use pkm_rs_resources::{
-    abilities::AbilityIndexBounded,
-    metadata_source::MetadataSource,
-    species::{SpeciesForm, metadata_table::source_has_form_metadata},
-};
+use pkm_rs_resources::metadata_source::MetadataSource;
+use pkm_rs_resources::species::SpeciesForm;
+use pkm_rs_resources::species::metadata_table::source_has_form_metadata;
 pub use plus_moves::*;
+#[cfg(feature = "wasm")]
+mod wasm;
 
 use crate::result::Error;
 

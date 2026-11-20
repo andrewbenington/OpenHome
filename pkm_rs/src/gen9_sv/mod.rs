@@ -5,8 +5,6 @@ use crate::encryption::swish_crypto::SwishBlocks;
 use crate::result::Error;
 #[cfg(feature = "wasm")]
 use pk9_buffer::Pk9Buffer;
-use pkm_rs_resources;
-use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::metadata_source::MetadataSource;
 #[cfg(feature = "wasm")]
 use pkm_rs_resources::ribbons::ModernRibbon;

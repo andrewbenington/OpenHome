@@ -1,4 +1,6 @@
 #[cfg(feature = "wasm")]
+mod pa9;
+#[cfg(feature = "wasm")]
 mod ph4;
 #[cfg(feature = "wasm")]
 mod pk3;

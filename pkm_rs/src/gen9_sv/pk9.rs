@@ -127,6 +127,8 @@ pub struct Pk9 {
 }
 
 impl Pk9 {
+    pub const MAX_VALID_MOVE: u32 = 919;
+
     // ------------------------------------------------------------------
     // Deserialise from a Pk9Buffer (the single source of all byte offsets)
     // ------------------------------------------------------------------
@@ -370,6 +372,10 @@ impl Pk9 {
         buffer.decrypt();
 
         buffer.species_game_index() == 0
+    }
+
+    pub fn ball_is_valid(ball: Ball) -> bool {
+        ball <= Ball::Beast || ball == Ball::Strange
     }
 }
 
