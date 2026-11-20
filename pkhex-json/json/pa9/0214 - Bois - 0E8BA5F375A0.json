@@ -1,0 +1,154 @@
+{
+  "encryption_constant": 2784196000,
+  "sanity": 0,
+  "checksum": 3723,
+  "species_form": {
+    "national_dex": 214,
+    "form_index": 0
+  },
+  "held_item_index": 0,
+  "trainer_id": 10962,
+  "secret_id": 12,
+  "exp": 2160,
+  "ability_index": "Guts",
+  "ability_num": "Second",
+  "markings": {
+    "circle": "unset",
+    "square": "unset",
+    "triangle": "unset",
+    "heart": "unset",
+    "star": "unset",
+    "diamond": "unset"
+  },
+  "personality_value": 3028936923,
+  "nature": "Brave",
+  "is_fateful_encounter": false,
+  "gender": "Male",
+  "is_alpha": false,
+  "evs": {
+    "hp": 0,
+    "atk": 0,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 0
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "ribbons": [],
+  "contest_memory_count": 0,
+  "battle_memory_count": 0,
+  "form_argument": 0,
+  "nickname": "Bois",
+  "nickname_trash": "42006F0069007300000072006F00730073000000000000000000",
+  "moves": [
+    {
+      "move_index": "Tackle",
+      "pp": 35,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Leer",
+      "pp": 30,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Endure",
+      "pp": 10,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Pin Missile",
+      "pp": 20,
+      "pp_ups": 0
+    }
+  ],
+  "relearn_moves": [
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E"
+  ],
+  "ivs": {
+    "hp": 31,
+    "atk": 31,
+    "def": 15,
+    "spa": 15,
+    "spd": 15,
+    "spe": 31
+  },
+  "is_egg": false,
+  "is_nicknamed": true,
+  "handler_name": "RoC",
+  "handler_gender": "Male",
+  "is_current_handler": true,
+  "handler_friendship": 50,
+  "handler_memory": {
+    "intensity": 0,
+    "memory": 0,
+    "feeling": 0,
+    "textVariables": 0
+  },
+  "handler_id": 0,
+  "handler_language": "English",
+  "trainer_name": "Tracie",
+  "trainer_friendship": 50,
+  "trainer_memory": {
+    "intensity": 0,
+    "memory": 0,
+    "feeling": 0,
+    "textVariables": 0
+  },
+  "egg_date": null,
+  "met_date": "10/17/2025",
+  "egg_location_index": 0,
+  "met_location_index": 30001,
+  "ball": "Pok\u00E9",
+  "met_level": 12,
+  "trainer_gender": "Female",
+  "hyper_training": {
+    "hp": false,
+    "atk": false,
+    "def": false,
+    "spa": false,
+    "spd": false,
+    "spe": false
+  },
+  "game_of_origin": "LegendsZa",
+  "game_of_origin_battle": null,
+  "language": "English",
+  "status_condition": 0,
+  "stat_level": 12,
+  "stats": {
+    "hp": 44,
+    "atk": 41,
+    "def": 24,
+    "spa": 16,
+    "spd": 29,
+    "spe": 26
+  },
+  "level": 12,
+  "affixed_ribbon": null,
+  "height_scalar": 0,
+  "weight_scalar": 0,
+  "scale": 128,
+  "mint_nature": "Brave",
+  "home_tracker": null,
+  "tm_flags_base_game": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "tm_flags_dlc": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "plus_moves": {
+    "block_0xd6": [
+      0, 4, 2, 0, 0, 0, 0, 0, 0, 0, 0, 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0
+    ],
+    "block_0x94": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  },
+  "current_hp": 44,
+  "obedience_level": 12
+}
