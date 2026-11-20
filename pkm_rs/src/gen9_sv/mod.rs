@@ -27,8 +27,6 @@ pub use pk9::*;
 #[cfg(feature = "wasm")]
 mod pk9_buffer;
 #[cfg(feature = "wasm")]
-mod pokemon_index;
-#[cfg(feature = "wasm")]
 mod sv_save;
 #[cfg(feature = "wasm")]
 mod sv_save_blocks;
@@ -55,15 +53,11 @@ const BOX_COLS: u8 = 6;
 pub(crate) const BOX_SLOTS: u8 = BOX_ROWS * BOX_COLS;
 #[cfg(feature = "wasm")]
 pub(crate) const BOX_NAME_LENGTH: usize = 34;
-const MAX_ABILITY_INDEX: u16 = 310; // Poison Puppeteer
-
 #[cfg(feature = "wasm")]
 const MAX_RIBBON_SV: usize = ModernRibbon::Partner as usize;
 
 pub const TM_FLAG_BYTE_LENGTH_BASE: usize = 25;
 pub const TM_FLAG_BYTE_LENGTH_DLC: usize = 13;
-
-pub type Pk9AbilityIndex = AbilityIndexBounded<MAX_ABILITY_INDEX>;
 
 #[cfg(feature = "wasm")]
 pub(crate) type BoxName = SizedUtf16String<BOX_NAME_LENGTH>;
@@ -113,10 +107,9 @@ impl TryFrom<SpeciesForm> for Pk9SpeciesAndForm {
     type Error = Error;
 
     fn try_from(value: SpeciesForm) -> std::result::Result<Self, Self::Error> {
+        let (national_dex, form_index) = value.split();
         Self::if_allowed(value).ok_or(Error::other(&format!(
-            "invalid species form for pk9: {}/{}",
-            value.get_ndex(),
-            value.get_form_index()
+            "invalid species form for pk9: {national_dex}/{form_index}"
         )))
     }
 }

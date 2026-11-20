@@ -1,6 +1,6 @@
 use super::PkhPk9Buffer;
 use super::pk9_buffer::PkhPk9BufferMut;
-use crate::gen9_sv::Pk9AbilityIndex;
+use crate::gen9::Gen9AbilityIndex;
 use crate::gen9_sv::{TM_FLAG_BYTE_LENGTH_BASE, TM_FLAG_BYTE_LENGTH_DLC};
 use crate::result::{Error, Result};
 
@@ -39,7 +39,7 @@ pub struct HomePk9Data {
     pub tm_flags_base_game: FlagSet<TM_FLAG_BYTE_LENGTH_BASE>,
     pub obedience_level: u8,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub ability_index: Pk9AbilityIndex,
+    pub ability_index: Gen9AbilityIndex,
     pub ability_num: AbilityNumber,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     #[cfg_attr(

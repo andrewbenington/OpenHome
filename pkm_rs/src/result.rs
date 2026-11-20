@@ -157,7 +157,7 @@ pub enum PokemonIndexType {
     Gen5,
     Gen6,
     Gen7,
-    ScarletViolet,
+    Gen9,
     Gen3RR,
     Gen3UB,
 }
@@ -173,7 +173,7 @@ impl Display for PokemonIndexType {
             PokemonIndexType::Gen5 => "Gen 5",
             PokemonIndexType::Gen6 => "Gen 6",
             PokemonIndexType::Gen7 => "Gen 7",
-            PokemonIndexType::ScarletViolet => "Scarlet/Violet",
+            PokemonIndexType::Gen9 => "Scarlet/Violet",
             PokemonIndexType::Gen3RR => "Radical Red",
             PokemonIndexType::Gen3UB => "Unbound",
         })
