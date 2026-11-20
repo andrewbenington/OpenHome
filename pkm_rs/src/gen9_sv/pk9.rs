@@ -1,8 +1,9 @@
 use super::Pk9Buffer;
+use super::Pk9SpeciesAndForm;
 use super::pk9_buffer::Pk9BufferMut;
-use super::{Pk9AbilityIndex, Pk9SpeciesAndForm};
 use crate::checksum::RefreshChecksum;
-use crate::gen9_sv::pokemon_index::SvPokemonIndex;
+use crate::gen9::Gen9AbilityIndex;
+use crate::gen9::Gen9PokemonIndex;
 use crate::gen9_sv::{MAX_RIBBON_SV, TM_FLAG_BYTE_LENGTH_BASE, TM_FLAG_BYTE_LENGTH_DLC};
 use crate::result::{Error, Result};
 use crate::traits::ModernEvs;
@@ -50,7 +51,7 @@ pub struct Pk9 {
     pub secret_id: u16,
     pub exp: u32,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub ability_index: Pk9AbilityIndex,
+    pub ability_index: Gen9AbilityIndex,
     pub ability_num: AbilityNumber,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub markings: MarkingsSixShapesColors,
@@ -133,7 +134,7 @@ impl Pk9 {
     pub fn from_buffer<S: AsRef<[u8]>>(buf: &Pk9Buffer<S>) -> Result<Self> {
         let home_tracker_raw = buf.home_tracker_raw();
         let species_and_form = SpeciesForm::new_valid_ndex(
-            SvPokemonIndex::new(buf.species_game_index())?.to_national_dex(),
+            Gen9PokemonIndex::new(buf.species_game_index())?.to_national_dex(),
             buf.form_index(),
         )?;
 
@@ -238,7 +239,7 @@ impl Pk9 {
         buf.set_encryption_constant(self.encryption_constant);
         buf.reset_sanity();
         buf.set_species_game_index(
-            SvPokemonIndex::from_species_and_form(self.species_and_form.0)
+            Gen9PokemonIndex::from_species_and_form(self.species_and_form.0)
                 .expect("Pk9 has SV-compatible species/form"),
         );
         buf.set_form_index(self.species_and_form.0.get_form_index());
