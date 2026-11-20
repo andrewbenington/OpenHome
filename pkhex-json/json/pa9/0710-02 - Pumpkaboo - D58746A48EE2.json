@@ -1,0 +1,154 @@
+{
+  "encryption_constant": 1185189602,
+  "sanity": 0,
+  "checksum": 54663,
+  "species_form": {
+    "national_dex": 710,
+    "form_index": 2
+  },
+  "held_item_index": 0,
+  "trainer_id": 8819,
+  "secret_id": 12808,
+  "exp": 74088,
+  "ability_index": "Frisk",
+  "ability_num": "Second",
+  "markings": {
+    "circle": "unset",
+    "square": "unset",
+    "triangle": "unset",
+    "heart": "unset",
+    "star": "unset",
+    "diamond": "unset"
+  },
+  "personality_value": 2731439867,
+  "nature": "Bashful",
+  "is_fateful_encounter": false,
+  "gender": "Male",
+  "is_alpha": false,
+  "evs": {
+    "hp": 0,
+    "atk": 0,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 0
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "ribbons": [],
+  "contest_memory_count": 0,
+  "battle_memory_count": 0,
+  "form_argument": 0,
+  "nickname": "Pumpkaboo",
+  "nickname_trash": "500075006D0070006B00610062006F006F000000000000000000",
+  "moves": [
+    {
+      "move_index": "Mystical Fire",
+      "pp": 10,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Shadow Ball",
+      "pp": 15,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Hypnosis",
+      "pp": 20,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Brutal Swing",
+      "pp": 20,
+      "pp_ups": 0
+    }
+  ],
+  "relearn_moves": [
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E"
+  ],
+  "ivs": {
+    "hp": 7,
+    "atk": 1,
+    "def": 3,
+    "spa": 7,
+    "spd": 3,
+    "spe": 24
+  },
+  "is_egg": false,
+  "is_nicknamed": false,
+  "handler_name": "",
+  "handler_gender": "Male",
+  "is_current_handler": false,
+  "handler_friendship": 0,
+  "handler_memory": {
+    "intensity": 0,
+    "memory": 0,
+    "feeling": 0,
+    "textVariables": 0
+  },
+  "handler_id": 0,
+  "handler_language": "None",
+  "trainer_name": "RoC",
+  "trainer_friendship": 50,
+  "trainer_memory": {
+    "intensity": 0,
+    "memory": 0,
+    "feeling": 0,
+    "textVariables": 0
+  },
+  "egg_date": null,
+  "met_date": "10/17/2025",
+  "egg_location_index": 0,
+  "met_location_index": 207,
+  "ball": "Ultra",
+  "met_level": 42,
+  "trainer_gender": "Male",
+  "hyper_training": {
+    "hp": false,
+    "atk": false,
+    "def": false,
+    "spa": false,
+    "spd": false,
+    "spe": false
+  },
+  "game_of_origin": "LegendsZa",
+  "game_of_origin_battle": null,
+  "language": "English",
+  "status_condition": 0,
+  "stat_level": 42,
+  "stats": {
+    "hp": 100,
+    "atk": 60,
+    "def": 65,
+    "spa": 44,
+    "spd": 52,
+    "spe": 53
+  },
+  "level": 42,
+  "affixed_ribbon": null,
+  "height_scalar": 0,
+  "weight_scalar": 0,
+  "scale": 132,
+  "mint_nature": "Bashful",
+  "home_tracker": null,
+  "tm_flags_base_game": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "tm_flags_dlc": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "plus_moves": {
+    "block_0xd6": [
+      0, 4, 0, 0, 40, 0, 64, 64, 0, 0, 0, 0, 0, 0, 1, 0, 4, 0, 0, 0, 0, 8, 0, 0, 0, 64, 0, 0, 0, 0,
+      1, 0, 0
+    ],
+    "block_0x94": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  },
+  "current_hp": 100,
+  "obedience_level": 42
+}

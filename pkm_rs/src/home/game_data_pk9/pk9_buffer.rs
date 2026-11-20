@@ -1,5 +1,6 @@
 use crate::bytes::{AsBytes, AsBytesMut};
-use crate::gen9_sv::{Pk9AbilityIndex, TM_FLAG_BYTE_LENGTH_BASE, TM_FLAG_BYTE_LENGTH_DLC};
+use crate::gen9::Gen9AbilityIndex;
+use crate::gen9_sv::{TM_FLAG_BYTE_LENGTH_BASE, TM_FLAG_BYTE_LENGTH_DLC};
 use crate::result::Result;
 use pkm_rs_resources::abilities::AbilityIndexWasm;
 use pkm_rs_resources::ball::Ball;
@@ -246,7 +247,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> PkhPk9Buffer<S> {
         self.set_u16_le(Offset::AbilityIndex, v);
     }
 
-    pub fn set_ability_index(&mut self, v: Pk9AbilityIndex) {
+    pub fn set_ability_index(&mut self, v: Gen9AbilityIndex) {
         self.set_ability_index_raw(u16::from(v));
     }
 

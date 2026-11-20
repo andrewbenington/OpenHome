@@ -15,7 +15,7 @@ use wasm_bindgen::prelude::*;
 const TOTAL_UNALIGNED_INDEXES: usize = 109;
 
 #[allow(clippy::zero_prefixed_literal)]
-const NATIONAL_TO_SV_INDEX_SHIFTS: [i8; TOTAL_UNALIGNED_INDEXES] = [
+const NATIONAL_TO_GEN9_INDEX_SHIFTS: [i8; TOTAL_UNALIGNED_INDEXES] = [
     0_001, 0_001, 0_001, 0_001, 0_033, 0_033, 0_033, 0_021, 0_021, 0_044, 0_044, 0_007, 0_007,
     0_007, 0_029, 0_031, 0_031, 0_031, 0_068, 0_068, 0_068, 0_002, 0_002, 0_017, 0_017, 0_030,
     0_030, 0_024, 0_024, 0_028, 0_028, 0_058, 0_058, 0_012, -0_13, -0_13, -0_31, -0_31, -0_29,
@@ -28,7 +28,7 @@ const NATIONAL_TO_SV_INDEX_SHIFTS: [i8; TOTAL_UNALIGNED_INDEXES] = [
 ];
 
 #[allow(clippy::zero_prefixed_literal)]
-const SV_INDEX_TO_NATIONAL_SHIFTS: [i8; TOTAL_UNALIGNED_INDEXES] = [
+const GEN9_INDEX_TO_NATIONAL_SHIFTS: [i8; TOTAL_UNALIGNED_INDEXES] = [
     0_065, -0_01, -0_01, -0_01, -0_01, 0_031, 0_031, 0_047, 0_047, 0_029, 0_029, 0_053, 0_031,
     0_031, 0_046, 0_044, 0_030, 0_030, -0_07, -0_07, -0_07, 0_013, 0_013, -0_02, -0_02, 0_023,
     0_023, 0_024, -0_21, -0_21, 0_027, 0_027, 0_047, 0_047, 0_047, 0_026, 0_014, -0_33, -0_33,
@@ -40,74 +40,74 @@ const SV_INDEX_TO_NATIONAL_SHIFTS: [i8; TOTAL_UNALIGNED_INDEXES] = [
     0_003, 0_003, -0_05, -0_12, -0_12,
 ];
 
-const FIRST_UNALIGNED_NATIONAL_SV: u16 = 917;
-const TOTAL_INDEX_COUNT: u16 = FIRST_UNALIGNED_NATIONAL_SV + (TOTAL_UNALIGNED_INDEXES as u16);
+const FIRST_UNALIGNED_NATIONAL_GEN9: u16 = 917;
+const TOTAL_INDEX_COUNT: u16 = FIRST_UNALIGNED_NATIONAL_GEN9 + (TOTAL_UNALIGNED_INDEXES as u16);
 
 const fn convert_index(key: u16, shifts: [i8; TOTAL_UNALIGNED_INDEXES]) -> Option<u16> {
     match key {
         0 => None,
-        1..FIRST_UNALIGNED_NATIONAL_SV => Some(key),
+        1..FIRST_UNALIGNED_NATIONAL_GEN9 => Some(key),
         TOTAL_INDEX_COUNT.. => None,
         _ => {
-            let shift_index = key - FIRST_UNALIGNED_NATIONAL_SV;
+            let shift_index = key - FIRST_UNALIGNED_NATIONAL_GEN9;
             let shift = shifts[shift_index as usize] as i32;
             Some(((key as i32) + shift) as u16)
         }
     }
 }
 
-pub const fn sv_to_national_dex(sv_index: u16) -> Option<u16> {
-    convert_index(sv_index, SV_INDEX_TO_NATIONAL_SHIFTS)
+pub const fn gen9_to_national_dex(gen9_index: u16) -> Option<u16> {
+    convert_index(gen9_index, GEN9_INDEX_TO_NATIONAL_SHIFTS)
 }
 
-pub const fn national_dex_to_sv(national_dex: u16) -> Option<u16> {
-    convert_index(national_dex, NATIONAL_TO_SV_INDEX_SHIFTS)
+pub const fn national_dex_to_gen9(national_dex: u16) -> Option<u16> {
+    convert_index(national_dex, NATIONAL_TO_GEN9_INDEX_SHIFTS)
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
-pub struct SvPokemonIndex(NonZeroU16);
+pub struct Gen9PokemonIndex(NonZeroU16);
 
 const INVALID_INDEX_MESSAGE: &str =
-    "SvPokemonIndex should always be valid for conversion to NationalDex";
+    "Gen9PokemonIndex should always be valid for conversion to NationalDex";
 
-impl SvPokemonIndex {
-    pub const fn new(sv_index: u16) -> Result<Self, InvalidSvPokemonIndex> {
-        if let Some(non_zero) = NonZeroU16::new(sv_index)
-            && sv_to_national_dex(sv_index).is_some()
+impl Gen9PokemonIndex {
+    pub const fn new(gen9_index: u16) -> Result<Self, InvalidGen9PokemonIndex> {
+        if let Some(non_zero) = NonZeroU16::new(gen9_index)
+            && gen9_to_national_dex(gen9_index).is_some()
         {
             Ok(Self(non_zero))
         } else {
-            Err(InvalidSvPokemonIndex(sv_index))
+            Err(InvalidGen9PokemonIndex(gen9_index))
         }
     }
 
     pub fn from_species_and_form(species_and_form: SpeciesForm) -> Result<Self, Error> {
-        if let Some(sv_index) = national_dex_to_sv(species_and_form.get_ndex() as u16) {
-            NonZeroU16::new(sv_index)
+        if let Some(gen9_index) = national_dex_to_gen9(species_and_form.get_ndex() as u16) {
+            NonZeroU16::new(gen9_index)
                 .map(Self)
-                .ok_or(InvalidSvPokemonIndex(sv_index).into())
+                .ok_or(InvalidGen9PokemonIndex(gen9_index).into())
         } else {
             Err(Error::NationalDex {
                 value: species_and_form.get_ndex() as u16,
-                converting_from: PokemonIndexType::ScarletViolet,
+                converting_from: PokemonIndexType::Gen9,
             })
         }
     }
 
     pub fn to_national_dex(self) -> NationalDex {
-        sv_to_national_dex(self.0.get())
+        gen9_to_national_dex(self.0.get())
             .map(NationalDex::new)
             .expect(INVALID_INDEX_MESSAGE)
             .expect(INVALID_INDEX_MESSAGE)
     }
 
     pub fn try_from_base(ndex: NationalDex) -> Result<Self, Error> {
-        national_dex_to_sv(ndex as u16)
+        national_dex_to_gen9(ndex as u16)
             .and_then(NonZeroU16::new)
             .ok_or(Error::NationalDex {
                 value: ndex as u16,
-                converting_from: PokemonIndexType::ScarletViolet,
+                converting_from: PokemonIndexType::Gen9,
             })
             .map(Self)
     }
@@ -117,14 +117,14 @@ impl SvPokemonIndex {
     }
 }
 
-impl Default for SvPokemonIndex {
+impl Default for Gen9PokemonIndex {
     fn default() -> Self {
         Self(unsafe { NonZeroU16::new_unchecked(1) })
     }
 }
 
 #[cfg(feature = "randomize")]
-impl Randomize for SvPokemonIndex {
+impl Randomize for Gen9PokemonIndex {
     fn randomized<R: rand::prelude::Rng>(rng: &mut R) -> Self {
         loop {
             if let Ok(index) = Self::from_species_and_form(SpeciesForm::randomized(rng)) {
@@ -134,27 +134,27 @@ impl Randomize for SvPokemonIndex {
     }
 }
 
-impl From<SvPokemonIndex> for u16 {
-    fn from(sv_index: SvPokemonIndex) -> Self {
-        sv_index.0.get()
+impl From<Gen9PokemonIndex> for u16 {
+    fn from(gen9_index: Gen9PokemonIndex) -> Self {
+        gen9_index.0.get()
     }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct InvalidSvPokemonIndex(u16);
+pub struct InvalidGen9PokemonIndex(u16);
 
-impl From<InvalidSvPokemonIndex> for Error {
-    fn from(error: InvalidSvPokemonIndex) -> Self {
+impl From<InvalidGen9PokemonIndex> for Error {
+    fn from(error: InvalidGen9PokemonIndex) -> Self {
         Error::PokemonGameIndex {
             value: error.0,
-            converting_from: PokemonIndexType::ScarletViolet,
+            converting_from: PokemonIndexType::Gen9,
         }
     }
 }
 
 #[cfg(test)]
-impl From<InvalidSvPokemonIndex> for TestError {
-    fn from(error: InvalidSvPokemonIndex) -> Self {
+impl From<InvalidGen9PokemonIndex> for TestError {
+    fn from(error: InvalidGen9PokemonIndex) -> Self {
         TestError::from(Error::from(error))
     }
 }
@@ -163,29 +163,29 @@ impl From<InvalidSvPokemonIndex> for TestError {
 mod tests {
     use super::*;
 
-    fn sv_to_national_dex_decode_round_trip(sv_index: u16) {
-        if let Some(national_dex) = sv_to_national_dex(sv_index) {
-            assert_eq!(national_dex_to_sv(national_dex), Some(sv_index));
+    fn gen9_to_national_dex_decode_round_trip(gen9_index: u16) {
+        if let Some(national_dex) = gen9_to_national_dex(gen9_index) {
+            assert_eq!(national_dex_to_gen9(national_dex), Some(gen9_index));
         }
     }
 
-    fn decode_sv_to_national_dex_round_trip(national_dex: u16) {
-        if let Some(sv_index) = national_dex_to_sv(national_dex) {
-            assert_eq!(sv_to_national_dex(sv_index), Some(national_dex));
+    fn decode_gen9_to_national_dex_round_trip(national_dex: u16) {
+        if let Some(gen9_index) = national_dex_to_gen9(national_dex) {
+            assert_eq!(gen9_to_national_dex(gen9_index), Some(national_dex));
         }
     }
 
     #[test]
-    fn test_sv_to_national_dex_decode_round_trip() {
+    fn test_gen9_to_national_dex_decode_round_trip() {
         for value in 0..=u16::MAX {
-            sv_to_national_dex_decode_round_trip(value);
+            gen9_to_national_dex_decode_round_trip(value);
         }
     }
 
     #[test]
-    fn test_decode_sv_to_national_dex_round_trip() {
+    fn test_decode_gen9_to_national_dex_round_trip() {
         for value in 1..=u16::MAX {
-            decode_sv_to_national_dex_round_trip(value);
+            decode_gen9_to_national_dex_round_trip(value);
         }
     }
 }
