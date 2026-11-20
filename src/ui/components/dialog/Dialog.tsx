@@ -1,4 +1,5 @@
 import { Dialog as BaseUiDialog } from '@base-ui/react/dialog'
+import { useLayoutEffect, useState } from 'react'
 import OhoButton, { OhoButtonProps } from '../OhoButton'
 import styles from './Dialog.module.css'
 
@@ -10,9 +11,7 @@ export const Dialog = {
   Trigger: (props: React.ComponentProps<typeof BaseUiDialog.Trigger>) => (
     <BaseUiDialog.Trigger {...props} />
   ),
-  Portal: (props: React.ComponentProps<typeof BaseUiDialog.Portal>) => (
-    <BaseUiDialog.Portal container={findDialogPortalContainer()} {...props} />
-  ),
+  Portal: DialogPortal,
   Backdrop: (props: React.ComponentProps<typeof BaseUiDialog.Backdrop>) => (
     <BaseUiDialog.Backdrop {...props} className={styles.Backdrop} />
   ),
@@ -27,7 +26,7 @@ export const Dialog = {
     const { open, onOpenChange, ...popupProps } = props
     return (
       <Dialog.Root open={open} onOpenChange={onOpenChange}>
-        <Dialog.Portal container={findDialogPortalContainer()}>
+        <Dialog.Portal>
           <Dialog.Backdrop />
           <Dialog.Popup {...popupProps} />
         </Dialog.Portal>
@@ -61,4 +60,15 @@ function findDialogPortalContainer() {
     document.getElementById('active-tab-content-container') ?? // dialog should not consider tabs a part of the app width
     document.getElementById('app-container')
   )
+}
+
+function DialogPortal(props: React.ComponentProps<typeof BaseUiDialog.Portal>) {
+  const [container, setContainer] = useState<HTMLElement | null>(null)
+  useLayoutEffect(() => {
+    setContainer(findDialogPortalContainer())
+  }, [])
+
+  if (!container) return null
+
+  return <BaseUiDialog.Portal container={container} {...props} />
 }
