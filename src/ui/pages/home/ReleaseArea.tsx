@@ -31,6 +31,8 @@ function useMonsToRelease(): MonsToReleaseState {
 export default function ReleaseArea() {
   const { loading, loadedMons } = useMonsToRelease()
 
+  return null
+
   return (
     <Flex className="drop-area" direction="column">
       <div className="drop-area-text diagonal-clip">Release</div>

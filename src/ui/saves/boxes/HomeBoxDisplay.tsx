@@ -1,5 +1,4 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { SortTypes } from '@openhome-core/pkm/sort'
 import { mapToObject } from '@openhome-core/util'
 import { $R, Option, R, range } from '@openhome-core/util/functional'
@@ -28,9 +27,8 @@ import {
   useDragSourceSupportsMon,
   useIsDraggingActive,
 } from '@openhome-ui/state-zustand/drag-and-drop/dragStore'
-import useOhpkmBatchIdLookup from '@openhome-ui/state/ohpkm/useOhpkmIdBatchLookup'
 import useTrackedDataRecovery from '@openhome-ui/state/ohpkm/useTrackedDataRecovery'
-import { EMPTY_SLOT, HomeMonLocation, useSaves } from '@openhome-ui/state/saves'
+import { useSaves } from '@openhome-ui/state/saves'
 import { cssClass } from '@openhome-ui/util/style'
 import { Button, Card, DropdownMenu, Flex, Heading, TextField, Tooltip } from '@radix-ui/themes'
 import { ToggleGroup } from 'radix-ui'
@@ -47,9 +45,10 @@ import useMultiSelect from '../../state/drag-and-drop/useMultiSelect'
 import { useOpenHomeBoxNavigator } from '../util'
 import AllHomeBoxes from './AllHomeBoxes'
 import ArrowButton from './ArrowButton'
-import BoxCellAsync, { BoxSlotResult } from './BoxCellAsync'
+import BoxCellAsync from './BoxCellAsync'
 import DroppableSpace from './DroppableSpace'
 import './style.css'
+import { useCurrentHomeBox } from './useCurrentHomeBox'
 
 export type BoxViewMode = 'one' | 'all'
 
@@ -246,18 +245,11 @@ export default function HomeBoxDisplay() {
   )
 }
 
-type SlotData = {
-  monPromise: Option<BoxSlotResult>
-  location: HomeMonLocation
-  identifier: Option<OhpkmIdentifier>
-  loading?: boolean
-}
-
 function SingleBoxMonDisplay() {
   const displayError = useDisplayError()
   const displayTitledError = useTitledErrorDisplay()
-  const { importMonsToLocation, getPendingMon } = useSaves()
-  const { getCurrentBox, getCurrentBank, removeAllHomeDupes } = useBanksAndBoxes()
+  const { importMonsToLocation } = useSaves()
+  const { getCurrentBox, removeAllHomeDupes } = useBanksAndBoxes()
   const { multiSelectState: dragState, isSelected, toggleSelection } = useMultiSelect()
   const { sortHomeBox, sortAllHomeBoxes } = useBanksAndBoxes()
   const {
@@ -304,56 +296,9 @@ function SingleBoxMonDisplay() {
 
   const removeDupesItem = Item.label('Remove duplicates from this box').action(removeAllHomeDupes)
 
-  const currentBankIndex = getCurrentBank().index
-  const currentBoxIndex = getCurrentBox().index
+  const currentBoxIndex = currentBox.index
 
-  const { batchResults: ohpkmsById, loading } = useOhpkmBatchIdLookup(
-    Array.from(currentBox.identifiers.values())
-  )
-
-  const slots: SlotData[] = useMemo(
-    () =>
-      range(OPENHOME_BOX_SLOTS)
-        .map((index: number) => currentBox.identifiers.get(index))
-        .map((storedId, index) => {
-          const location: HomeMonLocation = {
-            bank: currentBankIndex,
-            box: currentBoxIndex,
-            boxSlot: index,
-            isHome: true,
-          }
-
-          let identifier = storedId
-          let monPromise: BoxSlotResult = R.Ok(undefined) as BoxSlotResult
-
-          // pendingMon means this slot is in the process of being updated, but needs to wait
-          // for the OHPKM data to be registered. In the meantime the pendingMon should be displayed
-          // for immediate visual feedback
-          const pendingMon = getPendingMon(location)
-          if (pendingMon === EMPTY_SLOT) {
-            identifier = undefined
-          } else if (pendingMon) {
-            if (typeof pendingMon === 'string') {
-              identifier = pendingMon
-            } else {
-              identifier = undefined
-              monPromise = R.Ok(pendingMon) as BoxSlotResult
-            }
-          }
-
-          if (identifier) {
-            const lookupResult = ohpkmsById?.get(identifier)
-            monPromise =
-              lookupResult ?? (loading ? (R.Ok(undefined) as BoxSlotResult) : R.Err({ identifier }))
-          }
-
-          const monPresentButLoading =
-            (loading && identifier !== undefined && monPromise !== undefined) ||
-            pendingMon !== undefined
-          return { monPromise, location, identifier, loading: monPresentButLoading }
-        }),
-    [currentBankIndex, currentBox.identifiers, currentBoxIndex, getPendingMon, ohpkmsById, loading]
-  )
+  const slots = useCurrentHomeBox()
 
   return (
     <>
@@ -401,7 +346,7 @@ function SingleBoxMonDisplay() {
       </OpenHomeCtxMenu>
       <PokemonDetailsModal
         mon={selectedMon}
-        key={selectedMon?.openhomeId}
+        // key={selectedMon?.openhomeId}
         onClose={() => setSelectedIndex(undefined)}
         navigateRight={navigateRight}
         navigateLeft={navigateLeft}

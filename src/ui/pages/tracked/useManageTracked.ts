@@ -226,6 +226,11 @@ export function useManageTracked() {
         allSaveMons.map(ohpkmStore.getPotentialOhpkmId).filter(filterUndefined)
       )
 
+      if (R.isErr(loadedMons)) {
+        console.error(`could not build save file ${savePath.raw}: ${loadedMons.error}`)
+        continue
+      }
+
       for (const saveMon of allSaveMons) {
         const saveMonId = ohpkmStore.getPotentialOhpkmId(saveMon)
 
@@ -233,7 +238,7 @@ export function useManageTracked() {
           continue
         }
 
-        $O(loadedMons.get(saveMonId))
+        $O(loadedMons.data.get(saveMonId))
           .flatMap(R.dropError)
           .do((trackedMon) => {
             trackedMon.syncWithGameData(saveMon, save)

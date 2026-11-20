@@ -16,7 +16,6 @@ import {
 } from '@pkm-rs/pkg'
 
 const COMPASS_PLUGIN_ID = 'compass'
-
 export default class PK9Compass extends PK9 implements PluginPKMInterface, WasmPkmInterface {
   static getFormat(): PkmFormat {
     return 'PK9Compass'

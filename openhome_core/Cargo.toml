@@ -1,6 +1,6 @@
 [package]
 name = "openhome_core"
-version = "1.19.1"
+version = "1.19.2-test.3+performance-improvements-3"
 edition = "2024"
 
 [dependencies]

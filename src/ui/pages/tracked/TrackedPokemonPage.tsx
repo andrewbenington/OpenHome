@@ -14,7 +14,7 @@ import PokemonDetailsModal from '@openhome-ui/pokemon/PokemonDetailsModal'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { SaveError, saveErrorMessage, saveErrorTitle, useSaves } from '@openhome-ui/state/saves'
 import { Button, DropdownMenu, Flex } from '@radix-ui/themes'
-import { PropsWithChildren, ReactNode, useCallback, useState } from 'react'
+import { PropsWithChildren, ReactNode, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { boxNameOrDefault, useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import AllTrackedPokemon from './AllTrackedPokemon'
@@ -35,35 +35,32 @@ export default function TrackedPokemonPage() {
   const { tryLoadFromId } = useOhpkmStore()
   const displayError = useDisplayError()
 
-  const onSelectMon = useCallback(
-    async (openhomeId: OhpkmIdentifier) => {
-      const loadResult = tryLoadFromId(openhomeId)
-      if (!isThenable(loadResult)) {
-        $R(loadResult).match(
-          (mon) => setSelectedMon(mon),
-          (error) =>
-            displayError(
-              'Failed to find Pokémon data',
-              `Pokémon with identifier ${error.identifier} could not be found`
-            )
-        )
-
-        return
-      }
-
-      await loadResult.then(
-        R.match(
-          (mon) => setSelectedMon(mon),
-          (error) =>
-            displayError(
-              'Failed to find Pokémon data',
-              `Pokémon with identifier ${error.identifier} could not be found`
-            )
-        )
+  const onSelectMon = async (openhomeId: OhpkmIdentifier) => {
+    const loadResult = tryLoadFromId(openhomeId)
+    if (!isThenable(loadResult)) {
+      $R(loadResult).match(
+        (mon) => setSelectedMon(mon),
+        (error) =>
+          displayError(
+            'Failed to find Pokémon data',
+            `Pokémon with identifier ${error.identifier} could not be found`
+          )
       )
-    },
-    [displayError, tryLoadFromId]
-  )
+
+      return
+    }
+
+    await loadResult.then(
+      R.match(
+        (mon) => setSelectedMon(mon),
+        (error) =>
+          displayError(
+            'Failed to find Pokémon data',
+            `Pokémon with identifier ${error.identifier} could not be found`
+          )
+      )
+    )
+  }
 
   return (
     <SideTabNavigation

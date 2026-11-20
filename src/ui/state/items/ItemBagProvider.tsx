@@ -64,9 +64,6 @@ function LoadedLocalStateProvider(props: LoadedBagProviderProps) {
 
 const initialBagState: ItemBagState = { itemCounts: {}, modified: false }
 
-/*
- *  CONTEXT
- */
 export const LoadedLocalStateContext = createContext<LoadedLocalStateController>({
   state: initialBagState,
   dispatch: () => {},
