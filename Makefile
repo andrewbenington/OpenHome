@@ -1,4 +1,4 @@
-VERSION=1.19.2-test.1+performance-improvements
+VERSION=1.19.2-test.2+performance-improvements-2
 
 .PHONY: help
 help: # Display this help.
