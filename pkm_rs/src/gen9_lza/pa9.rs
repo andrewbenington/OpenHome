@@ -4,6 +4,7 @@ use super::pa9_buffer::Pa9BufferMut;
 use crate::checksum::RefreshChecksum;
 use crate::gen9::Gen9AbilityIndex;
 use crate::gen9::Gen9PokemonIndex;
+use crate::gen9_lza::PlusMoveFlags;
 use crate::gen9_lza::{MAX_RIBBON_LZA, TM_FLAG_BYTE_LENGTH_BASE, TM_FLAG_BYTE_LENGTH_DLC};
 use crate::result::{Error, Result};
 use crate::traits::ModernEvs;
@@ -21,7 +22,7 @@ use pkm_rs_resources::stats;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, FlagSet, HyperTraining, Ivs, Language,
-    MarkingsSixShapesColors, OriginGame, Stats8, Stats16Le, TeraType,
+    MarkingsSixShapesColors, OriginGame, Stats8, Stats16Le,
 };
 use pkm_rs_types::{Gender, PokeDate, TrainerMemory};
 use serde::Serialize;
@@ -45,7 +46,7 @@ pub struct Pa9 {
     pub sanity: u16,
     pub checksum: u16,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub species_and_form: Pa9SpeciesAndForm,
+    pub species_form: Pa9SpeciesAndForm,
     pub held_item_index: u16,
     pub trainer_id: u16,
     pub secret_id: u16,
@@ -84,6 +85,7 @@ pub struct Pa9 {
     pub is_egg: bool,
     pub is_nicknamed: bool,
     pub status_condition: u32,
+    pub plus_moves: PlusMoveFlags,
     pub handler_name: SizedUtf16String<26>,
     pub handler_gender: BinaryGender,
     pub handler_language: Option<Language>,
@@ -124,6 +126,8 @@ pub struct Pa9 {
 }
 
 impl Pa9 {
+    pub const MAX_VALID_MOVE: u32 = 920; // Nihil Light
+
     // ------------------------------------------------------------------
     // Deserialise from a Pa9Buffer (the single source of all byte offsets)
     // ------------------------------------------------------------------
@@ -156,7 +160,7 @@ impl Pa9 {
             encryption_constant: buf.encryption_constant(),
             sanity: buf.sanity(),
             checksum: buf.checksum(),
-            species_and_form: species_and_form.try_into()?,
+            species_form: species_and_form.try_into()?,
             held_item_index: buf.held_item_index(),
             trainer_id: buf.trainer_id(),
             secret_id: buf.secret_id(),
@@ -190,6 +194,7 @@ impl Pa9 {
             is_egg: buf.is_egg(),
             is_nicknamed: buf.is_nicknamed(),
             status_condition: buf.status_condition(),
+            plus_moves: buf.plus_move_flags(),
             handler_name: buf.handler_name(),
             handler_gender: buf.handler_gender(),
             handler_language: buf.handler_language().ok(),
@@ -235,10 +240,10 @@ impl Pa9 {
         buf.set_encryption_constant(self.encryption_constant);
         buf.reset_sanity();
         buf.set_species_game_index(
-            Gen9PokemonIndex::from_species_and_form(self.species_and_form.0)
+            Gen9PokemonIndex::from_species_and_form(self.species_form.0)
                 .expect("Pa9 has LZA-compatible species/form"),
         );
-        buf.set_form_index(self.species_and_form.0.get_form_index());
+        buf.set_form_index(self.species_form.0.get_form_index());
         buf.set_held_item_index(self.held_item_index);
         buf.set_trainer_id(self.trainer_id);
         buf.set_secret_id(self.secret_id);
@@ -271,6 +276,7 @@ impl Pa9 {
         buf.set_is_egg(self.is_egg);
         buf.set_is_nicknamed(self.is_nicknamed);
         buf.set_status_condition(self.status_condition);
+        buf.set_plus_move_flags(self.plus_moves);
         buf.set_handler_name(&self.handler_name);
         buf.set_handler_gender(self.handler_gender);
         if let Some(lang) = self.handler_language {
@@ -342,7 +348,7 @@ impl Pa9 {
     pub fn calculate_stats(&self) -> Stats16Le {
         stats::calculate_all_modern_for_source(
             MetadataSource::LegendsZa,
-            self.species_and_form.0,
+            self.species_form.0,
             &self.ivs,
             &self.evs,
             self.calculate_level() as u16,
@@ -362,6 +368,10 @@ impl Pa9 {
         buffer.decrypt();
 
         buffer.species_game_index() == 0
+    }
+
+    pub fn ball_is_valid(ball: Ball) -> bool {
+        ball <= Ball::Beast || ball == Ball::Strange
     }
 }
 
@@ -387,11 +397,11 @@ impl PkmBytes for Pa9 {
 
 impl HasSpeciesAndForm for Pa9 {
     fn get_species_metadata(&self) -> &'static SpeciesMetadata {
-        self.species_and_form.0.get_species_metadata()
+        self.species_form.0.get_species_metadata()
     }
 
     fn get_form_metadata(&self) -> &'static FormMetadata {
-        self.species_and_form.0.get_form_metadata()
+        self.species_form.0.get_form_metadata()
     }
 
     fn calculate_level(&self) -> u8 {

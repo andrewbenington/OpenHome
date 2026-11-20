@@ -2,7 +2,10 @@ use crate::bytes::{AsBytes, AsBytesMut};
 use crate::checksum::{Checksum, ChecksumU16Le, RefreshChecksum};
 use crate::encryption::BlockCrypto;
 use crate::gen9::{Gen9AbilityIndex, Gen9PokemonIndex};
-use crate::gen9_lza::{TM_FLAG_BYTE_LENGTH_BASE, TM_FLAG_BYTE_LENGTH_DLC};
+use crate::gen9_lza::{
+    LZA_PLUS_MOVES_0X94_BYTES, LZA_PLUS_MOVES_0XD6_BYTES, PlusMoveFlags, TM_FLAG_BYTE_LENGTH_BASE,
+    TM_FLAG_BYTE_LENGTH_DLC,
+};
 use crate::result::Result;
 use crate::traits::OhpkmByte;
 use crate::util;
@@ -61,6 +64,7 @@ enum Offset {
     CurrentHp = 138,
     IvsEggNicknamed = 140,
     StatusCondition = 144,
+    PlusMoves0x94 = 148,
     HandlerName = 168,
     HandlerGender = 194,
     HandlerLanguage = 195,
@@ -73,6 +77,7 @@ enum Offset {
     FormArgument = 208,
     AffixedRibbon = 212,
     Language = 213,
+    PlusMoves0xD6 = 214,
     TrainerName = 248,
     TrainerFriendship = 274,
     TrainerMemory = 275,
@@ -393,6 +398,21 @@ impl<S: AsRef<[u8]>> Pa9Buffer<S> {
 
     pub fn status_condition(&self) -> u32 {
         self.get_u32_le(Offset::StatusCondition)
+    }
+
+    fn plus_moves_block_0x94(&self) -> [u8; LZA_PLUS_MOVES_0X94_BYTES] {
+        self.get_array(Offset::PlusMoves0x94)
+    }
+
+    fn plus_moves_block_0xd6(&self) -> [u8; LZA_PLUS_MOVES_0XD6_BYTES] {
+        self.get_array(Offset::PlusMoves0xD6)
+    }
+
+    pub fn plus_move_flags(&self) -> PlusMoveFlags {
+        PlusMoveFlags::from_byte_blocks(
+            &self.plus_moves_block_0xd6(),
+            &self.plus_moves_block_0x94(),
+        )
     }
 
     fn handler_name_raw(&self) -> [u8; 26] {
@@ -816,6 +836,20 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pa9Buffer<S> {
 
     pub fn set_status_condition(&mut self, v: u32) {
         self.set_u32_le(Offset::StatusCondition, v);
+    }
+
+    fn set_plus_moves_block_0x94(&mut self, v: &[u8; LZA_PLUS_MOVES_0X94_BYTES]) {
+        self.set_array(Offset::PlusMoves0x94, v);
+    }
+
+    fn set_plus_moves_block_0xd6(&mut self, v: &[u8; LZA_PLUS_MOVES_0XD6_BYTES]) {
+        self.set_array(Offset::PlusMoves0xD6, v);
+    }
+
+    pub fn set_plus_move_flags(&mut self, v: PlusMoveFlags) {
+        let (block_0xd6, block_0x94) = v.to_bytes();
+        self.set_plus_moves_block_0x94(&block_0x94);
+        self.set_plus_moves_block_0xd6(&block_0xd6);
     }
 
     fn set_handler_name_raw(&mut self, v: &[u8; 26]) {

@@ -913,7 +913,7 @@ impl DsRibbonSet {
         }
     }
 
-    pub fn from_openhome<const M: usize>(openhome_set: OpenHomeRibbonSet<M>) -> Self {
+    pub fn from_openhome(openhome_set: OpenHomeRibbonSet) -> Self {
         Self {
             gen3: openhome_set
                 .into_iter()
@@ -945,7 +945,7 @@ impl DsRibbonSet {
         }
     }
 
-    pub fn to_openhome<const M: usize>(self) -> OpenHomeRibbonSet<M> {
+    pub fn to_openhome(self) -> OpenHomeRibbonSet {
         self.get_ribbons()
             .into_iter()
             .map(DsRibbon::to_openhome)

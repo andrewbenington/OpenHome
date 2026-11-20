@@ -1,0 +1,238 @@
+use pkm_rs_resources::ball::Ball;
+use pkm_rs_resources::ribbons::ModernRibbon;
+use pkm_rs_resources::{metadata_source::MetadataSource, ribbons::OpenHomeRibbonSet};
+use pkm_rs_types::{AbilityNumber, OriginGame, Stats16Le};
+
+use super::OhpkmConvert;
+use crate::convert_strategy::ConvertStrategy;
+use crate::convert_strategy::PkmConverter;
+use crate::format::PkmFormat;
+use crate::gen8_swsh;
+use crate::gen9_lza::{Pa9, Pa9SpeciesAndForm};
+use crate::ohpkm;
+use crate::ohpkm::OhpkmV2;
+use crate::ohpkm::id::OpenHomeId;
+use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
+use crate::result::{Error, Result};
+use crate::traits::HasSpeciesAndForm;
+
+impl OhpkmConvert for Pa9 {
+    fn to_main_data(&self) -> ohpkm::v2_sections::MainDataV2 {
+        let mut ribbons = OpenHomeRibbonSet::from_modern(self.ribbons);
+        ribbons.set_modern_ribbon(ModernRibbon::AlphaMark, self.is_alpha);
+
+        ohpkm::v2_sections::MainDataV2 {
+            openhome_id: OpenHomeId::new(
+                self.species_form.into_inner().get_ndex(),
+                self.trainer_id,
+                self.secret_id,
+                self.personality_value,
+            ),
+            personality_value: self.personality_value,
+            encryption_constant: self.encryption_constant,
+            species_and_form: self.species_form.into_inner(),
+            held_item_index: self.held_item_index,
+            trainer_id: self.trainer_id,
+            secret_id: self.secret_id,
+            exp: self.exp,
+            ability_index: self
+                .ability_index
+                .change_bound()
+                .expect("Pa9 max ability <= overall max ability"),
+            ability_num: self.ability_num,
+            markings: self.markings,
+            nature: self.nature,
+            mint_nature: if self.mint_nature != self.nature {
+                Some(self.mint_nature)
+            } else {
+                None
+            },
+            is_fateful_encounter: self.is_fateful_encounter,
+            gender: self.gender,
+            evs: self.evs,
+            contest: self.contest,
+            pokerus: Default::default(),
+            contest_memory_count: self.contest_memory_count,
+            battle_memory_count: self.battle_memory_count,
+            sociability: Default::default(),
+            height_scalar: self.height_scalar,
+            weight_scalar: self.weight_scalar,
+            ribbons: OpenHomeRibbonSet::from_modern(self.ribbons),
+            moves: self
+                .moves
+                .to_pp_adjusted(MetadataSource::LegendsZa, ohpkm::MOVE_METADATA_SOURCE),
+            nickname: self.nickname,
+            relearn_moves: self.relearn_moves,
+            ivs: self.ivs,
+            is_egg: self.is_egg,
+            is_nicknamed: self.is_nicknamed,
+            handler_name: self.handler_name,
+            is_current_handler: self.is_current_handler,
+            handler_friendship: self.handler_friendship,
+            handler_memory: self.handler_memory,
+            handler_gender: self.handler_gender,
+            handler_language: self.handler_language,
+            fullness: Default::default(),
+            enjoyment: Default::default(),
+            game_of_origin: self.game_of_origin,
+            game_of_origin_battle: self.game_of_origin_battle,
+            language: self.language,
+            form_argument: self.form_argument,
+            affixed_ribbon: self.affixed_ribbon,
+            trainer_name: self.trainer_name,
+            trainer_friendship: self.trainer_friendship,
+            trainer_memory: self.trainer_memory,
+            egg_date: self.egg_date,
+            met_date: self.met_date,
+            ball: self.ball,
+            egg_location_index: if self.egg_location_index == 0 {
+                None
+            } else {
+                Some(self.egg_location_index)
+            },
+            met_location_index: if OriginGame::is_frlg_switch(self.game_of_origin) {
+                254
+            } else {
+                self.met_location_index
+            },
+            met_level: self.met_level,
+            hyper_training: self.hyper_training,
+            trainer_gender: self.trainer_gender,
+            home_tracker: self.home_tracker,
+            favorite: Default::default(),
+            is_shadow: Default::default(),
+            scale: self.scale,
+            handler_id: Default::default(),
+            handler_affection: Default::default(),
+            console_region: Default::default(),
+            extra_form: Default::default(),
+            trainer_affection: Default::default(),
+            obedience_level: self.obedience_level,
+            display_color_rgb: Default::default(),
+            started_tracking_seconds: Default::default(),
+            pid_bit_flipped_for_shiny: Default::default(),
+        }
+    }
+
+    fn to_lza_data(&self) -> Option<ohpkm::v2_sections::LegendsZaData> {
+        Some(ohpkm::v2_sections::LegendsZaData {
+            tm_flags_base: self.tm_flags_base_game,
+            tm_flags_dlc: self.tm_flags_dlc,
+            plus_moves: self.plus_moves,
+        })
+    }
+
+    fn from_ohpkm(ohpkm: &OhpkmV2, strategy: ConvertStrategy) -> Result<Self> {
+        let form_metadata = ohpkm.get_form_metadata();
+        let converter = PkmConverter::new(PkmFormat::PA9, strategy);
+        let met_data = converter.met_data(ohpkm);
+
+        let ability_index = if let Some(current_ability) = ohpkm.ability_index().change_bound() {
+            current_ability
+        } else if let Some(bound_checked) = form_metadata.ability_bounded(ohpkm.ability_num()) {
+            bound_checked
+        } else if let Some(fallback) = form_metadata.ability_bounded(AbilityNumber::First) {
+            fallback
+        } else {
+            return Err(Error::AbilityIndex(
+                form_metadata.get_ability(AbilityNumber::First).to_u16(),
+            ));
+        };
+
+        let species_form: Pa9SpeciesAndForm = ohpkm.species_and_form().try_into()?;
+
+        let mut mon = Self {
+            encryption_constant: ohpkm.encryption_constant(),
+            sanity: 0,
+            checksum: 0,
+            species_form,
+            held_item_index: ohpkm.held_item_index(),
+            trainer_id: ohpkm.trainer_id(),
+            secret_id: ohpkm.secret_id(),
+            exp: ohpkm.exp(),
+            ability_index,
+            ability_num: ohpkm.ability_num(),
+            markings: ohpkm.markings(),
+            personality_value: ohpkm.personality_value(),
+            nature: ohpkm.nature(),
+            mint_nature: ohpkm.mint_nature(),
+            is_fateful_encounter: ohpkm.is_fateful_encounter(),
+            gender: ohpkm.gender(),
+            is_alpha: ohpkm.is_alpha(),
+            evs: ohpkm.evs(),
+            contest: ohpkm.contest(),
+            ribbons: ohpkm.ribbons().get_modern().into_iter().collect(),
+            height_scalar: ohpkm.height_scalar(),
+            weight_scalar: ohpkm.weight_scalar(),
+            scale: ohpkm.scale(),
+            contest_memory_count: ohpkm.contest_memory_count(),
+            battle_memory_count: ohpkm.battle_memory_count(),
+            form_argument: ohpkm.form_argument(),
+            affixed_ribbon: ohpkm.affixed_ribbon(),
+            nickname: ohpkm.nickname(),
+            moves: ohpkm
+                .moves()
+                .to_pp_adjusted(ohpkm::MOVE_METADATA_SOURCE, MetadataSource::LegendsZa),
+            relearn_moves: ohpkm.relearn_moves(),
+            ivs: converter.ivs(ohpkm),
+            is_egg: ohpkm.is_egg(),
+            is_nicknamed: ohpkm.is_nicknamed(),
+            plus_moves: ohpkm
+                .plus_moves_lza()
+                .unwrap_or_default()
+                .with_all_for_species_at_level(species_form.into_inner(), ohpkm.calculate_level()),
+            handler_name: ohpkm.handler_name(),
+            handler_gender: ohpkm.handler_gender(),
+            is_current_handler: ohpkm.is_current_handler(),
+            handler_friendship: ohpkm.handler_friendship(),
+            handler_memory: ohpkm.handler_memory(),
+            handler_language: ohpkm.handler_language(),
+            handler_id: ohpkm.handler_id(),
+            trainer_name: ohpkm.trainer_name(),
+            trainer_friendship: ohpkm.trainer_friendship(),
+            trainer_memory: ohpkm.trainer_memory(),
+            egg_date: ohpkm.egg_date(),
+            met_date: ohpkm.met_date(),
+            obedience_level: ohpkm.obedience_level(),
+            egg_location_index: ohpkm.egg_location_index().unwrap_or(0),
+            met_location_index: met_data.location_index,
+            ball: if Pa9::ball_is_valid(ohpkm.ball()) {
+                ohpkm.ball()
+            } else {
+                Ball::Poke
+            },
+            met_level: ohpkm.met_level(),
+            trainer_gender: ohpkm.trainer_gender(),
+            tm_flags_base_game: ohpkm.tm_flags_lza_base().unwrap_or_default(),
+            tm_flags_dlc: ohpkm.tm_flags_lza_dlc().unwrap_or_default(),
+            home_tracker: ohpkm.home_tracker(),
+            hyper_training: ohpkm.hyper_training(),
+            game_of_origin: met_data.origin,
+            game_of_origin_battle: ohpkm.game_of_origin_battle(),
+            language: ohpkm.language(),
+            status_condition: 0,
+            stat_level: 0,
+            current_hp: 0,
+            stats: Stats16Le::default(),
+        };
+
+        mon.stat_level = mon.calculate_level();
+        mon.stats = mon.calculate_stats();
+        mon.current_hp = mon.stats.hp;
+
+        mon.refresh_checksum();
+
+        Ok(mon)
+    }
+
+    fn bytes_to_stored(bytes: &[u8]) -> Result<StoredPkmBytes> {
+        Box::new(bytes.as_array().ok_or(Error::buffer_size_with_source(
+            "Pa9::OhpkmConvert::bytes_to_stored",
+            gen8_swsh::PKM_DATA_SIZE,
+            bytes.len(),
+        )))
+        .copied()
+        .map(Box::new)
+        .map(StoredPkmBytes::Pa9)
+    }
+}

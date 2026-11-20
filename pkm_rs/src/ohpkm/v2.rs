@@ -6,7 +6,7 @@ use super::v2_sections::{
 use crate::convert_strategy::{
     PidGenerationParameters, PidInitialization, PidModificationStrategy,
 };
-use crate::gen9_lza::PlusMoveFlags;
+use crate::gen9_lza::{LZA_BASE_TM_BYTES, LZA_DLC_TM_BYTES, PlusMoveFlags};
 use crate::ohpkm::OhpkmConvert;
 #[allow(deprecated)]
 use crate::ohpkm::deprecated::PastHandlerDataV1;
@@ -50,8 +50,6 @@ use tsify::Ts;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-#[cfg(feature = "wasm")]
-use crate::gen9_lza::{LZA_BASE_TM_BYTES, LZA_DLC_TM_BYTES};
 #[cfg(feature = "wasm")]
 use crate::gen9_sv;
 #[cfg(feature = "wasm")]
@@ -446,11 +444,11 @@ impl OhpkmV2 {
         self.main_data.battle_memory_count = v;
     }
 
-    pub const fn ribbons(&self) -> OpenHomeRibbonSet<16> {
+    pub const fn ribbons(&self) -> OpenHomeRibbonSet {
         self.main_data.ribbons
     }
 
-    pub const fn set_ribbons(&mut self, v: OpenHomeRibbonSet<16>) {
+    pub const fn set_ribbons(&mut self, v: OpenHomeRibbonSet) {
         self.main_data.ribbons = v;
     }
 
@@ -1425,6 +1423,40 @@ impl OhpkmV2 {
 
     pub fn plus_moves_lza(&self) -> Option<PlusMoveFlags> {
         Some(self.lza_data?.plus_moves)
+    }
+
+    pub fn tm_flags_lza_base(&self) -> Option<FlagSet<{ LZA_BASE_TM_BYTES }>> {
+        Some(self.lza_data?.tm_flags_base)
+    }
+
+    pub fn set_tm_flags_lza_base(&mut self, value: Option<FlagSet<{ LZA_BASE_TM_BYTES }>>) {
+        match value {
+            Some(flags) => {
+                self.lza_data.get_or_insert_default().tm_flags_base = flags;
+            }
+            None => {
+                if let Some(lza_data) = &mut self.lza_data {
+                    lza_data.tm_flags_base = FlagSet::default();
+                }
+            }
+        }
+    }
+
+    pub fn tm_flags_lza_dlc(&self) -> Option<FlagSet<{ LZA_DLC_TM_BYTES }>> {
+        Some(self.lza_data?.tm_flags_dlc)
+    }
+
+    pub fn set_tm_flags_lza_dlc(&mut self, value: Option<FlagSet<{ LZA_DLC_TM_BYTES }>>) {
+        match value {
+            Some(flags) => {
+                self.lza_data.get_or_insert_default().tm_flags_dlc = flags;
+            }
+            None => {
+                if let Some(lza_data) = &mut self.lza_data {
+                    lza_data.tm_flags_dlc = FlagSet::default();
+                }
+            }
+        }
     }
 
     // Past Handlers
@@ -3499,23 +3531,15 @@ impl OhpkmV2 {
 
     #[wasm_bindgen(getter = tmFlagsLzaBase)]
     pub fn tm_flags_lza_base_wasm(&self) -> Option<Vec<u8>> {
-        Some(self.lza_data?.tm_flags_base.to_bytes().to_vec())
+        self.tm_flags_lza_base()
+            .map(|arr| arr.bytes().copied().collect())
     }
 
     #[wasm_bindgen(setter = tmFlagsLzaBase)]
     pub fn set_tm_flags_lza_base_wasm(&mut self, value: Option<Vec<u8>>) {
-        match value {
-            Some(flags) => {
-                let sized_array = array_ref![flags, 0, LZA_BASE_TM_BYTES];
-                self.lza_data.get_or_insert_default().tm_flags_base =
-                    FlagSet::<LZA_BASE_TM_BYTES>::from_bytes(*sized_array);
-            }
-            None => {
-                if let Some(lza_data) = &mut self.lza_data {
-                    lza_data.tm_flags_base = FlagSet::default();
-                }
-            }
-        }
+        self.set_tm_flags_lza_base(
+            value.map(|vec| FlagSet::from_bytes(*array_ref![vec, 0, LZA_BASE_TM_BYTES])),
+        )
     }
 
     #[wasm_bindgen(getter = tmFlagsLzaDlc)]
