@@ -14,6 +14,7 @@ var pkmClassByDir = new Dictionary<string, Func<byte[], PKM>>
     { "pk7", bytes => new PK7(bytes) },
     { "pk8", bytes => new PK8(bytes) },
     { "pk9", bytes => new PK9(bytes) },
+    { "pa9", bytes => new PA9(bytes) },
     { "ph4", bytes => new PKH(bytes) },
 };
 
@@ -35,6 +36,10 @@ static object PkmToJsonObject(PKM pk)
     {
         return Pk9Object.Build(pk9);
     }
+    else if (pk is PA9 pa9)
+    {
+        return Pa9Object.Build(pa9);
+    }
     else if (pk is PKH pkh)
     {
         return PkhObject.Build(pkh);
@@ -49,11 +54,18 @@ static byte[] PkmToEncryptedBytes(PKM pk)
 {
     if (pk is PK9 pk9)
     {
-    var data = new byte[pk.SIZE_PARTY];
-    pk.WriteEncryptedDataParty(data);
-    return data;
-        
-    } else
+        var data = new byte[pk.SIZE_PARTY];
+        pk.WriteEncryptedDataParty(data);
+        return data;
+
+    }
+    else if (pk is PA9 pa9)
+    {
+        var data = new byte[pk.SIZE_PARTY];
+        pk.WriteEncryptedDataParty(data);
+        return data;
+    }
+    else
     {
         return null;
     }

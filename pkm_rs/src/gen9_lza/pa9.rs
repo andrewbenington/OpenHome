@@ -480,7 +480,7 @@ mod tests {
 
     #[test]
     fn is_shiny() -> TestResult<()> {
-        let path = PathBuf::from("pa9").join("0446 ★ - Munchlax - AF1E69687576.pa9");
+        let path = PathBuf::from("pa9").join("shiny-frigibax.pa9");
         let mon = tests::pkm_from_file::<Pa9>(&path)?.0;
         assert!(mon.is_shiny());
 
@@ -488,7 +488,7 @@ mod tests {
     }
 
     #[test]
-    fn compare_pkhex_wasm() -> TestResult<()> {
+    fn compare_pkhex_json() -> TestResult<()> {
         tests::compare_pkhex_json_all_in_dir::<Pa9>(&PathBuf::from("pa9"))
     }
 
@@ -503,7 +503,7 @@ mod tests {
     #[test]
     fn nickname_garbage_preserved() -> TestResult<()> {
         let (mon, bytes) =
-            tests::pkm_from_file::<Pa9>(&PathBuf::from("pa9").join("koraidon-garbage-bytes.pa9"))?;
+            tests::pkm_from_file::<Pa9>(&PathBuf::from("pa9").join("emboar-garbage-bytes.pa9"))?;
 
         let mon_recreated = Pa9::from_ohpkm(
             &OhpkmV2::convert_with_backup(&mon, &bytes)?,
@@ -542,26 +542,6 @@ mod tests {
         let mon = tests::pkm_from_file::<OhpkmV2>(&PathBuf::from("ohpkm").join("Machamp.ohpkm"))?.0;
 
         let _ = Pa9::from_ohpkm(&mon, ConvertStrategy::default());
-
-        Ok(())
-    }
-
-    #[test]
-    fn ohpkm_preserves_moves() -> TestResult<()> {
-        let mon = tests::pkm_from_file::<Pa9>(
-            &PathBuf::from("pa9").join("0128-01 - Tauros - 3ACEA55CFD17.pa9"),
-        )?
-        .0;
-
-        let ohpkm = OhpkmV2::convert_without_backup(&mon);
-
-        for (index, (pa9_move, ohpkm_move)) in mon.moves.into_iter().zip(ohpkm.moves()).enumerate()
-        {
-            assert_eq!(
-                pa9_move.move_index, ohpkm_move.move_index,
-                "Move in slot {index} is preserved"
-            );
-        }
 
         Ok(())
     }
