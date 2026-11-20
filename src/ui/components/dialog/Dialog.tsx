@@ -56,10 +56,7 @@ export const Dialog = {
 }
 
 function findDialogPortalContainer() {
-  return (
-    document.getElementById('active-tab-content-container') ?? // dialog should not consider tabs a part of the app width
-    document.getElementById('app-container')
-  )
+  return document.getElementById('active-tab-content-container') // dialog should not consider tabs a part of the app width
 }
 
 function DialogPortal(props: React.ComponentProps<typeof BaseUiDialog.Portal>) {
