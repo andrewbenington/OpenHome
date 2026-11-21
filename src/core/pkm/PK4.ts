@@ -311,7 +311,7 @@ export default class PK4 {
 
       this.ribbons = filterRibbons(other.ribbons ?? [], [Gen4Ribbons], '') ?? []
       this.nickname = converter.nickname(other, 10)
-      this.trainerName = other.trainerName
+      this.trainerName = other.trainerName.slice(0, 7)
       this.trainerGender = other.trainerGender
       this.isFatefulEncounter = other.isFatefulEncounter ?? false
     }

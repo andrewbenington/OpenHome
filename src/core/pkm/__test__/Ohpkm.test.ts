@@ -163,6 +163,48 @@ describe('nickname is properly truncated in 10-character formats', async () => {
   })
 })
 
+describe('OT name is properly truncated in 7-character formats', async () => {
+  test(`pk2`, () => {
+    const feraligatrBytes = pkmTestFileBytes('ohpkm', 'feraligatr.ohpkm')
+
+    const feraligatrOhpkm = OHPKM.fromBytes(feraligatrBytes.buffer)
+    expect(feraligatrOhpkm.trainerName).toEqual('MechaCthulhu')
+
+    const feraligatrPk2 = R.assert(PK2.fromOhpkm(feraligatrOhpkm, getDefaultConvertStrategy()))
+    expect(feraligatrPk2.trainerName).toEqual('MechaCt')
+  })
+
+  test(`pk3`, () => {
+    const feraligatrBytes = pkmTestFileBytes('ohpkm', 'feraligatr.ohpkm')
+
+    const feraligatrOhpkm = OHPKM.fromBytes(feraligatrBytes.buffer)
+    expect(feraligatrOhpkm.trainerName).toEqual('MechaCthulhu')
+
+    const feraligatrPk3 = R.assert(PK3.fromOhpkm(feraligatrOhpkm, getDefaultConvertStrategy()))
+    expect(feraligatrPk3.trainerName).toEqual('MechaCt')
+  })
+
+  test(`pk4`, () => {
+    const feraligatrBytes = pkmTestFileBytes('ohpkm', 'feraligatr.ohpkm')
+
+    const feraligatrOhpkm = OHPKM.fromBytes(feraligatrBytes.buffer)
+    expect(feraligatrOhpkm.trainerName).toEqual('MechaCthulhu')
+
+    const feraligatrPk4 = R.assert(PK4.fromOhpkm(feraligatrOhpkm, getDefaultConvertStrategy()))
+    expect(feraligatrPk4.trainerName).toEqual('MechaCt')
+  })
+
+  test(`pk5`, () => {
+    const feraligatrBytes = pkmTestFileBytes('ohpkm', 'feraligatr.ohpkm')
+
+    const feraligatrOhpkm = OHPKM.fromBytes(feraligatrBytes.buffer)
+    expect(feraligatrOhpkm.trainerName).toEqual('MechaCthulhu')
+
+    const feraligatrPk5 = R.assert(PK5.fromOhpkm(feraligatrOhpkm, getDefaultConvertStrategy()))
+    expect(feraligatrPk5.trainerName).toEqual('MechaCt')
+  })
+})
+
 test(`no extra ribbons are added when serializing/deserializing pk4`, () => {
   const feraligatrBytes = pkmTestFileBytes('ohpkm', 'feraligatr.ohpkm')
 
