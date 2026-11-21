@@ -471,6 +471,8 @@ impl TrainerDataGen7Alola {
 mod tests {
     use std::path::Path;
 
+    use pkm_rs_types::NationalDex;
+
     use crate::checksum::Checksum;
     use crate::convert_strategy::ConvertStrategy;
     use crate::gen7_alola::pk7_buffer::Pk7Buffer;
@@ -496,6 +498,31 @@ mod tests {
             ChecksumU16Le::calc_over_bytes(&after_serialized_bytes),
             0x3065
         );
+        Ok(())
+    }
+
+    // this test checks for a previous bug caused by not padding the output of BigUint::to_bytes_be() in encryption::meme_crypto::rsa_private.
+    // the bug would only occur roughly 1/256 times when encrypting with meme crypto, but was consistently recreatable by moving this scyther and then re-encrypting the save.
+    #[test]
+    fn sun_encryption_doesnt_fail_due_to_unpadded_rsa_private_output()
+    -> std::result::Result<(), Box<dyn std::error::Error>> {
+        let moon_bytes =
+            save_bytes_from_file(&Path::new("gen7-alola").join("sun_breaks_if_no_rsa_padding"))?;
+        let mut save = Gen7AlolaSave::from_bytes(&moon_bytes)?;
+
+        let box_index = BoxIndex::check_bound(2).expect("should be valid");
+        let box_slot = BoxSlot::check_bound(25).expect("should be valid");
+
+        let scyther = save
+            .get_mon_at(box_index, box_slot)
+            .expect("slot (2, 25) should exist")
+            .expect("slot (2, 25) is not empty");
+
+        assert_eq!(scyther.species_and_form.0.get_ndex(), NationalDex::Scyther);
+
+        save.set_mon_at(box_index, box_slot, None);
+        save.prepare_bytes_for_saving();
+
         Ok(())
     }
 
