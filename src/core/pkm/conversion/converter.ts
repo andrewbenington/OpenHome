@@ -51,8 +51,8 @@ export class PkmConverter {
     }
   }
 
-  personalityValue(mon: PKMInterface, shinyOdds: ShinyOdds) {
-    const parameters = PidGenerationParametersJs.new(
+  personalityValue(mon: PKMInterface & { personalityValue: number }, shinyOdds: ShinyOdds) {
+    const parameters = PidGenerationParametersJs.existing_pid(
       mon.nationalDex,
       mon.formIndex,
       mon.nature,

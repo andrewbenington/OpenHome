@@ -24,7 +24,8 @@ use wasm_bindgen::prelude::*;
 
 pub use converter::PkmConverter;
 pub use personality_value::{
-    PidGenerationParameters, PidModificationStrategy, generate_pk3_compatible_pid,
+    PidGenerationParameters, PidInitialization, PidModificationStrategy,
+    generate_pk3_compatible_pid,
 };
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Serialize))]
