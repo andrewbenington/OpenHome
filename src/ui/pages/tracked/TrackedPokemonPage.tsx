@@ -12,7 +12,7 @@ import SideTabNavigation from '@openhome-ui/components/side-tabs/SideTabNavigati
 import { useDisplayError } from '@openhome-ui/hooks/displayError'
 import PokemonDetailsModal from '@openhome-ui/pokemon/PokemonDetailsModal'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
-import { SaveError, saveErrorMessage, saveErrorTitle, useSaves } from '@openhome-ui/state/saves'
+import { OpenSaveError, saveErrorMessage, saveErrorTitle, useSaves } from '@openhome-ui/state/saves'
 import { Button, DropdownMenu, Flex } from '@radix-ui/themes'
 import { PropsWithChildren, ReactNode, useState } from 'react'
 import { useNavigate } from 'react-router'
@@ -235,7 +235,7 @@ function ForOneStateBody(props: ForOneStateBodyProps) {
     await saves.addSave(save).then(
       R.match(
         () => navigate('/home'),
-        (error: SaveError) => displayError(saveErrorTitle(error.type), saveErrorMessage(error))
+        (error: OpenSaveError) => displayError(saveErrorTitle(error.type), saveErrorMessage(error))
       )
     )
   }

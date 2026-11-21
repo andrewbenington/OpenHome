@@ -89,7 +89,7 @@ interface BaseSAV<P extends PKMInterface = PKMInterface> {
   supportsMon: (nationalDex: number, formNumber: number) => boolean
   supportsItem: (itemIndex: number) => boolean
 
-  prepareWriter: () => SaveWriter
+  prepareWriter: () => Result<SaveWriter>
 
   getDisplayData(): Record<string, string | number | undefined> | undefined
   getDisplayPkms(): DisplayPkm<P>[]
@@ -128,11 +128,15 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   updateItemData?: (itemData: ItemDataTs) => void
   getItemDatabase?: () => ItemTransferDatabase
 
-  prepareWriter(): SaveWriter {
-    this.prepareForSaving()
-    return {
-      bytes: new Uint8Array(this.bytes),
-      filepath: this.filePath.raw,
+  prepareWriter(): Result<SaveWriter> {
+    try {
+      this.prepareForSaving()
+      return R.Ok({
+        bytes: new Uint8Array(this.bytes),
+        filepath: this.filePath.raw,
+      })
+    } catch (e) {
+      return R.Err(String(e))
     }
   }
 
@@ -257,11 +261,15 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   updateItemData?: (itemData: ItemDataTs) => void
   getItemDatabase?: () => ItemTransferDatabase
 
-  prepareWriter(): SaveWriter {
-    this.prepareForSaving()
-    return {
-      bytes: new Uint8Array(this.bytes),
-      filepath: this.filePath.raw,
+  prepareWriter(): Result<SaveWriter> {
+    try {
+      this.prepareForSaving()
+      return R.Ok({
+        bytes: new Uint8Array(this.bytes),
+        filepath: this.filePath.raw,
+      })
+    } catch (e) {
+      return R.Err(String(e))
     }
   }
 

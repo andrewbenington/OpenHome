@@ -1,9 +1,7 @@
 import { AppBackend } from '@openhome-core/backend/appBackend'
 import useBackend from '@openhome-core/backend/useBackend'
-import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAVClass } from '@openhome-core/save/types'
-import { $R, Option, R, range, Result } from '@openhome-core/util/functional'
+import { $R, Option, partitionResults, R, range, Result } from '@openhome-core/util/functional'
 import { NowOrLater } from '@openhome-core/util/promise'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import PromptDialog from '@openhome-ui/components/dialog/PromptDialog'
@@ -25,6 +23,7 @@ import { useConvertStrategies } from '../convert-strategies'
 import { useItemBag } from '../items'
 import { useOhpkmStore } from '../ohpkm'
 import { openSavesReducer, SavesContext } from './reducer'
+import { formatSaveError, SaveError } from './useSaves'
 
 export type SavesProviderProps = {
   children: ReactNode
@@ -80,7 +79,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       if (R.isErr(result)) {
         displayError('Error Starting Save Transaction', result.error)
         setSaving(false)
-        return R.Err([TransactionStart(result.error)])
+        return R.Err([SaveError.TransactionStart(result.error)])
       }
 
       // Write appropriate trainer data to handler fields
@@ -97,7 +96,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
             const converted = save.convertOhpkm(trackedData, defaultConvertStrategy)
             if (R.isErr(converted)) {
-              return Promise.resolve(R.Err([PkmConversion(converted.error)]))
+              return Promise.resolve(R.Err([SaveError.PkmConversion(converted.error)]))
             }
             $R(save.convertOhpkm(trackedData, defaultConvertStrategy)).map((mon) =>
               save.setMonAt(boxNum, boxSlot, mon)
@@ -106,7 +105,15 @@ export default function SavesProvider({ children }: SavesProviderProps) {
         }
       }
 
-      const saveWriters = allOpenSaves.map((save) => save.prepareWriter())
+      const { successes: saveWriters, failures } = partitionResults(
+        allOpenSaves.map((save) => save.prepareWriter())
+      )
+
+      if (failures.length) {
+        await backend.rollbackTransaction()
+        setSaving(false)
+        return R.Err(failures.map(SaveError.SaveWriter))
+      }
 
       const promises = [
         backend.writeAllSaveFiles(saveWriters),
@@ -123,7 +130,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
           displayError('Error Saving Bag', saveBagResult.error)
           await backend.rollbackTransaction()
           setSaving(false)
-          return R.Err([SaveItemBagData(saveBagResult.error)])
+          return R.Err([SaveError.SaveItemBagData(saveBagResult.error)])
         }
         await itemBag.refetchStoredBag()
       }
@@ -135,20 +142,20 @@ export default function SavesProvider({ children }: SavesProviderProps) {
         displayError('Error Saving', errors)
         await backend.rollbackTransaction()
         setSaving(false)
-        return R.Err(errors.map(BackendSaveError))
+        return R.Err(errors.map(SaveError.Backend))
       }
 
       const syncedStateResult = await backend.saveSyncedState()
       if (R.isErr(syncedStateResult)) {
         displayError('Error Saving', syncedStateResult.error)
         setSaving(false)
-        return R.Err([BackendSaveError(syncedStateResult.error)])
+        return R.Err([SaveError.Backend(syncedStateResult.error)])
       }
 
       const commitResult = await backend.commitTransaction()
       if (R.isErr(commitResult)) {
         setSaving(false)
-        return R.Err([TransactionCommit(commitResult.error)])
+        return R.Err([SaveError.TransactionCommit(commitResult.error)])
       }
 
       openSavesDispatch({ type: 'clear_updated_box_slots' })
@@ -179,7 +186,10 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     let ignore = false
     // returns a function to stop listening
     const stopListening = AppBackend.onMenuEvents({
-      save: () => saveChangesEvent(false),
+      save: async () =>
+        saveChangesEvent(false).then(
+          R.peekErr((errors) => displayError('Error saving changes', errors.map(formatSaveError)))
+        ),
       reset: async () => {
         if (ignore) return
         openSavesDispatch({ type: 'clear_mons_to_release' })
@@ -195,7 +205,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       ignore = true
       stopListening()
     }
-  }, [openSavesDispatch, reloadBankStore])
+  }, [openSavesDispatch, reloadBankStore, displayError])
 
   if (openSavesState.error) {
     return (
@@ -213,8 +223,9 @@ export default function SavesProvider({ children }: SavesProviderProps) {
   }
 
   async function saveChangesReleaseConfirmed() {
-    await saveChanges(true)
+    const result = await saveChanges(true)
     hideReleaseWarning()
+    return result
   }
 
   function dismissSavedMessage() {
@@ -273,42 +284,6 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     </>
   )
 }
-
-type SaveError =
-  | { _SaveErrorType: 'TransactionStart'; message: string }
-  | { _SaveErrorType: 'TransactionCommit'; message: string }
-  | { _SaveErrorType: 'IdentifierNotTracked'; identifier: OhpkmIdentifier }
-  | { _SaveErrorType: 'PkmConversion'; message: string }
-  | { _SaveErrorType: 'GenG12Identifier'; mon: OHPKM }
-  | { _SaveErrorType: 'GenG345Identifier'; mon: OHPKM }
-  | { _SaveErrorType: 'SaveItemBagData'; message: string }
-  | { _SaveErrorType: 'BackendSaveError'; message: string }
-  | { _SaveErrorType: 'ReloadLookup'; message: string }
-
-const TransactionStart: (message: string) => SaveError = (message: string) => ({
-  _SaveErrorType: 'TransactionStart',
-  message,
-})
-
-const TransactionCommit: (message: string) => SaveError = (message: string) => ({
-  _SaveErrorType: 'TransactionCommit',
-  message,
-})
-
-const SaveItemBagData: (message: string) => SaveError = (message: string) => ({
-  _SaveErrorType: 'SaveItemBagData',
-  message,
-})
-
-const BackendSaveError: (message: string) => SaveError = (message: string) => ({
-  _SaveErrorType: 'BackendSaveError',
-  message,
-})
-
-const PkmConversion: (message: string) => SaveError = (message: string) => ({
-  _SaveErrorType: 'PkmConversion',
-  message,
-})
 
 interface SaveDisambiguationDialogProps {
   open: boolean

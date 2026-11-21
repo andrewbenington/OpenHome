@@ -1,5 +1,6 @@
 import { PK7 } from '@openhome-core/pkm'
 import { xorChecksum16BitLe } from '@openhome-core/util/byteLogic'
+import { R } from '@openhome-core/util/functional'
 import { readFileSync } from 'fs'
 import path from 'path'
 import { assert, beforeAll, describe, expect, test } from 'vitest'
@@ -77,7 +78,7 @@ describe('moon save file', () => {
   })
 
   test('output of to_bytes doesnt change', () => {
-    const writer = moonSav.prepareWriter()
+    const writer = R.assert(moonSav.prepareWriter())
     expect(xorChecksum16BitLe(writer.bytes)).toBe(0x3065)
   })
 

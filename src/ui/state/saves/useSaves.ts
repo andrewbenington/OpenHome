@@ -34,8 +34,8 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'home
 
   importMonsToLocation: (mons: PKMInterface[], startingAt: MonLocation) => Promise<OpenSavesState>
 
-  addSave(save: SAV): Promise<Result<SAV, SaveError>>
-  buildAndOpenSave: (filePath?: PathData) => Promise<Result<Option<SAV>, SaveError>>
+  addSave(save: SAV): Promise<Result<SAV, OpenSaveError>>
+  buildAndOpenSave: (filePath?: PathData) => Promise<Result<Option<SAV>, OpenSaveError>>
   removeSave(save: SAV): void
   saveBoxNavigateLeft(save: SAV): void
   saveBoxNavigateRight(save: SAV): void
@@ -207,7 +207,7 @@ export function useSaves(): SavesAndBanksManager {
     })
   }
 
-  const addSave = async (save: SAV): Promise<Result<SAV, SaveError>> => {
+  const addSave = async (save: SAV): Promise<Result<SAV, OpenSaveError>> => {
     try {
       await backend.addRecentSave(getSaveRef(save))
       const result = await backend.registerInPokedex(pokedexUpdatesFromSave(save))
@@ -266,7 +266,9 @@ export function useSaves(): SavesAndBanksManager {
     }
   }
 
-  const buildAndOpenSave = async (filePath?: PathData): Promise<Result<Option<SAV>, SaveError>> => {
+  const buildAndOpenSave = async (
+    filePath?: PathData
+  ): Promise<Result<Option<SAV>, OpenSaveError>> => {
     if (!filePath) {
       filePickerOpen.current = true
       const result = await backend.pickFile()
@@ -495,7 +497,7 @@ export function moveMonWithinSave(save: SAV, source: SaveMonLocation, dest: Save
   save.updatedBoxSlots.push({ box: source.box, boxSlot: source.boxSlot })
 }
 
-export type SaveError =
+export type OpenSaveError =
   | {
       type: 'ALREADY_OPEN'
     }
@@ -519,9 +521,9 @@ export type SaveError =
       cause: string
     }
 
-export type SaveErrorType = SaveError['type']
+export type OpenSaveErrorType = OpenSaveError['type']
 
-export function saveErrorTitle(errorType: SaveErrorType): string {
+export function saveErrorTitle(errorType: OpenSaveErrorType): string {
   switch (errorType) {
     case 'SELECT_FILE':
       return 'Error Selecting File'
@@ -538,7 +540,7 @@ export function saveErrorTitle(errorType: SaveErrorType): string {
   }
 }
 
-export function saveErrorMessage(error: SaveError): string {
+export function saveErrorMessage(error: OpenSaveError): string {
   switch (error.type) {
     case 'SELECT_FILE':
     case 'READ_FILE':
@@ -550,4 +552,76 @@ export function saveErrorMessage(error: SaveError): string {
     case 'ALREADY_OPEN':
       return 'The selected save file is already open'
   }
+}
+
+export type SaveErrorType =
+  | 'TransactionStart'
+  | 'TransactionCommit'
+  | 'IdentifierNotTracked'
+  | 'PkmConversion'
+  | 'SaveItemBagData'
+  | 'SaveWriter'
+  | 'Backend'
+  | 'ReloadLookup'
+
+export type SaveError = { _SaveErrorType: SaveErrorType; message: string }
+
+export const SaveError: Record<SaveErrorType, (message: string) => SaveError> = {
+  TransactionStart: (message: string): SaveError => ({
+    _SaveErrorType: 'TransactionStart',
+    message,
+  }),
+  TransactionCommit: (message: string): SaveError => ({
+    _SaveErrorType: 'TransactionCommit',
+    message,
+  }),
+  IdentifierNotTracked: (message: string): SaveError => ({
+    _SaveErrorType: 'IdentifierNotTracked',
+    message,
+  }),
+  PkmConversion: (message: string): SaveError => ({
+    _SaveErrorType: 'PkmConversion',
+    message,
+  }),
+  SaveItemBagData: (message: string): SaveError => ({
+    _SaveErrorType: 'SaveItemBagData',
+    message,
+  }),
+  SaveWriter: (message: string): SaveError => ({
+    _SaveErrorType: 'SaveWriter',
+    message,
+  }),
+  Backend: (message: string): SaveError => ({
+    _SaveErrorType: 'Backend',
+    message,
+  }),
+  ReloadLookup: (message: string): SaveError => ({
+    _SaveErrorType: 'ReloadLookup',
+    message,
+  }),
+}
+
+function formatErrorType(errorType: SaveErrorType): string {
+  switch (errorType) {
+    case 'TransactionStart':
+      return 'Error opening transaction'
+    case 'TransactionCommit':
+      return 'Error committing transaction'
+    case 'IdentifierNotTracked':
+      return 'Encountered identifier without tracking data'
+    case 'PkmConversion':
+      return 'Error converting OHPKM for save'
+    case 'SaveItemBagData':
+      return 'Error saving item bag'
+    case 'SaveWriter':
+      return 'Error encrypting or writing save to bytes'
+    case 'Backend':
+      return 'Unexpected backend error'
+    case 'ReloadLookup':
+      return 'Error reloading lookup tables'
+  }
+}
+
+export function formatSaveError(error: SaveError) {
+  return `${formatErrorType(error._SaveErrorType)}: ${error.message}`
 }

@@ -153,7 +153,7 @@ describe('G3RRSAV - Radical Red Save File Write Test', () => {
     modifiedSave.setMonAt(BOX, SLOT, mon)
     modifiedSave.prepareForSaving()
 
-    const rebuiltSave = new G3RRSAV(savePathData, modifiedSave.prepareWriter().bytes)
+    const rebuiltSave = new G3RRSAV(savePathData, R.assert(modifiedSave.prepareWriter()).bytes)
     expect(rebuiltSave.getMonAt(BOX, SLOT)?.nickname).toBe('ModTest')
   })
 })
