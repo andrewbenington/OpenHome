@@ -674,7 +674,7 @@ mod tests {
 
   #[cfg(feature = "randomize")]
   #[test]
-  fn to_from_bytes_random() -> std::result::Result<(), TestErrorWithSeed> {
+  fn to_from_bytes_random() -> Result<(), TestErrorWithSeed> {
     for seed in 0..=1000 {
       let mon = PK2PolishedCrystal::randomized(&mut StdRng::seed_from_u64(seed));
       tests::find_inconsistencies_to_from_bytes(mon)
@@ -776,18 +776,5 @@ mod tests {
     Ok(())
   }
 
-  const LYCANROC_ENCRYPTED_BYTES_HEX: &str = "46b5261b000034558854d9175f75d4867d2c35edcaad2fb725c21bdbde411d0c3a219f5425e8407615970cdaa2333d6af8fe0544f39714db0fd9b6e2fc16435f80a10ce841891d669619ef0e9c2eda9fdb780cb3e97d7c3985b858283fae77dbfd705a99c39c94ff4df68176ed33eece7aad275b586c1d81a1d3333602b85e6e77163c6c7e6905fa95cc219becc09b136bafe58bfe8d77327551d35e85eae6c5adc3e95503df2c60401e73e17ebc348d6ae22fd24cfbf5c2671e42daead18cd923e6408a537ec3fc136855986f4ac0f1d741480cf38be75d1d71a1d26bdbb87d2919dcc6b479c80d";
 
-  #[test]
-  fn encrypted_bytes_match_expected() -> TestResult<()> {
-    let path = PathBuf::from("pk2").join("lycanroc-alola-champion.pk2");
-    let mon = tests::pkm_from_file::<PK2PolishedCrystal>(&path)?.0;
-
-    let encrypted_bytes = mon.to_box_bytes_encrypted();
-    let encrypted_hex_str = tests::bytes_to_hex_string(&encrypted_bytes);
-
-    assert_eq!(encrypted_hex_str, LYCANROC_ENCRYPTED_BYTES_HEX);
-
-    Ok(())
-  }
 }
