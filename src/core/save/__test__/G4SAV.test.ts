@@ -84,7 +84,7 @@ describe('Platinum save file read/write', async () => {
       { box: TEST_BOX, boxSlot: UNOWN_QUESTION_SLOT }
     )
 
-    const saveWriter = saveFile.prepareWriter()
+    const saveWriter = R.assert(saveFile.prepareWriter())
     const rebuiltSave = new PtSAV(emptyPathData, saveWriter.bytes)
 
     expect(
@@ -170,7 +170,7 @@ describe('Pearl save file read/write', async () => {
       { box: TEST_BOX, boxSlot: UNOWN_QUESTION_SLOT }
     )
 
-    const saveWriter = saveFile.prepareWriter()
+    const saveWriter = R.assert(saveFile.prepareWriter())
     const rebuiltSave = new DPSAV(emptyPathData, saveWriter.bytes)
 
     expect(
@@ -257,7 +257,7 @@ describe('HeartGold save file read/write', async () => {
       { box: TEST_BOX, boxSlot: UNOWN_QUESTION_SLOT }
     )
 
-    const saveWriter = saveFile.prepareWriter()
+    const saveWriter = R.assert(saveFile.prepareWriter())
     const rebuiltSave = new HGSSSAV(emptyPathData, saveWriter.bytes)
 
     expect(

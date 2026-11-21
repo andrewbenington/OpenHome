@@ -157,9 +157,8 @@ describe('gen 8 save files', () => {
   })
 
   test('legends arceus writes back to identical bytes', () => {
-    expect(xorChecksum32BitLe(arceusSave.prepareWriter().bytes)).toBe(
-      xorChecksum32BitLe(arceusSaveBytes)
-    )
+    const saveWriter = R.assert(arceusSave.prepareWriter())
+    expect(xorChecksum32BitLe(saveWriter.bytes)).toBe(xorChecksum32BitLe(arceusSaveBytes))
   })
 
   test('scarlet/violet save builds', () => {
