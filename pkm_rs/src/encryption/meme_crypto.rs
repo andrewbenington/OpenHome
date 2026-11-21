@@ -2,7 +2,7 @@ use aes::{
     Aes128,
     cipher::{BlockCipherEncrypt, KeyInit},
 };
-use num::{BigInt, bigint::Sign};
+use num::BigUint;
 use sha1::{Digest as Sha1Digest, Sha1};
 use sha2::Sha256;
 
@@ -99,18 +99,18 @@ const AES_CHUNK_LENGTH: usize = 0x10;
 
 struct MemeKey<'a> {
     der: &'a [u8],
-    private_key: BigInt,
-    _public_key: BigInt,
-    modulo: BigInt,
+    private_key: BigUint,
+    _public_key: BigUint,
+    modulo: BigUint,
 }
 
 impl<'a> MemeKey<'a> {
     pub fn new(der: &'a [u8]) -> Self {
         Self {
             der,
-            private_key: BigInt::from_bytes_be(Sign::Plus, &SIGNING_KEY),
-            _public_key: BigInt::from_bytes_be(Sign::Plus, &der[0x7b..0x7e]),
-            modulo: BigInt::from_bytes_be(Sign::Plus, &der[0x18..0x79]),
+            private_key: BigUint::from_bytes_be(&SIGNING_KEY),
+            _public_key: BigUint::from_bytes_be(&der[0x7b..0x7e]),
+            modulo: BigUint::from_bytes_be(&der[0x18..0x79]),
         }
     }
 
@@ -201,16 +201,34 @@ impl<'a> MemeKey<'a> {
             .expect("AES_CHUNK_LENGTH sized array")
     }
 
+    // Not currently used, but may be needed in the future.
+    // IF USED IN THE FUTURE, YOU *MUST* REFACTOR TO HANDLE LEADING ZEROS LIKE rsa_private() DOES
+
     // fn rsa_public(&self, bytes: &[u8]) -> Vec<u8> {
-    //     let m = BigInt::from_bytes_be(Sign::Plus, bytes);
+    //     let m = BigUint::from_bytes_be(Sign::Plus, bytes);
     //     let c = m.modpow(&self.public_key, &self.modulo);
     //     c.to_bytes_be().1
     // }
 
     fn rsa_private(&self, bytes: &[u8]) -> Vec<u8> {
-        let m = BigInt::from_bytes_be(Sign::Plus, bytes);
+        let m = BigUint::from_bytes_be(bytes);
         let c = m.modpow(&self.private_key, &self.modulo);
-        c.to_bytes_be().1
+
+        let k = self.modulo.bits().div_ceil(8) as usize;
+
+        // BigUint::to_bytes_be() returns a buffer without any leading zeros, meaning it isn't always
+        // a buffer of length 96. we will resize and reuse the out buffer instead of allocating a new
+        // one for efficiency
+        let mut out = c.to_bytes_be();
+
+        // pad the buffer with zeros until it reaches the length of the input bytes (96)
+        let pad = k - out.len();
+        out.resize(k, 0);
+
+        // because this is big-endian, the padded zeroes need to be shifted from the end of the buffer to the start
+        out.rotate_right(pad);
+
+        out
     }
 }
 
@@ -228,19 +246,19 @@ mod tests {
     use super::*;
     use crate::tests::save_bytes_from_file;
 
-    fn bigint_to_hex_string(bigint: &BigInt) -> String {
+    fn big_uint_to_hex_string(bigint: &BigUint) -> String {
         bigint.to_str_radix(16)
     }
 
     fn bytes_to_hex_string(bytes: &[u8]) -> String {
-        BigInt::from_bytes_be(Sign::Plus, bytes).to_str_radix(16)
+        BigUint::from_bytes_be(bytes).to_str_radix(16)
     }
 
     #[test]
     fn memekey_private_is_accurate() -> Result<()> {
         let private = MemeKey::new(&POKEDEX_AND_SAVE_FILE_MEME_KEY_BYTES).private_key;
         assert_eq!(
-            bigint_to_hex_string(&private),
+            big_uint_to_hex_string(&private),
             "775455668fff3cba3026c2d0b26b8085895958341157aeb03b6b0495ee57803e2186eb6cb2eb62a71df18a3c9c6579077670961b3a6102dabe5a194ab58c3250aed597fc78978a326db1d7b28dcccb2a3e014edbd397ad33b8f28cd525054251"
         );
 
@@ -250,7 +268,7 @@ mod tests {
     #[test]
     fn memekey_public_is_accurate() -> Result<()> {
         let public = MemeKey::new(&POKEDEX_AND_SAVE_FILE_MEME_KEY_BYTES)._public_key;
-        assert_eq!(bigint_to_hex_string(&public), "10001");
+        assert_eq!(big_uint_to_hex_string(&public), "10001");
         Ok(())
     }
 
@@ -258,7 +276,7 @@ mod tests {
     fn memekey_modulo_is_accurate() -> Result<()> {
         let modulo = MemeKey::new(&POKEDEX_AND_SAVE_FILE_MEME_KEY_BYTES).modulo;
         assert_eq!(
-            bigint_to_hex_string(&modulo),
+            big_uint_to_hex_string(&modulo),
             "b61e192091f90a8f76a6eaaa9a3ce58c863f39ae253f037816f5975854e07a9a456601e7c94c29759fe155c064eddfa111443f81ef1a428cf6cd32f9dac9d48e94cfb3f690120e8e6b9111addaf11e7c96208c37c0143ff2bf3d7e831141a973"
         );
         Ok(())
