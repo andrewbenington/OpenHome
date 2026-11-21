@@ -551,16 +551,16 @@ export function useBanksAndBoxes() {
     switchBoxCurrentBank((getCurrentBank().current_box + 1) % currentBankBoxCount)
   }
 
-  async function sortHomeBox(
-    boxIndex: number,
-    sortType: string
-  ): Promise<Result<null, IdentifierNotPresentError[]>> {
-    const loadResults = await ohpkmStore.tryLoadBatch(allMonsInHomeBoxCurrentBank(boxIndex))
+  async function sortHomeBox(boxIndex: number, sortType: string): Promise<Result<null>> {
+    const batchResult = await ohpkmStore.tryLoadBatch(allMonsInHomeBoxCurrentBank(boxIndex))
+    if (R.isErr(batchResult)) return batchResult
 
-    const { successes: mons, failures } = partitionResults(Array.from(loadResults.values()))
+    const { successes: mons, failures } = partitionResults(Array.from(batchResult.data.values()))
 
     if (failures.length) {
-      return R.Err(failures)
+      return R.Err(
+        `The following tracking IDs are missing data: ${failures.map((f) => f.identifier).join(', ')}`
+      )
     }
 
     const sorted = mons.toSorted(getSortFunctionNullable(sortType))
@@ -584,10 +584,12 @@ export function useBanksAndBoxes() {
 
   async function sortAllHomeBoxes(
     sortType: string
-  ): Promise<Result<null, IdentifierNotPresentError[]>> {
+  ): Promise<Result<null, string | IdentifierNotPresentError[]>> {
     const currentBankMons = allMonsInCurrentBankWithLocations()
-    const loadResults = await ohpkmStore.tryLoadBatch(Object.keys(currentBankMons))
-    const { successes: allMons, failures } = partitionResults(Array.from(loadResults.values()))
+    const batchResult = await ohpkmStore.tryLoadBatch(Object.keys(currentBankMons))
+    if (R.isErr(batchResult)) return batchResult
+
+    const { successes: allMons, failures } = partitionResults(Array.from(batchResult.data.values()))
 
     if (failures.length) {
       failures.forEach((failure) => {

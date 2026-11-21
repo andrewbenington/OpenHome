@@ -1,7 +1,7 @@
 import { Option } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
 import { Inset, ContextMenu as RadixCtxMenu, Spinner } from '@radix-ui/themes'
-import { MouseEvent, ReactNode, useMemo, useState } from 'react'
+import { MouseEvent, ReactNode, useState } from 'react'
 import './style.css'
 import {
   CtxMenuElement,
@@ -23,18 +23,6 @@ type ContextMenuProps = { onOpenChange?: (open: boolean) => void } & (
 export default function OpenHomeCtxMenu(props: ContextMenuProps) {
   const { elements, sections, onOpenChange, ...triggerProps } = props
 
-  const allElements = useMemo(() => {
-    const allBuilders =
-      elements?.filter(filterUndefined) ??
-      sections?.filter(filterUndefined).flatMap((section, i) => {
-        const builders = i > 0 ? [Separator, ...section] : section
-        return builders.filter(filterUndefined)
-      }) ??
-      []
-
-    return allBuilders.map(buildComponent)
-  }, [elements, sections])
-
   return (
     <RadixCtxMenu.Root modal={false} onOpenChange={onOpenChange}>
       <RadixCtxMenu.Trigger
@@ -46,9 +34,28 @@ export default function OpenHomeCtxMenu(props: ContextMenuProps) {
           }
         }}
       />
-      <CtxMenuContent>{allElements}</CtxMenuContent>
+      <CtxMenuContent>
+        <CtxMenuItems elements={elements} sections={sections} />
+      </CtxMenuContent>
     </RadixCtxMenu.Root>
   )
+}
+
+function CtxMenuItems(props: {
+  elements?: Option<CtxMenuElementBuilder>[]
+  sections?: Option<CtxMenuSectionBuilders>[]
+}) {
+  const { elements, sections } = props
+
+  const allBuilders =
+    elements?.filter(filterUndefined) ??
+    sections?.filter(filterUndefined).flatMap((section, i) => {
+      const builders = i > 0 ? [Separator, ...section] : section
+      return builders.filter(filterUndefined)
+    }) ??
+    []
+
+  return <>{allBuilders.flatMap(buildComponent)}</>
 }
 
 function CtxMenuContent(props: RadixCtxMenu.ContentProps) {
