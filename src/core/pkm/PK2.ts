@@ -170,7 +170,7 @@ export default class PK2 {
       this.metLocationIndex = metData.locationIndex
       this.statusCondition = 0
       this.currentHP = other.currentHP ?? 0
-      this.trainerName = other.trainerName
+      this.trainerName = other.trainerName.slice(0, 7)
       this.nickname = converter.nickname(other, 10)
       this.trainerGender = other.trainerGender
       this.level = this.getLevel()

@@ -153,7 +153,7 @@ export default class PK1 {
 
       this.dvs = other.dvs
 
-      this.trainerName = other.trainerName
+      this.trainerName = other.trainerName.slice(0, 7)
       this.nickname = converter.nickname(other, 10)
     }
 
