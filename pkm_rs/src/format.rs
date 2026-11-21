@@ -99,8 +99,7 @@ impl PkmFormat {
             Self::PA9 => origin == OriginGame::LegendsZa,
             Self::PH4 => origin == OriginGame::Home,
 
-            Self::PK3RR | Self::PK3UB | Self::PB8LUMI | Self::PK9Compass => false,
-          PkmFormat::PK2PolishedCrystal => OriginGame::Crystal == origin
+            Self::PK2PolishedCrystal | Self::PK3RR | Self::PK3UB | Self::PB8LUMI | Self::PK9Compass => false,
         }
     }
 

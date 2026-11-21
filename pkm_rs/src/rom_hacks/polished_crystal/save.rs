@@ -7,23 +7,17 @@ use super::BOX_ROWS;
 use super::BOX_SLOTS;
 use crate::result::{Error, Result};
 use crate::traits::PkmBytes;
-use crate::util;
-use arrayref::array_ref;
-
 #[cfg(feature = "wasm")]
 use crate::{encryption, log};
+use arrayref::array_ref;
 
-use pkm_rs_types::read_u16_le;
 use pkm_rs_types::strings::SizedUtf16String;
-use pkm_rs_types::BinaryGender;
 use pkm_rs_types::BoundViolated;
-use pkm_rs_types::Language;
 use pkm_rs_types::OriginGame;
+use pkm_rs_types::{read_u16_le, PlayerNonBinaryGender};
 
 use serde::Serialize;
 
-#[cfg(feature = "wasm")]
-use crate::ohpkm::OhpkmConvert;
 use tsify::Ts;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
@@ -36,12 +30,16 @@ use crate::rom_hacks::polished_crystal::pk2_polished_crystal_buffer::PK2Polished
 const POLISHED_CRYSTAL_SIZE_BYTES: usize = 32_816;
 
 const POLISHED_CRYSTAL_SAVE_VERSION_INFO_OFFSET: usize = 3_042;
-const POLISHED_CRYSTAL_SAVE_VERSION_INFO_END_OFFSET: usize = POLISHED_CRYSTAL_SAVE_VERSION_INFO_OFFSET + POLISHED_CRYSTAL_SAVE_VERSION_INFO_SIZE;
 
-const POLISHED_CRYSTAL_TRAINER_DATA_OFFSET: usize = 4618;
-const TRAINER_DATA_SIZE: usize = 891;
+const POLISHED_CRYSTAL_TRAINER_DATA_OFFSET: usize = 4616;
 
-const NUM_BOXES: i32 = 20;
+const TRAINER_ID_SUB_OFFSET : usize = 0;
+const TRAINER_NAME_SUB_OFFSET : usize = 3;
+const TRAINER_NAME_SUB_END_OFFSET : usize = 10;
+const TRAINER_GENDER_SUB_OFFSET : usize = 2;
+
+const TRAINER_DATA_SIZE: usize = 10;
+
 
 const POLISHED_CRYSTAL_BOX_DATA_OFFSET: usize = 300;
 const POLISHED_CRYSTAL_BOX_NAMES_OFFSET: usize = 300;
@@ -281,11 +279,7 @@ impl Gen2PolishedCrystalSave {
       u16::from_be_bytes(bytes1) == 10u16
     }
 
-    #[cfg(feature = "wasm")]
-    fn display_tid(&self) -> String {
-        let trainer_data = self.get_trainer_data();
-        util::six_digit_trainer_id_from_parts(trainer_data.trainer_id, trainer_data.secret_id)
-    }
+
 
     const fn includes_origin(origin: OriginGame) -> bool {
         matches!(
@@ -362,10 +356,7 @@ impl Gen2PolishedCrystalSave {
         Self::is_save(bytes);
     }
 
-    #[wasm_bindgen(getter = displayId)]
-    pub fn display_tid_wasm(&self) -> String {
-        self.display_tid()
-    }
+
 
     #[wasm_bindgen(getter = trainerName)]
     pub fn trainer_name_wasm(&self) -> String {
@@ -377,10 +368,7 @@ impl Gen2PolishedCrystalSave {
         self.get_trainer_data().trainer_id
     }
 
-    #[wasm_bindgen(getter = secretId)]
-    pub fn secret_id_wasm(&self) -> u16 {
-        self.get_trainer_data().secret_id
-    }
+
 
     #[wasm_bindgen(getter = trainerGender)]
     pub fn trainer_gender_wasm(&self) -> u16 {
@@ -420,15 +408,9 @@ impl Gen2PolishedCrystalSave {
         self.current_pc_box_idx()
     }
 
-    #[wasm_bindgen(getter = gameOfOrigin)]
-    pub fn game_of_origin_wasm(&self) -> OriginGame {
-        OriginGame::from(self.get_trainer_data().game_code)
-    }
 
-    #[wasm_bindgen(getter = language)]
-    pub fn language_wasm(&self) -> Language {
-        self.get_trainer_data().language
-    }
+
+
 
     #[wasm_bindgen(js_name = includesOrigin)]
     pub fn includes_origin_wasm(origin: OriginGame) -> bool {
@@ -450,10 +432,7 @@ impl Gen2PolishedCrystalSave {
 #[derive(Default, Debug, Serialize, Clone, Copy)]
 pub struct TrainerDataGen2PolishedCrystal {
     pub trainer_id: u16,
-    pub secret_id: u16,
-    pub game_code: u8,
-    pub language: Language,
-    pub trainer_gender: BinaryGender,
+    pub trainer_gender: PlayerNonBinaryGender,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub trainer_name: SizedUtf16String<26>,
 }
@@ -461,24 +440,21 @@ pub struct TrainerDataGen2PolishedCrystal {
 impl TrainerDataGen2PolishedCrystal {
     fn from_bytes(block_bytes: &[u8; TRAINER_DATA_SIZE]) -> Self {
         Self {
-            trainer_id: read_u16_le!(block_bytes, 0),
-            secret_id: read_u16_le!(block_bytes, 2),
-            game_code: block_bytes[4],
-            language: Language::try_from(block_bytes[0x35]).unwrap_or(Language::None),
-            trainer_gender: BinaryGender::from(util::get_flag(block_bytes, 5, 0)),
-            trainer_name: SizedUtf16String::from_bytes(block_bytes[56..82].try_into().unwrap()),
+            trainer_id: read_u16_le!(block_bytes, TRAINER_ID_SUB_OFFSET),
+            trainer_gender: PlayerNonBinaryGender::parse(block_bytes[TRAINER_GENDER_SUB_OFFSET]),
+            trainer_name: SizedUtf16String::from_bytes(block_bytes[TRAINER_NAME_SUB_OFFSET..TRAINER_NAME_SUB_END_OFFSET].try_into().unwrap()),
         }
     }
 
-    fn to_bytes(self) -> [u8; TRAINER_DATA_SIZE] {
-        let mut bytes = [0u8; TRAINER_DATA_SIZE];
-        bytes[0..2].copy_from_slice(&self.trainer_id.to_le_bytes());
-        bytes[2..4].copy_from_slice(&self.secret_id.to_le_bytes());
-        bytes[4] = self.game_code;
-        util::set_flag(&mut bytes, 5, 0, self.trainer_gender);
-        bytes[56..80].copy_from_slice(&self.trainer_name.bytes());
-        bytes
-    }
+    // fn to_bytes(self) -> [u8; TRAINER_DATA_SIZE] {
+    //     let mut bytes = [0u8; TRAINER_DATA_SIZE];
+    //     bytes[0..2].copy_from_slice(&self.trainer_id.to_le_bytes());
+    //     bytes[2..4].copy_from_slice(&self.secret_id.to_le_bytes());
+    //     bytes[4] = self.game_code;
+    //     util::set_flag(&mut bytes, 5, 0, self.trainer_gender);
+    //     bytes[56..80].copy_from_slice(&self.trainer_name.bytes());
+    //     bytes
+    // }
 }
 
 #[cfg(feature = "wasm")]

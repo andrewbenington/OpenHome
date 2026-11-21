@@ -1,5 +1,4 @@
 use std::collections::HashSet;
-
 use arbitrary_int::{u3, u4};
 use chrono::Datelike;
 use serde::{Deserialize, Serialize, Serializer};
@@ -19,6 +18,7 @@ use rand::{RngExt, random_range};
 use tsify::{Ts, Tsify};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
+use crate::PlayerNonBinaryGender::{Female, Male, NonBinary};
 
 const MASK_BITS_1_2: u8 = 0b00000110;
 const MASK_BITS_1_2_INVERTED: u8 = 0b11111001;
@@ -123,6 +123,33 @@ pub enum BinaryGender {
     #[default]
     Male,
     Female,
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
+#[derive(
+  Debug, EnumString, Display, Default, Serialize, Deserialize, Clone, Copy, Eq, PartialEq,
+)]
+pub enum PlayerNonBinaryGender {
+  Male,
+  Female,
+
+  #[default]
+  NonBinary
+}
+
+impl PlayerNonBinaryGender {
+
+  pub fn parse(gender_byte : u8) -> Self {
+    match gender_byte {
+      0 => Male,
+      1 => Female,
+      2 => NonBinary,
+      _ => panic!("invalid gender: {gender_byte}"),
+    }
+  }
+
 }
 
 impl BinaryGender {

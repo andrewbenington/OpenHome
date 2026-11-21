@@ -27,6 +27,7 @@ pub enum PluginIdentifier {
     Unbound,
     LuminescentPlatinum,
     Compass,
+    PolishedCrystal
 }
 
 impl PluginIdentifier {

@@ -1,6 +1,6 @@
-import {OHPKM} from '@openhome-core/pkm/OHPKM'
-import {Errorable, R} from '@openhome-core/util/functional'
-import {FourMoves, PKMDate} from '@openhome-core/util/types'
+import {OHPKM} from '@openhome-core/pkm/OHPKM.ts'
+import {Errorable, R} from '@openhome-core/util/functional.ts'
+import {FourMoves, PKMDate} from '@openhome-core/util/types.ts'
 import {
   AbilityIndex,
   BinaryGender,
@@ -16,7 +16,7 @@ import {
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import {convertPokeDate, convertPokeDateOptional} from "@openhome-core/pkm/wasm/convert.ts";
-import {modernStatCalc} from "@openhome-core/pkm";
+import {modernStatCalc} from "@openhome-core/pkm/index.ts";
 import {
   decryptByteArrayGen67,
   get16BitChecksumLittleEndian,

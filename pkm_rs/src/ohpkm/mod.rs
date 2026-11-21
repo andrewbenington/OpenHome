@@ -17,7 +17,6 @@ pub use id::OpenHomeId;
 pub use v2::OhpkmV2;
 pub use v2_sections::UnknownHandlerSave;
 
-use crate::log;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;

@@ -1,11 +1,9 @@
-import PK2PolishedCrystal from "@openhome-core/pkm/rom_hacks/polished_crystal/PK2PolishedCrystal.ts";
 import {
   POLISHED_CRYSTAL_TRANSFER_RESTRICTIONS,
 } from "@openhome-core/resources/consts/TransferRestrictions.ts";
 import {
   BoxAndSlot, PluginIdentifier, SlotMetadata,
-  WasmOfficialSave,
-  WasmPluginSave, WasmSaveClass, WasmSaveInner
+  WasmPluginSave
 } from "@openhome-core/save/interfaces.ts";
 
 import {
@@ -20,6 +18,7 @@ import {PathData} from "@openhome-core/save/util/path.ts";
 import {Result} from "@openhome-core/util/functional.ts";
 import {isRestricted, TransferRestrictions} from "@openhome-core/save/util/TransferRestrictions.ts";
 import {Item} from "@openhome-core/resources/consts/Items.ts";
+import PK2PolishedCrystal from "@openhome-core/pkm/PK2PolishedCrystal.ts";
 
 export class Gen2PolishedCrystalSave extends WasmPluginSave<PK2PolishedCrystalWasm, PK2PolishedCrystal,
   Gen2PolishedCrystalSaveWasm> {
@@ -30,7 +29,8 @@ export class Gen2PolishedCrystalSave extends WasmPluginSave<PK2PolishedCrystalWa
   pluginIdentifier: PluginIdentifier = 'polished_crystal';
   WASM_SAVE_CLASS = Gen2PolishedCrystalSaveWasm;
 
-  transferRestrictions = POLISHED_CRYSTAL_TRANSFER_RESTRICTIONS
+  static transferRestrictions = POLISHED_CRYSTAL_TRANSFER_RESTRICTIONS;
+  transferRestrictions: TransferRestrictions = POLISHED_CRYSTAL_TRANSFER_RESTRICTIONS
 
   constructor(path: PathData, bytes: Uint8Array) {
     super(Gen2PolishedCrystalSaveWasm.fromBytes(bytes))

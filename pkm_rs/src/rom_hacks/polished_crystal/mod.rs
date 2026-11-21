@@ -5,7 +5,6 @@ pub mod save;
 pub mod pk2_polished_crystal_buffer;
 
 use pkm_rs_resources::metadata_source::MetadataSource;
-pub use save::Gen2PolishedCrystalSave;
 
 pub use pk2_polished_crystal::*;
 use pkm_rs_resources;
