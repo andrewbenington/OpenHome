@@ -174,15 +174,18 @@ impl PidModificationStrategy {
             trainer_id,
             secret_id,
             is_shiny,
-            existing_pid,
+            initialization,
             ..
         } = &parameters;
 
-        let tid_sid_seed: u32 = (*trainer_id as u32) << 16 | *secret_id as u32;
-        let tid_sid_seed: u64 = (tid_sid_seed as u64) << 32 | (tid_sid_seed as u64);
-        let rng = &mut StdRng::seed_from_u64(tid_sid_seed);
+        let tid_sid = (*trainer_id as u64) << 16 | *secret_id as u64;
 
-        let mut personality_value = existing_pid.unwrap_or(rng.next_u32());
+        let mut personality_value = match *initialization {
+            PidInitialization::ExistingPid(existing_pid) => existing_pid,
+            PidInitialization::Seed(seed) => {
+                StdRng::seed_from_u64((tid_sid << 32) | seed as u64).next_u32()
+            }
+        };
 
         for i in 0..u16::MAX {
             let inconsistencies = self.find_field_inconsistencies(personality_value, &parameters);
@@ -216,6 +219,22 @@ impl Default for PidModificationStrategy {
 }
 
 #[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "wasm", derive(Tsify, Serialize, Deserialize))]
+pub enum PidInitialization {
+    ExistingPid(u32),
+    Seed(u32),
+}
+
+impl PidInitialization {
+    pub fn first_pid(self) -> u32 {
+        match self {
+            PidInitialization::ExistingPid(existing) => existing,
+            PidInitialization::Seed(seed) => StdRng::seed_from_u64(seed as u64).next_u32(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
 pub struct PidGenerationParameters {
     pub species_form: SpeciesForm,
     pub nature: Option<NatureIndex>,
@@ -224,7 +243,7 @@ pub struct PidGenerationParameters {
     pub unown_letter: Option<u8>,
     pub trainer_id: u16,
     pub secret_id: u16,
-    pub existing_pid: Option<u32>,
+    pub initialization: PidInitialization,
 }
 
 pub fn generate_pk3_compatible_pid(
@@ -246,14 +265,15 @@ pub struct PidGenerationParametersJs {
     pub unown_letter: Option<u8>,
     pub trainer_id: u16,
     pub secret_id: u16,
-    pub existing_pid: Option<u32>,
+    #[wasm_bindgen(skip)]
+    pub initialization: PidInitialization,
 }
 
 #[cfg(feature = "wasm")]
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn, clippy::too_many_arguments)]
 impl PidGenerationParametersJs {
-    pub fn new(
+    pub fn existing_pid(
         national_dex: u16,
         form_index: u16,
         nature: Option<NatureIndex>,
@@ -262,7 +282,7 @@ impl PidGenerationParametersJs {
         unown_letter: Option<u8>,
         trainer_id: u16,
         secret_id: u16,
-        existing_pid: Option<u32>,
+        existing_pid: u32,
     ) -> Self {
         Self {
             national_dex,
@@ -273,7 +293,31 @@ impl PidGenerationParametersJs {
             unown_letter,
             trainer_id,
             secret_id,
-            existing_pid,
+            initialization: PidInitialization::ExistingPid(existing_pid),
+        }
+    }
+
+    pub fn seeded_random_pid(
+        national_dex: u16,
+        form_index: u16,
+        nature: Option<NatureIndex>,
+        gender: Option<Gender>,
+        is_shiny: bool,
+        unown_letter: Option<u8>,
+        trainer_id: u16,
+        secret_id: u16,
+        seed: u32,
+    ) -> Self {
+        Self {
+            national_dex,
+            form_index,
+            nature,
+            gender,
+            is_shiny,
+            unown_letter,
+            trainer_id,
+            secret_id,
+            initialization: PidInitialization::Seed(seed),
         }
     }
 }
@@ -291,7 +335,7 @@ impl TryFrom<PidGenerationParametersJs> for PidGenerationParameters {
             unown_letter: value.unown_letter,
             trainer_id: value.trainer_id,
             secret_id: value.secret_id,
-            existing_pid: value.existing_pid,
+            initialization: value.initialization,
         })
     }
 }

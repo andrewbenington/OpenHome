@@ -3,7 +3,9 @@ use super::v2_sections::{
     MonTags, MostRecentSave, Notes, PastHandlerDataV2, PluginData, SV_BASE_TM_BYTES_EXCLUDE_UNUSED,
     ScarletVioletData, SwordShieldData,
 };
-use crate::convert_strategy::{PidGenerationParameters, PidModificationStrategy};
+use crate::convert_strategy::{
+    PidGenerationParameters, PidInitialization, PidModificationStrategy,
+};
 use crate::gen9_lza::PlusMoveFlags;
 use crate::ohpkm::OhpkmConvert;
 #[allow(deprecated)]
@@ -1964,7 +1966,7 @@ impl From<&OhpkmV2> for PidGenerationParameters {
             },
             trainer_id: value.trainer_id(),
             secret_id: value.secret_id(),
-            existing_pid: Some(value.personality_value()),
+            initialization: PidInitialization::ExistingPid(value.personality_value()),
         }
     }
 }

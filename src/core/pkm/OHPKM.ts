@@ -173,7 +173,7 @@ export class OHPKM extends OhpkmWasm implements PKMInterface {
         this.nature = other.nature ?? NatureIndex.newFromModulo(other.exp)
 
         this.personalityValue = generatePk3CompatiblePid(
-          PidGenerationParametersJs.new(
+          PidGenerationParametersJs.seeded_random_pid(
             other.nationalDex,
             other.formIndex,
             other.nature,
@@ -181,7 +181,10 @@ export class OHPKM extends OhpkmWasm implements PKMInterface {
             other.isShiny(),
             other.formIndex,
             other.trainerID,
-            other.secretID
+            other.secretID,
+            other.dvs
+              ? (other.dvs.atk << 12) | (other.dvs.def << 8) | (other.dvs.spc << 4) | other.dvs.spe // hp is derived from other dvs, and this needs to fit in a u32
+              : other.exp & 0xffffffff
           ),
           new PkmConverter(other.format, getDefaultConvertStrategy()).pidModificationStrategy(
             'Odds8192'
