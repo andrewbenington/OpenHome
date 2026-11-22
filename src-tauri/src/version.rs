@@ -186,6 +186,7 @@ pub enum SignificantUpdate {
     V1_18_1,
     V1_19_0,
     V1_19_1,
+    V1_19_2,
 }
 
 impl SignificantUpdate {
@@ -228,6 +229,7 @@ impl SignificantUpdate {
             Self::V1_18_1 => Version::parse("1.18.1"),
             Self::V1_19_0 => Version::parse("1.19.0"),
             Self::V1_19_1 => Version::parse("1.19.1"),
+            Self::V1_19_2 => Version::parse("1.19.2"),
         }
         .expect("all versions are valid semver")
     }
@@ -443,6 +445,19 @@ impl SignificantUpdate {
             Self::V1_19_1 => Some(vec![
                 "A performance issue caused by the Pokédex in v1.19.0 has been fixed.",
                 "The OHPKM count display has been temporarily removed until an issue with it is fixed.",
+            ]),
+            Self::V1_19_2 => Some(vec![
+                "The 'Met Data' tab has been merged with the 'Summary' tab, and the 'Summary' tab has been made more visually pleasing.",
+                "When transferring items, clicking the total count will set the transfer count to that number. This makes it easier to transfer all instances of an item.",
+                "A bug that allowed moving more items than are present in the source save has been fixed.",
+                "A bug preventing toggle buttons from turning red has been fixed.",
+                "The Pokédex now registers mega evolutions if the corresponding mega stone is held by a Pokémon in the Home boxes.",
+                "Certain origin icons in the Pokédex no longer show for forms that are unobtainable with those origins.",
+                "Fixed a bug preventing 'Reveal in File Explorer' from working on Linux and Windows.",
+                "Nicknames and OT names are now truncated correctly for games with shorter character limits",
+                "Fixed a bug causing Gen 1/2 Pokémon from having identical generated personality values, which caused them to be incorrectly treated as clones.",
+                "Fixed an itermittent bug that would occur when saving after modifying a Gen 7 save file.",
+                "Optimizations have been made to prevent excess rerendering + lag.",
             ]),
             _ => None,
         }

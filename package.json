@@ -1,6 +1,6 @@
 {
   "name": "openhome",
-  "version": "1.19.2-test.3+performance-improvements-3",
+  "version": "1.19.2",
   "private": true,
   "description": "A tool for moving Pokémon between game saves",
   "keywords": [
