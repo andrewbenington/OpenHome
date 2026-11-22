@@ -551,7 +551,7 @@ impl BlockData {
 )]
 #[derive(Debug, Clone, Hash)]
 pub struct ObjectBlock {
-    #[serde(with = "serde_bytes")]
+    #[cfg_attr(feature = "wasm", serde(with = "serde_bytes"))]
     #[tsify(type = "Uint8Array<ArrayBuffer>")]
     bytes: Vec<u8>,
 }
