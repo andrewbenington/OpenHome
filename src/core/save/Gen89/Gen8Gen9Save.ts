@@ -123,7 +123,7 @@ export abstract class Gen8Gen9Save<P extends PK8 | PB8 | PA8 | PK9 | PA9> extend
       if (mon) {
         try {
           if (mon.gameOfOrigin && mon?.nationalDex) {
-            if (!(mon instanceof PK9)) {
+            if (!(mon instanceof PK9 || mon instanceof PA9)) {
               mon.recalculateStats()
               mon.refreshChecksum()
             }

@@ -1,6 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { isWasmFormat, WasmPkmFormat } from '@openhome-core/pkm/PKM'
-import { Gen34ContestRibbons, Gen34TowerRibbons } from '@openhome-core/resources'
+import { Gen34ContestRibbons, Gen34TowerRibbons, Moves } from '@openhome-core/resources'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import {
   LZA_BASE_TM_BYTES,
@@ -358,10 +358,6 @@ export class OHPKM extends OhpkmWasm implements PKMInterface {
       this.unknownA0 = other.unknownA0
       this.unknownF3 = other.unknownF3
 
-      this.tmFlagsLzaBase = other.tmFlagsLzaBase
-      this.tmFlagsLzaDlc = other.tmFlagsLzaDlc
-      this.plusMoveFlags = other.plusMoveFlags?.clone()
-
       if (other.heightScalar !== undefined && other.weightScalar !== undefined) {
         this.heightScalar = other.heightScalar
         this.weightScalar = other.weightScalar
@@ -598,7 +594,7 @@ export class OHPKM extends OhpkmWasm implements PKMInterface {
   }
 
   get plusMovesLza() {
-    return this.plusMoveFlags?.getMoveIds() ?? []
+    return Array.from(this.plusMoveFlags?.getMoveIds() ?? []).map((id) => Moves[id])
   }
 
   unionPlusFlagsLza(otherPlusFlags: PlusMoveFlags) {

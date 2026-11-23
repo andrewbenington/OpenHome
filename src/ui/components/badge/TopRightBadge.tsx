@@ -5,7 +5,7 @@ import { PluginIdentifier } from '@openhome-core/tauri/spectaCommands'
 import * as types from '@openhome-core/util/types'
 import { TopRightBadgeType } from '@openhome-ui/hooks/monDisplay'
 import { BallsImageList } from '@openhome-ui/images/items'
-import { Gender, HyperTraining, PlusMoveFlags, StatsPreSplit } from '@pkm-rs/pkg/pkm_rs'
+import { Gender, HyperTraining, StatsPreSplit } from '@pkm-rs/pkg/pkm_rs'
 import GenderIcon from '../pokemon/GenderIcon'
 import Badge from './Badge'
 import './Badge.css'
@@ -35,7 +35,7 @@ export type TopRightBadgeMon = {
   getLevel: () => number
   isShiny: () => boolean
 
-  plusMoveFlags?: PlusMoveFlags
+  plusMovesLza?: Move[]
   tmMovesLza?: Move[]
   tmMovesSv?: Move[]
   tmMovesSVDLC?: Move[]
@@ -113,7 +113,7 @@ export function TopRightBadge({ mon, badgeType }: TopRightBadgeProps) {
     case 'TM Count (Legends Z-A)':
       return <Badge.Numeric value={mon.tmMovesLza?.length} max={3} />
     case 'Plus Moves Known':
-      return <Badge.Numeric value={mon.plusMoveFlags?.getMoveIds().length} max={3} />
+      return <Badge.Numeric value={mon.plusMovesLza?.length} max={3} />
     default:
       return null
   }

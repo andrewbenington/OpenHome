@@ -68,7 +68,7 @@ export class LegendsZaSave extends Gen8Gen9Save<PA9> {
   }
 
   monConstructor(bytes: ArrayBuffer, encrypted: boolean): PA9 {
-    return new PA9(bytes, { encrypted })
+    return PA9.fromBytes(bytes, encrypted)
   }
 
   getBlockKey(blockName: G89BlockName | keyof typeof BlockKeys): number {

@@ -1,5 +1,4 @@
 import { PA9 } from '@openhome-core/pkm'
-import { Moves } from '@openhome-core/resources'
 import { R } from '@openhome-core/util/functional'
 import { getDefaultConvertStrategy } from '@pkm-rs/pkg'
 import fs from 'fs'
@@ -121,8 +120,8 @@ describe('legends z-a conversion to ohpkm and back is lossless', async () => {
     })
 
     test(`plus move flags match - ${file}`, () => {
-      expect(Array.from(original.plusMoveFlags.getMoveIds()).map((id) => Moves[id].name)).toEqual(
-        Array.from(roundTrip.plusMoveFlags.getMoveIds()).map((id) => Moves[id].name)
+      expect(Array.from(original.plusMovesLza).map((move) => move.name)).toEqual(
+        Array.from(roundTrip.plusMovesLza).map((move) => move.name)
       )
     })
   }
@@ -150,7 +149,7 @@ describe('pa9 - invalid greninja has expected moves', async () => {
 
   test(`greninja has expected plus flags`, () => {
     const mon = pa9FromTestFile('invalid-greninja.pa9')
-    expect(Array.from(mon.plusMovesLza).includes(RELIC_SONG))
-    expect(Array.from(mon.plusMovesLza).includes(PRECIPICE_BLADES))
+    expect(mon.plusMovesLza.some((move) => move.id === RELIC_SONG))
+    expect(mon.plusMovesLza.some((move) => move.id === PRECIPICE_BLADES))
   })
 })

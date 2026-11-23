@@ -1,6 +1,9 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { ModernRibbons } from '@openhome-core/resources'
-import { movesFromSvTmFlags } from '@openhome-core/resources/moves/flags'
+import { ModernRibbons, Moves } from '@openhome-core/resources'
+import {
+  movesFromLzaBaseTmFlags,
+  movesFromLzaDlcTmFlags,
+} from '@openhome-core/resources/moves/flags'
 import { Errorable, Option, R } from '@openhome-core/util/functional'
 import { FourMoves, PKMDate } from '@openhome-core/util/types'
 import {
@@ -485,16 +488,26 @@ export default class PA9 implements WasmPkmInterface {
     this.inner.trainer_gender = value
   }
 
-  get tmFlagsSvBase() {
+  get tmFlagsLzaBase() {
     return this.inner.tmFlagsBaseGame
   }
 
-  get tmFlagsSvDlc() {
+  get tmFlagsLzaDlc() {
     return this.inner.tmFlagsDlc
   }
 
-  get tmMovesSv() {
-    return this.tmFlagsSvBase ? movesFromSvTmFlags(this.tmFlagsSvBase) : []
+  get tmMovesLza() {
+    return movesFromLzaBaseTmFlags(this.tmFlagsLzaBase).concat(
+      movesFromLzaDlcTmFlags(this.tmFlagsLzaDlc)
+    )
+  }
+
+  get plusMoveFlags() {
+    return this.inner.plus_moves
+  }
+
+  get plusMovesLza() {
+    return Array.from(this.inner.plus_moves?.getMoveIds()).map((id) => Moves[id]) ?? []
   }
 
   get homeTracker() {
