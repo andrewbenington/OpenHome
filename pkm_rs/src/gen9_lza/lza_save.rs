@@ -459,7 +459,7 @@ mod tests {
             original_blocks_by_key.insert(block.key(), block.clone());
         }
 
-        assert_eq!(block_vec.len(), 6242);
+        assert_eq!(block_vec.len(), 162);
 
         let slice = save_bytes.into_boxed_slice();
 
@@ -492,7 +492,7 @@ mod tests {
     fn pkm_checksum_calculation_is_correct() -> Result<()> {
         use crate::checksum::Checksum;
 
-        let save_path = Path::new("gen9-lza").join("save");
+        let save_path = Path::new("gen9-lza").join("main");
         let save_bytes = tests::save_bytes_from_file(&save_path)?;
         let save = LegendsZaSave::from_bytes(save_bytes.into_boxed_slice())?;
 
@@ -517,20 +517,21 @@ mod tests {
         let save_bytes = tests::save_bytes_from_file(&Path::new("gen9-lza").join("main"))?;
         let mut save = LegendsZaSave::from_bytes(save_bytes.into_boxed_slice())?;
 
-        let ohpkm =
-            tests::pkm_from_file::<OhpkmV2>(&Path::new("ohpkm").join("cinderace-mint.ohpkm"))?;
+        let ohpkm = tests::pkm_from_file::<OhpkmV2>(
+            &Path::new("ohpkm").join("gallade-sharpness-alpha.ohpkm"),
+        )?;
 
-        let pk8 = Pa9::from_ohpkm(&ohpkm.0, ConvertStrategy::default())?;
+        let pa9 = Pa9::from_ohpkm(&ohpkm.0, ConvertStrategy::default())?;
 
         let box_index = BoxIndex::check_bound(0).expect("should be valid");
         let box_slot = BoxSlot::check_bound(9).expect("should be valid");
 
-        save.set_mon_at(box_index, box_slot, Some(pk8));
-        let retrieved_pk8 = save
+        save.set_mon_at(box_index, box_slot, Some(pa9));
+        let retrieved_pa9 = save
             .get_mon_at(box_index, box_slot)
             .expect("ribbon master is present");
 
-        if retrieved_pk8.calculate_checksum() != pk8.calculate_checksum() {
+        if retrieved_pa9.calculate_checksum() != pa9.calculate_checksum() {
             return Err(Error::other(
                 "pokemon changed between setting and retrieving",
             ));
