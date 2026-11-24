@@ -72,11 +72,18 @@ impl<const N: usize> From<&str> for SizedUtf16String<N> {
     }
 }
 
+
+
 impl<const N: usize> From<String> for SizedUtf16String<N> {
     fn from(value: String) -> Self {
-        SizedUtf16String::from(value.as_str())
+        let final_str = SizedUtf16String::from(value.as_str());
+        final_str
     }
+
+
 }
+
+
 
 impl<const N: usize> From<&SizedUtf16String<N>> for String {
     fn from(value: &SizedUtf16String<N>) -> Self {

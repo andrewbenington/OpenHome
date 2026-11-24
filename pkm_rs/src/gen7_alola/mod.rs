@@ -108,7 +108,7 @@ mod tests {
 
     #[test]
     fn vivillon_valid() -> Result<()> {
-        Pk7SpeciesAndForm::try_new(SpeciesForm::new_valid_ndex(NationalDex::Vivillon, 7).unwrap())
+        Pk7SpeciesAndForm::try_new(SpeciesForm::new_valid_ndex(NationalDex::Vivillon, 7)?)
             .expect("vivillon is valid");
         Ok(())
     }

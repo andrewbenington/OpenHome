@@ -159,6 +159,14 @@ impl BinaryGender {
             BinaryGender::Female => 1,
         }
     }
+
+    pub fn from_byte(byte : u8) -> Self {
+        match byte {
+            0=>BinaryGender::Male,
+            1=>BinaryGender::Female,
+            _ => panic!("This gender value was not in the system: {byte}"),
+        }
+    }
 }
 
 impl From<bool> for BinaryGender {
