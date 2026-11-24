@@ -9,7 +9,7 @@ import {
 import {
   ConvertStrategy,
   ExtraFormIndex,
-  Gen2PolishedCrystalSaveWasm,
+  Gen2PolishedCrystalSaveRust,
   PK2PolishedCrystalWasm,
   OriginGame,
 } from "@pkm-rs/pkg"
@@ -21,19 +21,19 @@ import {Item} from "@openhome-core/resources/consts/Items.ts";
 import PK2PolishedCrystal from "@openhome-core/pkm/PK2PolishedCrystal.ts";
 
 export class Gen2PolishedCrystalSave extends WasmPluginSave<PK2PolishedCrystalWasm, PK2PolishedCrystal,
-  Gen2PolishedCrystalSaveWasm> {
+  Gen2PolishedCrystalSaveRust> {
   getSlotMetadata = (_boxNum: number, _boxSlot: number): SlotMetadata => {
     return { isDisabled: false }
   }
 
   pluginIdentifier: PluginIdentifier = 'polished_crystal';
-  WASM_SAVE_CLASS = Gen2PolishedCrystalSaveWasm;
+  WASM_SAVE_CLASS = Gen2PolishedCrystalSaveRust;
 
   static transferRestrictions = POLISHED_CRYSTAL_TRANSFER_RESTRICTIONS;
   transferRestrictions: TransferRestrictions = POLISHED_CRYSTAL_TRANSFER_RESTRICTIONS
 
   constructor(path: PathData, bytes: Uint8Array) {
-    super(Gen2PolishedCrystalSaveWasm.fromBytes(bytes))
+    super(Gen2PolishedCrystalSaveRust.fromBytes(bytes))
     this.filePath = path
   }
 
@@ -81,6 +81,6 @@ export class Gen2PolishedCrystalSave extends WasmPluginSave<PK2PolishedCrystalWa
   }
 
   static fileIsSave(bytes: Uint8Array): boolean {
-    return Gen2PolishedCrystalSaveWasm.fileIsSave(bytes)
+    return Gen2PolishedCrystalSaveRust.fileIsSave(bytes)
   }
 }

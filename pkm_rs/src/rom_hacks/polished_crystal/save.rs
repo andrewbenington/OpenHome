@@ -46,6 +46,8 @@ const NON_BINARY_GENDER_BYTE: u8 = 2;
 const POLISHED_CRYSTAL_BOX_DATA_OFFSET: usize = 300;
 const POLISHED_CRYSTAL_BOX_NAMES_OFFSET: usize = 300;
 
+const POLISHED_CRYSTAL_NUM_BOXES : usize = 20;
+
 const BOX_DATA_SIZE: usize = 300;
 const BOX_NAME_BYTE_LENGTH: usize = 300;
 
@@ -102,7 +104,7 @@ impl SaveType {
   }
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = Gen2PolishedCrystalSaveWasm))]
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = Gen2PolishedCrystalSaveRust))]
 #[derive(Serialize, Debug)]
 pub struct Gen2PolishedCrystalSave {
   save_type: SaveType,
@@ -261,7 +263,7 @@ impl Gen2PolishedCrystalSave {
   }
 
   fn current_pc_box_idx(&self) -> usize {
-    if self.bytes[0] >= 32 {
+    if self.bytes[0] >= POLISHED_CRYSTAL_NUM_BOXES {
       0
     } else {
       self.bytes[0].into()
@@ -287,7 +289,7 @@ impl Gen2PolishedCrystalSave {
 }
 
 #[cfg(feature = "wasm")]
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_class = Gen2PolishedCrystalSaveWasm))]
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_class = Gen2PolishedCrystalSaveRust))]
 #[allow(clippy::missing_const_for_fn)]
 impl Gen2PolishedCrystalSave {
   #[wasm_bindgen(js_name = getMonAt)]
@@ -366,6 +368,30 @@ impl Gen2PolishedCrystalSave {
   #[wasm_bindgen(getter = trainerGender)]
   pub fn trainer_gender_wasm(&self) -> u16 {
     self.get_trainer_data().trainer_gender as u16
+  }
+
+
+  #[wasm_bindgen(getter = gameOfOrigin)]
+  pub fn game_of_origin_wasm(&self) -> OriginGame {
+    OriginGame::Crystal
+  }
+
+  #[wasm_bindgen(getter = secretId)]
+  pub fn secret_id_wasm(&self) -> u16 {
+
+
+    // Polished Crystal has no concept of a secret ID, so we return 0 as a placeholder.
+    0u16
+
+  }
+
+
+  #[wasm_bindgen(getter = displayId)]
+  pub fn display_tid_wasm(&self) -> String {
+
+    // The older games do not have the concept of a display ID or a secret ID, so we just return the
+    // trainer ID.
+    self.trainer_id_wasm().to_string()
   }
 
   #[wasm_bindgen(js_name = getBoxName)]
