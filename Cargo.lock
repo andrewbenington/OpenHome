@@ -114,16 +114,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0ab387a0c4143b4fd3804e193946e78c8ab16cf26c5fde2048e4ac3d618c3b64"
 
 [[package]]
-name = "array-bytes"
-version = "9.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "27d55334c98d756b32dcceb60248647ab34f027690f87f9a362fd292676ee927"
-dependencies = [
- "smallvec",
- "thiserror 2.0.21",
-]
-
-[[package]]
 name = "arrayref"
 version = "0.3.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -595,17 +585,6 @@ checksum = "4356eba6976435498d05a311ee9fc486da3bc81c200d3f0d7dd9703b41913f92"
 dependencies = [
  "bytes",
  "memchr",
-]
-
-[[package]]
-name = "concat-arrays"
-version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1df715824eb382e34b7afb7463b0247bf41538aeba731fba05241ecdb5dc3747"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 1.0.109",
 ]
 
 [[package]]
@@ -3216,11 +3195,8 @@ version = "1.19.2"
 dependencies = [
  "aes",
  "arbitrary-int",
- "array-bytes",
  "arrayref",
  "assert-json-diff",
- "byteorder",
- "concat-arrays",
  "console_error_panic_hook",
  "getrandom 0.4.3",
  "hex",
@@ -4473,7 +4449,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "72b64191b275b66ffe2469e8af2c1cfe3bafa67b529ead792a6d0160888b4237"
 dependencies = [
  "proc-macro2",
- "quote",
  "unicode-ident",
 ]
 
