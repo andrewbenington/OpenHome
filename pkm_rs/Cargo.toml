@@ -36,6 +36,7 @@ thiserror = "2.0.21"
 num_enum = "0.7.6"
 zerocopy = { version = "0.8.63", features = ["derive"] }
 uuid = { version = "1.29.1", features = ["serde"], optional = true }
+lazy_static = "1.5.1"
 
 [lib]
 name = "pkm_rs"
