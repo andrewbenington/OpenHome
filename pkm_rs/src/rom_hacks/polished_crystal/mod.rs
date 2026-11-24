@@ -4,6 +4,7 @@ pub mod pk2_polished_crystal;
 pub mod save;
 pub mod pk2_polished_crystal_buffer;
 pub mod string_conversion;
+mod array_utils;
 
 use pkm_rs_resources::metadata_source::MetadataSource;
 

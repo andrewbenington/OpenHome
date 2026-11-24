@@ -1,4 +1,4 @@
-use super::BoxIndex;
+use super::{array_utils, BoxIndex};
 use super::BoxSlot;
 use super::PK2PolishedCrystal;
 use super::BOX_COLS;
@@ -21,6 +21,7 @@ use crate::traits::OhpkmV2;
 use tsify::Ts;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
+use array_utils::with_sized;
 use BinaryGender::Male;
 
 #[cfg(feature = "wasm")]
@@ -426,16 +427,15 @@ pub struct TrainerDataGen2PolishedCrystal {
   pub is_non_binary: bool,
 }
 
-fn slice<const N: usize>(arr: &[u8]) -> &[u8; N] {
-  let expect_string: String = format!("slice should have length {}", N.to_string().as_str());
-  arr.try_into().expect(&*expect_string)
-}
-
 impl TrainerDataGen2PolishedCrystal {
   fn from_bytes(block_bytes: &[u8; TRAINER_DATA_SIZE]) -> Self {
+
     let trainer_id = read_u16_be!(block_bytes, TRAINER_ID_SUB_OFFSET);
-    let trainer_name =
-      Self::parse_gb_name(slice::<7>(&block_bytes[TRAINER_NAME_SUB_OFFSET..TRAINER_NAME_SUB_END_OFFSET]));
+
+    // Trainer name stuff
+    let trainer_name_arr = with_sized::<7>(&block_bytes[
+      TRAINER_NAME_SUB_OFFSET..TRAINER_NAME_SUB_END_OFFSET]);
+    let trainer_name = Self::parse_gb_name(trainer_name_arr);
 
 
     // Polished Crystal supports non-binary genders. To store this knowledge without altering
@@ -457,6 +457,10 @@ impl TrainerDataGen2PolishedCrystal {
   }
 
   fn parse_gb_name(name_arr: &[u8; 7]) -> SizedUtf16String<26> {
+
+    // Note that we call get_gb_char_from_byte() when processing the stored name, since
+    // player names in Game Boy games have a different mapping to Latin characters than
+    // other main series games.
     let vec_char : Vec<char> = name_arr
       .iter()
       .map(|x| get_gb_char_from_byte(x))
@@ -476,32 +480,6 @@ impl TrainerDataGen2PolishedCrystal {
   //     bytes
   // }
 }
-
-fn concat<const N : usize,
-const A1 : usize, const A2: usize>(arr1 : &[u8; A1], arr2 : &[u8; A2]) -> [u8; N] {
-  let mut combined = [0u8; N];
-  combined[..arr1.len()].copy_from_slice(arr1);
-  combined[arr1.len()..].copy_from_slice(arr2);
-  combined
-}
-
-// fn parse_gb_name(name_in_bytes: &[u8; 7]) -> SizedUtf16String<26> {
-//
-//   // Since names are stored differently on the Game Boy, we must map each byte in the name to
-//   // a specific character representation before returning the name string.
-//   let char_mapping: Vec<char> = name_in_bytes
-//     .iter()
-//     .map(|byte| get_gb_char_from_byte(&byte))
-//     .collect();
-//
-//   // Moreover, each Game Boy char has a byte representation, making this casting safe, even
-//   // though char usually consists of 4 bytes.
-//   let vec = char_mapping.iter().map(|char| *char as u8).collect();
-//   let converted: [u8; 7] = vec2array::<u8, 7>(vec).unwrap();
-//
-//   let arr = concat::<26, 19, 7>(&[0u8; 19], &converted);
-//   SizedUtf16String::<26>::from_bytes(arr)
-// }
 
 #[cfg(feature = "wasm")]
 #[wasm_bindgen]
@@ -523,7 +501,9 @@ mod tests {
 
   #[test]
   fn valid_trainer_data() -> std::result::Result<(), Box<dyn std::error::Error>> {
-    let bytes = save_bytes_from_file(&Path::new("gen2-polished-crystal").join("standard.sav"));
+    let bytes = save_bytes_from_file(
+      &Path::new("gen2-polished-crystal")
+        .join("standard.sav"));
 
     let save: Gen2PolishedCrystalSave = Gen2PolishedCrystalSave::from_bytes(&*bytes?)?;
 
