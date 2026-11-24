@@ -3,6 +3,8 @@ mod category;
 #[cfg(feature = "wasm")]
 mod groups;
 #[cfg(feature = "wasm")]
+mod lza_items;
+#[cfg(feature = "wasm")]
 mod merge_dedup;
 #[cfg(feature = "wasm")]
 mod oh_items;
@@ -12,8 +14,9 @@ mod sv_items;
 mod swsh_items;
 
 #[cfg(feature = "wasm")]
+pub use lza_items::LzaItemStorage;
+#[cfg(feature = "wasm")]
 pub use sv_items::SvItemStorage;
-
 #[cfg(feature = "wasm")]
 pub use swsh_items::{SwshItemPouch, SwshItemStorage};
 #[cfg(feature = "wasm")]

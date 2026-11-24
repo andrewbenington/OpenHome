@@ -1,0 +1,225 @@
+import { PA9 } from '@openhome-core/pkm'
+import { Item } from '@openhome-core/resources/consts/Items'
+import {
+  ZA_TRANSFER_RESTRICTIONS_BASE,
+  ZA_TRANSFER_RESTRICTIONS_MD,
+} from '@openhome-core/resources/consts/TransferRestrictions'
+import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
+import { Errorable } from '@openhome-core/util/functional'
+import { utf16BytesToString } from '@openhome-core/util/stringConversion'
+import {
+  BinaryGender,
+  Block,
+  BlockType,
+  ConvertStrategy,
+  ExtraFormIndex,
+  Languages,
+  ObjectBlock,
+  OriginGame,
+} from '@pkm-rs/pkg'
+import { OHPKM } from '../../pkm/OHPKM'
+import { BlockDataFor, blockIsType, SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
+import { emptyPathData, PathData } from '../util/path'
+import { G89BlockName, Gen8Gen9Save } from './Gen8Gen9Save'
+
+export type ZA_SAVE_REVISION = 'Base Game' | 'Mega Dimension'
+
+const BOX_SLOT_GAP_BYTES = 0x40
+const SAVE_SIZE_1_0_0 = 0x2f3284
+const SAVE_SIZE_1_0_2 = 0x2f3289
+const SAVE_SIZE_2_0_0 = 0x309fa6
+const SAVE_SIZE_2_0_1 = 0x309fb3
+
+export class LegendsZaSave extends Gen8Gen9Save<PA9> {
+  static boxSizeBytes = (PA9.getBoxSize() + BOX_SLOT_GAP_BYTES) * 30
+  static pkmType = PA9
+  static saveTypeAbbreviation = 'ZA'
+  static saveTypeName = 'Pokémon Legends Z-A'
+  static saveTypeID = 'ZASAV'
+
+  trainerBlock: MyStatus
+
+  origin: OriginGame
+
+  constructor(path: PathData, bytes: Uint8Array) {
+    super(path, bytes)
+
+    this.trainerBlock = new MyStatus(this.getBlockDataMust('MyStatus', 'Object').Object)
+    this.name = this.trainerBlock.getName()
+
+    this.boxes.forEach((box, i) => {
+      if (!box.name) {
+        box.name = `Box ${i + 1}`
+      }
+    })
+
+    this.tid = this.trainerBlock.getTID()
+    this.sid = this.trainerBlock.getSID()
+    this.displayID = this.trainerBlock.getFullID().toString().slice(-6).padStart(6, '0')
+    this.origin = this.trainerBlock.getGame()
+  }
+
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PA9> {
+    return PA9.fromOhpkm(ohpkm, strategy)
+  }
+
+  getBoxCount(): number {
+    return 32
+  }
+
+  monConstructor(bytes: ArrayBuffer, encrypted: boolean): PA9 {
+    return PA9.fromBytes(bytes, encrypted)
+  }
+
+  getBlockKey(blockName: G89BlockName | keyof typeof BlockKeys): number {
+    return BlockKeys[blockName]
+  }
+
+  getBlock(blockName: G89BlockName | keyof typeof BlockKeys): Block | undefined {
+    const key = this.getBlockKey(blockName)
+
+    return this.scBlocks.find((b) => b.key === key)
+  }
+
+  getBlockDataMust<T extends BlockType>(
+    blockName: G89BlockName | keyof typeof BlockKeys,
+    type: T
+  ): BlockDataFor<T> {
+    const block = this.getBlock(blockName)
+
+    if (!block) {
+      throw Error(`Missing block ${blockName}`)
+    }
+    if (!blockIsType(block, type)) {
+      throw Error(
+        `Block ${blockName} has data ${JSON.stringify(block.data)} (expected ${JSON.stringify(type)})`
+      )
+    }
+    return block.data
+  }
+
+  getMonBoxSizeBytes(): number {
+    return PA9.getBoxSize()
+  }
+
+  getBoxSizeBytes(): number {
+    return LegendsZaSave.boxSizeBytes
+  }
+
+  getBoxSlotGapBytes(): number {
+    return BOX_SLOT_GAP_BYTES
+  }
+
+  supportsMon(nationalDex: number, formNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    const revision = this.scBlocks ? this.getSaveRevision() : 'Mega Dimension'
+    switch (revision) {
+      case 'Base Game':
+        return !isRestricted(ZA_TRANSFER_RESTRICTIONS_BASE, nationalDex, formNumber, extraFormIndex)
+      case 'Mega Dimension':
+        return !isRestricted(ZA_TRANSFER_RESTRICTIONS_MD, nationalDex, formNumber, extraFormIndex)
+    }
+  }
+
+  supportsItem(itemIndex: number) {
+    const revision = this.scBlocks ? this.getSaveRevision() : 'Mega Dimension'
+    switch (revision) {
+      case 'Base Game':
+        return itemIndex <= Item.Falinksite
+      case 'Mega Dimension':
+        return itemIndex <= Item.Glimmoranite
+    }
+  }
+
+  getSaveRevision(): ZA_SAVE_REVISION {
+    return this.getBlock('Donuts') ? 'Mega Dimension' : 'Base Game'
+  }
+
+  getDisplayData() {
+    const trainerBlock = this.trainerBlock
+
+    return {
+      'Player Character': trainerBlock.getGender() ? 'Harmony' : 'Paxton',
+      'Save Version': this.getSaveRevision(),
+      Language: Languages.stringFromByte(trainerBlock.getLanguage()),
+    }
+  }
+
+  static fileIsSave(bytes: Uint8Array): boolean {
+    if (
+      ![SAVE_SIZE_1_0_0, SAVE_SIZE_1_0_2, SAVE_SIZE_2_0_0, SAVE_SIZE_2_0_1].includes(
+        bytes.byteLength
+      )
+    ) {
+      return false
+    }
+    try {
+      if (!SwishCrypto.getIsHashValid(bytes)) {
+        return false
+      }
+
+      const maybeSave = new LegendsZaSave(emptyPathData, bytes)
+      return maybeSave.getBlock('InfiniteRoyale') !== undefined
+    } catch {
+      return false
+    }
+  }
+
+  static includesOrigin(origin: OriginGame) {
+    return origin === OriginGame.Scarlet || origin === OriginGame.Violet
+  }
+
+  get trainerGender() {
+    return this.trainerBlock.getGender() ? BinaryGender.Female : BinaryGender.Male
+  }
+
+  get language() {
+    return this.trainerBlock.getLanguage()
+  }
+}
+
+const BlockKeys = {
+  TeamIndexes: 0x33f39467,
+  BoxLayout: 0x19722c89,
+  BoxWallpapers: 0x2eb1b190,
+
+  Box: 0x0d66012c,
+  Party: 0x3aa1a9ad,
+  Zukan: 0x2d87be5c,
+  MyStatus: 0xe3e89bd1,
+  PlayTime: 0xedaff794,
+
+  CurrentBox: 0x017c3cbb,
+
+  InfiniteRoyale: 0x8929bfb6,
+  Donuts: 0xbe007476,
+}
+
+class MyStatus {
+  dataView: DataView<ArrayBuffer>
+
+  constructor(scBlock: ObjectBlock) {
+    this.dataView = new DataView(scBlock.bytes.buffer)
+  }
+
+  public getName(): string {
+    return utf16BytesToString(this.dataView.buffer, 0x10, 24)
+  }
+  public getLanguage(): number {
+    return this.dataView.getUint8(0x07)
+  }
+  public getFullID(): number {
+    return this.dataView.getUint32(0x00, true)
+  }
+  public getTID(): number {
+    return this.dataView.getUint16(0x00, true)
+  }
+  public getSID(): number {
+    return this.dataView.getUint16(0x02, true)
+  }
+  public getGame(): OriginGame {
+    return this.dataView.getUint8(0x04)
+  }
+  public getGender(): boolean {
+    return !!(this.dataView.getUint8(0x05) & 1)
+  }
+}

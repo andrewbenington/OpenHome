@@ -9,10 +9,16 @@ pub use pa9::*;
 mod pa9_buffer;
 #[cfg(feature = "wasm")]
 pub use pa9_buffer::Pa9Buffer;
+#[cfg(feature = "wasm")]
+mod lza_save;
+#[cfg(feature = "wasm")]
+mod lza_save_blocks;
 mod plus_moves;
 use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_resources::species::metadata_table::source_has_form_metadata;
+#[cfg(feature = "wasm")]
+use pkm_rs_types::strings::SizedUtf16String;
 pub use plus_moves::*;
 #[cfg(feature = "wasm")]
 mod wasm;
@@ -41,6 +47,15 @@ const MAX_RIBBON_LZA: usize = ModernRibbon::Partner as usize;
 #[cfg(feature = "wasm")]
 pub const TM_FLAG_BYTE_LENGTH_BASE: usize = 25;
 pub const TM_FLAG_BYTE_LENGTH_DLC: usize = 13;
+
+#[cfg(feature = "wasm")]
+pub(crate) type BoxName = SizedUtf16String<BOX_NAME_LENGTH>;
+
+#[cfg(any(test, feature = "wasm"))]
+pub(crate) type BoxIndex = pkm_rs_types::BoundedU8<{ MAX_BOX_COUNT - 1 }>;
+
+#[cfg(any(test, feature = "wasm"))]
+pub(crate) type BoxSlot = pkm_rs_types::BoundedU8<{ BOX_SLOTS - 1 }>;
 
 #[derive(Debug, Clone, Copy, Default)]
 pub struct Pa9SpeciesAndForm(SpeciesForm);

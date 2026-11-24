@@ -184,7 +184,7 @@ impl SvItemStorage {
         2517, 2518, 2519, 2520, 2521,
     ];
 
-    /// Items that exist in the data but cannot be legally btained.
+    /// Items that exist in the data but cannot be legally obtained.
     pub const UNRELEASED: &'static [u16] = &[
         16,   // Cherish Ball
         111,  // Odd Keystone
@@ -211,9 +211,9 @@ impl SvItemStorage {
         2400, // Yellow Dish
     ];
 
-    /// Legal item IDs for a pouch, or `None` if Gen 9 has no such pouch.
-    pub const fn items_by_pouch(pouch: SvItemPouch) -> Option<&'static [u16]> {
-        Some(match pouch {
+    /// Legal item IDs for a pouch
+    pub const fn items_by_pouch(pouch: SvItemPouch) -> &'static [u16] {
+        match pouch {
             SvItemPouch::Other => Self::OTHER,
             SvItemPouch::KeyItems => Self::EVENT,
             SvItemPouch::TechnicalMachines => Self::MACHINE,
@@ -224,13 +224,11 @@ impl SvItemStorage {
             SvItemPouch::Treasure => Self::TREASURE,
             SvItemPouch::Picnic => Self::PICNIC,
             SvItemPouch::Materials => Self::MATERIAL,
-        })
+        }
     }
 
     pub fn pouch_for(item_index: u16) -> Option<SvItemPouch> {
-        SvItemPouch::iter().find(|&ty| {
-            Self::items_by_pouch(ty).is_some_and(|items| items.binary_search(&item_index).is_ok())
-        })
+        SvItemPouch::iter().find(|&ty| Self::items_by_pouch(ty).binary_search(&item_index).is_ok())
     }
 
     pub fn category_for(item_index: u16) -> Option<OpenhomeItemCategory> {
