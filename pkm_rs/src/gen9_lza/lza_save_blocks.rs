@@ -344,6 +344,7 @@ impl ItemInventory {
             swish_crypto::BlockData::Object(ObjectBlock::new(self.as_bytes().to_vec())),
         )
     }
+
     const fn empty(&self) -> ItemDataLza {
         self.items[0]
     }

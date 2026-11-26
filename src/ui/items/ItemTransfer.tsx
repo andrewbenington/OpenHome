@@ -250,14 +250,13 @@ function SingletonItemControls(props: ItemTransferControlsProps) {
             )}
             {props.side === 'left' ? null : registeredForDest ? registeredIcon : <ArrowUpIcon />}
           </OhoButton>
-          )
         </OhoFlex.RowCentered>
       ) : (
         <MessageRibbon
           style={{ padding: '0.5rem', marginLeft: 'auto', marginRight: 'auto' }}
           type="warning"
         >
-          {sourceItem?.name} is a singleton in this game and cannot be transferred.
+          {sourceItem?.name} is a singleton in this game and cannot be transferred in.
         </MessageRibbon>
       )}
     </OhoFlex.Row>

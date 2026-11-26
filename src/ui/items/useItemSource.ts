@@ -43,6 +43,7 @@ export function useItemSource(source: ItemTransferSource, dest: ItemTransferSour
           return nameTrimmed && nameTrimmed !== '???'
         })
         .filter((item) => item.isObtained || filter.includeUnobtained)
+        .filter((item) => item.count > 0 || filter.includeEmpty)
         .map((item) => ({
           ...item,
           pouch: database.internalCategoryForItem(item.index) ?? 0,
