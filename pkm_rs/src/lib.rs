@@ -18,6 +18,7 @@ pub mod gen7_alola;
 // pub mod gen7_lgpe;
 #[cfg(feature = "wasm")]
 pub mod gen8_swsh;
+pub mod gen9;
 pub mod gen9_lza;
 pub mod gen9_sv;
 #[cfg(feature = "wasm")]

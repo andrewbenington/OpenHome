@@ -48,7 +48,7 @@ pub struct OhpkmV1 {
     pub pokerus: Pokerus,
     pub contest_memory_count: u8,
     pub battle_memory_count: u8,
-    pub ribbons: OpenHomeRibbonSet<16>,
+    pub ribbons: OpenHomeRibbonSet,
     pub sociability: u32,
     pub height_scalar: u8,
     pub weight_scalar: u8,

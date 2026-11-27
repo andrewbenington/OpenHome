@@ -415,7 +415,14 @@ export function isMegaStone(itemIndex?: number): boolean {
     itemIndex !== undefined &&
     ((itemIndex >= Item.Gengarite && itemIndex <= Item.Latiosite) ||
       (itemIndex >= Item.Swampertite && itemIndex <= Item.Beedrillite) ||
-      (itemIndex >= Item.Clefablite && itemIndex <= Item.Falinksite) ||
+      isZaExclusiveMegaStone(itemIndex))
+  )
+}
+
+export function isZaExclusiveMegaStone(itemIndex?: number): boolean {
+  return (
+    itemIndex !== undefined &&
+    ((itemIndex >= Item.Clefablite && itemIndex <= Item.Falinksite) ||
       (itemIndex >= Item.RaichuniteX && itemIndex <= Item.Glimmoranite))
   )
 }
@@ -425,6 +432,15 @@ export function isZCrystal(itemIndex: number) {
     (itemIndex >= Item.NormaliumZ && itemIndex <= Item.PikaniumZ) ||
     (itemIndex >= Item.DecidiumZ && itemIndex <= Item.PikashuniumZ_2) ||
     (itemIndex >= Item.SolganiumZ && itemIndex <= Item.KommoniumZ_2)
+  )
+}
+
+export function isSingletonHeldItem(itemIndex: number) {
+  return (
+    isZaExclusiveMegaStone(itemIndex) ||
+    isZCrystal(itemIndex) ||
+    itemIndex === Item.RedOrb ||
+    itemIndex === Item.BlueOrb
   )
 }
 

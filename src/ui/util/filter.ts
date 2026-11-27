@@ -10,7 +10,6 @@ import {
   HyperTraining,
   OriginGame,
   PkmType,
-  PlusMoveFlags,
   ShinyLeaves,
   StatsPreSplit,
 } from '@pkm-rs/pkg'
@@ -60,7 +59,7 @@ export type FilterableMon = FormSpecifiersForFormat &
     isShiny: () => boolean
     isSquareShiny: () => boolean
 
-    plusMoveFlags?: PlusMoveFlags
+    plusMovesLza?: Move[]
     tmMovesLza?: Move[]
     tmMovesSv?: Move[]
     tmMovesSVDLC?: Move[]

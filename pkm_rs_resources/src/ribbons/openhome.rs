@@ -359,21 +359,22 @@ impl Display for OpenHomeRibbon {
 
 const OBSOLETE_RIBBON_BYTES: usize = 6;
 const MAX_MODERN_RIBBON: usize = ModernRibbon::MAX;
+const MODERN_RIBBON_BYTES: usize = 16;
 
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Default, Debug, Clone, Copy)]
-pub struct OpenHomeRibbonSet<const MODERN_BYTE_COUNT: usize> {
+pub struct OpenHomeRibbonSet {
     obsolete: ObsoleteRibbonSet,
-    modern: ModernRibbonSet<MODERN_BYTE_COUNT, MAX_MODERN_RIBBON>,
+    modern: ModernRibbonSet<MODERN_RIBBON_BYTES, MAX_MODERN_RIBBON>,
 }
 
-impl<const MODERN_BYTE_COUNT: usize> OpenHomeRibbonSet<MODERN_BYTE_COUNT> {
+impl OpenHomeRibbonSet {
     pub fn from_bytes(bytes: &[u8]) -> Result<Self, Box<dyn Error>> {
         let byte_len = bytes.len();
-        if byte_len < OBSOLETE_RIBBON_BYTES + MODERN_BYTE_COUNT {
+        if byte_len < OBSOLETE_RIBBON_BYTES + MODERN_RIBBON_BYTES {
             return Err(format!(
                 "OpenHome ribbon flag byte length must be at least {} (received {byte_len})",
-                OBSOLETE_RIBBON_BYTES + MODERN_BYTE_COUNT
+                OBSOLETE_RIBBON_BYTES + MODERN_RIBBON_BYTES
             )
             .into());
         }
@@ -383,7 +384,7 @@ impl<const MODERN_BYTE_COUNT: usize> OpenHomeRibbonSet<MODERN_BYTE_COUNT> {
                 bytes[0..OBSOLETE_RIBBON_BYTES].try_into().unwrap(),
             ),
             modern: ModernRibbonSet::from_bytes(
-                bytes[OBSOLETE_RIBBON_BYTES..OBSOLETE_RIBBON_BYTES + MODERN_BYTE_COUNT]
+                bytes[OBSOLETE_RIBBON_BYTES..OBSOLETE_RIBBON_BYTES + MODERN_RIBBON_BYTES]
                     .try_into()
                     .unwrap(),
             ),
@@ -400,14 +401,14 @@ impl<const MODERN_BYTE_COUNT: usize> OpenHomeRibbonSet<MODERN_BYTE_COUNT> {
 
     pub fn from_obsolete(obsolete: ObsoleteRibbonSet) -> Self {
         Self {
-            modern: ModernRibbonSet::<MODERN_BYTE_COUNT, MAX_MODERN_RIBBON>::default(),
+            modern: ModernRibbonSet::<MODERN_RIBBON_BYTES, MAX_MODERN_RIBBON>::default(),
             obsolete,
         }
     }
 
     pub fn from_modern<const M: usize, const MAX: usize>(modern: ModernRibbonSet<M, MAX>) -> Self {
         Self {
-            modern: modern.with_max::<MODERN_BYTE_COUNT, MAX_MODERN_RIBBON>(),
+            modern: modern.with_max::<MODERN_RIBBON_BYTES, MAX_MODERN_RIBBON>(),
             obsolete: ObsoleteRibbonSet::default(),
         }
     }
@@ -421,9 +422,9 @@ impl<const MODERN_BYTE_COUNT: usize> OpenHomeRibbonSet<MODERN_BYTE_COUNT> {
     }
 
     pub fn to_bytes(self) -> Vec<u8> {
-        let mut bytes: Vec<u8> = vec![0; OBSOLETE_RIBBON_BYTES + MODERN_BYTE_COUNT];
+        let mut bytes: Vec<u8> = vec![0; OBSOLETE_RIBBON_BYTES + MODERN_RIBBON_BYTES];
         bytes[0..OBSOLETE_RIBBON_BYTES].copy_from_slice(&self.obsolete.to_bytes());
-        bytes[OBSOLETE_RIBBON_BYTES..OBSOLETE_RIBBON_BYTES + MODERN_BYTE_COUNT]
+        bytes[OBSOLETE_RIBBON_BYTES..OBSOLETE_RIBBON_BYTES + MODERN_RIBBON_BYTES]
             .copy_from_slice(&self.modern.to_bytes());
 
         bytes
@@ -439,6 +440,10 @@ impl<const MODERN_BYTE_COUNT: usize> OpenHomeRibbonSet<MODERN_BYTE_COUNT> {
             OpenHomeRibbon::Mod(ribbon) => self.modern.add_ribbon(ribbon),
             OpenHomeRibbon::Obs(ribbon) => self.obsolete.add_ribbon(ribbon),
         }
+    }
+
+    pub fn set_modern_ribbon(&mut self, ribbon: ModernRibbon, value: bool) {
+        self.modern.set_ribbon(ribbon, value)
     }
 
     pub fn add_ribbons(&mut self, ribbons: Vec<OpenHomeRibbon>) {
@@ -491,7 +496,7 @@ impl<const MODERN_BYTE_COUNT: usize> OpenHomeRibbonSet<MODERN_BYTE_COUNT> {
     }
 }
 
-impl<const N: usize> Serialize for OpenHomeRibbonSet<N> {
+impl Serialize for OpenHomeRibbonSet {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
@@ -500,13 +505,13 @@ impl<const N: usize> Serialize for OpenHomeRibbonSet<N> {
     }
 }
 
-impl<const N: usize> FromIterator<OpenHomeRibbon> for OpenHomeRibbonSet<N> {
+impl FromIterator<OpenHomeRibbon> for OpenHomeRibbonSet {
     fn from_iter<T: IntoIterator<Item = OpenHomeRibbon>>(iter: T) -> Self {
         Self::default().with_ribbons(iter.into_iter().collect())
     }
 }
 
-impl<const N: usize> IntoIterator for OpenHomeRibbonSet<N> {
+impl IntoIterator for OpenHomeRibbonSet {
     type Item = OpenHomeRibbon;
     type IntoIter = std::vec::IntoIter<Self::Item>;
 

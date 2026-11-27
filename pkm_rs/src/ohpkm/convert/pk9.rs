@@ -188,7 +188,7 @@ impl OhpkmConvert for Pk9 {
                 obedience_level: ohpkm.obedience_level(),
                 egg_location_index: ohpkm.egg_location_index().unwrap_or(0),
                 met_location_index: met_data.location_index,
-                ball: if ohpkm.ball() <= Ball::Beast {
+                ball: if Pk9::ball_is_valid(ohpkm.ball()) {
                     ohpkm.ball()
                 } else {
                     Ball::Poke

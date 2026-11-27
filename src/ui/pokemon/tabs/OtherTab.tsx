@@ -46,7 +46,6 @@ import {
   Geolocations,
   Language,
   OriginGames,
-  PlusMoveFlags,
   Pokerus,
   ShinyLeaves,
   StatsPreSplit,
@@ -70,7 +69,7 @@ const OtherDisplay = (props: { mon: OtherDisplayPkmData }) => {
   const tutorMovesLa = mon.tutorMovesLa
   const tmMovesSvBase = mon.tmMovesSv
   const tmMovesLza = mon.tmMovesLza
-  const plusMovesLza = Array.from(mon.plusMoveFlags?.getMoveIds() ?? []).map((id) => Moves[id])
+  const plusMovesLza = mon.plusMovesLza
 
   return (
     <div style={{ overflow: 'hidden', height: '100%' }}>
@@ -632,7 +631,7 @@ export type OtherDisplayPkmData = {
   teraTypeOriginal?: TeraType
   teraTypeOverride?: TeraType
   tmMovesLza?: Move[]
-  plusMoveFlags?: PlusMoveFlags
+  plusMovesLza?: Move[]
   tmMovesSv?: Move[]
   tmMovesSVDLC?: Move[]
   trMovesSwSh?: Move[]

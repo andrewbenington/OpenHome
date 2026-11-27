@@ -129,7 +129,7 @@ function renderSource(source: OriginGame | 'OpenHome') {
   return source === 'OpenHome' ? (
     <Badge.OpenHome />
   ) : (
-    <Badge.Game originGame={source} withName style={{ width: 'fit-content' }} />
+    <Badge.Game originGame={source} withNameAbbr />
   )
 }
 

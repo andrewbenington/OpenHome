@@ -159,8 +159,11 @@ impl ScarletVioletSave {
         Pk9::from_ohpkm(&ohpkm, strategy)
     }
 
-    const fn is_save(bytes: &[u8]) -> bool {
-        bytes.len() >= SAVE_SIZE_BYTES_MIN && bytes.len() <= SAVE_SIZE_BYTES_MAX
+    fn is_save(bytes: &[u8]) -> bool {
+        bytes.len() >= SAVE_SIZE_BYTES_MIN
+            && bytes.len() <= SAVE_SIZE_BYTES_MAX
+            && SwishBlocks::from_bytes(bytes.to_vec().into_boxed_slice())
+                .is_ok_and(|blocks| blocks.has_block(SvBlockKey::Config))
     }
 
     fn display_tid(&self) -> String {
@@ -376,7 +379,6 @@ impl ScarletVioletSave {
             ..
         } = self.blocks.my_status;
 
-        // add_field(&obj, "Language", trainer_card.language)?;
         add_u16_hex(&obj, "Trainer ID", trainer_id.get())?;
         add_u16_hex(&obj, "Secret ID", secret_id.get())?;
         add_string(

@@ -7,7 +7,6 @@ use crate::encryption::swish_crypto::{
 };
 use crate::gen9_sv::{BoxIndex, BoxSlot, MAX_BOX_COUNT};
 use crate::items::{ItemDataTs, SvItemStorage};
-// use crate::items::SvItemStorage;
 use crate::result::{Error, Result, StdResult};
 use crate::traits::PkmBytes;
 use crate::util::{self, vec_into_box};
@@ -90,6 +89,7 @@ pub enum SvBlockKey {
     BoxLayout = 0x19722c89,
     BoxWallpapers = 0x2EB1B190,
     CurrentBox = 0x017C3CBB,
+    Config = 0xdf4f1875,
 
     Box = 0x0d66012c,
     MysteryGift = 0x99E1625E,

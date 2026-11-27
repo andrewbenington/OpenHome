@@ -49,7 +49,7 @@ type WasmPkmClass = {
   new (arg: OHPKM, options: PkmConstructorOptions): WasmPkmInterface
 }
 
-const WasmPkmFormats: WasmPkmClass[] = [PK3, PK7, PK8, PK9, PH4, PK9Compass]
+const WasmPkmFormats: WasmPkmClass[] = [PK3, PK7, PK8, PK9, PA9, PH4, PK9Compass]
 
 export type WasmPkmFormat = InstanceType<(typeof WasmPkmFormats)[number]>
 export function isWasmFormat(pkm: PKMInterface): pkm is WasmPkmFormat {

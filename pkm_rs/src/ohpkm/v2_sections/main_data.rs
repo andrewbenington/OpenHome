@@ -73,7 +73,7 @@ pub struct MainDataV2 {
     pub contest_memory_count: u8,
     pub battle_memory_count: u8,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub ribbons: OpenHomeRibbonSet<16>,
+    pub ribbons: OpenHomeRibbonSet,
     pub sociability: u32,
     pub height_scalar: u8,
     pub weight_scalar: u8,

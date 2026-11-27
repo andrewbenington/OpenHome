@@ -37,7 +37,6 @@ export function ItemTransfer(props: ItemTransferProps) {
     selectedSourceId === 'source2' ? source1Controller : source2Controller
 
   const selectedItem = selectedSourceController.selectedItem
-
   return (
     <div className="save-items-display">
       <OhoFlex.RowEqualSized ref={parentRef} gridColumn="1 / span 2" gap="1" mx="1" mt="1">
@@ -65,8 +64,9 @@ export function ItemTransfer(props: ItemTransferProps) {
       <div className="item-transfer-card">
         <OhoFlex.ColFullWidth gap="1">
           {selectedItem?.index &&
-          selectedSourceController.database.maxAllowed(selectedItem.index) === 1 ? (
-            <KeyItemRegisterControls
+          (selectedSourceController.database.maxAllowed(selectedItem.index) === 1 ||
+            unselectedSourceController.database.maxAllowed(selectedItem.index) === 1) ? (
+            <SingletonItemControls
               key={selectedItem?.index}
               sourceController={selectedSourceController}
               destController={unselectedSourceController}
@@ -208,7 +208,7 @@ function ItemTransferControls(props: ItemTransferControlsProps) {
   )
 }
 
-function KeyItemRegisterControls(props: ItemTransferControlsProps) {
+function SingletonItemControls(props: ItemTransferControlsProps) {
   const itemDataForSource = props.sourceController.selectedItem
   const itemDataForDest = itemDataForSource
     ? props.destController.getItemData(itemDataForSource.index)
@@ -221,37 +221,44 @@ function KeyItemRegisterControls(props: ItemTransferControlsProps) {
   const registeredIcon = registeredForDest ? <RegisteredIcon /> : null
 
   return (
-    <OhoFlex.Row gap="1" direction={props.side === 'left' ? 'row' : 'row-reverse'}>
-      <OhoFlex.RowCentered width="50%" height="2.6rem" mt="var(--padding-radius-xs-sm)">
-        {props.destController.source.sourceType === 'OpenHome' ? (
-          sourceItem &&
-          props.destController.database.maxAllowed(sourceItem.index) === 1 && (
-            <OhoButton
-              size="2"
-              color="red"
-              variant="classic"
-              style={{ fontWeight: 'bold', width: 'fit-content' }}
-              onClick={() => {
-                if (registeredForSource && sourceItem && !registeredForDest) {
-                  props.destController.source.addItems(sourceItem?.index, 1)
-                }
-              }}
-              disabled={!registeredForSource || registeredForDest}
-            >
-              {props.side === 'right' ? null : registeredForDest ? registeredIcon : <ArrowUpIcon />}
-              {registeredForDest ? 'Registered' : 'Register'}
-              {sourceItem && !registeredForDest && (
-                <Badge.Item item={sourceItem} showLabel backgroundColor="var(--gray-11)" />
-              )}
-              {props.side === 'left' ? null : registeredForDest ? registeredIcon : <ArrowUpIcon />}
-            </OhoButton>
-          )
-        ) : (
-          <MessageRibbon style={{ padding: '0.5rem' }} type="warning">
-            Key items cannot be sent to a save file.
-          </MessageRibbon>
-        )}
-      </OhoFlex.RowCentered>
+    <OhoFlex.Row
+      gap="1"
+      direction={props.side === 'left' ? 'row' : 'row-reverse'}
+      height="2.6rem"
+      mt="var(--padding-radius-xs-sm)"
+    >
+      {props.destController.source.sourceType === 'OpenHome' &&
+      sourceItem &&
+      props.destController.database.maxAllowed(sourceItem.index) === 1 ? (
+        <OhoFlex.RowCentered width="50%" mt="0">
+          <OhoButton
+            size="2"
+            color="red"
+            variant="classic"
+            style={{ fontWeight: 'bold', width: 'fit-content' }}
+            onClick={() => {
+              if (registeredForSource && sourceItem && !registeredForDest) {
+                props.destController.source.addItems(sourceItem?.index, 1)
+              }
+            }}
+            disabled={!registeredForSource || registeredForDest}
+          >
+            {props.side === 'right' ? null : registeredForDest ? registeredIcon : <ArrowUpIcon />}
+            {registeredForDest ? 'Registered' : 'Register'}
+            {sourceItem && !registeredForDest && (
+              <Badge.Item item={sourceItem} showLabel backgroundColor="var(--gray-11)" />
+            )}
+            {props.side === 'left' ? null : registeredForDest ? registeredIcon : <ArrowUpIcon />}
+          </OhoButton>
+        </OhoFlex.RowCentered>
+      ) : (
+        <MessageRibbon
+          style={{ padding: '0.5rem', marginLeft: 'auto', marginRight: 'auto' }}
+          type="warning"
+        >
+          {sourceItem?.name} is a singleton in this game and cannot be transferred in.
+        </MessageRibbon>
+      )}
     </OhoFlex.Row>
   )
 }

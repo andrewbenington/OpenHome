@@ -1,0 +1,154 @@
+{
+  "encryption_constant": 2873985328,
+  "sanity": 0,
+  "checksum": 9362,
+  "species_form": {
+    "national_dex": 658,
+    "form_index": 0
+  },
+  "held_item_index": 0,
+  "trainer_id": 1000,
+  "secret_id": 44161,
+  "exp": 117360,
+  "ability_index": "Torrent",
+  "ability_num": "First",
+  "markings": {
+    "circle": "unset",
+    "square": "unset",
+    "triangle": "unset",
+    "heart": "unset",
+    "star": "unset",
+    "diamond": "unset"
+  },
+  "personality_value": 1565979198,
+  "nature": "Relaxed",
+  "is_fateful_encounter": false,
+  "gender": "Male",
+  "is_alpha": true,
+  "evs": {
+    "hp": 252,
+    "atk": 0,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 0
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "ribbons": ["Alpha Mark"],
+  "contest_memory_count": 0,
+  "battle_memory_count": 0,
+  "form_argument": 0,
+  "nickname": "Greninja",
+  "nickname_trash": "4700720065006E0069006E006A00610000000000000000000000",
+  "moves": [
+    {
+      "move_index": "Blizzard",
+      "pp": 5,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Night Slash",
+      "pp": 15,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Substitute",
+      "pp": 10,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Shadow Sneak",
+      "pp": 30,
+      "pp_ups": 0
+    }
+  ],
+  "relearn_moves": [
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E"
+  ],
+  "ivs": {
+    "hp": 31,
+    "atk": 26,
+    "def": 26,
+    "spa": 31,
+    "spd": 15,
+    "spe": 31
+  },
+  "is_egg": false,
+  "is_nicknamed": false,
+  "handler_name": "",
+  "handler_gender": "Male",
+  "is_current_handler": false,
+  "handler_friendship": 0,
+  "handler_memory": {
+    "intensity": 0,
+    "memory": 0,
+    "feeling": 0,
+    "textVariables": 0
+  },
+  "handler_id": 0,
+  "handler_language": "None",
+  "trainer_name": "Yoonah",
+  "trainer_friendship": 50,
+  "trainer_memory": {
+    "intensity": 0,
+    "memory": 0,
+    "feeling": 0,
+    "textVariables": 0
+  },
+  "egg_date": null,
+  "met_date": "8/16/2026",
+  "egg_location_index": 0,
+  "met_location_index": 273,
+  "ball": "Ultra",
+  "met_level": 50,
+  "trainer_gender": "Female",
+  "hyper_training": {
+    "hp": false,
+    "atk": false,
+    "def": false,
+    "spa": false,
+    "spd": false,
+    "spe": false
+  },
+  "game_of_origin": "LegendsZa",
+  "game_of_origin_battle": null,
+  "language": "English",
+  "status_condition": 0,
+  "stat_level": 50,
+  "stats": {
+    "hp": 179,
+    "atk": 113,
+    "def": 93,
+    "spa": 123,
+    "spd": 83,
+    "spe": 127
+  },
+  "level": 50,
+  "affixed_ribbon": null,
+  "height_scalar": 0,
+  "weight_scalar": 0,
+  "scale": 255,
+  "mint_nature": "Relaxed",
+  "home_tracker": null,
+  "tm_flags_base_game": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "tm_flags_dlc": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "plus_moves": {
+    "block_0xd6": [
+      0, 4, 8, 162, 0, 0, 128, 32, 32, 0, 4, 0, 0, 0, 0, 0, 136, 0, 0, 1, 0, 8, 0, 0, 0, 0, 0, 64,
+      0, 0, 0, 0, 0
+    ],
+    "block_0x94": [105, 0, 110, 0, 106, 0, 97, 0, 0, 0, 0, 0]
+  },
+  "current_hp": 179,
+  "obedience_level": 50
+}

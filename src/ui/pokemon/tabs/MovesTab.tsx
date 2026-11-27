@@ -2,7 +2,7 @@ import { PA8 } from '@openhome-core/pkm'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { getMoveMaxPP } from '@openhome-core/pkm/util'
-import { Moves } from '@openhome-core/resources'
+import { Move, Moves } from '@openhome-core/resources'
 import { FourMoves } from '@openhome-core/util/types'
 import { EditIcon } from '@openhome-ui/components/Icons'
 import OhoFlex from '@openhome-ui/components/OhoFlex'
@@ -33,14 +33,14 @@ export default function MovesTab(props: { mon: PKMInterface }) {
           <Separator />
         </Inset>
         <Flex className="pokemon-moves-card-content" direction="row" justify="between" gap="0.5rem">
-          {pendingMoves?.map((move, i) =>
+          {pendingMoves?.map((moveId, i) =>
             editing && mon instanceof OHPKM ? (
               <MoveSelect
                 key={`move_slot_${i}`}
                 currentMoveIds={pendingMoves}
                 learnedMoveIds={Array.from(mon.learnedMovesWasm)}
                 uniqueFieldId={`move_slot_${i}`}
-                value={move}
+                value={moveId}
                 onChange={async (moveId) => {
                   pendingMoves[i] = moveId ?? 0
                   setPendingMoves(pendingMoves)
@@ -49,14 +49,14 @@ export default function MovesTab(props: { mon: PKMInterface }) {
               />
             ) : (
               <MoveCard
-                key={`relearn-${i}-${move}`}
-                move={move}
+                key={`relearn-${i}-${moveId}`}
+                move={moveId}
                 movePP={mon.movePP[i]}
-                maxPP={getMoveMaxPP(move, mon.format, mon.movePPUps[i])}
+                maxPP={getMoveMaxPP(moveId, mon.format, mon.movePPUps[i])}
                 ppUps={mon.movePPUps[i]}
-                plusMove={mon.plusMoveFlags?.getMoveIds().some((id) => id === move)}
+                plusMove={mon.plusMovesLza?.some((m) => m.id === moveId)}
                 masteredLa={
-                  (mon instanceof PA8 || mon instanceof OHPKM) && mon.isMasteredMoveLa(move)
+                  (mon instanceof PA8 || mon instanceof OHPKM) && mon.isMasteredMoveLa(moveId)
                 }
               />
             )
@@ -75,8 +75,8 @@ export default function MovesTab(props: { mon: PKMInterface }) {
         </Flex>
       </div>
       {extraPokemonMoves(mon).map(
-        ({ label, moveIds }) =>
-          moveIds.length > 0 && (
+        ({ label, moves }) =>
+          moves.length > 0 && (
             <div key={label} className="pokemon-modal-card pokemon-moves-card">
               <h3 className="pokemon-moves-card-title">{label}</h3>
               <Inset side="x" p="0" mx="-2">
@@ -88,13 +88,13 @@ export default function MovesTab(props: { mon: PKMInterface }) {
                 justify="center"
                 gap="0.5rem"
               >
-                {moveIds.map((move, i) => (
+                {moves.map((move, i) => (
                   <MoveCard
-                    key={`relearn-${i}-${move}`}
-                    move={move}
+                    key={`relearn-${i}-${move.id}`}
+                    move={move.id}
                     noPP
-                    plusMove={mon instanceof OHPKM && mon.isPlusMove(move)}
-                    masteredLa={mon instanceof OHPKM && mon.isMasteredMoveLa(move)}
+                    plusMove={mon instanceof OHPKM && mon.isPlusMove(move.id)}
+                    masteredLa={mon instanceof OHPKM && mon.isMasteredMoveLa(move.id)}
                   />
                 ))}
               </Grid>
@@ -107,50 +107,41 @@ export default function MovesTab(props: { mon: PKMInterface }) {
 
 type ExtraPokemonMoves = {
   label: string
-  moveIds: number[]
+  moves: Move[]
 }
 
 function extraPokemonMoves(mon: PKMInterface): ExtraPokemonMoves[] {
   const extraMoves: ExtraPokemonMoves[] = []
 
-  function include(label: string, moveIds: number[]) {
-    extraMoves.push({ label, moveIds })
+  function include(label: string, moves: Move[]) {
+    extraMoves.push({ label, moves })
   }
 
   if (mon instanceof OHPKM) {
-    include('All Known Moves', Array.from(mon.learnedMovesWasm))
+    include(
+      'All Known Moves',
+      Array.from(mon.learnedMovesWasm).map((id) => Moves[id])
+    )
   }
 
-  if (mon.plusMoveFlags) {
-    include('Plus Moves', Array.from(mon.plusMoveFlags.getMoveIds()))
+  if (mon.plusMovesLza) {
+    include('Plus Moves', mon.plusMovesLza)
   }
 
   if (mon.tutorMovesLa) {
-    include(
-      'Tutor Moves (Legends Arceus)',
-      mon.tutorMovesLa.map((move) => move.id)
-    )
+    include('Tutor Moves (Legends Arceus)', mon.tutorMovesLa)
   }
 
   if (mon.tmMovesLza) {
-    include(
-      'TMs (Legends Z-A)',
-      mon.tmMovesLza.map((move) => move.id)
-    )
+    include('TMs (Legends Z-A)', mon.tmMovesLza)
   }
 
   if (mon.tmMovesSv) {
-    include(
-      'TMs (Scarlet/Violet)',
-      mon.tmMovesSv.map((move) => move.id)
-    )
+    include('TMs (Scarlet/Violet)', mon.tmMovesSv)
   }
 
   if (mon.trMovesSwSh) {
-    include(
-      'TRs (Sword/Shield)',
-      mon.trMovesSwSh.map((move) => move.id)
-    )
+    include('TRs (Sword/Shield)', mon.trMovesSwSh)
   }
 
   return extraMoves
