@@ -191,6 +191,7 @@ impl OhpkmConvert for PK2PolishedCrystal {
             form_argument_elapsed: 0,
             current_hp: 0,
             stats: Stats16Le::default(),
+            dvs: ohpkm.dvs(),
         };
 
         mon.stat_level = mon.calculate_level();

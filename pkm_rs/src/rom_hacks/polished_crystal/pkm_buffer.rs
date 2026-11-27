@@ -11,20 +11,13 @@ use arbitrary_int::u3;
 use arbitrary_int::u7;
 use pkm_rs_resources::abilities::AbilityIndexWasm;
 use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::moves::{MoveDataOffsets, MoveSlot, MoveSlots, PpUpStorage};
+use pkm_rs_resources::moves::{MoveDataOffsets, MoveSlots, PpUpStorage};
 use pkm_rs_resources::natures::NatureIndex;
-use pkm_rs_resources::ribbons::ModernRibbonSet;
 use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_types::strings::SizedUtf16String;
-use pkm_rs_types::{
-  AbilityNumber, BinaryGender, ContestStats, Gender, Geolocations, HyperTraining, Ivs,
-  MarkingsSixShapesColors, OriginGame, PokeDate, Pokerus, Stats8, TrainerMemory,
-};
-use pkm_rs_types::{Language, Stats16Le};
 use pkm_rs_types::{read_u16_le, read_u32_le};
-
-#[cfg(feature = "wasm")]
-use crate::encryption::BlockCrypto;
+use pkm_rs_types::{AbilityNumber, BinaryGender, Dvs, Gender, HyperTraining, Ivs, OriginGame, PokeDate, Pokerus, Stats8};
+use pkm_rs_types::{Language, Stats16Le};
 
 const CHECKSUM_OFFSET: usize = 6;
 const MOVE_DATA_OFFSETS: MoveDataOffsets = MoveDataOffsets {
@@ -60,6 +53,7 @@ enum Offset {
   HandlerFriendship,
   HandlerName,
   TrainerFriendship,
+  FormIndex,
 
   AbilityIndex = 9999,
   AbilityNum = 9998,
@@ -77,7 +71,6 @@ enum Offset {
   EggLocation = 9986,
   MetLocation = 9985,
   Ball = 9984,
-
 }
 
 impl From<Offset> for usize {
@@ -217,7 +210,6 @@ impl<S: AsRef<[u8]>> PK2PolishedCrystalBuffer<S> {
     self.bytes().len() == super::PARTY_SIZE
   }
 
-
   pub fn checksum(&self) -> u16 {
     self.get_u16_le(Offset::Checksum)
   }
@@ -226,17 +218,33 @@ impl<S: AsRef<[u8]>> PK2PolishedCrystalBuffer<S> {
     self.get_u16_le(Offset::NationalDex)
   }
 
+  pub fn form_index(&self) -> u16 {
+    self.get_u16_le(Offset::FormIndex)
+  }
 
+  pub fn encrypt(&self) {
+
+  }
+
+  pub fn decrypt(&self) {
+
+  }
+
+  pub fn decrypted(&mut self) -> &mut Self {
+    self
+  }
 
   pub fn species_and_form(&self) -> Result<PK2PolishedCrystalSpeciesAndForm> {
     let species_and_form = SpeciesForm::new(self.species_ndex(), self.form_index().into())?;
 
-    PK2PolishedCrystalSpeciesAndForm::try_new(species_and_form).ok_or(Error::form_index(species_and_form))
+    PK2PolishedCrystalSpeciesAndForm::try_new(species_and_form)
+      .ok_or(Error::form_index(species_and_form))
   }
 
   pub fn held_item_index(&self) -> u16 {
     self.get_u16_le(Offset::HeldItem)
   }
+
 
   pub fn trainer_id(&self) -> u16 {
     self.get_u16_le(Offset::TrainerId)
@@ -267,10 +275,6 @@ impl<S: AsRef<[u8]>> PK2PolishedCrystalBuffer<S> {
   }
 
 
-  pub fn markings(&self) -> MarkingsSixShapesColors {
-    MarkingsSixShapesColors::from_bytes(self.markings_raw())
-  }
-
   pub fn personality_value(&self) -> u32 {
     self.get_u32_le(Offset::PersonalityValue)
   }
@@ -282,8 +286,6 @@ impl<S: AsRef<[u8]>> PK2PolishedCrystalBuffer<S> {
   pub fn nature(&self) -> Result<NatureIndex> {
     Ok(NatureIndex::try_from(self.nature_raw())?)
   }
-
-
 
   pub fn gender(&self) -> Gender {
     todo!()
@@ -298,22 +300,10 @@ impl<S: AsRef<[u8]>> PK2PolishedCrystalBuffer<S> {
   }
 
 
-  pub fn contest(&self) -> ContestStats {
-    ContestStats::from_bytes(self.contest_raw())
-  }
-
 
   pub fn pokerus(&self) -> Pokerus {
     Pokerus::from_byte(self.get_u8(Offset::Pokerus))
   }
-
-
-
-  pub fn ribbons(&self) -> ModernRibbonSet<7, { super::MAX_RIBBON_ALOLA }> {
-    ModernRibbonSet::from_bytes(self.ribbons_raw())
-  }
-
-
 
 
 
@@ -330,19 +320,13 @@ impl<S: AsRef<[u8]>> PK2PolishedCrystalBuffer<S> {
   }
 
 
-  pub fn relearn_move(&self, idx: usize) -> MoveSlot {
-    MoveSlot::from_le_bytes(self.relearn_move_raw(idx))
-  }
-
-
 
   fn dvs_egg_nicknamed_raw(&self) -> [u8; 4] {
-
     todo!()
   }
 
   pub fn dvs(&self) -> Ivs {
-    Ivs::from_30_bits(self.ivs_egg_nicknamed_raw())
+    Ivs::from_30_bits(self.dvs_egg_nicknamed_raw())
   }
 
   pub fn is_egg(&self) -> bool {
@@ -374,28 +358,9 @@ impl<S: AsRef<[u8]>> PK2PolishedCrystalBuffer<S> {
   }
 
 
-  pub fn geolocations(&self) -> Geolocations {
-    Geolocations::from_bytes(self.geolocations_raw())
-  }
-
   pub fn handler_friendship(&self) -> u8 {
     todo!()
   }
-
-
-
-
-
-
-  pub fn handler_memory(&self) -> TrainerMemory {
-    TrainerMemory {
-      intensity: self.handler_memory_intensity(),
-      memory: self.handler_memory_memory(),
-      feeling: self.handler_memory_feeling(),
-      text_variable: self.handler_memory_text_variable(),
-    }
-  }
-
 
 
   fn trainer_name_raw(&self) -> [u8; 26] {
@@ -414,18 +379,6 @@ impl<S: AsRef<[u8]>> PK2PolishedCrystalBuffer<S> {
     todo!()
   }
 
-
-
-
-
-  pub fn trainer_memory(&self) -> TrainerMemory {
-    TrainerMemory {
-      intensity: self.trainer_memory_intensity(),
-      memory: self.trainer_memory_memory(),
-      text_variable: self.trainer_memory_text_variable(),
-      feeling: self.trainer_memory_feeling(),
-    }
-  }
 
   fn egg_date_raw(&self) -> [u8; 3] {
     self.get_array(Offset::EggDate)
@@ -491,9 +444,6 @@ impl<S: AsRef<[u8]>> PK2PolishedCrystalBuffer<S> {
     OriginGame::from(self.game_of_origin_raw())
   }
 
-
-
-
   fn language_raw(&self) -> u8 {
     self.get_u8(Offset::Language)
   }
@@ -509,9 +459,6 @@ impl<S: AsRef<[u8]>> PK2PolishedCrystalBuffer<S> {
   pub fn status_condition(&self) -> u32 {
     self.get_u32_le(Offset::StatusCondition)
   }
-
-
-
 
   pub fn current_hp(&self) -> u16 {
     self.get_u16_le(Offset::CurrentHp)
@@ -529,18 +476,8 @@ impl<S: AsRef<[u8]>> PK2PolishedCrystalBuffer<S> {
   // Encryption
   // ------------------------------------------------------------------
 
-  #[cfg(feature = "wasm")]
-  fn block_crypto(&self) -> BlockCrypto {
-    BlockCrypto::gen67(self.encryption_constant())
-  }
 
-  pub fn encrypted_copy(&self) -> Box<[u8]> {
-    self.block_crypto().to_encrypted_bytes(self.0.as_ref())
-  }
 
-  pub fn decrypted_copy(&self) -> Box<[u8]> {
-    self.block_crypto().to_decrypted_bytes(self.0.as_ref())
-  }
 }
 
 // ==================================================================
@@ -552,8 +489,6 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> PK2PolishedCrystalBuffer<S> {
   fn bytes_mut(&mut self) -> &mut [u8] {
     self.0.as_mut()
   }
-
-
 
   pub fn set_checksum(&mut self, v: u16) {
     self.set_u16_le(Offset::Checksum, v);
@@ -605,10 +540,6 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> PK2PolishedCrystalBuffer<S> {
   }
 
 
-  pub fn set_markings(&mut self, v: MarkingsSixShapesColors) {
-    self.set_markings_raw(&v.to_bytes());
-  }
-
   pub fn set_personality_value(&mut self, v: u32) {
     self.set_u32_le(Offset::PersonalityValue, v);
   }
@@ -622,7 +553,6 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> PK2PolishedCrystalBuffer<S> {
   }
 
   pub fn set_is_fateful_encounter(&mut self, v: bool) {
-
     todo!()
   }
 
@@ -639,24 +569,10 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> PK2PolishedCrystalBuffer<S> {
   }
 
 
-  pub fn set_contest(&mut self, v: ContestStats) {
-    self.set_contest_raw(&v.to_bytes());
-  }
-
 
   pub fn set_pokerus(&mut self, v: Pokerus) {
     self.set_u8(Offset::Pokerus, v.to_byte());
   }
-
-
-
-  pub fn set_ribbons(&mut self, v: ModernRibbonSet<7, { super::MAX_RIBBON_ALOLA }>) {
-    self.set_ribbons_raw(&v.to_bytes());
-  }
-
-
-
-
 
   fn set_nickname_raw(&mut self, v: &[u8; 26]) {
     self.set_array(Offset::Nickname, v);
@@ -670,22 +586,16 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> PK2PolishedCrystalBuffer<S> {
     v.write_spans(self.bytes_mut(), MOVE_DATA_OFFSETS, PpUpStorage::FourBytes);
   }
 
-
-  pub fn set_relearn_move(&mut self, idx: usize, v: MoveSlot) {
-    self.set_relearn_move_raw(idx, v.to_le_bytes());
-  }
-
-  pub fn set_dvs(&mut self, v: &Ivs) {
+  pub fn set_dvs(&mut self, v: &Dvs) {
     todo!()
   }
 
-  pub fn set_is_egg(&mut self, v: bool)
-  {
-  todo!()
+  pub fn set_is_egg(&mut self, v: bool) {
+    todo!()
   }
 
   pub fn set_is_nicknamed(&mut self, v: bool) {
-  todo!()
+    todo!()
   }
 
   fn set_handler_name_raw(&mut self, v: &[u8; 26]) {
@@ -708,15 +618,9 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> PK2PolishedCrystalBuffer<S> {
     self.set_flag(Offset::IsCurrentHandler, 0, v);
   }
 
-
-
   pub fn set_handler_friendship(&mut self, v: u8) {
     self.set_u8(Offset::HandlerFriendship, v);
   }
-
-
-
-
 
   fn set_trainer_name_raw(&mut self, v: &[u8; 26]) {
     self.set_array(Offset::TrainerName, v);
@@ -729,7 +633,6 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> PK2PolishedCrystalBuffer<S> {
   pub fn set_trainer_friendship(&mut self, v: u8) {
     self.set_u8(Offset::TrainerFriendship, v);
   }
-
 
   fn set_egg_date_raw(&mut self, v: [u8; 3]) {
     self.set_array(Offset::EggDate, &v);
@@ -796,9 +699,6 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> PK2PolishedCrystalBuffer<S> {
     self.set_game_of_origin_raw(v as u8);
   }
 
-
-
-
   fn set_language_raw(&mut self, v: u8) {
     self.set_u8(Offset::Language, v);
   }
@@ -815,9 +715,6 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> PK2PolishedCrystalBuffer<S> {
     self.set_u32_le(Offset::StatusCondition, v);
   }
 
-
-
-
   pub fn set_current_hp(&mut self, v: u16) {
     self.set_u16_le(Offset::CurrentHp, v);
   }
@@ -830,29 +727,6 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> PK2PolishedCrystalBuffer<S> {
     self.set_stats_raw(v.to_bytes());
   }
 
-  // ------------------------------------------------------------------
-  // Encryption
-  // ------------------------------------------------------------------
-
-  pub fn encrypt(&mut self) {
-    self.block_crypto().encrypt(self.0.as_mut());
-  }
-
-  pub fn decrypt(&mut self) {
-    self.block_crypto().decrypt(self.0.as_mut());
-  }
-
-  pub fn encrypted(&mut self) -> &mut Self {
-    self.block_crypto().encrypt(self.0.as_mut());
-
-    self
-  }
-
-  pub fn decrypted(&mut self) -> &mut Self {
-    self.block_crypto().decrypt(self.0.as_mut());
-
-    self
-  }
 }
 
 // ==================================================================

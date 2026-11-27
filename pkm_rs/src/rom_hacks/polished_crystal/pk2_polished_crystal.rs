@@ -16,10 +16,7 @@ use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
 use pkm_rs_resources::species::{FormMetadata, SpeciesForm, SpeciesMetadata};
 use pkm_rs_resources::stats;
 use pkm_rs_types::strings::SizedUtf16String;
-use pkm_rs_types::{
-  AbilityNumber, BinaryGender, ContestStats, HyperTraining, Ivs, Language,
-  MarkingsSixShapesColors, OriginGame, Pokerus, Stats8, Stats16Le, TryIntoTs, TsResult,
-};
+use pkm_rs_types::{AbilityNumber, BinaryGender, ContestStats, HyperTraining, Ivs, Language, MarkingsSixShapesColors, OriginGame, Pokerus, Stats8, Stats16Le, TryIntoTs, TsResult, Dvs};
 use pkm_rs_types::{Gender, Geolocations, PokeDate, TrainerMemory};
 use serde::Serialize;
 
@@ -40,7 +37,7 @@ use pkm_rs_types::randomize::Randomize;
 use crate::checksum::{Checksum, RefreshChecksum};
 
 #[cfg(feature = "wasm")]
-use crate::rom_hacks::polished_crystal::pk2_polished_crystal_buffer::{PK2PolishedCrystalBuffer, PK2PolishedCrystalBufferMut};
+use crate::rom_hacks::polished_crystal::pkm_buffer::{PK2PolishedCrystalBuffer, PK2PolishedCrystalBufferMut};
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = PK2PolishedCrystalWasm))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
@@ -130,12 +127,12 @@ pub struct PK2PolishedCrystal {
   #[cfg_attr(feature = "randomize", randomize(skip))]
   #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
   pub stats: Stats16Le,
+  pub dvs: Dvs
 }
 
 const MAX_RIBBON_ALOLA: usize = ModernRibbon::BattleTreeMaster as usize;
 
 #[cfg(feature = "wasm")]
-
 impl PK2PolishedCrystal {
   // ------------------------------------------------------------------
   // Deserialise from a PK2PolishedCrystalBuffer (the single source of all byte offsets)
@@ -143,57 +140,29 @@ impl PK2PolishedCrystal {
 
   pub fn from_buffer<S: AsRef<[u8]>>(buf: &PK2PolishedCrystalBuffer<S>) -> Result<Self> {
     let mut mon = PK2PolishedCrystal {
-      encryption_constant: buf.encryption_constant(),
-      sanity: buf.sanity(),
       checksum: buf.checksum(),
       species_and_form: buf.species_and_form()?,
       held_item_index: buf.held_item_index(),
       trainer_id: buf.trainer_id(),
-      secret_id: buf.secret_id(),
       exp: buf.exp(),
       ability_index: AbilityIndexBounded::try_from(buf.ability_index_raw())?,
       ability_num: buf.ability_num()?,
-      markings: buf.markings(),
       personality_value: buf.personality_value(),
       nature: buf.nature()?,
-      is_fateful_encounter: buf.is_fateful_encounter(),
       gender: buf.gender(),
       evs: buf.evs(),
-      contest: buf.contest(),
-      resort_event_status: buf.resort_event_status(),
       pokerus: buf.pokerus(),
-      super_training_flags: buf.super_training_flags(),
-      ribbons: buf.ribbons(),
-      contest_memory_count: buf.contest_memory_count(),
-      battle_memory_count: buf.battle_memory_count(),
-      super_training_dist_flags: buf.super_training_dist_flags(),
-      form_argument: buf.form_argument(),
       nickname: buf.nickname(),
       moves: buf.move_slots(),
-      relearn_moves: [
-        buf.relearn_move(0),
-        buf.relearn_move(1),
-        buf.relearn_move(2),
-        buf.relearn_move(3),
-      ],
-      secret_super_training_unlocked: buf.secret_super_training_unlocked(),
-      secret_super_training_complete: buf.secret_super_training_complete(),
-      ivs: buf.ivs(),
+
       is_egg: buf.is_egg(),
       is_nicknamed: buf.is_nicknamed(),
       handler_name: buf.handler_name(),
       handler_gender: buf.handler_gender(),
       is_current_handler: buf.is_current_handler(),
-      geolocations: buf.geolocations(),
       handler_friendship: buf.handler_friendship(),
-      handler_affection: buf.handler_affection(),
-      handler_memory: buf.handler_memory(),
-      fullness: buf.fullness(),
-      enjoyment: buf.enjoyment(),
       trainer_name: buf.trainer_name(),
       trainer_friendship: buf.trainer_friendship(),
-      trainer_affection: buf.trainer_affection(),
-      trainer_memory: buf.trainer_memory(),
       egg_date: buf.egg_date(),
       met_date: buf.met_date(),
       egg_location_index: buf.egg_location_index(),
@@ -203,10 +172,9 @@ impl PK2PolishedCrystal {
       trainer_gender: buf.trainer_gender(),
       hyper_training: buf.hyper_training(),
       game_of_origin: buf.game_of_origin(),
-      country: buf.country(),
-      region: buf.region(),
-      console_region: buf.console_region(),
-      language: buf.language()?,
+
+      // Only available in this language
+      language: Language::English,
       ..Default::default()
     };
 
@@ -216,62 +184,35 @@ impl PK2PolishedCrystal {
 
     if buf.is_party() {
       mon.status_condition = buf.status_condition();
-      mon.form_argument_remain = buf.form_argument_remain();
-      mon.form_argument_elapsed = buf.form_argument_elapsed();
     }
 
     Ok(mon)
   }
 
   pub fn write_to_box_buffer(&self, buf: &mut PK2PolishedCrystalBufferMut) {
-    buf.set_encryption_constant(self.encryption_constant);
-    buf.reset_sanity();
     buf.set_species_and_form(self.species_and_form.0);
     buf.set_held_item_index(self.held_item_index);
     buf.set_trainer_id(self.trainer_id);
-    buf.set_secret_id(self.secret_id);
     buf.set_exp(self.exp);
     buf.set_ability_index(self.ability_index);
     buf.set_ability_num(self.ability_num);
-    buf.set_markings(self.markings);
     buf.set_personality_value(self.personality_value);
     buf.set_nature(self.nature);
     buf.set_gender(self.gender);
     buf.set_is_fateful_encounter(self.is_fateful_encounter);
     buf.set_evs(self.evs);
-    buf.set_contest(self.contest);
-    buf.set_resort_event_status(self.resort_event_status);
     buf.set_pokerus(self.pokerus);
-    buf.set_super_training_flags(self.super_training_flags);
-    buf.set_ribbons(self.ribbons);
-    buf.set_contest_memory_count(self.contest_memory_count);
-    buf.set_battle_memory_count(self.battle_memory_count);
-    buf.set_super_training_dist_flags(self.super_training_dist_flags);
-    buf.set_form_argument(self.form_argument);
     buf.set_nickname(&self.nickname);
     buf.set_move_slots(&self.moves);
-    buf.set_relearn_move(0, self.relearn_moves[0]);
-    buf.set_relearn_move(1, self.relearn_moves[1]);
-    buf.set_relearn_move(2, self.relearn_moves[2]);
-    buf.set_relearn_move(3, self.relearn_moves[3]);
-    buf.set_secret_super_training_unlocked(self.secret_super_training_unlocked);
-    buf.set_secret_super_training_complete(self.secret_super_training_complete);
-    buf.set_ivs(&self.ivs);
+    buf.set_dvs(&self.dvs);
     buf.set_is_egg(self.is_egg);
     buf.set_is_nicknamed(self.is_nicknamed);
     buf.set_handler_name(&self.handler_name);
     buf.set_handler_gender(self.handler_gender);
     buf.set_is_current_handler(self.is_current_handler);
-    buf.set_geolocations(self.geolocations);
     buf.set_handler_friendship(self.handler_friendship);
-    buf.set_handler_affection(self.handler_affection);
-    buf.set_handler_memory(self.handler_memory);
-    buf.set_fullness(self.fullness);
-    buf.set_enjoyment(self.enjoyment);
     buf.set_trainer_name(&self.trainer_name);
     buf.set_trainer_friendship(self.trainer_friendship);
-    buf.set_trainer_affection(self.trainer_affection);
-    buf.set_trainer_memory(self.trainer_memory);
     buf.set_egg_date(self.egg_date);
     buf.set_met_date(self.met_date);
     buf.set_egg_location_index(self.egg_location_index);
@@ -281,20 +222,13 @@ impl PK2PolishedCrystal {
     buf.set_trainer_gender(self.trainer_gender);
     buf.set_hyper_training(self.hyper_training);
     buf.set_game_of_origin(self.game_of_origin);
-    buf.set_country(self.country);
-    buf.set_region(self.region);
-    buf.set_console_region(self.console_region);
     buf.set_language(self.language);
-
     buf.refresh_checksum();
   }
 
   pub fn write_to_party_buffer(&self, buf: &mut PK2PolishedCrystalBufferMut) {
     self.write_to_box_buffer(buf);
     buf.set_status_condition(self.status_condition);
-    buf.set_stat_level(self.stat_level);
-    buf.set_form_argument_remain(self.form_argument_remain);
-    buf.set_form_argument_elapsed(self.form_argument_elapsed);
     buf.set_current_hp(self.current_hp);
     buf.set_stats(self.stats);
   }
@@ -341,7 +275,7 @@ impl PK2PolishedCrystal {
     )
       .unwrap_or_else(|| {
         panic!(
-          "pk2 has species/form present in ultra sun + moon: {:#?}",
+          "pk7 does not have species/form present in ultra sun + moon: {:#?}",
           self.species_and_form.0
         )
       })
@@ -367,9 +301,9 @@ impl PK2PolishedCrystal {
   pub fn is_empty_slot(bytes: &[u8]) -> bool {
     let mut owned = bytes.to_owned();
     let mut buffer = PK2PolishedCrystalBuffer::box_span_mut(&mut owned);
-    buffer.decrypt();
-
     buffer.species_ndex() == 0
+
+
   }
 }
 

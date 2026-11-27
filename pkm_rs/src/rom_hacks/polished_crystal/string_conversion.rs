@@ -1,5 +1,9 @@
 use std::collections::HashMap;
+use std::fmt::Error;
 use std::sync::LazyLock;
+
+
+
 
 static GAMEBOY_BYTE_CHAR_MAPPING: LazyLock<HashMap<u8, char>> = LazyLock::new(|| HashMap::from([
   (0x7fu8, ' '),

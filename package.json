@@ -95,6 +95,7 @@
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@types/better-sqlite3": "^9.6.0",
+    "@types/bson": "^4.2.4",
     "@types/crypto-js": "^4.2.2",
     "@types/mocha": "^10.0.10",
     "@types/node": "^26.6.6",

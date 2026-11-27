@@ -1,4 +1,4 @@
-use super::{array_utils, BoxIndex};
+use super::BoxIndex;
 use super::BoxSlot;
 use super::PK2PolishedCrystal;
 use super::BOX_COLS;
@@ -7,60 +7,71 @@ use super::BOX_ROWS;
 use super::BOX_SLOTS;
 use crate::result::{Error, Result};
 use crate::traits::PkmBytes;
-#[cfg(feature = "wasm")]
-use crate::{encryption, log};
 use arrayref::array_ref;
+use pkm_rs_types::read_u16_le;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::OriginGame;
-use pkm_rs_types::{read_u16_be, BinaryGender, BoundViolated};
-use pkm_rs_types::read_u16_le;
+use pkm_rs_types::{BinaryGender, BoundViolated};
+use std::collections::HashMap;
+use std::sync::LazyLock;
 
 use serde::Serialize;
 
+use crate::log;
+#[cfg(feature = "wasm")]
+use crate::rom_hacks::polished_crystal::pkm_buffer::PK2PolishedCrystalBuffer;
+pub(crate) use crate::rom_hacks::polished_crystal::trainer_data::TrainerDataGen2PolishedCrystal;
+use crate::rom_hacks::polished_crystal::trainer_data::{POLISHED_CRYSTAL_TRAINER_DATA_OFFSET, TRAINER_DATA_SIZE};
 use crate::traits::OhpkmV2;
 use tsify::Ts;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
-use array_utils::with_sized;
 use BinaryGender::Male;
-
-#[cfg(feature = "wasm")]
-use crate::rom_hacks::polished_crystal::pk2_polished_crystal_buffer::PK2PolishedCrystalBuffer;
-use crate::rom_hacks::polished_crystal::string_conversion::get_gb_char_from_byte;
+use crate::rom_hacks::polished_crystal::array_utils::as_sized_array;
 
 const POLISHED_CRYSTAL_SIZE_BYTES: usize = 32_816;
 
 const POLISHED_CRYSTAL_SAVE_VERSION_INFO_OFFSET: usize = 3_042;
 
-const POLISHED_CRYSTAL_TRAINER_DATA_OFFSET: usize = 4616;
+const POLISHED_CRYSTAL_BOX_METADATA_OFFSET: usize = 0x2f20;
+const POLISHED_CRYSTAL_BOX_NAMES_OFFSET: usize = 13176;
 
-const TRAINER_ID_SUB_OFFSET: usize = 0;
-const TRAINER_NAME_SUB_OFFSET: usize = 3;
-const TRAINER_NAME_SUB_END_OFFSET: usize = 10;
-const TRAINER_GENDER_SUB_OFFSET: usize = 2;
+const POLISHED_CRYSTAL_NUM_BOXES : u8 = 20;
 
-const TRAINER_DATA_SIZE: usize = 10;
+const BOX_NAME_BYTE_LENGTH: usize = 9;
 
-const NON_BINARY_GENDER_BYTE: u8 = 2;
-
-const POLISHED_CRYSTAL_BOX_DATA_OFFSET: usize = 300;
-const POLISHED_CRYSTAL_BOX_NAMES_OFFSET: usize = 300;
-
-const POLISHED_CRYSTAL_NUM_BOXES : usize = 20;
-
-const BOX_DATA_SIZE: usize = 300;
-const BOX_NAME_BYTE_LENGTH: usize = 300;
+const BOX_MON_DATA_SIZE : usize = 49;
+const BOX_SIZE : usize = 33;
 
 const POLISHED_CRYSTAL_SAVE_VERSION_INFO_SIZE: usize = 2;
 
 type BoxName = SizedUtf16String<BOX_NAME_BYTE_LENGTH>;
 
+const NATIONAL_DEX_BYTE : usize = 0;
 #[cfg(feature = "wasm")]
-const POLISHED_CRYSTAL_PC_CHECKSUM_OFFSET: usize = 300;
+const POLISHED_CRYSTAL_PC_CHECKSUM_OFFSET: usize = 11533;
 
 #[derive(Serialize, Debug)]
 enum SaveType {
   PolishedCrystal,
+}
+
+static BOX_MON_SECTOR_ADDRESSES: LazyLock<HashMap<&str, usize>> = LazyLock::new(|| HashMap::from([
+  ("sBoxMons1A", 16384),
+  ("sBoxMons1B", 0),
+  ("sBoxMons1C", 13836),
+  ("sBoxMons2A", 24576),
+  ("sBoxMons2B", 3057),
+  ("sBoxMons2C", 14424),
+]));
+
+pub fn get_box_sector_address(sector_name : &str) -> Result<usize> {
+  let map: HashMap<&str, usize> = BOX_MON_SECTOR_ADDRESSES.clone();
+  if map.contains_key(sector_name) {
+    Ok(map[sector_name])
+  } else {
+    Err(Error::other(&format!("No mapping found for sector \"{}\"", sector_name)))
+  }
 }
 
 #[cfg(feature = "wasm")]
@@ -79,15 +90,16 @@ impl SaveType {
 
   const fn box_data_offset(&self) -> usize {
     match self {
-      SaveType::PolishedCrystal => POLISHED_CRYSTAL_BOX_DATA_OFFSET,
+      SaveType::PolishedCrystal => POLISHED_CRYSTAL_BOX_METADATA_OFFSET,
     }
   }
 
+  /**
+  Return the address of the metadata for the Pokémon at the given box and slot.
+  */
   #[cfg(feature = "wasm")]
   const fn mon_byte_offset(&self, box_index: BoxIndex, box_slot: BoxSlot) -> usize {
-    let box_offset = self.box_data_offset()
-      + box_index.to_usize() * BOX_SLOTS as usize * (PK2PolishedCrystal::BOX_SIZE);
-    box_offset + box_slot.to_usize() * PK2PolishedCrystal::BOX_SIZE
+    POLISHED_CRYSTAL_BOX_METADATA_OFFSET + (box_slot.get() as usize * BOX_SIZE) + box_index.get() as usize
   }
 
   #[cfg(feature = "wasm")]
@@ -118,16 +130,18 @@ impl Gen2PolishedCrystalSave {
   fn from_bytes_for_type(bytes: &[u8], save_type: SaveType) -> Result<Self> {
     if bytes.len() < save_type.file_size_bytes() {
       Err(Error::buffer_size_with_source(
-        "The loaded Gen 2 Polished Crystal save file did not have the right expected size!",
+        "The loaded Gen 2 Pol\
+        ished Crystal save file did not have the right expected size!",
         save_type.file_size_bytes(),
         bytes.len(),
       ))
     } else {
-      Ok(Self {
+      let mut result = Ok(Self {
         save_type,
         bytes: bytes.into(),
         size: bytes.len(),
-      })
+      });
+      result
     }
   }
 
@@ -137,18 +151,19 @@ impl Gen2PolishedCrystalSave {
 
   #[cfg(feature = "wasm")]
   pub fn prepare_bytes_for_saving(&self) -> Box<[u8]> {
-    let mut bytes = self.bytes.clone();
+    // let mut bytes = self.bytes.clone();
 
-    let pc_checksum_offset = self.save_type.pc_checksum_offset();
-    bytes[pc_checksum_offset..pc_checksum_offset + 2]
-      .copy_from_slice(&self.calc_checksum().to_le_bytes());
+    todo!("Do checksum calcs");
+    // let pc_checksum_offset = self.save_type.pc_checksum_offset();
+    // bytes[pc_checksum_offset..pc_checksum_offset + 2]
+    //   .copy_from_slice(&self.calc_checksum().to_le_bytes());
 
-    bytes
+    // bytes
   }
 
-  fn calculate_pc_checksum(&self) -> u16 {
-    encryption::crc16_ccitt_invert(&self.bytes, self.save_type.box_data_offset(), BOX_DATA_SIZE)
-  }
+  // fn calculate_pc_checksum(&self) -> u16 {
+  //   encryption::crc16_ccitt_invert(&self.bytes, self.save_type.box_data_offset(), BOX_DATA_SIZE)
+  // }
 
   fn get_trainer_data(&self) -> TrainerDataGen2PolishedCrystal {
     let offset = self.save_type.trainer_data_offset();
@@ -159,21 +174,23 @@ impl Gen2PolishedCrystalSave {
   }
 
   fn copy_pokemon_bytes_to(&mut self, box_index: BoxIndex, box_slot: BoxSlot, data: &[u8]) {
+
+
+
     let byte_offset = self.save_type.mon_byte_offset(box_index, box_slot);
     self.bytes[byte_offset..byte_offset + PK2PolishedCrystal::BOX_SIZE].copy_from_slice(data);
+
+    todo!("Must perform a special calculation to get the address of the stored mon.")
   }
 
-  fn get_mon_bytes_raw(&self, box_index: BoxIndex, box_slot: BoxSlot) -> &[u8] {
-    let byte_offset = self.save_type.mon_byte_offset(box_index, box_slot);
-    &self.bytes[byte_offset..byte_offset + PK2PolishedCrystal::BOX_SIZE]
+  fn get_mon_bytes_raw(&self, _box_index: BoxIndex, _box_slot: BoxSlot) -> &[u8] {
+
+    // After getting all the metadata for a Pokémon, extract the by
+
+    todo!("Mons are stored differently so this needs to be redone");
   }
 
-  fn get_mon_bytes_decrypted(&self, box_index: BoxIndex, box_slot: BoxSlot) -> Box<[u8]> {
-    let mut copied_bytes = Box::from(self.get_mon_bytes_raw(box_index, box_slot));
-    PK2PolishedCrystalBuffer::box_span_mut(&mut copied_bytes).decrypt();
 
-    copied_bytes
-  }
 
   fn from_bytes(bytes: &[u8]) -> Result<Self> {
     match bytes.len() {
@@ -192,16 +209,73 @@ impl Gen2PolishedCrystalSave {
     box_index: BoxIndex,
     box_slot: BoxSlot,
   ) -> Result<Option<PK2PolishedCrystal>> {
-    let decrypted_bytes = self.get_mon_bytes_decrypted(box_index, box_slot);
-    let national_dex = read_u16_le!(decrypted_bytes, 8);
+
+    let bytes = self.bytes.clone();
+
+    // Get information on the address of the Pokémon, by looking up the information from an index
+    // in the save file.
+    let slot_index = box_slot.get();
+    let box_index_unwrapped = box_index.get();
+    let mon_metadata_index = bytes[POLISHED_CRYSTAL_BOX_METADATA_OFFSET +
+      (33u8 * box_index_unwrapped + slot_index) as usize];
+
+    if mon_metadata_index == 0 {
+      return Ok(None);
+    }
+
+    let mon_flag = (bytes[POLISHED_CRYSTAL_BOX_METADATA_OFFSET + (33usize * box_index_unwrapped as usize)
+      + 20usize + (slot_index / 8) as usize] >> (slot_index % 8)) & 1;
+
+    let mon_flag_number = if mon_flag == 0 { 1} else {2};
+    let mon_block_name = match mon_metadata_index {
+      ..167 => 'A',
+      167..195 => 'B',
+        _ => 'C'
+    };
+
+    let sector_name = format!("sBoxMons{}{}", mon_flag_number, mon_block_name);
+    let result = get_box_sector_address(&*sector_name);
+    let mut address = bytes[result?] as usize;
+
+    if mon_block_name == 'A' {
+      address += bytes[mon_metadata_index as usize] as usize * 49usize;
+    } else if mon_block_name == 'B' {
+      address += (bytes[mon_metadata_index as usize] - 167) as usize * 49usize;
+    } else {
+      address += (bytes[mon_metadata_index as usize] - 195) as usize * 49usize;
+    }
+
+    let mon_address = address as usize;
+    let mon_bytes : [u8 ; BOX_MON_DATA_SIZE] = *as_sized_array::<49>(
+      &bytes[mon_address..mon_address + BOX_MON_DATA_SIZE]);
+
+    let national_dex = read_u16_le!(mon_bytes, NATIONAL_DEX_BYTE);
 
     if national_dex > 0 {
-      PK2PolishedCrystal::from_bytes(&decrypted_bytes)
+      PK2PolishedCrystal::from_bytes(&mon_bytes)
         .map(Some)
         .inspect_err(|err| log!("malformed pkm at box {box_index}, slot {box_slot}: {err}"))
     } else {
       Ok(None)
     }
+
+
+    // let decrypted_bytes = self.get_mon_bytes_decrypted(box_index, box_slot);
+    //
+    // let has_mon = Self::slot_has_mon(&decrypted_bytes);
+    //
+    // if has_mon {
+    //   PK2PolishedCrystal::from_bytes(&decrypted_bytes)
+    //     .map(Some)
+    //     .inspect_err(|err| log!("malformed pkm at box {box_index}, slot {box_slot}: {err}"))
+    // } else {
+    //   Ok(None)
+    // }
+  }
+
+  fn slot_has_mon(decrypted_bytes: &Box<[u8]>) -> bool {
+    let national_dex = read_u16_le!(decrypted_bytes, 0);
+    national_dex > 0
   }
 
   fn set_mon_at(
@@ -222,21 +296,14 @@ impl Gen2PolishedCrystalSave {
     self.copy_pokemon_bytes_to(box_index, box_slot, &mon_bytes);
 
     // refresh pc checksum
-    let checksum_offset = self.save_type.pc_checksum_offset();
-    let calculated_checksum = self.calculate_pc_checksum();
-    self.bytes[checksum_offset..checksum_offset + 2]
-      .copy_from_slice(&calculated_checksum.to_le_bytes());
+    // let checksum_offset = self.save_type.pc_checksum_offset();
+    // let calculated_checksum = self.calculate_pc_checksum();
+    // self.bytes[checksum_offset..checksum_offset + 2]
+    //   .copy_from_slice(&calculated_checksum.to_le_bytes());
   }
 
-  fn box_name(&self, box_index: BoxIndex) -> BoxName {
-    let start =
-      self.save_type.box_names_offset() + BOX_NAME_BYTE_LENGTH * box_index.get() as usize;
-    let end = start + BOX_NAME_BYTE_LENGTH;
-    let name_bytes: [u8; BOX_NAME_BYTE_LENGTH] = self.bytes[start..end]
-      .try_into()
-      .expect("end should be exactly BOX_NAME_BYTE_LENGTH after start");
-
-    SizedUtf16String::from_bytes(name_bytes)
+  fn box_name(&self, _box_index: BoxIndex) -> BoxName {
+    todo!()
   }
 
   pub fn box_mon_count(&self, box_index: BoxIndex) -> usize {
@@ -263,11 +330,7 @@ impl Gen2PolishedCrystalSave {
   }
 
   fn current_pc_box_idx(&self) -> usize {
-    if self.bytes[0] >= POLISHED_CRYSTAL_NUM_BOXES {
-      0
-    } else {
-      self.bytes[0].into()
-    }
+    if self.bytes[0] >= POLISHED_CRYSTAL_NUM_BOXES { 0 } else { self.bytes[0].into() }
   }
 
   fn is_save(bytes: &[u8]) -> bool {
@@ -287,6 +350,8 @@ impl Gen2PolishedCrystalSave {
     matches!(origin, OriginGame::Crystal)
   }
 }
+
+
 
 #[cfg(feature = "wasm")]
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_class = Gen2PolishedCrystalSaveRust))]
@@ -345,10 +410,11 @@ impl Gen2PolishedCrystalSave {
     Self::from_bytes(&bytes)
   }
 
-  #[wasm_bindgen]
-  pub fn calc_checksum(&self) -> u16 {
-    encryption::crc16_ccitt_invert(&self.bytes, self.save_type.box_data_offset(), BOX_DATA_SIZE)
-  }
+
+  // #[wasm_bindgen]
+  // pub fn calc_checksum(&self) -> u16 {
+  //   encryption::crc16_ccitt_invert(&self.bytes, self.save_type.box_data_offset(), BOX_DATA_SIZE)
+  // }
 
   #[wasm_bindgen(js_name = isValidSave)]
   pub fn is_valid_save_wasm(bytes: &[u8]) {
@@ -443,79 +509,6 @@ impl Gen2PolishedCrystalSave {
   }
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Default, Debug, Serialize, Clone, Copy)]
-pub struct TrainerDataGen2PolishedCrystal {
-  pub trainer_id: u16,
-  pub trainer_gender: BinaryGender,
-  #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-  pub trainer_name: SizedUtf16String<26>,
-  pub is_non_binary: bool,
-}
-
-impl TrainerDataGen2PolishedCrystal {
-  fn from_bytes(block_bytes: &[u8; TRAINER_DATA_SIZE]) -> Self {
-
-    let trainer_id = read_u16_be!(block_bytes, TRAINER_ID_SUB_OFFSET);
-
-    // Trainer name stuff
-    let trainer_name_arr = with_sized::<7>(&block_bytes[
-      TRAINER_NAME_SUB_OFFSET..TRAINER_NAME_SUB_END_OFFSET]);
-    let trainer_name = Self::parse_gb_name(trainer_name_arr);
-
-
-    // Polished Crystal supports non-binary genders. To store this knowledge without altering
-    // the existing BinaryGender structs (ugh!), we store a separate is_non_binary flag to
-    // track if the player is non-binary.
-    let gender_byte = block_bytes[TRAINER_GENDER_SUB_OFFSET];
-    let trainer_gender = if gender_byte != NON_BINARY_GENDER_BYTE {
-      BinaryGender::from_byte(gender_byte)
-    } else {
-      Male
-    };
-
-    Self {
-      trainer_id,
-      trainer_gender,
-      trainer_name,
-      is_non_binary: gender_byte == 2,
-    }
-  }
-
-  fn parse_gb_name(name_arr: &[u8; 7]) -> SizedUtf16String<26> {
-
-    // Note that we call get_gb_char_from_byte() when processing the stored name, since
-    // player names in Game Boy games have a different mapping to Latin characters than
-    // other main series games.
-    let vec_char : Vec<char> = name_arr
-      .iter()
-      .map(|x| get_gb_char_from_byte(x))
-      .collect();
-    let name_as_string : String = vec_char.iter().cloned().collect::<String>();
-
-    SizedUtf16String::from(name_as_string.as_str())
-  }
-
-  // fn to_bytes(self) -> [u8; TRAINER_DATA_SIZE] {
-  //     let mut bytes = [0u8; TRAINER_DATA_SIZE];
-  //     bytes[0..2].copy_from_slice(&self.trainer_id.to_le_bytes());
-  //     bytes[2..4].copy_from_slice(&self.secret_id.to_le_bytes());
-  //     bytes[4] = self.game_code;
-  //     util::set_flag(&mut bytes, 5, 0, self.trainer_gender);
-  //     bytes[56..80].copy_from_slice(&self.trainer_name.bytes());
-  //     bytes
-  // }
-}
-
-#[cfg(feature = "wasm")]
-#[wasm_bindgen]
-#[allow(clippy::missing_const_for_fn)]
-impl TrainerDataGen2PolishedCrystal {
-  #[wasm_bindgen]
-  pub fn get_name_wasm(&self) -> String {
-    self.trainer_name.to_string()
-  }
-}
 #[cfg(feature = "wasm")]
 #[cfg(test)]
 mod tests {
