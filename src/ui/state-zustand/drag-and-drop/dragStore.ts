@@ -7,7 +7,9 @@ import { useSaves } from '@openhome-ui/state/saves'
 import { useCallback } from 'react'
 import { create } from 'zustand'
 
-export const useDragStore = create<{ payload?: DragPayload; overId?: string }>(() => ({}))
+type DragState = { payload?: DragPayload; overId?: string }
+
+export const useDragStore = create<DragState>(() => ({}))
 
 export const useIsDraggingActive = () => useDragStore((s) => Boolean(s.payload))
 

@@ -1,6 +1,10 @@
+// input device state
+
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { SAV } from '@openhome-core/save/interfaces'
 import { Dispatch, Reducer, createContext } from 'react'
+import { create } from 'zustand'
+import { DragPayload } from '../state/drag-and-drop'
 
 type DragSource = {
   save: SAV
@@ -70,3 +74,5 @@ export const MouseContext = createContext<[MouseState, Dispatch<MouseAction>]>([
   initialState,
   () => null,
 ])
+
+export const useControlState = create<{ payload?: DragPayload; overId?: string }>(() => ({}))
