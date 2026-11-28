@@ -40,8 +40,8 @@ impl IsShiny for CompassPk9 {
 }
 
 impl PkmBytes for CompassPk9 {
-    const BOX_SIZE: usize = Pk9::BOX_SIZE;
-    const PARTY_SIZE: usize = Pk9::BOX_SIZE;
+    const BOX_MON_SIZE: usize = Pk9::BOX_MON_SIZE;
+    const PARTY_MON_SIZE: usize = Pk9::BOX_MON_SIZE;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
         Pk9::from_bytes(bytes).map(Self)

@@ -108,7 +108,7 @@ impl StatAbbr {
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "toStat"))]
-    pub fn to_stat(abbr: &str) -> Option<Stat> {
+    pub fn convert_to_stat(abbr: &str) -> Option<Stat> {
         match abbr {
             "HP" => Some(Stat::Hp),
             "Atk" => Some(Stat::Attack),
@@ -587,6 +587,7 @@ impl StatsPreSplit {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, serde::Serialize, serde::Deserialize)]
 pub struct Dvs(u16);
 
+
 impl Dvs {
     pub const fn zero() -> Self {
         Self(0)
@@ -679,7 +680,7 @@ impl Dvs {
     }
 
     const fn make_shiny(self) -> Self {
-        let mut atk = (self.get_atk().saturating_sub(1)).div_ceil(2);
+        let mut atk = self.get_atk().saturating_sub(1).div_ceil(2);
         if atk & 0b11 == 0b01 {
             atk += 1;
         } else if atk.is_multiple_of(4) {
@@ -723,6 +724,8 @@ impl Dvs {
             dvs
         }
     }
+
+
 }
 
 const fn u2_offset_one_bit(value: u16) -> u16 {
@@ -859,6 +862,8 @@ impl ContestStats {
             self.sheen,
         ]
     }
+
+
 }
 
 #[cfg_attr(feature = "randomize", derive(Randomize))]
@@ -913,3 +918,4 @@ mod tests {
         assert_eq!(Dvs::from_ivs(&Ivs::zero(), false, None), Dvs::zero());
     }
 }
+

@@ -188,7 +188,7 @@ impl std::ops::Deref for BoxData {
 
 const_assert_eq!(
     std::mem::offset_of!(BoxDataInner, ride_legendary_bytes),
-    MAX_BOX_COUNT as usize * BOX_SLOTS as usize * Pk9::BOX_SIZE
+    MAX_BOX_COUNT as usize * BOX_SLOTS as usize * Pk9::BOX_MON_SIZE
 );
 
 #[derive(Debug, Clone)]

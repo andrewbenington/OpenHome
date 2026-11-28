@@ -73,8 +73,8 @@ impl SaveType {
 
     const fn mon_byte_offset(&self, box_index: BoxIndex, box_slot: BoxSlot) -> usize {
         let box_offset =
-            self.box_data_offset() + box_index.to_usize() * BOX_SLOTS as usize * (Pk7::BOX_SIZE);
-        box_offset + box_slot.to_usize() * Pk7::BOX_SIZE
+            self.box_data_offset() + box_index.to_usize() * BOX_SLOTS as usize * (Pk7::BOX_MON_SIZE);
+        box_offset + box_slot.to_usize() * Pk7::BOX_MON_SIZE
     }
 
     const fn pc_checksum_offset(&self) -> usize {
@@ -160,12 +160,12 @@ impl Gen7AlolaSave {
 
     fn copy_pokemon_bytes_to(&mut self, box_index: BoxIndex, box_slot: BoxSlot, data: &[u8]) {
         let byte_offset = self.save_type.mon_byte_offset(box_index, box_slot);
-        self.bytes[byte_offset..byte_offset + Pk7::BOX_SIZE].copy_from_slice(data);
+        self.bytes[byte_offset..byte_offset + Pk7::BOX_MON_SIZE].copy_from_slice(data);
     }
 
     fn get_mon_bytes_raw(&self, box_index: BoxIndex, box_slot: BoxSlot) -> &[u8] {
         let byte_offset = self.save_type.mon_byte_offset(box_index, box_slot);
-        &self.bytes[byte_offset..byte_offset + Pk7::BOX_SIZE]
+        &self.bytes[byte_offset..byte_offset + Pk7::BOX_MON_SIZE]
     }
 
     fn get_mon_bytes_decrypted(&self, box_index: BoxIndex, box_slot: BoxSlot) -> Box<[u8]> {

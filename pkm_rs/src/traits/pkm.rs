@@ -26,9 +26,9 @@ pub trait MaybeHasSpeciesAndForm: Pkm {
 }
 
 pub trait PkmBytes: Sized {
-    const BOX_SIZE: usize;
+    const BOX_MON_SIZE: usize;
     // if not specified, assume box/party representation is the same (as is the case for gen 8+)
-    const PARTY_SIZE: usize = Self::BOX_SIZE;
+    const PARTY_MON_SIZE: usize = Self::BOX_MON_SIZE;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self>;
     fn write_box_bytes(&self, bytes: &mut [u8]);
@@ -39,12 +39,12 @@ pub trait PkmBytes: Sized {
     }
 
     fn to_box_bytes(&self) -> Box<[u8]> {
-        let mut bytes = vec![0u8; Self::BOX_SIZE];
+        let mut bytes = vec![0u8; Self::BOX_MON_SIZE];
         self.write_box_bytes(&mut bytes);
         bytes.into_boxed_slice()
     }
     fn to_party_bytes(&self) -> Box<[u8]> {
-        let mut bytes = vec![0u8; Self::PARTY_SIZE];
+        let mut bytes = vec![0u8; Self::PARTY_MON_SIZE];
         self.write_party_bytes(&mut bytes);
         bytes.into_boxed_slice()
     }

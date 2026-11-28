@@ -7,12 +7,13 @@ pub mod string_conversion;
 mod array_utils;
 mod trainer_data;
 pub mod boxes;
+pub mod abilities;
+pub mod dvs;
 
 use pkm_rs_resources::metadata_source::MetadataSource;
 
 pub use pk2_polished_crystal::*;
 use pkm_rs_resources;
-use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ribbons::ModernRibbon;
 use pkm_rs_resources::species::metadata_table::source_has_form_metadata;
 use pkm_rs_resources::species::SpeciesForm;
@@ -21,7 +22,7 @@ use pkm_rs_types::randomize::Randomize;
 
 use serde::Serialize;
 
-pub(crate) const BOX_SIZE: usize = 232;
+pub(crate) const BOX_SIZE: usize = 49;
 pub(crate) const PARTY_SIZE: usize = 260;
 
 pub const BOX_COUNT: u8 = 20;
@@ -32,7 +33,6 @@ pub const BOX_SLOTS: u8 = BOX_ROWS * BOX_COLS;
 const MAX_RIBBON_ALOLA: usize = ModernRibbon::BattleTreeMaster as usize;
 
 const NEUROFORCE: u16 = 233;
-pub type PK2PolishedCrystalAbilityIndex = AbilityIndexBounded<NEUROFORCE>;
 
 #[derive(Debug, Clone, Copy, Default)]
 #[cfg_attr(feature = "wasm", derive(tsify::Tsify))]

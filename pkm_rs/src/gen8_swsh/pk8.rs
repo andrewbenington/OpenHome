@@ -302,8 +302,8 @@ impl Pk8 {
     pub fn try_from_bytes(bytes: &[u8]) -> Result<Self> {
         let size = bytes.len();
         match size {
-            Self::BOX_SIZE => Self::from_buffer(&Pk8Buffer::new(bytes)),
-            _ => Err(Error::buffer_size(Self::BOX_SIZE, size)),
+            Self::BOX_MON_SIZE => Self::from_buffer(&Pk8Buffer::new(bytes)),
+            _ => Err(Error::buffer_size(Self::BOX_MON_SIZE, size)),
         }
     }
 
@@ -319,7 +319,7 @@ impl Pk8 {
     }
 
     pub fn calculate_checksum(&self) -> u16 {
-        let mut bytes = [0u8; Self::BOX_SIZE];
+        let mut bytes = [0u8; Self::BOX_MON_SIZE];
         self.write_box_bytes(&mut bytes);
         Pk8Buffer::new(&bytes).calculate_checksum()
     }
@@ -360,8 +360,8 @@ impl Pk8 {
 }
 
 impl PkmBytes for Pk8 {
-    const BOX_SIZE: usize = 344;
-    const PARTY_SIZE: usize = 344; // Party data is also stored in the PC now
+    const BOX_MON_SIZE: usize = 344;
+    const PARTY_MON_SIZE: usize = 344; // Party data is also stored in the PC now
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
         Self::try_from_bytes(bytes)
@@ -372,7 +372,7 @@ impl PkmBytes for Pk8 {
     }
 
     fn to_box_bytes(&self) -> Box<[u8]> {
-        let mut bytes = Box::new([0u8; Self::BOX_SIZE]);
+        let mut bytes = Box::new([0u8; Self::BOX_MON_SIZE]);
         self.write_box_bytes(bytes.as_mut_slice());
 
         bytes

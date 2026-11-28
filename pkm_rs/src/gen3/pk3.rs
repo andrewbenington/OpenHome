@@ -159,9 +159,9 @@ impl Pk3 {
     pub fn from_slot_bytes(mut bytes: Box<[u8]>) -> Result<Option<Self>> {
         let size = bytes.len();
         let buffer = match size {
-            Self::BOX_SIZE => Pk3Buffer::box_span(&bytes),
-            Self::PARTY_SIZE => Pk3Buffer::party_span(&bytes),
-            _ => return Err(Error::buffer_size(Self::BOX_SIZE, size)),
+            Self::BOX_MON_SIZE => Pk3Buffer::box_span(&bytes),
+            Self::PARTY_MON_SIZE => Pk3Buffer::party_span(&bytes),
+            _ => return Err(Error::buffer_size(Self::BOX_MON_SIZE, size)),
         };
 
         if buffer.gen3_species_index() == 0 {
@@ -215,9 +215,9 @@ impl Pk3 {
     pub fn try_from_bytes(bytes: &[u8]) -> Result<Self> {
         let size = bytes.len();
         match size {
-            Self::BOX_SIZE => Self::from_buffer(&Pk3Buffer::box_span(bytes)),
-            Self::PARTY_SIZE => Self::from_buffer(&Pk3Buffer::party_span(bytes)),
-            _ => Err(Error::buffer_size(Self::BOX_SIZE, size)),
+            Self::BOX_MON_SIZE => Self::from_buffer(&Pk3Buffer::box_span(bytes)),
+            Self::PARTY_MON_SIZE => Self::from_buffer(&Pk3Buffer::party_span(bytes)),
+            _ => Err(Error::buffer_size(Self::BOX_MON_SIZE, size)),
         }
     }
 
@@ -242,7 +242,7 @@ impl Pk3 {
     }
 
     pub fn calculate_checksum(&self) -> u16 {
-        let mut bytes = [0u8; Self::BOX_SIZE];
+        let mut bytes = [0u8; Self::BOX_MON_SIZE];
         self.write_box_bytes(&mut bytes);
         Pk3BufferRef::box_span(&bytes).calculate_checksum()
     }
@@ -304,8 +304,8 @@ impl Serialize for Pk3 {
 }
 
 impl PkmBytes for Pk3 {
-    const BOX_SIZE: usize = 80;
-    const PARTY_SIZE: usize = 100;
+    const BOX_MON_SIZE: usize = 80;
+    const PARTY_MON_SIZE: usize = 100;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
         Self::try_from_bytes(bytes)
@@ -322,14 +322,14 @@ impl PkmBytes for Pk3 {
     }
 
     fn to_box_bytes(&self) -> Box<[u8]> {
-        let mut bytes = Box::new([0u8; Self::BOX_SIZE]);
+        let mut bytes = Box::new([0u8; Self::BOX_MON_SIZE]);
         self.write_box_bytes(bytes.as_mut_slice());
 
         bytes
     }
 
     fn to_party_bytes(&self) -> Box<[u8]> {
-        let mut bytes = Box::new([0u8; Self::PARTY_SIZE]);
+        let mut bytes = Box::new([0u8; Self::PARTY_MON_SIZE]);
         self.write_party_bytes(bytes.as_mut_slice());
 
         bytes

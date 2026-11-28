@@ -296,9 +296,9 @@ impl Pk7 {
     pub fn try_from_bytes(bytes: &[u8]) -> Result<Self> {
         let size = bytes.len();
         match size {
-            Self::BOX_SIZE => Self::from_buffer(&Pk7Buffer::box_span(bytes)),
-            Self::PARTY_SIZE => Self::from_buffer(&Pk7Buffer::party_span(bytes)),
-            _ => Err(Error::buffer_size(Self::BOX_SIZE, size)),
+            Self::BOX_MON_SIZE => Self::from_buffer(&Pk7Buffer::box_span(bytes)),
+            Self::PARTY_MON_SIZE => Self::from_buffer(&Pk7Buffer::party_span(bytes)),
+            _ => Err(Error::buffer_size(Self::BOX_MON_SIZE, size)),
         }
     }
 
@@ -314,7 +314,7 @@ impl Pk7 {
     }
 
     pub fn calculate_checksum(&self) -> u16 {
-        let mut bytes = [0u8; Self::BOX_SIZE];
+        let mut bytes = [0u8; Self::BOX_MON_SIZE];
         self.write_box_bytes(&mut bytes);
         Pk7Buffer::box_span(&bytes).calculate_checksum()
     }
@@ -346,7 +346,7 @@ impl Pk7 {
     }
 
     pub fn empty_box_slot_bytes(trainer_name: &SizedUtf16String<26>) -> Box<[u8]> {
-        let mut bytes = Box::new([0u8; Self::BOX_SIZE]);
+        let mut bytes = Box::new([0u8; Self::BOX_MON_SIZE]);
         let mut buffer = Pk7BufferMut::box_span_mut(bytes.as_mut_slice());
 
         buffer.set_handler_name(trainer_name);
@@ -368,8 +368,8 @@ impl Pk7 {
 }
 
 impl PkmBytes for Pk7 {
-    const BOX_SIZE: usize = 232;
-    const PARTY_SIZE: usize = 260;
+    const BOX_MON_SIZE: usize = 232;
+    const PARTY_MON_SIZE: usize = 260;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
         Self::try_from_bytes(bytes)
@@ -386,14 +386,14 @@ impl PkmBytes for Pk7 {
     }
 
     fn to_box_bytes(&self) -> Box<[u8]> {
-        let mut bytes = Box::new([0u8; Self::BOX_SIZE]);
+        let mut bytes = Box::new([0u8; Self::BOX_MON_SIZE]);
         self.write_box_bytes(bytes.as_mut_slice());
 
         bytes
     }
 
     fn to_party_bytes(&self) -> Box<[u8]> {
-        let mut bytes = Box::new([0u8; Self::PARTY_SIZE]);
+        let mut bytes = Box::new([0u8; Self::PARTY_MON_SIZE]);
         self.write_party_bytes(bytes.as_mut_slice());
 
         bytes

@@ -1,13 +1,13 @@
 #![allow(unused_variables)]
 
-use super::{PK2PolishedCrystalAbilityIndex, PK2PolishedCrystalSpeciesAndForm};
+use super::PK2PolishedCrystalSpeciesAndForm;
 use crate::bytes::{AsBytes, AsBytesMut};
 
 #[cfg(feature = "wasm")]
 use crate::checksum::{Checksum, ChecksumU16Le, RefreshChecksum};
 use crate::result::{Error, Result};
+use crate::rom_hacks::polished_crystal::abilities::PolishedCrystalAbility;
 use crate::util;
-use arbitrary_int::u3;
 use arbitrary_int::u7;
 use pkm_rs_resources::abilities::AbilityIndexWasm;
 use pkm_rs_resources::ball::Ball;
@@ -15,20 +15,22 @@ use pkm_rs_resources::moves::{MoveDataOffsets, MoveSlots, PpUpStorage};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_types::strings::SizedUtf16String;
-use pkm_rs_types::{read_u16_le, read_u32_le};
-use pkm_rs_types::{AbilityNumber, BinaryGender, Dvs, Gender, HyperTraining, Ivs, OriginGame, PokeDate, Pokerus, Stats8};
+use pkm_rs_types::{
+  AbilityNumber, BinaryGender, Dvs, Gender, HyperTraining, OriginGame, PokeDate, Pokerus, Stats8,
+};
 use pkm_rs_types::{Language, Stats16Le};
+use pkm_rs_types::{read_u16_le, read_u32_le};
 
 const CHECKSUM_OFFSET: usize = 6;
 const MOVE_DATA_OFFSETS: MoveDataOffsets = MoveDataOffsets {
-  moves: 90,
-  pp: 98,
-  pp_ups: 102,
+  moves: 2,
+  pp: 22,
+  pp_ups: 22,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Offset {
-  NationalDex = 0,
+  SpeciesForm = 0,
   HeldItem = 1,
   Move1 = 2,
   Move2 = 3,
@@ -38,7 +40,6 @@ enum Offset {
   Exp = 8,
   Evs = 0x0B,
   Dvs = 0x11,
-  PersonalityValue = 0x14,
   PpUpData = 0x16,
   FriendshipOrEggCycles = 0x17,
   Pokerus = 0x18,
@@ -53,11 +54,8 @@ enum Offset {
   HandlerFriendship,
   HandlerName,
   TrainerFriendship,
-  FormIndex,
 
-  AbilityIndex = 9999,
-  AbilityNum = 9998,
-  Nature = 9997,
+  ShininessAbilityNature = 20,
   IsCurrentHandler = 9996,
   HandlerGender = 9995,
   GameOfOrigin = 9994,
@@ -71,6 +69,7 @@ enum Offset {
   EggLocation = 9986,
   MetLocation = 9985,
   Ball = 9984,
+  IsEgg = 21,
 }
 
 impl From<Offset> for usize {
@@ -93,6 +92,13 @@ pub type PK2PolishedCrystalBufferMut<'a> = PK2PolishedCrystalBuffer<&'a mut [u8]
 #[cfg(feature = "wasm")]
 #[derive(Default, Clone, Copy)]
 pub struct PK2PolishedCrystalBuffer<S: AsRef<[u8]>>(S);
+
+impl<S: AsRef<[u8]>> PK2PolishedCrystalBuffer<S> {
+  // todo!() Fix this
+  pub(crate) fn shininess(&self) -> bool {
+    self.get_u8(Offset::ShininessAbilityNature) == 1
+  }
+}
 
 // ------------------------------------------------------------------
 // Constructors — immutable
@@ -214,28 +220,27 @@ impl<S: AsRef<[u8]>> PK2PolishedCrystalBuffer<S> {
     self.get_u16_le(Offset::Checksum)
   }
 
-  pub fn species_ndex(&self) -> u16 {
-    self.get_u16_le(Offset::NationalDex)
+  pub fn species_ndex(&self) -> u8 {
+    self.get_u8(Offset::SpeciesForm)
   }
 
   pub fn form_index(&self) -> u16 {
-    self.get_u16_le(Offset::FormIndex)
+    self.get_u16_le(Offset::SpeciesForm)
   }
 
-  pub fn encrypt(&self) {
+  pub fn encrypt(&self) {}
 
-  }
-
-  pub fn decrypt(&self) {
-
-  }
+  pub fn decrypt(&self) {}
 
   pub fn decrypted(&mut self) -> &mut Self {
     self
   }
 
   pub fn species_and_form(&self) -> Result<PK2PolishedCrystalSpeciesAndForm> {
-    let species_and_form = SpeciesForm::new(self.species_ndex(), self.form_index().into())?;
+    let species = self.species_ndex();
+    let form = (self.get_u8(Offset::IsEgg) & 0x1f) - 1;
+
+    let species_and_form = SpeciesForm::new(species as u16, form as u16)?;
 
     PK2PolishedCrystalSpeciesAndForm::try_new(species_and_form)
       .ok_or(Error::form_index(species_and_form))
@@ -245,12 +250,12 @@ impl<S: AsRef<[u8]>> PK2PolishedCrystalBuffer<S> {
     self.get_u16_le(Offset::HeldItem)
   }
 
-
   pub fn trainer_id(&self) -> u16 {
     self.get_u16_le(Offset::TrainerId)
   }
 
   pub fn secret_id(&self) -> u16 {
+    // A placeholder value, due to the lack of secret ID's in Pokémon Polished Crystal.
     0u16
   }
 
@@ -259,31 +264,20 @@ impl<S: AsRef<[u8]>> PK2PolishedCrystalBuffer<S> {
   }
 
   pub fn ability_index_raw(&self) -> u8 {
-    self.get_u8(Offset::AbilityIndex)
+    self.get_u8(Offset::ShininessAbilityNature)
   }
 
   pub fn ability_index(&self) -> Result<AbilityIndexWasm> {
     Ok(AbilityIndexWasm::try_from(self.ability_index_raw())?)
   }
 
-  pub fn ability_num_raw(&self) -> u8 {
-    u3::extract_u8(self.get_u8(Offset::AbilityNum), 0).into()
-  }
-
-  pub fn ability_num(&self) -> Result<AbilityNumber> {
-    Ok(u3::extract_u8(self.get_u8(Offset::AbilityNum), 0).try_into()?)
-  }
-
-
-  pub fn personality_value(&self) -> u32 {
-    self.get_u32_le(Offset::PersonalityValue)
-  }
-
   pub fn nature_raw(&self) -> u8 {
-    self.get_u8(Offset::Nature)
+    // !todo() Peform the bit math to get the nature
+    self.get_u8(Offset::ShininessAbilityNature)
   }
 
   pub fn nature(&self) -> Result<NatureIndex> {
+    // !todo() Peform the bit math to get the nature
     Ok(NatureIndex::try_from(self.nature_raw())?)
   }
 
@@ -299,13 +293,9 @@ impl<S: AsRef<[u8]>> PK2PolishedCrystalBuffer<S> {
     Stats8::from_bytes(self.evs_raw())
   }
 
-
-
   pub fn pokerus(&self) -> Pokerus {
     Pokerus::from_byte(self.get_u8(Offset::Pokerus))
   }
-
-
 
   pub fn nickname_raw(&self) -> [u8; 26] {
     self.get_array(Offset::Nickname)
@@ -319,14 +309,12 @@ impl<S: AsRef<[u8]>> PK2PolishedCrystalBuffer<S> {
     MoveSlots::from_bytes(self.bytes(), MOVE_DATA_OFFSETS, PpUpStorage::FourBytes)
   }
 
-
-
   fn dvs_egg_nicknamed_raw(&self) -> [u8; 4] {
     todo!()
   }
 
-  pub fn dvs(&self) -> Ivs {
-    Ivs::from_30_bits(self.dvs_egg_nicknamed_raw())
+  pub fn dvs(&self) -> Dvs {
+    Dvs::from_bytes(&self.get_array::<2>(Offset::Dvs))
   }
 
   pub fn is_egg(&self) -> bool {
@@ -357,11 +345,9 @@ impl<S: AsRef<[u8]>> PK2PolishedCrystalBuffer<S> {
     self.get_flag(Offset::IsCurrentHandler, 0)
   }
 
-
   pub fn handler_friendship(&self) -> u8 {
     todo!()
   }
-
 
   fn trainer_name_raw(&self) -> [u8; 26] {
     self.get_array(Offset::TrainerName)
@@ -378,7 +364,6 @@ impl<S: AsRef<[u8]>> PK2PolishedCrystalBuffer<S> {
   pub fn trainer_affection(&self) -> u8 {
     todo!()
   }
-
 
   fn egg_date_raw(&self) -> [u8; 3] {
     self.get_array(Offset::EggDate)
@@ -475,9 +460,6 @@ impl<S: AsRef<[u8]>> PK2PolishedCrystalBuffer<S> {
   // ------------------------------------------------------------------
   // Encryption
   // ------------------------------------------------------------------
-
-
-
 }
 
 // ==================================================================
@@ -495,7 +477,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> PK2PolishedCrystalBuffer<S> {
   }
 
   pub fn set_species_ndex(&mut self, v: u16) {
-    self.set_u16_le(Offset::NationalDex, v);
+    self.set_u16_le(Offset::SpeciesForm, v);
   }
 
   pub fn set_form_index(&mut self, v: u8) {
@@ -524,28 +506,19 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> PK2PolishedCrystalBuffer<S> {
   }
 
   fn set_ability_index_raw(&mut self, v: u8) {
-    self.set_u8(Offset::AbilityIndex, v);
+    self.set_u8(Offset::ShininessAbilityNature, v);
   }
 
-  pub fn set_ability_index(&mut self, v: PK2PolishedCrystalAbilityIndex) {
+  pub fn set_ability_index(&mut self, v: PolishedCrystalAbility) {
     self.set_ability_index_raw(u8::from(v));
-  }
-
-  fn set_ability_num_raw(&mut self, v: u8) {
-    self.set_u8(Offset::AbilityNum, v);
   }
 
   pub fn set_ability_num(&mut self, v: AbilityNumber) {
     self.set_ability_num_raw(v.to_byte());
   }
 
-
-  pub fn set_personality_value(&mut self, v: u32) {
-    self.set_u32_le(Offset::PersonalityValue, v);
-  }
-
   fn set_nature_raw(&mut self, v: u8) {
-    self.set_u8(Offset::Nature, v);
+    self.set_u8(Offset::ShininessAbilityNature, v);
   }
 
   pub fn set_nature(&mut self, v: NatureIndex) {
@@ -567,8 +540,6 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> PK2PolishedCrystalBuffer<S> {
   pub fn set_evs(&mut self, v: Stats8) {
     self.set_evs_raw(&v.to_bytes());
   }
-
-
 
   pub fn set_pokerus(&mut self, v: Pokerus) {
     self.set_u8(Offset::Pokerus, v.to_byte());
@@ -726,7 +697,6 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> PK2PolishedCrystalBuffer<S> {
   pub fn set_stats(&mut self, v: Stats16Le) {
     self.set_stats_raw(v.to_bytes());
   }
-
 }
 
 // ==================================================================

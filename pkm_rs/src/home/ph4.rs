@@ -253,7 +253,7 @@ impl Ph4 {
 }
 
 impl PkmBytes for Ph4 {
-    const BOX_SIZE: usize = super::PH4_PKM_MAX_SIZE;
+    const BOX_MON_SIZE: usize = super::PH4_PKM_MAX_SIZE;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
         Self::from_bytes(bytes)
@@ -394,7 +394,7 @@ impl PkmBytes for Ph4 {
     }
 
     fn to_box_bytes(&self) -> Box<[u8]> {
-        let mut bytes = Box::new([0u8; Self::BOX_SIZE]);
+        let mut bytes = Box::new([0u8; Self::BOX_MON_SIZE]);
         self.write_box_bytes(bytes.as_mut_slice());
 
         bytes

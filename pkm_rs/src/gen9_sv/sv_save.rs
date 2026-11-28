@@ -123,7 +123,7 @@ impl ScarletVioletSave {
         // ensure moving a Pokémon from a save slot in OpenHome such that
         // its previous slot is made empty does not result in a Bad Egg
         // being left in the slot
-        let mut bytes = Box::new([0u8; Pk9::BOX_SIZE]);
+        let mut bytes = Box::new([0u8; Pk9::BOX_MON_SIZE]);
         let mut buffer = Pk9Buffer::new_mut(bytes.as_mut_slice());
 
         buffer.refresh_checksum();

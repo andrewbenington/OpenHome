@@ -34,7 +34,7 @@ const POLISHED_CRYSTAL_SIZE_BYTES: usize = 32_816;
 
 const POLISHED_CRYSTAL_SAVE_VERSION_INFO_OFFSET: usize = 3_042;
 
-const POLISHED_CRYSTAL_BOX_METADATA_OFFSET: usize = 0x2f20;
+const POLISHED_CRYSTAL_BOX_METADATA_OFFSET: usize = 13176;
 const POLISHED_CRYSTAL_BOX_NAMES_OFFSET: usize = 13176;
 
 const POLISHED_CRYSTAL_NUM_BOXES: u8 = 20;
@@ -183,7 +183,7 @@ impl Gen2PolishedCrystalSave {
 
   fn copy_pokemon_bytes_to(&mut self, box_index: BoxIndex, box_slot: BoxSlot, data: &[u8]) {
     let byte_offset = self.save_type.mon_byte_offset(box_index, box_slot);
-    self.bytes[byte_offset..byte_offset + PK2PolishedCrystal::BOX_SIZE].copy_from_slice(data);
+    self.bytes[byte_offset..byte_offset + PK2PolishedCrystal::BOX_MON_SIZE].copy_from_slice(data);
 
     todo!("Must perform a special calculation to get the address of the stored mon.")
   }
@@ -218,7 +218,7 @@ impl Gen2PolishedCrystalSave {
     let slot_index = box_slot.get();
     let box_index_unwrapped = box_index.get();
     let mon_metadata_index = bytes[POLISHED_CRYSTAL_BOX_METADATA_OFFSET
-      + (33u8 * box_index_unwrapped + slot_index) as usize];
+      + (33u8 * box_index_unwrapped + slot_index) as usize] - 1;
 
     if mon_metadata_index == 0 {
       return Ok(None);
@@ -240,14 +240,14 @@ impl Gen2PolishedCrystalSave {
 
     let sector_name = format!("sBoxMons{}{}", mon_flag_number, mon_block_name);
     let result = get_box_sector_address(&*sector_name);
-    let mut address = bytes[result?] as usize;
+    let mut address = result?;
 
     if mon_block_name == 'A' {
-      address += bytes[mon_metadata_index as usize] as usize * 49usize;
+      address += (mon_metadata_index as usize) * 49usize;
     } else if mon_block_name == 'B' {
-      address += (bytes[mon_metadata_index as usize] - 167) as usize * 49usize;
+      address += (mon_metadata_index as usize - 167) * 49usize;
     } else {
-      address += (bytes[mon_metadata_index as usize] - 195) as usize * 49usize;
+      address += (mon_metadata_index as usize - 195) * 49usize;
     }
 
     let mon_address = address;

@@ -3844,9 +3844,9 @@ fn add_section_bytes_to_js_object<T: DataSection<ErrorType = Error>>(
 }
 
 impl PkmBytes for OhpkmV2 {
-    const BOX_SIZE: usize = 0;
+    const BOX_MON_SIZE: usize = 0;
 
-    const PARTY_SIZE: usize = 0;
+    const PARTY_MON_SIZE: usize = 0;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
         match Self::from_bytes(bytes) {

@@ -310,8 +310,8 @@ impl OhpkmV1 {
 }
 
 impl PkmBytes for OhpkmV1 {
-    const BOX_SIZE: usize = 433;
-    const PARTY_SIZE: usize = 433;
+    const BOX_MON_SIZE: usize = 433;
+    const PARTY_MON_SIZE: usize = 433;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
         Self::from_bytes(bytes)
@@ -478,7 +478,7 @@ impl PkmBytes for OhpkmV1 {
     }
 
     fn to_box_bytes(&self) -> Box<[u8]> {
-        let mut bytes = Box::new([0u8; Self::BOX_SIZE]);
+        let mut bytes = Box::new([0u8; Self::BOX_MON_SIZE]);
         self.write_box_bytes(bytes.as_mut_slice());
 
         bytes

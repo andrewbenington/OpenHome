@@ -197,7 +197,7 @@ impl MyStatusBlock {
 pub(super) struct BoxBlock(swish_crypto::ObjectBlock);
 
 impl BoxBlock {
-    const BOX_SIZE_BYTES: usize = Pk8::BOX_SIZE * (BOX_SLOTS as usize);
+    const BOX_SIZE_BYTES: usize = Pk8::BOX_MON_SIZE * (BOX_SLOTS as usize);
 
     pub const fn box_bytes_start(box_index: BoxIndex) -> usize {
         Self::BOX_SIZE_BYTES * box_index.get() as usize
@@ -205,17 +205,17 @@ impl BoxBlock {
 
     pub const fn pokemon_bytes_start(box_index: BoxIndex, box_slot: BoxSlot) -> usize {
         let box_start = Self::box_bytes_start(box_index);
-        box_start + Pk8::BOX_SIZE * box_slot.get() as usize
+        box_start + Pk8::BOX_MON_SIZE * box_slot.get() as usize
     }
 
     pub fn mon_bytes_at(&self, box_index: BoxIndex, box_slot: BoxSlot) -> &[u8] {
         let start = Self::pokemon_bytes_start(box_index, box_slot);
-        &self.0.bytes()[start..start + Pk8::BOX_SIZE]
+        &self.0.bytes()[start..start + Pk8::BOX_MON_SIZE]
     }
 
     pub fn mon_bytes_at_mut(&mut self, box_index: BoxIndex, box_slot: BoxSlot) -> &mut [u8] {
         let start = Self::pokemon_bytes_start(box_index, box_slot);
-        &mut self.0.bytes_mut()[start..start + Pk8::BOX_SIZE]
+        &mut self.0.bytes_mut()[start..start + Pk8::BOX_MON_SIZE]
     }
 
     fn into_block(self) -> swish_crypto::Block {
