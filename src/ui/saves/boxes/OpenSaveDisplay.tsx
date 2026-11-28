@@ -32,7 +32,7 @@ import { Button, Flex, Grid, Separator } from '@radix-ui/themes'
 import { useContext, useMemo, useState } from 'react'
 import { MdClose } from 'react-icons/md'
 import { SaveItemsModal } from '../../items/ItemTransfer'
-import useMultiSelect, { useSelectLocation } from '../../state/drag-and-drop/useMultiSelect'
+import useMultiSelect from '../../state/drag-and-drop/useMultiSelect'
 import { cssClass } from '../../util/style'
 import { SaveDetailsModal } from '../SaveDetailsModal'
 import { useBoxNavigator } from '../util'
@@ -60,9 +60,8 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const [, dispatchError] = useContext(ErrorContext)
   const [openModal, setOpenModal] = useState<Option<SaveDataModalType>>(undefined)
   const { saveIndex } = props
-  const toggleBoxSlotSelected = useSelectLocation()
 
-  const { multiSelectEnabled, isSelected } = useMultiSelect()
+  const { multiSelectEnabled, isSelected, toggleLocationSelected } = useMultiSelect()
   const [selectedMonNotInBoxes, setSelectedMonNotInBoxes] = useState<PKMInterface>()
 
   const save = allOpenSaves[saveIndex]
@@ -257,7 +256,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                   }}
                   multiSelectEnabled={multiSelectEnabled}
                   isSelected={isSelected(location)}
-                  onToggleSelect={() => toggleBoxSlotSelected(location)}
+                  onToggleSelect={() => toggleLocationSelected(location)}
                   contextMenu={
                     mon
                       ? [

@@ -41,10 +41,7 @@ import {
   OPENHOME_BOX_SLOTS,
   useBanksAndBoxes,
 } from '../../state-zustand/banks-and-boxes/store'
-import useMultiSelect, {
-  useSelectLocation,
-  useToggleMultiselect,
-} from '../../state/drag-and-drop/useMultiSelect'
+import useMultiSelect, { useMultiSelectToggle } from '../../state/drag-and-drop/useMultiSelect'
 import { useOpenHomeBoxNavigator } from '../util'
 import AllHomeBoxes from './AllHomeBoxes'
 import ArrowButton from './ArrowButton'
@@ -62,8 +59,7 @@ export default function HomeBoxDisplay() {
   const [viewMode, setViewMode] = useState<BoxViewMode>('one')
   const [editingBoxName, setEditingBoxName] = useState('')
   const [debugMode, setDebugMode] = useState(false)
-  const toggleMultiselect = useToggleMultiselect()
-  const { multiSelectEnabled } = useMultiSelect()
+  const MultiSelect = useMultiSelectToggle()
   const {
     addBoxCurrentBank,
     getCurrentBox,
@@ -151,11 +147,11 @@ export default function HomeBoxDisplay() {
                   onUnset={() => setBoxNameCurrentBank(currentBox.index, editingBoxName)}
                   icon={EditIcon}
                   hint="Change box name"
-                  disabled={multiSelectEnabled}
+                  disabled={MultiSelect.enabled}
                 />
                 <ToggleButton
-                  state={multiSelectEnabled}
-                  setState={toggleMultiselect}
+                  state={MultiSelect.enabled}
+                  setState={MultiSelect.setEnabled}
                   icon={SelectIcon}
                   disabled={editing}
                 />
@@ -253,8 +249,7 @@ function SingleBoxMonDisplay() {
   const displayTitledError = useTitledErrorDisplay()
   const { importMonsToLocation } = useSaves()
   const { getCurrentBox, removeAllHomeDupes } = useBanksAndBoxes()
-  const { multiSelectEnabled, isSelected } = useMultiSelect()
-  const toggleBoxSlotSelected = useSelectLocation()
+  const { multiSelectEnabled, isSelected, toggleLocationSelected } = useMultiSelect()
   const { sortHomeBox, sortAllHomeBoxes } = useBanksAndBoxes()
   const {
     currentIndex: selectedIndex,
@@ -342,7 +337,7 @@ function SingleBoxMonDisplay() {
                 ]}
                 multiSelectEnabled={multiSelectEnabled}
                 isSelected={isSelected(location)}
-                onToggleSelect={() => toggleBoxSlotSelected(location)}
+                onToggleSelect={() => toggleLocationSelected(location)}
               />
             )
           })}

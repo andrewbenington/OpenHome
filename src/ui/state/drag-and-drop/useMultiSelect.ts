@@ -1,70 +1,53 @@
-import { createContext, Dispatch, SetStateAction, useCallback, useMemo } from 'react'
+import { createContext, Dispatch, SetStateAction, useMemo } from 'react'
 import { create } from 'zustand'
 import { locationKey } from '.'
 import { MonLocation } from '../saves'
 
-const useMultiSelect2 = create<MultiSelectState>(defaultMultiSelectState)
+const useMultiSelectState = create<MultiSelectState>(defaultMultiSelectState)
 
-export const useToggleMultiselect = () => (value: boolean) =>
-  useMultiSelect2.setState((prev) => ({ ...prev, multiSelectEnabled: value }))
+export const useMultiSelectToggle = () => {
+  const setEnabled = (enabled: boolean) =>
+    useMultiSelectState.setState({
+      multiSelectEnabled: enabled,
+      selectedLocations: [],
+    })
+  const enabled = useMultiSelectState().multiSelectEnabled
 
-export const useSelectLocation = () => (location: MonLocation) => {
-  useMultiSelect2.setState((prev) => {
-    const key = locationKey(location)
-    const isSelected = prev.selectedLocations.some((loc) => locationKey(loc) === key)
-
-    if (isSelected) {
-      return {
-        ...prev,
-        selectedLocations: prev.selectedLocations.filter((loc) => locationKey(loc) !== key),
-      }
-    } else {
-      return {
-        ...prev,
-        selectedLocations: [...prev.selectedLocations, location],
-      }
-    }
-  })
+  return { enabled, setEnabled }
 }
 
 export default function useMultiSelect() {
-  const [multiSelectState, setMultiSelectState] = [useMultiSelect2(), useMultiSelect2.setState]
+  const multiSelectState = useMultiSelectState()
+
   const selectedLocationKeys = useMemo(
     () => new Set(multiSelectState.selectedLocations.map(locationKey)),
     [multiSelectState.selectedLocations]
   )
 
-  const setMultiSelectEnabled = useCallback(
-    (enabled: boolean) => {
-      setMultiSelectState((prev) => {
-        return {
-          ...prev,
-          multiSelectEnabled: enabled,
-          selectedLocations: enabled ? prev.selectedLocations : [],
-        }
-      })
-    },
-    [setMultiSelectState]
-  )
-
-  const clearSelections = useCallback(() => {
-    setMultiSelectState((prev) => {
+  const clearSelections = () => {
+    useMultiSelectState.setState((prev) => {
       return { ...prev, selectedLocations: [] }
     })
-  }, [setMultiSelectState])
+  }
 
-  const isSelected = useCallback(
-    (location: MonLocation) => {
-      return selectedLocationKeys.has(locationKey(location))
-    },
-    [selectedLocationKeys]
-  )
+  const isSelected = (location: MonLocation) => selectedLocationKeys.has(locationKey(location))
+
+  const toggleLocationSelected = (location: MonLocation) => {
+    useMultiSelectState.setState((prev) => {
+      const thisKey = locationKey(location)
+      const selectedLocations = isSelected(location)
+        ? prev.selectedLocations.filter((other) => locationKey(other) !== thisKey)
+        : [...prev.selectedLocations, location]
+
+      return { selectedLocations, multiSelectEnabled: true }
+    })
+  }
 
   return {
     ...multiSelectState,
-    setMultiSelectEnabled,
     clearSelections,
     isSelected,
+    toggleLocationSelected,
   }
 }
 
