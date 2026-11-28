@@ -27,7 +27,7 @@ const getBackgroundDetails = (disabled?: boolean) => {
 
 interface DraggableMonProps {
   className?: string
-  onClick: () => void
+  onClick: (e: React.MouseEvent) => void
   disabled?: boolean
   mon: DraggableMonData
   style: CSSProperties

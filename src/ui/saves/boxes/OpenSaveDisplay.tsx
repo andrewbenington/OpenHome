@@ -60,7 +60,8 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const [, dispatchError] = useContext(ErrorContext)
   const [openModal, setOpenModal] = useState<Option<SaveDataModalType>>(undefined)
   const { saveIndex } = props
-  const { multiSelectState, toggleSelection, isSelected } = useMultiSelect()
+
+  const { multiSelectEnabled, isSelected, toggleLocationSelected } = useMultiSelect()
   const [selectedMonNotInBoxes, setSelectedMonNotInBoxes] = useState<PKMInterface>()
 
   const save = allOpenSaves[saveIndex]
@@ -253,9 +254,9 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                       return await attemptImportMons(importedMons, location)
                     }
                   }}
-                  multiSelectEnabled={multiSelectState.multiSelectEnabled}
+                  multiSelectEnabled={multiSelectEnabled}
                   isSelected={isSelected(location)}
-                  onToggleSelect={() => toggleSelection(location)}
+                  onToggleSelect={() => toggleLocationSelected(location)}
                   contextMenu={
                     mon
                       ? [

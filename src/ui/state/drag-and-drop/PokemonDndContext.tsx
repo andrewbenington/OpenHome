@@ -43,16 +43,14 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
         ...defaults.filter((sensor) => sensor !== PointerSensor),
         PointerSensor.configure({
           activationConstraints: [
-            multiSelect.multiSelectState.multiSelectEnabled
+            multiSelect.multiSelectEnabled
               ? new PointerActivationConstraints.Delay({ value: 100, tolerance: 8 })
               : new PointerActivationConstraints.Distance({ value: 10 }),
           ],
         }),
       ]}
     >
-      <PokemonDndOverlay multiSelectState={multiSelect.multiSelectState}>
-        {children}
-      </PokemonDndOverlay>
+      <PokemonDndOverlay multiSelectState={multiSelect}>{children}</PokemonDndOverlay>
     </DragDropProvider>
   )
 }
@@ -135,7 +133,7 @@ async function onDragEnd(
   banksAndBoxes: BanksAndBoxesController,
   displayError: ErrorDisplayFn
 ) {
-  const multiSelectState = multiSelectController.multiSelectState
+  const { multiSelectEnabled, selectedLocations } = multiSelectController
 
   const dest = e.operation.target?.data
   const payload: Option<DragPayload> = e.operation.source?.data
@@ -155,21 +153,21 @@ async function onDragEnd(
   if (allMonsWithLocations.length === 0) return
   const firstMonWithLocation = allMonsWithLocations[0]
 
-  const selectedLocationKeys = new Set(multiSelectState.selectedLocations.map(locationKey))
+  const selectedLocationKeys = new Set(selectedLocations.map(locationKey))
   const sourceLocationKey = locationKey(firstMonWithLocation)
   const isSourceSelected = selectedLocationKeys.has(sourceLocationKey)
-  const selectedLocations = isSourceSelected
+  const selectedLocationsBesidesSource = isSourceSelected
     ? [
         firstMonWithLocation,
-        ...multiSelectState.selectedLocations.filter((l) => locationKey(l) !== sourceLocationKey),
+        ...selectedLocations.filter((l) => locationKey(l) !== sourceLocationKey),
       ]
     : [firstMonWithLocation]
 
   const { mon } = firstMonWithLocation
 
   if (dropElementId === 'to_release') {
-    if (multiSelectState.multiSelectEnabled && isSourceSelected) {
-      for (const location of selectedLocations) {
+    if (multiSelectEnabled && isSourceSelected) {
+      for (const location of selectedLocationsBesidesSource) {
         const mon = await savesAndBanks.getMonAtLocation(location)
         if (mon) savesAndBanks.releaseMonAtLocation(location)
       }
@@ -178,8 +176,8 @@ async function onDragEnd(
       savesAndBanks.releaseMonAtLocation(firstMonWithLocation)
     }
   } else if (dropElementId === 'item-bag') {
-    if (multiSelectState.multiSelectEnabled && isSourceSelected) {
-      for (const location of selectedLocations) {
+    if (multiSelectEnabled && isSourceSelected) {
+      for (const location of selectedLocationsBesidesSource) {
         const mon = await savesAndBanks.getMonAtLocation(location)
         if (mon) await savesAndBanks.moveMonItemToBag(location)
       }
@@ -191,7 +189,7 @@ async function onDragEnd(
     isMonLocation(dest) &&
     (dest.isHome || monSupportedBySave(savesAndBanks.saveFromIdentifier(dest.saveIdentifier), mon))
   ) {
-    if (multiSelectState.multiSelectEnabled && isSourceSelected) {
+    if (multiSelectEnabled && isSourceSelected) {
       const targetSave = dest.isHome
         ? undefined
         : savesAndBanks.saveFromIdentifier(dest.saveIdentifier)
@@ -239,7 +237,7 @@ async function onDragEnd(
         ? nextHomeDestination(dest.box, dest.boxSlot)
         : nextSaveDestination(dest.box, dest.boxSlot)
 
-      for (const sourceLoc of selectedLocations) {
+      for (const sourceLoc of selectedLocationsBesidesSource) {
         if (!nextDestination) break
 
         const currMon = await savesAndBanks.getMonAtLocation(sourceLoc)

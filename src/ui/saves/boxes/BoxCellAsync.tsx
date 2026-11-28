@@ -30,7 +30,7 @@ interface BoxCellAsyncProps {
   location: MonLocation
   contextMenu?: CtxMenuElementBuilder[]
   isSelected?: boolean
-  onToggleSelect?: () => void
+  onToggleSelect: () => void
   multiSelectEnabled?: boolean
 }
 

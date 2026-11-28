@@ -47,7 +47,7 @@ interface BoxCellProps {
   location: MonLocation
   contextMenu?: CtxMenuElementBuilder[]
   isSelected?: boolean
-  onToggleSelect?: () => void
+  onToggleSelect: () => void
   multiSelectEnabled?: boolean
   style?: CSSProperties
 }
@@ -193,13 +193,27 @@ function BoxCell(props: BoxCellProps) {
     return '#6662'
   }, [disabled, isFilteredOut, isSelected, monDisplayColor, showBackgroundColor])
 
-  const handleClick = useCallback(() => {
-    if (multiSelectEnabled && mon && onToggleSelect) {
-      onToggleSelect()
-    } else {
-      onClick()
-    }
-  }, [multiSelectEnabled, mon, onClick, onToggleSelect])
+  const handleClick = useCallback(
+    (e: React.MouseEvent) => {
+      // Box Slot Click Handler:
+      // - If the slot is empty, do nothing
+      // - If multi select is on, toggle selection for the slot unless the option key is held
+      //   - The option key acts as a selection bypass, allowing the user to see the Pokémon details even in multi-select mode
+      // - If multi select is off, show the Pokémon details unless the shift key is held
+      //.  - The shift key lets the user immediately start multi selecting even if multi select was off
+
+      if (!mon) return
+
+      const shouldSelect = !e.altKey && (multiSelectEnabled || e.shiftKey)
+
+      if (shouldSelect) {
+        onToggleSelect()
+      } else {
+        onClick()
+      }
+    },
+    [multiSelectEnabled, mon, onClick, onToggleSelect]
+  )
 
   const handleMouseEnter = useCallback(
     (e: React.MouseEvent) => {
